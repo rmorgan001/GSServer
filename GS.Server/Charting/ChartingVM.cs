@@ -169,7 +169,7 @@ namespace GS.Server.Charting
         {
             try
             {
-                ThreadContext.InvokeOnUiThread(
+                ThreadContext.BeginInvokeOnUiThread(
                     delegate
                     {
                         switch (e.PropertyName)
@@ -178,7 +178,7 @@ namespace GS.Server.Charting
                                 PhdProcess(_phd.PhdGuideStep);
                                 break;
                         }
-                    }, _ctPhd);
+                    });
             }
             catch (Exception ex)
             {
