@@ -1,0 +1,560 @@
+﻿<UserControl x:Class="GS.Server.SkyTelescope.SkyTelescopeV"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:GS.Server.Domain"
+             xmlns:telescope="clr-namespace:GS.Server.Controls.Telescope"
+             xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+             xmlns:enums="clr-namespace:ASCOM.Utilities;assembly=ASCOM.Utilities"
+             xmlns:deviceInterface="clr-namespace:ASCOM.DeviceInterface;assembly=ASCOM.DeviceInterfaces"
+             Loaded="SkyTelescopeV_OnLoaded" TextOptions.TextFormattingMode="Display"
+             mc:Ignorable="d"  d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter  x:Key="BoolToVis"/>
+    </UserControl.Resources>
+    <Grid>
+        <md:DialogHost HorizontalAlignment="Center" CloseOnClickAway="True"
+                           IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
+        <md:DrawerHost HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="2" 
+                    IsLeftDrawerOpen="{Binding OpenSetupDialog}" BorderBrush="{DynamicResource MaterialDesignDivider}">
+            <!-- switched lines for opendialog so COM can open the settings IsLeftDrawerOpen="{Binding OpenSetupDialog}"-->
+            <!--IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}"-->
+            <md:DrawerHost.LeftDrawerContent>
+                <Grid Width="750">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="1" />
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="40" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5">
+                        <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18"  Foreground="{DynamicResource PrimaryHueMidBrush}">Settings</Label>
+                        <ToggleButton Grid.Row="0" HorizontalAlignment="Right" ToolTip="Close"
+                            Style="{StaticResource MaterialDesignHamburgerToggleButton}"  Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
+                            CommandParameter="{x:Static Dock.Left}" IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked}"/>
+                    </Grid>
+                    <ComboBox Grid.Row="2" Grid.Column="0" md:HintAssist.Hint="Com Port" MinWidth="10" Margin="10 0" ToolTip="Active ports"
+                        ItemsSource="{Binding ComPorts}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <ComboBox.SelectedItem>
+                            <Binding Path="ComPort" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </ComboBox.SelectedItem>
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                    </ComboBox>
+                    <ComboBox Grid.Row="3" Grid.Column="0" md:HintAssist.Hint="Baud Rate" MinWidth="10" Margin="10 0" ToolTip="Serial Speed"
+                              ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type enums:SerialSpeed}}}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <ComboBox.Text>
+                            <Binding Path="BaudRate" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                        </ComboBox.Text>
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                    </ComboBox>
+                    <ComboBox Grid.Row="3" Grid.Column="1" md:HintAssist.Hint="Equatorial System" MinWidth="10" Margin="10 0" 
+                              ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type deviceInterface:EquatorialCoordinateType}}}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                        <ComboBox.Text>
+                            <Binding Path="EquatorialCoordinateType" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                        </ComboBox.Text>
+                    </ComboBox>
+                    <ComboBox Grid.Row="2" Grid.Column="1" md:HintAssist.Hint="Alignment Mode" MinWidth="10" Margin="10 0"
+                              ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type deviceInterface:AlignmentModes}}}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                        <ComboBox.Text>
+                            <Binding Path="AlignmentMode" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                        </ComboBox.Text>
+                    </ComboBox>
+                    <ComboBox Grid.Row="2" Grid.Column="3" md:HintAssist.Hint="RA Guiding Rate %" MinWidth="10" Margin="10 0" ToolTip="Percentage of tracking rate"
+                              ItemsSource="{Binding GuideRateOffsetXs}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <ComboBox.SelectedItem>
+                            <Binding Path="GuideRateOffsetX" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </ComboBox.SelectedItem>
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                    </ComboBox>
+                    <ComboBox Grid.Row="3" Grid.Column="3" md:HintAssist.Hint="Dec Guiding Rate %" MinWidth="10" Margin="10 0" ToolTip="Percentage of tracking rate"
+                              ItemsSource="{Binding GuideRateOffsetYs}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <ComboBox.SelectedItem>
+                            <Binding Path="GuideRateOffsetY" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </ComboBox.SelectedItem>
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                    </ComboBox>
+                    <ComboBox Grid.Row="2" Grid.Column="2" md:HintAssist.Hint="Mount" MinWidth="10" Margin="10 0" ToolTip="Manufacturer"
+                              ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type skyTelescope:MountType}}}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                        <ComboBox.Text>
+                            <Binding Path="Mount" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                        </ComboBox.Text>
+                    </ComboBox>
+                    <ComboBox Grid.Row="3" Grid.Column="2" md:HintAssist.Hint="Max Slew Rate deg/sec" MinWidth="10" Margin="10 0" ToolTip="Hand control max speed"
+                              ItemsSource="{Binding MaxSlewRates}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <ComboBox.SelectedItem>
+                            <Binding Path="MaxSlewRate" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </ComboBox.SelectedItem>
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                    </ComboBox>
+                    <ComboBox Grid.Row="2" Grid.Column="4" md:HintAssist.Hint="Over Meridian Limit" MinWidth="10" Margin="10 0" ToolTip="Axis limit in degrees"
+                              ItemsSource="{Binding HourAngleLimits}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <ComboBox.SelectedItem>
+                            <Binding Path="HourAngleLimit" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </ComboBox.SelectedItem>
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                    </ComboBox>
+                    <ComboBox Grid.Row="3" Grid.Column="4" md:HintAssist.Hint="Tracking Rate" MinWidth="10" Margin="10 0" ToolTip="Rates for tracking"
+                              ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type deviceInterface:DriveRates}}}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <ComboBox.SelectedItem>
+                            <Binding Path="TrackingRate" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </ComboBox.SelectedItem>
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                    </ComboBox>
+                    <ComboBox Grid.Row="4" Grid.Column="2" md:HintAssist.Hint="ST4 Guiderate" MinWidth="10" Margin="10 0" ToolTip="Guider port" Width="80"
+                              HorizontalAlignment="Left" ItemsSource="{Binding St4Guiderates}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <ComboBox.SelectedItem>
+                            <Binding Path="St4Guiderate" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </ComboBox.SelectedItem>
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                    </ComboBox>
+                    <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Margin="-5,0,0,0">
+                        <md:PopupBox  StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="Reset">
+                            <Grid Width="150" >
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30" />
+                                    <RowDefinition Height="40" />
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" HorizontalAlignment="Center" >Reset to default?</Label>
+                                <Button Grid.Row="1" HorizontalAlignment="Center" Content="Accept" 
+                                        Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ClickResetSiderealRateCommand}"/>
+                            </Grid>
+                        </md:PopupBox>
+                        <TextBox  
+                                md:HintAssist.Hint="Sidereal Rate" Width="90"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" >
+                            <TextBox.Text>
+                                <Binding Path="SiderealRate" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                                    <Binding.ValidationRules>
+                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" Margin="-5,0,0,0">
+                        <md:PopupBox StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="Reset">
+                            <Grid Width="150">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30" />
+                                    <RowDefinition Height="40" />
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" HorizontalAlignment="Center">Reset to default?</Label>
+                                <Button Grid.Row="1" HorizontalAlignment="Center" Content="Accept" 
+                                        Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ClickResetSolarRateCommand}"/>
+                            </Grid>
+                        </md:PopupBox>
+                        <TextBox Width="90" md:HintAssist.Hint="Solar Rate" 
+                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" >
+                            <TextBox.Text>
+                                <Binding Path="SolarRate" Mode="TwoWay" UpdateSourceTrigger="LostFocus" >
+                                    <Binding.ValidationRules>
+                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1" VerticalAlignment="Center" Margin="-5,0,0,0">
+                        <md:PopupBox  StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="Reset">
+                            <Grid Width="150">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30" />
+                                    <RowDefinition Height="40" />
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" HorizontalAlignment="Center">Reset to default?</Label>
+                                <Button Grid.Row="1" HorizontalAlignment="Center" Content="Accept" 
+                                        Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ClickResetLunarRateCommand}"/>
+                            </Grid>
+                        </md:PopupBox>
+                        <TextBox Width="90" md:HintAssist.Hint="Lunar Rate"
+                             Style="{StaticResource MaterialDesignFloatingHintTextBox}">
+                            <TextBox.Text>
+                                <Binding Path="LunarRate" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                                    <Binding.ValidationRules>
+                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Grid.Row="7" Grid.Column="1" VerticalAlignment="Center" Margin="-5,0,0,0">
+                        <md:PopupBox  StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="Reset">
+                            <Grid Width="150">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30" />
+                                    <RowDefinition Height="40" />
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" HorizontalAlignment="Center">Reset to default?</Label>
+                                <Button Grid.Row="1" HorizontalAlignment="Center" Content="Accept" 
+                                        Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ClickResetKingRateCommand}"/>
+                            </Grid>
+                        </md:PopupBox>
+                        <TextBox Width="90" md:HintAssist.Hint="King Rate"
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}" >
+                            <TextBox.Text>
+                                <Binding Path="KingRate" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                                    <Binding.ValidationRules>
+                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
+                    </StackPanel>
+                    <StackPanel Grid.Row="5" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="5,0,0,0">
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}"  HorizontalAlignment="Center" Width="25" Height="25" ToolTip="On/Off"
+                                      IsChecked="{Binding EncodersOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Encoders</Label>
+                    </StackPanel>
+                    <StackPanel Grid.Row="6" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="5,0,0,0">
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="Alternates PPEC with guide commands"
+                                      IsChecked="{Binding AlternatingPpec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Alternating PPEC</Label>
+                    </StackPanel>
+                    <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="5,0,0,0">
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25"
+                                      IsChecked="{Binding Refraction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Refraction</Label>
+                    </StackPanel>
+                    <StackPanel Grid.Row="7" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="5,0,0,0">
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="Uses GoTo commands for Dec guiding"
+                                      IsChecked="{Binding DecPulseToGoTo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >GoTo Dec Pulse</Label>
+                    </StackPanel>
+                    <StackPanel Grid.Row="8" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="5,0,0,0">
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="On/Off special items"
+                                      IsChecked="{Binding DebugVisability, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Diagnostics</Label>
+                    </StackPanel>
+                    <Grid Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3" Grid.RowSpan="4" Margin="0,0,10,0" HorizontalAlignment="Right">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="50" />
+                            <RowDefinition Height="50" />
+                            <RowDefinition Height="50" />
+                            <RowDefinition Height="50" />
+                        </Grid.RowDefinitions>
+                        <Label Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" VerticalAlignment="Bottom">Observatory Location</Label>
+                        <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0" Foreground="{DynamicResource PrimaryHueMidBrush}">Latitude:</Label>
+                        <ComboBox Grid.Row="1" Grid.Column="1" IsEnabled="True" md:HintAssist.Hint="Degrees" MinWidth="72" Margin="16 0 0 0"
+                                ItemsSource="{Binding LatitudeRange}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                            <ComboBox.SelectedItem>
+                                <Binding Path="Lat1" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </ComboBox.SelectedItem>
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                        </ComboBox>
+                        <ComboBox Grid.Row="1" Grid.Column="2" IsEnabled="True" md:HintAssist.Hint="Minutes" MinWidth="72" Margin="16 0 0 0" 
+                            ItemsSource="{Binding Minutes}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                            <ComboBox.SelectedItem>
+                                <Binding Path="Lat2" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </ComboBox.SelectedItem>
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                        </ComboBox>
+                        <ComboBox Grid.Row="1" Grid.Column="3" IsEnabled="True" md:HintAssist.Hint="Seconds" MinWidth="72" Margin="16 0 0 0" IsEditable="True"
+                           ItemsSource="{Binding Seconds}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                            <ComboBox.Text>
+                                <Binding Path="Lat3" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </ComboBox.Text>
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                        </ComboBox>
+                        <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0" Foreground="{DynamicResource PrimaryHueMidBrush}">Longitude:</Label>
+                        <ComboBox Grid.Row="2" Grid.Column="1" md:HintAssist.Hint="Degrees" MinWidth="72" Margin="16 0 0 0" 
+                            ItemsSource="{Binding LongitudeRange}"
+                            Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                            <ComboBox.SelectedItem>
+                            <Binding Path="Long1" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </ComboBox.SelectedItem>
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                        </ComboBox>
+                        <ComboBox Grid.Row="2" Grid.Column="2" md:HintAssist.Hint="Minutes" MinWidth="72" Margin="16 0 0 0" 
+                            ItemsSource="{Binding Minutes}"
+                            Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                            <ComboBox.SelectedItem>
+                                <Binding Path="Long2" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </ComboBox.SelectedItem>
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                        </ComboBox>
+                        <ComboBox Grid.Row="2" Grid.Column="3" md:HintAssist.Hint="Seconds" MinWidth="72" Margin="16 0 0 0" IsEditable="True"
+                            ItemsSource="{Binding Seconds}"
+                            Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                            <ComboBox.Text>
+                                <Binding Path="Long3" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </ComboBox.Text>
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                        </ComboBox>
+                        <ComboBox Grid.Row="3" Grid.Column="2" md:HintAssist.Hint="Temperature" MinWidth="80" Margin="0 10 0 0" IsEditable="True"
+                                  ItemsSource="{Binding Temperatures}" ToolTip="Ambient temperature celsius"
+                                  Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                            <ComboBox.Text>
+                                <Binding Path="Temperature" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </ComboBox.Text>
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                        </ComboBox>
+                        <TextBox Grid.Row="3" Grid.Column="3" Margin="16 0 0 0" ToolTip="In meters"
+                                     md:HintAssist.Hint="Elevation" 
+                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}">
+                            <TextBox.Text>
+                                <Binding Path="Elevation" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                                    <Binding.ValidationRules>
+                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
+                        <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center">
+                            <md:DialogHost IsOpen="{Binding IsGpsDialogOpen}" DialogContent="{Binding GpsContent}">
+                                <Button VerticalAlignment="Bottom" Width="60" Content="GPS" ToolTip="Connect GPS device" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding OpenGpsDialogCommand}"/>
+                            </md:DialogHost>
+                            <md:DialogHost Margin="10,0,0,0" IsOpen="{Binding IsCdcDialogOpen}" DialogContent="{Binding CdcContent}">
+                                <Button VerticalAlignment="Bottom" Width="60" Content="CdC" ToolTip="Connect to CdC server" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding OpenCdcDialogCommand}"/>
+                            </md:DialogHost>
+                        </StackPanel>
+                    </Grid>
+                    <StackPanel Orientation="Horizontal" Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                        <Button Margin="10 0" Width="100" Content="Close" ToolTip="Close and Save"
+                                Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickCloseSettingsCommand}"/>
+                        <Button Margin="5" Width="155" Content="Set Park to Current" ToolTip="Sets park to current position"
+                                Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSaveParkCommand}"/>
+                    </StackPanel>
+                </Grid>
+            </md:DrawerHost.LeftDrawerContent>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+                    <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False"  x:Name="MenuToggleButton" 
+                                  Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" ToolTip="Open"
+                                  Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
+                    <telescope:TopCoordsBar HorizontalAlignment="Left" IsEnabled="{Binding ScreenEnabled}"/>
+                </StackPanel>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" >
+                        <Grid Background="Transparent" Margin="20,0,0,0">
+                            <Border 
+                                    BorderBrush="Black"
+                                    BorderThickness="3"
+                                    CornerRadius="5">
+                                <Border.Effect>
+                                    <DropShadowEffect />
+                                </Border.Effect>
+                            </Border>
+                            <StackPanel IsEnabled="{Binding ScreenEnabled}">
+                                <Rectangle RadiusY="5" RadiusX="5" Width="253" Height="340">
+                                    <Rectangle.Style>
+                                        <Style TargetType="Rectangle">
+                                            <Style.Triggers>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter Property="Opacity" Value="0.2" />
+                                                </Trigger>
+                                                <Trigger Property="IsEnabled" Value="True">
+                                                    <Setter Property="Opacity" Value="1.0" />
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                    <Rectangle.Fill>
+                                        <ImageBrush   ImageSource="../Resources/M33.png" />
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                            </StackPanel>
+                            <StackPanel>
+                                <telescope:Debug IsEnabled="{Binding ScreenEnabled}" Visibility="{Binding DebugVisability, Converter={StaticResource BoolToVis}}"/>
+                            </StackPanel>
+                        </Grid>
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Margin="10,0,0,0">
+                            <telescope:StandardButtonBar Margin="10,0,0,0" IsEnabled="{Binding ScreenEnabled}"/>
+                            <telescope:PpecBar Margin="10,0,0,0" IsEnabled="{Binding ScreenEnabled}"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="1" Margin="10,0,0,0">
+                        <telescope:RaDecGoTo IsEnabled="{Binding ScreenEnabled}"/>
+                        <telescope:HandController Margin="0,20,0,0" IsEnabled="{Binding ScreenEnabled}" HorizontalAlignment="Right"/>
+                        <telescope:Backlash IsEnabled="{Binding ScreenEnabled}"/>
+                    </StackPanel>
+                </Grid>
+                <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="0">
+                    <telescope:BottomStatusBar IsEnabled="{Binding ScreenEnabled}"/>
+                    <Button  Width="120" Height="30" Margin="20 0" ToolTip="Connect/disconnect mount"
+                            Command="{Binding ClickConnectCommand}" Content="{Binding ConnectButtonContent}" Style="{StaticResource MaterialDesignRaisedDarkButton}"/>
+                </StackPanel>
+            </Grid>
+        </md:DrawerHost>
+    </Grid>
+</UserControl>
+
+
+
+ 
+
+
+

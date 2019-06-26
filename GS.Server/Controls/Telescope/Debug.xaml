@@ -1,0 +1,41 @@
+﻿<UserControl x:Class="GS.Server.Controls.Telescope.Debug"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d">
+    <StackPanel Orientation="Vertical" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="5">
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Margin="5,0,0,0">Internal X:</TextBlock>
+            <TextBlock Margin="5,0,0,0" Text="{Binding MountAxisX, StringFormat={}{0}°}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Margin="5,0,0,0">Internal Y:</TextBlock>
+            <TextBlock Margin="5,0,0,0" Text="{Binding MountAxisY, StringFormat={}{0}°}"/>
+        </StackPanel>
+        <TextBlock/>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Margin="5,0,0,0">Actual X:</TextBlock>
+            <TextBlock Margin="5,0,0,0" Text="{Binding ActualAxisX, StringFormat={}{0}°}">
+                <Run Text="°"/>
+            </TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Margin="5,0,0,0">Actual Y:</TextBlock>
+            <TextBlock Margin="5,0,0,0" Text="{Binding ActualAxisY, StringFormat={}{0}°}"/>
+        </StackPanel>
+        <TextBlock/>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Margin="5,0,0,0">Sidereal Time:</TextBlock>
+            <TextBlock Margin="5,0,0,0" Text="{Binding SiderealTime}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Button Margin="5,10,0,0"
+                Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                Width="100"
+                Command="{Binding ClickFlipSopCommand}">
+                Flip SOP
+            </Button>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

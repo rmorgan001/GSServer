@@ -1,0 +1,78 @@
+﻿<UserControl x:Class="GS.Server.Cdc.CdcDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:domain="clr-namespace:GS.Server.Domain"
+        mc:Ignorable="d" >
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,10,0,10">
+            <TextBox md:HintAssist.Hint="IP Address" Width="70" HorizontalAlignment="Left"
+                Style="{StaticResource MaterialDesignFloatingHintTextBox}" >
+                <TextBox.Text>
+                    <Binding Path="CdcIpAddress" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                        <Binding.ValidationRules>
+                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                            <domain:IpAddressValidationRule ValidatesOnTargetUpdated="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+            <TextBox md:HintAssist.Hint="Port Number" Width="70" Margin="8,0,0,0" HorizontalAlignment="Right"
+                Style="{StaticResource MaterialDesignFloatingHintTextBox}" >
+                <TextBox.Text>
+                    <Binding Path="CdcPortNumber" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                        <Binding.ValidationRules>
+                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                            <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,10,0,5" >
+            <Button VerticalAlignment="Bottom" HorizontalAlignment="Left"  IsCancel="True" Style="{DynamicResource MaterialDesignFlatButton}"
+                    Command="{Binding RetrieveCdcDialogCommand}">
+                RETRIEVE
+            </Button>
+            <Button VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10,0,0,0" IsCancel="True" Style="{DynamicResource MaterialDesignFlatButton}"
+                    Command="{Binding SendObsCdcDialogCommand}">
+                SEND
+            </Button>
+        </StackPanel>
+        <StackPanel Orientation="Vertical" Grid.Row="2" HorizontalAlignment="Center" Margin="0,5,0,5">
+            <StackPanel Orientation="Horizontal" >
+                <TextBlock Text="Latitude: "/>  
+                <TextBlock Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" Text="{Binding CdcLatString}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Longitude: "/>
+                <TextBlock Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" Text="{Binding CdcLongString}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Elevation: "/>
+                <TextBlock Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" Text="{Binding CdcElevation}"/>
+                <TextBlock Text="m"/>
+            </StackPanel>
+        </StackPanel>
+        <TextBlock Grid.Row="3" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" >Accept Coordinates?</TextBlock>
+        <StackPanel Orientation="Horizontal" Grid.Row="4" VerticalAlignment="Bottom" Margin="0,5">
+            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}"
+                    Command="{Binding AcceptCdcDialogCommand}">
+                ACCEPT
+            </Button>
+            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}"
+                    Command="{Binding CancelCdcDialogCommand}">
+                CANCEL
+            </Button>
+        </StackPanel>
+    </Grid>
+    </UserControl>

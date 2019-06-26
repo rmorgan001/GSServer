@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="GS.Server.Focuser.FocuserView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d">
+    <Grid Width="800">
+        <md:DialogHost HorizontalAlignment="Center" CloseOnClickAway="True"
+                       IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
+        <md:DrawerHost  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="2" 
+            IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" 
+            BorderBrush="{DynamicResource MaterialDesignDivider}">
+        <md:DrawerHost.LeftDrawerContent>
+            <Grid Width="700">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40" />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" Grid.Column="0" >
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18"  Foreground="{DynamicResource PrimaryHueMidBrush}">Settings</Label>
+                    <ToggleButton DockPanel.Dock="Top" HorizontalAlignment="Right" Margin="5" 
+                        Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
+                        Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
+                        CommandParameter="{x:Static Dock.Left}"
+                        IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"/>
+                </Grid>
+            </Grid>
+        </md:DrawerHost.LeftDrawerContent>
+        <Grid Width="800">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <ToggleButton Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top"
+                Command="{x:Static md:DrawerHost.OpenDrawerCommand}"
+                CommandParameter="{x:Static Dock.Left}"
+                Style="{StaticResource MaterialDesignHamburgerToggleButton}" IsChecked="False"
+                              x:Name="MenuToggleButton"/>
+                <TextBlock Grid.Row="1" Text="Not Installed" 
+                           FontWeight="Bold" FontSize="18"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Grid>
+    </md:DrawerHost>
+    </Grid>
+</UserControl>

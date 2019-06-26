@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="GS.Server.Domain.HomeResetDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" >
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <TextBlock VerticalAlignment="Center" Margin="10 0" Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" >Accept to set mount position to the Home position</TextBlock>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0 16 0 0" HorizontalAlignment="Center">
+            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" 
+                    Command="{Binding AcceptHomeResetDialogCommand}">
+                ACCEPT
+            </Button>
+            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}"
+                    Command="{Binding CancelHomeResetDialogCommand}">
+                CANCEL
+            </Button>
+        </StackPanel>
+    </Grid>
+    </UserControl>

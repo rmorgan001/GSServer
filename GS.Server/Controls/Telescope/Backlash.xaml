@@ -1,0 +1,18 @@
+﻿<UserControl x:Class="GS.Server.Controls.Telescope.Backlash"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             TextOptions.TextFormattingMode="Display"
+             mc:Ignorable="d">
+    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+        <Slider Minimum="0" Maximum="500" ToolTip="Dec Backlash" Margin="0,-15,0,0" Name="slValue" Width="320"
+                Style="{StaticResource MaterialDesignDiscreteSlider}"
+                Value="{Binding DecBacklash, UpdateSourceTrigger=PropertyChanged, Delay=800}"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Label HorizontalAlignment="Center" Content="Dec Backlash Compensation (Microsteps)"/>
+            <Label HorizontalAlignment="Center" Content="{Binding ElementName=slValue, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+        </StackPanel>
+    </StackPanel> 
+</UserControl>
+ 

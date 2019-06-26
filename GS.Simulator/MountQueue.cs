@@ -1,0 +1,191 @@
+﻿/* Copyright(C) 2019  Rob Morgan (robert.morgan.e@gmail.com)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+using System;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
+using GS.Principles;
+
+namespace GS.Simulator
+{
+    public static class MountQueue
+    {
+        #region Fields
+
+        private static BlockingCollection<IMountCommand> _commandBlockingCollection;
+        private static ConcurrentDictionary<long, IMountCommand> _resultsDictionary;
+        private static Actions _actions;
+        private static CancellationTokenSource _cts;
+
+        #endregion
+
+        #region properties
+
+        public static bool IsRunning { get; private set; }
+        private static long _id;
+        public static long NewId => Interlocked.Increment(ref _id);
+
+        #endregion
+
+        #region Queues
+
+        /// <summary>
+        /// Add a command to the blocking queue
+        /// </summary>
+        /// <param name="command"></param>
+        public static void AddCommand(IMountCommand command)
+        {
+            if (!IsRunning) return;
+            CleanResults(20, 120);
+            _commandBlockingCollection.TryAdd(command);
+        }
+
+        /// <summary>
+        /// Cleans up the results dictionary
+        /// </summary>
+        /// <param name="count"></param>
+        /// <param name="seconds"></param>
+        private static void CleanResults(int count, int seconds)
+        {
+            if (!IsRunning) return;
+            if (_resultsDictionary.IsEmpty) return;
+            var recordscount = _resultsDictionary.Count;
+            if (recordscount == 0) return;
+            if (count == 0 && seconds == 0)
+            {
+                _resultsDictionary.Clear();
+                return;
+            }
+
+            if (recordscount < count) return;
+            var now = HiResDateTime.UtcNow;
+            foreach (var result in _resultsDictionary)
+            {
+                if (result.Value.CreatedUtc.AddSeconds(seconds) >= now) continue;
+                _resultsDictionary.TryRemove(result.Key, out _);
+            }
+        }
+
+        /// <summary>
+        /// Mount data results
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public static IMountCommand GetCommandResult(IMountCommand command)
+        {
+            if (!IsRunning || _cts.IsCancellationRequested)
+            {
+                var e = new MountException(ErrorCode.ErrQueueFailed, "Queue not running");
+                command.Exception = e;
+                command.Successful = false;
+                return command;
+            }
+            var sw = Stopwatch.StartNew();
+            while (sw.Elapsed.TotalMilliseconds < 3000)
+            {
+                if (_resultsDictionary == null) break;
+                var success = _resultsDictionary.TryRemove(command.Id, out var result);
+                if (!success)
+                {
+                    Thread.Sleep(1);
+                    continue;
+                }
+                sw.Stop();
+                return result;
+            }
+            sw.Stop();
+            var ex = new MountException(ErrorCode.ErrQueueFailed, $"Queue Read Timeout {command.Id}, {command}");
+            command.Exception = ex;
+            command.Successful = false;
+            return command;
+        }
+
+        /// <summary>
+        /// Process command queue
+        /// </summary>
+        /// <param name="command"></param>
+        private static void ProcessCommandQueue(IMountCommand command)
+        {
+            try
+            {
+                if (!IsRunning || _cts.IsCancellationRequested || !Actions.IsConnected) return;
+                command.Execute(_actions);
+                if (command.Id > 0)
+                {
+                    _resultsDictionary.TryAdd(command.Id, command);
+                }
+            }
+            catch (Exception e)
+            {
+                command.Exception = e;
+                command.Successful = false;
+            }
+        }
+
+        public static void Start()
+        {
+            Stop();
+            if (_cts == null) _cts = new CancellationTokenSource();
+            var ct = _cts.Token;
+
+            _actions = new Actions();
+            _actions.InitializeAxes();
+            _resultsDictionary = new ConcurrentDictionary<long, IMountCommand>();
+            _commandBlockingCollection = new BlockingCollection<IMountCommand>();
+            IsRunning = true;
+
+            Task.Factory.StartNew(() =>
+            {
+                while (!ct.IsCancellationRequested)
+                {
+                    foreach (var command in _commandBlockingCollection.GetConsumingEnumerable())
+                    {
+                        ProcessCommandQueue(command);
+                    }
+                }
+            }, ct);
+
+            //var task = Task.Run(() =>
+            //{
+            //    while (!ct.IsCancellationRequested)
+            //    {
+            //        foreach (var command in _commandBlockingCollection.GetConsumingEnumerable())
+            //        {
+            //            ProcessCommandQueue(command);
+            //        }
+            //    }
+            //}, ct);
+            //await task;
+            //task.Wait(ct);
+
+            IsRunning = true;
+        }
+
+        public static void Stop()
+        {
+            _actions?.Shutdown();
+            _cts?.Cancel();
+            _cts?.Dispose();
+            _cts = null;
+            IsRunning = false;
+            _resultsDictionary = null;
+            _commandBlockingCollection = null;
+        }
+
+        #endregion
+    }
+}

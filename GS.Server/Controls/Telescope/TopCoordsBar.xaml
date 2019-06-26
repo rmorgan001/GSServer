@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="GS.Server.Controls.Telescope.TopCoordsBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+             TextOptions.TextFormattingMode="Display"
+             mc:Ignorable="d"  d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10 0" >
+        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" >Right Ascension:</Label>
+        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="LimeGreen" Content="{Binding RightAscension, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" >Declination:</Label>
+        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="LimeGreen" Content="{Binding Declination, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" >Azimuth:</Label>
+        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="LimeGreen" Content="{Binding Azimuth, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" >Altitude:</Label>
+        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="LimeGreen" Content="{Binding Altitude, UpdateSourceTrigger=PropertyChanged}"/>
+    </StackPanel>
+</UserControl>

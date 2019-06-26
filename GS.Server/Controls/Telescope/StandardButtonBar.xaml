@@ -1,0 +1,55 @@
+﻿<UserControl x:Class="GS.Server.Controls.Telescope.StandardButtonBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             TextOptions.TextFormattingMode="Display"
+             mc:Ignorable="d">
+    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <md:Badged Badge="{Binding ParkBadgeContent}"  BadgeColorZoneMode="PrimaryMid" >
+            <Button Margin="5"
+                    Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                    Width="100" Height="30" ToolTip="Park mount"
+                    Command="{Binding ClickParkCommand}"
+                    Content="{Binding ParkButtonContent}"/>
+        </md:Badged>
+        <md:Badged Badge="{Binding HomeBadgeContent}" BadgeColorZoneMode="PrimaryMid">
+            <Button Margin="5"  Height="30"
+                Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                Width="100" ToolTip="Slew to home position"
+                Command="{Binding ClickHomeCommand}">
+            Home
+            </Button>
+        </md:Badged>
+            <Button Margin="5" x:Name="StopButton"
+                Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                Width="100"  Height="30" ToolTip="Stop mount"
+                Command="{Binding ClickStopCommand}">
+            Stop
+        </Button>
+        <md:Badged Badge="{Binding TrackingBadgeContent}"  BadgeColorZoneMode="PrimaryMid">
+            <Button Margin="5" ToolTip="Tracking on/off"
+                Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                Width="100" Height="30"
+                Command="{Binding ClickTrackingCommand}">
+            Tracking
+            </Button>
+        </md:Badged>
+        <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Bottom" CloseOnClickAway="True"
+                       IsOpen="{Binding IsHomeResetDialogOpen}" DialogContent="{Binding HomeResetContent}">
+            <Button Margin="5" Height="30"
+                Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                Width="100" ToolTip="Reset axis positions to home"
+                Command="{Binding OpenHomeResetDialogCommand}">
+            SetHome
+            </Button>
+        </md:DialogHost>
+        <Button Margin="5" ToolTip="Mount Information"
+                Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                Width="100"  Height="30"
+                Command="{Binding ClickMountInfoDialogCommand}">
+            Info
+        </Button>
+    </StackPanel>
+</UserControl>

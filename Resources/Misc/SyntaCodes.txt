@@ -1,0 +1,223 @@
+send    ':C b DDDDDD [0D]'
+  C = command ( a..z, A..Z )
+  b = card    ( 1 = Az, 2 = Alt )
+  DDDDDD = data ( little endian )   uses 24bit little endian ( unless its a bitmapped command like :G )
+//-------------------------------------------------------------------------------------------------
+receive '= DDDDDD [0D]'    or '! D [0D]'
+  = means OK and DDDDDD is data     uses 24bit little endian ( unless its a bitmapped command like :f, :q )
+  ! means failed and D is reason flag ????
+  seen D = 0  Invalid Command     // the command doesnt apply to the model
+           1  Invalid Paramcount  // a valid command was passed with invalid param count
+           2  Motor not Stopped   // a valid command failed to run ( ie sending :G whilst motor is running )
+           3  NonHex Param        // the parameter contains a non uppercase Hex Char  // Note! It doesnt mean an invalid parameter
+           4  Not energised       // motor is not energised
+           5  Driver Asleep       // card is in sleep mode
+           6  Mount is not tracking
+           7
+           8  Invalid PPEC model
+//-----------------------------------------------
+Values for Bytes sent ( = ascii Hex NybbleCount )
+:C  DDDDDD bytes
+  sent rcvd
+a  0    6  Get microsteps per 360deg             // =llhhLL[0D]
+b  0    6  Get timer interrupt freq              // =llhhLL[0D]
+c  0    6  Get current :U value                  // =llhhLL[0D]
+d  0    6  Get Current Encoder count             // =llhhLL[0D]  default  #x800000  = home  ( this is synched somehow with :j Data )
+e  0    6  Get Motor Card Version                // =llhhMM[0D]  MM = mount type,
+                                                 //             x00 = "EQ6Pro"
+                                                 //             x01 = "HEQ5"
+                                                 //             x02 = "EQ5"
+                                                 //             x03 = "EQ3"
+                                                 //             x04 = "EQ8"
+                                                 //             x05 = "AZEQ6"
+                                                 //             x06 = "AZEQ5"
+                                                 //             hh.ll = board version    hh=x00..x07 = equatorial
+                                                 //                                        =x08..xFF = altaz
+f  0    3  Get axis tracking/slewing "status"    // =ABC[0D]
+                                                 // A  xxx0      0 means GOTO,    1 means SLEW           ***  these are diff to :G usage
+                                                 //              0 means "actually doing" the goto. On stopping, it reverts to Slew Mode
+                                                 //    xx0x      0 means  +ve,    1 means  -ve
+                                                 //    x0xx      0 means LoRate,  1 means HiSpeed        ***
+                                                 // B  xxx0      0 means stopped, 1 means moving,
+                                                 //    xx0x      0 means OK,      1 means blocked   ( For DC motors only )
+                                                 // C  xxx0      1 means axis is Initialised/Energised
+                                                 //    xx0x      1 means level switch ON            ( AltAz mounts and DEC only )
+g  0    2  Get HiSpeed multiplier                // =llhhLL[0D]  EQ6Pro, AZEQ5, EQ8 = 16   AZEQ6 = 32
+h  0    6  Get Current "goto" target             // =llhhLL[0D]  last value as set by    :S or ( :j +/- :H )
+i  0    6  Get Current "slew" speed              // =llhhLL[0D]  must use with :f Hi/Lo and :g multiplier for correct value
+                                                 //              Note! this value gets changed as a goto is done, ie a goto trumps any prev :I data
+                                                 //              AZEQ5 changes as we do a goto, EQ6 only returns one value.
+j  0    6  Get Current Axis position.            // =llhhLL[0D]  Cardinal encoder count with #x800000 = 0 as a centre datum
+                                                 //              #x800000 = CW shaft down, DEC = 0 and pointing at West Horizon in Sth Hemi ( via Hbx boot )
+k  1    6  :kx0[0D]=llhhLL[0D]   gets running microstep count since last start/reset
+           :kx1[0D]=llhhLL[0D]   gets running microstep count since last start/reset  then resets count
+           // :k  works on EQ6Pro, but not AZEQ5, AZEQ6, EQ8
+l ***
+m  0    6  Appears to be ramp up for a goto      // =llhhLL[0D]  ( ie :j +/- :M ) )
+                                                 // :J processing for EQ6Pro converts data to :h +/- :c  if above low distance limit
+                                                 //                                        to :h         if below low distance limit
+n  0    2  Read EEProm Addr                      // =DD[0D]    used with :C  for peek ???   ####
+o ***
+p ***
+q  6    6  :qx000000[0D]=000000[0D]    if axis is CW  from home ( ie -ve ) just after home sensor trip has been reset
+                        =FFFFFF[0D]               CCW from home ( ie +ve ) just after home sensor trip has been reset )
+                        =llhhLL[0D]    if sensor has tripped since reset ( use :W to clear data first )
+           // AZEQ5 returns =000080 for Az and Alt
+           :qx010000[0D]=ABCDEF[0D]  ie the bitmapped nybbles for current status
+           // A    8  not defined
+           //      4  not defined
+           //      2  PPEC ON
+           //      1  PPEC training in progress,
+           // B    8  supports AZ/EQ
+           //      4  has Home Sensors
+           //      2  supports PPEC
+           //      1  supports dual encoders
+           // C    8  has WIFI
+           //      4  supports half current tracking          // ref :Wx06....
+           //      2  axes slews must start independently     // ie cant use :J3
+           //      1  has polar LED
+           // D
+           // E
+           // F
+           // EQ6    returns !0
+           // AZEQ5          =0B6000  at boot
+           // AZEQ6          =0B3000
+           // EQ8            =076000
+r  0    2  Read Register Addr                    // =DD[0D] or =DDDD or =DDDDDD  used with :A  for peek ???
+                  // result appears to vary based on length of last valid data return   ref test data done lower
+                  // AZEQ5 returns =[0D]  ie no data if used directly after :A
+                  // must use :A then :g then :r   ( ie the :g fake sets the return length to 2 )
+s  0    6  Get microsteps per worm rev           // =llhhLL[0D]   Used for wormwheel teeth calcs and PPEC
+t ***
+u ***
+v ***
+w ***
+x ***
+y ***
+z  0    0  Set Debug Flag                        // EQ6Pro returns !0[0D],   AZEQ5/AZEQ6/EQ8 returns =[0D]
+
+A  2    0  :AxHH[0D]      Set Register Addr      // used with :R and :r   for Register poke/peek
+B ***
+C  4    0  :CxLLHH[0D]    Set EEProm   Addr      // used with :N and :n   for EEProm   poke/peek
+D  0    6  :Dx[0D]        Get 1x Track Rate      // =llhhLL[0D]  This is the :I rate used to give sidereal tracking
+E  6    0  :ExllhhLL[0D]  Reset Axis datum to    // used to synch encoder posn against a known HA/DEC )
+F  0    0  :Fx[0D]        Initialise Target Axis ( energises motor )
+G  2    0  :GxAB[0D]      Prepare slew parameters using bitmapped nybbles xAB
+             // ( :f is used to read the "current" actual status )
+             // A = '0' high speed GOTO slewing,      doesnt make "bitmapped" sense, but it is as coded by SkyWatcher????? ?????
+             //     '1' low  speed slewing mode,      all other bytes use bitmapping ( incl :f ), this doesnt
+             //     '2' low  speed GOTO mode,
+             //     '3' high speed slewing mode
+             // xxx0   0 means AutoGoto, 1 means manual slew or stopped
+             // xx0x   0 means HiRate if Goto else LoRate if Slew
+             //        speed mode for AutoGoto is ignored for EQ6Pro
+             // B = '0'  +CW  and Nth Hemi
+             //     '1'  -CCW and Nth Hemi
+             //     '2'  +CW  and Sth Hemi
+             //     '3'  -CCW and Sth Hemi
+             // xxx0   0 means +ve, 1 = -ve  "motor" direction, ie code takes care of whats N/S/E/W etc
+             //        +ve speed in RA  is Axle moves CW when viewed from pole
+             //        +ve speed in DEC is Axle moves CCW when viewed from above
+             // xx0x   0 means Nth Hemi else Sth Hemi ( ST4 guiding related ) ?????
+             // Note! when using :S type gotos, the direction bit here "appears" to be ignored
+
+H  6    0  :HxllhhLL[0D]  Set goto target ( as a delta to current ) increment. Direction set by :G,
+I  6    0  :IxllhhLL[0D]  Set Manual slewing rate ( read in conjunction with Hi/Lo rate as set by :G )
+J  0    0  :Jx[0D]        Start moving
+K  0    0  :Kx[0D]        Stop moving normal ( ramp if reqd )
+L  0    0  :Lx[0D]        Stop moving Immediately
+M  6    0  :MxllhhLL[0D]  Set break point increment  // Doesnt appear to do anything ????? But possibly Ramp UP related
+             // EQASCOM uses         if H > 80000 then H - 80000 else H / 2
+             // Indi    uses HiSpeed if H > 3200 then 3200 else H/10        based on skywatcher code ( that also sets I )
+             //              LoSpeed if H >  200 then  200 else H/10
+             // no values of :M appear to affect my EQ6 behaviour
+N  2    0  :NxHH[0D]      Set EEProm Value to xHH   // used with :C  for poke??   NOT TESTED
+O  1    0  :OxA[0D]       Toggle "Trigger/Snap Port"  A = '1' = On, '0' = Off   // EQ6 fires both at same time via Hbx, ie :O11 :O21
+                          // AZEQ5 can fire independently, EQ8 uses :O2x[0D] to dire its only port.
+P  1    0  :PxA[0D]       set ST4 guiderate A = 0..4 = 1.0, 0.75, 0.50, 0.25, 0.125
+Q ***                     Set Bootloader Mode       // Always uses :Qx55AA[0D] and has no response.   55AA looks like a flash unlock code ????
+R  2    0  :RxHH[0D]      Set Register Value to xHH // used with :A  for poke??   NOT TESTED
+S  6    0  :SxllhhLL[0D]  Set absolute goto target  // EQ8 also uses :M with this, but :M is absolute in EQ8 ?????
+                          // :S appears to ignore direction data set via :G
+T  6    0  :TxllhhLL[0D]  Set LSB of speed          // hhLL must be 0000.   ie equivalent to :I = ll0000[0D]  but works in HiSpeed mode ?????
+                          // Set Long Goto Step Period  ( as per Synta )
+U  6    0  :UxllhhLL[0D]  Set rampdown range        // sets the microsteps from target where the rampdown process begins
+V  2    0  :VxHH[0D]      Set Polar LED brightness  // HH := x00 to xFF
+W  6    0  :Wx000000[0D]  Start PPEC train
+           :Wx010000[0D]  Stop  PPEC train
+           :Wx020000[0D]  Turn PPEC ON
+           :Wx030000[0D]  Turn PPEC OFF   ( also sent when synch encoder used in EQ6 in 3.36. Not in 3.37 ???
+           :Wx040000[0D]  Encoder ON
+           :Wx050000[0D]  Encoder OFF
+           :Wx060000[0D]  Disable Full Current Low speed
+           :Wx060100[0D]  Enable  Full Current Low speed
+           :Wx07vvvv[0D]  Set Stride for Slewing                       // need to test
+           :Wx080000[0D]  Reset Home Sensor datum
+X ***
+Y ***
+Z ***
+//=================================================================================================
+When setting "GOTO" data, it appears to require a correct sequence
+ie :G then :H then :M   or
+   :G then :S then :M for gotos.
+Mount must be stopped before sending :G here, or it chucks a fault.
+:M appears to have no function anymore????
+
+:U appears to be standalone, and can be set at any time and is totally "sticky"
+   Only appears to work so far with the EQ6Pro
+
+When getting data we also need to get current status
+:j gets current offset
+:f is used first to check for current mode ie slew/goto, Hi/Lo, Fwd/Bwd so we know/can check signs for :h and :m
+:h gets current target  ( should be ( :j + :H ) for Fwds, ( :j - :H ) for Bwds )   // ie same as :S
+:m gets ???     target  ( should be ( :j + :M ) for Fwds, ( :j - :M ) for Bwds )
+:d gets the current quadrature encoder count ( if encoders are fitted ). Result is always true
+   ie even if encoders are OFF, :d returns the true count.
+// *** WARNING ***  :f always responds correctly to the latest :G
+// however, :h and :m do not. The :M and :H/:S must be sent AFTER :G
+// if you want to correctly reverse engineer settings from :h, :m
+
+When setting "Slew" data, it also requires a set procedure
+Again :G sets direction and speed "range", and must be sent when stopped.
+:I is used to set the speed.
+The value used is basically the no of timer interrupts per microstep
+:I := ( :b * 1296000 / :a ) / Speed    ( where Speed is in arcsec/sec )
+If :I is greater than about 10, then the slew will need to use :G = LoSpeed mode
+If :I is less than 10, then the slew will need :G = HiRate, and :I := I * :g
+In LoSpeed mode, once moving, simply resending a new :I will cause the speed to change.
+In HiSpeed mode, you must issue a stop, resend :G, reset :I then restart.
+
+
+//Just be careful that you also allow for commands
+//that only work in some mounts and not others
+//ie You can set and use the :U command to
+//optimise your goto rampdowns in the EQ6
+//but not the AZEQ5/AZEQ6/EQ8 etc.
+//(Get it wrong and yr gotos dont stop tho :-)  )
+
+//The :k command also works in the EQ6 but not the later ones.
+
+//The :M command gets used a lot in the drivers, but doesnt
+//actually to appear to do anything in the later firmwares.
+
+//Also, early goto code used to use :H for offset from current
+//but later code uses :S for absolute position
+//so it can be optimised based on what you want to do.
+
+//One last thing if you are writing from scratch and going to allow 
+//for pulseguides.
+//With the newer cards that can handle PPEC, if you guide using
+//ST4 commands, the cards deal with it seamlessly.
+//If you send pulseguides with PPEC ON, any bin change
+//effectively kills your move.You need to turn PPEC OFF
+//then guide, then turn PPEC ON to get correct timings.
+
+//One last last thing :-)
+//Timers can have a big effect on how long guides go for.
+//I have been playing with using gotos to do DEC pulseguides.
+//Below a set distance, gotos dont actually ramp,
+//they just go at a set speed.If a pulseguide comes in
+//it can be converted to a distance and issued as a set and forget goto
+//and you get deadly accurate movement,
+//and can also very accurately allow for any measured lash.
+//johansea Andrew Johansen Melbourne Australia

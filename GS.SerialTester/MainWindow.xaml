@@ -1,0 +1,47 @@
+﻿<Window x:Class="GS.SerialTester.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" SizeToContent="WidthAndHeight" Closing="MainWindow_OnClosing"
+        TextOptions.TextFormattingMode="Display"
+        Title="GS.SerialTester">
+    <Grid>
+        <StackPanel Orientation="Vertical">
+            <StackPanel Margin="10,10,0,0" Orientation="Horizontal">
+                <Button Click="ButtonBase_OnClick" Width="50" HorizontalAlignment="Left">start</Button>
+                <Button Margin="10,0,0,0" Click="ButtonBase1_OnClick" Width="50" HorizontalAlignment="Left">stop</Button>
+                <Label>Com Port:</Label>
+                <ComboBox Margin="5,0,0,0" x:Name="port" SelectedIndex="0" Width="50" ToolTip="Com Port">
+                    <ComboBoxItem >0</ComboBoxItem>
+                    <ComboBoxItem>1</ComboBoxItem>
+                    <ComboBoxItem>2</ComboBoxItem>
+                    <ComboBoxItem>3</ComboBoxItem>
+                    <ComboBoxItem>4</ComboBoxItem>
+                    <ComboBoxItem>5</ComboBoxItem>
+                    <ComboBoxItem>6</ComboBoxItem>
+                    <ComboBoxItem>7</ComboBoxItem>
+                    <ComboBoxItem>8</ComboBoxItem>
+                    <ComboBoxItem>9</ComboBoxItem>
+                    <ComboBoxItem>10</ComboBoxItem>
+                    <ComboBoxItem>11</ComboBoxItem>
+                    <ComboBoxItem>12</ComboBoxItem>
+                </ComboBox>
+                <Label>Interval (ms):</Label>
+                <ComboBox ItemsSource="{Binding IntervalList}" Width="60" ToolTip="Speed">
+                    <ComboBox.SelectedItem>
+                        <Binding Path="Interval" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        </Binding>
+                    </ComboBox.SelectedItem>
+                    <ComboBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </ComboBox.ItemsPanel>
+                </ComboBox>
+            </StackPanel>
+            <TextBox Margin="5,10,5,5" x:Name="mytextblock" Width="460" Height="80" HorizontalAlignment="Left" 
+                     FontSize="20" Background="CadetBlue" VerticalScrollBarVisibility="Auto"></TextBox>
+        </StackPanel>
+    </Grid>
+</Window>

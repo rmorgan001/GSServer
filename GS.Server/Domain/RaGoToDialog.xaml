@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="GS.Server.Domain.RaGoToDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" >
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Vertical" Grid.Row="0" HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal" >
+                <TextBlock Text="RA: "/>  
+                <TextBlock Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" Text="{Binding GoToRaString}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Dec: "/>  
+                <TextBlock Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" Text="{Binding GoToDecString}"/>
+            </StackPanel>
+        </StackPanel>
+        <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,10,0,0" Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" >Accept Coordinates?</TextBlock>
+        <StackPanel Orientation="Horizontal" Grid.Row="2"
+                    Margin="0 16 0 0">
+            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}"
+                    Command="{Binding AcceptRaGoToDialogCommand}">
+                ACCEPT
+            </Button>
+            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}"
+                    Command="{Binding CancelRaGoToDialogCommand}">
+                CANCEL
+            </Button>
+        </StackPanel>
+    </Grid>
+    </UserControl>
