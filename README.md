@@ -54,6 +54,10 @@ You can download the installable version at https://groups.yahoo.com/neo/groups/
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
+## Support
+
+Can be found at https://groups.io/g/GSS/topics
+
 ## License
 
 This project is licensed under the GNU Affero General Public License - see the [LICENSE.md](LICENSE.md) file for details
