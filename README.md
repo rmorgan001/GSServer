@@ -52,6 +52,11 @@ You can download the installable version at https://groups.yahoo.com/neo/groups/
 
 Please read [CODE_OF_CONDUCT.md](https://github.com/rmorgan001/GSServer/blob/master/Docs/CODE_OF_CONDUCT.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
+If you are contributing to this repository, please first discuss the change you wish to make via issue,
+email, or any other method with the owners of this repository before making a change. 
+
+Please note we have a code of conduct, please follow it in all your interactions with the project.
+
 ## Authors
 
 * **Robert Morgan** - *Initial work* - https://github.com/rmorgan001
