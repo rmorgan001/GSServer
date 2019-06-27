@@ -57,6 +57,8 @@ email, or any other method with the owners of this repository before making a ch
 
 Please note we have a code of conduct, please follow it in all your interactions with the project.
 
+Please read [CONTRIBUTING.md](https://github.com/rmorgan001/GSServer/blob/master/Docs/CONTRIBUTING.md)
+
 ## Authors
 
 * **Robert Morgan** - *Initial work* - https://github.com/rmorgan001
