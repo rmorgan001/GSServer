@@ -48,6 +48,10 @@ You can download the installable version at https://groups.yahoo.com/neo/groups/
 * Microsoft.Xaml.Behaviors.Wpf
 * Newtonsoft.Json
 
+## Contributing
+
+Please read [CONTRIBUTING.md](https://github.com/rmorgan001/GSServer/blob/master/Docs/Contributing.md) for details on our code of conduct, and the process for submitting pull requests to us.
+
 ## Authors
 
 * **Robert Morgan** - *Initial work* - https://github.com/rmorgan001
