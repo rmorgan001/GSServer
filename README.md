@@ -50,7 +50,7 @@ You can download the installable version at https://groups.yahoo.com/neo/groups/
 
 ## Contributing
 
-Please read [CODE_OF_CONDUCT.md](https://github.com/rmorgan001/GSServer/Docs/CODE_OF_CONDUCT.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CODE_OF_CONDUCT.md](https://github.com/rmorgan001/GSServer/blob/master/Docs/CODE_OF_CONDUCT.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Authors
 
