@@ -47,7 +47,7 @@ You can download the installable version at https://groups.yahoo.com/neo/groups/
 * Inno Setup Compiler version 5.5.8 http://www.innosetup.com
 * Microsoft.Xaml.Behaviors.Wpf
 * Newtonsoft.Json
-* Reference Dlls and other information can be downloaded [here](https://drive.google.com/open?id=13nAFTjvD_HTZVNBRV0BwxsHk0EmJ1ayi)
+* Reference strong named Dlls and other information can be downloaded [here](https://drive.google.com/open?id=13nAFTjvD_HTZVNBRV0BwxsHk0EmJ1ayi)
 
 ## Contributing
 
