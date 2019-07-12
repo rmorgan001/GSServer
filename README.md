@@ -95,3 +95,9 @@ Can be found at https://groups.io/g/GSS/topics
 * ASCOM development team
 * Andrew Johansen & Colm Brazel
 * SkywatcherEQ8 members at https://groups.yahoo.com/neo/groups/SkywatcherEQ8/info
+
+## Updates
+
+1.0.0.8 released 12 July 2019
+    * Added Full Current Option
+    * Corrected EQ6 :q command returning !0 Abnormal response
