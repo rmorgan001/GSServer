@@ -99,5 +99,6 @@ Can be found at https://groups.io/g/GSS/topics
 ## Updates
 
 1.0.0.8 released 12 July 2019
-    * Added Full Current Option
-    * Corrected EQ6 :q command returning !0 Abnormal response
+    Added Full Current Option
+    Corrected EQ6 :q command returning !0 Abnormal response
+    
