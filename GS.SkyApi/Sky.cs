@@ -641,7 +641,7 @@ namespace GS.SkyApi
 
             ValidateMount();
             var validAxis = ValidateAxis(axis);
-            var command = new SkySetFullCurrentLowSpeed(SkyQueue.NewId, validAxis, on);
+            var command = new SkySetFullCurrent(SkyQueue.NewId, validAxis, on);
             GetResult(command);
         }
 

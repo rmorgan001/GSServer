@@ -299,6 +299,11 @@
                             </TextBox.Text>
                         </TextBox>
                     </StackPanel>
+                    <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="5,0,0,0">
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25"
+                                      IsChecked="{Binding Refraction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Refraction</Label>
+                    </StackPanel>
                     <StackPanel Grid.Row="5" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="5,0,0,0">
                         <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}"  HorizontalAlignment="Center" Width="25" Height="25" ToolTip="On/Off"
                                       IsChecked="{Binding EncodersOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -309,17 +314,17 @@
                                       IsChecked="{Binding AlternatingPpec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Alternating PPEC</Label>
                     </StackPanel>
-                    <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="5,0,0,0">
-                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25"
-                                      IsChecked="{Binding Refraction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Refraction</Label>
-                    </StackPanel>
                     <StackPanel Grid.Row="7" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="5,0,0,0">
                         <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="Uses GoTo commands for Dec guiding"
                                       IsChecked="{Binding DecPulseToGoTo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >GoTo Dec Pulse</Label>
                     </StackPanel>
                     <StackPanel Grid.Row="8" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="5,0,0,0">
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="On/Off special items"
+                                      IsChecked="{Binding FullCurrent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Full Current</Label>
+                    </StackPanel>
+                    <StackPanel Grid.Row="9" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="5,0,0,0">
                         <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="On/Off special items"
                                       IsChecked="{Binding DebugVisability, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Diagnostics</Label>

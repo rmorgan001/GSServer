@@ -20,6 +20,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GS.Simulator", "GS.Simulator\GS.Simulator.csproj", "{E463EC96-56DA-447B-8719-F68C33771185}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColorPicker", "ColorPicker\ColorPicker.csproj", "{6813ECB1-B6B3-49F4-9070-9E4DFEF34FAE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D4660C10-2AA7-49D3-AF73-F180C4BADD71} = {D4660C10-2AA7-49D3-AF73-F180C4BADD71}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GS.SerialTester", "GS.SerialTester\GS.SerialTester.csproj", "{34638981-3D0B-422A-A36D-6E6A79A0BB45}"
 EndProject

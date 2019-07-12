@@ -634,6 +634,7 @@ namespace GS.SkyWatcher
                 { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" Axis:{axis} Rate:{on}" };
             MonitorLog.LogToMonitor(monitorItem);
 
+            if (!CanDualEncoders) return;
             _commands.SetEncoders(axis, on);
         }
 
@@ -644,6 +645,7 @@ namespace GS.SkyWatcher
         /// <param name="on">on=true,off=false</param>
         internal void SetPpec(AxisId axis, bool on)
         {
+            if (!CanPpec) return;
             _commands.SetPpec(axis, on);
         }
 
@@ -654,6 +656,7 @@ namespace GS.SkyWatcher
         /// <param name="on">on=true,off=false</param>
         internal void SetPpecTrain(AxisId axis, bool on)
         {
+            if (!CanPpec) return;
             _commands.SetPpecTrain(axis, on);
         }
 
@@ -662,8 +665,9 @@ namespace GS.SkyWatcher
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="on">on=true,off=false</param>
-        internal void SetFullCurrentLowSpeed(AxisId axis, bool on)
+        internal void SetFullCurrent(AxisId axis, bool on)
         {
+            if (!CanHalfTrack) return;
             _commands.SetLowSpeedCurrent(axis, on);
         }
 
@@ -730,7 +734,7 @@ namespace GS.SkyWatcher
 
         internal long GetHomePosition(AxisId axis)
         {
-            return _commands.GetHomePosition(axis);
+            return !CanHomeSensors ? 0 : _commands.GetHomePosition(axis);
         }
 
         internal string GetMotorCardVersion(AxisId axis)
@@ -1068,7 +1072,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// parses results from the q command using 010000
+        /// parses results from the q command using =010000
         /// </summary>
         private void ParseCapabilities()
         {

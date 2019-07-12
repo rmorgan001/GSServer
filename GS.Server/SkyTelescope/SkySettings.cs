@@ -603,6 +603,23 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static bool _fullCurrent;
+        public static bool FullCurrent
+        {
+            get => _fullCurrent;
+            set
+            {
+                if (_fullCurrent == value) return;
+                _fullCurrent = value;
+                Properties.SkyTelescope.Default.FullCurrent = value;
+                SkyServer.SkyTasks(MountTaskName.FullCurrent);
+
+                var monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+        }
+
         private static double _focalLength;
         public static double FocalLength
         {
@@ -1065,6 +1082,7 @@ namespace GS.Server.SkyTelescope
             Elevation = Properties.SkyTelescope.Default.Elevation;
             Encoders = Properties.SkyTelescope.Default.EncodersOn;
             FocalLength = Properties.SkyTelescope.Default.FocalLength;
+            FullCurrent = Properties.SkyTelescope.Default.FullCurrent;
             GotoPrecision = Properties.SkyTelescope.Default.GotoPrecision;
             GuideRateOffsetY = Properties.SkyTelescope.Default.GuideRateOffsetY;
             GuideRateOffsetX = Properties.SkyTelescope.Default.GuideRateOffsetX;

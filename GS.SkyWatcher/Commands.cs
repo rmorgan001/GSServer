@@ -993,7 +993,7 @@ namespace GS.SkyWatcher
             
             switch (receivedData[0].ToString())
             {
-                //receive '= DDDDDD [0D]'    or '! D [0D]'
+                //receive '=DDDDDD [0D]'    or '!D [0D]'
                 case "=":  // Normal response
                     break;
                 case "!":  // Abnormal response.
@@ -1002,6 +1002,7 @@ namespace GS.SkyWatcher
                     {
                         case "!0":
                             errormsg = "Invalid Command: Command doesnt apply to the model";
+                            if (command == 'q') return "=000000";
                             break;
                         case "!1":
                             errormsg = "Invalid Paramcount: Valid command was passed with invalid param count";

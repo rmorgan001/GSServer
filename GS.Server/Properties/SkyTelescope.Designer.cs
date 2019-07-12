@@ -1018,5 +1018,17 @@ namespace GS.Server.Properties {
                 this["GotoPrecision"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool FullCurrent {
+            get {
+                return ((bool)(this["FullCurrent"]));
+            }
+            set {
+                this["FullCurrent"] = value;
+            }
+        }
     }
 }

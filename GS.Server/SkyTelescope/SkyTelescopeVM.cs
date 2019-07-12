@@ -96,7 +96,7 @@ namespace GS.Server.SkyTelescope
                     GuideRateOffsetXs = new List<double>(Numbers.InclusiveRange(10, 100,10));
                     GuideRateOffsetYs = new List<double>(Numbers.InclusiveRange(10, 100, 10));
                     MaxSlewRates = new List<double>(Numbers.InclusiveRange(2.0, 5));
-                    HourAngleLimits = new List<double>(Numbers.InclusiveRange(0, 15, 1));
+                    HourAngleLimits = new List<double>(Numbers.InclusiveRange(0, 45, 1));
                     LatitudeRange = new List<int>(Enumerable.Range(-89, 179));
                     LongitudeRange = new List<int>(Enumerable.Range(-179, 359));
                     Hours = new List<int>(Enumerable.Range(0, 24));
@@ -740,6 +740,17 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        public bool FullCurrent
+        {
+            get => SkySettings.FullCurrent;
+            set
+            {
+                if (value == SkySettings.FullCurrent) return;
+                SkySettings.FullCurrent = value;
+                OnPropertyChanged();
+            }
+        }
+
         public bool AlternatingPpec
         {
             get => SkySettings.AlternatingPpec;
@@ -1176,6 +1187,38 @@ namespace GS.Server.SkyTelescope
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private ICommand _testCommand;
+        public ICommand ClickTestCommand
+        {
+            get
+            {
+                return _testCommand ?? (_testCommand = new RelayCommand(param => Test()));
+            }
+            set => _testCommand = value;
+        }
+        private void Test()
+        {
+            try
+            {
+                Principles.Alignment.Test2Star();
             }
             catch (Exception ex)
             {

@@ -37,5 +37,13 @@
                 Flip SOP
             </Button>
         </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Button Margin="5,10,0,0"
+                    Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                    Width="100"
+                    Command="{Binding ClickTestCommand}">
+                Test
+            </Button>
+        </StackPanel>
     </StackPanel>
 </UserControl>

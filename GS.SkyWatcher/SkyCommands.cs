@@ -1912,7 +1912,7 @@ namespace GS.SkyWatcher
         }
     }
 
-    public class SkySetFullCurrentLowSpeed : ISkyCommand
+    public class SkySetFullCurrent : ISkyCommand
     {
         public long Id { get; }
         public DateTime CreatedUtc { get;}
@@ -1922,7 +1922,7 @@ namespace GS.SkyWatcher
         private readonly AxisId _axis;
         private readonly bool _on;
 
-        public SkySetFullCurrentLowSpeed(long id, AxisId axis, bool on)
+        public SkySetFullCurrent(long id, AxisId axis, bool on)
         {
             Id = id;
             _axis = axis;
@@ -1937,7 +1937,7 @@ namespace GS.SkyWatcher
         {
             try
             {
-                skyWatcher.SetFullCurrentLowSpeed(_axis, _on);
+                skyWatcher.SetFullCurrent(_axis, _on);
                 Successful = true;
             }
             catch (Exception e)

@@ -75,6 +75,7 @@ namespace GS.Server.SkyTelescope
             AlternatingPpec,
             DecPulseToGoTo,
             Encoders,
+            FullCurrent,
             GetOneStepIndicators,
             LoadDefaults,
             StopAxes,

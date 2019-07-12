@@ -13,9 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-
-// ReSharper disable RedundantAssignment
+ // ReSharper disable RedundantAssignment
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -822,7 +820,7 @@ namespace GS.Server.SkyTelescope
         // Tracks tracking
         private static TrackingMode _trackingMode;
         private static bool _tracking;
-        public static bool TrackingSpeak { get; set; }
+        private static bool TrackingSpeak { get; set; }
         public static bool Tracking
         {
             get => _trackingMode != TrackingMode.Off;
@@ -1042,6 +1040,8 @@ namespace GS.Server.SkyTelescope
                         case MountTaskName.DecPulseToGoTo:
                             break;
                         case MountTaskName.Encoders:
+                            break;
+                        case MountTaskName.FullCurrent:
                             break;
                         case MountTaskName.GetOneStepIndicators:
                             break;
@@ -1440,6 +1440,10 @@ namespace GS.Server.SkyTelescope
                         case MountTaskName.Encoders:
                             _ = new SkySetEncoder(0, AxisId.Axis1, SkySettings.Encoders);
                             _ = new SkySetEncoder(0, AxisId.Axis2, SkySettings.Encoders);
+                            break;
+                        case MountTaskName.FullCurrent:
+                            _ = new SkySetFullCurrent(0, AxisId.Axis1, SkySettings.FullCurrent);
+                            _ = new SkySetFullCurrent(0, AxisId.Axis2, SkySettings.FullCurrent);
                             break;
                         case MountTaskName.GetOneStepIndicators:
                             //tests if mount can one step
@@ -2273,6 +2277,7 @@ namespace GS.Server.SkyTelescope
                     SkyTasks(MountTaskName.StopAxes);
                     SkyTasks(MountTaskName.LoadDefaults);
                     SkyTasks(MountTaskName.Encoders);
+                    SkyTasks(MountTaskName.FullCurrent);
                     SkyTasks(MountTaskName.SetSt4Guiderate);
                     SkyTasks(MountTaskName.GetOneStepIndicators);
                     SkyTasks(MountTaskName.SetSouthernHemisphere);
