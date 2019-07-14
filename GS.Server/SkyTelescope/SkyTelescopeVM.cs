@@ -1581,6 +1581,11 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
+                if (SkyServer.Tracking)
+                {
+                    OpenDialog("Tracking off or stop mount before setting home position");
+                    return;
+                }
                 HomeResetContent = new HomeResetDialog();
                 IsHomeResetDialogOpen = true;
             }

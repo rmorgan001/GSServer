@@ -689,7 +689,7 @@ namespace GS.SkyWatcher
             var szCmd = LongToHex(6);
             if (on)
             {
-                szCmd = LongToHex(601);
+                szCmd = "060100";
             }
             CmdToAxis(axis, 'W', szCmd);
         }
@@ -760,7 +760,7 @@ namespace GS.SkyWatcher
                                     Method = MethodBase.GetCurrentMethod().Name,
                                     Thread = Thread.CurrentThread.ManagedThreadId,
                                     Message =
-                                        $"Serial Retry Warning: {_retryCount} {cmdDataStr}"
+                                        $"Serial Retry Warning: {_retryCount} {cmdData}"
                                 };
                                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -1000,6 +1000,10 @@ namespace GS.SkyWatcher
                     string errormsg;
                     switch (receivedData)
                     {
+                        case "!":
+                            errormsg = "Invalid Reason Code";
+                            if (command == 'q') return "=000000";
+                            break;
                         case "!0":
                             errormsg = "Invalid Command: Command doesnt apply to the model";
                             if (command == 'q') return "=000000";
@@ -1033,7 +1037,7 @@ namespace GS.SkyWatcher
                             break;
                     }
                     monitorItem = new MonitorEntry
-                        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" Abnormal Response: Axis:{axis}, Command:{command}, CommandStr:{cmdDataStr}, Message: {errormsg}" };
+                        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" Abnormal Response: Axis:{axis}, Command:{command}, Received:{receivedData}, CommandStr:{cmdDataStr}, Message: {errormsg}" };
                     MonitorLog.LogToMonitor(monitorItem);
                     receivedData = null;
                     break;

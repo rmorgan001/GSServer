@@ -160,12 +160,23 @@ namespace GS.Server.Gps
                 RTSEnable = false,
                 Handshake = SerialHandshake.RequestToSendXonXoff,
                 Parity = SerialParity.None,
-                Connected = true
             };
-            IsConnected = _serial.Connected;
-            ReadGpsData(_serial);
-            _serial.Connected = false;
-            _serial.Dispose();
+
+            try
+            {
+                _serial.Connected = true;
+                IsConnected = _serial.Connected;
+                ReadGpsData(_serial);
+                _serial.Connected = false;
+                _serial.Dispose();
+            }
+            catch (Exception)
+            {
+                _serial.Connected = false;
+                _serial.Dispose();
+                throw;
+            }
+
         }
 
         /// <summary>

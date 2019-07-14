@@ -2546,12 +2546,16 @@ namespace GS.Server.SkyTelescope
         public static void ResetHomePositions()
         {
             if (!IsMountRunning) return;
+            if (Tracking)Tracking = false;
+
             switch (SkySystem.Mount)
             {
                 case MountType.Simulator:
+                    SimTasks(MountTaskName.StopAxes);
                     SimTasks(MountTaskName.SetHomePositions);
                     break;
                 case MountType.SkyWatcher:
+                    SkyTasks(MountTaskName.StopAxes);
                     SkyTasks(MountTaskName.SetHomePositions);
                     break;
                 default:
