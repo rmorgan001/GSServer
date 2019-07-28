@@ -6,9 +6,9 @@ namespace GS.Server.Domain
     /// Interaction logic for Window1.xaml
     /// </summary>
     [ComVisible(false)]
-    public partial class Dialog
+    public partial class DialogOK
     {
-        public Dialog()
+        public DialogOK()
         {
             InitializeComponent();
         }

@@ -6,33 +6,29 @@
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d">
-    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <StackPanel Orientation="Vertical" HorizontalAlignment="Left"  VerticalAlignment="Center" >
         <md:Badged Badge="{Binding ParkBadgeContent}"  BadgeColorZoneMode="PrimaryMid" >
-            <Button Margin="5"
+            <Button Margin="5" Width="100" Height="30" ToolTip="Park mount"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                    Width="100" Height="30" ToolTip="Park mount"
                     Command="{Binding ClickParkCommand}"
                     Content="{Binding ParkButtonContent}"/>
         </md:Badged>
         <md:Badged Badge="{Binding HomeBadgeContent}" BadgeColorZoneMode="PrimaryMid">
-            <Button Margin="5"  Height="30"
-                Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                Width="100" ToolTip="Slew to home position"
-                Command="{Binding ClickHomeCommand}">
+            <Button Margin="5" Height="30" Width="100" ToolTip="Slew to home position"
+                    Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                    Command="{Binding ClickHomeCommand}">
             Home
             </Button>
         </md:Badged>
-            <Button Margin="5" x:Name="StopButton"
-                Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                Width="100"  Height="30" ToolTip="Stop mount"
-                Command="{Binding ClickStopCommand}">
+            <Button Margin="5" x:Name="StopButton" Width="100"  Height="30" ToolTip="Stop mount"
+                    Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                    Command="{Binding ClickStopCommand}">
             Stop
         </Button>
         <md:Badged Badge="{Binding TrackingBadgeContent}"  BadgeColorZoneMode="PrimaryMid">
-            <Button Margin="5" ToolTip="Tracking on/off"
-                Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                Width="100" Height="30"
-                Command="{Binding ClickTrackingCommand}">
+            <Button Margin="5" ToolTip="Tracking on/off" Width="100" Height="30"
+                    Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                    Command="{Binding ClickTrackingCommand}">
             Tracking
             </Button>
         </md:Badged>

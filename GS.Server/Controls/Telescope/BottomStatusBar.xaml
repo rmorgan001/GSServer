@@ -6,14 +6,26 @@
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d">
-    <DockPanel VerticalAlignment="Center" >
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <TextBlock Margin="10 0" VerticalAlignment="Center" ToolTip="Home indicator">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Column="0" Margin="10 0" VerticalAlignment="Center" ToolTip="Home">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsHome}" Value="True">
-                                <Setter Property="Foreground" Value="LimeGreen"></Setter>
+                            <Setter Property="Foreground" Value="{DynamicResource SecondaryAccentBrush}"></Setter>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding IsHome}" Value="False">
                                 <Setter Property="Foreground" Value="{DynamicResource PrimaryHueDarkBrush}" />
@@ -26,13 +38,13 @@
                 </TextBlock.Style>
                 Home
             </TextBlock>
-            <TextBlock  Margin="5 0" VerticalAlignment="Center" ToolTip="Park Indicator">
+        <TextBlock Grid.Column="1" Margin="5 0" VerticalAlignment="Center" ToolTip="Park">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
                         <Setter Property="Background" Value="Transparent"></Setter>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding AtPark}" Value="True">
-                                <Setter Property="Foreground" Value="LimeGreen"></Setter>
+                            <Setter Property="Foreground" Value="{DynamicResource SecondaryAccentBrush}"></Setter>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding AtPark}" Value="False">
                                 <Setter Property="Foreground" Value="{DynamicResource PrimaryHueDarkBrush}" />
@@ -55,12 +67,12 @@
                 </TextBlock.Style>
             Parked
             </TextBlock>
-            <TextBlock Margin="5 0" VerticalAlignment="Center" ToolTip="Slewing indicator">
+        <TextBlock Grid.Column="2" Margin="5 0" VerticalAlignment="Center" ToolTip="Slewing">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsSlewing}" Value="True">
-                                <Setter Property="Foreground" Value="LimeGreen"></Setter>
+                            <Setter Property="Foreground" Value="{DynamicResource SecondaryAccentBrush}"></Setter>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding IsSlewing}" Value="False">
                                 <Setter Property="Foreground" Value="{DynamicResource PrimaryHueDarkBrush}" />
@@ -73,12 +85,12 @@
                 </TextBlock.Style>
         Slewing
             </TextBlock>
-            <TextBlock Margin="5 0" VerticalAlignment="Center" ToolTip="Tracing indicator">
+        <TextBlock Grid.Column="3" Margin="5 0" VerticalAlignment="Center" ToolTip="Tracing">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsTracking}" Value="True">
-                                <Setter Property="Foreground" Value="LimeGreen"></Setter>
+                            <Setter Property="Foreground" Value="{DynamicResource SecondaryAccentBrush}"></Setter>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding IsTracking}" Value="False">
                                 <Setter Property="Foreground" Value="{DynamicResource PrimaryHueDarkBrush}" />
@@ -91,7 +103,7 @@
                 </TextBlock.Style>
             Tracking
             </TextBlock>
-            <TextBlock Margin="5 0" VerticalAlignment="Center" Text="{Binding IsSideOfPier}" ToolTip="Side of Pier" Width="60" Foreground="DimGray">
+        <TextBlock Grid.Column="4" Margin="5 0" VerticalAlignment="Center" Text="{Binding IsSideOfPier}" ToolTip="Side of Pier" Width="60" Foreground="DimGray">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
                         <Style.Triggers>
@@ -105,7 +117,7 @@
                                 <DataTrigger.EnterActions>
                                     <BeginStoryboard>
                                         <Storyboard RepeatBehavior="5x">
-                                            <ColorAnimation To="LimeGreen" Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)" 
+                                        <ColorAnimation To="Transparent" Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)" 
                                                             Duration="0:0:0.15" BeginTime="0:0:0"/>
                                             <ColorAnimation To="DimGray" Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)" 
                                                             Duration="0:0:0.15" BeginTime="0:0:0.15"/>
@@ -117,7 +129,7 @@
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
-            <Button Command="{Binding ClearLimitCommand}" Style="{StaticResource MaterialDesignFlatButton}" Width="60" ToolTip="Axis limit indicator">
+        <Button Grid.Column="5" Command="{Binding ClearLimitCommand}" Style="{StaticResource MaterialDesignFlatButton}" Width="60" ToolTip="Axis limit">
                 <md:PackIcon Kind="WarningCircle" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left"  >
                     <md:PackIcon.Style>
                         <Style TargetType="md:PackIcon">
@@ -136,7 +148,7 @@
                     </md:PackIcon.Style>
                 </md:PackIcon>
             </Button>
-            <Button Command="{Binding ClearWarningCommand}" Style="{StaticResource MaterialDesignFlatButton}" Width="60" ToolTip="Click to reset warning indicator">
+        <Button Grid.Column="6" Command="{Binding ClearWarningCommand}" Style="{StaticResource MaterialDesignFlatButton}" Width="60" ToolTip="Click to reset warning">
                 <md:PackIcon Kind="WarningBox" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left" >
                     <md:PackIcon.Style>
                         <Style TargetType="md:PackIcon">
@@ -155,7 +167,7 @@
                     </md:PackIcon.Style>
                 </md:PackIcon>
             </Button>
-            <Button Command="{Binding ClearErrorsCommand}" Style="{StaticResource MaterialDesignFlatButton}" Width="60" ToolTip="Click to reset error indicator">
+        <Button Grid.Column="7" Command="{Binding ClearErrorsCommand}" Style="{StaticResource MaterialDesignFlatButton}" Width="60" ToolTip="Click to reset error">
                 <md:PackIcon Kind="AlarmLight" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left" >
                     <md:PackIcon.Style>
                         <Style TargetType="md:PackIcon">
@@ -174,12 +186,12 @@
                     </md:PackIcon.Style>
                 </md:PackIcon>
             </Button>
-            <md:PackIcon Kind="SpeakerWireless" Margin="10 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="Voice indicator" Padding="0">
+        <md:PackIcon Grid.Column="8" Kind="SpeakerWireless" Margin="10 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="Voice" Padding="0">
                 <md:PackIcon.Style>
                     <Style TargetType="md:PackIcon">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding VoiceState}" Value="True">
-                                <Setter Property="Foreground" Value="LimeGreen"></Setter>
+                            <Setter Property="Foreground" Value="{DynamicResource SecondaryAccentBrush}"></Setter>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding VoiceState}" Value="False">
                                 <Setter Property="Foreground" Value="{DynamicResource PrimaryHueDarkBrush}" />
@@ -188,12 +200,12 @@
                     </Style>
                 </md:PackIcon.Style>
             </md:PackIcon>
-            <md:PackIcon Kind="Monitor" Margin="10 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="Monitor indicator">
+        <md:PackIcon Grid.Column="9" Kind="Monitor" Margin="10 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="Monitor">
                 <md:PackIcon.Style>
                     <Style TargetType="md:PackIcon">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding MonitorState}" Value="True">
-                                <Setter Property="Foreground" Value="LimeGreen"></Setter>
+                            <Setter Property="Foreground" Value="{DynamicResource SecondaryAccentBrush}"></Setter>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding MonitorState}" Value="False">
                                 <Setter Property="Foreground" Value="{DynamicResource PrimaryHueDarkBrush}" />
@@ -202,12 +214,12 @@
                     </Style>
                 </md:PackIcon.Style>
             </md:PackIcon>
-            <md:PackIcon Kind="Usb" Margin="10 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="Mount connection indicator">
+        <md:PackIcon Grid.Column="10" Kind="Usb" Margin="10 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="Mount Connection">
                 <md:PackIcon.Style>
                     <Style TargetType="md:PackIcon">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsConnected}" Value="True">
-                                <Setter Property="Foreground" Value="LimeGreen"></Setter>
+                            <Setter Property="Foreground" Value="{DynamicResource SecondaryAccentBrush}"></Setter>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding IsConnected}" Value="False">
                                 <Setter Property="Foreground" Value="{DynamicResource PrimaryHueDarkBrush}" />
@@ -219,8 +231,7 @@
                     </Style>
                 </md:PackIcon.Style>
             </md:PackIcon>
-        </StackPanel>
-    </DockPanel>
+    </Grid>
 </UserControl>
   
  

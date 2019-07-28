@@ -13,22 +13,19 @@
         <StackPanel Orientation="Vertical" Grid.Row="0" HorizontalAlignment="Center">
             <StackPanel Orientation="Horizontal" >
                 <TextBlock Text="RA: "/>  
-                <TextBlock Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" Text="{Binding GoToRaString}"/>
+                <TextBlock Text="{Binding GoToRaString}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Dec: "/>  
-                <TextBlock Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" Text="{Binding GoToDecString}"/>
+                <TextBlock Text="{Binding GoToDecString}"/>
             </StackPanel>
         </StackPanel>
-        <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,10,0,0" Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" >Accept Coordinates?</TextBlock>
-        <StackPanel Orientation="Horizontal" Grid.Row="2"
-                    Margin="0 16 0 0">
-            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}"
-                    Command="{Binding AcceptRaGoToDialogCommand}">
+        <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,10,0,0">Accept Coordinates?</TextBlock>
+        <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="0 16 0 0">
+            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding AcceptRaGoToDialogCommand}">
                 ACCEPT
             </Button>
-            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}"
-                    Command="{Binding CancelRaGoToDialogCommand}">
+            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding CancelRaGoToDialogCommand}">
                 CANCEL
             </Button>
         </StackPanel>

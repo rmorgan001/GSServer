@@ -126,10 +126,6 @@ namespace GS.Server.SkyTelescope
                     lst = SkyServer.SiderealTime;
                     axes = Coordinate.AltAz2RaDec(axes[0], axes[1], SkySettings.Latitude, lst);
 
-                    var monitorItem = new MonitorEntry
-                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"1:{axes[0]},{axes[1]},{SkySettings.Latitude},{lst}" };
-                    MonitorLog.LogToMonitor(monitorItem);
-
                     axes[0] = Coordinate.Ra2Ha(axes[0], lst) * 15.0; // ha in degrees
 
                     if (SkyServer.SouthernHemisphere) axes[1] = -axes[1];
@@ -147,10 +143,6 @@ namespace GS.Server.SkyTelescope
                     lst = SkyServer.SiderealTime;
                     axes = Coordinate.AltAz2RaDec(axes[0], axes[1], SkySettings.Latitude, lst);
 
-                    monitorItem = new MonitorEntry
-                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"1:{axes[0]},{axes[1]},{SkySettings.Latitude},{lst}" };
-                    MonitorLog.LogToMonitor(monitorItem);
-
                     axes[0] = Coordinate.Ra2Ha(axes[0], lst) * 15.0; // ha in degrees
 
                     if (SkyServer.SouthernHemisphere) axes[1] = -axes[1];
@@ -161,6 +153,11 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
             axes = Range.RangeAxesXY(axes);
+            
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Range:{axes[0]},{axes[1]}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
             return new[] { axes[1], axes[0] };
         }
 

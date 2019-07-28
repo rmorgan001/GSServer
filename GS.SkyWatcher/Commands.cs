@@ -410,6 +410,21 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
+        /// j Gets radians position of an axis
+        /// </summary>
+        /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
+        /// <returns>Radians of the axis or NaN if no respose is received</returns>
+        internal double GetAxisPositionNaN(AxisId axis)
+        {
+            var response = CmdToAxis(axis, 'j', null, true);
+            if(string.IsNullOrEmpty(response)) return double.NaN;
+            var iPosition = StringToLong(response);
+            iPosition -= 0x00800000;
+            _positions[(int)axis] = StepToAngle(axis, iPosition);
+            return _positions[(int)axis];
+        }
+
+        /// <summary>
         /// j Gets axis poistion counter
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
@@ -724,8 +739,9 @@ namespace GS.SkyWatcher
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="command">The comamnd char set</param>
         /// <param name="cmdDataStr">The data need to send</param>
+        /// <param name="ignoreWarnings">to ignore serial response issues</param>
         /// <returns>The response string from mount</returns>
-        private string CmdToAxis(AxisId axis, char command, string cmdDataStr)
+        private string CmdToAxis(AxisId axis, char command, string cmdDataStr, bool ignoreWarnings = false)
         {
             MonitorEntry monitorItem;
             for (var i = 0; i < 5; i++)
@@ -766,16 +782,12 @@ namespace GS.SkyWatcher
 
                             }
 
-                            // too many retries - serial issue  
-                            //if (_retryCount > _totalRetriesLimit)
-                            //{
-                            //    _retryCount = 0;
-                            //throw new MountControlException(ErrorCode.ErrTooManyRetries,
-                            //        $"Too Many Serial Retries: {_retryCount}");
-                            //}
-
                             if (string.IsNullOrEmpty(responseString))
                             {
+                                // sometimes :j will not return a response so this is used to ignore it
+                                if (ignoreWarnings) return null;
+
+                                // serial issue stop axes
                                 SendRequest(AxisId.Axis1, 'K', null);
                                 SendRequest(AxisId.Axis2, 'K', null);
                                 throw new TimeoutException("Null Response");

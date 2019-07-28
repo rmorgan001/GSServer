@@ -5,6 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:shared="clr-namespace:GS.Shared;assembly=GS.Shared"
+             xmlns:mdc="clr-namespace:MaterialDesignColors;assembly=MaterialDesignColors"
+             xmlns:domain="clr-namespace:GS.Server.Domain"
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d">
     <UserControl.Resources>
@@ -28,7 +30,7 @@
                 </Setter>
             </Style>
             <DataTemplate DataType="{x:Type shared:MonitorEntry}">
-                <Grid IsSharedSizeScope="True"  >
+                <Grid IsSharedSizeScope="True" Background="Black">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Index" Width="Auto"/>
                         <ColumnDefinition SharedSizeGroup="Date" Width="Auto"/>
@@ -37,6 +39,7 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="{Binding Index}" Grid.Column="0" FontSize="13" FontWeight="Bold" Margin="5,0,0,0"/>
+                    <TextBlock Text="{Binding Path=Datetime, StringFormat=HH:mm:ss.fff}" Grid.Column="1" FontSize="13" Margin="5,0,0,0"/>
                     <!-- Other fields to display in the monitor textblock
                                 <TextBlock Text="{Binding Datetime}" Grid.Column="1" FontSize="13" Margin="5,0,0,0"/>
                                 <TextBlock Text="{Binding Category}" Grid.Column="2" FontSize="13" Margin="5,0,0,0"/>
@@ -45,12 +48,13 @@
                     <TextBlock Text="{Binding Message}" Grid.Column="4" FontSize="13" Margin="5,0,0,0" TextWrapping="Wrap"/>
                 </Grid>
             </DataTemplate>
+            <domain:ColorToBrushConverter x:Key="ColorToBrush"/>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
         <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Center" CloseOnClickAway="True"
                        IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
-        <md:DrawerHost HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="2" 
+        <md:DrawerHost HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0" 
                        IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" 
                        BorderBrush="{DynamicResource MaterialDesignDivider}">
             <md:DrawerHost.LeftDrawerContent>
@@ -60,17 +64,17 @@
                         <RowDefinition Height="26"/>
                         <RowDefinition Height="26"/>
                         <RowDefinition Height="26"/>
-                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
-                    <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" Foreground="{DynamicResource PrimaryHueMidBrush}">Monitor</Label>
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" >Monitor</Label>
                     <ToggleButton Grid.Row="0"   HorizontalAlignment="Right" Margin="5" ToolTip="Close"
                               Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
                               Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
                               CommandParameter="{x:Static Dock.Left}"
                               IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"/>
                     <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="20 0">
-                        <Label Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="{DynamicResource PrimaryHueMidBrush}">Device:</Label>
+                        <Label Width="80" VerticalAlignment="Center" HorizontalAlignment="Right">Device:</Label>
                         <StackPanel Orientation="Horizontal" >
                             <CheckBox IsChecked="{Binding ServerDevice}" Style="{StaticResource MaterialDesignCheckBox}"/>
                             <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" >Server</TextBlock>
@@ -81,7 +85,7 @@
                         </StackPanel>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="20 0">
-                        <Label Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="{DynamicResource PrimaryHueMidBrush}">Category:</Label>
+                        <Label Width="80" VerticalAlignment="Center" HorizontalAlignment="Right">Category:</Label>
                         <StackPanel Orientation="Horizontal" >
                             <CheckBox IsChecked="{Binding Driver}" Style="{StaticResource MaterialDesignCheckBox}"/>
                             <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" >Driver</TextBlock>
@@ -100,7 +104,7 @@
                         </StackPanel>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Grid.Row="3" Margin="20 0">
-                        <Label Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="{DynamicResource PrimaryHueMidBrush}">Type:</Label>
+                        <Label Width="80" VerticalAlignment="Center" HorizontalAlignment="Right">Type:</Label>
                         <StackPanel Orientation="Horizontal" >
                             <CheckBox IsChecked="{Binding Information}" Style="{StaticResource MaterialDesignCheckBox}"/>
                             <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" >Info</TextBlock>
@@ -118,107 +122,119 @@
                             <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" >Error</TextBlock>
                         </StackPanel>
                     </StackPanel>
-                    <StackPanel Grid.Row="4" Margin="20 10" Background="Black" VerticalAlignment="Top">
-                        <ItemsControl Height="235" FontFamily="Segoe UI" FontSize="8" Foreground="DarkSeaGreen" ItemsSource="{Binding Path=MonitorEntries}" Style="{StaticResource LogViewerStyle}"/>
-                    </StackPanel>
+                    <!--<StackPanel Grid.Row="4" Margin="20 10" Background="Black" VerticalAlignment="Stretch">-->
+                    <Border Grid.Row="4" Background="Black" Margin="5,5" >
+                    <ItemsControl FontFamily="Segoe UI" FontSize="8" Foreground="DarkSeaGreen" ItemsSource="{Binding Path=MonitorEntries}" Style="{StaticResource LogViewerStyle}"/>
+                    </Border>
+                    <!--</StackPanel>-->
                     <StackPanel Orientation="Horizontal" Grid.Row="5" VerticalAlignment="Top" HorizontalAlignment="Center">
                         <StackPanel Orientation="Horizontal" >
                             <CheckBox IsChecked="{Binding SessionLog}" Style="{StaticResource MaterialDesignCheckBox}"/>
-                            <TextBlock Width="Auto" ToolTip="On/Off creating a session log" Margin="10 0" VerticalAlignment="Center">Session Log</TextBlock>
+                            <TextBlock Width="Auto" ToolTip="On/Off creating a session log" Margin="5 0" VerticalAlignment="Center">Session Log</TextBlock>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" >
                             <CheckBox IsChecked="{Binding MonitorToFile}" Style="{StaticResource MaterialDesignCheckBox}"/>
-                            <TextBlock Width="Auto" Margin="10 0" VerticalAlignment="Center" ToolTip="Writes text items to a file" >Log to file</TextBlock>
+                            <TextBlock Width="Auto" Margin="5 0" VerticalAlignment="Center" ToolTip="Writes text items to a file" >Log to file</TextBlock>
                         </StackPanel>
-                        <Button Margin="10 0" ToolTip="Start/Stop Monitoring"
+                        <Button Margin="5 0" ToolTip="Start/Stop Monitoring"
                         Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                        Width="100"
+                        Width="75"
                         Command="{Binding ClickStartStopCommand}"
                         Content="{Binding StartStopButtonText}"/>
-                        <Button Margin="10 0" ToolTip="Clear text items"
+                        <Button Margin="5 0" ToolTip="Clear text items"
                         Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                        Width="100"
+                        Width="75"
                         Command="{Binding ClickClearCommand}"
                         Content="Clear"/>
-                        <Button Margin="10 0" ToolTip="Export text to a file"
+                        <Button Margin="5 0" ToolTip="Export text to a file"
                         Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                        Width="100"
+                        Width="75"
                         Command="{Binding ClickExportCommand}"
                         Content="Export"/>
-                        <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" ToolTip="Total text lines" Text="{Binding Path=MonitorEntries.Count}" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                        <Button Margin="5 0" ToolTip="Copy to Clipboard"
+                                Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                                Width="75"
+                                Command="{Binding ClickCopyCommand}"
+                                Content="Copy"/>
+                        <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" ToolTip="Total text lines" Text="{Binding Path=MonitorEntries.Count}"/>
                     </StackPanel>
                 </Grid>
             </md:DrawerHost.LeftDrawerContent>
-            <Grid >
+            <Grid Margin="5,5">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="40" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
                     <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False" x:Name="MenuToggleButton" ToolTip="Open"
                                   Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}"
                                   Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
                 </StackPanel>
-                <Grid Grid.Row="1" HorizontalAlignment="Center" >
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="35" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Row="0" Grid.Column="0"  Margin="10 0" VerticalAlignment="Center"  HorizontalAlignment="Center"  Foreground="{DynamicResource PrimaryHueMidBrush}">Available Tabs</TextBlock>
-                    <TextBlock Grid.Row="0" Grid.Column="1"  Margin="10 0" VerticalAlignment="Center"  HorizontalAlignment="Center"  Foreground="{DynamicResource PrimaryHueMidBrush}">Options</TextBlock>
-                    <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
-                    <StackPanel Orientation="Horizontal" Width="Auto"  Margin="10 10">
-                        <CheckBox ToolTip="On/Off menu item" IsChecked="{Binding SkyWatcher}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                        <TextBlock Margin="10 0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}">SkyWatcher</TextBlock>
+                <ScrollViewer Grid.Row="1"  VerticalScrollBarVisibility="Auto">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Bottom"  HorizontalAlignment="Center"  Foreground="{DynamicResource MaterialDesignColumnHeader}">Available Tabs</TextBlock>
+                        <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom"  HorizontalAlignment="Center"  Foreground="{DynamicResource MaterialDesignColumnHeader}">Options</TextBlock>
+                        <TextBlock Grid.Row="0" Grid.Column="2" VerticalAlignment="Bottom"  HorizontalAlignment="Center"  Foreground="{DynamicResource MaterialDesignColumnHeader}">Voice</TextBlock>
+                        <TextBlock Grid.Row="0" Grid.Column="3" VerticalAlignment="Bottom"  HorizontalAlignment="Center"  Foreground="{DynamicResource MaterialDesignColumnHeader}">Theme Colors</TextBlock>
+                        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Bottom"  HorizontalAlignment="Center"  Foreground="{DynamicResource MaterialDesignColumnHeader}">Performance</TextBlock>
+                        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Width="Auto" Margin="5">
+                            <CheckBox ToolTip="On/Off menu item" IsChecked="{Binding SkyWatcher}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
+                            <TextBlock Margin="10 0" VerticalAlignment="Center">SkyWatcher</TextBlock>
+                        </StackPanel>
+                            <!--<StackPanel Orientation="Horizontal" Width="Auto"  Margin="10 10">
+                                <CheckBox IsChecked="{Binding Focuser}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
+                            <TextBlock Margin="10 0" VerticalAlignment="Center">Focuser</TextBlock>
+                            </StackPanel>-->
+                            <StackPanel Orientation="Horizontal" Width="Auto"  Margin="5">
+                                <CheckBox ToolTip="On/Off menu item" IsChecked="{Binding Charting}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
+                                <TextBlock Margin="10 0" VerticalAlignment="Center">Charts</TextBlock>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Width="Auto"  Margin="5">
+                                <CheckBox ToolTip="On/Off menu item" IsChecked="{Binding Notes}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
+                                <TextBlock Margin="10 0" VerticalAlignment="Center">Notes</TextBlock>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Width="Auto"  Margin="5">
+                                <CheckBox IsChecked="{Binding Gamepad}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
+                                <TextBlock Margin="10 0" VerticalAlignment="Center">Gamepad</TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Width="Auto"  Margin="5">
+                            <CheckBox ToolTip="On/Off screensavor" IsChecked="{Binding SleepMode}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
+                            <TextBlock Margin="10 0" VerticalAlignment="Center">No Sleep mode</TextBlock>
+                        </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="5">
+                            <CheckBox ToolTip="Start in taks bar" IsChecked="{Binding StartMinimized}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
+                            <TextBlock Margin="10 0" VerticalAlignment="Center">Start minimized</TextBlock>
+                        </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="5">
+                            <CheckBox ToolTip="Window above other windows" IsChecked="{Binding StartOnTop}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
+                            <TextBlock Margin="10 0" VerticalAlignment="Center">Start window on top</TextBlock>
+                        </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="5">
+                            <CheckBox ToolTip="Polar alignment warning" IsChecked="{Binding HomeWarning}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
+                            <TextBlock Margin="10 0" VerticalAlignment="Center">Home Warning On</TextBlock>
+                        </StackPanel>
                     </StackPanel>
-                    <!--<StackPanel Orientation="Horizontal" Width="Auto"  Margin="10 10">
-                        <CheckBox IsChecked="{Binding Focuser}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                    <TextBlock Margin="10 0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}">Focuser</TextBlock>
-                    </StackPanel>-->
-                    <StackPanel Orientation="Horizontal" Width="Auto"  Margin="10 10">
-                        <CheckBox ToolTip="On/Off menu item" IsChecked="{Binding Charting}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                        <TextBlock Margin="10 0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}">Charts</TextBlock>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Width="Auto"  Margin="10 10">
-                        <CheckBox ToolTip="On/Off menu item" IsChecked="{Binding Notes}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                        <TextBlock Margin="10 0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}">Notes</TextBlock>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Width="Auto"  Margin="10 10">
-                        <CheckBox IsChecked="{Binding Gamepad}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                        <TextBlock Margin="10 0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}">Gamepad</TextBlock>
-                    </StackPanel>
-                </StackPanel>
-                <StackPanel Grid.Row="1" Grid.Column="1" Width="Auto" Orientation="Vertical" VerticalAlignment="Top"  Margin="10 0" HorizontalAlignment="Center">
-                    <StackPanel Orientation="Horizontal" Width="Auto"  Margin="10 10">
-                        <CheckBox ToolTip="On/Off screensavor" IsChecked="{Binding SleepMode}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                        <TextBlock Margin="10 0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}">No Sleep mode</TextBlock>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="10 10">
-                        <CheckBox ToolTip="Start in taks bar" IsChecked="{Binding StartMinimized}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                        <TextBlock Margin="10 0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}">Start minimized</TextBlock>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="10 10">
-                        <CheckBox ToolTip="Window above other windows" IsChecked="{Binding StartOnTop}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                        <TextBlock Margin="10 0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}">Start window on top</TextBlock>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="10 10">
-                        <CheckBox ToolTip="Polar alignment warning" IsChecked="{Binding HomeWarning}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                        <TextBlock Margin="10 0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}">Home Warning On</TextBlock>
-                    </StackPanel>
-                </StackPanel>
-                <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Vertical" VerticalAlignment="Top"  Margin="0 0" HorizontalAlignment="Center">
-                    <StackPanel Orientation="Horizontal" Margin="10 10">
+                        <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Center">
+                          <StackPanel Orientation="Horizontal" Margin="10 10">
                         <CheckBox ToolTip="Activate speech" IsChecked="{Binding VoiceActive}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                        <TextBlock Margin="10 0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}">Voice/Speech on</TextBlock>
+                        <TextBlock Margin="10 0" VerticalAlignment="Center">Voice/Speech on</TextBlock>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="10 -5">
+                            <StackPanel Orientation="Horizontal" Margin="10 -5">
                         <ComboBox md:HintAssist.Hint="Voice Name" ToolTip="Voice selection"
                           MinWidth="10" Width="210" HorizontalAlignment="Left"
                           ItemsSource="{Binding VoiceNames}"
@@ -233,10 +249,10 @@
                             </ComboBox.ItemsPanel>
                         </ComboBox>
                     </StackPanel>
-                    <StackPanel Orientation="Vertical" Margin="10 15" HorizontalAlignment="Left" Width="210">
+                            <StackPanel Orientation="Vertical" Margin="10 15" HorizontalAlignment="Left" Width="210">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Margin="0 5" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Volume level</TextBlock>
-                            <TextBlock Margin="75 0" Width="60" VerticalAlignment="Center" Text="{Binding VoiceVolume}" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            <TextBlock Margin="0 5" VerticalAlignment="Center">Volume level</TextBlock>
+                            <TextBlock Margin="75 0" Width="60" VerticalAlignment="Center" Text="{Binding VoiceVolume}"/>
                         </StackPanel>
                         <Slider Value="{Binding VoiceVolume, Mode=TwoWay}" Foreground="{DynamicResource PrimaryHueLightBrush}" ToolTip="Volume"
                         TickFrequency="10" 
@@ -246,61 +262,80 @@
                         Minimum="1"
                         Maximum="100" />
                     </StackPanel>
-                    <StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Left" Width="210">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}">Simulator Performance</TextBlock>
-                            <TextBlock Margin="15,0,0,0" Text="{Binding SimInterval, StringFormat={} {0}ms}" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                         </StackPanel>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Label Grid.Column="0" HorizontalAlignment="Left">Fast</Label>
-                            <Label Grid.Column="1" HorizontalAlignment="Center">Med</Label>
-                            <Label Grid.Column="2" HorizontalAlignment="Right">Slow</Label>
-                        </Grid>
-                        <Slider Value="{Binding SimInterval, Mode=TwoWay}" Foreground="{DynamicResource PrimaryHueLightBrush}" ToolTip="Performance"
-                                TickFrequency="10" 
-                                IsSnapToTickEnabled ="True"
-                                TickPlacement="BottomRight"
-                                Orientation="Horizontal"
-                                Delay="3"
-                                Minimum="100"
-                                Maximum="500" />
-                    </StackPanel>
-                    <StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Left" Width="210">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}">SkyWatcher Performance</TextBlock>
-                            <TextBlock  Width="60" VerticalAlignment="Center" Text="{Binding SkyInterval, StringFormat={} {0}ms}" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                        <StackPanel Grid.Row="1" Grid.Column="3" Orientation="Vertical" HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Margin="8" HorizontalAlignment="Center">
+                                <TextBlock VerticalAlignment="Center">Light</TextBlock>
+                                <ToggleButton Margin="8 0 16 0" IsChecked="{Binding DarkTheme}" Command="{Binding ClickBaseCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=IsChecked}" />
+                                <TextBlock VerticalAlignment="Center">Dark</TextBlock>
+                            </StackPanel>
+                            <ComboBox md:HintAssist.Hint="Primary Color" Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                      ItemsSource="{Binding PrimaryColors}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                                <ComboBox.SelectedItem>
+                                    <Binding Path="PrimaryColor" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                                </ComboBox.SelectedItem>
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type mdc:Swatch}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="20"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <md:PackIcon Grid.Column="0" Kind="CameraIris" Width="20" Height="20" Foreground="{Binding ExemplarHue.Color, Converter={StaticResource ColorToBrush}}"/>
+                                            <TextBlock Grid.Column="1" Margin="10,0,0,0" Text="{Binding Name}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
+                            <ComboBox IsEnabled="True" md:HintAssist.Hint="Accent Color" Margin="5" 
+                                      ItemsSource="{Binding AccentColors}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                                <ComboBox.SelectedItem>
+                                    <Binding Path="AccentColor" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                                </ComboBox.SelectedItem>
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type mdc:Swatch}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="20"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <md:PackIcon Grid.Column="0" Kind="CameraIris" Width="20" Height="20" Foreground="{Binding ExemplarHue.Color, Converter={StaticResource ColorToBrush}}"/>
+                                            <TextBlock Grid.Column="1" Margin="10,0,0,0" Text="{Binding Name}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
                         </StackPanel>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Label Grid.Column="0" HorizontalAlignment="Left">Fast</Label>
-                            <Label Grid.Column="1" HorizontalAlignment="Center">Med</Label>
-                            <Label Grid.Column="2" HorizontalAlignment="Right">Slow</Label>
-                        </Grid>
-                        <Slider Value="{Binding SkyInterval, Mode=TwoWay}" Foreground="{DynamicResource PrimaryHueLightBrush}" ToolTip="Performance"
-                                TickFrequency="10"  
-                                IsSnapToTickEnabled ="True"
-                                TickPlacement="BottomRight"
-                                Orientation="Horizontal"
-                                Delay="3"
-                                Minimum="100"
-                                Maximum="500" />
-                    </StackPanel>
-                </StackPanel>
-  
-
-                </Grid>
-
-                
-          </Grid>
+                        <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center">
+                            <ComboBox md:HintAssist.Hint="Display Interval (ms)" MinWidth="100" Margin="0,10,0,5" ToolTip="Display Interval"
+                                      ItemsSource="{Binding IntervalList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                                <ComboBox.SelectedItem>
+                                    <Binding Path="DisplayInterval" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </ComboBox.SelectedItem>
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+            </Grid>
         </md:DrawerHost>
     </Grid>
 </UserControl>

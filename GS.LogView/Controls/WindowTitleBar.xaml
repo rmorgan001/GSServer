@@ -8,8 +8,8 @@
     <StackPanel Background="Black" >
         <Grid>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10,0,0,0">
-                <Label Content="GS LogView" FontSize="15" Foreground="{DynamicResource PrimaryHueMidBrush}" VerticalAlignment="Center"/>
-                <Label Content="{Binding Version}" FontSize="10" Foreground="{DynamicResource PrimaryHueMidBrush}" VerticalAlignment="Center"/>
+                <Label Content="GS LogView" FontSize="15" VerticalAlignment="Center"/>
+                <Label Content="{Binding Version}" FontSize="10" VerticalAlignment="Center"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5 0">
                 <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}"   Foreground="{DynamicResource PrimaryHueMidBrush}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding MinimizeWindowCommand}"  WindowChrome.IsHitTestVisibleInChrome="True">

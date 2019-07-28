@@ -539,14 +539,19 @@ namespace GS.SkyWatcher
         /// <summary>
         /// Get axis position in degrees
         /// </summary>
-        /// <returns>vector in degrees</returns>
+        /// <returns>array in degrees, could return array of NaN if no responces returned</returns>
         internal double[] GetPositionsInDegrees()
         {
             var positions = new double[] {0, 0};
-            {
-                positions[0] = Principles.Units.Rad2Deg1(_commands.GetAxisPosition(AxisId.Axis1));
-                positions[1] = Principles.Units.Rad2Deg1(_commands.GetAxisPosition(AxisId.Axis2));
-            }
+
+            var x = _commands.GetAxisPositionNaN(AxisId.Axis1);
+            if (!double.IsNaN(x)) x = Principles.Units.Rad2Deg1(x);
+            positions[0] = x;
+
+            var y = _commands.GetAxisPositionNaN(AxisId.Axis2);
+            if (!double.IsNaN(y)) y = Principles.Units.Rad2Deg1(y);
+            positions[1] = y;
+
             return positions;
         }
 

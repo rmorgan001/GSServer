@@ -7,7 +7,7 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              TextOptions.TextFormattingMode="Display" FontSize="15"
              mc:Ignorable="d">
-    <Grid Width="800">
+    <Grid >
         <md:DialogHost HorizontalAlignment="Center" CloseOnClickAway="True"
                        IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
         <!--<md:DrawerHost  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="2" 
@@ -21,7 +21,7 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0" Grid.Column="0" >
-                    <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18"  Foreground="{DynamicResource PrimaryHueMidBrush}">Settings</Label>
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18">Settings</Label>
                     <ToggleButton DockPanel.Dock="Top" HorizontalAlignment="Right" Margin="5" 
                         Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
                         Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
@@ -30,37 +30,37 @@
                 </Grid>
             </Grid>
         </md:DrawerHost.LeftDrawerContent>-->
-        <Grid Width="800">
-            <Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions >
                 <!--<RowDefinition Height="40"/>-->
                 <RowDefinition Height="80"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="80"/>
-                </Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
                 <!--<ToggleButton Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top"
                 Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}"
                 Style="{StaticResource MaterialDesignHamburgerToggleButton}" IsChecked="False" x:Name="MenuToggleButton"/>-->
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10 10" HorizontalAlignment="Center">
-                    <TextBlock Margin="10 0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}">Gamepad On</TextBlock>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10 10" HorizontalAlignment="Left">
+                    <TextBlock Margin="10 0" VerticalAlignment="Center" >Gamepad On</TextBlock>
                     <CheckBox ToolTip="Gamepad On" IsChecked="{Binding IsGamepadRunning}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                    <TextBlock Margin="20,0,10,0" VerticalAlignment="Center"  Foreground="{DynamicResource PrimaryHueMidBrush}">Sensitivity:</TextBlock>
+                    <TextBlock Margin="20,0,10,0" VerticalAlignment="Center">Sensitivity:</TextBlock>
                     <Slider Name="sDelay" Width="200"  Minimum="50" Maximum="500" AutoToolTipPlacement="BottomRight" 
                             VerticalAlignment="Center"  IsSnapToTickEnabled="True" IsEnabled="{Binding EnableTextBoxes}"
                             Style="{StaticResource MaterialDesignSlider}" Value="{Binding Delay, UpdateSourceTrigger=PropertyChanged, Delay=800}"/>
-                    <TextBlock Margin="10 0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}"
-                               Text="{Binding ElementName=sDelay, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{Binding ElementName=sDelay, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
-            <Grid Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center">
+            <ScrollViewer Grid.Row="1"  VerticalScrollBarVisibility="Auto">
+                    <Grid >
                 <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="70"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="180"/>
-                    <ColumnDefinition Width="180"/>
-                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <TextBox Grid.Row="0" Grid.Column="0" md:HintAssist.Hint="Tracking" Width="125" Margin="0,10,0,0" IsReadOnly="True"
                     Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}" >
@@ -266,9 +266,10 @@
                         </b:EventTrigger>
                     </b:Interaction.Triggers>
                 </TextBox>
+                <Button Grid.Row="4" Grid.ColumnSpan="3" Grid.Column="0" HorizontalAlignment="Center" Content="Save" IsEnabled="{Binding EnableTextBoxes}"
+                        Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSaveCommand}"/>
             </Grid>
-            <Button Grid.Row="2" HorizontalAlignment="Center" Content="Save" IsEnabled="{Binding EnableTextBoxes}"
-                        Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ClickSaveCommand}"/>
+                </ScrollViewer>
         </Grid>
     <!--</md:DrawerHost>-->
     </Grid>

@@ -51,15 +51,15 @@
         <StackPanel Orientation="Vertical" Grid.Row="2" HorizontalAlignment="Center" Margin="0,5,0,5">
             <StackPanel Orientation="Horizontal" >
                 <TextBlock Text="Latitude: "/>  
-                <TextBlock Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" Text="{Binding CdcLatString}"/>
+                <TextBlock Text="{Binding CdcLatString}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Longitude: "/>
-                <TextBlock Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" Text="{Binding CdcLongString}"/>
+                <TextBlock Text="{Binding CdcLongString}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Elevation: "/>
-                <TextBlock Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" Text="{Binding CdcElevation}"/>
+                <TextBlock Text="{Binding CdcElevation}"/>
                 <TextBlock Text="m"/>
             </StackPanel>
         </StackPanel>

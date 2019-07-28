@@ -52,6 +52,15 @@ namespace GS.Shared
             }
         }
 
+        public static IEnumerable<int> InclusiveIntRange(int start, int end, int step = 1)
+        {
+            while (start <= end)
+            {
+                yield return start;
+                start += step;
+            }
+        }
+
         public static double TruncateD(double value, int digits)
         {
             var factor = Math.Pow(10.0, digits);

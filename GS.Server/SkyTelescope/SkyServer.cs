@@ -214,6 +214,7 @@ namespace GS.Server.SkyTelescope
         // Driver input for mount moves
         private static bool _ascomOn;
 
+        // Allow ascom driver movements
         public static bool AscomOn
         {
             get => _ascomOn;
@@ -698,7 +699,6 @@ namespace GS.Server.SkyTelescope
             {
                 if (value == _mountrunning) return;
                 _mountrunning = value;
-                AscomOn = value;
                 if (value)
                 {
                     MountStart();
@@ -1050,6 +1050,8 @@ namespace GS.Server.SkyTelescope
                         case MountTaskName.StopAxes:
                             _ = new CmdAxisStop(0, Axis.Axis1);
                             _ = new CmdAxisStop(0, Axis.Axis2);
+                            break;
+                        case MountTaskName.InitialiseAxes:
                             break;
                         case MountTaskName.InstantStopAxes:
                             break;
@@ -1451,6 +1453,9 @@ namespace GS.Server.SkyTelescope
                             break;
                         case MountTaskName.LoadDefaults:
                             _ = new SkyLoadDefaultMountSettings(0);
+                            break;
+                        case MountTaskName.InitialiseAxes:
+                            _ = new SkyInitializeAxes(0);
                             break;
                         case MountTaskName.InstantStopAxes:
                             _ = new SkyAxisStopInstant(0, AxisId.Axis1);
@@ -2236,7 +2241,7 @@ namespace GS.Server.SkyTelescope
         private static bool MountConnect()
         {
             object _;
-            AscomOn = true;
+            if(!AscomOn)AscomOn = true;
             _targetRaDec = new Vector(double.NaN, double.NaN); // invalid target position
             var positions = GetDefaultPositions();
 
@@ -2250,11 +2255,12 @@ namespace GS.Server.SkyTelescope
 
                     if (_mountAxes.X.Equals(double.NaN) || _mountAxes.Y.Equals(double.NaN))
                     {
-                        _ = new CmdAxisToDegrees(0, Axis.Axis1, positions[0]);
+                         _ = new CmdAxisToDegrees(0, Axis.Axis1, positions[0]);
                         _ = new CmdAxisToDegrees(0, Axis.Axis2, positions[1]);
                     }
                     else
                     {
+                        // set because of reconnects so axes doesn't start at zero
                         _altAzSync = new Vector(Azimuth, Altitude);
                         SimTasks(MountTaskName.SyncAltAz);
                     }
@@ -2265,7 +2271,7 @@ namespace GS.Server.SkyTelescope
                     SkyTrackingRate = new Vector(0, 0);
 
                     // create a command and put in queue to test connection
-                    var init = new SkyInitializeAxes(SkyQueue.NewId);
+                    var init = new SkyGetMotorCardVersion(SkyQueue.NewId, AxisId.Axis1);
                     _ = (string) SkyQueue.GetCommandResult(init).Result;
                     if (!init.Successful && init.Exception != null)
                     {
@@ -2279,22 +2285,19 @@ namespace GS.Server.SkyTelescope
                     SkyTasks(MountTaskName.Encoders);
                     SkyTasks(MountTaskName.FullCurrent);
                     SkyTasks(MountTaskName.SetSt4Guiderate);
-                    SkyTasks(MountTaskName.GetOneStepIndicators);
                     SkyTasks(MountTaskName.SetSouthernHemisphere);
                     SkyTasks(MountTaskName.MountName);
                     SkyTasks(MountTaskName.MountVersion);
                     SkyTasks(MountTaskName.StepsPerRevolution);
+                    SkyTasks(MountTaskName.InitialiseAxes);
+                    SkyTasks(MountTaskName.GetOneStepIndicators);
 
                     if (_mountAxes.X.Equals(double.NaN) || _mountAxes.Y.Equals(double.NaN))
                     {
                         _ = new SkySetAxisPosition(0, AxisId.Axis1, positions[0]);
                         _ = new SkySetAxisPosition(0, AxisId.Axis2, positions[1]);
                     }
-                    else
-                    {
-                        _altAzSync = new Vector(Azimuth, Altitude);
-                        SimTasks(MountTaskName.SyncAltAz);
-                    }
+
 
                     break;
                 default:
@@ -2322,7 +2325,7 @@ namespace GS.Server.SkyTelescope
                     if (!MountQueue.IsRunning) throw new Exception("Failed to start simulator queue");
 
                     // start event to update UI
-                    interval = SkySettings.SimInterval;
+                    interval = SkySettings.DisplayInterval;
 
                     break;
                 case MountType.SkyWatcher:
@@ -2338,7 +2341,7 @@ namespace GS.Server.SkyTelescope
                         throw new SkyServerException(ErrorCode.ErrMount, "Failed to start sky queue");
 
                     // Event to get mount data and update UI
-                    interval = SkySettings.SkyInterval;
+                    interval = SkySettings.DisplayInterval;
 
                     break;
                 default:
@@ -2983,18 +2986,19 @@ namespace GS.Server.SkyTelescope
                 switch (SkySystem.Mount)
                 {
                     case MountType.Simulator:
-                        _mediatimer.Period = SkySettings.SimInterval;
+                        _mediatimer.Period = SkySettings.DisplayInterval;
                         break;
                     case MountType.SkyWatcher:
-                        _mediatimer.Period = SkySettings.SkyInterval;
+                        _mediatimer.Period = SkySettings.DisplayInterval;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
 
-                // Get raw positions
+                // Get raw positions, some are non-responses from mount and are returned as NaN
                 var rawPositions = GetRawPositions();
-                if (rawPositions == null) return;
+                if (double.IsNaN(rawPositions[0]) || double.IsNaN(rawPositions[1])) return;
+                //if (rawPositions == null) return;
 
                 // UI diagnostics
                 ActualAxisX = rawPositions[0];

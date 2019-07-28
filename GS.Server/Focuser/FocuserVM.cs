@@ -17,6 +17,7 @@ using System;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Input;
+using GS.Principles;
 using GS.Server.Domain;
 using GS.Server.Helpers;
 using GS.Server.Main;
@@ -36,6 +37,10 @@ namespace GS.Server.Focuser
 
         public FocuserVM()
         {
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading FocuserVM" };
+            MonitorLog.LogToMonitor(monitorItem);
+
             SkyTelescope();
         }
 
@@ -122,12 +127,12 @@ namespace GS.Server.Focuser
         private void OpenDialog(string msg)
         {
             if (msg != null) DialogMsg = msg;
-            DialogContent = new Dialog();
+            DialogContent = new DialogOK();
             IsDialogOpen = true;
 
             var monitorItem = new MonitorEntry
             {
-                Datetime = Principles.HiResDateTime.UtcNow,
+                Datetime = HiResDateTime.UtcNow,
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Interface,
                 Type = MonitorType.Information,

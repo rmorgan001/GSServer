@@ -189,6 +189,45 @@ namespace GS.Server.Settings
             }
         }
 
+        private static bool _darkTheme;
+        public static bool DarkTheme
+        {
+            get => _darkTheme;
+            set
+            {
+                if (_darkTheme == value) return;
+                _darkTheme = value;
+                Properties.Server.Default.DarkTheme = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static string _primaryColor;
+        public static string PrimaryColor
+        {
+            get => _primaryColor;
+            set
+            {
+                if (_primaryColor == value) return;
+                _primaryColor = value;
+                Properties.Server.Default.PrimaryColor = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static string _accentColor;
+        public static string AccentColor
+        {
+            get => _accentColor;
+            set
+            {
+                if (_accentColor == value) return;
+                _accentColor = value;
+                Properties.Server.Default.AccentColor = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Methods      
@@ -209,7 +248,9 @@ namespace GS.Server.Settings
             VoiceName = Properties.Server.Default.VoiceName;
             VoiceVolume = Properties.Server.Default.VoiceVolume;
             DarkSkyKey = Properties.Server.Default.DarkSkyKey;
-
+            DarkTheme = Properties.Server.Default.DarkTheme;
+            PrimaryColor = Properties.Server.Default.PrimaryColor;
+            AccentColor = Properties.Server.Default.AccentColor;
 
         }
 

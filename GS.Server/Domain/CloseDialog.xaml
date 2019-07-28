@@ -9,15 +9,12 @@
             <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <TextBlock VerticalAlignment="Center" Margin="10 0" Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" xml:space="preserve"  >Application(s) still connected. &#10; Accept to close anyway?</TextBlock>
-        <StackPanel Orientation="Horizontal" Grid.Row="1"
-                    Margin="0 16 0 0">
-            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" 
-                    Command="{Binding AcceptCloseDialogCommand}">
+        <TextBlock VerticalAlignment="Center" Margin="10 0" xml:space="preserve"  >Application(s) still connected. &#10; Accept to close anyway?</TextBlock>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0 16 0 0">
+            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding AcceptCloseDialogCommand}">
                 ACCEPT
             </Button>
-            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}"
-                    Command="{Binding CancelCloseDialogCommand}">
+            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding CancelCloseDialogCommand}">
                 CANCEL
             </Button>
         </StackPanel>

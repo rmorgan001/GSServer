@@ -1771,11 +1771,11 @@ namespace ASCOM.GS.Sky.Telescope
             switch (SkySystem.Mount)
             {
                 case MountType.Simulator:
-                    delay += SkySettings.SimInterval;
+                    delay += SkySettings.DisplayInterval;
                     break;
                 case MountType.SkyWatcher:
                     delay += 20;  // some gotos have been off .10 to .70 seconds, not sure exactly why
-                    delay += SkySettings.SkyInterval;
+                    delay += SkySettings.DisplayInterval;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

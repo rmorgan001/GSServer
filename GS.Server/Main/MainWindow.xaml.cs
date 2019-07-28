@@ -35,6 +35,7 @@ namespace GS.Server.Main
             base.OnStateChanged(e);
 
             InvalidateMeasure();
+
         }
     }
 }

@@ -9,14 +9,12 @@
             <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <TextBlock VerticalAlignment="Center" Margin="10 0" Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" >Accept to set mount position to the Home position</TextBlock>
+        <TextBlock VerticalAlignment="Center" Margin="10 0" >Accept to set mount position to the Home position</TextBlock>
         <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0 16 0 0" HorizontalAlignment="Center">
-            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" 
-                    Command="{Binding AcceptHomeResetDialogCommand}">
+            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding AcceptHomeResetDialogCommand}">
                 ACCEPT
             </Button>
-            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}"
-                    Command="{Binding CancelHomeResetDialogCommand}">
+            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding CancelHomeResetDialogCommand}">
                 CANCEL
             </Button>
         </StackPanel>

@@ -131,6 +131,7 @@ namespace GS.Server.Gps
                 MonitorLog.LogToMonitor(monitorItem);
 
                 GpsRunning = false;
+                //throw;
             }
         }
 

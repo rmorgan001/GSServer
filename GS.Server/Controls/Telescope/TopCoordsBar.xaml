@@ -6,14 +6,24 @@
              xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d"  d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
-    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10 0" >
-        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" >Right Ascension:</Label>
-        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="LimeGreen" Content="{Binding RightAscension, UpdateSourceTrigger=PropertyChanged}"/>
-        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" >Declination:</Label>
-        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="LimeGreen" Content="{Binding Declination, UpdateSourceTrigger=PropertyChanged}"/>
-        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" >Azimuth:</Label>
-        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="LimeGreen" Content="{Binding Azimuth, UpdateSourceTrigger=PropertyChanged}"/>
-        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" >Altitude:</Label>
-        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="LimeGreen" Content="{Binding Altitude, UpdateSourceTrigger=PropertyChanged}"/>
-    </StackPanel>
+    <Grid VerticalAlignment="Center">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Label Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" >Right Ascension:</Label>
+        <Label Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource SecondaryAccentBrush}" Content="{Binding RightAscension, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label Grid.Column="2" VerticalAlignment="Bottom" HorizontalAlignment="Center" >Declination:</Label>
+        <Label Grid.Column="3" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource SecondaryAccentBrush}" Content="{Binding Declination, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label Grid.Column="4" VerticalAlignment="Bottom" HorizontalAlignment="Center" >Azimuth:</Label>
+        <Label Grid.Column="5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource SecondaryAccentBrush}" Content="{Binding Azimuth, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label Grid.Column="6" VerticalAlignment="Bottom" HorizontalAlignment="Center" >Altitude:</Label>
+        <Label Grid.Column="7" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource SecondaryAccentBrush}" Content="{Binding Altitude, UpdateSourceTrigger=PropertyChanged}"/>
+    </Grid>
 </UserControl>

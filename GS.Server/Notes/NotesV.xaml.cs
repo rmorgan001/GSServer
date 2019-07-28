@@ -749,7 +749,7 @@ namespace GS.Server.Notes
         {
             if (msg == null) return;
             DialogMsg = msg;
-            DialogContent = new Dialog1();
+            DialogContent = new DialogOK();
             IsDialogOpen = true;
         }
 
@@ -1019,6 +1019,30 @@ namespace GS.Server.Notes
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void RtbEditor_OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                using (var ms = new MemoryStream())
+                {
+                    var range = new TextRange(rtbEditor.Document.ContentStart, rtbEditor.Document.ContentEnd);
+                    range.Save(ms, DataFormats.Rtf);
+                    ms.Seek(0, SeekOrigin.Begin);
+                    using (var sr = new StreamReader(ms))
+                    {
+                        SkyServer.Notes = sr.ReadToEnd();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog1(ex.Message);
+            }
         }
     }
 }

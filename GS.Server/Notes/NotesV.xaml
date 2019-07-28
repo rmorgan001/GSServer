@@ -18,7 +18,7 @@
         <CommandBinding Command="ApplicationCommands.SaveAs" Executed="SaveAs_Executed" />
         <CommandBinding Command="ApplicationCommands.Save" Executed="Save_Executed" />
     </UserControl.CommandBindings>
-    <Grid Width="800">
+    <Grid>
         <md:DialogHost HorizontalAlignment="Center" CloseOnClickAway="True" Name="DialogHost"
                        IsOpen="{Binding Path=IsDialogOpen}" DialogContent="{Binding Path=DialogContent}"/>
         <!--<md:DrawerHost HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="2" 
@@ -41,18 +41,20 @@
                 </Grid>
             </Grid>
         </md:DrawerHost.LeftDrawerContent>-->
-        <Grid Width="800">
+        <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="35"/>
-                <RowDefinition Height="35"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Width="900" >
-                    <!--<ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top"
+            </Grid.RowDefinitions>
+            <!--<StackPanel Grid.Row="0" Orientation="Horizontal">
+                <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top"
                         Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}"
-                        Style="{StaticResource MaterialDesignHamburgerToggleButton}" IsChecked="False" x:Name="MenuToggleButton"/>-->
-                    <ToolBarTray VerticalAlignment="Center" Width="800" Background="{DynamicResource MaterialDesignPaper}">
-                        <ToolBar Style="{DynamicResource MaterialDesignToolBar}" Background="{DynamicResource MaterialDesignPaper}" ClipToBounds="True" >
+                        Style="{StaticResource MaterialDesignHamburgerToggleButton}" IsChecked="False" x:Name="MenuToggleButton"/>
+            </StackPanel>-->
+            <md:ColorZone Grid.Row="0" Mode="Standard">
+                <ToolBarTray VerticalAlignment="Stretch" IsLocked="True" >
+                    <ToolBar Background="Transparent">
                                     <Button Padding="2" Command="Open" ToolTip="Open"><md:PackIcon Kind="FileDocumentOutline"/></Button>
                                     <Button Padding="2" Command="Save" ToolTip="Save"><md:PackIcon Kind="ContentSave"/></Button>
                                     <Button Padding="2" Command="SaveAs" ToolTip="SaveAs"><md:PackIcon Kind="FileReplace"/></Button>
@@ -150,30 +152,32 @@
                                     </ToggleButton>
                         </ToolBar>
                         </ToolBarTray>
-                </StackPanel>
-                <ToolBarTray Grid.Row="1" VerticalAlignment="Center" Background="{DynamicResource MaterialDesignPaper}">
-                    <ToolBar Style="{DynamicResource MaterialDesignToolBar}" Background="{DynamicResource MaterialDesignPaper}" >
+            </md:ColorZone>
+            <md:ColorZone Grid.Row="1" Mode="Standard">
+            <ToolBarTray VerticalAlignment="Stretch" IsLocked="True">
+                <ToolBar Background="Transparent" Margin="5,0,0,0">
                         <Label VerticalAlignment="Center" Padding="0">Shortcuts:</Label>
                         <Button ToolTip="Date" Padding="2" Click="BtDate_OnClick"><md:PackIcon Kind="DateRange"/></Button>
                         <Button ToolTip="Time" Padding="2" Click="BtTime_OnClick"><md:PackIcon Kind="EventTime"/></Button>
-                        <Button ToolTip="Ra" Click="Ra_OnClick" Height="25"  Width="35" Margin="1" Padding="2" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}">Ra</Button>
-                        <Button ToolTip="Dec" Click="Dec_OnClick" Height="25" Width="35"  Margin="1" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}">Dec</Button>
-                        <Button ToolTip="Alt" Click="BtAlt_OnClick" Height="25"  Width="35"  Margin="1"  Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}">Alt</Button>
-                        <Button ToolTip="Az" Click="BtAz_OnClick" Height="25" Width="35"  Margin="1" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}">Az</Button>
-                        <Button ToolTip="Moon Phase" Click="BtMoon_OnClick" Height="25" Width="45"  Margin="1" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}">Moon</Button>
-                        <Button ToolTip="Log Entry" Click="BtLog_OnClick" Height="25" Width="25"  Margin="1" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}">Log</Button>
-                        <Button ToolTip="Alignment Mode" Click="BtAlignmentMode_OnClick" Height="25" Width="25"  Margin="1" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}">Am</Button>
-                        <Button ToolTip="Equatorial Coordinate Type" Click="BtEqSystem_OnClick" Height="25" Width="25"  Margin="1" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}">Eq</Button>
-                        <Button ToolTip="Observatory Location" Click="BtObservatory_OnClick" Height="25" Width="25"  Margin="1" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}">Ob</Button>
-                        <Button ToolTip="Weather" Click="BtWeather_OnClick" Height="25" Width="58" HorizontalAlignment="Left"  Margin="1" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}">Weather</Button>
+                        <Button ToolTip="Ra" Click="Ra_OnClick" Margin="1" Padding="2" >Ra</Button>
+                    <Button ToolTip="Dec" Click="Dec_OnClick"  Margin="1" Padding="2">Dec</Button>
+                    <Button ToolTip="Alt" Click="BtAlt_OnClick" Margin="1" Padding="2">Alt</Button>
+                    <Button ToolTip="Az" Click="BtAz_OnClick" Margin="1" Padding="2">Az</Button>
+                    <Button ToolTip="Moon Phase" Click="BtMoon_OnClick" Margin="1" Padding="2">Moon</Button>
+                    <Button ToolTip="Log Entry" Click="BtLog_OnClick" Margin="1" Padding="2">Log</Button>
+                    <Button ToolTip="Alignment Mode" Click="BtAlignmentMode_OnClick" Margin="1" Padding="2">Am</Button>
+                    <Button ToolTip="Equatorial Coordinate Type" Click="BtEqSystem_OnClick" Margin="1" Padding="2">Eq</Button>
+                    <Button ToolTip="Observatory Location" Click="BtObservatory_OnClick" Margin="1" Padding="2">Ob</Button>
+                    <Button ToolTip="Weather" Click="BtWeather_OnClick" HorizontalAlignment="Left"  Margin="1" Padding="2">Weather</Button>
                         <!--<ComboBox Name="cbSkySettings" ToolTip="Font" Width="100" />-->
                     </ToolBar>
             </ToolBarTray>
-                <RichTextBox Grid.Row="2" x:Name="rtbEditor" Margin="5,5,5,5" AcceptsTab="True" AcceptsReturn="True" SpellCheck.IsEnabled="False" 
-                             FontFamily="Arial" FontSize="12" VerticalScrollBarVisibility="Auto" TextOptions.TextFormattingMode="Ideal"
-                             TextOptions.TextRenderingMode="Auto"  Background="#202020"  Foreground="DarkSeaGreen"
-                             KeyDown="RtbEditor_OnKeyDown" SelectionChanged="RtbEditor_SelectionChanged" />
-            </Grid>
+            </md:ColorZone>
+            <RichTextBox Grid.Row="2" x:Name="rtbEditor" AcceptsTab="True" AcceptsReturn="True" SpellCheck.IsEnabled="False" 
+                             FontFamily="Arial" FontSize="14" VerticalScrollBarVisibility="Auto" TextOptions.TextFormattingMode="Ideal" Unloaded="RtbEditor_OnUnloaded"
+                             TextOptions.TextRenderingMode="Auto"  MinHeight="200" MinWidth="700" Foreground="{DynamicResource MaterialDesignBody}"
+                             KeyDown="RtbEditor_OnKeyDown" SelectionChanged="RtbEditor_SelectionChanged" Background="{DynamicResource MaterialDesignPaper}"/>
+        </Grid>
     <!--</md:DrawerHost>-->
     </Grid>
 </UserControl>

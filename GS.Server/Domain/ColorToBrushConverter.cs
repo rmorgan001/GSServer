@@ -25,19 +25,17 @@ namespace GS.Server.Domain
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null)
-                return new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
-
-            if (value is Color)
-                return new SolidColorBrush((Color)value);
-
-            if (value is string)
+            switch (value)
             {
-                return value.Equals(string.Empty) ? new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)) : new SolidColorBrush(ParseString((string) value));
+                case null:
+                    return new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
+                case Color color:
+                    return new SolidColorBrush(color);
+                case string s:
+                    return value.Equals(string.Empty) ? new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)) : new SolidColorBrush(ParseString(s));
+                default:
+                    throw new NotSupportedException("ColorToBurshConverter only supports converting from Color and String");
             }
-
-
-            throw new NotSupportedException("ColorToBurshConverter only supports converting from Color and String");
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

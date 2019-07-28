@@ -101,9 +101,6 @@
     <Setting Name="TraceLogger" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="SimulatorInterval" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">300</Value>
-    </Setting>
     <Setting Name="RATrackingOffset" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
@@ -112,9 +109,6 @@
     </Setting>
     <Setting Name="Temperature" Type="System.Double" Scope="User">
       <Value Profile="(Default)">20</Value>
-    </Setting>
-    <Setting Name="SkyInterval" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">300</Value>
     </Setting>
     <Setting Name="GuideRateOffsetX" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.5</Value>
@@ -253,6 +247,9 @@
     </Setting>
     <Setting Name="FullCurrent" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="DisplayInterval" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">300</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -12,23 +12,23 @@
         xmlns:properties="clr-namespace:GS.Server.Properties"
         xmlns:notes="clr-namespace:GS.Server.Notes"
         xmlns:gamepad="clr-namespace:GS.Server.Gamepad"
-        mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanMinimize"  WindowStyle="None" 
+        mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanResizeWithGrip"  WindowStyle="None" 
         WindowState="{Binding WindowState, Source={x:Static properties:Server.Default}, Mode=TwoWay}"
         Height="{Binding WindowHeight, Source={x:Static properties:Server.Default}, Mode=TwoWay}" 
         Width="{Binding WindowWidth, Source={x:Static properties:Server.Default}, Mode=TwoWay}"
         Left="{Binding WindowLeft, Source={x:Static properties:Server.Default}, Mode=TwoWay}"
         Top="{Binding WindowTop, Source={x:Static properties:Server.Default}, Mode=TwoWay}"
-        ContentRendered="MainWindow_OnContentRendered" Closed="MainWindow_OnClosed" SizeToContent="WidthAndHeight"
+        ContentRendered="MainWindow_OnContentRendered" Closed="MainWindow_OnClosed"  
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         d:DataContext="{d:DesignInstance main:MainWindowVM, IsDesignTimeCreatable=True}"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}" 
-        Background="{DynamicResource MaterialDesignPaper}" >
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}" Title="GS Server" FontStretch="Normal">
     <WindowChrome.WindowChrome>
         <WindowChrome
             ResizeBorderThickness="6"
             CaptionHeight="30"
             CornerRadius="5,5,5,5"
-            GlassFrameThickness="0">
+            GlassFrameThickness="1">
         </WindowChrome>
     </WindowChrome.WindowChrome>
     <Window.Resources>
@@ -51,17 +51,21 @@
             <gamepad:GamepadV />
         </DataTemplate>
     </Window.Resources>
-    <Grid Height="510" Width="800">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="440"/>
-        </Grid.RowDefinitions>
-        <mcontrol:WindowTitleBar Grid.Row="0" />
-        <mcontrol:TabBar Grid.Row="1" />
-        <Grid Grid.Row="2">
-            <ContentControl Content="{Binding CurrentPageViewModel}" />
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo x:Name="taskBarItemInfo" Description="GreenSweep Server" />
+    </Window.TaskbarItemInfo>
+    <Grid Background="{DynamicResource MaterialDesignBody}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <mcontrol:WindowTitleBar Grid.Row="0"/>
+            <mcontrol:TabBar Grid.Row="1"/>
+        <Grid Grid.Row="2" Margin="1" Background="{DynamicResource MaterialDesignPaper}">
+                <ContentControl Content="{Binding CurrentPageViewModel}"/>
+            </Grid>
         </Grid>
-    </Grid>
+
 </Window>
 

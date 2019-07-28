@@ -18,14 +18,17 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Windows;
 using System.Windows.Input;
 using GS.Server.Domain;
 using GS.Server.Helpers;
 using GS.Server.Main;
 using GS.Server.SkyTelescope;
 using GS.Shared;
+using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
 using Microsoft.Win32;
 
@@ -36,7 +39,7 @@ namespace GS.Server.Settings
         #region fields
 
         public string TopName => "GS Server";
-        public string BottomName => "Settings";
+        public string BottomName => "Options";
         public int Uid => 3;
         private readonly MainWindowVM _mainWindowVm;
         public static SettingsVM _settingsVM;
@@ -70,10 +73,21 @@ namespace GS.Server.Settings
 
                     _mainWindowVm = MainWindowVM._mainWindowVm;
                     SleepMode = Settings.SleepMode;
+
+                    // Theme Colors
+                    PrimaryColors = (IList<Swatch>) new SwatchesProvider().Swatches;
+                    var primaryColors = PrimaryColors as Swatch[] ?? PrimaryColors.ToArray();
+                    AccentColors = primaryColors.Where(item => item.IsAccented).ToList();
+                    PrimaryColor = primaryColors.First(item => item.Name.Equals(Settings.PrimaryColor));
+                    AccentColor = primaryColors.First(item => item.Name.Equals(Settings.AccentColor));
+                    new PaletteHelper().SetLightDark(Settings.DarkTheme);
+
+                    //Performance
+                    IntervalList = new List<int>(Numbers.InclusiveIntRange(10, 500, 10));
                 }
             }
             catch (Exception ex)
-            {
+            { 
                 var monitorItem = new MonitorEntry
                 { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
@@ -84,7 +98,7 @@ namespace GS.Server.Settings
 
         #region ViewModel
 
-          /// <summary>
+        /// <summary>
         /// Subscription to changes from Settings
         /// </summary>
         /// <param name="sender"></param>
@@ -103,6 +117,15 @@ namespace GS.Server.Settings
                                 break;
                             case "Focuser":
                                 Focuser = Settings.Focuser;
+                                break;
+                            case "DarkTheme":
+                                DarkTheme = Settings.DarkTheme;
+                                break;
+                            case "PrimaryColor":
+                               // PrimaryColor = Settings.PrimaryColor;
+                                break;
+                            case "AccentColor":
+                                //AccentColor = Settings.AccentColor;
                                 break;
                             case "Gamepad":
                                 Gamepad = Settings.Gamepad;
@@ -284,36 +307,58 @@ namespace GS.Server.Settings
             }
         }
 
-        #endregion
-
-        #region Properties
-
-        private int _skyInterval;
-        public int SkyInterval
+        public bool DarkTheme
         {
-            get => SkySettings.SkyInterval;
+            get => Settings.DarkTheme;
             set
             {
-                if (value == _skyInterval) return;
-                _skyInterval = value;
-                SkySettings.SkyInterval = value;
+                Settings.DarkTheme = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public IList<Swatch> PrimaryColors { get; }
+        private Swatch _primaryColor;
+        public Swatch PrimaryColor
+        {
+            get => _primaryColor;
+            set
+            {
+                _primaryColor = value;
+                new PaletteHelper().ReplacePrimaryColor(_primaryColor);
+                Settings.PrimaryColor = _primaryColor.Name;
+                OnPropertyChanged();
+            }
+        }
+
+        public IList<Swatch> AccentColors { get; }
+        private Swatch _accentColor;
+        public Swatch AccentColor
+        {
+            get => _accentColor;
+            set
+            {
+                _accentColor = value;
+                new PaletteHelper().ReplaceAccentColor(_accentColor);
+                Settings.AccentColor = _accentColor.Name;
+                OnPropertyChanged();
+            }
+        }
+
+        public IList<int> IntervalList { get; }
+        private int _displayInterval;
+        public int DisplayInterval
+        {
+            get => SkySettings.DisplayInterval;
+            set
+            {
+                if (value == _displayInterval) return;
+                _displayInterval = value;
+                SkySettings.DisplayInterval = value;
                 OnPropertyChanged();
             }
         }
         
-        private int _simInterval;
-        public int SimInterval
-        {
-            get => SkySettings.SimInterval;
-            set
-            {
-                if (value == _simInterval) return;
-                _simInterval = value;
-                SkySettings.SimInterval = value;
-                OnPropertyChanged();
-            }
-        }
-
         public bool HomeWarning
         {
             get => SkySettings.HomeWarning;
@@ -661,6 +706,138 @@ namespace GS.Server.Settings
             }
         }
 
+        private ICommand _clickCopyCommand;
+        public ICommand ClickCopyCommand
+        {
+            get
+            {
+                return _clickCopyCommand ?? (_clickCopyCommand = new RelayCommand(
+                           param => ClickCopy()
+                       ));
+            }
+        }
+        private void ClickCopy()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    using (var stream = new MemoryStream())
+                    {
+                        var sw = new StreamWriter(stream);
+                        foreach (var item in MonitorEntries)
+                        {
+                            sw.Write($"{item.Index},{item.Datetime.ToLocalTime():dd/MM/yyyy HH:mm:ss.fff},{item.Device},{item.Category},{item.Type},{item.Thread},{item.Method},{item.Message}{Environment.NewLine}");
+                            sw.Flush();
+                        }
+                        sw.Flush();
+                        stream.Position = 0;
+                        using (var streamReader = new StreamReader(stream))
+                        {
+                            Clipboard.SetText(streamReader.ReadToEnd());
+                        }
+                        stream.Close();
+                        OpenDialog("Copied to Clipboard");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private ICommand _clickBaseCommand;
+        public ICommand ClickBaseCommand
+        {
+            get
+            {
+                return _clickBaseCommand ?? (_clickBaseCommand = new RelayCommand(
+                           param => ClickBase((bool)param)
+                       ));
+            }
+        }
+        private void ClickBase(bool isDark)
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    new PaletteHelper().SetLightDark(isDark);
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private ICommand _clickPrimaryColorCommand;
+        public ICommand ClickPrimaryColorCommand
+        {
+            get
+            {
+                return _clickPrimaryColorCommand ?? (_clickPrimaryColorCommand = new RelayCommand(
+                           param => ClickPrimaryColor((Swatch)param)
+                       ));
+            }
+        }
+        private void ClickPrimaryColor(Swatch swatch)
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    new PaletteHelper().ReplacePrimaryColor(swatch);
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private ICommand _clickAccentColorCommand;
+        public ICommand ClickAccentColorCommand
+        {
+            get
+            {
+                return _clickAccentColorCommand ?? (_clickAccentColorCommand = new RelayCommand(
+                           param => ClickAccentColor((Swatch)param)
+                       ));
+            }
+        }
+        private void ClickAccentColor(Swatch swatch)
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    new PaletteHelper().ReplaceAccentColor(swatch);
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message);
+            }
+        }
+
         #endregion
 
         #region Error  
@@ -714,7 +891,7 @@ namespace GS.Server.Settings
         private void OpenDialog(string msg)
         {
             if (msg != null) DialogMsg = msg;
-            DialogContent = new Dialog();
+            DialogContent = new DialogOK();
             IsDialogOpen = true;
 
             var monitorItem = new MonitorEntry

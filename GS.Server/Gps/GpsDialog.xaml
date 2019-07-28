@@ -30,19 +30,19 @@
         <StackPanel Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Center" Margin="0,5">
             <StackPanel Orientation="Horizontal" >
                 <TextBlock Text="NMEA: "/>
-                <TextBlock Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" Text="{Binding NmeaSentence}"/>
+                <TextBlock Text="{Binding NmeaSentence}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" >
                 <TextBlock Text="Latitude: "/>  
-                <TextBlock Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" Text="{Binding GpsLatString}"/>
+                <TextBlock Text="{Binding GpsLatString}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Longitude: "/>
-                <TextBlock Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" Text="{Binding GpsLongString}"/>
+                <TextBlock Text="{Binding GpsLongString}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Elevation: "/>
-                <TextBlock Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" Text="{Binding GpsElevation}"/>
+                <TextBlock Text="{Binding GpsElevation}"/>
                 <TextBlock Text="m"/>
             </StackPanel>
         </StackPanel>

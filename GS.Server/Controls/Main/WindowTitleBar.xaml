@@ -8,19 +8,21 @@
     <StackPanel Background="Black" >
         <Grid>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10,0,0,0">
-                <Label Content="GS Server" FontSize="15" Foreground="{DynamicResource PrimaryHueMidBrush}" VerticalAlignment="Center"/>
-                <Label Content="{Binding Version}" FontSize="10" Foreground="{DynamicResource PrimaryHueMidBrush}" VerticalAlignment="Center"/>
+                <Label Content="GS Server" FontSize="15" VerticalAlignment="Bottom" Foreground="{DynamicResource PrimaryHueLightBrush}"/>
+                <Label Content="{Binding Version}" VerticalAlignment="Bottom" Foreground="{DynamicResource PrimaryHueLightBrush}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5 0">
-                <Label Content="Connected Applications:" FontSize="10" Foreground="{DynamicResource PrimaryHueMidBrush}" VerticalAlignment="Center"/>
-                <Label Content="{Binding AppCount}" Foreground="{DynamicResource PrimaryHueMidBrush}" VerticalAlignment="Center"/>
-                <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}"   Foreground="{DynamicResource PrimaryHueMidBrush}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding MinimizeWindowCommand}"  WindowChrome.IsHitTestVisibleInChrome="True">
-                    <md:PackIcon Kind="WindowMinimize" VerticalAlignment="Center" Width="25" Height="25" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                <Label Content="Connected Applications:" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueLightBrush}"/>
+                <Label Content="{Binding AppCount}" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueLightBrush}"/>
+                <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding MinimizeWindowCommand}"  WindowChrome.IsHitTestVisibleInChrome="True">
+                    <md:PackIcon Kind="WindowMinimize" VerticalAlignment="Center" Width="25" Height="25" Foreground="{DynamicResource PrimaryHueLightBrush}" />
                 </Button>
-                <md:DialogHost HorizontalAlignment="Left" VerticalAlignment="Bottom" CloseOnClickAway="True"
-                                   IsOpen="{Binding IsCloseDialogOpen}" DialogContent="{Binding CloseContent}">
-                    <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueMidBrush}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding OpenCloseDialogCommand}" WindowChrome.IsHitTestVisibleInChrome="True">
-                        <md:PackIcon Kind="Power" VerticalAlignment="Center" Width="25" Height="25" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding MaximizeWindowCommand}"  WindowChrome.IsHitTestVisibleInChrome="True">
+                    <md:PackIcon Kind="WindowMaximize" VerticalAlignment="Center" Width="25" Height="25" Foreground="{DynamicResource PrimaryHueLightBrush}" />
+                </Button>
+                <md:DialogHost HorizontalAlignment="Left" VerticalAlignment="Bottom" CloseOnClickAway="True" IsOpen="{Binding IsCloseDialogOpen}" DialogContent="{Binding CloseContent}">
+                    <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightBrush}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding OpenCloseDialogCommand}" WindowChrome.IsHitTestVisibleInChrome="True">
+                        <md:PackIcon Kind="Power" VerticalAlignment="Center" Width="25" Height="25" Foreground="{DynamicResource PrimaryHueLightBrush}" />
                     </Button>
                 </md:DialogHost>
             </StackPanel>

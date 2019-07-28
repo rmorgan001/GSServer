@@ -19,7 +19,7 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0" Grid.Column="0" >
-                    <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18"  Foreground="{DynamicResource PrimaryHueMidBrush}">Settings</Label>
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18">Settings</Label>
                     <ToggleButton DockPanel.Dock="Top" HorizontalAlignment="Right" Margin="5" 
                         Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
                         Command="{x:Static md:DrawerHost.CloseDrawerCommand}"

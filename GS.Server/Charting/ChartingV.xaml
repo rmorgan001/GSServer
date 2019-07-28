@@ -12,24 +12,23 @@
              mc:Ignorable="d" d:DataContext="{d:DesignInstance local:ChartingVM}">
             <UserControl.Resources>
                 <domain:EnumBooleanConverter x:Key="EBC" />
-                <BooleanToVisibilityConverter  x:Key="BoolToVis" />
+                <BooleanToVisibilityConverter  x:Key="BoolToVis"/>
                 <domain:BoolToRowHeightConverter x:Key="BtH"/>
                 <domain:ColorToBrushConverter x:Key="ColorToBrush"/>
             </UserControl.Resources>
-    <Grid VerticalAlignment="Top">
+    <Grid>
         <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Center"  CloseOnClickAway="True" 
                        IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
-        <md:DrawerHost  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="2" 
-                 IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" BorderBrush="{DynamicResource MaterialDesignDivider}">
+        <md:DrawerHost BorderThickness="0" IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" BorderBrush="{DynamicResource MaterialDesignDivider}">
             <md:DrawerHost.LeftDrawerContent>
                 <Grid Width="750">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="40" />
-                        <RowDefinition Height="440"/>
-                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid Grid.Row="0" Grid.Column="0" >
-                        <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18"  Foreground="{DynamicResource PrimaryHueMidBrush}">Settings</Label>
+                        <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18">Settings</Label>
                         <ToggleButton DockPanel.Dock="Top" HorizontalAlignment="Right" Margin="5" ToolTip="Close"
                                               Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
                                               Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
@@ -53,7 +52,7 @@
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Pulse Charts:</Label>
+                        <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Pulse Charts:</Label>
                         <StackPanel Orientation="Horizontal" Grid.Row="0"  Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center">
                             <RadioButton GroupName="DataType" Margin="20,0,0,0" VerticalAlignment="Center" ToolTip="Pulse in steps" Style="{StaticResource MaterialDesignRadioButton}"
                                      IsChecked="{Binding DataType, Converter={StaticResource EBC}, ConverterParameter={x:Static local:ChartTypes.Steps}}">Microsteps</RadioButton>
@@ -61,25 +60,25 @@
                                      IsChecked="{Binding DataType, Converter={StaticResource EBC}, ConverterParameter={x:Static local:ChartTypes.Duration}}">Duration(ms)</RadioButton>
                             <RadioButton GroupName="DataType" Margin="10,0,0,0" VerticalAlignment="Center" ToolTip="Time to execute pulse" Style="{StaticResource MaterialDesignRadioButton}"
                                      IsChecked="{Binding DataType, Converter={StaticResource EBC}, ConverterParameter={x:Static local:ChartTypes.Execute}}">Execution(ms)</RadioButton>
-                            <Label Margin="10,3,0,0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >In Arcseconds:</Label>
+                            <Label Margin="10,3,0,0" VerticalAlignment="Center">In Arcseconds:</Label>
                             <ToggleButton Margin="10,0,0,0" VerticalAlignment="Center" ToolTip="Convert Pulses to Arcseconds" Style="{StaticResource MaterialDesignActionLightToggleButton}" Width="25" Height="25" x:Name="ArcsecondsCheckbox" IsChecked="{Binding ShowInArcseconds}"/>
                         </StackPanel>
-                        <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Other Charts:</Label>
+                        <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Other Charts:</Label>
                         <StackPanel Orientation="Horizontal" Grid.Row="1"  Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center">
                             <RadioButton GroupName="DataType" Margin="20,0,0,0" VerticalAlignment="Center" ToolTip="Estimate tracking quality" Style="{StaticResource MaterialDesignRadioButton}"
                                          IsChecked="{Binding DataType, Converter={StaticResource EBC}, ConverterParameter={x:Static local:ChartTypes.Tracking}}">Tracking</RadioButton>
-                            <Label Margin="10,3,0,0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Base on previous poistion</Label>
+                            <Label Margin="10,3,0,0" VerticalAlignment="Center">Base on previous poistion</Label>
                             <ToggleButton Margin="10,0,0,0" VerticalAlignment="Center" ToolTip="Base on last position" Style="{StaticResource MaterialDesignActionLightToggleButton}" Width="25" Height="25" x:Name="BaseIndexPositionCheckBox" IsChecked="{Binding BaseIndexPosition}"/>
                         </StackPanel>
-                        <Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >RA Chart:</Label>
+                        <Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center">RA Chart:</Label>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="3"  Grid.Column="1" Grid.ColumnSpan="2">
-                            <Label Margin="0,0,0,0"  VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Line</Label>
+                            <Label Margin="0,0,0,0"  VerticalAlignment="Center">Line</Label>
                             <ToggleButton ToolTip="Line chart" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" IsChecked="{Binding RaLine}"/>
-                            <Label Margin="10,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Bar</Label>
+                            <Label Margin="10,0,0,0" VerticalAlignment="Center">Bar</Label>
                             <ToggleButton  ToolTip="Bar chart"  Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" IsChecked="{Binding RaBar}"/>
-                            <Label Margin="10,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Step</Label>
+                            <Label Margin="10,0,0,0" VerticalAlignment="Center">Step</Label>
                             <ToggleButton  ToolTip="Step chart" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" IsChecked="{Binding RaStep}"/>
-                            <Label Margin="10,0,0,0"  VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Invert:</Label>
+                            <Label Margin="10,0,0,0"  VerticalAlignment="Center">Invert:</Label>
                             <ToggleButton ToolTip="Switch data positive/negative" Margin="0,0,0,0" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" IsChecked="{Binding InvertRa}"/>
                             <ComboBox Margin="30,0,0,0"  md:HintAssist.Hint="Color" MinWidth="72" VerticalAlignment="Bottom" Width="200"
                                       ItemsSource="{Binding ColorsList}" >
@@ -109,15 +108,15 @@
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
                         </StackPanel>
-                        <Label Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Dec Chart:</Label>
+                        <Label Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Dec Chart:</Label>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2">
-                            <Label Margin="0,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Line</Label>
+                            <Label Margin="0,0,0,0" VerticalAlignment="Center">Line</Label>
                             <ToggleButton ToolTip="Line chart" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" IsChecked="{Binding DecLine}"/>
-                            <Label Margin="10,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Bar</Label>
+                            <Label Margin="10,0,0,0" VerticalAlignment="Center">Bar</Label>
                             <ToggleButton ToolTip="Bar chart" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" IsChecked="{Binding DecBar}"/>
-                            <Label Margin="10,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Step</Label>
+                            <Label Margin="10,0,0,0" VerticalAlignment="Center">Step</Label>
                             <ToggleButton ToolTip="Step chart" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" IsChecked="{Binding DecStep}"/>
-                            <Label Margin="10,0,0,0"  VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Invert:</Label>
+                            <Label Margin="10,0,0,0"  VerticalAlignment="Center">Invert:</Label>
                             <ToggleButton ToolTip="Switch data positive/negative" Margin="0,0,0,0" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" IsChecked="{Binding InvertDec}"/>
                             <ComboBox Margin="30,0,0,0"  md:HintAssist.Hint="Color" MinWidth="72" VerticalAlignment="Bottom" Width="200"
                                       ItemsSource="{Binding ColorsList}" >
@@ -147,15 +146,15 @@
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
                         </StackPanel>
-                        <Label Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >PHD RA:</Label>
+                        <Label Grid.Row="5" Grid.Column="0" VerticalAlignment="Center">PHD RA:</Label>
                         <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center">
-                            <Label Margin="0,0,0,0"  VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Line</Label>
+                            <Label Margin="0,0,0,0"  VerticalAlignment="Center">Line</Label>
                             <ToggleButton ToolTip="Line chart" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" IsChecked="{Binding ThirdLine}"/>
-                            <Label Margin="10,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Bar</Label>
+                            <Label Margin="10,0,0,0" VerticalAlignment="Center">Bar</Label>
                             <ToggleButton ToolTip="Bar chart" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" IsChecked="{Binding ThirdBar}"/>
-                            <Label Margin="10,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Step</Label>
+                            <Label Margin="10,0,0,0" VerticalAlignment="Center">Step</Label>
                             <ToggleButton ToolTip="Step chart" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" IsChecked="{Binding ThirdStep}"/>
-                            <Label Margin="10,0,0,0"  VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Invert:</Label>
+                            <Label Margin="10,0,0,0"  VerticalAlignment="Center">Invert:</Label>
                             <ToggleButton ToolTip="Switch data positive/negative" Margin="0,0,0,0" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" IsChecked="{Binding InvertThird}"/>
                             <ComboBox Margin="30,0,0,0"  md:HintAssist.Hint="Color" MinWidth="72" VerticalAlignment="Bottom" Width="200"
                                       ItemsSource="{Binding ColorsList}" >
@@ -185,15 +184,15 @@
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
                         </StackPanel>
-                        <Label Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >PHD Dec:</Label>
+                        <Label Grid.Row="6" Grid.Column="0" VerticalAlignment="Center">PHD Dec:</Label>
                         <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center">
-                            <Label Margin="0,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Line</Label>
+                            <Label Margin="0,0,0,0" VerticalAlignment="Center" >Line</Label>
                             <ToggleButton ToolTip="Line chart" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" IsChecked="{Binding FourthLine}"/>
-                            <Label Margin="10,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Bar</Label>
+                            <Label Margin="10,0,0,0" VerticalAlignment="Center">Bar</Label>
                             <ToggleButton ToolTip="Bar chart" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" IsChecked="{Binding FourthBar}"/>
-                            <Label Margin="10,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Step</Label>
+                            <Label Margin="10,0,0,0" VerticalAlignment="Center">Step</Label>
                             <ToggleButton ToolTip="Step chart"  Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" IsChecked="{Binding FourthStep}"/>
-                            <Label Margin="10,0,0,0"  VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Invert:</Label>
+                            <Label Margin="10,0,0,0"  VerticalAlignment="Center">Invert:</Label>
                             <ToggleButton ToolTip="Switch data positive/negative" Margin="0,0,0,0" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" IsChecked="{Binding InvertFourth}"/>
                             <ComboBox Margin="30,0,0,0"  md:HintAssist.Hint="Color" MinWidth="72" VerticalAlignment="Bottom" Width="200"
                                 ItemsSource="{Binding ColorsList}" >
@@ -224,11 +223,11 @@
                             </ComboBox>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Grid.Row="7"  Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center">
-                            <Label Margin="0,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Disable Animations:</Label>
+                            <Label Margin="0,0,0,0" VerticalAlignment="Center" >Disable Animations:</Label>
                             <ToggleButton Margin="0,0,0,0" ToolTip="Animate drawing lines" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" IsChecked="{Binding DisableAnimations}"/>
-                            <Label Margin="10,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Logging:</Label>
+                            <Label Margin="10,0,0,0" VerticalAlignment="Center">Logging:</Label>
                             <ToggleButton Margin="0,0,0,0" ToolTip="Output file ChartingLog" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" x:Name="ToFileCheckbox" IsChecked="{Binding LogCharting}"/>
-                            <Label Visibility="Hidden" Margin="10,0,0,0"  VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Test Data:</Label>
+                            <Label Visibility="Hidden" Margin="10,0,0,0"  VerticalAlignment="Center">Test Data:</Label>
                             <ToggleButton Visibility="Hidden" Margin="0,0,0,0" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" x:Name="TestCheckbox" IsChecked="{Binding TestData}"/>
                         </StackPanel>
                         <StackPanel  Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="2">
@@ -277,6 +276,21 @@
                                     </ItemsPanelTemplate>
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
+                            <ComboBox md:HintAssist.Hint="Max Points"  MinWidth="15" Margin="10,0,0,0" VerticalAlignment="Bottom" HorizontalAlignment="Center" 
+                                      ItemsSource="{Binding MaxPointsRange}" ToolTip="Total number of points" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                                <ComboBox.SelectedItem>
+                                    <Binding Path="MaxPoints" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </ComboBox.SelectedItem>
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
                             <TextBox md:HintAssist.Hint="PHD2 Host IP" Width="100" Margin="15,0,0,0" ToolTip="Address to PHD2 server" Style="{StaticResource MaterialDesignFloatingHintTextBox}" >
                                 <TextBox.Text>
                                     <Binding Path="PhdHostText" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -290,43 +304,38 @@
                     </Grid>
                 </Grid>
             </md:DrawerHost.LeftDrawerContent>
-            <Grid>
+            <Grid Margin="5,5">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="40"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <ToggleButton Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False" x:Name="MenuToggleButton"
                           Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" ToolTip="Open"
                           Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
-                <Grid Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="40"/>
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Center"  Margin="30,0,0,0">
-                        <Label VerticalAlignment="Bottom" ToolTip="Chart Type" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" Content="{Binding ChartName}"/>
-                        <md:Badged Badge="{Binding StartBadgeContent}" BadgeColorZoneMode="PrimaryMid">
-                            <Button Margin="10,5,0,0" Height="30" Width="80" ToolTip="On/Off" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickStartChartingCommand}">
-                                Start
-                            </Button>
-                        </md:Badged>
-                        <Button Margin="15,0,0,0" Height="30" Width="80" ToolTip="Remove Plots" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickClearChartCommand}">
-                            Clear
+                <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Center" >
+                    <Label VerticalAlignment="Center"  ToolTip="Chart Type" HorizontalAlignment="Center" Content="{Binding ChartName}"/>
+                    <md:Badged Badge="{Binding StartBadgeContent}" BadgeColorZoneMode="PrimaryMid" VerticalAlignment="Center">
+                        <Button Margin="10,0,0,0" Height="30" Width="80" ToolTip="On/Off" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickStartChartingCommand}">
+                            Start
                         </Button>
-                        <md:Badged Badge="{Binding PhdBadgeContent}" BadgeColorZoneMode="PrimaryMid">
-                            <Button Margin="15,5,0,0" Height="30" Width="80" ToolTip="Connect" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPhdConnectCommand}">
-                                PHD2
-                            </Button>
-                        </md:Badged>
-                        <ToggleButton Margin="20,0,0,0" ToolTip="Off/On" Style="{StaticResource MaterialDesignActionLightToggleButton}" Background="{Binding RaColor}" HorizontalAlignment="Center" Width="25" Height="25" x:Name="RACheckbox" IsChecked="{Binding RaCheckBox}"/>
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >RA</Label>
-                        <ToggleButton ToolTip="Off/On" Style="{StaticResource MaterialDesignActionLightToggleButton}" Background="{Binding DecColor}" HorizontalAlignment="Center" Width="25" Height="25" x:Name="DecCheckbox" IsChecked="{Binding DecCheckBox}"/>
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Dec</Label>
-                        <Button Margin="10,0,0,0" Height="30" Width="80" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickChartZoomResetCommand}">
-                            AutoY
+                    </md:Badged>
+                    <Button Margin="15,0,0,0" Height="30" Width="80" ToolTip="Remove Plots"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickClearChartCommand}">
+                        Clear
+                    </Button>
+                    <md:Badged Badge="{Binding PhdBadgeContent}" BadgeColorZoneMode="PrimaryMid" VerticalAlignment="Center">
+                        <Button Margin="15,0,0,0" Height="30" Width="80" ToolTip="Connect" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPhdConnectCommand}">
+                            PHD2
                         </Button>
-                    </StackPanel>
-                    <Grid Grid.Column="0" Grid.Row="1" Height="360" Width="780" ShowGridLines="False" HorizontalAlignment="Center" >
+                    </md:Badged>
+                    <ToggleButton Margin="20,0,0,0" ToolTip="Off/On" Style="{StaticResource MaterialDesignActionLightToggleButton}" Background="{Binding RaColor}" HorizontalAlignment="Center" Width="25" Height="25" x:Name="RACheckbox" IsChecked="{Binding RaCheckBox}"/>
+                    <Label VerticalAlignment="Center"  HorizontalAlignment="Center">RA</Label>
+                    <ToggleButton ToolTip="Off/On" Style="{StaticResource MaterialDesignActionLightToggleButton}" Background="{Binding DecColor}" HorizontalAlignment="Center" Width="25" Height="25" x:Name="DecCheckbox" IsChecked="{Binding DecCheckBox}"/>
+                    <Label VerticalAlignment="Center"  HorizontalAlignment="Center">Dec</Label>
+                    <Button Margin="10,0,0,0" Height="30" Width="80" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickChartZoomResetCommand}">
+                        AutoY
+                    </Button>
+                </StackPanel>
+                    <Grid Grid.Row="1" ShowGridLines="True"  Background="{DynamicResource MaterialDesignPaper}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="{Binding RaRowHeight, Converter={StaticResource BtH}}"/>
                             <RowDefinition Height="{Binding DecRowHeight, Converter={StaticResource BtH}}"/>
@@ -336,15 +345,15 @@
                             <ColumnDefinition/>
                             <ColumnDefinition Width="0"/>
                         </Grid.ColumnDefinitions>
-                        <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BorderBrush="DimGray" Opacity=".5" BorderThickness=".5"/>
-                        <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" Visibility="Hidden">W</Label>
-                        <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" Visibility="Hidden">E</Label>
+                        <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BorderBrush="{Binding RaColor}"  Opacity="1" BorderThickness="1" Margin="0,0,0,1"/>
+                        <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center">W</Label>
+                        <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center">E</Label>
                         <Grid Grid.Column="1" Grid.Row="0" Margin="20,0,10,0">
-                            <Label HorizontalAlignment="Left" IsEnabled="False" Foreground="{DynamicResource PrimaryHueMidBrush}" Content="{Binding StrRaLineOne, Mode=OneWay}"/>
-                            <Label HorizontalAlignment="Right" IsEnabled="False" Foreground="{DynamicResource PrimaryHueMidBrush}">Ra</Label>
+                            <Label HorizontalAlignment="Left" IsEnabled="False" Content="{Binding StrRaLineOne, Mode=OneWay}"/>
+                            <Label HorizontalAlignment="Center" IsEnabled="True" FontSize="18">Ra</Label>
                         </Grid>
                         <lvc:CartesianChart Grid.Column="1" Grid.Row="0" Foreground="DarkGray" Hoverable="False" DisableAnimations="{Binding DisableAnimations, Mode=OneWay}" AnimationsSpeed="{Binding AnimationsSpeed, Mode=OneWay}" DataTooltip="{x:Null}" 
-                                            Visibility="{Binding RaCheckBox, Converter={StaticResource BoolToVis}}" Zoom="Y">
+                                            Visibility="{Binding RaCheckBox, Converter={StaticResource BoolToVis}}" Zoom="Xy" >
                             <lvc:CartesianChart.Series>
                                 <geared:GLineSeries Title="Ra" PointGeometry="{x:Null}" DataLabels="False"  Stroke="{Binding RaColor}" StrokeThickness="1" Fill="Transparent" Panel.ZIndex="0"
                                                 Visibility="{Binding RaLine, Converter={StaticResource BoolToVis}}" Values="{Binding RaValues, Mode=OneWay}" LineSmoothness="{Binding LineSmoothness, Mode=OneWay}"/>
@@ -360,7 +369,7 @@
                                                 Visibility="{Binding ThirdStep, Converter={StaticResource BoolToVis}}" Values="{Binding ThirdValues, Mode=OneWay}"/>
                             </lvc:CartesianChart.Series>
                             <lvc:CartesianChart.AxisX >
-                                <lvc:Axis FontSize="13" LabelFormatter="{Binding DateTimeFormatter, Mode=OneWay}" DisableAnimations="True" Foreground="DarkGray" MaxValue="{Binding AxisXmax, Mode=OneWay}" MinValue="{Binding AxisXmin, Mode=OneWay}" Unit="{Binding AxisXunit, Mode=OneWay}">
+                                <lvc:Axis FontSize="13" LabelFormatter="{Binding DateTimeFormatter, Mode=TwoWay}" DisableAnimations="True" Foreground="DarkGray" MaxValue="{Binding AxisXmax, Mode=TwoWay}" MinValue="{Binding AxisXmin, Mode=TwoWay}" Unit="{Binding AxisXunit, Mode=TwoWay}">
                                 </lvc:Axis>
                             </lvc:CartesianChart.AxisX>
                             <lvc:CartesianChart.AxisY>
@@ -374,15 +383,15 @@
                                 </lvc:Axis>
                             </lvc:CartesianChart.AxisY>
                         </lvc:CartesianChart>
-                        <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BorderBrush="DimGray" Opacity=".5" BorderThickness=".5"/>
-                        <Label Grid.Column="0" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" Visibility="Hidden">N</Label>
-                        <Label Grid.Column="0" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" Visibility="Hidden">S</Label>
+                        <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BorderBrush="{Binding DecColor}" Opacity="1" BorderThickness="1" Margin="0,1,0,0"/>
+                        <Label Grid.Column="0" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center">N</Label>
+                        <Label Grid.Column="0" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Center">S</Label>
                         <Grid Grid.Column="1" Grid.Row="1" Margin="20,0,10,0">
-                            <Label HorizontalAlignment="Left" IsEnabled="False" Foreground="{DynamicResource PrimaryHueMidBrush}" Content="{Binding StrDecLineOne, Mode=OneWay}"/>
-                            <Label HorizontalAlignment="Right" IsEnabled="False" Foreground="{DynamicResource PrimaryHueMidBrush}">Dec</Label>
+                            <Label HorizontalAlignment="Left" IsEnabled="False" Content="{Binding StrDecLineOne, Mode=OneWay}"/>
+                            <Label HorizontalAlignment="Center"  IsEnabled="True" FontSize="18">Dec</Label>
                         </Grid>
                         <lvc:CartesianChart Grid.Column="1" Grid.Row="1" Foreground="DarkGray" Hoverable="False" DisableAnimations="{Binding DisableAnimations, Mode=OneWay}" AnimationsSpeed="{Binding AnimationsSpeed, Mode=OneWay}" DataTooltip="{x:Null}" 
-                                            Visibility="{Binding DecCheckBox, Converter={StaticResource BoolToVis}}" Zoom="Y">
+                                            Visibility="{Binding DecCheckBox, Converter={StaticResource BoolToVis}}" Zoom="Xy">
                             <lvc:CartesianChart.Series >
                                 <geared:GLineSeries Title="Dec" PointGeometry="{x:Null}" DataLabels="False" Stroke="{Binding DecColor, Mode=OneWay}" StrokeThickness="1" Fill="Transparent" Panel.ZIndex="0" 
                                                     Visibility="{Binding DecLine, Converter={StaticResource BoolToVis}}" Values="{Binding DecValues, Mode=OneWay}" LineSmoothness="{Binding LineSmoothness, Mode=OneWay}"/>
@@ -398,7 +407,7 @@
                                                     Visibility="{Binding FourthStep, Converter={StaticResource BoolToVis}}" Values="{Binding FourthValues, Mode=OneWay}"/>
                             </lvc:CartesianChart.Series>
                             <lvc:CartesianChart.AxisX >
-                                <lvc:Axis FontSize="13" LabelFormatter="{Binding DateTimeFormatter, Mode=OneWay}" DisableAnimations="True" Foreground="DarkGray" MaxValue="{Binding AxisXmax, Mode=OneWay}" MinValue="{Binding AxisXmin, Mode=OneWay}" Unit="{Binding AxisXunit, Mode=OneWay}">
+                                <lvc:Axis FontSize="13" LabelFormatter="{Binding DateTimeFormatter, Mode=TwoWay}" DisableAnimations="True" Foreground="DarkGray" MaxValue="{Binding AxisXmax, Mode=TwoWay}" MinValue="{Binding AxisXmin, Mode=TwoWay}" Unit="{Binding AxisXunit, Mode=TwoWay}">
                                 </lvc:Axis>
                             </lvc:CartesianChart.AxisX>
                             <lvc:CartesianChart.AxisY>
@@ -413,7 +422,6 @@
                             </lvc:CartesianChart.AxisY>
                         </lvc:CartesianChart>
                     </Grid>
-                </Grid>
             </Grid>
         </md:DrawerHost>
     </Grid>

@@ -151,6 +151,21 @@ namespace GS.Server.Main
             Properties.Server.Default.WindowState = WindowState.Minimized;
         }
 
+        private ICommand _maxmizeWindowCommand;
+        public ICommand MaximizeWindowCommand
+        {
+            get
+            {
+                return _maxmizeWindowCommand ?? (_maxmizeWindowCommand = new RelayCommand(
+                           param => MaxmizeWindow()
+                       ));
+            }
+        }
+        private void MaxmizeWindow()
+        {
+            Properties.Server.Default.WindowState = WindowState.Maximized;
+        }
+
         private ICommand _normalWindowCommand;
         public ICommand NormalWindowCommand
         {
@@ -483,6 +498,30 @@ namespace GS.Server.Main
                 OnPropertyChanged();
             }
         }
+
+
+        private ICommand _resetWindowCommand;
+        public ICommand ResetWindowCommand
+        {
+            get
+            {
+                return _resetWindowCommand ?? (_resetWindowCommand = new RelayCommand(
+                           param => ResetWindow()
+                       ));
+            }
+        }
+        private void ResetWindow()
+        {
+            Properties.Server.Default.WindowState = WindowState.Normal;
+            Properties.Server.Default.WindowHeight = 510;
+            Properties.Server.Default.WindowWidth = 850;
+        }
+
+        //WindowState="{Binding WindowState, Source={x:Static properties:Server.Default}, Mode=TwoWay}"
+        //Height="{Binding WindowHeight, Source={x:Static properties:Server.Default}, Mode=TwoWay}" 
+        //Width="{Binding WindowWidth, Source={x:Static properties:Server.Default}, Mode=TwoWay}"
+        //Left="{Binding WindowLeft, Source={x:Static properties:Server.Default}, Mode=TwoWay}"
+        //Top="{Binding WindowTop, Source={x:Static properties:Server.Default}, Mode=TwoWay}"
 
         #endregion
 

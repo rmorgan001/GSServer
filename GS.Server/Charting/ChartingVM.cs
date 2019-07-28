@@ -76,9 +76,8 @@ namespace GS.Server.Charting
                     {
                         using (new WaitCursor())
                         {
-
                             var monitorItem = new MonitorEntry
-                                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading GuidingVM" };
+                                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading ChartingVM" };
                             MonitorLog.LogToMonitor(monitorItem);
 
                             LoadChart();
@@ -101,7 +100,7 @@ namespace GS.Server.Charting
                                 if (!ColorsList.Contains(color.Name) && !color.IsSystemColor)
                                 { ColorsList.Add(color.Name); }
                             }
-                }
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -410,7 +409,7 @@ namespace GS.Server.Charting
         }
 
         private bool _isCharting;
-        private bool IsCharting
+        private bool  IsCharting
         {
             get => _isCharting;
             set
@@ -695,6 +694,18 @@ namespace GS.Server.Charting
             }
         }
 
+        public IList<double> MaxPointsRange { get; set; }
+        private double _maxPoints;
+        public double MaxPoints
+        {
+            get => _maxPoints;
+            set
+            {
+                _maxPoints = value;
+                OnPropertyChanged();
+            }
+        }
+
         public IList<int> AxisMinSecondsRange { get; set; }
         public int AxisMinSeconds
         {
@@ -780,7 +791,7 @@ namespace GS.Server.Charting
         public double AxisXmax
         {
             get => _axisXmax;
-            private set
+            set
             {
                 _axisXmax = value;
                 OnPropertyChanged();
@@ -791,7 +802,7 @@ namespace GS.Server.Charting
         public double AxisXmin
         {
             get => _axisXmin;
-            private set
+            set
             {
                 _axisXmin = value;
                 OnPropertyChanged();
@@ -842,8 +853,8 @@ namespace GS.Server.Charting
             }
         }
 
-        public Func<double, string> DateTimeFormatter { get; private set; }
-        public long AxisXunit { get; private set; }
+        public Func<double, string> DateTimeFormatter { get; set; }
+        public long AxisXunit { get; set; }
 
         //public long AxisYstep { get; set; }
         public double AxisYunit { get; set; }
@@ -916,9 +927,11 @@ namespace GS.Server.Charting
 
             SetXaxisLimits(DateTime.Now);
 
+            MaxPointsRange = new List<double>(Numbers.InclusiveRange(200, 2000, 100));
             AxisMinSecondsRange = new List<int>(Enumerable.Range(10, 51));
             AnimationTimes = new List<int>(Enumerable.Range(0, 10));
             Smoothness = new List<int>(Enumerable.Range(0, 10));
+            MaxPoints = 1000;
             DecCheckBox = false;
             RaCheckBox = true;
             LogCharting = Shared.Settings.LogCharting;
@@ -990,7 +1003,7 @@ namespace GS.Server.Charting
                     DataToLog(ChartItemCode.Data, $"StepsPerRevolution={SkyServer.StepsPerRevolution[0]}");
                     DataToLog(ChartItemCode.Data, $"CurrentTrackingRate={SkyServer.CurrentTrackingRate() * 3600}");
                     DataToLog(ChartItemCode.Data, $"ShowInArcseconds={ShowInArcseconds}");
-                    DataToLog(ChartItemCode.Data, $"Interval={SkySettings.SkyInterval}");
+                    DataToLog(ChartItemCode.Data, $"Interval={SkySettings.DisplayInterval}");
                     MonitorLog.GetPulses = true;
                     SkyServer.MonitorPulse = true;
                 }
@@ -1040,8 +1053,8 @@ namespace GS.Server.Charting
             }
 
             //lets only use the last 150 values
-            if (RaValues.Count > 200) RaValues.RemoveAt(0);
-            if (DecValues.Count > 200) DecValues.RemoveAt(0);
+            if (RaValues.Count > MaxPoints) RaValues.RemoveAt(0);
+            if (DecValues.Count > MaxPoints) DecValues.RemoveAt(0);
 
         }
 
@@ -1096,7 +1109,7 @@ namespace GS.Server.Charting
                         DataToLog(ChartItemCode.Data, $"CurrentTrackingRate={SkyServer.CurrentTrackingRate() * 3600}");
                         DataToLog(ChartItemCode.Data, $"Latitude={SkySettings.Latitude}");
                         DataToLog(ChartItemCode.Data, $"BaseIndexPosition={BaseIndexPosition}");
-                        DataToLog(ChartItemCode.Data, $"Interval={SkySettings.SkyInterval}");
+                        DataToLog(ChartItemCode.Data, $"Interval={SkySettings.DisplayInterval}");
                         MonitorLog.GetjEntries = true;
                     }
                     else
@@ -1132,8 +1145,8 @@ namespace GS.Server.Charting
             }
             
             // Max items on the chart
-            if (RaValues.Count > 1000) RaValues.RemoveAt(0);
-            if (DecValues.Count > 1000) DecValues.RemoveAt(0);
+            if (RaValues.Count > MaxPoints) RaValues.RemoveAt(0);
+            if (DecValues.Count > MaxPoints) DecValues.RemoveAt(0);
         }
 
         private double Cmdj1Conversion(MonitorEntry entry)
@@ -1276,8 +1289,8 @@ namespace GS.Server.Charting
                 EntryToLog(ChartItemCode.FourthValue, dec);
             }
 
-            if (ThirdValues.Count > 200) ThirdValues.RemoveAt(0);
-            if (FourthValues.Count > 200) FourthValues.RemoveAt(0);
+            if (ThirdValues.Count > MaxPoints) ThirdValues.RemoveAt(0);
+            if (FourthValues.Count > MaxPoints) FourthValues.RemoveAt(0);
         }
 
         private bool PhdConnected()
@@ -1345,7 +1358,7 @@ namespace GS.Server.Charting
         private void OpenDialog(string msg)
         {
             if (msg != null) DialogMsg = msg;
-            DialogContent = new Dialog();
+            DialogContent = new DialogOK();
             IsDialogOpen = true;
 
             var monitorItem = new MonitorEntry

@@ -19,6 +19,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using GS.Principles;
 using GS.Server.Domain;
 using GS.Server.Helpers;
 using GS.Server.Main;
@@ -45,6 +46,10 @@ namespace GS.Server.Gamepad
         {
             try
             {
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading GamepadVM" };
+                MonitorLog.LogToMonitor(monitorItem);
+
                 SkyTelescope();
                 Settings();
                 Delay = Properties.Gamepad.Default.Delay;
@@ -54,7 +59,7 @@ namespace GS.Server.Gamepad
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
@@ -501,7 +506,7 @@ namespace GS.Server.Gamepad
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
@@ -827,7 +832,7 @@ namespace GS.Server.Gamepad
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
@@ -860,7 +865,7 @@ namespace GS.Server.Gamepad
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
@@ -941,7 +946,7 @@ namespace GS.Server.Gamepad
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
@@ -974,7 +979,7 @@ namespace GS.Server.Gamepad
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
@@ -1007,7 +1012,7 @@ namespace GS.Server.Gamepad
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
@@ -1071,12 +1076,12 @@ namespace GS.Server.Gamepad
         private void OpenDialog(string msg)
         {
             if (msg != null) DialogMsg = msg;
-            DialogContent = new Dialog();
+            DialogContent = new DialogOK();
             IsDialogOpen = true;
 
             var monitorItem = new MonitorEntry
             {
-                Datetime = Principles.HiResDateTime.UtcNow,
+                Datetime = HiResDateTime.UtcNow,
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Interface,
                 Type = MonitorType.Information,

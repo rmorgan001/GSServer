@@ -936,28 +936,15 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static int _simInterval;
-        public static int SimInterval
+        private static int _displayInterval;
+        public static int DisplayInterval
         {
-            get => _simInterval;
+            get => _displayInterval;
             set
             {
-                if (_simInterval == value) return;
-                _simInterval = value;
-                Properties.SkyTelescope.Default.SimulatorInterval = value;
-                OnStaticPropertyChanged();
-            }
-        }
-
-        private static int _skyInterval;
-        public static int SkyInterval
-        {
-            get => _skyInterval;
-            set
-            {
-                if (SkyInterval == value) return;
-                _skyInterval = value;
-                Properties.SkyTelescope.Default.SkyInterval = value;
+                if (_displayInterval == value) return;
+                _displayInterval = value;
+                Properties.SkyTelescope.Default.DisplayInterval = value;
                 OnStaticPropertyChanged();
             }
         }
@@ -1103,8 +1090,7 @@ namespace GS.Server.SkyTelescope
             Refraction = Properties.SkyTelescope.Default.Refraction;
             RaTrackingOffset = Properties.SkyTelescope.Default.RATrackingOffset;
             SiderealRate = Properties.SkyTelescope.Default.SiderealRate;
-            SimInterval = Properties.SkyTelescope.Default.SimulatorInterval;
-            SkyInterval = Properties.SkyTelescope.Default.SkyInterval;
+            DisplayInterval = Properties.SkyTelescope.Default.DisplayInterval;
             SolarRate = Properties.SkyTelescope.Default.SolarRate;
             St4Guiderate = Properties.SkyTelescope.Default.St4Guiderate;
             Temperature = Properties.SkyTelescope.Default.Temperature;

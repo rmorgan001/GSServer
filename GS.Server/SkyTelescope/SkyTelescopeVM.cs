@@ -2920,7 +2920,6 @@ namespace GS.Server.SkyTelescope
         }
         private void ClearLimitAlarm()
         {
-            SkyServer.AscomOn = true;
             SkyServer.LimitAlarm = false;
         }
 
@@ -3056,7 +3055,7 @@ namespace GS.Server.SkyTelescope
         private void OpenDialog(string msg)
         {
             if (msg != null) DialogMsg = msg;
-             DialogContent = new Dialog();
+             DialogContent = new DialogOK();
             IsDialogOpen = true;
 
             var monitorItem = new MonitorEntry

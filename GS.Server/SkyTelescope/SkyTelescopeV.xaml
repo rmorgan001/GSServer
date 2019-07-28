@@ -15,9 +15,8 @@
         <BooleanToVisibilityConverter  x:Key="BoolToVis"/>
     </UserControl.Resources>
     <Grid>
-        <md:DialogHost HorizontalAlignment="Center" CloseOnClickAway="True"
-                           IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
-        <md:DrawerHost HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="2" 
+        <md:DialogHost HorizontalAlignment="Center" CloseOnClickAway="True" IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" Background="Transparent"/>
+        <md:DrawerHost HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0" 
                     IsLeftDrawerOpen="{Binding OpenSetupDialog}" BorderBrush="{DynamicResource MaterialDesignDivider}">
             <!-- switched lines for opendialog so COM can open the settings IsLeftDrawerOpen="{Binding OpenSetupDialog}"-->
             <!--IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}"-->
@@ -43,7 +42,7 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5">
-                        <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18"  Foreground="{DynamicResource PrimaryHueMidBrush}">Settings</Label>
+                        <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18">Settings</Label>
                         <ToggleButton Grid.Row="0" HorizontalAlignment="Right" ToolTip="Close"
                             Style="{StaticResource MaterialDesignHamburgerToggleButton}"  Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
                             CommandParameter="{x:Static Dock.Left}" IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked}"/>
@@ -215,7 +214,7 @@
                             </Grid>
                         </md:PopupBox>
                         <TextBox  
-                                md:HintAssist.Hint="Sidereal Rate" Width="90"
+                                md:HintAssist.Hint="Sidereal Rate" Width="110"
                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" >
                             <TextBox.Text>
                                 <Binding Path="SiderealRate" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -239,7 +238,7 @@
                                         Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ClickResetSolarRateCommand}"/>
                             </Grid>
                         </md:PopupBox>
-                        <TextBox Width="90" md:HintAssist.Hint="Solar Rate" 
+                        <TextBox Width="110" md:HintAssist.Hint="Solar Rate" 
                              Style="{StaticResource MaterialDesignFloatingHintTextBox}" >
                             <TextBox.Text>
                                 <Binding Path="SolarRate" Mode="TwoWay" UpdateSourceTrigger="LostFocus" >
@@ -263,7 +262,7 @@
                                         Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ClickResetLunarRateCommand}"/>
                             </Grid>
                         </md:PopupBox>
-                        <TextBox Width="90" md:HintAssist.Hint="Lunar Rate"
+                        <TextBox Width="110" md:HintAssist.Hint="Lunar Rate"
                              Style="{StaticResource MaterialDesignFloatingHintTextBox}">
                             <TextBox.Text>
                                 <Binding Path="LunarRate" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -287,7 +286,7 @@
                                         Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ClickResetKingRateCommand}"/>
                             </Grid>
                         </md:PopupBox>
-                        <TextBox Width="90" md:HintAssist.Hint="King Rate"
+                        <TextBox Width="110" md:HintAssist.Hint="King Rate"
                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" >
                             <TextBox.Text>
                                 <Binding Path="KingRate" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -302,32 +301,32 @@
                     <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="5,0,0,0">
                         <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25"
                                       IsChecked="{Binding Refraction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Refraction</Label>
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center">Refraction</Label>
                     </StackPanel>
                     <StackPanel Grid.Row="5" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="5,0,0,0">
                         <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}"  HorizontalAlignment="Center" Width="25" Height="25" ToolTip="On/Off"
                                       IsChecked="{Binding EncodersOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Encoders</Label>
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center">Encoders</Label>
                     </StackPanel>
                     <StackPanel Grid.Row="6" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="5,0,0,0">
                         <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="Alternates PPEC with guide commands"
                                       IsChecked="{Binding AlternatingPpec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Alternating PPEC</Label>
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center">Alternating PPEC</Label>
                     </StackPanel>
                     <StackPanel Grid.Row="7" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="5,0,0,0">
                         <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="Uses GoTo commands for Dec guiding"
                                       IsChecked="{Binding DecPulseToGoTo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >GoTo Dec Pulse</Label>
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center">GoTo Dec Pulse</Label>
                     </StackPanel>
                     <StackPanel Grid.Row="8" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="5,0,0,0">
                         <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="On/Off special items"
                                       IsChecked="{Binding FullCurrent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Full Current</Label>
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center">Full Current</Label>
                     </StackPanel>
                     <StackPanel Grid.Row="9" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="5,0,0,0">
                         <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="On/Off special items"
                                       IsChecked="{Binding DebugVisability, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" >Diagnostics</Label>
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center">Diagnostics</Label>
                     </StackPanel>
                     <Grid Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3" Grid.RowSpan="4" Margin="0,0,10,0" HorizontalAlignment="Right">
                         <Grid.ColumnDefinitions>
@@ -342,8 +341,8 @@
                             <RowDefinition Height="50" />
                             <RowDefinition Height="50" />
                         </Grid.RowDefinitions>
-                        <Label Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" VerticalAlignment="Bottom">Observatory Location</Label>
-                        <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0" Foreground="{DynamicResource PrimaryHueMidBrush}">Latitude:</Label>
+                        <Label Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" HorizontalAlignment="Center" VerticalAlignment="Bottom">Observatory Location</Label>
+                        <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0">Latitude:</Label>
                         <ComboBox Grid.Row="1" Grid.Column="1" IsEnabled="True" md:HintAssist.Hint="Degrees" MinWidth="72" Margin="16 0 0 0"
                                 ItemsSource="{Binding LatitudeRange}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.SelectedItem>
@@ -390,7 +389,7 @@
                                 </ItemsPanelTemplate>
                             </ComboBox.ItemsPanel>
                         </ComboBox>
-                        <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0" Foreground="{DynamicResource PrimaryHueMidBrush}">Longitude:</Label>
+                        <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0">Longitude:</Label>
                         <ComboBox Grid.Row="2" Grid.Column="1" md:HintAssist.Hint="Degrees" MinWidth="72" Margin="16 0 0 0" 
                             ItemsSource="{Binding LongitudeRange}"
                             Style="{StaticResource MaterialDesignFloatingHintComboBox}">
@@ -486,70 +485,79 @@
                     </StackPanel>
                 </Grid>
             </md:DrawerHost.LeftDrawerContent>
-            <Grid>
+            <Grid Margin="5,5">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40" />
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="40"/>
                 </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
                 <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
-                    <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False"  x:Name="MenuToggleButton" 
-                                  Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" ToolTip="Open"
+                    <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False" x:Name="MenuToggleButton" ToolTip="Open"
+                                  Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" 
                                   Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
-                    <telescope:TopCoordsBar HorizontalAlignment="Left" IsEnabled="{Binding ScreenEnabled}"/>
                 </StackPanel>
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" >
-                        <Grid Background="Transparent" Margin="20,0,0,0">
-                            <Border 
-                                    BorderBrush="Black"
-                                    BorderThickness="3"
-                                    CornerRadius="5">
-                                <Border.Effect>
-                                    <DropShadowEffect />
-                                </Border.Effect>
-                            </Border>
-                            <StackPanel IsEnabled="{Binding ScreenEnabled}">
-                                <Rectangle RadiusY="5" RadiusX="5" Width="253" Height="340">
-                                    <Rectangle.Style>
-                                        <Style TargetType="Rectangle">
-                                            <Style.Triggers>
-                                                <Trigger Property="IsEnabled" Value="False">
-                                                    <Setter Property="Opacity" Value="0.2" />
-                                                </Trigger>
-                                                <Trigger Property="IsEnabled" Value="True">
-                                                    <Setter Property="Opacity" Value="1.0" />
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                    <Rectangle.Fill>
-                                        <ImageBrush   ImageSource="../Resources/M33.png" />
-                                    </Rectangle.Fill>
-                                </Rectangle>
+                <telescope:TopCoordsBar Grid.Row="0" Grid.Column="0" IsEnabled="{Binding ScreenEnabled}" HorizontalAlignment="Center"/>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <Grid HorizontalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" >
+                            <Grid Background="Transparent" Margin="20,0,0,0" Height="340" VerticalAlignment="Top">
+                                <Border 
+                                        BorderBrush="Black"
+                                        BorderThickness="3"
+                                        CornerRadius="5">
+                                    <Border.Effect>
+                                        <DropShadowEffect />
+                                    </Border.Effect>
+                                </Border>
+                                <StackPanel IsEnabled="{Binding ScreenEnabled}">
+                                    <Rectangle RadiusY="5" RadiusX="5" Width="253" Height="340">
+                                        <Rectangle.Style>
+                                            <Style TargetType="Rectangle">
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsEnabled" Value="False">
+                                                        <Setter Property="Opacity" Value="0.2" />
+                                                    </Trigger>
+                                                    <Trigger Property="IsEnabled" Value="True">
+                                                        <Setter Property="Opacity" Value="1.0" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Rectangle.Style>
+                                        <Rectangle.Fill>
+                                            <ImageBrush   ImageSource="../Resources/M33.png" />
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                </StackPanel>
+                                <StackPanel>
+                                    <telescope:Debug IsEnabled="{Binding ScreenEnabled}" Visibility="{Binding DebugVisability, Converter={StaticResource BoolToVis}}"/>
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Margin="1,0,0,0">
+                                <telescope:StandardButtonBar Margin="10,0,0,0" IsEnabled="{Binding ScreenEnabled}"/>
+                                <telescope:PpecBar Margin="10,0,0,0" IsEnabled="{Binding ScreenEnabled}"/>
                             </StackPanel>
-                            <StackPanel>
-                                <telescope:Debug IsEnabled="{Binding ScreenEnabled}" Visibility="{Binding DebugVisability, Converter={StaticResource BoolToVis}}"/>
-                            </StackPanel>
-                        </Grid>
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Margin="10,0,0,0">
-                            <telescope:StandardButtonBar Margin="10,0,0,0" IsEnabled="{Binding ScreenEnabled}"/>
-                            <telescope:PpecBar Margin="10,0,0,0" IsEnabled="{Binding ScreenEnabled}"/>
                         </StackPanel>
-                    </StackPanel>
-                    <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="1" Margin="10,0,0,0">
-                        <telescope:RaDecGoTo IsEnabled="{Binding ScreenEnabled}"/>
-                        <telescope:HandController Margin="0,20,0,0" IsEnabled="{Binding ScreenEnabled}" HorizontalAlignment="Right"/>
-                        <telescope:Backlash IsEnabled="{Binding ScreenEnabled}"/>
-                    </StackPanel>
-                </Grid>
-                <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="0">
+                        <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="1" Margin="10,0,0,0" >
+                            <telescope:RaDecGoTo IsEnabled="{Binding ScreenEnabled}"/>
+                            <telescope:HandController Margin="0,20,0,0" IsEnabled="{Binding ScreenEnabled}" />
+                            <telescope:Backlash IsEnabled="{Binding ScreenEnabled}"/>
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+                <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center">
                     <telescope:BottomStatusBar IsEnabled="{Binding ScreenEnabled}"/>
-                    <Button  Width="120" Height="30" Margin="20 0" ToolTip="Connect/disconnect mount"
+                    <Button  Width="120" Height="30" Margin="10 0" ToolTip="Connect/disconnect mount"
                             Command="{Binding ClickConnectCommand}" Content="{Binding ConnectButtonContent}" Style="{StaticResource MaterialDesignRaisedDarkButton}"/>
                 </StackPanel>
             </Grid>

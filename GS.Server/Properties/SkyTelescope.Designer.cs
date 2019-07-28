@@ -421,18 +421,6 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("300")]
-        public int SimulatorInterval {
-            get {
-                return ((int)(this["SimulatorInterval"]));
-            }
-            set {
-                this["SimulatorInterval"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public int RATrackingOffset {
             get {
@@ -464,18 +452,6 @@ namespace GS.Server.Properties {
             }
             set {
                 this["Temperature"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("300")]
-        public int SkyInterval {
-            get {
-                return ((int)(this["SkyInterval"]));
-            }
-            set {
-                this["SkyInterval"] = value;
             }
         }
         
@@ -1028,6 +1004,18 @@ namespace GS.Server.Properties {
             }
             set {
                 this["FullCurrent"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("300")]
+        public int DisplayInterval {
+            get {
+                return ((int)(this["DisplayInterval"]));
+            }
+            set {
+                this["DisplayInterval"] = value;
             }
         }
     }

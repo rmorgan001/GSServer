@@ -9,15 +9,12 @@
             <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <TextBlock VerticalAlignment="Center" Margin="10 0" Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" >Accept to start training</TextBlock>
-        <StackPanel Orientation="Horizontal" Grid.Row="1"
-                    Margin="0 16 0 0">
-            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" 
-                    Command="{Binding AcceptPpecDialogCommand}">
+        <TextBlock VerticalAlignment="Center" Margin="10 0">Accept to start training</TextBlock>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0 16 0 0">
+            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding AcceptPpecDialogCommand}">
                 ACCEPT
             </Button>
-            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}"
-                    Command="{Binding CancelPpecDialogCommand}">
+            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding CancelPpecDialogCommand}">
                 CANCEL
             </Button>
         </StackPanel>
