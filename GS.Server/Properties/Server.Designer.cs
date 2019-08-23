@@ -145,7 +145,7 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("510")]
         public double WindowHeight {
             get {
                 return ((double)(this["WindowHeight"]));
@@ -157,7 +157,7 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("850")]
         public double WindowWidth {
             get {
                 return ((double)(this["WindowWidth"]));
@@ -169,7 +169,7 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
         public double WindowLeft {
             get {
                 return ((double)(this["WindowLeft"]));
@@ -181,7 +181,7 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
         public double WindowTop {
             get {
                 return ((double)(this["WindowTop"]));

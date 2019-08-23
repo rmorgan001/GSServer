@@ -497,7 +497,7 @@ namespace GS.Server.SkyTelescope
                     {
                         ports.Add((int)tmp);
                     }
-                }
+               }
                return ports;
             }
         }
@@ -1159,52 +1159,6 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private ICommand _flipSopCommand;
-        public ICommand ClickFlipSopCommand
-        {
-            get
-            {
-                return _flipSopCommand ?? (_flipSopCommand = new RelayCommand(param => FlipSop()));
-            }
-            set => _flipSopCommand = value;
-        }
-        private void FlipSop()
-        {
-            try
-            {
-                var sop = SkyServer.SideOfPier;
-                switch (sop)
-                {
-                    case PierSide.pierEast:
-                        SkyServer.SideOfPier = PierSide.pierWest;
-                        break;
-                    case PierSide.pierUnknown:
-                        OpenDialog($"PierSide: {PierSide.pierUnknown}");
-                        break;
-                    case PierSide.pierWest:
-                        SkyServer.SideOfPier = PierSide.pierEast;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = Principles.HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message);
-            }
-        }
-
         private ICommand _testCommand;
         public ICommand ClickTestCommand
         {
@@ -1218,7 +1172,19 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
-                Principles.Alignment.Test2Star();
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Warning,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"test warning"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                // Principles.Alignment.Test2Star();
             }
             catch (Exception ex)
             {
@@ -1583,7 +1549,7 @@ namespace GS.Server.SkyTelescope
             {
                 if (SkyServer.Tracking)
                 {
-                    OpenDialog("Tracking off or stop mount before setting home position");
+                    OpenDialog("Stop mount before setting home position");
                     return;
                 }
                 HomeResetContent = new HomeResetDialog();
@@ -1664,6 +1630,140 @@ namespace GS.Server.SkyTelescope
             try
             {
                 IsHomeResetDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private bool _isFlipDialogOpen;
+        public bool IsFlipDialogOpen
+        {
+            get => _isFlipDialogOpen;
+            set
+            {
+                if (_isFlipDialogOpen == value) return;
+                _isFlipDialogOpen = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private object _flipContent;
+        public object FlipContent
+        {
+            get => _flipContent;
+            set
+            {
+                if (_flipContent == value) return;
+                _flipContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openFlipDialogCommand;
+        public ICommand OpenFlipDialogCommand
+        {
+            get
+            {
+                return _openFlipDialogCommand ?? (_openFlipDialogCommand = new RelayCommand(
+                           param => OpenFlipDialog()
+                       ));
+            }
+        }
+        private void OpenFlipDialog()
+        {
+            try
+            {
+                FlipContent = new FlipDialog();
+                IsFlipDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+
+        }
+
+        private ICommand _acceptFlipDialogCommand;
+        public ICommand AcceptFlipDialogCommand
+        {
+            get
+            {
+                return _acceptFlipDialogCommand ?? (_acceptFlipDialogCommand = new RelayCommand(
+                           param => AcceptFlipDialog()
+                       ));
+            }
+        }
+        private void AcceptFlipDialog()
+        {
+            try
+            {
+                var sop = SkyServer.SideOfPier;
+                switch (sop)
+                {
+                    case PierSide.pierEast:
+                        SkyServer.SideOfPier = PierSide.pierWest;
+                        break;
+                    case PierSide.pierUnknown:
+                        OpenDialog($"PierSide: {PierSide.pierUnknown}");
+                        break;
+                    case PierSide.pierWest:
+                        SkyServer.SideOfPier = PierSide.pierEast;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                IsFlipDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                IsFlipDialogOpen = false;
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private ICommand _cancelFlipDialogCommand;
+        public ICommand CancelFlipDialogCommand
+        {
+            get
+            {
+                return _cancelFlipDialogCommand ?? (_cancelFlipDialogCommand = new RelayCommand(
+                           param => CancelFlipDialog()
+                       ));
+            }
+        }
+        private void CancelFlipDialog()
+        {
+            try
+            {
+                IsFlipDialogOpen = false;
             }
             catch (Exception ex)
             {
@@ -2989,7 +3089,7 @@ namespace GS.Server.SkyTelescope
                         case AlignmentModes.algGermanPolar:
                             var msg = @"When starting normally place the mount in the 'Home' position.";
                             msg += Environment.NewLine + @"Home Position is counterweight down and declination pointing towards the pole.";
-                            msg += Environment.NewLine + @"Click the 'SetHome' button before or after obtaining a polar alignment.";
+                            msg += Environment.NewLine + @"Click the 'Set Home' button before or after obtaining a polar alignment.";
 
                             OpenDialog(msg);
                             break;

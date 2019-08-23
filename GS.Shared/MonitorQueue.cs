@@ -55,7 +55,15 @@ namespace GS.Shared
                 if (_warningState == value) return;
                 _warningState = value;
                 OnStaticPropertyChanged();
+                FlipOffWarningState();
             }
+        }
+
+        private static async void FlipOffWarningState()
+        {
+            if (!WarningState) return;
+            await Task.Delay(100 );
+            WarningState = false;
         }
 
         /// <summary>
@@ -161,7 +169,7 @@ namespace GS.Shared
         /// trigger the property event for the UI to pick up the property
         /// </summary>
         /// <param name="propertyName"></param>
-        public static void OnStaticPropertyChanged([CallerMemberName] string propertyName = null)
+        private static void OnStaticPropertyChanged([CallerMemberName] string propertyName = null)
         {
             StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));
         }
@@ -235,7 +243,7 @@ namespace GS.Shared
                       //  WriteOutCmdj(entry);
                     }
                     break;
-                case "Tracking":  // from simulator
+                case "AxesDegrees":  // from simulator
                     if (entry.Message.Contains("tracking"))
                     {
                         CmdjSentEntry = entry;

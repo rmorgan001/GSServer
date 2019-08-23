@@ -776,7 +776,7 @@ namespace GS.SkyWatcher
                                     Method = MethodBase.GetCurrentMethod().Name,
                                     Thread = Thread.CurrentThread.ManagedThreadId,
                                     Message =
-                                        $"Serial Retry Warning: {_retryCount} {cmdData}"
+                                        $"Serial Retry Warning:{_retryCount},{cmdData},{ignoreWarnings}"
                                 };
                                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -876,9 +876,10 @@ namespace GS.SkyWatcher
             Serial.Write(commandStr.ToString());
 
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{commandStr}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{commandStr.ToString().Trim()}" };
             MonitorLog.LogToMonitor(monitorItem);
-            return $"{commandStr}";
+
+            return $"{commandStr.ToString().Trim()}";
         }
 
         ///// <summary>

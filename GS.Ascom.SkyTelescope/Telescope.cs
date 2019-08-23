@@ -1240,7 +1240,10 @@ namespace ASCOM.GS.Sky.Telescope
             CheckRange(Declination, -90, 90, "SlewToCoordinates", "Declination");
             CheckParked("SlewToCoordinates");
             CheckTracking(true, "SlewToCoordinates");
+
             var radec = Transforms.CoordTypeToInternal(RightAscension, Declination);
+            SkyServer.TargetRa = radec.X;
+            SkyServer.TargetDec = radec.Y;
             SkyServer.SlewRaDec(radec.X, radec.Y);
             while (SkyServer.SlewState == SlewType.SlewRaDec || SkyServer.SlewState == SlewType.SlewSettle)
             {
@@ -1259,12 +1262,16 @@ namespace ASCOM.GS.Sky.Telescope
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.HoursToHMS(RightAscension, "h ", ":", "", 2)},{_util.DegreesToDMS(Declination, "° ", ":", "", 2)}" };
             MonitorLog.LogToMonitor(monitorItem);
 
+
             CheckCapability(SkySettings.CanSlewAsync, "SlewToCoordinatesAsync");
             CheckRange(RightAscension, 0, 24, "SlewToCoordinatesAsync", "RightAscension");
             CheckRange(Declination, -90, 90, "SlewToCoordinatesAsync", "Declination");
             CheckParked("SlewToCoordinatesAsync");
             CheckTracking(true, "SlewToCoordinatesAsync");
+
             var radec = Transforms.CoordTypeToInternal(RightAscension, Declination);
+            SkyServer.TargetRa = radec.X;
+            SkyServer.TargetDec = radec.Y;
             SkyServer.SlewRaDec(radec.X, radec.Y);
         }
 
@@ -1499,6 +1506,7 @@ namespace ASCOM.GS.Sky.Telescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 CheckVersionOne("TrackingRate", true);
+                CheckTrackingRate("TrackingRate", value);
                 SkySettings.TrackingRate = value;
             }
         }
@@ -1593,6 +1601,19 @@ namespace ASCOM.GS.Sky.Telescope
         #endregion
 
         #region Private Methods
+
+        private static void CheckTrackingRate(string propertyOrMethod, DriveRates enumValue)
+        {
+            var success = Enum.IsDefined(typeof(DriveRates), enumValue);
+            if (success) return;
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{propertyOrMethod},{enumValue}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            throw new InvalidValueException("TrackingRate invalid");
+        }
+
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object,System.Object,System.Object)")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object,System.Object)")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "GS.Shared.MonitorEntry.set_Message(System.String)")]

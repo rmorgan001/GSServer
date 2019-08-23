@@ -47,6 +47,10 @@ namespace GS.Server.Main
         private GamepadVM _gamepadVM;
         public static MainWindowVM _mainWindowVm;
 
+        private double _tempHeight = 510;
+        private double _tempWidth = 850;
+        private WindowState _tempWindowState = WindowState.Normal;
+
         #endregion
 
         #region Main Page
@@ -512,17 +516,26 @@ namespace GS.Server.Main
         }
         private void ResetWindow()
         {
-            Properties.Server.Default.WindowState = WindowState.Normal;
-            Properties.Server.Default.WindowHeight = 510;
-            Properties.Server.Default.WindowWidth = 850;
+            var h = Properties.Server.Default.WindowHeight;
+            var w = Properties.Server.Default.WindowWidth;
+
+            if (Math.Abs(h - 510) > 0 || Math.Abs(w - 850) > 0)
+            {
+                _tempHeight = Properties.Server.Default.WindowHeight;
+                _tempWidth = Properties.Server.Default.WindowWidth;
+                _tempWindowState = Properties.Server.Default.WindowState;
+
+                Properties.Server.Default.WindowState = WindowState.Normal;
+                Properties.Server.Default.WindowHeight = 510;
+                Properties.Server.Default.WindowWidth = 850;
+            }
+            else
+            {
+                Properties.Server.Default.WindowState = _tempWindowState;
+                Properties.Server.Default.WindowHeight = _tempHeight;
+                Properties.Server.Default.WindowWidth = _tempWidth;
+            }
         }
-
-        //WindowState="{Binding WindowState, Source={x:Static properties:Server.Default}, Mode=TwoWay}"
-        //Height="{Binding WindowHeight, Source={x:Static properties:Server.Default}, Mode=TwoWay}" 
-        //Width="{Binding WindowWidth, Source={x:Static properties:Server.Default}, Mode=TwoWay}"
-        //Left="{Binding WindowLeft, Source={x:Static properties:Server.Default}, Mode=TwoWay}"
-        //Top="{Binding WindowTop, Source={x:Static properties:Server.Default}, Mode=TwoWay}"
-
         #endregion
 
         #region Close Button and Dialog     

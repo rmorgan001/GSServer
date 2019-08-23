@@ -214,7 +214,8 @@
                     </Style>
                 </md:PackIcon.Style>
             </md:PackIcon>
-        <md:PackIcon Grid.Column="10" Kind="Usb" Margin="10 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="Mount Connection">
+        <Button Grid.Column="10" Command="{Binding ClickMountInfoDialogCommand}" Style="{StaticResource MaterialDesignFlatButton}" Width="60" ToolTip="Click for mount information">
+            <md:PackIcon Kind="Usb" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left"  ToolTip="Mount Info">
                 <md:PackIcon.Style>
                     <Style TargetType="md:PackIcon">
                         <Style.Triggers>
@@ -231,6 +232,7 @@
                     </Style>
                 </md:PackIcon.Style>
             </md:PackIcon>
+        </Button>
     </Grid>
 </UserControl>
   

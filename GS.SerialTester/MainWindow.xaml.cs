@@ -183,14 +183,14 @@ namespace GS.SerialTester
         private static void InvokeOnUiThread(Action action, CancellationToken token = default(CancellationToken))
         {
             if (Application.Current == null) return;
-            if (Application.Current.Dispatcher.CheckAccess())
+            if (Application.Current.Dispatcher != null && Application.Current.Dispatcher.CheckAccess())
             {
                 action();
             }
             else
             {
                 if (token.IsCancellationRequested) return;
-                Application.Current.Dispatcher.Invoke(action);
+                if (Application.Current.Dispatcher != null) Application.Current.Dispatcher.Invoke(action);
             }
         }
 

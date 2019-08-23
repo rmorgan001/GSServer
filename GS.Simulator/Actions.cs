@@ -15,6 +15,9 @@
  */
 using System;
 using System.Diagnostics;
+using System.Reflection;
+using System.Threading;
+using GS.Principles;
 using GS.Shared;
 
 namespace GS.Simulator
@@ -72,6 +75,13 @@ namespace GS.Simulator
         internal double[] AxesDegrees()
         {
             var x = Convert.ToDouble(_ioserial.Send($"degrees,{Axis.Axis1}"));
+
+            //put in for capture tracking in charts
+            var stepsx = _ioserial.Send($"steps,{Axis.Axis1}");
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"tracking,{null},{stepsx}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
             var y = Convert.ToDouble(_ioserial.Send($"degrees,{Axis.Axis2}"));
             var d = new[] { x, y };
             return d;
@@ -108,7 +118,7 @@ namespace GS.Simulator
         /// <returns></returns>
         internal bool AxisPulse(Axis axis, double guiderate, int duration, int backlash, double declination = 0)
         {
-            var arcsecs = duration / 1000.0 * Principles.Conversions.Deg2ArcSec(Math.Abs(guiderate));
+            var arcsecs = duration / 1000.0 * Conversions.Deg2ArcSec(Math.Abs(guiderate));
 
             switch (axis)
             {
@@ -134,7 +144,7 @@ namespace GS.Simulator
                 pulseEntry.Declination = declination;
                 var loc = AxisSteps();
                 if (MonitorPulse) pulseEntry.PositionStart = loc[(int)axis];
-                pulseEntry.StartTime = Principles.HiResDateTime.UtcNow;
+                pulseEntry.StartTime = HiResDateTime.UtcNow;
             }
 
             // execute pulse
@@ -152,7 +162,7 @@ namespace GS.Simulator
             {
                 var loc1 = AxisSteps();
                 pulseEntry.PositionEnd = loc1[(int) axis];
-                pulseEntry.EndTime = Principles.HiResDateTime.UtcNow;
+                pulseEntry.EndTime = HiResDateTime.UtcNow;
                 pulseEntry.AltPPECon = false;
                 pulseEntry.PPECon = false;
                 MonitorLog.LogToMonitor(pulseEntry);
@@ -251,7 +261,7 @@ namespace GS.Simulator
             _revSteps[0] = a;
             _revSteps[1] = a;
             //steps per second
-            var b = Principles.Conversions.StepPerArcsec(a);
+            var b = Conversions.StepPerArcsec(a);
             _stepsPerSec[0] = b;
             _stepsPerSec[1] = b;
 

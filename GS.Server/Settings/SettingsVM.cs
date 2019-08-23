@@ -83,7 +83,7 @@ namespace GS.Server.Settings
                     new PaletteHelper().SetLightDark(Settings.DarkTheme);
 
                     //Performance
-                    IntervalList = new List<int>(Numbers.InclusiveIntRange(10, 500, 10));
+                    IntervalList = new List<int>(Numbers.InclusiveIntRange(100, 500, 10));
                 }
             }
             catch (Exception ex)

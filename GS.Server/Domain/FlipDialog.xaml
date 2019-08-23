@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="GS.Server.Domain.HomeResetDialog"
+﻿<UserControl x:Class="GS.Server.Domain.FlipDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -8,13 +8,14 @@
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
-        <TextBlock VerticalAlignment="Center" Margin="10 0" >Accept to reset mount position to the Home position</TextBlock>
-        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0 16 0 0" HorizontalAlignment="Center">
-            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding AcceptHomeResetDialogCommand}">
+        <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,10,0,0">Continue to flip mount?</TextBlock>
+        <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="0 16 0 0">
+            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding AcceptFlipDialogCommand}">
                 ACCEPT
             </Button>
-            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding CancelHomeResetDialogCommand}">
+            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding CancelFlipDialogCommand}">
                 CANCEL
             </Button>
         </StackPanel>

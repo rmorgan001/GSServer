@@ -105,3 +105,10 @@ Can be found at https://groups.io/g/GSS/topics
 1.0.0.10 released 28 July 2019
 * UI bug fixes and enhancements 
    
+1.0.0.11 released 23 Aug 2019
+* User can resize application window
+* Ascom conformance changes
+* Goto strategy changed when within meridian limits setting
+* Manual Flip SOP button added
+* Corrected sync issue after a flip
+* Added color themes

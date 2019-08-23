@@ -29,21 +29,13 @@
             <TextBlock Margin="5,0,0,0">Sidereal Time:</TextBlock>
             <TextBlock Margin="5,0,0,0" Text="{Binding SiderealTime}"/>
         </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <Button Margin="5,10,0,0"
-                Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                Width="100"
-                Command="{Binding ClickFlipSopCommand}">
-                Flip SOP
-            </Button>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal">
+        <!--<StackPanel Orientation="Horizontal">
             <Button Margin="5,10,0,0"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}"
                     Width="100"
                     Command="{Binding ClickTestCommand}">
                 Test
             </Button>
-        </StackPanel>
+        </StackPanel>-->
     </StackPanel>
 </UserControl>

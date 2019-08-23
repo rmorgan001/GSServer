@@ -14,10 +14,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using System;
-using System.Reflection;
 using System.Threading;
 using GS.Principles;
-using GS.Shared;
 
 namespace GS.Simulator
 {
@@ -498,9 +496,6 @@ namespace GS.Simulator
             switch (axis)
             {
                 case Axis.Axis1:
-                    var monitorItem = new MonitorEntry
-                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"tracking,{_trackingX},{StepsX}" };
-                    MonitorLog.LogToMonitor(monitorItem);
                     _isTrackingX = Math.Abs(_trackingX) > 0;
                     return _isTrackingX ? _trackingX * interval : 0;
                 case Axis.Axis2:

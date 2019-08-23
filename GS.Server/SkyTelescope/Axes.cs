@@ -110,12 +110,33 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
+        /// GEMs have two possible axes positions, given an axis position this returns the other 
+        /// </summary>
+        /// <param name="alt">position</param>
+        /// <returns>other axis position</returns>
+        internal static double[] GetAltAxisPosition(double[] alt)
+        {
+            var d = new[] { 0.0, 0.0 };
+            if (alt[0] > 90)
+            {
+                d[0] = alt[0] - 180;
+                d[1] = 180 - alt[1];
+            }
+            else
+            {
+                d[0] = alt[0] + 180;
+                d[1] = 180 - alt[1];
+            }
+            return d;
+        }
+
+        /// <summary>
         /// convert a decimal Alt/Az positions to an axes positions.
         /// </summary>
         /// <param name="altAz"></param>
         /// <returns></returns>
         internal static double[] AltAzToAxesYX(double[] altAz)
-        {
+        { 
             var axes = new []{altAz[0],altAz[1]};
             double lst;
             switch (SkySettings.AlignmentMode)
@@ -252,11 +273,10 @@ namespace GS.Server.SkyTelescope
         /// convert a RaDec position to an axes positions. 
         /// </summary>
         /// <param name="raDec"></param>
-        /// <param name="preserveSop"></param>
         /// <returns></returns>
-        internal static double[] RaDecToAxesXY(double[] raDec, bool preserveSop = false)
+        internal static double[] RaDecToAxesXY(double[] raDec)
         {
-            var axes = new []{raDec[0],raDec[1]};
+            var axes = new[] { raDec[0], raDec[1]};
             switch (SkySettings.AlignmentMode)
             {
                 case AlignmentModes.algAltAz:
@@ -274,18 +294,14 @@ namespace GS.Server.SkyTelescope
                         axes[0] += 180;
                         axes[1] = 180 - axes[1];
                     }
-                    var sop = SkyServer.SideOfPier;
-                    var newsop = (axes[1] <= 90 && axes[1] >= -90) ? PierSide.pierEast : PierSide.pierWest;
-                    if (preserveSop && newsop != sop)
-                    {
-                        if (SkySettings.NoSyncPastMeridian)
-                            throw new InvalidOperationException("Sync is not allowed when the mount has tracked past the meridian");
+                    axes = Range.RangeAxesXY(axes);
 
-                        axes[0] -= 180;
-                        axes[1] = 180 - axes[1];
-                    }
-
-                    break;
+                    //check for alternative position within meridian limits
+                    var b = AxesAppToMount(axes);
+                    var alt = SkyServer.CheckAlternatePosition(b);
+                    if (alt != null) axes = alt;
+                    
+                    return axes;
                 case AlignmentModes.algPolar:
                     axes[0] = (SkyServer.SiderealTime - axes[0]) * 15.0;
                     axes[1] = (SkyServer.SouthernHemisphere) ? -axes[1] : axes[1];

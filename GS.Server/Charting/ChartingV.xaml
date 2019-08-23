@@ -314,7 +314,7 @@
                           Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
                 <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Center" >
                     <Label VerticalAlignment="Center"  ToolTip="Chart Type" HorizontalAlignment="Center" Content="{Binding ChartName}"/>
-                    <md:Badged Badge="{Binding StartBadgeContent}" BadgeColorZoneMode="PrimaryMid" VerticalAlignment="Center">
+                    <md:Badged Badge="{Binding StartBadgeContent}" VerticalAlignment="Center">
                         <Button Margin="10,0,0,0" Height="30" Width="80" ToolTip="On/Off" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickStartChartingCommand}">
                             Start
                         </Button>
@@ -322,7 +322,7 @@
                     <Button Margin="15,0,0,0" Height="30" Width="80" ToolTip="Remove Plots"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickClearChartCommand}">
                         Clear
                     </Button>
-                    <md:Badged Badge="{Binding PhdBadgeContent}" BadgeColorZoneMode="PrimaryMid" VerticalAlignment="Center">
+                    <md:Badged Badge="{Binding PhdBadgeContent}" VerticalAlignment="Center">
                         <Button Margin="15,0,0,0" Height="30" Width="80" ToolTip="Connect" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPhdConnectCommand}">
                             PHD2
                         </Button>
