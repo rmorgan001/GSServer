@@ -22,7 +22,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using ASCOM.DeviceInterface;
-using GS.Server.Helpers;
 using GS.Shared;
 
 namespace GS.Server.SkyTelescope
@@ -469,7 +468,6 @@ namespace GS.Server.SkyTelescope
             {
                 if (_hcSpeed == value) return;
                 _hcSpeed = value;
-                Synthesizer.Speak(value.ToString());
                 Properties.SkyTelescope.Default.HcSpeed = value.ToString();
 
                 var monitorItem = new MonitorEntry

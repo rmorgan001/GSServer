@@ -15,6 +15,7 @@
  */
 using System;
 using System.Runtime.InteropServices;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace GS.Server.Domain
@@ -25,7 +26,7 @@ namespace GS.Server.Domain
         public override ValidationResult Validate(object value, System.Globalization.CultureInfo cultureInfo)
         {
             var canConvert = System.Net.IPAddress.TryParse(value as string ?? throw new InvalidOperationException(), out _);
-            return new ValidationResult(canConvert, "Invalid IP");
+            return new ValidationResult(canConvert, Application.Current.Resources["cvtInvIP"].ToString());
         }
     }
 }

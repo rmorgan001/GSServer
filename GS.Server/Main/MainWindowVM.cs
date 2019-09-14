@@ -46,6 +46,7 @@ namespace GS.Server.Main
         private SettingsVM _settingsVM;
         private GamepadVM _gamepadVM;
         public static MainWindowVM _mainWindowVm;
+        public Languages _languages;
 
         private double _tempHeight = 510;
         private double _tempWidth = 850;
@@ -61,6 +62,10 @@ namespace GS.Server.Main
             {
                 using (new WaitCursor())
                 {
+                    //Load language resource file
+                    _languages = new Languages();
+                    _languages.SetLanguageDictionary();
+
                     //setup property info from the GSServer
                     GSServer.StaticPropertyChanged += PropertyChangedServer;
                     Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
@@ -94,9 +99,10 @@ namespace GS.Server.Main
                     // Set starting page
                     CurrentPageViewModel = PageViewModels[0];
                     SkyWatcherVMRadio = true;
+
                 }
 
-            }
+            } 
             catch (Exception ex) 
             {
                 var monitorItem = new MonitorEntry
@@ -167,7 +173,7 @@ namespace GS.Server.Main
         }
         private void MaxmizeWindow()
         {
-            Properties.Server.Default.WindowState = WindowState.Maximized;
+            Properties.Server.Default.WindowState = Properties.Server.Default.WindowState != WindowState.Maximized ? WindowState.Maximized : WindowState.Normal;
         }
 
         private ICommand _normalWindowCommand;

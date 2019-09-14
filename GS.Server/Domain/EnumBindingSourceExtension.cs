@@ -14,6 +14,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using System;
+using System.Windows;
 using System.Windows.Markup;
 
 namespace GS.Server.Domain
@@ -26,17 +27,15 @@ namespace GS.Server.Domain
             get => _enumType;
             set
             {
-                if (value != _enumType)
+                if (value == _enumType) return;
+                if (null != value)
                 {
-                    if (null != value)
-                    {
-                        Type enumType = Nullable.GetUnderlyingType(value) ?? value;
-                        if (!enumType.IsEnum)
-                            throw new ArgumentException("Type must be for an Enum.");
-                    }
-
-                    _enumType = value;
+                    var enumType = Nullable.GetUnderlyingType(value) ?? value;
+                    if (!enumType.IsEnum)
+                        throw new ArgumentException(Application.Current.Resources["cvtEnumErr1"].ToString());
                 }
+
+                _enumType = value;
             }
         }
 
@@ -50,7 +49,7 @@ namespace GS.Server.Domain
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
             if (null == _enumType)
-                throw new InvalidOperationException("The EnumType must be specified.");
+                throw new InvalidOperationException(Application.Current.Resources["cvtEnumErr2"].ToString());
 
             var actualEnumType = Nullable.GetUnderlyingType(_enumType) ?? _enumType;
             var enumValues = Enum.GetValues(actualEnumType);

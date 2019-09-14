@@ -290,7 +290,7 @@ namespace GS.Server.Settings
             {
                 Settings.VoiceActive = value;
                 Synthesizer.VoiceActive = value;
-                Synthesizer.Speak("Voice active");
+                Synthesizer.Speak(Application.Current.Resources["vceActive"].ToString());
                 OnPropertyChanged();
                 RaisePropertyChanged("VoiceActive");
             }

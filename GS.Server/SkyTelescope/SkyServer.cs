@@ -146,7 +146,7 @@ namespace GS.Server.SkyTelescope
             set
             {
                 if (value == AlertState) return;
-                if (value) Synthesizer.Speak("Error error");
+                if (value) Synthesizer.Speak(Application.Current.Resources["vceError"].ToString());
                 _alertState = value;
                 OnStaticPropertyChanged();
             }
@@ -198,7 +198,7 @@ namespace GS.Server.SkyTelescope
             {
                 SkySettings.AtPark = value;
                 OnStaticPropertyChanged();
-                Synthesizer.Speak(value ? "Parked" : "UnPark");
+                Synthesizer.Speak(value ? Application.Current.Resources["vceParked"].ToString() : Application.Current.Resources["vceUnParked"].ToString());
 
                 var monitorItem = new MonitorEntry
                 {
@@ -626,7 +626,7 @@ namespace GS.Server.SkyTelescope
             {
                 if (LimitAlarm == value) return;
                 _limitAlarm = value;
-                if (value) Synthesizer.Speak("Limit warning");
+                if (value) Synthesizer.Speak(Application.Current.Resources["vceLimit"].ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -799,20 +799,20 @@ namespace GS.Server.SkyTelescope
                 {
                     if (AtPark)
                     {
-                        if(TrackingSpeak)Synthesizer.Speak("Parked");
-                        throw new ASCOM.ParkedException("Cannot track when parked");
+                        if(TrackingSpeak)Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
+                        throw new ASCOM.ParkedException(Application.Current.Resources["exParked"].ToString());
                     }
 
                     switch (SkySettings.AlignmentMode)
                     {
                         case AlignmentModes.algAltAz:
                             _trackingMode = TrackingMode.AltAz;
-                            if (TrackingSpeak) Synthesizer.Speak("Tracking on");
+                            if (TrackingSpeak) Synthesizer.Speak(Application.Current.Resources["vceTrackingOn"].ToString());
                             break;
                         case AlignmentModes.algGermanPolar:
                         case AlignmentModes.algPolar:
                             _trackingMode = SouthernHemisphere ? TrackingMode.EqS : TrackingMode.EqN;
-                            if (TrackingSpeak) Synthesizer.Speak("Tracking on");
+                            if (TrackingSpeak) Synthesizer.Speak(Application.Current.Resources["vceTrackingOn"].ToString());
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -820,7 +820,7 @@ namespace GS.Server.SkyTelescope
                 }
                 else
                 {
-                    if (TrackingSpeak && _trackingMode != TrackingMode.Off) Synthesizer.Speak("Tracking off");
+                    if (TrackingSpeak && _trackingMode != TrackingMode.Off) Synthesizer.Speak(Application.Current.Resources["vceTrackingOff"].ToString());
                     _trackingMode = TrackingMode.Off;
                 }
 
@@ -1095,7 +1095,7 @@ namespace GS.Server.SkyTelescope
             {
                 if (Pec == value) return;
                 _pec = value;
-                Synthesizer.Speak(value ? "Peck on" : "Peck off");
+                Synthesizer.Speak(value ? Application.Current.Resources["vcePeckOn"].ToString() : Application.Current.Resources["vcePeckOff"].ToString());
 
                 var monitorItem = new MonitorEntry
                 {
@@ -1121,8 +1121,8 @@ namespace GS.Server.SkyTelescope
             {
                 if (PecTraining == value) return;
                 _pecTraining = value;
-                Synthesizer.Speak(value ? "Peck Training on" : "Peck training off");
-
+                Synthesizer.Speak(value ? Application.Current.Resources["vcePeckTrainOn"].ToString() : Application.Current.Resources["vcePeckTrainOff"].ToString());
+                
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope,
@@ -1568,15 +1568,13 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Checks command object for errors then sends to error handler
+        /// Checks command object for errors and unsucessful execution
         /// </summary>
         /// <param name="command"></param>
-        /// <returns></returns>
+        /// <returns>true for errors found and not sucessful</returns>
         private static bool CheckSkyErrors(ISkyCommand command)
         {
-            if (command.Successful || command.Exception == null) return false;
-            SkyErrorHandler(command.Exception);
-            return true;
+            return !command.Successful && command.Exception != null;
         }
 
         #endregion
@@ -1614,7 +1612,7 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
 
-            Synthesizer.Speak("Stop");
+            Synthesizer.Speak(Application.Current.Resources["vceStop"].ToString());
         }
 
         /// <summary>
@@ -1958,12 +1956,10 @@ namespace GS.Server.SkyTelescope
                 case MountType.SkyWatcher:
                     var skyPositions = new SkyGetPositionsInDegrees(SkyQueue.NewId);
                     actualDegrees = (double[]) SkyQueue.GetCommandResult(skyPositions).Result;
-                    if (CheckSkyErrors(skyPositions)) return actualDegrees;
-                    break;
+                    return CheckSkyErrors(skyPositions) ? null : actualDegrees;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
             return actualDegrees;
         }
 
@@ -1990,6 +1986,7 @@ namespace GS.Server.SkyTelescope
             var trackingState = Tracking;
             TrackingSpeak = false;
             Tracking = false;
+            IsSlewing = true;
 
             var returncode = 0;
             switch (SkySystem.Mount)
@@ -2571,7 +2568,7 @@ namespace GS.Server.SkyTelescope
             var altaz = Axes.AltAzToAxesYX(new[] {Altitude, Azimuth});
             SkySettings.ParkAxisY = altaz[0];
             SkySettings.ParkAxisX = altaz[1];
-            Synthesizer.Speak("Park Set");
+            Synthesizer.Speak(Application.Current.Resources["vceParkSet"].ToString());
         }
 
         /// <summary>
@@ -2835,7 +2832,7 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
 
-            Synthesizer.Speak("Syncing to Azimuth");
+            Synthesizer.Speak(Application.Current.Resources["vceSyncAz"].ToString());
         }
 
         /// <summary>
@@ -2863,7 +2860,7 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
 
-            Synthesizer.Speak("Syncing to coordinates");
+            Synthesizer.Speak(Application.Current.Resources["vceSyncCoords"].ToString());
 
             //todo
             //calculate mount positions for each pierside
@@ -2933,24 +2930,24 @@ namespace GS.Server.SkyTelescope
                 case SlewType.SlewSettle:
                     break;
                 case SlewType.SlewMoveAxis:
-                    Synthesizer.Speak("Slewing");
+                    Synthesizer.Speak(Application.Current.Resources["vceSlewing"].ToString());
                     break;
                 case SlewType.SlewRaDec:
-                    Synthesizer.Speak("Slewing to Coordinates");
+                    Synthesizer.Speak(Application.Current.Resources["vceSlewCoords"].ToString());
                     break;
                 case SlewType.SlewAltAz:
-                    Synthesizer.Speak("Slewing to Coordinates");
+                    Synthesizer.Speak(Application.Current.Resources["vceSlewCoords"].ToString());
                     break;
                 case SlewType.SlewPark:
-                    Synthesizer.Speak("Slewing to Park");
+                    Synthesizer.Speak(Application.Current.Resources["vceSlewPark"].ToString());
                     break;
                 case SlewType.SlewHome:
-                    Synthesizer.Speak("Slewing Home");
+                    Synthesizer.Speak(Application.Current.Resources["vceSlewHome"].ToString());
                     break;
                 case SlewType.SlewHandpad:
                     break;
                 case SlewType.SlewComplete:
-                    Synthesizer.Speak("Slewing Complete");
+                    Synthesizer.Speak(Application.Current.Resources["vceSlewComplete"].ToString());
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(slewtype), slewtype, null);
@@ -2970,24 +2967,24 @@ namespace GS.Server.SkyTelescope
                 case SlewType.SlewSettle:
                     break;
                 case SlewType.SlewMoveAxis:
-                    Synthesizer.Speak("Slewing Complete");
+                    Synthesizer.Speak(Application.Current.Resources["vceSlewComplete"].ToString());
                     break;
                 case SlewType.SlewRaDec:
-                    Synthesizer.Speak("Slewing Complete");
+                    Synthesizer.Speak(Application.Current.Resources["vceSlewComplete"].ToString());
                     break;
                 case SlewType.SlewAltAz:
-                    Synthesizer.Speak("Slewing Complete");
+                    Synthesizer.Speak(Application.Current.Resources["vceSlewComplete"].ToString());
                     break;
                 case SlewType.SlewPark:
-                    Synthesizer.Speak("Parked");
+                    Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     break;
                 case SlewType.SlewHome:
-                    Synthesizer.Speak("Home");
+                    Synthesizer.Speak(Application.Current.Resources["vceHome"].ToString());
                     break;
                 case SlewType.SlewHandpad:
                     break;
                 case SlewType.SlewComplete:
-                    Synthesizer.Speak("Slewing Complete");
+                    Synthesizer.Speak(Application.Current.Resources["vceSlewComplete"].ToString());
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(slewtype), slewtype, null);
@@ -3015,6 +3012,7 @@ namespace GS.Server.SkyTelescope
 
                 // Get raw positions, some are non-responses from mount and are returned as NaN
                 var rawPositions = GetRawPositions();
+                if (rawPositions == null) return;
                 if (double.IsNaN(rawPositions[0]) || double.IsNaN(rawPositions[1])) return;
 
                 // UI diagnostics

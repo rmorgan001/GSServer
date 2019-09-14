@@ -28,15 +28,14 @@ namespace GS.Shared
         /// <param name="token"></param>
         public static void InvokeOnUiThread(Action action, CancellationToken token = default(CancellationToken))
         {
-            if (Application.Current == null) return;
-            if (Application.Current.Dispatcher.CheckAccess())
+            if (Application.Current.Dispatcher != null && Application.Current.Dispatcher.CheckAccess())
             {
                 action();
             }
             else
             {
                 if (token.IsCancellationRequested) return;
-                Application.Current.Dispatcher.Invoke(action);
+                if (Application.Current.Dispatcher != null) Application.Current.Dispatcher.Invoke(action);
             }
         }
 
@@ -46,14 +45,13 @@ namespace GS.Shared
         /// <param name="action"></param>
         public static void BeginInvokeOnUiThread(Action action)
         {
-            if (Application.Current == null) return;
-            if (Application.Current.Dispatcher.CheckAccess())
+            if (Application.Current.Dispatcher != null && Application.Current.Dispatcher.CheckAccess())
             {
                 action();
             }
             else
             {
-                Application.Current.Dispatcher.BeginInvoke(action);
+                if (Application.Current.Dispatcher != null) Application.Current.Dispatcher.BeginInvoke(action);
             }
         }
     }

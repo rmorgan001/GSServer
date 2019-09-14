@@ -22,6 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Drawing;
+using System.Windows;
 using System.Windows.Threading;
 using GS.Principles;
 using GS.Server.Domain;
@@ -433,7 +434,8 @@ namespace GS.Server.Charting
                     _ctsPulse?.Cancel();
                     _ctsPulse = null;
                 }
-                StartBadgeContent = value ? "on" : "";
+                StartBadgeContent = value ? Application.Current.Resources["badgeCStart"].ToString() : "";
+
             }
         }
 
@@ -961,7 +963,7 @@ namespace GS.Server.Charting
                 case ChartTypes.Steps:
                 case ChartTypes.Execute:
                 case ChartTypes.Duration:
-                    ChartName = ShowInArcseconds ? $"{DataType} (arcsec)" : $"{DataType}";
+                    ChartName = ShowInArcseconds ? $"{DataType} ({Application.Current.Resources["masArcSec"]})" : $"{DataType}";
                     break;
                 case ChartTypes.Tracking:
                     ChartName = $"{DataType}";
@@ -1114,7 +1116,7 @@ namespace GS.Server.Charting
                     }
                     else
                     {
-                        OpenDialog($"Turn mount tracking on to run {DataType}");                   
+                        OpenDialog($"{Application.Current.Resources["msgCTurnOnTracking"]} {DataType}");
                     }
                 }
                 else
@@ -1172,7 +1174,7 @@ namespace GS.Server.Charting
             var ratesteps = ((_jstartpos - position) / _stepsPerSecond);
             var ratetime = (_jstarttime - entry.Datetime).TotalSeconds;
             var rate = ratesteps / ratetime;
-            StrRaLineOne = $"Estimating Rate: {rate}";
+            StrRaLineOne = $"{Application.Current.Resources["msgCEstRate"]} {rate}";
 
             if (BaseIndexPosition)
             {
@@ -1199,7 +1201,7 @@ namespace GS.Server.Charting
 
                 _phd = new GuiderImpl(PhdHostText, 1, _ctsPhd);
                 _phd.Connect();
-                PhdBadgeContent = _phd.IsConnected() ? "on" : "";
+                PhdBadgeContent = _phd.IsConnected() ? Application.Current.Resources["badgeCPhdStart"].ToString() : "";
                 Mouse.OverrideCursor = null;
 
                 _taskRunning = true;
@@ -1232,7 +1234,7 @@ namespace GS.Server.Charting
                     case Phd.ErrorCode.Disconnected:
                     case Phd.ErrorCode.GuidingError:
                     case Phd.ErrorCode.NoResponse:
-                        OpenDialog($"PHD2: {ex.Message}");
+                        OpenDialog(ex.Message);
                         break;
                 }
             }
@@ -1241,7 +1243,7 @@ namespace GS.Server.Charting
                 var monitorItem = new MonitorEntry
                 { Datetime =  HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog($"PHD2 Exception: {ex.Message}");
+                OpenDialog(ex.Message);
             }
             finally
             {

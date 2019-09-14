@@ -52,7 +52,7 @@
         </DataTemplate>
     </Window.Resources>
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo x:Name="taskBarItemInfo" Description="GreenSweep Server" />
+        <TaskbarItemInfo x:Name="taskBarItemInfo" Description="{DynamicResource taskbarDescription}" />
     </Window.TaskbarItemInfo>
     <Grid Background="{DynamicResource MaterialDesignBody}">
             <Grid.RowDefinitions>

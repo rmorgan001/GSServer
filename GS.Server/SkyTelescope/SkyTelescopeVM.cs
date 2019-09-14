@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Windows;
 using System.Windows.Input;
 using ASCOM.DeviceInterface;
 using ASCOM.Utilities;
@@ -107,7 +108,7 @@ namespace GS.Server.SkyTelescope
 
                     // initial view items
                     AtPark = SkyServer.AtPark;
-                    ConnectButtonContent = "Connect";
+                    ConnectButtonContent = Application.Current.Resources["btnConnect"].ToString();
                     VoiceState = Synthesizer.VoiceActive;
 
                 }
@@ -1402,7 +1403,7 @@ namespace GS.Server.SkyTelescope
                     if (SkyServer.AtPark)
                     {
                         BlinkParked();
-                        Synthesizer.Speak("Parked");
+                        Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                         return;
                     }
                     SkyServer.GoToHome();
@@ -1549,7 +1550,7 @@ namespace GS.Server.SkyTelescope
             {
                 if (SkyServer.Tracking)
                 {
-                    OpenDialog("Stop mount before setting home position");
+                    OpenDialog(Application.Current.Resources["msgStopMount"].ToString());
                     return;
                 }
                 HomeResetContent = new HomeResetDialog();
@@ -1592,7 +1593,7 @@ namespace GS.Server.SkyTelescope
                 using (new WaitCursor())
                 {
                     SkyServer.ResetHomePositions();
-                    Synthesizer.Speak("Home Set");
+                    Synthesizer.Speak(Application.Current.Resources["vceHomeSet"].ToString());
                     IsHomeResetDialogOpen = false;
                 }
             }
@@ -1991,7 +1992,7 @@ namespace GS.Server.SkyTelescope
                         SkySettings.Latitude);
                     if (AltAz[0] < 0)
                     {
-                        OpenDialog($"Target Below Horizon Az: {AltAz[1]} Alt: {AltAz[0]}");
+                        OpenDialog($"{Application.Current.Resources["msgTargetBelow"]}: {AltAz[1]} Alt: {AltAz[0]}");
                         return;
                     }
 
@@ -2192,7 +2193,7 @@ namespace GS.Server.SkyTelescope
                 else
                 {
                     PecTrainOn = false;
-                    OpenDialog("Tracking must be on first");
+                    OpenDialog(Application.Current.Resources["msgTrackingOn"].ToString());
                 }
             }
             catch (Exception ex)
@@ -2308,6 +2309,7 @@ namespace GS.Server.SkyTelescope
                 if (Enum.IsDefined(typeof(SlewSpeed), Convert.ToInt32(value)) == false) return;
                 _hcspeed = value;
                 SkySettings.HcSpeed = (SlewSpeed)value;
+                Synthesizer.Speak(SkySettings.HcSpeed.ToString());
                 OnPropertyChanged();
             }
         }
@@ -2426,7 +2428,7 @@ namespace GS.Server.SkyTelescope
                 if (SkyServer.AtPark)
                 {
                     BlinkParked();
-                    Synthesizer.Speak("Parked");
+                    Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
                 StartSlew(FlipEW ? SlewDirection.SlewRight : SlewDirection.SlewLeft);
@@ -2500,7 +2502,7 @@ namespace GS.Server.SkyTelescope
                 if (SkyServer.AtPark)
                 {
                     BlinkParked();
-                    Synthesizer.Speak("Parked");
+                    Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
                 StartSlew(FlipEW ? SlewDirection.SlewLeft : SlewDirection.SlewRight);
@@ -2574,7 +2576,7 @@ namespace GS.Server.SkyTelescope
                 if (SkyServer.AtPark)
                 {
                     BlinkParked();
-                    Synthesizer.Speak("Parked");
+                    Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
                 StartSlew(FlipNS ? SlewDirection.SlewDown : SlewDirection.SlewUp);
@@ -2648,7 +2650,7 @@ namespace GS.Server.SkyTelescope
                 if (SkyServer.AtPark)
                 {
                     BlinkParked();
-                    Synthesizer.Speak("Parked");
+                    Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
                 StartSlew(FlipNS ? SlewDirection.SlewUp : SlewDirection.SlewDown);
@@ -2784,7 +2786,7 @@ namespace GS.Server.SkyTelescope
             {
                 if (IsHome == value) return;
                 _ishome = value;
-                HomeBadgeContent = value ? "home" : "";
+                HomeBadgeContent = value ? Application.Current.Resources["badgeHome"].ToString() : "";
                 OnPropertyChanged();
             }
         }
@@ -2796,8 +2798,8 @@ namespace GS.Server.SkyTelescope
             set
             {
                 _atpark = value;
-                ParkButtonContent = value ? "UnPark" : "Park";
-                ParkBadgeContent = value ? "parked" : "";
+                ParkButtonContent = value ? Application.Current.Resources["btnUnPark"].ToString() : Application.Current.Resources["btnPark"].ToString(); 
+                ParkBadgeContent = value ? Application.Current.Resources["btnhintPark"].ToString() : "";
                 OnPropertyChanged();
             }
         }
@@ -2834,7 +2836,7 @@ namespace GS.Server.SkyTelescope
             {
                 if (IsTracking == value) return;
                 _istracking = value;
-                TrackingBadgeContent = value ? "on" : "";
+                TrackingBadgeContent = value ? Application.Current.Resources["btnhintTracking"].ToString() : "";
                 OnPropertyChanged();
             }
         }
@@ -2941,7 +2943,7 @@ namespace GS.Server.SkyTelescope
             set
             {
                 ScreenEnabled = value;
-                ConnectButtonContent = value ? "Disconnect" : "Connect";
+                ConnectButtonContent = value ? Application.Current.Resources["btnDisConnect"].ToString() : Application.Current.Resources["btnConnect"].ToString(); 
             }
         }
 
@@ -3087,10 +3089,9 @@ namespace GS.Server.SkyTelescope
                         case AlignmentModes.algPolar:
                             break;
                         case AlignmentModes.algGermanPolar:
-                            var msg = @"When starting normally place the mount in the 'Home' position.";
-                            msg += Environment.NewLine + @"Home Position is counterweight down and declination pointing towards the pole.";
-                            msg += Environment.NewLine + @"Click the 'Set Home' button before or after obtaining a polar alignment.";
-
+                            var msg = Application.Current.Resources["msgHome1"].ToString();
+                            msg += Environment.NewLine + Application.Current.Resources["msgHome2"];
+                            msg += Environment.NewLine + Application.Current.Resources["msgHome3"];
                             OpenDialog(msg);
                             break;
                         default:
@@ -3484,7 +3485,8 @@ namespace GS.Server.SkyTelescope
                     }
                     else
                     {
-                        OpenDialog($"No data found on COM port {GpsComPort}, please try again");
+                        OpenDialog(Application.Current.Resources["msgGPSNoDataFound"].ToString() +  GpsComPort);
+
                     }
                 }
             }

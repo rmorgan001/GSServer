@@ -20,7 +20,7 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <TextBlock Grid.Column="0" Margin="10 0" VerticalAlignment="Center" ToolTip="Home">
+        <TextBlock Grid.Column="0" Margin="10 0" VerticalAlignment="Center" ToolTip="{DynamicResource tbtipHome}" Text="{DynamicResource tbHome}">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
                         <Style.Triggers>
@@ -36,9 +36,8 @@
                         </Style.Triggers>
                     </Style>
                 </TextBlock.Style>
-                Home
-            </TextBlock>
-        <TextBlock Grid.Column="1" Margin="5 0" VerticalAlignment="Center" ToolTip="Park">
+        </TextBlock>
+        <TextBlock Grid.Column="1" Margin="5 0" VerticalAlignment="Center" ToolTip="{DynamicResource tbtipParked}" Text="{DynamicResource tbParked}">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
                         <Setter Property="Background" Value="Transparent"></Setter>
@@ -65,9 +64,8 @@
                         </Style.Triggers>
                     </Style>
                 </TextBlock.Style>
-            Parked
             </TextBlock>
-        <TextBlock Grid.Column="2" Margin="5 0" VerticalAlignment="Center" ToolTip="Slewing">
+        <TextBlock Grid.Column="2" Margin="5 0" VerticalAlignment="Center" ToolTip="{DynamicResource tbtipSlewing}" Text="{DynamicResource tbSlewing}">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
                         <Style.Triggers>
@@ -83,9 +81,8 @@
                         </Style.Triggers>
                     </Style>
                 </TextBlock.Style>
-        Slewing
             </TextBlock>
-        <TextBlock Grid.Column="3" Margin="5 0" VerticalAlignment="Center" ToolTip="Tracing">
+        <TextBlock Grid.Column="3" Margin="5 0" VerticalAlignment="Center" ToolTip="{DynamicResource tbtipTracking}" Text="{DynamicResource tbTracking}">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
                         <Style.Triggers>
@@ -101,9 +98,8 @@
                         </Style.Triggers>
                     </Style>
                 </TextBlock.Style>
-            Tracking
             </TextBlock>
-        <TextBlock Grid.Column="4" Margin="5 0" VerticalAlignment="Center" Text="{Binding IsSideOfPier}" ToolTip="Side of Pier" Width="60" Foreground="DimGray">
+        <TextBlock Grid.Column="4" Margin="5 0" VerticalAlignment="Center"  Width="60" Foreground="DimGray" Text="{Binding IsSideOfPier}" ToolTip="{DynamicResource tbtipSOP}">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
                         <Style.Triggers>
@@ -129,7 +125,7 @@
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
-        <Button Grid.Column="5" Command="{Binding ClearLimitCommand}" Style="{StaticResource MaterialDesignFlatButton}" Width="60" ToolTip="Axis limit">
+        <Button Grid.Column="5" Command="{Binding ClearLimitCommand}" Style="{StaticResource MaterialDesignFlatButton}" Width="60" ToolTip="{DynamicResource btntipAxisLimit}">
                 <md:PackIcon Kind="WarningCircle" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left"  >
                     <md:PackIcon.Style>
                         <Style TargetType="md:PackIcon">
@@ -148,7 +144,7 @@
                     </md:PackIcon.Style>
                 </md:PackIcon>
             </Button>
-        <Button Grid.Column="6" Command="{Binding ClearWarningCommand}" Style="{StaticResource MaterialDesignFlatButton}" Width="60" ToolTip="Click to reset warning">
+        <Button Grid.Column="6" Command="{Binding ClearWarningCommand}" Style="{StaticResource MaterialDesignFlatButton}" Width="60" ToolTip="{DynamicResource btntipWarnings}">
                 <md:PackIcon Kind="WarningBox" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left" >
                     <md:PackIcon.Style>
                         <Style TargetType="md:PackIcon">
@@ -167,7 +163,7 @@
                     </md:PackIcon.Style>
                 </md:PackIcon>
             </Button>
-        <Button Grid.Column="7" Command="{Binding ClearErrorsCommand}" Style="{StaticResource MaterialDesignFlatButton}" Width="60" ToolTip="Click to reset error">
+        <Button Grid.Column="7" Command="{Binding ClearErrorsCommand}" Style="{StaticResource MaterialDesignFlatButton}" Width="60" ToolTip="{DynamicResource btntipErrors}">
                 <md:PackIcon Kind="AlarmLight" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left" >
                     <md:PackIcon.Style>
                         <Style TargetType="md:PackIcon">
@@ -186,7 +182,7 @@
                     </md:PackIcon.Style>
                 </md:PackIcon>
             </Button>
-        <md:PackIcon Grid.Column="8" Kind="SpeakerWireless" Margin="10 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="Voice" Padding="0">
+        <md:PackIcon Grid.Column="8" Kind="SpeakerWireless" Margin="10 0" Width="29" Height="29" VerticalAlignment="Center" Padding="0" ToolTip="{DynamicResource ictipVoice}">
                 <md:PackIcon.Style>
                     <Style TargetType="md:PackIcon">
                         <Style.Triggers>
@@ -200,7 +196,7 @@
                     </Style>
                 </md:PackIcon.Style>
             </md:PackIcon>
-        <md:PackIcon Grid.Column="9" Kind="Monitor" Margin="10 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="Monitor">
+        <md:PackIcon Grid.Column="9" Kind="Monitor" Margin="10 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="{DynamicResource ictipMonitor}">
                 <md:PackIcon.Style>
                     <Style TargetType="md:PackIcon">
                         <Style.Triggers>
@@ -214,8 +210,8 @@
                     </Style>
                 </md:PackIcon.Style>
             </md:PackIcon>
-        <Button Grid.Column="10" Command="{Binding ClickMountInfoDialogCommand}" Style="{StaticResource MaterialDesignFlatButton}" Width="60" ToolTip="Click for mount information">
-            <md:PackIcon Kind="Usb" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left"  ToolTip="Mount Info">
+        <Button Grid.Column="10" Command="{Binding ClickMountInfoDialogCommand}" Style="{StaticResource MaterialDesignFlatButton}" Width="60" ToolTip="{DynamicResource btntipConnected}">
+            <md:PackIcon Kind="Usb" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left"  ToolTip="{DynamicResource btntipConnected}">
                 <md:PackIcon.Style>
                     <Style TargetType="md:PackIcon">
                         <Style.Triggers>

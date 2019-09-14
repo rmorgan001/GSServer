@@ -6,11 +6,11 @@
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d">
     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-        <Slider Minimum="0" Maximum="500" ToolTip="Dec Backlash" Margin="0,-15,0,0" Name="slValue" 
+        <Slider Minimum="0" Maximum="500" Margin="0,-15,0,0" Name="slValue" ToolTip="{DynamicResource sldtipBacklash}" 
                 Style="{StaticResource MaterialDesignDiscreteSlider}"
                 Value="{Binding DecBacklash, UpdateSourceTrigger=PropertyChanged, Delay=800}"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <Label HorizontalAlignment="Center" Content="Dec Backlash Compensation (Microsteps)"/>
+            <Label HorizontalAlignment="Center" Content="{DynamicResource lbBacklash}"/>
             <Label HorizontalAlignment="Center" Content="{Binding ElementName=slValue, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
         </StackPanel>
     </StackPanel> 

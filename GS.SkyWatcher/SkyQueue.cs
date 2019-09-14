@@ -105,7 +105,7 @@ namespace GS.SkyWatcher
                 return command;
             }
             var sw = Stopwatch.StartNew();
-            while (sw.Elapsed.TotalMilliseconds < 5000 )
+            while (sw.Elapsed.TotalMilliseconds < 7000 )
             {
                 if (_resultsDictionary == null) break;
                 var success = _resultsDictionary.TryRemove(command.Id, out var result);

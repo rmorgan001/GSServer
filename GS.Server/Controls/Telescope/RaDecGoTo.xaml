@@ -20,8 +20,8 @@
             <ColumnDefinition Width="80"/>
             <ColumnDefinition Width="80"/>
         </Grid.ColumnDefinitions>
-        <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right">RA:</Label>
-        <ComboBox Grid.Row="0" Grid.Column="1" md:HintAssist.Hint="Hours" VerticalAlignment="Bottom" IsEditable="True" HorizontalAlignment="Center" Width="55"
+        <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="{DynamicResource lbRa}"/>
+        <ComboBox Grid.Row="0" Grid.Column="1" md:HintAssist.Hint="{DynamicResource hintHours}" VerticalAlignment="Bottom" IsEditable="True" HorizontalAlignment="Center" Width="55"
                                   ItemsSource="{Binding Hours}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
             <ComboBox.Text>
                 <Binding Path="RaHours" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -37,7 +37,7 @@
                 </ItemsPanelTemplate>
             </ComboBox.ItemsPanel>
         </ComboBox>
-        <ComboBox Grid.Row="0" Grid.Column="2" md:HintAssist.Hint="Minutes" VerticalAlignment="Bottom" IsEditable="True" HorizontalAlignment="Center" Width="55"
+        <ComboBox Grid.Row="0" Grid.Column="2" md:HintAssist.Hint="{DynamicResource hintMinutes}" VerticalAlignment="Bottom" IsEditable="True" HorizontalAlignment="Center" Width="55"
                                 ItemsSource="{Binding Minutes}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
             <ComboBox.Text>
                 <Binding Path="RaMinutes" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -53,7 +53,7 @@
                 </ItemsPanelTemplate>
             </ComboBox.ItemsPanel>
         </ComboBox>
-        <ComboBox Grid.Row="0" Grid.Column="3" md:HintAssist.Hint="Seconds" VerticalAlignment="Bottom" IsEditable="True" HorizontalAlignment="Center"  Width="70"
+        <ComboBox Grid.Row="0" Grid.Column="3" md:HintAssist.Hint="{DynamicResource hintSeconds}" VerticalAlignment="Bottom" IsEditable="True" HorizontalAlignment="Center"  Width="70"
                                 ItemsSource="{Binding Seconds}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
             <ComboBox.Text>
                 <Binding Path="RaSeconds" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -69,8 +69,8 @@
                 </ItemsPanelTemplate>
             </ComboBox.ItemsPanel>
         </ComboBox>
-        <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right">Dec:</Label>
-        <ComboBox Grid.Row="1" Grid.Column="1" md:HintAssist.Hint="Degrees" VerticalAlignment="Bottom" IsEditable="True" HorizontalAlignment="Center" Width="55"
+        <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="{DynamicResource lbDec}"/>
+        <ComboBox Grid.Row="1" Grid.Column="1" md:HintAssist.Hint="{DynamicResource hintDegrees}" VerticalAlignment="Bottom" IsEditable="True" HorizontalAlignment="Center" Width="55"
                                   ItemsSource="{Binding LatitudeRange}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
             <ComboBox.Text>
                 <Binding Path="DecDegrees" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -86,7 +86,7 @@
                 </ItemsPanelTemplate>
             </ComboBox.ItemsPanel>
         </ComboBox>
-        <ComboBox Grid.Row="1" Grid.Column="2" md:HintAssist.Hint="Minutes" VerticalAlignment="Bottom" IsEditable="True" HorizontalAlignment="Center" Width="55"
+        <ComboBox Grid.Row="1" Grid.Column="2" md:HintAssist.Hint="{DynamicResource hintMinutes}" VerticalAlignment="Bottom" IsEditable="True" HorizontalAlignment="Center" Width="55"
                                   ItemsSource="{Binding Minutes}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
             <ComboBox.Text>
                 <Binding Path="DecMinutes" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -102,7 +102,7 @@
                 </ItemsPanelTemplate>
             </ComboBox.ItemsPanel>
         </ComboBox>
-        <ComboBox Grid.Row="1" Grid.Column="3" md:HintAssist.Hint="Seconds" VerticalAlignment="Bottom" IsEditable="True" HorizontalAlignment="Center" Width="70"
+        <ComboBox Grid.Row="1" Grid.Column="3" md:HintAssist.Hint="{DynamicResource hintSeconds}" VerticalAlignment="Bottom" IsEditable="True" HorizontalAlignment="Center" Width="70"
                   ItemsSource="{Binding Minutes}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
             <ComboBox.Text>
                 <Binding Path="DecSeconds" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -118,12 +118,12 @@
                 </ItemsPanelTemplate>
             </ComboBox.ItemsPanel>
         </ComboBox>
-        <Button Grid.Row="0" Grid.Column="4" VerticalAlignment="Bottom" HorizontalAlignment="Center" Height="30" ToolTip="Fill with current postion"
-                Command="{Binding PopulateGoToRaDecCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}">Copy</Button>
+        <Button Grid.Row="0" Grid.Column="4" VerticalAlignment="Bottom" HorizontalAlignment="Center" Height="30" ToolTip="{DynamicResource btntipCopy}"
+                Command="{Binding PopulateGoToRaDecCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{DynamicResource btnCopy}"/>
         <md:DialogHost Grid.Row="1" Grid.Column="4" CloseOnClickAway="True" VerticalAlignment="Bottom" 
                                 IsOpen="{Binding IsRaGoToDialogOpen}" DialogContent="{Binding RaGoToContent}">
-            <Button  VerticalAlignment="Bottom" HorizontalAlignment="Center" Height="30" ToolTip="Slew to coordinates"
-                    Command="{Binding OpenRaGoToDialogCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}">GoTo</Button>
+            <Button  VerticalAlignment="Bottom" HorizontalAlignment="Center" Height="30" ToolTip="{DynamicResource btntipGoTo}"
+                    Command="{Binding OpenRaGoToDialogCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{DynamicResource btnGoTo}"/>
         </md:DialogHost>
     </Grid>
 </UserControl>

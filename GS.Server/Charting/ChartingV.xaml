@@ -310,30 +310,26 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <ToggleButton Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False" x:Name="MenuToggleButton"
-                          Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" ToolTip="Open"
+                          Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" ToolTip="{DynamicResource tbtntipCOpen}"
                           Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
                 <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Center" >
                     <Label VerticalAlignment="Center"  ToolTip="Chart Type" HorizontalAlignment="Center" Content="{Binding ChartName}"/>
                     <md:Badged Badge="{Binding StartBadgeContent}" VerticalAlignment="Center">
-                        <Button Margin="10,0,0,0" Height="30" Width="80" ToolTip="On/Off" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickStartChartingCommand}">
-                            Start
-                        </Button>
+                        <Button Margin="10,0,0,0" Height="30" Width="80" ToolTip="{DynamicResource btnCStart}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickStartChartingCommand}"
+                                Content="{DynamicResource btnCStart}"/>
                     </md:Badged>
-                    <Button Margin="15,0,0,0" Height="30" Width="80" ToolTip="Remove Plots"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickClearChartCommand}">
-                        Clear
-                    </Button>
+                    <Button Margin="15,0,0,0" Height="30" Width="80" ToolTip="{DynamicResource btnCClear}"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickClearChartCommand}"
+                            Content="{DynamicResource btnCClear}"/>
                     <md:Badged Badge="{Binding PhdBadgeContent}" VerticalAlignment="Center">
-                        <Button Margin="15,0,0,0" Height="30" Width="80" ToolTip="Connect" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPhdConnectCommand}">
-                            PHD2
-                        </Button>
+                        <Button Margin="15,0,0,0" Height="30" Width="80" ToolTip="{DynamicResource btnCPhd}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPhdConnectCommand}"
+                                Content="{DynamicResource btnCPhd}"/>
                     </md:Badged>
-                    <ToggleButton Margin="20,0,0,0" ToolTip="Off/On" Style="{StaticResource MaterialDesignActionLightToggleButton}" Background="{Binding RaColor}" HorizontalAlignment="Center" Width="25" Height="25" x:Name="RACheckbox" IsChecked="{Binding RaCheckBox}"/>
-                    <Label VerticalAlignment="Center"  HorizontalAlignment="Center">RA</Label>
-                    <ToggleButton ToolTip="Off/On" Style="{StaticResource MaterialDesignActionLightToggleButton}" Background="{Binding DecColor}" HorizontalAlignment="Center" Width="25" Height="25" x:Name="DecCheckbox" IsChecked="{Binding DecCheckBox}"/>
-                    <Label VerticalAlignment="Center"  HorizontalAlignment="Center">Dec</Label>
-                    <Button Margin="10,0,0,0" Height="30" Width="80" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickChartZoomResetCommand}">
-                        AutoY
-                    </Button>
+                    <ToggleButton Margin="20,0,0,0" Style="{StaticResource MaterialDesignActionLightToggleButton}" Background="{Binding RaColor}" HorizontalAlignment="Center" Width="25" Height="25" x:Name="RACheckbox" IsChecked="{Binding RaCheckBox}"/>
+                    <Label VerticalAlignment="Center"  HorizontalAlignment="Center" Content="{DynamicResource lbCRa}"/>
+                    <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" Background="{Binding DecColor}" HorizontalAlignment="Center" Width="25" Height="25" x:Name="DecCheckbox" IsChecked="{Binding DecCheckBox}"/>
+                    <Label VerticalAlignment="Center"  HorizontalAlignment="Center" Content="{DynamicResource lbCDec}"/>
+                    <Button Margin="10,0,0,0" Height="30" Width="80" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickChartZoomResetCommand}"
+                            Content="{DynamicResource btnCAutoY}"/>
                 </StackPanel>
                     <Grid Grid.Row="1" ShowGridLines="True"  Background="{DynamicResource MaterialDesignPaper}">
                         <Grid.RowDefinitions>
@@ -346,11 +342,11 @@
                             <ColumnDefinition Width="0"/>
                         </Grid.ColumnDefinitions>
                         <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BorderBrush="{Binding RaColor}"  Opacity="1" BorderThickness="1" Margin="0,0,0,1"/>
-                        <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center">W</Label>
-                        <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center">E</Label>
+                    <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Content="{DynamicResource lbCW}"/>
+                    <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{DynamicResource lbCE}"/>
                         <Grid Grid.Column="1" Grid.Row="0" Margin="20,0,10,0">
                             <Label HorizontalAlignment="Left" IsEnabled="False" Content="{Binding StrRaLineOne, Mode=OneWay}"/>
-                            <Label HorizontalAlignment="Center" IsEnabled="True" FontSize="18">Ra</Label>
+                        <Label HorizontalAlignment="Center" IsEnabled="True" FontSize="18" Content="{DynamicResource lbCRa}"/>
                         </Grid>
                         <lvc:CartesianChart Grid.Column="1" Grid.Row="0" Foreground="DarkGray" Hoverable="False" DisableAnimations="{Binding DisableAnimations, Mode=OneWay}" AnimationsSpeed="{Binding AnimationsSpeed, Mode=OneWay}" DataTooltip="{x:Null}" 
                                             Visibility="{Binding RaCheckBox, Converter={StaticResource BoolToVis}}" Zoom="Xy" >
@@ -384,11 +380,11 @@
                             </lvc:CartesianChart.AxisY>
                         </lvc:CartesianChart>
                         <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BorderBrush="{Binding DecColor}" Opacity="1" BorderThickness="1" Margin="0,1,0,0"/>
-                        <Label Grid.Column="0" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center">N</Label>
-                        <Label Grid.Column="0" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Center">S</Label>
+                    <Label Grid.Column="0" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" Content="{DynamicResource lbCN}"/>
+                    <Label Grid.Column="0" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{DynamicResource lbCS}"/>
                         <Grid Grid.Column="1" Grid.Row="1" Margin="20,0,10,0">
                             <Label HorizontalAlignment="Left" IsEnabled="False" Content="{Binding StrDecLineOne, Mode=OneWay}"/>
-                            <Label HorizontalAlignment="Center"  IsEnabled="True" FontSize="18">Dec</Label>
+                        <Label HorizontalAlignment="Center"  IsEnabled="True" FontSize="18" Content="{DynamicResource lbCDec}"/>
                         </Grid>
                         <lvc:CartesianChart Grid.Column="1" Grid.Row="1" Foreground="DarkGray" Hoverable="False" DisableAnimations="{Binding DisableAnimations, Mode=OneWay}" AnimationsSpeed="{Binding AnimationsSpeed, Mode=OneWay}" DataTooltip="{x:Null}" 
                                             Visibility="{Binding DecCheckBox, Converter={StaticResource BoolToVis}}" Zoom="Xy">

@@ -42,6 +42,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -51,6 +52,7 @@
     </Compile>
     <Compile Include="Charting.cs" />
     <Compile Include="GssAttribute.cs" />
+    <Compile Include="Languages.cs" />
     <Compile Include="Monitor.cs" />
     <Compile Include="MonitorQueue.cs" />
     <Compile Include="Numbers.cs" />
@@ -80,6 +82,12 @@
       <Name>GS.Principles</Name>
       <Private>False</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Languages\StringResources.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

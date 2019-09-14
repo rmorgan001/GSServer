@@ -1018,7 +1018,7 @@ namespace ASCOM.GS.Sky.Telescope
             MonitorLog.LogToMonitor(monitorItem);
 
             var alreadyopen = SkyServer.OpenSetupDialog;
-            if (alreadyopen) return;
+            if (alreadyopen) throw new InvalidOperationException("Driver is already open");
             SkyServer.OpenSetupDialog = true;
             while (true)
             {

@@ -14,6 +14,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using System.Runtime.InteropServices;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace GS.Server.Domain
@@ -24,7 +25,7 @@ namespace GS.Server.Domain
         public override ValidationResult Validate(object value, System.Globalization.CultureInfo cultureInfo)
         {
             var canConvert = int.TryParse(value as string, out _);
-            return new ValidationResult(canConvert, "Invalid Number");
+            return new ValidationResult(canConvert, Application.Current.Resources["cvtInvNumber"].ToString());
         }
     }
 }

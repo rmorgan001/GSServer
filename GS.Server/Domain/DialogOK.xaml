@@ -12,15 +12,7 @@
         </Grid.RowDefinitions>
         <TextBlock VerticalAlignment="Center" Margin="5 0" xml:space="preserve" Text="{Binding DialogMsg}"/>
         <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center" Margin="0 16 0 0">
-            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding ClickOkDialogCommand}">
-                OK
-            </Button>
-            <!--<Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}"
-                    Command="{Binding CancelErrorDialogCommand}">
-                CANCEL
-            </Button>
-            Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"  
-            -->
+            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding ClickOkDialogCommand}" Content="{DynamicResource btnOk}"/>
         </StackPanel>
     </Grid>
     </UserControl>

@@ -6,27 +6,25 @@
              mc:Ignorable="d">
     <StackPanel Orientation="Vertical" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="5">
         <StackPanel Orientation="Horizontal">
-            <TextBlock Margin="5,0,0,0">Internal X:</TextBlock>
+            <TextBlock Margin="5,0,0,0" Text="{DynamicResource tbInternalX}"/>
             <TextBlock Margin="5,0,0,0" Text="{Binding MountAxisX, StringFormat={}{0}°}"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
-            <TextBlock Margin="5,0,0,0">Internal Y:</TextBlock>
+            <TextBlock Margin="5,0,0,0" Text="{DynamicResource tbInternalY}"/>
             <TextBlock Margin="5,0,0,0" Text="{Binding MountAxisY, StringFormat={}{0}°}"/>
         </StackPanel>
         <TextBlock/>
         <StackPanel Orientation="Horizontal">
-            <TextBlock Margin="5,0,0,0">Actual X:</TextBlock>
-            <TextBlock Margin="5,0,0,0" Text="{Binding ActualAxisX, StringFormat={}{0}°}">
-                <Run Text="°"/>
-            </TextBlock>
+            <TextBlock Margin="5,0,0,0" Text="{DynamicResource tbActualX}"/>
+            <TextBlock Margin="5,0,0,0" Text="{Binding ActualAxisX, StringFormat={}{0}°}"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
-            <TextBlock Margin="5,0,0,0">Actual Y:</TextBlock>
+            <TextBlock Margin="5,0,0,0" Text="{DynamicResource tbActualY}"/>
             <TextBlock Margin="5,0,0,0" Text="{Binding ActualAxisY, StringFormat={}{0}°}"/>
         </StackPanel>
         <TextBlock/>
         <StackPanel Orientation="Horizontal">
-            <TextBlock Margin="5,0,0,0">Sidereal Time:</TextBlock>
+            <TextBlock Margin="5,0,0,0" Text="{DynamicResource tbSiderealTime}"/>
             <TextBlock Margin="5,0,0,0" Text="{Binding SiderealTime}"/>
         </StackPanel>
         <!--<StackPanel Orientation="Horizontal">

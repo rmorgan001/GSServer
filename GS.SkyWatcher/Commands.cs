@@ -797,6 +797,8 @@ namespace GS.SkyWatcher
                         }
                         catch (TimeoutException ex)
                         {
+                            if (ignoreWarnings) return null;
+
                             MountConnected = false;
                             throw axis == AxisId.Axis1
                                 ? new MountControlException(ErrorCode.ErrNoresponseAxis1, "Timeout", ex)

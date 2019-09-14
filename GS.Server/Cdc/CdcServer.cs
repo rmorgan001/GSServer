@@ -18,6 +18,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Windows;
 using ASCOM.Utilities;
 using GS.Shared;
 
@@ -55,7 +56,7 @@ namespace GS.Server.Cdc
             _tcpClient?.Connect(Ip, Port);
             if (!_tcpClient.Connected)
             {
-                throw new Exception("Server not found.");
+                throw new Exception(Application.Current.Resources["CdcNotFound"].ToString());
             }
 
         }
@@ -157,7 +158,7 @@ namespace GS.Server.Cdc
             }
             else
             {
-                throw new Exception("Observatory Information not found.");
+                throw new Exception(Application.Current.Resources["CdcOBNotFound"].ToString());
             }
             return darray;
         }

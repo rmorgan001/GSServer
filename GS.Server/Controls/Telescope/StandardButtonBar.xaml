@@ -8,46 +8,44 @@
              mc:Ignorable="d">
     <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" >
         <md:Badged Badge="{Binding ParkBadgeContent}">
-            <Button Margin="5" Width="100" Height="30" ToolTip="Park mount"
+            <Button Margin="5" Width="100" Height="30" ToolTip="{DynamicResource btntipPark}"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}"
                     Command="{Binding ClickParkCommand}"
                     Content="{Binding ParkButtonContent}"/>
         </md:Badged>
         <md:Badged Badge="{Binding HomeBadgeContent}" >
-            <Button Margin="5" Height="30" Width="100" ToolTip="Slew to home position"
+            <Button Margin="5" Height="30" Width="100" ToolTip="{DynamicResource btntipHome}"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                    Command="{Binding ClickHomeCommand}">
-            Home
+                    Command="{Binding ClickHomeCommand}"
+                    Content="{DynamicResource btnHome}">
             </Button>
         </md:Badged>
-            <Button Margin="5" x:Name="StopButton" Width="100" Height="30" ToolTip="Stop mount"
+        <Button Margin="5" x:Name="StopButton" Width="100" Height="30" ToolTip="{DynamicResource btntipStop}"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                    Command="{Binding ClickStopCommand}">
-            Stop
+                    Command="{Binding ClickStopCommand}"
+                    Content="{DynamicResource btnStop}">
         </Button>
         <md:Badged Badge="{Binding TrackingBadgeContent}">
-            <Button Margin="5" ToolTip="Tracking on/off" Width="100" Height="30"
+            <Button Margin="5" Width="100" Height="30" ToolTip="{DynamicResource btntipTracking}"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                    Command="{Binding ClickTrackingCommand}">
-            Tracking
+                    Command="{Binding ClickTrackingCommand}"
+                    Content="{DynamicResource btnTracking}">
             </Button>
         </md:Badged>
         <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Bottom" CloseOnClickAway="True"
                        IsOpen="{Binding IsHomeResetDialogOpen}" DialogContent="{Binding HomeResetContent}">
-            <Button Margin="5" Height="30"
+            <Button Margin="5" Width="100" Height="30" ToolTip="{DynamicResource btntipSetHome}"
                 Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                Width="100" ToolTip="Reset axis positions to home"
-                Command="{Binding OpenHomeResetDialogCommand}">
-            Set Home
+                Command="{Binding OpenHomeResetDialogCommand}"
+                Content="{DynamicResource btnSetHome}">
             </Button>
         </md:DialogHost>
         <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Bottom" CloseOnClickAway="True"
                        IsOpen="{Binding IsFlipDialogOpen}" DialogContent="{Binding FlipContent}">
-            <Button Margin="5" Height="30"
+            <Button Margin="5" Width="100" Height="30" ToolTip="{DynamicResource btntipFlip}"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                    Width="100" ToolTip="Flip Side of Pier"
-                    Command="{Binding OpenFlipDialogCommand}">
-                Flip SOP
+                    Command="{Binding OpenFlipDialogCommand}"
+                    Content="{DynamicResource btnFlip}">
             </Button>
         </md:DialogHost>
     </StackPanel>

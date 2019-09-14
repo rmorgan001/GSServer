@@ -15,6 +15,7 @@
  */
 using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 
@@ -34,7 +35,7 @@ namespace GS.Server.Domain
                 case string s:
                     return value.Equals(string.Empty) ? new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)) : new SolidColorBrush(ParseString(s));
                 default:
-                    throw new NotSupportedException("ColorToBurshConverter only supports converting from Color and String");
+                    throw new NotSupportedException(Application.Current.Resources["cvtInvNumber"].ToString());
             }
         }
 

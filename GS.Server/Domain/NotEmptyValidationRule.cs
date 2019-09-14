@@ -15,6 +15,7 @@
  */
 using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace GS.Server.Domain
@@ -25,7 +26,7 @@ namespace GS.Server.Domain
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
             return string.IsNullOrWhiteSpace((value ?? "").ToString())
-                ? new ValidationResult(false, "Required")
+                ? new ValidationResult(false, Application.Current.Resources["cvtRequired"].ToString())
                 : ValidationResult.ValidResult;
         }
     }
