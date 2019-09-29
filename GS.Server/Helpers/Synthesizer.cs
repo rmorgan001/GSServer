@@ -32,11 +32,11 @@ namespace GS.Server.Helpers
 
         private static IList<string> VoiceNames;
         
-        private static string VoiceName => Properties.Server.Default.VoiceName;
+        private static string VoiceName => Settings.Settings.VoiceName;
 
         private static int Rate { get; }
 
-        private static int Volume => Properties.Server.Default.VoiceVolume;
+        private static int Volume => Settings.Settings.VoiceVolume; 
 
         internal static bool VoiceActive
         {

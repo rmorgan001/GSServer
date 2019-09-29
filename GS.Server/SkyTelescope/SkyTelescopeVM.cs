@@ -111,6 +111,8 @@ namespace GS.Server.SkyTelescope
                     ConnectButtonContent = Application.Current.Resources["btnConnect"].ToString();
                     VoiceState = Synthesizer.VoiceActive;
 
+                    SetHCFlipsVisability();
+
                 }
 
                 // check to make sure window is visable then connect if requested.
@@ -1445,7 +1447,7 @@ namespace GS.Server.SkyTelescope
                 using (new WaitCursor())
                 {
                     if (!SkyServer.IsMountRunning) return;
-                    SkyServer.AbortSlew();
+                    SkyServer.StopAxes();
                 }
             }
             catch (Exception ex)
@@ -2230,11 +2232,11 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
-            using (new WaitCursor())
-            {
-                SkyServer.PecTraining = !SkyServer.PecTraining;
-                IsPpecDialogOpen = false;
-            }
+                using (new WaitCursor())
+                {
+                    SkyServer.PecTraining = !SkyServer.PecTraining;
+                    IsPpecDialogOpen = false;
+                }
             }
             catch (Exception ex)
             {
@@ -2338,6 +2340,62 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private bool _nsVisability;
+        public bool NSVisability
+        {
+            get => _nsVisability;
+            set
+            {
+                if (_nsVisability == value) return;
+                _nsVisability = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _ewVisability;
+        public bool EWVisability
+        {
+            get => _ewVisability;
+            set
+            {
+                if (_ewVisability == value) return;
+                _ewVisability = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private void SetHCFlipsVisability ()
+        {
+            switch (HcMode)
+            {
+                case HCMode.Axes:
+                    EWVisability = true;
+                    NSVisability = true;
+                    break;
+                case HCMode.Compass:
+                    EWVisability = false;
+                    NSVisability = false;
+                    break;
+                case HCMode.Guiding:
+                    EWVisability = false;
+                    NSVisability = false;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        public HCMode HcMode
+        {
+            get => SkySettings.HcMode;
+            set
+            {
+                SkySettings.HcMode = value;
+                SetHCFlipsVisability();
+                OnPropertyChanged();
+            }
+        }
+
         private ICommand _hcSpeedupCommand;
         public ICommand HcSpeedupCommand
         {
@@ -2431,7 +2489,7 @@ namespace GS.Server.SkyTelescope
                     Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
-                StartSlew(FlipEW ? SlewDirection.SlewRight : SlewDirection.SlewLeft);
+                StartSlew(FlipEW && EWVisability ? SlewDirection.SlewRight : SlewDirection.SlewLeft);
             }
             catch (Exception ex)
             {
@@ -2505,7 +2563,7 @@ namespace GS.Server.SkyTelescope
                     Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
-                StartSlew(FlipEW ? SlewDirection.SlewLeft : SlewDirection.SlewRight);
+                StartSlew(FlipEW && EWVisability ? SlewDirection.SlewLeft : SlewDirection.SlewRight);
             }
             catch (Exception ex)
             {
@@ -2579,7 +2637,7 @@ namespace GS.Server.SkyTelescope
                     Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
-                StartSlew(FlipNS ? SlewDirection.SlewDown : SlewDirection.SlewUp);
+                StartSlew(FlipNS && NSVisability ? SlewDirection.SlewDown : SlewDirection.SlewUp);
             }
             catch (Exception ex)
             {
@@ -2653,7 +2711,7 @@ namespace GS.Server.SkyTelescope
                     Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
-                StartSlew(FlipNS ? SlewDirection.SlewUp : SlewDirection.SlewDown);
+                StartSlew(FlipNS && NSVisability ? SlewDirection.SlewUp : SlewDirection.SlewDown);
             }
             catch (Exception ex)
             {

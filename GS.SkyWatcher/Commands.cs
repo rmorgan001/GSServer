@@ -874,12 +874,12 @@ namespace GS.SkyWatcher
                     break;
             }
 
-            //Serial.Transmit(commandStr.ToString());
-            Serial.Write(commandStr.ToString());
-
             var monitorItem = new MonitorEntry
                 { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{commandStr.ToString().Trim()}" };
             MonitorLog.LogToMonitor(monitorItem);
+
+            //Serial.Transmit(commandStr.ToString());
+            Serial.Write(commandStr.ToString());
 
             return $"{commandStr.ToString().Trim()}";
         }

@@ -4,10 +4,10 @@
 #define MyAppExeName "GS.Server.exe"
 
 [Setup]
-AppVerName=ASCOM GS Server 1.0.0.14
-AppVersion=1.0.0.14
-VersionInfoVersion=1.0.0.14
-OutputBaseFilename="ASCOMGSServer10014Setup"
+AppVerName=ASCOM GS Server 1.0.0.16
+AppVersion=1.0.0.16
+VersionInfoVersion=1.0.0.16
+OutputBaseFilename="ASCOMGSServer10016Setup"
 AppID={{0ff78bd6-6149-4536-9252-3da68b94f7c2}
 AppName=GS Server
 AppPublisher=Robert Morgan <robert.morgan.e@gmail.com>

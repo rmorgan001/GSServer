@@ -84,6 +84,10 @@ namespace GS.Server.Settings
 
                     //Performance
                     IntervalList = new List<int>(Numbers.InclusiveIntRange(100, 500, 10));
+                    //Volume Range
+                    VolumeList = new List<int>(Numbers.InclusiveIntRange(0, 100));
+
+                    ClearSettings();
                 }
             }
             catch (Exception ex)
@@ -296,6 +300,7 @@ namespace GS.Server.Settings
             }
         }
 
+        public IList<int> VolumeList { get; }
         public int VoiceVolume
         {
             get => Settings.VoiceVolume;
@@ -367,6 +372,222 @@ namespace GS.Server.Settings
                 if (HomeWarning == value) return;
                 SkySettings.HomeWarning = value;
                 OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
+        #region Reset Settings
+        private bool _skyTelescopeSettings;
+        public bool SkyTelescopeSettings
+        {
+            get => _skyTelescopeSettings;
+            set
+            {
+                _skyTelescopeSettings = value; 
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _serverSettings;
+        public bool ServerSettings
+        {
+            get => _serverSettings;
+            set
+            {
+                _serverSettings = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _chartSettings;
+        public bool ChartSettings
+        {
+            get => _chartSettings;
+            set
+            {
+                _chartSettings = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _gamepadSettings;
+        public bool GamepadSettings
+        {
+            get => _gamepadSettings;
+            set
+            {
+                _gamepadSettings = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _monitorSettings;
+        public bool MonitorSettings
+        {
+            get => _monitorSettings;
+            set
+            {
+                _monitorSettings = value; 
+                OnPropertyChanged();
+            }
+
+        }
+
+        private void ClearSettings()
+        {
+            SkyTelescopeSettings = false;
+            ServerSettings = false;
+            ChartSettings = false;
+            GamepadSettings = false;
+            MonitorSettings = false;
+        }
+
+        private bool _isSettingsResetDialogOpen;
+        public bool IsSettingsResetDialogOpen
+        {
+            get => _isSettingsResetDialogOpen;
+            set
+            {
+                if (_isSettingsResetDialogOpen == value) return;
+                _isSettingsResetDialogOpen = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private object _settingsResetContent;
+        public object SettingsResetContent
+        {
+            get => _settingsResetContent;
+            set
+            {
+                if (_settingsResetContent == value) return;
+                _settingsResetContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openSettingsResetDialogCommand;
+        public ICommand OpenSettingsResetDialogCommand
+        {
+            get
+            {
+                return _openSettingsResetDialogCommand ?? (_openSettingsResetDialogCommand = new RelayCommand(
+                           param => OpenSettingsResetDialog()
+                       ));
+            }
+        }
+        private void OpenSettingsResetDialog()
+        {
+            try
+            {
+                if (!SkyTelescopeSettings && !ServerSettings && !ChartSettings && !GamepadSettings && !MonitorSettings)
+                {
+                    OpenDialog(Application.Current.Resources["tbNoResetSettings"].ToString());
+                    return;
+                }
+                SettingsResetContent = new ResetSettingsDialog();
+                IsSettingsResetDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+
+        }
+
+        private ICommand _acceptSettingsResetDialogCommand;
+        public ICommand AcceptResetDialogCommand
+        {
+            get
+            {
+                return _acceptSettingsResetDialogCommand ?? (_acceptSettingsResetDialogCommand = new RelayCommand(
+                           param => AcceptSettingsResetDialog()
+                       ));
+            }
+        }
+        private void AcceptSettingsResetDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (SkyTelescopeSettings) Properties.SkyTelescope.Default.Reset();
+                    if (ServerSettings) Properties.Server.Default.Reset();
+                    if (ChartSettings) Properties.Chart.Default.Reset();
+                    if (GamepadSettings) Properties.Gamepad.Default.Reset();
+                    if (MonitorSettings) Shared.Properties.Monitor.Default.Reset();
+                    
+                    IsSettingsResetDialogOpen = false;
+                    OpenDialog(Application.Current.Resources["msgRestart"].ToString());
+                    ClearSettings();
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private ICommand _cancelSettingsResetDialogCommand;
+        public ICommand CancelResetDialogCommand
+        {
+            get
+            {
+                return _cancelSettingsResetDialogCommand ?? (_cancelSettingsResetDialogCommand = new RelayCommand(
+                           param => CancelSettingsResetDialog()
+                       ));
+            }
+        }
+        private void CancelSettingsResetDialog()
+        {
+            try
+            {
+                ClearSettings();
+                IsSettingsResetDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
             }
         }
 

@@ -83,7 +83,7 @@
                             </ItemsPanelTemplate>
                         </ComboBox.ItemsPanel>
                         <ComboBox.Text>
-                            <Binding Path="EquatorialCoordinateType" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                                <Binding Path="EquatorialCoordinateType" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
                         </ComboBox.Text>
                     </ComboBox>
                     <ComboBox Grid.Row="1" Grid.Column="4" md:HintAssist.Hint="{DynamicResource cbhintAlignment}" MinWidth="10" Margin="10,0,0,0" ToolTip="{DynamicResource cbhintAlignment}"

@@ -81,6 +81,7 @@ namespace GS.Server.Charting
                                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading ChartingVM" };
                             MonitorLog.LogToMonitor(monitorItem);
 
+                            ChartSettings.Load();
                             LoadChart();
                             _version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
@@ -88,9 +89,11 @@ namespace GS.Server.Charting
                             MonitorQueue.StaticPropertyChanged += PropertyChangedMonitor;
                             // Phd events
                             GuiderImpl.PropertyChanged += PropertyChangedGuiding;
+                            // Settings
+                            ChartSettings.StaticPropertyChanged += PropertyChangedSettings;
 
-                            // X axis second timer
-                            _xAxisTimer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(1)};
+                    // X axis second timer
+                    _xAxisTimer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(1)};
                             _xAxisTimer.Tick += XAxisTimer_Tick;
 
                             // combo selections
@@ -184,6 +187,26 @@ namespace GS.Server.Charting
             {
                 var monitorItem = new MonitorEntry
                     { Datetime =  HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private void PropertyChangedSettings(object sender, PropertyChangedEventArgs e)
+        {
+            try
+            {
+                ThreadContext.BeginInvokeOnUiThread(
+                    delegate
+                    {
+
+                    });
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -441,257 +464,15 @@ namespace GS.Server.Charting
 
         public List<string> ColorsList { get; set; }
 
-        public string ThirdColor
-        {
-            get => Properties.Chart.Default.ThirdColor;
-            set
-            {
-                Properties.Chart.Default.ThirdColor = value;
-                OnPropertyChanged();
-
-            }
-        }
-
-        public string FourthColor
-        {
-            get => Properties.Chart.Default.FourthColor;
-            set
-            {
-                Properties.Chart.Default.FourthColor = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string RaColor
-        {
-            get => Properties.Chart.Default.RaColor;
-            set
-            {
-                Properties.Chart.Default.RaColor = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string DecColor
-        {
-            get => Properties.Chart.Default.DecColor;
-            set
-            {
-                Properties.Chart.Default.DecColor = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool InvertRa
-        {
-            get => Properties.Chart.Default.InvertRa;
-            set
-            {
-                Properties.Chart.Default.InvertRa = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool InvertDec
-        {
-            get => Properties.Chart.Default.InvertDec;
-            set
-            {
-                Properties.Chart.Default.InvertDec = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool InvertThird
-        {
-            get => Properties.Chart.Default.InvertThird;
-            set
-            {
-                Properties.Chart.Default.InvertThird = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool InvertFourth
-        {
-            get => Properties.Chart.Default.InvertFourth;
-            set
-            {
-                Properties.Chart.Default.InvertFourth = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool RaLine
-        {
-            get => Properties.Chart.Default.RaLine;
-            set
-            {
-                Properties.Chart.Default.RaLine = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool RaBar
-        {
-            get => Properties.Chart.Default.RaBar;
-            set
-            {
-                Properties.Chart.Default.RaBar = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool RaStep
-        {
-            get => Properties.Chart.Default.RaStep;
-            set
-            {
-                Properties.Chart.Default.RaStep = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool DecLine
-        {
-            get => Properties.Chart.Default.DecLine;
-            set
-            {
-                Properties.Chart.Default.DecLine = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool DecBar
-        {
-            get => Properties.Chart.Default.DecBar;
-            set
-            {
-                Properties.Chart.Default.DecBar = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool DecStep
-        {
-            get => Properties.Chart.Default.DecStep;
-            set
-            {
-                Properties.Chart.Default.DecStep = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool ThirdLine
-        {
-            get => Properties.Chart.Default.ThirdLine;
-            set
-            {
-                Properties.Chart.Default.ThirdLine = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool ThirdBar
-        {
-            get => Properties.Chart.Default.ThirdBar;
-            set
-            {
-                Properties.Chart.Default.ThirdBar = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool ThirdStep
-        {
-            get => Properties.Chart.Default.ThirdStep;
-            set
-            {
-                Properties.Chart.Default.ThirdStep = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool FourthLine
-        {
-            get => Properties.Chart.Default.FourthLine;
-            set
-            {
-                Properties.Chart.Default.FourthLine = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool FourthBar
-        {
-            get => Properties.Chart.Default.FourthBar;
-            set
-            {
-                Properties.Chart.Default.FourthBar = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool FourthStep
-        {
-            get => Properties.Chart.Default.FourthStep;
-            set
-            {
-                Properties.Chart.Default.FourthStep = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string PhdHostText
-        {
-            get => Properties.Chart.Default.PhdHostText;
-            set
-            {
-                Properties.Chart.Default.PhdHostText = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool ShowInArcseconds
-        {
-            get => Properties.Chart.Default.ShowInArcseconds;
-            set
-            {
-                Properties.Chart.Default.ShowInArcseconds = value;
-                SetChartName();
-                OnPropertyChanged();
-            }
-        }
-
-        public bool BaseIndexPosition
-        {
-            get => Properties.Chart.Default.BaseIndexPosition;
-            set
-            {
-                Properties.Chart.Default.BaseIndexPosition = value;
-                OnPropertyChanged();
-            }
-        }
-
         private bool _logCharting;
         public bool LogCharting
         {
             get => _logCharting;
             set
             {
-                if(_logCharting == value) return;
+                if (_logCharting == value) return;
                 _logCharting = value;
                 Shared.Settings.LogCharting = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool DisableAnimations
-        {
-            get => Properties.Chart.Default.DisableAnimations;
-            set
-            {
-                Properties.Chart.Default.DisableAnimations = value;
                 OnPropertyChanged();
             }
         }
@@ -708,36 +489,285 @@ namespace GS.Server.Charting
             }
         }
 
+        public IList<int> Smoothness { get; set; }
+
+        public IList<int> AnimationTimes { get; set; }
+
         public IList<int> AxisMinSecondsRange { get; set; }
-        public int AxisMinSeconds
+
+        #endregion
+
+        #region Settings
+
+        public string ThirdColor
         {
-            get => Properties.Chart.Default.AxisMinSeconds;
+            get => ChartSettings.ThirdColor;
             set
             {
-                Properties.Chart.Default.AxisMinSeconds = value;
+                ChartSettings.ThirdColor = value;
+                OnPropertyChanged();
+
+            }
+        }
+
+        public string FourthColor
+        {
+            get => ChartSettings.FourthColor;
+            set
+            {
+                ChartSettings.FourthColor = value;
                 OnPropertyChanged();
             }
         }
 
-        public IList<int> AnimationTimes { get; set; }
-        public int AnimationTime
+        public string RaColor
         {
-            get => Properties.Chart.Default.AnimationTime;
+            get => ChartSettings.RaColor;
             set
             {
-                Properties.Chart.Default.AnimationTime = value;
+                ChartSettings.RaColor = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string DecColor
+        {
+            get => ChartSettings.DecColor;
+            set
+            {
+                ChartSettings.DecColor = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool InvertRa
+        {
+            get => ChartSettings.InvertRa;
+            set
+            {
+                ChartSettings.InvertRa = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool InvertDec
+        {
+            get => ChartSettings.InvertDec;
+            set
+            {
+                ChartSettings.InvertDec = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool InvertThird
+        {
+            get => ChartSettings.InvertThird;
+            set
+            {
+                ChartSettings.InvertThird = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool InvertFourth
+        {
+            get => ChartSettings.InvertFourth;
+            set
+            {
+                ChartSettings.InvertFourth = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool RaLine
+        {
+            get => ChartSettings.RaLine;
+            set
+            {
+                ChartSettings.RaLine = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool RaBar
+        {
+            get => ChartSettings.RaBar;
+            set
+            {
+                ChartSettings.RaBar = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool RaStep
+        {
+            get => ChartSettings.RaStep;
+            set
+            {
+                ChartSettings.RaStep = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool DecLine
+        {
+            get => ChartSettings.DecLine;
+            set
+            {
+                ChartSettings.DecLine = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool DecBar
+        {
+            get => ChartSettings.DecBar;
+            set
+            {
+                ChartSettings.DecBar = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool DecStep
+        {
+            get => ChartSettings.DecStep;
+            set
+            {
+                ChartSettings.DecStep = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool ThirdLine
+        {
+            get => ChartSettings.ThirdLine;
+            set
+            {
+                ChartSettings.ThirdLine = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool ThirdBar
+        {
+            get => ChartSettings.ThirdBar;
+            set
+            {
+                ChartSettings.ThirdBar = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool ThirdStep
+        {
+            get => ChartSettings.ThirdStep;
+            set
+            {
+                ChartSettings.ThirdStep = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool FourthLine
+        {
+            get => ChartSettings.FourthLine;
+            set
+            {
+                ChartSettings.FourthLine = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool FourthBar
+        {
+            get => ChartSettings.FourthBar;
+            set
+            {
+                ChartSettings.FourthBar = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool FourthStep
+        {
+            get => ChartSettings.FourthStep;
+            set
+            {
+                ChartSettings.FourthStep = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string PhdHostText
+        {
+            get => ChartSettings.PhdHostText;
+            set
+            {
+                ChartSettings.PhdHostText = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool ShowInArcseconds
+        {
+            get => ChartSettings.ShowInArcseconds;
+            set
+            {
+                ChartSettings.ShowInArcseconds = value;
+                SetChartName();
+                OnPropertyChanged();
+            }
+        }
+
+        public bool BaseIndexPosition
+        {
+            get => ChartSettings.BaseIndexPosition;
+            set
+            {
+                ChartSettings.BaseIndexPosition = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool DisableAnimations
+        {
+            get => ChartSettings.DisableAnimations;
+            set
+            {
+                ChartSettings.DisableAnimations = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int AxisMinSeconds
+        {
+            get => ChartSettings.AxisMinSeconds;
+            set
+            {
+                ChartSettings.AxisMinSeconds = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int AnimationTime
+        {
+            get => ChartSettings.AnimationTime;
+            set
+            {
+                ChartSettings.AnimationTime = value;
                 AnimationsSpeed = TimeSpan.FromMilliseconds(value * 100);
                 OnPropertyChanged();
             }
         }
 
-        public IList<int> Smoothness { get; set; }
         public int LineSmoothness
         {
-            get => Properties.Chart.Default.LineSmoothness;
+            get => ChartSettings.LineSmoothness;
             set
             {
-                Properties.Chart.Default.LineSmoothness = value;
+                ChartSettings.LineSmoothness = value;
                 OnPropertyChanged();
             }
         }

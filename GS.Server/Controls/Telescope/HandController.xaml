@@ -6,8 +6,12 @@
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:helpers="clr-namespace:GS.Server.Helpers"
              xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+             xmlns:domain="clr-namespace:GS.Server.Domain"
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d"  d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter  x:Key="BoolToVis"/>
+    </UserControl.Resources>
     <Grid Width="250" Height="175">
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -45,27 +49,39 @@
                 helpers:MouseBehaviour.MouseLeftButtonDownCommand="{Binding HcMouseDownStopCommand}">
             <md:PackIcon Kind="ArrowAll" />
         </Button>
-        <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="3" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Bottom">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Label Width="90" VerticalAlignment="Bottom"  HorizontalAlignment="Left" Content="{DynamicResource lbSpeed}">
-                <Label.LayoutTransform>
-                    <TransformGroup>
-                        <RotateTransform Angle="90" />
-                        <ScaleTransform ScaleX="-1" ScaleY="-1"/>
-                    </TransformGroup>
-                </Label.LayoutTransform>
-            </Label>
-                <Slider Height="120" HorizontalAlignment="Center" IsSnapToTickEnabled="True" TickFrequency="1" TickPlacement="Both" 
+        <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="3" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Top">
+            <ComboBox md:HintAssist.Hint="{DynamicResource lbMode}" ToolTip="{DynamicResource cbtipMode}" Height="40"
+                      ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type skyTelescope:HCMode}}}" 
+                      Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+                <ComboBox.Text>
+                    <Binding Path="HcMode" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                </ComboBox.Text>
+            </ComboBox>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
+                <Label Content="{DynamicResource lbSpeed}">
+                    <Label.LayoutTransform>
+                        <TransformGroup>
+                            <RotateTransform Angle="90" />
+                            <ScaleTransform ScaleX="-1" ScaleY="-1"/>
+                        </TransformGroup>
+                    </Label.LayoutTransform>
+                </Label>
+                <Slider MinHeight="90" HorizontalAlignment="Center" IsSnapToTickEnabled="True" TickFrequency="1" TickPlacement="Both" 
                     Orientation="Vertical" Minimum="1" Maximum="8" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" 
                     Value="{Binding HcSpeed, Mode=TwoWay, Delay=800}" ToolTip="{DynamicResource sltipSpeed}"/>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,-5" Visibility="{Binding NSVisability, Converter={StaticResource BoolToVis}}">
                 <ToggleButton HorizontalAlignment="Center" Width="20" Height="10" ToolTip="{DynamicResource tbtntipFlipNS}"
                               Style="{StaticResource MaterialDesignSwitchToggleButton}"
                               IsChecked="{Binding FlipNS, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{DynamicResource lbFlipNS}"/>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+            <StackPanel Orientation="Horizontal" Margin="0,-5,0,0" Visibility="{Binding EWVisability, Converter={StaticResource BoolToVis}}">
                 <ToggleButton HorizontalAlignment="Center" Width="20" Height="10"
                               Style="{StaticResource MaterialDesignSwitchToggleButton}" ToolTip="{DynamicResource tbtntipFlipEW}"
                               IsChecked="{Binding FlipEW, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />

@@ -64,7 +64,7 @@
     <ApplicationIcon>Resources\greenswamp1.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>1.0.0.14</AssemblyVersion>
+    <AssemblyVersion>1.0.0.16</AssemblyVersion>
     <AssemblyPublicKeyToken>565de7938946fba7</AssemblyPublicKeyToken>
   </PropertyGroup>
   <PropertyGroup>
@@ -163,6 +163,7 @@
     <Compile Include="Cdc\CdcDialog.xaml.cs">
       <DependentUpon>CdcDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Charting\ChartSettings.cs" />
     <Compile Include="Controls\Main\WindowTitleBar.xaml.cs">
       <DependentUpon>WindowTitleBar.xaml</DependentUpon>
     </Compile>
@@ -211,6 +212,9 @@
       <DependentUpon>HomeResetDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Domain\NotifyPropertyChangedExtension.cs" />
+    <Compile Include="Domain\ResetSettingsDialog.xaml.cs">
+      <DependentUpon>ResetSettingsDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Domain\PpecDialog.xaml.cs">
       <DependentUpon>PpecDialog.xaml</DependentUpon>
     </Compile>
@@ -230,6 +234,7 @@
       <DependentUpon>FocuserV.xaml</DependentUpon>
     </Compile>
     <Compile Include="Gamepad\Gamepad.cs" />
+    <Compile Include="Gamepad\GamepadSettings.cs" />
     <Compile Include="Gamepad\GamepadV.xaml.cs">
       <DependentUpon>GamepadV.xaml</DependentUpon>
     </Compile>
@@ -349,6 +354,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Domain\HomeResetDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Domain\ResetSettingsDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

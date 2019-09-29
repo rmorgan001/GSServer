@@ -186,7 +186,6 @@ namespace GS.Shared
                 _logMonitor = value;
                 Properties.Monitor.Default.LogMonitor = value;
                 OnStaticPropertyChanged();
-                Save();
             }
         }
 
@@ -200,7 +199,6 @@ namespace GS.Shared
                 _logCharting = value;
                 Properties.Monitor.Default.LogCharting = value;
                 OnStaticPropertyChanged();
-                Save();
             }
         }
 
@@ -217,7 +215,6 @@ namespace GS.Shared
                 if (_logSession == value) return;
                 _logSession = value;
                 Properties.Monitor.Default.LogSession = value;
-                Save();
             }
         }
 
@@ -230,7 +227,6 @@ namespace GS.Shared
                 if (_startMonitor == value) return;
                 _startMonitor = value;
                 Properties.Monitor.Default.StartMonitor = value;
-                Save();
                 OnStaticPropertyChanged();
             }
         }

@@ -232,7 +232,7 @@ namespace GS.SkyWatcher
                 // Convert lash to extra pulse duration in milliseconds
                 if (backlashsteps > 0)
                 {
-                    var lashduration = backlashsteps * (arcsecs / (Math.Abs(guiderate) * 3600) * 1000);
+                    var lashduration = backlashsteps / _stepsPerSecond[0] / 3600 / Math.Abs(guiderate) * 1000;
                     duration += (int) lashduration;
                 }
 
@@ -343,7 +343,7 @@ namespace GS.SkyWatcher
                     if (backlashsteps > 0)
                     {
                         // convert backlash
-                        var lashduration = backlashsteps * (arcsecs / (Math.Abs(guiderate) * 3600) * 1000);
+                        var lashduration = backlashsteps / _stepsPerSecond[1] / 3600 / Math.Abs(guiderate) * 1000;
 
                         //add the lash time to duration
                         duration += (int) lashduration;

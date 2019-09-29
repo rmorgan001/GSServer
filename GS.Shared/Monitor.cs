@@ -77,7 +77,6 @@ namespace GS.Shared
                 default:
                     throw new ArgumentOutOfRangeException(nameof(monitorDevice), monitorDevice, null);
             }
-            Settings.Save();
         }
 
         private static void Save_MonitorCategory(MonitorCategory monitorCategory, bool value)
@@ -102,7 +101,6 @@ namespace GS.Shared
                 default:
                     throw new ArgumentOutOfRangeException(nameof(monitorCategory), monitorCategory, null);
             }
-            Settings.Save();
         }
 
         private static void Save_MonitorType(MonitorType monitorType, bool value)
@@ -124,7 +122,6 @@ namespace GS.Shared
                 default:
                     throw new ArgumentOutOfRangeException(nameof(monitorType), monitorType, null);
             }
-            Settings.Save();
         }
 
         /// <summary>

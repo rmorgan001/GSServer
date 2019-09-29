@@ -476,6 +476,22 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static HCMode _hcMode;
+        public static HCMode HcMode
+        {
+            get => _hcMode;
+            set
+            {
+                if (_hcMode == value) return;
+                _hcMode = value;
+                Properties.SkyTelescope.Default.HCMode = value.ToString();
+
+                var monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+        }
+
         private static bool _alternatingPpec;
         public static bool AlternatingPpec
         {
@@ -1057,6 +1073,8 @@ namespace GS.Server.SkyTelescope
             TrackingRate = dparse;
             Enum.TryParse<SlewSpeed>(Properties.SkyTelescope.Default.HcSpeed, true, out var hparse);
             HcSpeed = hparse;
+            Enum.TryParse<HCMode>(Properties.SkyTelescope.Default.HCMode, true, out var hcparse);
+            HcMode = hcparse;
 
             AlternatingPpec = Properties.SkyTelescope.Default.AlternatingPPEC;
             ApertureArea = Properties.SkyTelescope.Default.ApertureArea;

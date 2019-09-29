@@ -1018,5 +1018,17 @@ namespace GS.Server.Properties {
                 this["DisplayInterval"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Axes")]
+        public string HCMode {
+            get {
+                return ((string)(this["HCMode"]));
+            }
+            set {
+                this["HCMode"] = value;
+            }
+        }
     }
 }

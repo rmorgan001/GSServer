@@ -251,5 +251,8 @@
     <Setting Name="DisplayInterval" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">300</Value>
     </Setting>
+    <Setting Name="HCMode" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Axes</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

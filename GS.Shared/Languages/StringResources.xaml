@@ -89,7 +89,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="lbFlipNS">Flip N/S</system:String>
     <system:String x:Key="tbtntipFlipEW">Reverse E/W direction</system:String>
     <system:String x:Key="lbFlipEW">Flip E/W</system:String>
-    
+    <system:String x:Key="lbMode">Mode</system:String>
+    <system:String x:Key="cbtipMode">Direction Mode</system:String>
+
     <!--PPEC bar-->
     <system:String x:Key="tbStartTraining">Accept to start training</system:String>
     <system:String x:Key="tbStartTrainingMode">Start PPEC training mode</system:String>
@@ -187,6 +189,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="vcePeckTrainOn">Peck Training on</system:String>
     <system:String x:Key="vcePeckTrainOff">Peck Training off</system:String>
     <system:String x:Key="vceStop">Stop</system:String>
+    <system:String x:Key="vceAbortSlew">Abort</system:String>
     <system:String x:Key="vceParkSet">Park Set</system:String>
     <system:String x:Key="vceSyncAz">Syncing to Azimuth</system:String>
     <system:String x:Key="vceSyncCoords">Syncing to Coordinates</system:String>
@@ -352,6 +355,16 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="tbhintOPrimaryColor">Primary Color</system:String>
     <system:String x:Key="tbhintOAccentColor">Accent Color</system:String>
     <system:String x:Key="tbhintODisplayInterval">Display Interval (ms)</system:String>
+    <system:String x:Key="msgRestart">Settings reset. Please restart GS Server</system:String>
+    <system:String x:Key="tbAcceptResetSettings">Accept to reset the selected settings</system:String>
+    <system:String x:Key="tbNoResetSettings">No settings selected</system:String>
+    <system:String x:Key="cbServerSettings">Options</system:String>
+    <system:String x:Key="cbSkyTelescopeSettings">SkyWatcher</system:String>
+    <system:String x:Key="cbChartsSettings">Charts</system:String>
+    <system:String x:Key="cbGamepadSettings">Gamepad</system:String>
+    <system:String x:Key="cbMonitorSettings">Monitor</system:String>
+    <system:String x:Key="tbOSettings">Reset Settings</system:String>
+    <system:String x:Key="btnResetSettings">Reset</system:String>
 
     <!--Charts -->
     <system:String x:Key="tbtntipCOpen">Open</system:String>

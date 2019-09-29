@@ -1758,7 +1758,7 @@ namespace ASCOM.GS.Sky.Telescope
             if (raDecSlew == SkyServer.Tracking) return;
 
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{SkyServer.Tracking},{method}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{SkyServer.Tracking},{raDecSlew},{method}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             throw new InvalidOperationException($"{method} is not allowed when tracking is {SkyServer.Tracking}");
