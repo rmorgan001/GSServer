@@ -112,3 +112,10 @@ Can be found at https://groups.io/g/GSS/topics
 * Manual Flip SOP button added
 * Corrected sync issue after a flip
 * Added color themes
+
+1.0.0.16 released 28 Sept 2019
+* New Hand Controler Modes
+* New Reset Settings
+* Park Correction
+* Abort Slew Correction for tracking
+* IsSlewing correction for CCD Commander
