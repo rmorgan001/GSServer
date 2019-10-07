@@ -18,7 +18,7 @@ GS Server is SkyWatcher ASCOM telescope driver for use with astronomy software a
 
 ![Alt text](Docs/gsserver1.jpg?raw=true "GSServer")
 
-You can download the installable version at https://groups.yahoo.com/neo/groups/GreenSwamp/info or at https://groups.io/g/GSS/files .  located in the files section.
+You can download the installable version at https://groups.io/g/GSS/files .  located in the files section.
 
 ## Solution Projects
 
