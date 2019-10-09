@@ -17,19 +17,24 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Media3D;
 using ASCOM.DeviceInterface;
 using ASCOM.Utilities;
+using GS.Principles;
 using GS.Server.Cdc;
 using GS.Server.Domain;
 using GS.Server.Gps;
 using GS.Server.Helpers;
 using GS.Server.Main;
 using GS.Shared;
+using HelixToolkit.Wpf;
 using MaterialDesignThemes.Wpf;
 
 namespace GS.Server.SkyTelescope
@@ -43,7 +48,8 @@ namespace GS.Server.SkyTelescope
         public string BottomName => "Telescope";
         public int Uid => 0;
         public static SkyTelescopeVM _skyTelescopeVM;
-        
+        private readonly string _directoryPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase);
+
         #endregion
 
         #region View Model Items
@@ -60,12 +66,14 @@ namespace GS.Server.SkyTelescope
                     DebugVisability = false;
                     _skyTelescopeVM = this;
 
+                    LoadImages();
+
                     //Show in Tab?
                     if (!Properties.Server.Default.SkyWatcher) return;
 
                     var monitorItem = new MonitorEntry
                     {
-                        Datetime = Principles.HiResDateTime.UtcNow,
+                        Datetime = HiResDateTime.UtcNow,
                         Device = MonitorDevice.Telescope,
                         Category = MonitorCategory.Interface,
                         Type = MonitorType.Information,
@@ -111,6 +119,10 @@ namespace GS.Server.SkyTelescope
                     ConnectButtonContent = Application.Current.Resources["btnConnect"].ToString();
                     VoiceState = Synthesizer.VoiceActive;
 
+                    ParkSelection = ParkPositions.FirstOrDefault();
+                    ParkSelectionSetting = ParkPositions.FirstOrDefault();
+
+                    //set HC toggles for flip
                     SetHCFlipsVisability();
 
                 }
@@ -122,7 +134,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -176,6 +188,9 @@ namespace GS.Server.SkyTelescope
                      case "Elevation":
                          Elevation = SkySettings.Elevation;
                          break;
+                     case "ParkPositions":
+                         OnPropertyChanged($"ParkPositions");
+                         break;
                  }
              });
             }
@@ -183,7 +198,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -226,9 +241,8 @@ namespace GS.Server.SkyTelescope
                                 break;
                             case "RightAscensionXform":
                                 RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXform, "h ", ":", "", 2);
-                                break;
-                            case "SiderealTime":
-                                if (DebugVisability) SiderealTime = _util.HoursToHMS(SkyServer.SiderealTime);
+                                Rotate();
+                                GetDebugProperties();
                                 break;
                             case "IsHome":
                                 IsHome = SkyServer.IsHome;
@@ -275,21 +289,6 @@ namespace GS.Server.SkyTelescope
                             case "IsMountRunning":
                                 MountState = SkyServer.IsMountRunning;
                                 break;
-                            case "MountAxisX":
-                                if(DebugVisability) MountAxisX = $"{Numbers.TruncateD(SkyServer.MountAxisX, 15)}";
-                                    break;
-                            case "MountAxisY":
-                                if (DebugVisability) MountAxisY =  $"{Numbers.TruncateD(SkyServer.MountAxisY, 15)}";
-                                    break;
-                            case "MountError":
-                                MountError = SkyServer.MountError;
-                                break;
-                            case "ActualAxisX":
-                                if (DebugVisability) ActualAxisX = $"{Numbers.TruncateD(SkyServer.ActualAxisX, 15)}";
-                                break;
-                            case "ActualAxisY":
-                                if (DebugVisability) ActualAxisY = $"{Numbers.TruncateD(SkyServer.ActualAxisY, 15)}";
-                                    break;
                             }
                         });
             }
@@ -297,7 +296,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -332,7 +331,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -367,7 +366,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -406,7 +405,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -445,7 +444,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -484,6 +483,26 @@ namespace GS.Server.SkyTelescope
             ((IDisposable) _util)?.Dispose();
         }
 
+        public IList<string> ImageFiles;
+        private string _imageFile;
+        public string ImageFile
+        {
+            get => _imageFile;
+            set
+            {
+                if (_imageFile == value) return;
+                _imageFile = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private void LoadImages()
+        {
+            //image size Width="253" Height="340"
+            var random = new Random();
+            ImageFiles = new List<string> { "M33.png", "M74.png", "NGC6992.png"};
+            ImageFile = "../Resources/" +  ImageFiles[random.Next(ImageFiles.Count)];
+        }
 
         #endregion
 
@@ -652,6 +671,7 @@ namespace GS.Server.SkyTelescope
             {
                 SkySettings.AlignmentMode = value;
                 OnPropertyChanged();
+                
             }
         }
 
@@ -936,14 +956,30 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    SkyServer.SetParkAxis();
+                    if (ParkSelectionSetting == null)
+                    {
+                        OpenDialog("Nothing selected");
+                        return;
+                    }
+                    var parkcoords = Axes.MountAxis2ParkCoords();
+                    ParkSelectionSetting.X = parkcoords[0];
+                    ParkSelectionSetting.Y = parkcoords[1];
+
+                    var parkToUpdate = ParkPositions.FirstOrDefault(p => p.Name == ParkSelectionSetting.Name);
+                    if (parkToUpdate == null) return;
+                    
+                    parkToUpdate.X = parkcoords[0];
+                    parkToUpdate.Y = parkcoords[1];
+                    SkySettings.ParkPositions = ParkPositions;
+                    OpenDialog($"Position saved to {parkToUpdate.Name}");
+                    Synthesizer.Speak(Application.Current.Resources["vceParkSet"].ToString());
                 }
 }
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -952,7 +988,6 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-
                 SkyServer.AlertState = true;
                 OpenDialog(ex.Message);
             }
@@ -982,7 +1017,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -1022,7 +1057,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -1101,6 +1136,16 @@ namespace GS.Server.SkyTelescope
 
         #region Debug
 
+        private void GetDebugProperties()
+        {
+            if (!DebugVisability) return;
+            MountAxisX = $"{Numbers.TruncateD(SkyServer.MountAxisX, 15)}";
+            MountAxisY = $"{Numbers.TruncateD(SkyServer.MountAxisY, 15)}";
+            ActualAxisX = $"{Numbers.TruncateD(SkyServer.ActualAxisX, 15)}";
+            ActualAxisY = $"{Numbers.TruncateD(SkyServer.ActualAxisY, 15)}";
+            SiderealTime = _util.HoursToHMS(SkyServer.SiderealTime);
+        }
+
         private string _actualAxisX;
         public string ActualAxisX
         {
@@ -1159,6 +1204,9 @@ namespace GS.Server.SkyTelescope
                 _debugVisability = value;
                 SkyServer.Debug = value;
                 OnPropertyChanged();
+                if (!value) return;
+                MountAxisX = SkyServer.MountAxisX.ToString(CultureInfo.InvariantCulture);
+                GetDebugProperties();
             }
         }
 
@@ -1177,7 +1225,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Warning,
@@ -1193,7 +1241,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -1290,6 +1338,346 @@ namespace GS.Server.SkyTelescope
 
         #region Button Control
 
+        private List<ParkPosition> _parkPositions;
+        public List<ParkPosition> ParkPositions
+        {
+            get => SkySettings.ParkPositions;
+            set
+            {
+                if (_parkPositions == value) return;
+                _parkPositions = value;
+                SkySettings.ParkPositions = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ParkPosition _parkSelection;
+        public ParkPosition ParkSelection
+        {
+            get => _parkSelection;
+            set
+            {
+                if (_parkSelection == value) return;
+                _parkSelection = value;
+                SkyServer.ParkSelected = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ParkPosition _parkSelectionSetting;
+        public ParkPosition ParkSelectionSetting
+        {
+            get => _parkSelectionSetting;
+            set
+            {
+                if (_parkSelectionSetting == value) return;
+                _parkSelectionSetting = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _parkNewName;
+        public string ParkNewName
+        {
+            get => _parkNewName;
+            set
+            {
+                if (_parkNewName == value) return;
+                _parkNewName = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _parkName;
+        public string ParkName
+        {
+            get => SkySettings.ParkName;
+            set
+            {
+                if (_parkName == value) return;
+                _parkName = value;
+                SkySettings.ParkName = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isParkAddDialogOpen;
+        public bool IsParkAddDialogOpen
+        {
+            get => _isParkAddDialogOpen;
+            set
+            {
+                if (_isParkAddDialogOpen == value) return;
+                _isParkAddDialogOpen = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private object _parkAddContent;
+        public object ParkAddContent
+        {
+            get => _parkAddContent;
+            set
+            {
+                if (_parkAddContent == value) return;
+                _parkAddContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openParkAddDialogCommand;
+        public ICommand OpenParkAddDialogCommand
+        {
+            get
+            {
+                return _openParkAddDialogCommand ?? (_openParkAddDialogCommand = new RelayCommand(
+                           param => OpenParkAddDialog()
+                       ));
+            }
+        }
+        private void OpenParkAddDialog()
+        {
+            try
+            {
+                ParkNewName = null;
+                ParkAddContent = new ParkAddDialog();
+                IsParkAddDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+
+        }
+
+        private ICommand _acceptParkAddDialogCommand;
+        public ICommand AcceptParkAddDialogCommand
+        {
+            get
+            {
+                return _acceptParkAddDialogCommand ?? (_acceptParkAddDialogCommand = new RelayCommand(
+                           param => AcceptParkAddDialog()
+                       ));
+            }
+        }
+        private void AcceptParkAddDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (string.IsNullOrEmpty(ParkNewName)) return;
+                    var pp = new ParkPosition {Name = ParkNewName.Trim()};
+                    ParkPositions.Add(pp);
+                    SkySettings.ParkPositions = ParkPositions;
+                    ParkSelectionSetting = pp;
+                    ParkSelection = ParkPositions.FirstOrDefault();
+                    IsParkAddDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private ICommand _cancelParkAddDialogCommand;
+        public ICommand CancelParkAddDialogCommand
+        {
+            get
+            {
+                return _cancelParkAddDialogCommand ?? (_cancelParkAddDialogCommand = new RelayCommand(
+                           param => CancelParkAddDialog()
+                       ));
+            }
+        }
+        private void CancelParkAddDialog()
+        {
+            try
+            {
+                IsParkAddDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private bool _isParkDeleteDialogOpen;
+        public bool IsParkDeleteDialogOpen
+        {
+            get => _isParkDeleteDialogOpen;
+            set
+            {
+                if (_isParkDeleteDialogOpen == value) return;
+                _isParkDeleteDialogOpen = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private object _parkDeleteContent;
+        public object ParkDeleteContent
+        {
+            get => _parkDeleteContent;
+            set
+            {
+                if (_parkDeleteContent == value) return;
+                _parkDeleteContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openParkDeleteDialogCommand;
+        public ICommand OpenParkDeleteDialogCommand
+        {
+            get
+            {
+                return _openParkDeleteDialogCommand ?? (_openParkDeleteDialogCommand = new RelayCommand(
+                           param => OpenParkDeleteDialog()
+                       ));
+            }
+        }
+        private void OpenParkDeleteDialog()
+        {
+            try
+            {
+                ParkDeleteContent = new ParkDeleteDialog();
+                IsParkDeleteDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+
+        }
+
+        private ICommand _acceptParkDeleteDialogCommand;
+        public ICommand AcceptParkDeleteDialogCommand
+        {
+            get
+            {
+                return _acceptParkDeleteDialogCommand ?? (_acceptParkDeleteDialogCommand = new RelayCommand(
+                           param => AcceptParkDeleteDialog()
+                       ));
+            }
+        }
+        private void AcceptParkDeleteDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (ParkSelectionSetting == null) return;
+                    //if (ParkPositions.Count == 1) return;
+                    ParkPositions.Remove(ParkSelectionSetting);
+                    SkySettings.ParkPositions = ParkPositions;
+                    ParkSelectionSetting = ParkPositions.FirstOrDefault();
+                    ParkSelection = ParkPositions.FirstOrDefault();
+                    IsParkDeleteDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private ICommand _cancelParkDeleteDialogCommand;
+        public ICommand CancelParkDeleteDialogCommand
+        {
+            get
+            {
+                return _cancelParkDeleteDialogCommand ?? (_cancelParkDeleteDialogCommand = new RelayCommand(
+                           param => CancelParkDeleteDialog()
+                       ));
+            }
+        }
+        private void CancelParkDeleteDialog()
+        {
+            try
+            {
+                IsParkDeleteDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+        }
+
         private ICommand _clickparkcommand;
         public ICommand ClickParkCommand
         {
@@ -1318,7 +1706,7 @@ namespace GS.Server.SkyTelescope
                     }
                     var monitorItem = new MonitorEntry
                     {
-                        Datetime = Principles.HiResDateTime.UtcNow,
+                        Datetime = HiResDateTime.UtcNow,
                         Device = MonitorDevice.Telescope,
                         Category = MonitorCategory.Interface,
                         Type = MonitorType.Information,
@@ -1334,7 +1722,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -1415,7 +1803,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -1454,7 +1842,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -1497,7 +1885,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -1562,7 +1950,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -1603,7 +1991,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -1638,7 +2026,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -1698,7 +2086,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -1772,7 +2160,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -1811,7 +2199,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -1935,7 +2323,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -1990,7 +2378,7 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    var AltAz = Principles.Coordinate.RaDec2AltAz(GoToRa, GoToDec, SkyServer.SiderealTime,
+                    var AltAz = Coordinate.RaDec2AltAz(GoToRa, GoToDec, SkyServer.SiderealTime,
                         SkySettings.Latitude);
                     if (AltAz[0] < 0)
                     {
@@ -2006,7 +2394,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -2053,7 +2441,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -2094,7 +2482,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -2202,7 +2590,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -2242,7 +2630,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -2278,7 +2666,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -2420,7 +2808,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -2457,7 +2845,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -2495,7 +2883,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -2529,7 +2917,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -2569,7 +2957,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -2603,7 +2991,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -2643,7 +3031,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -2677,7 +3065,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -2717,7 +3105,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -2751,7 +3139,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -2784,7 +3172,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -2857,7 +3245,7 @@ namespace GS.Server.SkyTelescope
             {
                 _atpark = value;
                 ParkButtonContent = value ? Application.Current.Resources["btnUnPark"].ToString() : Application.Current.Resources["btnPark"].ToString(); 
-                ParkBadgeContent = value ? Application.Current.Resources["btnhintPark"].ToString() : "";
+                ParkBadgeContent = value ? SkySettings.ParkName : ""; //Application.Current.Resources["btnhintPark"].ToString()
                 OnPropertyChanged();
             }
         }
@@ -3219,7 +3607,7 @@ namespace GS.Server.SkyTelescope
 
             var monitorItem = new MonitorEntry
             {
-                Datetime = Principles.HiResDateTime.UtcNow,
+                Datetime = HiResDateTime.UtcNow,
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Interface,
                 Type = MonitorType.Information,
@@ -3387,7 +3775,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -3449,7 +3837,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -3490,7 +3878,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -3552,7 +3940,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -3586,7 +3974,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -3695,7 +4083,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -3758,7 +4146,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -3799,7 +4187,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -3842,7 +4230,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -3882,7 +4270,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -3916,7 +4304,7 @@ namespace GS.Server.SkyTelescope
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -3927,6 +4315,164 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
+            }
+        }
+
+        #endregion
+
+        #region Viewport3D
+
+        private System.Windows.Media.Media3D.Model3D _model;
+        public System.Windows.Media.Media3D.Model3D Model
+        {
+            get => _model;
+            set
+            {
+                if (_model == value) return;
+                _model = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _modelOn;
+        public bool ModelOn
+        {
+            get => _modelOn;
+            set
+            {
+                if (_modelOn == value) return;
+                _modelOn = value;
+                if (value)
+                {
+                    LoadGEM();
+                    LoadCompass();
+                    Rotate();
+                }
+                OnPropertyChanged();
+            }
+        }
+
+        private double _xaxis;
+        public double Xaxis
+        {
+            get => _xaxis;
+            set
+            {
+                _xaxis = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _yaxis;
+        public double Yaxis
+        {
+            get => _yaxis;
+            set
+            {
+                _yaxis = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _zaxis;
+        public double Zaxis
+        {
+            get => _zaxis;
+            set
+            {
+                _zaxis = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Material _compass;
+        public Material Compass
+        {
+            get => _compass;
+            set
+            {
+                _compass = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private void LoadGEM()
+        {
+            try
+            {
+                const string gpModel = @"Models/GEM1.obj";
+                var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(), gpModel);
+                var file = new Uri(filePath).LocalPath;
+                var import = new ModelImporter();
+                Material material = new DiffuseMaterial(new SolidColorBrush(Colors.Crimson));
+                import.DefaultMaterial = material;
+                Model = import.Load(file);
+
+                Xaxis = -90;
+                Yaxis = 90;
+                Zaxis = -20;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private void LoadCompass()
+        {
+            try
+            {
+                const string compassN = @"Models/compassN.png";
+                const string compassS = @"Models/compassS.png";
+                var compassFile = SkyServer.SouthernHemisphere ? compassS : compassN;
+                var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(), compassFile);
+                var file = new Uri(filePath).LocalPath;
+                Compass = MaterialHelper.CreateImageMaterial(file, 80);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private void Rotate()
+        {
+            if (!ModelOn) return;
+
+            switch (SkySystem.Mount)
+            {
+                case MountType.Simulator:
+                    Yaxis = Math.Round(SkyServer.ActualAxisX, 3);
+                    Xaxis = SkyServer.SouthernHemisphere ? Math.Round(SkyServer.ActualAxisY * -1.0, 3) : Math.Round(SkyServer.ActualAxisY - 180, 3);
+                    break;
+                case MountType.SkyWatcher:
+                    Yaxis = Math.Round(SkyServer.ActualAxisX, 3);
+                    Xaxis = Math.Round(SkyServer.ActualAxisY * -1.0, 3);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 

@@ -495,6 +495,11 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        /// <summary>
+        /// Park position selected in UI
+        /// </summary>
+        public static ParkPosition ParkSelected { private get; set; }
+
         //private static DateTime SettleTime { get; set; } not sure if this is needed
 
         private static double _slewSettleTime;
@@ -528,10 +533,22 @@ namespace GS.Server.SkyTelescope
             {
                 if (SouthernHemisphere)
                 {
-                    return _mountAxes.Y <= 90 && _mountAxes.Y >= -90 ? PierSide.pierWest : PierSide.pierEast;
+                    //return _mountAxes.Y <= 90 && _mountAxes.Y >= -90 ? PierSide.pierWest : PierSide.pierEast;
+                    // replaced with ...
+                    if (_mountAxes.Y < 90.0000000001  && _mountAxes.Y > -90.0000000001 )
+                    {
+                        return PierSide.pierWest;
+                    }
+                    return PierSide.pierEast;
                 }
 
-                return _mountAxes.Y <= 90 && _mountAxes.Y >= -90 ? PierSide.pierEast : PierSide.pierWest;
+                // return _mountAxes.Y <= 90 && _mountAxes.Y >= -90 ? PierSide.pierEast : PierSide.pierWest;
+                // replaced with ...
+                if (_mountAxes.Y < 90.0000000001 && _mountAxes.Y > -90.0000000001)
+                {
+                    return PierSide.pierEast;
+                }
+                return PierSide.pierWest;
             }
             set
             {
@@ -572,6 +589,18 @@ namespace GS.Server.SkyTelescope
                 Synthesizer.Speak(value.ToString());
                 _isSideOfPier = value;
                 OnStaticPropertyChanged();
+
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{value},{_mountAxes.Y}, {_mountAxes.Y < 90 || _mountAxes.Y.IsEqualTo(90, 0.0000000001)},{_mountAxes.Y > -90 || _mountAxes.Y.IsEqualTo(-90, 0.0000000001)} "
+                };
+                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
@@ -785,7 +814,6 @@ namespace GS.Server.SkyTelescope
             set
             {
                 if (value == _tracking) return;
-                _tracking = value;
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope,
@@ -823,6 +851,7 @@ namespace GS.Server.SkyTelescope
                     if (TrackingSpeak && _trackingMode != TrackingMode.Off) Synthesizer.Speak(Application.Current.Resources["vceTrackingOff"].ToString());
                     _trackingMode = TrackingMode.Off;
                 }
+                _tracking = value;
 
                 SetTracking();
                 OnStaticPropertyChanged();
@@ -889,7 +918,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"GoTo Initial:{_targetAxes},{stopwatch.Elapsed.TotalSeconds}"
+                Message = $"Initial:{_targetAxes},{stopwatch.Elapsed.TotalSeconds}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -944,7 +973,7 @@ namespace GS.Server.SkyTelescope
                         Type = MonitorType.Information,
                         Method = MethodBase.GetCurrentMethod().Name,
                         Thread = Thread.CurrentThread.ManagedThreadId,
-                        Message = $"GoTo Percision:{target[0]},{deltaTime},{deltaDegree}"
+                        Message = $"Percision:{target[0]},{deltaTime},{deltaDegree}"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
 
@@ -1270,7 +1299,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"GoTo Initial:{_targetAxes},{stopwatch.Elapsed.TotalSeconds}"
+                Message = $"Initial:{_targetAxes},{stopwatch.Elapsed.TotalSeconds}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -1304,7 +1333,7 @@ namespace GS.Server.SkyTelescope
                         Type = MonitorType.Information,
                         Method = MethodBase.GetCurrentMethod().Name,
                         Thread = Thread.CurrentThread.ManagedThreadId,
-                        Message = $"GoTo Delta:{rate},{deltaTime},{deltaDegree}"
+                        Message = $"Delta:{rate},{deltaTime},{deltaDegree}"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
 
@@ -1338,7 +1367,7 @@ namespace GS.Server.SkyTelescope
                         Type = MonitorType.Information,
                         Method = MethodBase.GetCurrentMethod().Name,
                         Thread = Thread.CurrentThread.ManagedThreadId,
-                        Message = $"GoTo Precision Slew:{target[0]},{deltaTime},{deltaDegree}"
+                        Message = $"Precision:{target[0]},{deltaTime},{deltaDegree}"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
 
@@ -2081,6 +2110,12 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         public static void GoToHome()
         {
+            if (IsSlewing)
+            {
+                StopAxes();
+                return;
+            }
+
             Tracking = false;
 
             var monitorItem = new MonitorEntry
@@ -2098,20 +2133,29 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         public static void GoToPark()
         {
-            Tracking = false;
+            if (IsSlewing)
+            {
+                StopAxes();
+                return;
+            }
 
+            // get position selected in ui
+            var ps = ParkSelected;
+            if (ps == null) return;
+            SetParkAxis(ps.Name, ps.X, ps.Y);
+
+            Tracking = false;
             var x = SkySettings.ParkAxisX;
             var y = SkySettings.ParkAxisY;
+            var name = SkySettings.ParkName;
 
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server,
                 Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name,
-                Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Slew to Park {x},{y}"
+                Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{name},{x},{y}"
             };
             MonitorLog.LogToMonitor(monitorItem);
-
-
             SlewMount(new Vector(x, y), SlewType.SlewPark);
         }
 
@@ -2319,7 +2363,7 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Sets up defaults after an established connection
         /// </summary>
-        private static bool  MountConnect()
+        private static bool MountConnect()
         {
             object _;
             if(!AscomOn)AscomOn = true;
@@ -2404,6 +2448,7 @@ namespace GS.Server.SkyTelescope
                             rawPositions = null;
                             continue;
                         }
+                        //todo fix
                         if (!rawPositions[0].IsBetween(-.1, .1) || !rawPositions[1].IsBetween(-.1, .1)) continue;
                         _ = new SkySetAxisPosition(0, AxisId.Axis1, positions[0]);
                         _ = new SkySetAxisPosition(0, AxisId.Axis2, positions[1]);
@@ -2713,27 +2758,18 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Sets the internal current positions to park position
+        /// Sets park positions from internal current positions
         /// </summary>
-        public static void SetParkAxis()
+        public static void SetParkAxis(string name)
         {
-            double parkX;
-            double parkY;
+            // convert current position
+            var park = Axes.MountAxis2ParkCoords();
+            if (park == null) return;
 
-            if (SouthernHemisphere)
-            {
-                parkX = MountAxisX + 180;
-                parkY = 180 - MountAxisY;
-            }
-            else
-            {
-                parkX = MountAxisX;
-                parkY = MountAxisY;
-            }
+            SkySettings.ParkAxisY = park[1];
+            SkySettings.ParkAxisX = park[0];
+            SkySettings.ParkName = name;
 
-            SkySettings.ParkAxisY = parkY;
-            SkySettings.ParkAxisX = parkX;
-            
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
@@ -2742,11 +2778,35 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{parkX},{parkY}, {MountAxisX},{MountAxisY}"
+                Message = $"{park[1]},{park[0]}, {MountAxisX},{MountAxisY}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
             Synthesizer.Speak(Application.Current.Resources["vceParkSet"].ToString());
+        }
+
+        /// <summary>
+        /// Sets park positions, expects MountAxis2ParkCoords is already done
+        /// </summary>
+        public static void SetParkAxis(string name, double x, double y)
+        {
+            if (string.IsNullOrEmpty(name)) name = "Empty";
+
+            SkySettings.ParkAxisY = y;
+            SkySettings.ParkAxisX = x;
+            SkySettings.ParkName = name;
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod().Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{name},{x},{y}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
         }
 
         /// <summary>
@@ -2995,7 +3055,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = "Stop Axes"
+                Message = $"{SlewState}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 

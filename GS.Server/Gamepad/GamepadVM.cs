@@ -50,10 +50,10 @@ namespace GS.Server.Gamepad
                     { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading GamepadVM" };
                 MonitorLog.LogToMonitor(monitorItem);
 
+                GamepadSettings.Load();
                 SkyTelescope();
                 Settings();
-                Delay = Properties.Gamepad.Default.Delay;
-                if (Properties.Gamepad.Default.Startup) IsGamepadRunning = true;
+                IsGamepadRunning = GamepadSettings.Startup;
             }
             catch (Exception ex)
             {
@@ -77,7 +77,7 @@ namespace GS.Server.Gamepad
         private bool _isGamepadRunning;
         public bool IsGamepadRunning
         {
-            get => _isGamepadRunning;
+            get => GamepadSettings.Startup;
             set
             {
                 if (_isGamepadRunning == value) return;
@@ -94,8 +94,7 @@ namespace GS.Server.Gamepad
                     ctsGamepad = null;
                 }
                 _isGamepadRunning = value;
-                Properties.Gamepad.Default.Startup = value;
-                Properties.Gamepad.Default.Save();
+                GamepadSettings.Startup = _isGamepadRunning;
                 OnPropertyChanged();
             }
         }
@@ -247,11 +246,11 @@ namespace GS.Server.Gamepad
         private int _delay;
         public int Delay
         {
-            get => _delay;
+            get => GamepadSettings.Delay;
             set
             {
                 _delay = value;
-                Properties.Gamepad.Default.Delay = value;
+                GamepadSettings.Delay = _delay;
                 OnPropertyChanged();
             }
         }
@@ -305,7 +304,7 @@ namespace GS.Server.Gamepad
                             KeepRunning = false;
                             continue;
                         }
-                        //ct.ThrowIfCancellationRequested();
+
                         if (!_gamepad.IsAvailable)
                         {
                             Thread.Sleep(2000);
@@ -492,9 +491,6 @@ namespace GS.Server.Gamepad
                             }
                         }
 
-                        //var sw = Stopwatch.StartNew();
-                        //while (sw.Elapsed.TotalMilliseconds < Delay){ }
-                        //sw.Stop();
                         Thread.Sleep(Delay);
                     }
                 }, ct);

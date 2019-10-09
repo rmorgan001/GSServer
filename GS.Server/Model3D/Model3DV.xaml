@@ -1,0 +1,81 @@
+﻿<UserControl x:Class="GS.Server.Model3D.Model3DV"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:telescope="clr-namespace:GS.Server.Controls.Telescope"
+             mc:Ignorable="d">
+    <Grid>
+        <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Center" CloseOnClickAway="True"
+                       IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
+        <md:DrawerHost HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0" 
+                       IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" 
+                       BorderBrush="{DynamicResource MaterialDesignDivider}">
+            <md:DrawerHost.LeftDrawerContent>
+                <Grid Width="750">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" Content="{DynamicResource lb3dSettings}"/>
+                    <ToggleButton Grid.Row="0"  HorizontalAlignment="Right" Margin="5" ToolTip="{DynamicResource tbtipOClose}"
+                              Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
+                              Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
+                              CommandParameter="{x:Static Dock.Left}"
+                              IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"/>
+                    <StackPanel Grid.Row="1" Orientation="Vertical" Visibility="Visible" IsEnabled="False">
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="X"/>
+                            <Slider  Width="200" HorizontalAlignment="Left" Delay="1" Minimum="-360" Maximum="360" 
+                                     Value="{Binding Xaxis}" />
+                            <Label Content="{Binding Xaxis}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Y"/>
+                            <Slider  Width="200" HorizontalAlignment="Left" Delay="1" Minimum="-360" Maximum="360" 
+                                     Value="{Binding Yaxis}" />
+                            <Label Content="{Binding Yaxis}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Z"/>
+                            <Slider  Width="200" HorizontalAlignment="Left" Delay="1" Minimum="-360" Maximum="360" 
+                                     Value="{Binding Zaxis}" />
+                            <Label Content="{Binding Zaxis}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </md:DrawerHost.LeftDrawerContent>
+            <Grid Margin="5,5" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="80" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <telescope:TopCoordsBar Grid.Row="0" Grid.Column="0" IsEnabled="{Binding ScreenEnabled}" HorizontalAlignment="Center"/>
+                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+                    <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False" x:Name="MenuToggleButton" ToolTip="Open"
+                                  Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}"
+                                  Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
+                </StackPanel>
+                <ScrollViewer Grid.Row="1" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto">
+                    <telescope:HelixViewport3D IsEnabled="{Binding ScreenEnabled}">
+                        <telescope:HelixViewport3D.Style>
+                            <Style TargetType="telescope:HelixViewport3D">
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Opacity" Value="0.2" />
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="True">
+                                        <Setter Property="Opacity" Value="1.0" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </telescope:HelixViewport3D.Style>
+                    </telescope:HelixViewport3D>
+                </ScrollViewer>
+            </Grid>
+        </md:DrawerHost>
+    </Grid>
+</UserControl>

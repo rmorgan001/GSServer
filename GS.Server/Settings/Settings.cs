@@ -98,6 +98,19 @@ namespace GS.Server.Settings
             }
         }
 
+        private static bool _model3d;
+        public static bool Model3D
+        {
+            get => _model3d;
+            set
+            {
+                if (_model3d == value) return;
+                _model3d = value;
+                Properties.Server.Default.Model3D = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static bool _sleepMode;
         public static bool SleepMode
         {
@@ -241,6 +254,7 @@ namespace GS.Server.Settings
             Gamepad = Properties.Server.Default.Gamepad;
             Notes = Properties.Server.Default.Notes;
             SkyWatcher = Properties.Server.Default.SkyWatcher;
+            Model3D = Properties.Server.Default.Model3D;
             SleepMode = Properties.Server.Default.SleepMode;
             StartMinimized = Properties.Server.Default.StartMinimized;
             StartOnTop = Properties.Server.Default.StartOnTop;

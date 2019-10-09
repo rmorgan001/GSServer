@@ -930,7 +930,7 @@ namespace ASCOM.GS.Sky.Telescope
             if (!SkyServer.AscomOn) return;
 
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{Direction}"};
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{Direction},{Duration}"};
             MonitorLog.LogToMonitor(monitorItem);
 
             if (SkyServer.AtPark) throw new ParkedException();
@@ -1007,7 +1007,7 @@ namespace ASCOM.GS.Sky.Telescope
             MonitorLog.LogToMonitor(monitorItem);
 
             CheckCapability(SkySettings.CanSetPark, "SetPark");
-            SkyServer.SetParkAxis();
+            SkyServer.SetParkAxis("External");
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "GS.Shared.MonitorEntry.set_Message(System.String)")]

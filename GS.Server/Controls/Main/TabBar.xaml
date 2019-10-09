@@ -20,6 +20,7 @@
                     <ColumnDefinition Width="Auto"/> 
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40"/>
@@ -45,6 +46,9 @@
                 <RadioButton Grid.Column="6" FontSize="16" IsChecked="{Binding GamepadVMRadioRadio}"
                              Visibility="{Binding Path=GamepadRadioVisable, Converter={StaticResource BoolToVis}}"
                              Style="{StaticResource MaterialDesignTabRadioButton}" Content="{DynamicResource rbtnGamepad}"/>
+                <RadioButton Grid.Column="7" FontSize="16" IsChecked="{Binding Model3DVMRadioRadio}"
+                             Visibility="{Binding Path=Model3DRadioVisable, Converter={StaticResource BoolToVis}}"
+                             Style="{StaticResource MaterialDesignTabRadioButton}" Content="{DynamicResource rbtnModel3D}"/>
             </Grid>
         </ScrollViewer>
     </md:ColorZone>

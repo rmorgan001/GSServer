@@ -31,6 +31,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="rbtnNotes">Notes</system:String> 
     <system:String x:Key="rbtnOptions">Options</system:String>
     <system:String x:Key="rbtnGamepad">Gamepad</system:String>
+    <system:String x:Key="rbtnModel3D">3D</system:String>
     <system:String x:Key="btntipWindowFlip">Flip Window Size</system:String>
 
     <!--Top bar-->
@@ -59,6 +60,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btntipFlip">Flip Side of Pier</system:String>
     <system:String x:Key="msgHomeReset">Accept to reset mount position to the Home position</system:String>
     <system:String x:Key="msgContinueFlip">Continue to flip mount?</system:String>
+    <system:String x:Key="cbtipPark">Park Positions</system:String>
 
     <!--Bottom Status bar-->
     <system:String x:Key="tbHome">Home</system:String>
@@ -301,6 +303,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="msgHome1">When starting normally place the mount in the 'Home' position.</system:String>
     <system:String x:Key="msgHome2">Home Position is counterweight down and declination pointing towards the pole.</system:String>
     <system:String x:Key="msgHome3">Click the 'Set Home' button before or after obtaining a polar alignment.</system:String>
+    <system:String x:Key="msgParkNewName">Add new park position name?</system:String>
+    <system:String x:Key="msgParkDelete">Delete park position name?</system:String>
 
     <!--Exceptions -->
     <system:String x:Key="exParked">Cannot track when parked</system:String>
@@ -342,6 +346,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="tbOCharts">Charts</system:String>
     <system:String x:Key="tbONotes">Notes</system:String>
     <system:String x:Key="tbOGamepad">Gamepad</system:String>
+    <system:String x:Key="tbOModel3D">3D Model</system:String>
     <system:String x:Key="tbOSleepMode">No Sleep mode</system:String>
     <system:String x:Key="tbOStartMin">Start minimized</system:String>
     <system:String x:Key="tbOStartTop">Start window on top</system:String>
@@ -383,5 +388,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="masArcSec">arcsec</system:String>
     <system:String x:Key="msgCTurnOnTracking">Turn mount tracking on to run</system:String>
     <system:String x:Key="msgCEstRate">Estimating Rate:</system:String>
+
+
+    <!--3DModel -->
+    <system:String x:Key="lb3dSettings">Settings</system:String>
 </ResourceDictionary>
  

@@ -25,6 +25,27 @@ namespace GS.Server.SkyTelescope
     public static class Axes
     {
         /// <summary>
+        /// Get coordinates to store for park information
+        /// </summary>
+        /// <returns></returns>
+        public static double[] MountAxis2ParkCoords()
+        {
+            var a = new[] { 0.0, 0.0 };
+            if (SkyServer.SouthernHemisphere)
+            {
+                a[0] = SkyServer.MountAxisX + 180;
+                a[1] = 180 - SkyServer.MountAxisY;
+            }
+            else
+            {
+                a[0] = SkyServer.MountAxisX;
+                a[1] = SkyServer.MountAxisY;
+            }
+
+            return a;
+        }
+
+        /// <summary>
         /// Converts axes positions from Local to Mount 
         /// </summary>
         /// <param name="axes"></param>

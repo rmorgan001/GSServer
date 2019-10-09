@@ -4,48 +4,59 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:GS.Server.Domain"
+             xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d">
     <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" >
-        <md:Badged Badge="{Binding ParkBadgeContent}">
-            <Button Margin="5" Width="100" Height="30" ToolTip="{DynamicResource btntipPark}"
+        <ComboBox md:HintAssist.Hint="{DynamicResource cbtipPark}" Margin="5,0,0,15" ToolTip="{DynamicResource cbtipPark}" MaxWidth="120" Width="120"
+                  ItemsSource="{Binding ParkPositions}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEditable="False">
+            <ComboBox.SelectedItem>
+                <Binding Path="ParkSelection" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                    </Binding.ValidationRules>
+                </Binding>
+            </ComboBox.SelectedItem>
+            <ComboBox.ItemTemplate>
+                <DataTemplate DataType="skyTelescope:ParkPosition">
+                    <TextBlock Text="{Binding Name}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <md:Badged Badge="{Binding ParkBadgeContent}" BadgePlacementMode="TopRight">
+            <Button Margin="5" Width="100" Height="25" ToolTip="{DynamicResource btntipPark}" HorizontalAlignment="Left"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                    Command="{Binding ClickParkCommand}"
-                    Content="{Binding ParkButtonContent}"/>
+                    Command="{Binding ClickParkCommand}" Content="{Binding ParkButtonContent}"/>
         </md:Badged>
-        <md:Badged Badge="{Binding HomeBadgeContent}" >
-            <Button Margin="5" Height="30" Width="100" ToolTip="{DynamicResource btntipHome}"
+        <md:Badged Badge="{Binding HomeBadgeContent}" BadgePlacementMode="TopRight">
+            <Button Margin="5" Height="25" Width="100" ToolTip="{DynamicResource btntipHome}" HorizontalAlignment="Left"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                    Command="{Binding ClickHomeCommand}"
-                    Content="{DynamicResource btnHome}">
+                    Command="{Binding ClickHomeCommand}" Content="{DynamicResource btnHome}">
             </Button>
         </md:Badged>
-        <Button Margin="5" x:Name="StopButton" Width="100" Height="30" ToolTip="{DynamicResource btntipStop}"
+        <Button Margin="5" Width="100" Height="25" ToolTip="{DynamicResource btntipStop}" HorizontalAlignment="Left"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                    Command="{Binding ClickStopCommand}"
-                    Content="{DynamicResource btnStop}">
+                    Command="{Binding ClickStopCommand}" Content="{DynamicResource btnStop}">
         </Button>
-        <md:Badged Badge="{Binding TrackingBadgeContent}">
-            <Button Margin="5" Width="100" Height="30" ToolTip="{DynamicResource btntipTracking}"
+        <md:Badged Badge="{Binding TrackingBadgeContent}" BadgePlacementMode="TopRight">
+            <Button Margin="5" Width="100" Height="25" ToolTip="{DynamicResource btntipTracking}" HorizontalAlignment="Left"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                    Command="{Binding ClickTrackingCommand}"
-                    Content="{DynamicResource btnTracking}">
+                    Command="{Binding ClickTrackingCommand}" Content="{DynamicResource btnTracking}">
             </Button>
         </md:Badged>
-        <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Bottom" CloseOnClickAway="True"
+        <md:DialogHost  VerticalAlignment="Bottom" CloseOnClickAway="True"
                        IsOpen="{Binding IsHomeResetDialogOpen}" DialogContent="{Binding HomeResetContent}">
-            <Button Margin="5" Width="100" Height="30" ToolTip="{DynamicResource btntipSetHome}"
+            <Button Margin="5" Width="100" Height="25" ToolTip="{DynamicResource btntipSetHome}" HorizontalAlignment="Left"
                 Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                Command="{Binding OpenHomeResetDialogCommand}"
-                Content="{DynamicResource btnSetHome}">
+                Command="{Binding OpenHomeResetDialogCommand}" Content="{DynamicResource btnSetHome}">
             </Button>
         </md:DialogHost>
-        <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Bottom" CloseOnClickAway="True"
+        <md:DialogHost VerticalAlignment="Bottom" CloseOnClickAway="True" 
                        IsOpen="{Binding IsFlipDialogOpen}" DialogContent="{Binding FlipContent}">
-            <Button Margin="5" Width="100" Height="30" ToolTip="{DynamicResource btntipFlip}"
+            <Button Margin="5" Width="100" Height="25" ToolTip="{DynamicResource btntipFlip}" HorizontalAlignment="Left"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                    Command="{Binding OpenFlipDialogCommand}"
-                    Content="{DynamicResource btnFlip}">
+                    Command="{Binding OpenFlipDialogCommand}" Content="{DynamicResource btnFlip}">
             </Button>
         </md:DialogHost>
     </StackPanel>

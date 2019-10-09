@@ -12,6 +12,7 @@
         xmlns:properties="clr-namespace:GS.Server.Properties"
         xmlns:notes="clr-namespace:GS.Server.Notes"
         xmlns:gamepad="clr-namespace:GS.Server.Gamepad"
+        xmlns:model3D="clr-namespace:GS.Server.Model3D"
         mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanResizeWithGrip"  WindowStyle="None" 
         WindowState="{Binding WindowState, Source={x:Static properties:Server.Default}, Mode=TwoWay}"
         Height="{Binding WindowHeight, Source={x:Static properties:Server.Default}, Mode=TwoWay}" 
@@ -49,6 +50,9 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type gamepad:GamepadVM}">
             <gamepad:GamepadV />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type model3D:Model3DVM}">
+            <model3D:Model3DV />
         </DataTemplate>
     </Window.Resources>
     <Window.TaskbarItemInfo>

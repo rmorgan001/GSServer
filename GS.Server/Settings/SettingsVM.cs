@@ -137,6 +137,9 @@ namespace GS.Server.Settings
                             case "SkyWatcher":
                                 SkyWatcher = Settings.SkyWatcher;
                                 break;
+                            case "Model3D":
+                                Model3D = Settings.Model3D;
+                                break;
                             case "SleepMode":
                                 SleepMode = Settings.SleepMode;
                                 break;
@@ -223,6 +226,17 @@ namespace GS.Server.Settings
             {
                 Settings.Notes = value;
                 _mainWindowVm.UpdateTabViewModel("Notes");
+                OnPropertyChanged();
+            }
+        }
+
+        public bool Model3D
+        {
+            get => Settings.Model3D;
+            set
+            {
+                Settings.Model3D = value;
+                _mainWindowVm.UpdateTabViewModel("Model3D");
                 OnPropertyChanged();
             }
         }
@@ -525,11 +539,40 @@ namespace GS.Server.Settings
             {
                 using (new WaitCursor())
                 {
-                    if (SkyTelescopeSettings) Properties.SkyTelescope.Default.Reset();
-                    if (ServerSettings) Properties.Server.Default.Reset();
-                    if (ChartSettings) Properties.Chart.Default.Reset();
-                    if (GamepadSettings) Properties.Gamepad.Default.Reset();
-                    if (MonitorSettings) Shared.Properties.Monitor.Default.Reset();
+                    if (SkyTelescopeSettings)
+                    {
+                        Properties.SkyTelescope.Default.Reset();
+                        Properties.SkyTelescope.Default.Save();
+                        Properties.SkyTelescope.Default.Reload();
+                    }
+
+                    if (ServerSettings)
+                    {
+                        Properties.Server.Default.Reset();
+                        Properties.Server.Default.Save();
+                        Properties.Server.Default.Reload();
+                    }
+
+                    if (ChartSettings)
+                    {
+                        Properties.Chart.Default.Reset();
+                        Properties.Chart.Default.Save();
+                        Properties.Chart.Default.Reload();
+                    }
+
+                    if (GamepadSettings)
+                    {
+                        Properties.Gamepad.Default.Reset();
+                        Properties.Gamepad.Default.Save();
+                        Properties.Gamepad.Default.Reload();
+                    }
+
+                    if (MonitorSettings)
+                    {
+                        Shared.Properties.Monitor.Default.Reset();
+                        Shared.Properties.Monitor.Default.Save();
+                        Shared.Properties.Monitor.Default.Reload();
+                    }
                     
                     IsSettingsResetDialogOpen = false;
                     OpenDialog(Application.Current.Resources["msgRestart"].ToString());

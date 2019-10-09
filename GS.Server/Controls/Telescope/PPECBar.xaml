@@ -7,23 +7,23 @@
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d">
     <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="10,0,0,0">
-            <ToggleButton HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{DynamicResource tbOnOff}"
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="5,0,0,0">
+            <ToggleButton HorizontalAlignment="Center" Width="20" Height="20" ToolTip="{DynamicResource tbOnOff}"
                           Style="{StaticResource MaterialDesignActionLightToggleButton}"
                           IsChecked="{Binding PpecOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{DynamicResource lbPpec}"/>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="10,5,0,0">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="5,0,0,0">
             <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Bottom" CloseOnClickAway="True"
                            IsOpen="{Binding IsPpecDialogOpen}" DialogContent="{Binding PpecContent}">
-                <ToggleButton  HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{DynamicResource tbStartTrainingMode}"
+                <ToggleButton  HorizontalAlignment="Center" Width="20" Height="20" ToolTip="{DynamicResource tbStartTrainingMode}"
                               IsChecked="{Binding PecTrainOn}" Style="{StaticResource MaterialDesignActionLightToggleButton}"
                               Command="{Binding OpenPpecDialogCommand}"/>
             </md:DialogHost>
             <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{DynamicResource lbPpecTraining}"/>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="8,5,0,0">
-            <md:PackIcon Kind="Timer" Width="30" Height="30" ToolTip="{DynamicResource ictipPpecTimer}">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="3,5,0,0">
+            <md:PackIcon Kind="Timer" Width="25" Height="25" ToolTip="{DynamicResource ictipPpecTimer}">
                 <md:PackIcon.Style>
                     <Style TargetType="md:PackIcon">
                         <Style.Triggers>

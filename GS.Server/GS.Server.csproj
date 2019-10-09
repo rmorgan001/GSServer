@@ -64,7 +64,7 @@
     <ApplicationIcon>Resources\greenswamp1.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>1.0.0.16</AssemblyVersion>
+    <AssemblyVersion>1.0.0.17</AssemblyVersion>
     <AssemblyPublicKeyToken>565de7938946fba7</AssemblyPublicKeyToken>
   </PropertyGroup>
   <PropertyGroup>
@@ -89,6 +89,9 @@
     <Reference Include="DarkSkyApi, Version=3.3.0.0, Culture=neutral, PublicKeyToken=565de7938946fba7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Resources\DarkSky\DarkSkyApi.dll</HintPath>
+    </Reference>
+    <Reference Include="HelixToolkit.Wpf, Version=2.9.0.0, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
+      <HintPath>..\packages\HelixToolkit.Wpf.2.9.0\lib\net45\HelixToolkit.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="LiveCharts, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
       <HintPath>..\packages\LiveCharts.0.9.7\lib\net45\LiveCharts.dll</HintPath>
@@ -170,6 +173,9 @@
     <Compile Include="Controls\Main\TabBar.xaml.cs">
       <DependentUpon>TabBar.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Telescope\HelixViewport3D.xaml.cs">
+      <DependentUpon>HelixViewport3D.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Telescope\HandController.xaml.cs">
       <DependentUpon>HandController.xaml</DependentUpon>
     </Compile>
@@ -193,6 +199,12 @@
     </Compile>
     <Compile Include="Domain\BoolToRowHeightConverter.cs" />
     <Compile Include="Domain\BoolToVisConverter.cs" />
+    <Compile Include="Domain\ParkDeleteDialog.xaml.cs">
+      <DependentUpon>ParkDeleteDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Domain\ParkAddDialog.xaml.cs">
+      <DependentUpon>ParkAddDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Domain\ColorToBrushConverter.cs" />
     <Compile Include="Domain\EnumBooleanConverter .cs" />
     <Compile Include="Domain\EnumBindingSourceExtension.cs" />
@@ -255,6 +267,10 @@
     <Compile Include="Main\IPageVM.cs" />
     <Compile Include="Main\MainWindowVM.cs" />
     <Compile Include="Focuser\FocuserVM.cs" />
+    <Compile Include="Model3D\Model3DV.xaml.cs">
+      <DependentUpon>Model3DV.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Model3D\Model3DVM.cs" />
     <Compile Include="Notes\DocumentPaginatorWrapper.cs" />
     <Compile Include="Notes\NotesV.xaml.cs">
       <DependentUpon>NotesV.xaml</DependentUpon>
@@ -289,6 +305,7 @@
     <Compile Include="Settings\SettingsVM.cs" />
     <Compile Include="SkyTelescope\Axes.cs" />
     <Compile Include="SkyTelescope\Enums.cs" />
+    <Compile Include="SkyTelescope\ParkPosition.cs" />
     <Compile Include="SkyTelescope\Transforms.cs" />
     <Compile Include="SkyTelescope\SkySettings.cs" />
     <Compile Include="SkyTelescope\SkySystem.cs" />
@@ -317,6 +334,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Controls\Telescope\HelixViewport3D.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\Telescope\HandController.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -342,6 +363,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\Telescope\PPECBar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Domain\ParkDeleteDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Domain\ParkAddDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -407,6 +436,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Model3D\Model3DV.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Notes\NotesV.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -442,6 +475,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Models\GermanPolar1.mtl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Models\GEM1.obj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Notes\NotesTemplates\NotesLog.rtf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -522,6 +561,21 @@
     <Resource Include="Resources\License.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\M74.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\NGC6992.png" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="Models\compassN.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Models\compassS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

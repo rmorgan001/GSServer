@@ -157,7 +157,7 @@
                                   Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
                 </StackPanel>
                 <ScrollViewer Grid.Row="1"  VerticalScrollBarVisibility="Auto">
-                    <Grid>
+                    <Grid Margin="10">
                         <Grid.RowDefinitions>
                             <RowDefinition />
                             <RowDefinition />
@@ -168,10 +168,10 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Left" Margin="10,10,0,0">
+                        <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Orientation="Vertical" HorizontalAlignment="Left">
                             <TextBlock Margin="0,0,0,5" VerticalAlignment="Center"  HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}"  Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{DynamicResource tbOTabs}"/>
                             <StackPanel Orientation="Horizontal" Width="Auto">
-                                <CheckBox IsChecked="{Binding SkyWatcher}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOSkyWatcher}"/>
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding SkyWatcher}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOSkyWatcher}"/>
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource tbOSkyWatcher}"/>
                         </StackPanel>
                             <!--<StackPanel Orientation="Horizontal" Width="Auto"  Margin="10 10">
@@ -179,41 +179,45 @@
                             <TextBlock Margin="10 0" VerticalAlignment="Center">Focuser</TextBlock>
                             </StackPanel>-->
                             <StackPanel Orientation="Horizontal" Width="Auto">
-                                <CheckBox IsChecked="{Binding Charting}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOCharts}"/>
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding Charting}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOCharts}"/>
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource tbOCharts}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Width="Auto">
-                                <CheckBox IsChecked="{Binding Notes}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbONotes}"/>
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding Notes}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbONotes}"/>
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource tbONotes}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Width="Auto">
-                                <CheckBox IsChecked="{Binding Gamepad}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOGamepad}"/>
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding Gamepad}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOGamepad}"/>
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource tbOGamepad}"/>
                             </StackPanel>
+                            <StackPanel Orientation="Horizontal" Width="Auto">
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding Model3D}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOModel3D}"/>
+                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource tbOModel3D}"/>
+                            </StackPanel>
                         </StackPanel>
-                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" Margin="10,10,0,0">
+                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left">
                             <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}"  HorizontalAlignment="Left"  Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{DynamicResource tbOOptions}"/>
                             <StackPanel Orientation="Horizontal" Width="Auto">
-                                <CheckBox IsChecked="{Binding SleepMode}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOSleepMode}"/>
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding SleepMode}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOSleepMode}"/>
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource tbOSleepMode}"/>
                         </StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding StartMinimized}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOStartMin}"/>
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding StartMinimized}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOStartMin}"/>
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource tbOStartMin}"/>
                         </StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding StartOnTop}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOStartTop}"/>
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding StartOnTop}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOStartTop}"/>
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource tbOStartTop}"/>
                         </StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding HomeWarning}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOHomeWarning}"/>
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding HomeWarning}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOHomeWarning}"/>
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource tbOHomeWarning}"/>
                         </StackPanel>
                     </StackPanel>
-                        <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Left" Margin="10,10,0,0">
+                        <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Left">
                             <TextBlock Margin="0,0,0,5" VerticalAlignment="Center"  HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}"  Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{DynamicResource tbOVoice}"/>
                             <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding VoiceActive}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOVoiceSpeech}"/>
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding VoiceActive}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOVoiceSpeech}"/>
                                 <TextBlock Margin="10 10" VerticalAlignment="Center" Text="{DynamicResource tbOVoiceSpeech}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal"  Margin="0,0,0,0">
@@ -249,7 +253,7 @@
                                 </ComboBox>
                             </StackPanel>
                         </StackPanel>
-                        <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Vertical" HorizontalAlignment="Left" Margin="10,10,0,0">
+                        <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Vertical" HorizontalAlignment="Left">
                             <TextBlock Margin="0,0,0,5" VerticalAlignment="Center"  HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}"  Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{DynamicResource tbOColors}"/>
                             <StackPanel Orientation="Horizontal" Margin="5">
                                 <TextBlock VerticalAlignment="Center" Text="{DynamicResource tbOLight}"/>
@@ -303,7 +307,36 @@
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
                         </StackPanel>
-                        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Left" Margin="10,10,0,0">
+                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" >
+                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center"  HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}"  Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{DynamicResource tbOSettings}"/>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding ServerSettings}" ToolTip="{DynamicResource cbServerSettings}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
+                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource cbServerSettings}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding SkyTelescopeSettings}" ToolTip="{DynamicResource cbSkyTelescopeSettings}"  Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
+                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource cbSkyTelescopeSettings}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding ChartSettings}" ToolTip="{DynamicResource cbChartsSettings}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
+                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource cbChartsSettings}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding GamepadSettings}" ToolTip="{DynamicResource cbGamepadSettings}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
+                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource cbGamepadSettings}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding MonitorSettings}" ToolTip="{DynamicResource cbMonitorSettings}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
+                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource cbMonitorSettings}"/>
+                            </StackPanel>
+                            <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Bottom" CloseOnClickAway="True"
+                                           IsOpen="{Binding IsSettingsResetDialogOpen}" DialogContent="{Binding SettingsResetContent}">
+                                <Button Margin="5" Height="30" ToolTip="{DynamicResource tbOSettings}" Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                                        Command="{Binding OpenSettingsResetDialogCommand}" Content="{DynamicResource btnResetSettings}">
+                                </Button>
+                            </md:DialogHost>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.Column="3"  Orientation="Vertical" HorizontalAlignment="Left" Margin="10,15,0,0">
                             <TextBlock Margin="0,0,0,5" VerticalAlignment="Center"  HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}"  Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{DynamicResource tbOPerf}"/>
                             <ComboBox md:HintAssist.Hint="{DynamicResource tbhintODisplayInterval}" MinWidth="100" Margin="0,10,0,5" ToolTip="{DynamicResource tbhintODisplayInterval}"
                                       ItemsSource="{Binding IntervalList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
@@ -320,35 +353,6 @@
                                     </ItemsPanelTemplate>
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
-                        </StackPanel>
-                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" Margin="10,10,0,0">
-                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center"  HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}"  Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{DynamicResource tbOSettings}"/>
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding ServerSettings}" ToolTip="{DynamicResource cbServerSettings}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource cbServerSettings}"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding SkyTelescopeSettings}" ToolTip="{DynamicResource cbSkyTelescopeSettings}"  Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource cbSkyTelescopeSettings}"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding ChartSettings}" ToolTip="{DynamicResource cbChartsSettings}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource cbChartsSettings}"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding GamepadSettings}" ToolTip="{DynamicResource cbGamepadSettings}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource cbGamepadSettings}"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding MonitorSettings}" ToolTip="{DynamicResource cbMonitorSettings}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource cbMonitorSettings}"/>
-                            </StackPanel>
-                            <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Bottom" CloseOnClickAway="True"
-                                           IsOpen="{Binding IsSettingsResetDialogOpen}" DialogContent="{Binding SettingsResetContent}">
-                                <Button Margin="5" Height="30" ToolTip="{DynamicResource tbOSettings}" Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                                        Command="{Binding OpenSettingsResetDialogCommand}" Content="{DynamicResource btnResetSettings}">
-                                </Button>
-                            </md:DialogHost>
                         </StackPanel>
                     </Grid>
                 </ScrollViewer>

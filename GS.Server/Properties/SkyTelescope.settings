@@ -254,5 +254,11 @@
     <Setting Name="HCMode" Type="System.String" Scope="User">
       <Value Profile="(Default)">Axes</Value>
     </Setting>
+    <Setting Name="ParkPositions" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ParkName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Default</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

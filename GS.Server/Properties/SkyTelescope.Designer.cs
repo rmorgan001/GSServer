@@ -1030,5 +1030,29 @@ namespace GS.Server.Properties {
                 this["HCMode"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ParkPositions {
+            get {
+                return ((string)(this["ParkPositions"]));
+            }
+            set {
+                this["ParkPositions"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Default")]
+        public string ParkName {
+            get {
+                return ((string)(this["ParkName"]));
+            }
+            set {
+                this["ParkName"] = value;
+            }
+        }
     }
 }

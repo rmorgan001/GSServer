@@ -26,6 +26,7 @@ using GS.Server.Focuser;
 using GS.Server.Charting;
 using GS.Server.Gamepad;
 using GS.Server.Helpers;
+using GS.Server.Model3D;
 using GS.Server.Notes;
 using GS.Server.Settings;
 using GS.Server.SkyTelescope;
@@ -45,8 +46,9 @@ namespace GS.Server.Main
         private NotesVM _notesVM;
         private SettingsVM _settingsVM;
         private GamepadVM _gamepadVM;
+        private Model3DVM _model3dVM;
         public static MainWindowVM _mainWindowVm;
-        public Languages _languages;
+        public readonly Languages _languages;
 
         private double _tempHeight = 510;
         private double _tempWidth = 850;
@@ -95,6 +97,7 @@ namespace GS.Server.Main
                     UpdateTabViewModel("Notes");
                     UpdateTabViewModel("Settings");
                     UpdateTabViewModel("Gamepad");
+                    UpdateTabViewModel("Model3D");
 
                     // Set starting page
                     CurrentPageViewModel = PageViewModels[0];
@@ -310,6 +313,25 @@ namespace GS.Server.Main
                     PageViewModels.Add(_settingsVM);
                     SettingsRadioVisable = true;
                     break;
+                case "Model3D":
+                    if (Properties.Server.Default.Model3D)
+                    {
+                        if (!PageViewModels.Contains(_model3dVM))
+                        {
+                            _model3dVM = new Model3DVM();
+                            PageViewModels.Add(_model3dVM);
+                        }
+                        Model3DRadioVisable = true;
+                    }
+                    else
+                    {
+                        if (PageViewModels.Contains(_model3dVM))
+                        {
+                            PageViewModels.Remove(_model3dVM);
+                        }
+                        Model3DRadioVisable = false;
+                    }
+                    break;
             }
         }
 
@@ -505,6 +527,34 @@ namespace GS.Server.Main
             {
                 if (_gamepadRadioVisable == value) return;
                 _gamepadRadioVisable = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _model3dVMRadio;
+        public bool Model3DVMRadioRadio
+        {
+            get => _model3dVMRadio;
+            set
+            {
+                using (new WaitCursor())
+                {
+                    if (_model3dVMRadio == value) return;
+                    _model3dVMRadio = value;
+                    if (value) ChangeViewModel(_model3dVM);
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _model3dRadioVisable;
+        public bool Model3DRadioVisable
+        {
+            get => _model3dRadioVisable;
+            set
+            {
+                if (_model3dRadioVisable == value) return;
+                _model3dRadioVisable = value;
                 OnPropertyChanged();
             }
         }

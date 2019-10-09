@@ -51,7 +51,7 @@
       <Value Profile="(Default)">Normal</Value>
     </Setting>
     <Setting Name="Notes" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="DarkSkyKey" Type="System.String" Scope="User">
       <Value Profile="(Default)">3f69788eb1c931a32cc83059783a60f5</Value>
@@ -67,6 +67,9 @@
     </Setting>
     <Setting Name="AccentColor" Type="System.String" Scope="User">
       <Value Profile="(Default)">green</Value>
+    </Setting>
+    <Setting Name="Model3D" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -23,6 +23,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using ASCOM.DeviceInterface;
 using GS.Shared;
+using Newtonsoft.Json;
 
 namespace GS.Server.SkyTelescope
 {
@@ -1024,6 +1025,33 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static List<ParkPosition> _parkPositions;
+        public static List<ParkPosition> ParkPositions
+        {
+            get => _parkPositions;
+            set
+            {
+               // if (_parkPositions == value) return;
+                _parkPositions = value.OrderBy(ParkPosition => ParkPosition.Name).ToList();
+                var output = JsonConvert.SerializeObject(_parkPositions);
+                Properties.SkyTelescope.Default.ParkPositions = output;
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static string _parkName;
+        public static string ParkName
+        {
+            get => _parkName;
+            set
+            {
+                if (_parkName == value) return;
+                _parkName = value;
+                Properties.SkyTelescope.Default.ParkName = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -1102,6 +1130,7 @@ namespace GS.Server.SkyTelescope
             MaxSlewRate = Properties.SkyTelescope.Default.MaximumSlewRate;
             ParkAxisX = Properties.SkyTelescope.Default.ParkAxisX;
             ParkAxisY = Properties.SkyTelescope.Default.ParkAxisY;
+            ParkName = Properties.SkyTelescope.Default.ParkName;
             RaBacklash = Properties.SkyTelescope.Default.RaBacklash;
             Refraction = Properties.SkyTelescope.Default.Refraction;
             RaTrackingOffset = Properties.SkyTelescope.Default.RATrackingOffset;
@@ -1111,6 +1140,20 @@ namespace GS.Server.SkyTelescope
             St4Guiderate = Properties.SkyTelescope.Default.St4Guiderate;
             Temperature = Properties.SkyTelescope.Default.Temperature;
             UTCDateOffset = Properties.SkyTelescope.Default.UTCDateOffset;
+
+            //first time load from old park positions
+           var pp = Properties.SkyTelescope.Default.ParkPositions;
+            if (string.IsNullOrEmpty(pp))
+            {
+                var pp1 = new ParkPosition { Name = "Default", X = ParkAxisX, Y = ParkAxisY };
+                var pp2 = new ParkPosition { Name = "Home", X = 90, Y = 90 };
+                var pps = new List<ParkPosition> { pp1, pp2 };
+                pp = JsonConvert.SerializeObject(pps);
+                Properties.SkyTelescope.Default.ParkPositions = pp;
+            }
+
+            // Json items
+            ParkPositions = JsonConvert.DeserializeObject<List<ParkPosition>>(pp);
         }
 
         public static void Upgrade()

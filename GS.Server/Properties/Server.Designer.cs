@@ -217,7 +217,7 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool Notes {
             get {
                 return ((bool)(this["Notes"]));
@@ -284,6 +284,18 @@ namespace GS.Server.Properties {
             }
             set {
                 this["AccentColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Model3D {
+            get {
+                return ((bool)(this["Model3D"]));
+            }
+            set {
+                this["Model3D"] = value;
             }
         }
     }

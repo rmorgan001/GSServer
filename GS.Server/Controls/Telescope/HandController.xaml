@@ -12,7 +12,8 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter  x:Key="BoolToVis"/>
     </UserControl.Resources>
-    <Grid Width="250" Height="175">
+    <Border Margin="0,0,10,0" BorderBrush="DimGray"  BorderThickness="3" CornerRadius="5" Background="{DynamicResource MaterialDesignToolBarBackground}">
+        <Grid Width="250" Height="175">
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition />
@@ -89,4 +90,5 @@
             </StackPanel>
         </StackPanel>
     </Grid>
+        </Border>
 </UserControl>

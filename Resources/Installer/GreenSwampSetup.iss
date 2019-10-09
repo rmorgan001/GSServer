@@ -4,10 +4,10 @@
 #define MyAppExeName "GS.Server.exe"
 
 [Setup]
-AppVerName=ASCOM GS Server 1.0.0.16
-AppVersion=1.0.0.16
-VersionInfoVersion=1.0.0.16
-OutputBaseFilename="ASCOMGSServer10016Setup"
+AppVerName=ASCOM GS Server 1.0.0.17
+AppVersion=1.0.0.17
+VersionInfoVersion=1.0.0.17
+OutputBaseFilename="ASCOMGSServer10017Setup"
 AppID={{0ff78bd6-6149-4536-9252-3da68b94f7c2}
 AppName=GS Server
 AppPublisher=Robert Morgan <robert.morgan.e@gmail.com>
@@ -37,13 +37,15 @@ Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\"
 Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\Drivers\"
 Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\Drivers\SkyScripts\"
 Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\NotesTemplates\"
+Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\Models"
 ; TODO: Add subfolders below {app} as needed (e.g. Name: "{app}\MyFolder")
 
 [Files]
 Source: "C:\Users\Rob\source\repos\GSSolution\Builds\Release\*.*"; DestDir: "{app}"
 Source: "C:\Users\Rob\source\repos\GSSolution\Builds\Release\Drivers\*.*"; DestDir: "{app}\Drivers";
 Source: "C:\Users\Rob\source\repos\GSSolution\Builds\Release\Drivers\SkyScripts\*.*"; DestDir: "{app}\SkyScripts";
-Source: "C:\Users\Rob\source\repos\GSSolution\Builds\Debug\Notes\NotesTemplates\*.*"; DestDir: "{app}\NotesTemplates";
+Source: "C:\Users\Rob\source\repos\GSSolution\Builds\Release\Notes\NotesTemplates\*.*"; DestDir: "{app}\NotesTemplates";
+Source: "C:\Users\Rob\source\repos\GSSolution\Builds\Release\Models\*.*"; DestDir: "{app}\Models";
 ; Require a read-me to appear after installation, maybe driver's Help doc
 Source: "C:\Users\Rob\source\repos\GSSolution\Resources\Manuals\GSS Manual.pdf"; DestDir: "{app}"; Flags: isreadme
 ; TODO: Add other files needed by your driver here (add subfolders above)
@@ -54,6 +56,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; \
 
 [Icons]
 Name: "{group}\GS Server"; Filename: "{app}\GS.Server.exe"
+Name: "{group}\GS Log Viewer"; Filename: "{app}\GS.LogView.exe"
+Name: "{group}\GS Serial Tester"; Filename: "{app}\GS.SerialTester.exe"
 Name: "{group}\GS Manual"; Filename: "{app}\GSS Manual.pdf"
 Name: "{userdesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 

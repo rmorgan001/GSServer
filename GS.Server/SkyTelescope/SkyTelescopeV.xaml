@@ -10,7 +10,7 @@
              xmlns:enums="clr-namespace:ASCOM.Utilities;assembly=ASCOM.Utilities"
              xmlns:deviceInterface="clr-namespace:ASCOM.DeviceInterface;assembly=ASCOM.DeviceInterfaces"
              Loaded="SkyTelescopeV_OnLoaded" TextOptions.TextFormattingMode="Display"
-             mc:Ignorable="d"  d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
     <UserControl.Resources>
         <BooleanToVisibilityConverter  x:Key="BoolToVis"/>
     </UserControl.Resources>
@@ -22,9 +22,9 @@
             <!--IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}"-->
             <md:DrawerHost.LeftDrawerContent>
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <Grid Width="750" Height="420" Margin="10,0,10,0" >
+                    <Grid Width="750" Height="420" Margin="10,0,10,0" VerticalAlignment="Top" >
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="40"/>
+                        <RowDefinition/>
                         <RowDefinition/>
                         <RowDefinition/>
                         <RowDefinition/>
@@ -38,7 +38,7 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5">
@@ -88,7 +88,7 @@
                     </ComboBox>
                     <ComboBox Grid.Row="1" Grid.Column="4" md:HintAssist.Hint="{DynamicResource cbhintAlignment}" MinWidth="10" Margin="10,0,0,0" ToolTip="{DynamicResource cbhintAlignment}"
                               ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type deviceInterface:AlignmentModes}}}"
-                              Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEnabled="False">
                         <ComboBox.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <VirtualizingStackPanel />
@@ -326,19 +326,52 @@
                                       IsChecked="{Binding DebugVisability, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{DynamicResource lbDiagnostics}"/>
                     </StackPanel>
-                    <Button Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2" Margin="5" Content="{DynamicResource btnSetPark}" ToolTip="{DynamicResource btnSetPark}"
-                            Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSaveParkCommand}" VerticalAlignment="Bottom"/>
-                    <Border Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3" Grid.RowSpan="4" Margin="0,0,10,0" 
-                            BorderThickness="1" Background="{DynamicResource MaterialDesignToolBarBackground}" HorizontalAlignment="Stretch"  VerticalAlignment="Center" >
-                        <Grid Margin="10,10,10,10">
+                    <Border Margin="0,0,4,0" Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2" BorderThickness="3" BorderBrush="DimGray" CornerRadius="5"
+                            Background="{DynamicResource MaterialDesignToolBarBackground}">
+                            <StackPanel Orientation="Horizontal" >
+                            <ComboBox md:HintAssist.Hint="{DynamicResource cbtipPark}" Margin="15,0,0,0" ToolTip="{DynamicResource cbtipPark}" Width="125"
+                                      ItemsSource="{Binding ParkPositions}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEditable="False">
+                                <ComboBox.SelectedItem>
+                                        <Binding Path="ParkSelectionSetting" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </ComboBox.SelectedItem>
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate DataType="skyTelescope:ParkPosition">
+                                        <TextBlock Text="{Binding Name}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        <md:DialogHost IsOpen="{Binding IsParkAddDialogOpen}" DialogContent="{Binding ParkAddContent}">
+                            <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}" Command="{Binding OpenParkAddDialogCommand}"
+                                ToolTip="Add" Height="25" Width="25" Margin="10 0 0 0"  VerticalAlignment="Center">
+                                <md:PackIcon Kind="Plus" Height="22" Width="22" />
+                            </Button>
+                        </md:DialogHost>
+                        <md:DialogHost IsOpen="{Binding IsParkDeleteDialogOpen}" DialogContent="{Binding ParkDeleteContent}">
+                            <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+                                Command="{Binding OpenParkDeleteDialogCommand}" Height="25" Width="25"
+                                Margin="10 0 0 0" VerticalAlignment="Center">
+                                <md:PackIcon Kind="Minus" Height="22" Width="22" />
+                            </Button>
+                        </md:DialogHost>
+                                <Button Margin="10,0,0,0" Content="Set" ToolTip="{DynamicResource btnSetPark}" 
+                                        Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSaveParkCommand}" />
+                            </StackPanel>
+                        </Border>
+                    <Border Margin="3" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3" Grid.RowSpan="4" CornerRadius="5" BorderThickness="3" BorderBrush="DimGray"
+                            Background="{DynamicResource MaterialDesignToolBarBackground}"  >
+                        <Grid Margin="10,0,10,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
-                            <ColumnDefinition Width="*" MinWidth="75"/>
+                            <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition/>
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition/>
                             <RowDefinition/>
                             <RowDefinition/>
@@ -347,19 +380,19 @@
                             <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="{DynamicResource lbLatitude}"/>
                             <ComboBox Grid.Row="1" Grid.Column="1" IsEnabled="True" md:HintAssist.Hint="{DynamicResource hintDegrees}" Margin="10,0,0,0" ToolTip="{DynamicResource hintDegrees}"
                                 ItemsSource="{Binding LatitudeRange}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
-                            <ComboBox.SelectedItem>
-                                <Binding Path="Lat1" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
-                                    <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
-                                    </Binding.ValidationRules>
-                                </Binding>
-                            </ComboBox.SelectedItem>
-                            <ComboBox.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <VirtualizingStackPanel />
-                                </ItemsPanelTemplate>
-                            </ComboBox.ItemsPanel>
-                        </ComboBox>
+                                <ComboBox.SelectedItem>
+                                    <Binding Path="Lat1" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </ComboBox.SelectedItem>
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
                             <ComboBox Grid.Row="1" Grid.Column="2" IsEnabled="True" md:HintAssist.Hint="{DynamicResource hintMinutes}" Margin="10,0,0,0" ToolTip="{DynamicResource hintMinutes}"
                             ItemsSource="{Binding Minutes}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.SelectedItem>
@@ -458,7 +491,7 @@
                                 </ItemsPanelTemplate>
                             </ComboBox.ItemsPanel>
                         </ComboBox>
-                            <TextBox Grid.Row="3" Grid.Column="3" ToolTip="{DynamicResource tbtipMeters}" md:HintAssist.Hint="{DynamicResource tbElevation}"  Margin="10,5,0,0"
+                            <TextBox Grid.Row="3" Grid.Column="3" ToolTip="{DynamicResource tbtipMeters}" md:HintAssist.Hint="{DynamicResource tbElevation}"  Margin="10,0,0,0"
                                      Style="{StaticResource MaterialDesignFloatingHintTextBox}">
                             <TextBox.Text>
                                 <Binding Path="Elevation" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -502,7 +535,19 @@
                 </StackPanel>
                 <telescope:TopCoordsBar Grid.Row="0" Grid.Column="0" IsEnabled="{Binding ScreenEnabled}" HorizontalAlignment="Center"/>
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <Grid HorizontalAlignment="Center">
+                    <Grid HorizontalAlignment="Center" VerticalAlignment="Top" IsEnabled="{Binding ScreenEnabled}">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Opacity" Value="0.2" />
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="True">
+                                        <Setter Property="Opacity" Value="1.0" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*"/>
@@ -511,55 +556,42 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0">
+                            <telescope:RaDecGoTo IsEnabled="{Binding ScreenEnabled}"/>
+                            <telescope:HandController Margin="0,10,0,0" IsEnabled="{Binding ScreenEnabled}" />
+                            <telescope:Backlash IsEnabled="{Binding ScreenEnabled}"/>
+                        </StackPanel>
                         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1" >
-                            <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Margin="1,0,0,0">
-                                <telescope:StandardButtonBar Margin="10,10,0,0" IsEnabled="{Binding ScreenEnabled}"/>
-                                <telescope:PpecBar Margin="10,0,0,0" IsEnabled="{Binding ScreenEnabled}"/>
+                            <StackPanel Orientation="Vertical">
+                                <telescope:StandardButtonBar IsEnabled="{Binding ScreenEnabled}"/>
+                                <telescope:PpecBar IsEnabled="{Binding ScreenEnabled}"/>
                             </StackPanel>
-                            <Grid Background="Transparent" Margin="20,0,0,0" Height="340" VerticalAlignment="Top">
-                                <Border 
-                                        BorderBrush="Black"
-                                        BorderThickness="3"
-                                        CornerRadius="5">
-                                    <Border.Effect>
-                                        <DropShadowEffect />
-                                    </Border.Effect>
-                                </Border>
-                                <StackPanel IsEnabled="{Binding ScreenEnabled}">
-                                    <Rectangle RadiusY="5" RadiusX="5" Width="253" Height="340">
-                                        <Rectangle.Style>
-                                            <Style TargetType="Rectangle">
-                                                <Style.Triggers>
-                                                    <Trigger Property="IsEnabled" Value="False">
-                                                        <Setter Property="Opacity" Value="0.2" />
-                                                    </Trigger>
-                                                    <Trigger Property="IsEnabled" Value="True">
-                                                        <Setter Property="Opacity" Value="1.0" />
-                                                    </Trigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Rectangle.Style>
-                                        <Rectangle.Fill>
-                                            <ImageBrush ImageSource="../Resources/M33.png" />
-                                        </Rectangle.Fill>
-                                    </Rectangle>
-                                </StackPanel>
+                            <Border Margin="20,0,0,0" CornerRadius="5" BorderThickness="3" BorderBrush="DimGray" HorizontalAlignment="Stretch"  VerticalAlignment="Center" 
+                                    Background="{DynamicResource MaterialDesignToolBarBackground}" >
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="10"  Opacity=".5" ShadowDepth="10"/>
+                                </Border.Effect>
+                                <Grid Width="253" Height="335" IsEnabled="{Binding ScreenEnabled}">
+                                    <Grid.Background>
+                                        <ImageBrush ImageSource="{Binding ImageFile}" Stretch="UniformToFill"/>
+                                    </Grid.Background>
+                                    <telescope:HelixViewport3D IsEnabled="{Binding ScreenEnabled}" Visibility="{Binding ModelOn, Converter={StaticResource BoolToVis}}"/>
                                 <StackPanel>
                                     <telescope:Debug IsEnabled="{Binding ScreenEnabled}" Visibility="{Binding DebugVisability, Converter={StaticResource BoolToVis}}"/>
                                 </StackPanel>
-                            </Grid>
-
-                        </StackPanel>
-                        <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0" Margin="10,0,0,0" >
-                            <telescope:RaDecGoTo IsEnabled="{Binding ScreenEnabled}"/>
-                            <telescope:HandController Margin="0,20,0,0" IsEnabled="{Binding ScreenEnabled}" />
-                            <telescope:Backlash IsEnabled="{Binding ScreenEnabled}"/>
-                        </StackPanel>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Left"  IsEnabled="{Binding ScreenEnabled}" Margin="5">
+                                    <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="3DView"
+                                                  IsChecked="{Binding ModelOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <Label Content="3D"/>
+                                </StackPanel>
+                                </Grid>
+                            </Border>
+                    </StackPanel>
                     </Grid>
                 </ScrollViewer>
                 <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center">
                     <telescope:BottomStatusBar IsEnabled="{Binding ScreenEnabled}"/>
-                    <Button  Width="120" Height="30" Margin="10 0" ToolTip="{DynamicResource btntipConnect}"
+                    <Button Width="120" Height="30" ToolTip="{DynamicResource btntipConnect}"
                             Command="{Binding ClickConnectCommand}" Content="{Binding ConnectButtonContent}" Style="{StaticResource MaterialDesignRaisedDarkButton}"/>
                 </StackPanel>
             </Grid>
