@@ -411,7 +411,6 @@ namespace GS.SkyWatcher
 
         /// <summary>
         /// Use goto mode to target position
-        /// anything less than 20 steps and the mount will force 20 
         /// </summary>
         /// <param name="axis">>AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="movingSteps">Microsteps to move</param>
@@ -467,7 +466,7 @@ namespace GS.SkyWatcher
             int direction;
 
             // Get current position (radians) of the axis.
-            var curPosition = _commands.GetAxisPosition(axis);
+            var curPosition = _commands.GetAxisPosition(axis); // :j
 
             // Calculate slewing distance.
             // Note: For EQ mount, Positions[AXIS1] is offset( -PI/2 ) adjusted in GetAxisPosition().
@@ -519,18 +518,19 @@ namespace GS.SkyWatcher
             // Check if the distance is long enough to trigger a high speed GOTO.
             if (movingSteps > _lowSpeedGotoMargin[(int) axis])
             {
-                _commands.SetMotionMode(axis, 0, direction, SouthernHemisphere); // high speed GOTO slewing 
+                _commands.SetMotionMode(axis, 0, direction, SouthernHemisphere); // :G high speed GOTO slewing 
                 highspeed = true;
             }
             else
             {
-                _commands.SetMotionMode(axis, 2, direction, SouthernHemisphere); // low speed GOTO slewing
+                _commands.SetMotionMode(axis, 2, direction, SouthernHemisphere); // :G low speed GOTO slewing
                 highspeed = false;
             }
 
-            _commands.SetGotoTargetIncrement(axis, movingSteps);
-            _commands.SetBreakPointIncrement(axis, _breakSteps[(int) axis]);
-            _commands.StartMotion(axis);
+            
+            _commands.SetGotoTargetIncrement(axis, movingSteps); // :H
+            _commands.SetBreakPointIncrement(axis, _breakSteps[(int) axis]); // :M
+            _commands.StartMotion(axis); // :J
 
             _targetPositions[(int) axis] = targetPosition;
             _commands.SetSlewingTo((int) axis, forward, highspeed);
@@ -689,7 +689,6 @@ namespace GS.SkyWatcher
             _breakSteps = _commands.GetBreakSteps();
             GetMotorCardVersion(AxisId.Axis1);
             ParseCapabilities();
-            //SetDefaultPositions();
             SetStepsPerSecond();
         }
 
@@ -737,9 +736,9 @@ namespace GS.SkyWatcher
             return _commands.GetLastSlewSpeed(axis);
         }
 
-        internal long GetHomePosition(AxisId axis)
+        internal long? GetHomePosition(AxisId axis)
         {
-            return !CanHomeSensors ? 0 : _commands.GetHomePosition(axis);
+            return !CanHomeSensors ? ((long?) null).GetValueOrDefault() : _commands.GetHomePosition(axis);
         }
 
         internal string GetMotorCardVersion(AxisId axis)

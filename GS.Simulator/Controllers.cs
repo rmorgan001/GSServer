@@ -32,7 +32,7 @@ namespace GS.Simulator
         private const bool CanAzEq = false;
         private const bool CanDualEncoders = false;
         private const bool CanHalfTrack = false;
-        private const bool CanHomeSensors = false;
+        private const bool CanHomeSensors = true;
         private const bool CanPolarLed = false;
         private const bool CanPpec = false;
         private const bool CanWifi = false;
@@ -67,6 +67,8 @@ namespace GS.Simulator
         private bool _isSlewSlewingY;
         private bool _isGotoSlewingX;
         private bool _isGotoSlewingY;
+        private bool _homeSensorX;
+        private bool _homeSensorY;
 
         private const int _maxrate = 4;
         private const double SlewSpeedOne = .01 * _maxrate;
@@ -88,6 +90,8 @@ namespace GS.Simulator
         private int StepsY => (int) (DegreesY * 36000);
         private double HcX { get; set; }
         private double HcY { get; set; }
+        private int HomeSensorX { get; set; }
+        private int HomeSensorY { get; set; }
 
         #endregion
 
@@ -290,6 +294,18 @@ namespace GS.Simulator
                             break;
                     }
 
+                    break;
+                case "homesensor":
+                    switch (ParseAxis(cmd[1]))
+                    {
+                        case Axis.Axis1:
+                            return $"{HomeSensorX}";
+                        case Axis.Axis2:
+                            return $"{HomeSensorY}";
+                    }
+                    break;
+                case "homesensorreset":
+                    HomeSensorReset(ParseAxis(cmd[1]));
                     break;
                 case "setdegrees":
                     a = Convert.ToDouble(cmd[2]);
@@ -599,8 +615,69 @@ namespace GS.Simulator
             changeX += GoTo(Axis.Axis1, seconds);
             changeY += GoTo(Axis.Axis2, seconds);
 
+            // Update Home Sensor
+            HomeSensorTripCheck(Axis.Axis1, changeX);
+            HomeSensorTripCheck(Axis.Axis2, changeY);
+
+            // Updates position
             CheckStopped(changeX, changeY);
+
+            // Updates slewing info
             CheckSlewing();
+        }
+
+        private void HomeSensorTripCheck(Axis axis, double change)
+        {
+            if (Math.Abs(change) < .0000000001) return;
+            switch (axis)
+            {
+                case Axis.Axis1:
+                   // if (DegreesX > 110 || DegreesX < 70) return;
+                   if (DegreesX > 90 && _homeSensorX )
+                   {
+                       HomeSensorX = 90 * 36000;
+                       _homeSensorX = false;
+                   }
+                   if (DegreesX < 90 && !_homeSensorX)
+                   {
+                       HomeSensorX = 90 * 36000;
+                       _homeSensorX = true;
+                   }
+                   break;
+                case Axis.Axis2:
+                   // if (DegreesY > 110 || DegreesY < 70) return;
+                   if (DegreesY > 90.0 && _homeSensorY)
+                   {
+                       HomeSensorY = 90 * 36000;
+                       _homeSensorY = false;
+                   }
+
+                   if (DegreesY < 90.0 && !_homeSensorY)
+                   {
+                       HomeSensorY = 90 * 36000;
+                       _homeSensorY = true;
+                   }
+                   break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
+            }
+        }
+
+        private void HomeSensorReset(Axis axis)
+        {
+            switch (axis)
+            {
+                case Axis.Axis1:
+                    if (DegreesX > 90) HomeSensorX = 0;
+                    if (DegreesX < 90) HomeSensorX = 16777215;
+                    break;
+                case Axis.Axis2:
+                    if (DegreesY > 90) HomeSensorY = 0;
+                    if (DegreesY < 90) HomeSensorY = 16777215;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
+            }
         }
 
         /// <summary>

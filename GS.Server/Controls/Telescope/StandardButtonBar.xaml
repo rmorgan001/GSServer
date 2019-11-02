@@ -52,12 +52,16 @@
                 Command="{Binding OpenHomeResetDialogCommand}" Content="{DynamicResource btnSetHome}">
             </Button>
         </md:DialogHost>
-        <md:DialogHost VerticalAlignment="Bottom" CloseOnClickAway="True" 
-                       IsOpen="{Binding IsFlipDialogOpen}" DialogContent="{Binding FlipContent}">
+        <md:DialogHost VerticalAlignment="Bottom" CloseOnClickAway="True" IsOpen="{Binding IsFlipDialogOpen}" DialogContent="{Binding FlipContent}">
             <Button Margin="5" Width="100" Height="25" ToolTip="{DynamicResource btntipFlip}" HorizontalAlignment="Left"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}"
                     Command="{Binding OpenFlipDialogCommand}" Content="{DynamicResource btnFlip}">
             </Button>
+        </md:DialogHost>
+        <md:DialogHost VerticalAlignment="Bottom" IsOpen="{Binding IsAutoHomeDialogOpen}" DialogContent="{Binding AutoHomeContent}">
+            <Button Margin="5" Width="100" Height="25" ToolTip="{DynamicResource btnAutoHome}" HorizontalAlignment="Left"
+                    Style="{StaticResource MaterialDesignRaisedDarkButton}" 
+                    Command="{Binding OpenAutoHomeDialogCommand}" Content="{DynamicResource btnAutoHome}"/>
         </md:DialogHost>
     </StackPanel>
 </UserControl>

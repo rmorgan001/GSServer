@@ -584,6 +584,24 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static bool _decPulseToGoTo;
+        public static bool DecPulseToGoTo
+        {
+            get => _decPulseToGoTo;
+            set
+            {
+                if (_decPulseToGoTo == value) return;
+                _decPulseToGoTo = value;
+                Properties.SkyTelescope.Default.DecPulseToGoTo = value;
+                OnStaticPropertyChanged();
+                SkyServer.SkyTasks(MountTaskName.DecPulseToGoTo);
+
+                var monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+        }
+
         private static double _elevation;
         public static double Elevation
         {
@@ -1101,8 +1119,9 @@ namespace GS.Server.SkyTelescope
             TrackingRate = dparse;
             Enum.TryParse<SlewSpeed>(Properties.SkyTelescope.Default.HcSpeed, true, out var hparse);
             HcSpeed = hparse;
-            Enum.TryParse<HCMode>(Properties.SkyTelescope.Default.HCMode, true, out var hcparse);
-            HcMode = hcparse;
+            var hcmodebol = Enum.TryParse<HCMode>(Properties.SkyTelescope.Default.HCMode, true, out var hcparse);
+            if (!hcmodebol) hcparse = HCMode.Guiding;// getting rid of compass mode
+            HcMode = hcparse;  
 
             AlternatingPpec = Properties.SkyTelescope.Default.AlternatingPPEC;
             ApertureArea = Properties.SkyTelescope.Default.ApertureArea;
@@ -1110,6 +1129,7 @@ namespace GS.Server.SkyTelescope
             AtPark = Properties.SkyTelescope.Default.AtPark;
             AutoTrack = Properties.SkyTelescope.Default.AutoTrack;
             DecBacklash = Properties.SkyTelescope.Default.DecBacklash;
+            DecPulseToGoTo = Properties.SkyTelescope.Default.DecPulseToGoTo;
             Elevation = Properties.SkyTelescope.Default.Elevation;
             Encoders = Properties.SkyTelescope.Default.EncodersOn;
             FocalLength = Properties.SkyTelescope.Default.FocalLength;

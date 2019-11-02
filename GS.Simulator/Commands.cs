@@ -510,6 +510,81 @@ namespace GS.Simulator
         }
     }
 
+
+    /// <summary>
+    /// Get Home Sensor Status
+    /// </summary>
+    public class CmdHomeSensor : IMountCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; private set; }
+        private readonly Axis _axis;
+
+        public CmdHomeSensor(long id, Axis axis)
+        {
+            Id = id;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            _axis = axis;
+            Successful = false;
+            MountQueue.AddCommand(this);
+        }
+
+        public void Execute(Actions actions)
+        {
+            try
+            {
+                Result = actions.HomeSensor(_axis);
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Reset home sensor
+    /// </summary>
+    public class CmdHomeSensorReset : IMountCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; private set; }
+        private readonly Axis _axis;
+
+        public CmdHomeSensorReset(long id, Axis axis)
+        {
+            Id = id;
+            _axis = axis;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            Successful = false;
+            Result = null;
+            MountQueue.AddCommand(this);
+        }
+
+        public void Execute(Actions actions)
+        {
+            try
+            {
+                actions.HomeSensorReset(_axis);
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
+
     /// <summary>
     /// Get Mount Name
     /// </summary>

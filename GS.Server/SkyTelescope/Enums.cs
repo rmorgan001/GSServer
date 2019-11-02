@@ -20,7 +20,6 @@ namespace GS.Server.SkyTelescope
         public enum HCMode
         {
             Axes,
-            Compass,
             Guiding
         }
 

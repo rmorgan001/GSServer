@@ -1054,5 +1054,17 @@ namespace GS.Server.Properties {
                 this["ParkName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DecPulseToGoTo {
+            get {
+                return ((bool)(this["DecPulseToGoTo"]));
+            }
+            set {
+                this["DecPulseToGoTo"] = value;
+            }
+        }
     }
 }

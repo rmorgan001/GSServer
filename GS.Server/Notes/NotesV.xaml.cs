@@ -38,6 +38,7 @@ namespace GS.Server.Notes
         private static readonly string _myDocs = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         private static readonly string _filePath = Path.Combine(_myDocs, "GSServer\\");
         private readonly Util _util = new Util();
+        private const string _newline = "\u2028";
 
         public NotesV()
         {
@@ -53,7 +54,7 @@ namespace GS.Server.Notes
                     }
                 }
 
-               // cbSkySettings.ItemsSource = AllSkySettings();
+                // cbSkySettings.ItemsSource = AllSkySettings();
 
                 _fileName = _filePath + "Notes.rtf";
                 cbFontFamily.ItemsSource = Fonts.SystemFontFamilies.OrderBy(f => f.Source);
@@ -65,7 +66,7 @@ namespace GS.Server.Notes
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
             }
@@ -127,7 +128,7 @@ namespace GS.Server.Notes
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog1(ex.Message);
@@ -150,7 +151,7 @@ namespace GS.Server.Notes
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
             }
@@ -169,7 +170,7 @@ namespace GS.Server.Notes
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
             }
@@ -212,7 +213,7 @@ namespace GS.Server.Notes
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
             }
@@ -251,7 +252,7 @@ namespace GS.Server.Notes
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
+                    Message = $"{ex.Message}, {ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
@@ -297,7 +298,7 @@ namespace GS.Server.Notes
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
+                    Message = $"{ex.Message}, {ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
@@ -314,7 +315,8 @@ namespace GS.Server.Notes
                 if (b == null) return;
                 if ((bool) !b) return;
                 rtbEditor?.Selection.ApplyPropertyValue(FlowDocument.ForegroundProperty, new SolidColorBrush(colorDialog.SelectedColor));
-                    rtbEditor?.Focus(); 
+                    rtbEditor?.Focus();
+                    Paintbrush.Foreground = new SolidColorBrush(colorDialog.SelectedColor);
             }
             catch (Exception ex)
             {
@@ -326,7 +328,7 @@ namespace GS.Server.Notes
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
+                    Message = $"{ex.Message}, {ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
@@ -342,8 +344,14 @@ namespace GS.Server.Notes
                 var b = colorDialog.ShowDialog();
                 if (b == null) return;
                 if ((bool)!b) return;
-                rtbEditor?.Selection.ApplyPropertyValue(FlowDocument.BackgroundProperty, new SolidColorBrush(colorDialog.SelectedColor));
-                rtbEditor?.Focus();
+                if (rtbEditor != null)
+                {
+                    rtbEditor.Selection.ApplyPropertyValue(FlowDocument.BackgroundProperty, new SolidColorBrush(colorDialog.SelectedColor));
+                  //  rtbEditor.Document.Background = new SolidColorBrush(colorDialog.SelectedColor);
+                    rtbEditor?.Focus();
+                }
+
+                ColorLens.Foreground = new SolidColorBrush(colorDialog.SelectedColor);
             }
             catch (Exception ex)
             {
@@ -355,7 +363,7 @@ namespace GS.Server.Notes
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
+                    Message = $"{ex.Message}, {ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
@@ -418,7 +426,7 @@ namespace GS.Server.Notes
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
+                    Message = $"{ex.Message}, {ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
@@ -445,7 +453,7 @@ namespace GS.Server.Notes
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
+                    Message = $"{ex.Message}, {ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
@@ -472,7 +480,7 @@ namespace GS.Server.Notes
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
+                    Message = $"{ex.Message}, {ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
@@ -499,7 +507,7 @@ namespace GS.Server.Notes
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
+                    Message = $"{ex.Message}, {ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
@@ -519,7 +527,7 @@ namespace GS.Server.Notes
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
             }
@@ -538,7 +546,7 @@ namespace GS.Server.Notes
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
             }
@@ -594,7 +602,7 @@ namespace GS.Server.Notes
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
+                    Message = $"{ex.Message}, {ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
@@ -626,7 +634,7 @@ namespace GS.Server.Notes
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
+                    Message = $"{ex.Message}, {ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
@@ -652,7 +660,7 @@ namespace GS.Server.Notes
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
+                    Message = $"{ex.Message}, {ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
@@ -679,7 +687,7 @@ namespace GS.Server.Notes
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
+                    Message = $"{ex.Message}, {ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
@@ -706,7 +714,7 @@ namespace GS.Server.Notes
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
+                    Message = $"{ex.Message}, {ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
@@ -737,7 +745,7 @@ namespace GS.Server.Notes
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
+                    Message = $"{ex.Message}, {ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
@@ -763,50 +771,50 @@ namespace GS.Server.Notes
             try
             {
                 using (new WaitCursor())
+                {
+                    var client = new DarkSkyService(Settings.Settings.DarkSkyKey);
+                    var exclusionList = new List<Exclude> { Exclude.Minutely, Exclude.Hourly, Exclude.Daily, Exclude.Daily };
+                    var task = client.GetWeatherDataAsync(SkySettings.Latitude, SkySettings.Longitude, Unit.Auto, exclusionList);
+                    const int timeout = 10000;
+                    if (await Task.WhenAny(task, Task.Delay(timeout)) == task)
                     {
-                        var client = new DarkSkyService(Settings.Settings.DarkSkyKey);
-                        var exclusionList = new List<Exclude> { Exclude.Minutely, Exclude.Hourly, Exclude.Daily, Exclude.Daily };
-                        var task = client.GetWeatherDataAsync(SkySettings.Latitude, SkySettings.Longitude, Unit.Auto, exclusionList);
-                        const int timeout = 10000;
-                        if (await Task.WhenAny(task, Task.Delay(timeout)) == task)
+                        var result = task.Result;
+                        if (result != null)
                         {
-                            var result = task.Result;
-                            if (result != null)
-                            {
-                                var unit = (Unit)Enum.Parse(typeof(Unit), $"{result.Flags.Units.Trim().ToUpper()}");
+                            var unit = (Unit)Enum.Parse(typeof(Unit), $"{result.Flags.Units.Trim().ToUpper()}");
 
-                                var str = $"Dark Sky Weather Service ({client.ApiCallsMade}): Units {unit} {Environment.NewLine}";
-                                str += $"DateTime: {ConvertDSField(result, unit, "Time")} {Environment.NewLine}";
-                                str += $"Temperature: {ConvertDSField(result, unit, "Temperature")} {Environment.NewLine}";
-                                str += $"ApparentTemperature: {ConvertDSField(result, unit, "ApparentTemperature")} {Environment.NewLine}";
-                                str += $"CloudCover: {ConvertDSField(result, unit, "CloudCover")} {Environment.NewLine}";
-                                str += $"DewPoint: {ConvertDSField(result, unit, "DewPoint")} {Environment.NewLine}";
-                                str += $"Humidity: {ConvertDSField(result, unit, "Humidity")} {Environment.NewLine}";
-                                str += $"NearestStormBearing: {ConvertDSField(result, unit, "NearestStormBearing")} {Environment.NewLine}";
-                                str += $"NearestStormDistance: {ConvertDSField(result, unit, "NearestStormDistance")} {Environment.NewLine}";
-                                str += $"Ozone: {ConvertDSField(result, unit, "Ozone")} {Environment.NewLine}";
-                                str += $"PrecipitationType: {ConvertDSField(result, unit, "PrecipitationType")} {Environment.NewLine}";
-                                str += $"PrecipitationIntensity: {ConvertDSField(result, unit, "PrecipitationIntensity")} {Environment.NewLine}";
-                                str += $"PrecipitationProbability: {ConvertDSField(result, unit, "PrecipitationProbability")} {Environment.NewLine}";
-                                str += $"Pressure: {ConvertDSField(result, unit, "Pressure")} {Environment.NewLine}";
-                                str += $"Visibility: {ConvertDSField(result, unit, "Visibility")} {Environment.NewLine}";
-                                str += $"UVIndex: {ConvertDSField(result, unit, "UVIndex")} {Environment.NewLine}";
-                                str += $"WindSpeed: {ConvertDSField(result, unit, "WindSpeed")} {Environment.NewLine}";
-                                str += $"WindGust: {ConvertDSField(result, unit, "WindGust")} {Environment.NewLine}";
-                                str += $"WindBearing: {ConvertDSField(result, unit, "WindBearing")} {Environment.NewLine}";
-                                str += $"Summary: {ConvertDSField(result, unit, "Summary")} {Environment.NewLine}";
-                                if (rtbEditor == null) return;
-                                rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
-                                rtbEditor.CaretPosition?.InsertTextInRun(str);
-                                return;
-                            }
-                            OpenDialog1("No Data Found");
+                            var str = $"Dark Sky Weather Service ({client.ApiCallsMade}): Units {unit} {_newline}";
+                            str += $"DateTime: {ConvertDSField(result, unit, "Time")} {_newline}";
+                            str += $"Temperature: {ConvertDSField(result, unit, "Temperature")} {_newline}";
+                            str += $"ApparentTemperature: {ConvertDSField(result, unit, "ApparentTemperature")} {_newline}";
+                            str += $"CloudCover: {ConvertDSField(result, unit, "CloudCover")} {_newline}";
+                            str += $"DewPoint: {ConvertDSField(result, unit, "DewPoint")} {_newline}";
+                            str += $"Humidity: {ConvertDSField(result, unit, "Humidity")} {_newline}";
+                            str += $"NearestStormBearing: {ConvertDSField(result, unit, "NearestStormBearing")} {_newline}";
+                            str += $"NearestStormDistance: {ConvertDSField(result, unit, "NearestStormDistance")} {_newline}";
+                            str += $"Ozone: {ConvertDSField(result, unit, "Ozone")} {_newline}";
+                            str += $"PrecipitationType: {ConvertDSField(result, unit, "PrecipitationType")} {_newline}";
+                            str += $"PrecipitationIntensity: {ConvertDSField(result, unit, "PrecipitationIntensity")} {_newline}";
+                            str += $"PrecipitationProbability: {ConvertDSField(result, unit, "PrecipitationProbability")} {_newline}";
+                            str += $"Pressure: {ConvertDSField(result, unit, "Pressure")} {_newline}";
+                            str += $"Visibility: {ConvertDSField(result, unit, "Visibility")} {_newline}";
+                            str += $"UVIndex: {ConvertDSField(result, unit, "UVIndex")} {_newline}";
+                            str += $"WindSpeed: {ConvertDSField(result, unit, "WindSpeed")} {_newline}";
+                            str += $"WindGust: {ConvertDSField(result, unit, "WindGust")} {_newline}";
+                            str += $"WindBearing: {ConvertDSField(result, unit, "WindBearing")} {_newline}";
+                            str += $"Summary: {ConvertDSField(result, unit, "Summary")} {_newline}";
+                            if (rtbEditor == null) return;
+                            rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
+                            rtbEditor.CaretPosition?.InsertTextInRun(str);
+                            return;
                         }
-                        else
-                        {
-                            OpenDialog1("The operation has timed out.");
-                        }
+                        OpenDialog1("No Data Found");
                     }
+                    else
+                    {
+                        OpenDialog1("The operation has timed out.");
+                    }
+                }
 
             }
             catch (Exception ex)
@@ -819,7 +827,7 @@ namespace GS.Server.Notes
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
+                    Message = $"{ex.Message}, {ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
@@ -1039,7 +1047,7 @@ namespace GS.Server.Notes
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
             }

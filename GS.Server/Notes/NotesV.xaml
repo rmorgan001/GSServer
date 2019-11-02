@@ -136,10 +136,10 @@
                         <ComboBox Name="cbFontFamily" ToolTip="{DynamicResource btntipNFont}" Width="100" DropDownClosed="CbFontFamily_DropDownClosed" />
                         <ComboBox Name="cbFontSize" ToolTip="{DynamicResource btntipNFontSize}" DropDownClosed="CbFontSize_DropDownClosed" SelectedValuePath="Content"/>
                         <Button Padding="2" Click="BtForground_Click" ToolTip="{DynamicResource btntipNFontForground}" ToolBar.OverflowMode="AsNeeded">
-                                <md:PackIcon Kind="Paintbrush"/>
+                            <md:PackIcon Kind="Paintbrush" Name="Paintbrush"/>
                                     </Button>
                         <Button Padding="2" Click="BtBackground_Click" ToolTip="{DynamicResource btntipNFontBackground}" ToolBar.OverflowMode="AsNeeded">
-                                <md:PackIcon Kind="ColorLens"/>
+                                <md:PackIcon Kind="ColorLens" Name="ColorLens"/>
                                     </Button>
                         <ToggleButton Name="tbSpell" Padding="2" ToolTip="{DynamicResource btntipNSpellcheck}" ToolBar.OverflowMode="AsNeeded" Height="20" Width="20" Margin="2"
                                                   Style="{StaticResource MaterialDesignActionToggleButton}" Click="TbSpell_OnClick">
@@ -174,7 +174,7 @@
             </ToolBarTray>
             </md:ColorZone>
             <RichTextBox Grid.Row="2" x:Name="rtbEditor" AcceptsTab="True" AcceptsReturn="True" SpellCheck.IsEnabled="False" 
-                             FontFamily="Arial" FontSize="14" VerticalScrollBarVisibility="Auto" TextOptions.TextFormattingMode="Ideal" Unloaded="RtbEditor_OnUnloaded"
+                         FontFamily="Segoe UI" FontSize="14" VerticalScrollBarVisibility="Auto" Unloaded="RtbEditor_OnUnloaded" TextOptions.TextFormattingMode="Display"
                              TextOptions.TextRenderingMode="Auto"  MinHeight="200" MinWidth="700" Foreground="{DynamicResource MaterialDesignBody}"
                              KeyDown="RtbEditor_OnKeyDown" SelectionChanged="RtbEditor_SelectionChanged" Background="{DynamicResource MaterialDesignPaper}"/>
         </Grid>

@@ -25,10 +25,10 @@ namespace GS.Server.SkyTelescope
     public static class Axes
     {
         /// <summary>
-        /// Get coordinates to store for park information
+        /// Convert internal mountaxis degrees to mount with corrrect hemi
         /// </summary>
         /// <returns></returns>
-        public static double[] MountAxis2ParkCoords()
+        public static double[] MountAxis2Mount()
         {
             var a = new[] { 0.0, 0.0 };
             if (SkyServer.SouthernHemisphere)

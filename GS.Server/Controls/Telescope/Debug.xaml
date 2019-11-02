@@ -27,13 +27,12 @@
             <TextBlock Margin="5,0,0,0" Text="{DynamicResource tbSiderealTime}"/>
             <TextBlock Margin="5,0,0,0" Text="{Binding SiderealTime}"/>
         </StackPanel>
-        <!--<StackPanel Orientation="Horizontal">
-            <Button Margin="5,10,0,0"
+        <StackPanel Orientation="Horizontal">
+            <!--<Button Margin="5,10,0,0" Width="100"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                    Width="100"
                     Command="{Binding ClickTestCommand}">
                 Test
-            </Button>
-        </StackPanel>-->
+            </Button>-->
+        </StackPanel>
     </StackPanel>
 </UserControl>

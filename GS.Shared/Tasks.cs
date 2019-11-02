@@ -22,7 +22,7 @@ namespace GS.Shared
     static class Tasks
     {
         /// <summary>
-        /// 
+        /// a extension method version that incorporates cancellation of the timeout when the original task completes as suggested
         /// </summary>
         /// <remarks>https://stackoverflow.com/questions/4238345/asynchronously-wait-for-taskt-to-complete-with-timeout</remarks>
         /// <typeparam name="TResult"></typeparam>
@@ -33,17 +33,10 @@ namespace GS.Shared
         {
             using (var timeoutCancellationTokenSource = new CancellationTokenSource())
             {
-
                 var completedTask = await Task.WhenAny(task, Task.Delay(timeout, timeoutCancellationTokenSource.Token));
-                if (completedTask == task)
-                {
-                    timeoutCancellationTokenSource.Cancel();
-                    return await task;  // Very important in order to propagate exceptions
-                }
-                else
-                {
-                    throw new TimeoutException("The operation has timed out.");
-                }
+                if (completedTask != task) throw new TimeoutException("The operation has timed out.");
+                timeoutCancellationTokenSource.Cancel();
+                return await task;  // Very important in order to propagate exceptions
             }
         }
     }

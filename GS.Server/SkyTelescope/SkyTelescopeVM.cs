@@ -19,6 +19,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Management;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
@@ -93,6 +94,7 @@ namespace GS.Server.SkyTelescope
                     // Deals with applications trying to open the setup dialog more than once. 
                     OpenSetupDialog = SkyServer.OpenSetupDialog;
                     SkyServer.OpenSetupDialog = true;
+                    SettingsGridEnabled = true;
 
                     // setup property events to monitor
                     SkyServer.StaticPropertyChanged += PropertyChangedSkyServer;
@@ -161,6 +163,18 @@ namespace GS.Server.SkyTelescope
             {
                 if (_screenEnabled == value) return;
                 _screenEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _settingsGridEnabled;
+        public bool SettingsGridEnabled
+        {
+            get => _settingsGridEnabled;
+            set
+            {
+                if (_settingsGridEnabled == value) return;
+                _settingsGridEnabled = value;
                 OnPropertyChanged();
             }
         }
@@ -262,6 +276,9 @@ namespace GS.Server.SkyTelescope
                             case "LimitAlarm":
                                 LimitAlarm = SkyServer.LimitAlarm;
                                 break;
+                            case "MountError":
+                                MountError = SkyServer.MountError;
+                                break;
                             case "AlertState":
                                 AlertState = SkyServer.AlertState;
                                 break;
@@ -288,6 +305,9 @@ namespace GS.Server.SkyTelescope
                                 break;
                             case "IsMountRunning":
                                 MountState = SkyServer.IsMountRunning;
+                                break;
+                            case "AutoHomeProgressBar":
+                                AutoHomeProgressBar = SkyServer.AutoHomeProgressBar;
                                 break;
                             }
                         });
@@ -507,6 +527,28 @@ namespace GS.Server.SkyTelescope
         #endregion
 
         #region Drawer Settings 
+
+        // alternative listing of ports
+        public IList<string> AllComPorts
+        {
+            get
+            {
+                using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE Caption like '%(COM%'"))
+                {
+                    var portnames = System.IO.Ports.SerialPort.GetPortNames();
+                    var ports = searcher.Get().Cast<ManagementBaseObject>().ToList().Select(p => p["Caption"].ToString());
+
+                    var portList = portnames.Select(n => n + " - " + ports.FirstOrDefault(s => s.Contains(n))).ToList();
+
+                    foreach (var s in portList)
+                    {
+                        Console.WriteLine(s);
+                    }
+
+                    return portList;
+                }
+            }
+        }
 
         public IList<int> ComPorts { get
             {
@@ -787,11 +829,11 @@ namespace GS.Server.SkyTelescope
 
         public bool DecPulseToGoTo
         {
-            get => SkyServer.DecPulseToGoTo;
+            get => SkySettings.DecPulseToGoTo;
             set
             {
-                if (value == SkyServer.DecPulseToGoTo) return;
-                SkyServer.DecPulseToGoTo = value;
+                if (value == SkySettings.DecPulseToGoTo) return;
+                SkySettings.DecPulseToGoTo = value;
                 OnPropertyChanged();
             }
         }
@@ -961,7 +1003,7 @@ namespace GS.Server.SkyTelescope
                         OpenDialog("Nothing selected");
                         return;
                     }
-                    var parkcoords = Axes.MountAxis2ParkCoords();
+                    var parkcoords = Axes.MountAxis2Mount();
                     ParkSelectionSetting.X = parkcoords[0];
                     ParkSelectionSetting.Y = parkcoords[1];
 
@@ -1234,8 +1276,6 @@ namespace GS.Server.SkyTelescope
                     Message = $"test warning"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-
-                // Principles.Alignment.Test2Star();
             }
             catch (Exception ex)
             {
@@ -1908,6 +1948,7 @@ namespace GS.Server.SkyTelescope
             {
                 if (_isHomeResetDialogOpen == value) return;
                 _isHomeResetDialogOpen = value;
+                ScreenEnabled = !value;
                 OnPropertyChanged();
             }
         }
@@ -1982,6 +2023,7 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
+
                     SkyServer.ResetHomePositions();
                     Synthesizer.Speak(Application.Current.Resources["vceHomeSet"].ToString());
                     IsHomeResetDialogOpen = false;
@@ -2049,6 +2091,7 @@ namespace GS.Server.SkyTelescope
             {
                 if (_isFlipDialogOpen == value) return;
                 _isFlipDialogOpen = value;
+                ScreenEnabled = !value;
                 OnPropertyChanged();
             }
         }
@@ -2760,10 +2803,10 @@ namespace GS.Server.SkyTelescope
                     EWVisability = true;
                     NSVisability = true;
                     break;
-                case HCMode.Compass:
-                    EWVisability = false;
-                    NSVisability = false;
-                    break;
+                //case HCMode.Compass:
+                //    EWVisability = false;
+                //    NSVisability = false;
+                //    break;
                 case HCMode.Guiding:
                     EWVisability = false;
                     NSVisability = false;
@@ -4473,6 +4516,228 @@ namespace GS.Server.SkyTelescope
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        #endregion
+
+        #region AutoHome Dialog
+
+        private bool _startEnabled;
+        public bool StartEnabled
+        {
+            get => _startEnabled;
+            set
+            {
+                if (_startEnabled == value) return;
+                _startEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _autoHomeProgressBar;
+        public int AutoHomeProgressBar
+        {
+            get => _autoHomeProgressBar;
+            set
+            {
+                if (_autoHomeProgressBar == value) return;
+                _autoHomeProgressBar = value;
+                if (value > 99)
+                {
+                    IsAutoHomeDialogOpen = false;
+                    SkyServer.AutoHomeProgressBar = 0;
+                }
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isAutoHomeDialogOpen;
+        public bool IsAutoHomeDialogOpen
+        {
+            get => _isAutoHomeDialogOpen;
+            set
+            {
+                if (_isAutoHomeDialogOpen == value) return;
+                _isAutoHomeDialogOpen = value;
+                ScreenEnabled = !value;
+                OnPropertyChanged();
+            }
+        }
+
+        private object _autoHomeContent;
+        public object AutoHomeContent
+        {
+            get => _autoHomeContent;
+            set
+            {
+                if (_autoHomeContent == value) return;
+                _autoHomeContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openAutoHomeDialogCommand;
+        public ICommand OpenAutoHomeDialogCommand
+        {
+            get
+            {
+                return _openAutoHomeDialogCommand ?? (_openAutoHomeDialogCommand = new RelayCommand(
+                           param => OpenAutoHomeDialog()
+                       ));
+            }
+        }
+        private void OpenAutoHomeDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    AutoHomeContent = new AutoHomeDialog();
+                    StartEnabled = true;
+                    SkyServer.AutoHomeProgressBar = 0;
+                    IsAutoHomeDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private ICommand _startAutoHomeDialogCommand;
+        public ICommand StartAutoHomeDialogCommand
+        {
+            get
+            {
+                return _startAutoHomeDialogCommand ?? (_startAutoHomeDialogCommand = new RelayCommand(
+                           param => StartAutoHomeDialog()));
+            }
+        }
+        private void StartAutoHomeDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    //start autohome
+                    StartEnabled = false;
+                    SkyServer.AutoHomeProgressBar = 0;
+                    SkyServer.AutoHomeStop = false;
+                    SkyServer.AutoHomeAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+
+        }
+
+        private ICommand _stopAutoHomeDialogCommand;
+        public ICommand StopAutoHomeDialogCommand
+        {
+            get
+            {
+                return _stopAutoHomeDialogCommand ?? (_stopAutoHomeDialogCommand = new RelayCommand(
+                           param => StopAutoHomeDialog()
+                       ));
+            }
+        }
+        private void StopAutoHomeDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    // stop autohome
+                    SkyServer.AutoHomeStop = true;
+                    StartEnabled = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private ICommand _cancelAutoHomeDialogCommand;
+        public ICommand CancelAutoHomeDialogCommand
+        {
+            get
+            {
+                return _cancelAutoHomeDialogCommand ?? (_cancelAutoHomeDialogCommand = new RelayCommand(
+                           param => CancelAutoHomeDialog()
+                       ));
+            }
+        }
+        private void CancelAutoHomeDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    // cancel autohome
+                    SkyServer.AutoHomeStop = true;
+                    IsAutoHomeDialogOpen = false;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
             }
         }
 

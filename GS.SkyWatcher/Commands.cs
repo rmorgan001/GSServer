@@ -438,7 +438,11 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// q Home position 
+        /// qx00 Home position
+        /// Send :qx000000[0D]
+        ///     =000000[0D]    if axis is CW  from home ( ie -ve ) just after home sensor trip has been reset
+        ///     =FFFFFF[0D]    CCW from home(ie +ve ) just after home sensor trip has been reset )
+        ///     =llhhLL[0D]    if sensor has tripped since reset(use :W to clear data first )
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>  
         internal long GetHomePosition(AxisId axis)
@@ -446,11 +450,12 @@ namespace GS.SkyWatcher
             var szCmd = LongToHex(0);
             var response = CmdToAxis(axis, 'q', szCmd);
             var position = StringToLong(response);
-            return position;
+            if (response == "=000000") position = -position;
+                return position;
         }
 
         /// <summary>
-        /// q Capabilities
+        /// qx01 Capabilities
         ///    :qx010000[0D]=ABCDEF[0D]  ie the bitmapped nybbles for current status
         /// A    8  not defined
         ///      4  not defined
@@ -650,7 +655,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// W on/off PPEC train
+        /// Wx01 on/off PPEC train
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="on"></param>
@@ -665,7 +670,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// W on/off PPEC
+        /// Wx03 on/off PPEC
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="on"></param>
@@ -680,7 +685,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// W on/off encoders
+        /// Wx04 Wx05 on/off encoders
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="on"></param>
@@ -695,7 +700,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// W on/off Full Current Low speed
+        /// Wx06 Wx0601 on/off Full Current Low speed
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="on"></param>
@@ -708,9 +713,9 @@ namespace GS.SkyWatcher
             }
             CmdToAxis(axis, 'W', szCmd);
         }
-        
+
         /// <summary>
-        /// W 7 Set Stride for Slewing
+        /// Wx07 Set Stride for Slewing
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         internal void SetSlewingStride(AxisId axis)  
@@ -720,7 +725,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// W 8 reset the home position index
+        /// Wx08 reset the home position index
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         internal void SetHomePositionIndex(AxisId axis)  

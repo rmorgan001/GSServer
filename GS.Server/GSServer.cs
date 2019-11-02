@@ -708,7 +708,20 @@ namespace GS.Server
                     { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message},{ex.Source},{ex.StackTrace},{ex.InnerException}"};
                 MonitorLog.LogToMonitor(monitorItem);
 
-                var str = $"Fatal error in the server: {ex.Message}";
+                var str = $"Fatal error in GS Server: {ex.Message}";
+
+                monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer: {str}, {ex.StackTrace}" };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                var exi = ex.InnerException;
+                if (ex.InnerException != null)
+                {
+                    monitorItem = new MonitorEntry
+                        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer: {exi?.InnerException?.Message}, {exi?.InnerException?.StackTrace}" };
+                    MonitorLog.LogToMonitor(monitorItem);
+                }
+
                 MessageBox.Show(str);throw;
             }
             finally

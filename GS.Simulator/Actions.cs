@@ -284,6 +284,25 @@ namespace GS.Simulator
         }
 
         /// <summary>
+        /// home sensor status
+        /// </summary>
+        /// <param name="axis"></param>
+        /// <returns></returns>
+        internal int HomeSensor(Axis axis)
+        {
+            return Convert.ToInt32(_ioserial.Send($"homesensor,{axis}"));
+        }
+
+        /// <summary>
+        /// reset home sensor
+        /// </summary>
+        /// <param name="axis"></param>
+        internal void HomeSensorReset(Axis axis)
+        {
+            _ioserial.Send($"homesensorreset,{axis}");
+        }
+
+        /// <summary>
         /// Get name
         /// </summary>
         /// <returns></returns>

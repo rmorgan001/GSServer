@@ -59,8 +59,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnFlip">Flip SOP</system:String>
     <system:String x:Key="btntipFlip">Flip Side of Pier</system:String>
     <system:String x:Key="msgHomeReset">Accept to reset mount position to the Home position</system:String>
-    <system:String x:Key="msgContinueFlip">Continue to flip mount?</system:String>
+    <system:String x:Key="msgContinueFlip">Accept to flip mount</system:String>
     <system:String x:Key="cbtipPark">Park Positions</system:String>
+    <system:String x:Key="btnAutoHome">AutoHome</system:String>
 
     <!--Bottom Status bar-->
     <system:String x:Key="tbHome">Home</system:String>
@@ -116,7 +117,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     
     <!--Backlash -->
     <system:String x:Key="sldtipBacklash">Dec Backlash</system:String>
-    <system:String x:Key="lbBacklash">Dec Backlash Compensation (Microsteps)</system:String>
+    <system:String x:Key="lbBacklash">Dec Backlash Compensate</system:String>
 
     <!--Debug bar-->
     <system:String x:Key="tbInternalX">Internal X:</system:String>
@@ -177,6 +178,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnAccept">Accept</system:String>
     <system:String x:Key="btnCancel">Cancel</system:String>
     <system:String x:Key="btnOk">Ok</system:String>
+    <system:String x:Key="btnStart">Start</system:String>
+    <system:String x:Key="btnDiaStop">Stop</system:String>
 
     <!--Synthesizer -->
     <system:String x:Key="vceParked">Parked</system:String>

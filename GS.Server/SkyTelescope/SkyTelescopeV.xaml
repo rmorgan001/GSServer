@@ -22,7 +22,7 @@
             <!--IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}"-->
             <md:DrawerHost.LeftDrawerContent>
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <Grid Width="750" Height="420" Margin="10,0,10,0" VerticalAlignment="Top" >
+                    <Grid Width="750" Height="420" Margin="10,0,10,0" VerticalAlignment="Top" IsEnabled="{Binding SettingsGridEnabled}">
                     <Grid.RowDefinitions>
                         <RowDefinition/>
                         <RowDefinition/>
@@ -353,7 +353,7 @@
                         <md:DialogHost IsOpen="{Binding IsParkDeleteDialogOpen}" DialogContent="{Binding ParkDeleteContent}">
                             <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}"
                                 Command="{Binding OpenParkDeleteDialogCommand}" Height="25" Width="25"
-                                Margin="10 0 0 0" VerticalAlignment="Center">
+                                ToolTip="Delete"  Margin="10 0 0 0" VerticalAlignment="Center">
                                 <md:PackIcon Kind="Minus" Height="22" Width="22" />
                             </Button>
                         </md:DialogHost>
@@ -560,11 +560,11 @@
                             <telescope:RaDecGoTo IsEnabled="{Binding ScreenEnabled}"/>
                             <telescope:HandController Margin="0,10,0,0" IsEnabled="{Binding ScreenEnabled}" />
                             <telescope:Backlash IsEnabled="{Binding ScreenEnabled}"/>
+                            <telescope:PpecBar IsEnabled="{Binding ScreenEnabled}"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1" >
                             <StackPanel Orientation="Vertical">
                                 <telescope:StandardButtonBar IsEnabled="{Binding ScreenEnabled}"/>
-                                <telescope:PpecBar IsEnabled="{Binding ScreenEnabled}"/>
                             </StackPanel>
                             <Border Margin="20,0,0,0" CornerRadius="5" BorderThickness="3" BorderBrush="DimGray" HorizontalAlignment="Stretch"  VerticalAlignment="Center" 
                                     Background="{DynamicResource MaterialDesignToolBarBackground}" >

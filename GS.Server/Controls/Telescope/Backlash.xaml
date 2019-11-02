@@ -7,11 +7,11 @@
              mc:Ignorable="d">
     <StackPanel Orientation="Vertical" Margin="0,5,0,0">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <Slider Minimum="0" Maximum="500" Width="200" Name="slValue" HorizontalAlignment="Left" IsSnapToTickEnabled="True" TickFrequency="1" VerticalAlignment="Center"
+            <Slider Minimum="0" Maximum="500" Width="130" Name="slValue" HorizontalAlignment="Left" IsSnapToTickEnabled="True" TickFrequency="1" VerticalAlignment="Center"
                     ToolTip="{DynamicResource sldtipBacklash}" Style="{StaticResource MaterialDesignSlider}" Value="{Binding DecBacklash, UpdateSourceTrigger=PropertyChanged, Delay=800}"/>
-            <Label HorizontalAlignment="Right" VerticalAlignment="Bottom"  Content="{Binding ElementName=slValue, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+            <Label Content="{Binding ElementName=slValue, Path=Value, UpdateSourceTrigger=PropertyChanged}" Width="33"/>
+            <Label Content="{DynamicResource lbBacklash}"/>
         </StackPanel>
-        <Label HorizontalAlignment="Center" Content="{DynamicResource lbBacklash}"/>
     </StackPanel> 
 </UserControl>
  
