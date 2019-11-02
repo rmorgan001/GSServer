@@ -15,6 +15,7 @@ GS Server is SkyWatcher ASCOM telescope driver for use with astronomy software a
 * Synthesized speach commands
 * No Sleep mode to keep screensaver off
 * Monitor driver, server, and mount data live
+* Autohome process for axes with home sensors
 
 ![Alt text](Docs/gsserver1.jpg?raw=true "GSServer")
 
@@ -123,3 +124,7 @@ Can be found at https://groups.io/g/GSS/topics
 1.0.0.17 released 9 Oct 2019
 * Added park poistions
 * Added 3d model
+
+1.0.0.18 released 1 Nov 2019
+* Added AutoHome process
+* Notes enhancements
