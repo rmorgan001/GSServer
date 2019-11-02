@@ -119,3 +119,7 @@ Can be found at https://groups.io/g/GSS/topics
 * Park Correction
 * Abort Slew Correction for tracking
 * IsSlewing correction for CCD Commander
+
+1.0.0.17 released 9 Oct 2019
+* Added park poistions
+* Added 3d model
