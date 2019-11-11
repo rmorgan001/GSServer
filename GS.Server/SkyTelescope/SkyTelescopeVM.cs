@@ -103,6 +103,7 @@ namespace GS.Server.SkyTelescope
                     SkySettings.StaticPropertyChanged += PropertyChangedSkySettings;
                     Shared.Settings.StaticPropertyChanged += PropertyChangedMonitorLog;
                     Synthesizer._staticPropertyChanged += PropertyChangedSynthesizer;
+                    Settings.Settings.StaticPropertyChanged += PropertyChangedSettings;
 
                     GuideRateOffsetXs = new List<double>(Numbers.InclusiveRange(10, 100,10));
                     GuideRateOffsetYs = new List<double>(Numbers.InclusiveRange(10, 100, 10));
@@ -115,6 +116,7 @@ namespace GS.Server.SkyTelescope
                     Seconds = new List<int>(Enumerable.Range(0, 60));
                     St4Guiderates = new List<double> {1.0, 0.75, 0.50, 0.25, 0.125};
                     Temperatures = new List<double>(Numbers.InclusiveRange(-50, 60,1.0));
+                    AutoHomeLimits = new List<int>(Enumerable.Range(20, 160));
 
                     // initial view items
                     AtPark = SkyServer.AtPark;
@@ -247,7 +249,10 @@ namespace GS.Server.SkyTelescope
                             case "Azimuth":
                                 Azimuth = _util.DegreesToDMS(SkyServer.Azimuth, "° ", ":", "", 2);
                                 break;
-                            case "DeclinationXform":
+                            case "CanPec":
+                                PecEnabled = SkyServer.CanPec;
+                                break;
+                                case "DeclinationXform":
                                  Declination = _util.DegreesToDMS(SkyServer.DeclinationXform, "° ", ":", "", 2);
                                  break;
                             case "OpenSetupDialog":
@@ -456,6 +461,45 @@ namespace GS.Server.SkyTelescope
                         {
                             case "WarningState":
                                 WarningState = MonitorQueue.WarningState;
+                                break;
+                        }
+                    });
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Property changes from option settings
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PropertyChangedSettings(object sender, PropertyChangedEventArgs e)
+        {
+            try
+            {
+                ThreadContext.BeginInvokeOnUiThread(
+                    delegate
+                    {
+                        switch (e.PropertyName)
+                        {
+                            case "AccentColor":
+                                LoadGEM();
                                 break;
                         }
                     });
@@ -2218,45 +2262,6 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private ICommand _clickMountInfoDialogCommand;
-        public ICommand ClickMountInfoDialogCommand
-        {
-            get
-            {
-                return _clickMountInfoDialogCommand ?? (_clickMountInfoDialogCommand = new RelayCommand(
-                           param => ClickMountInfoDialog()
-                       ));
-            }
-        }
-        private void ClickMountInfoDialog()
-        {
-            try
-            {
-                var msg = $"Mount: {SkyServer.MountName}" + Environment.NewLine;
-                        msg += $"Version: {SkyServer.MountVersion}" + Environment.NewLine;
-                        msg += $"StepsRa: {SkyServer.StepsPerRevolution[0]}" + Environment.NewLine;
-                        msg += $"StepsDec: {SkyServer.StepsPerRevolution[1]}" + Environment.NewLine;
-                OpenDialog(msg);
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message);
-            }
-        }
-        
         #endregion
 
         #region RA Coord GoTo Control
@@ -2544,6 +2549,18 @@ namespace GS.Server.SkyTelescope
 
         #region PPEC Control
 
+        private bool _pecEnabled;
+        public bool PecEnabled
+        {
+            get => _pecEnabled;
+            set
+            {
+                if (_pecEnabled == value) return;
+                _pecEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+
         public bool PpecOn
         {
             get => SkyServer.Pec;
@@ -2771,26 +2788,26 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private bool _nsVisability;
-        public bool NSVisability
+        private bool _nsEnabled;
+        public bool NSEnabled
         {
-            get => _nsVisability;
+            get => _nsEnabled;
             set
             {
-                if (_nsVisability == value) return;
-                _nsVisability = value;
+                if (_nsEnabled == value) return;
+                _nsEnabled = value;
                 OnPropertyChanged();
             }
         }
 
-        private bool _ewVisability;
-        public bool EWVisability
+        private bool _ewEnabled;
+        public bool EWEnabled
         {
-            get => _ewVisability;
+            get => _ewEnabled;
             set
             {
-                if (_ewVisability == value) return;
-                _ewVisability = value;
+                if (_ewEnabled == value) return;
+                _ewEnabled = value;
                 OnPropertyChanged();
             }
         }
@@ -2800,16 +2817,16 @@ namespace GS.Server.SkyTelescope
             switch (HcMode)
             {
                 case HCMode.Axes:
-                    EWVisability = true;
-                    NSVisability = true;
+                    EWEnabled = true;
+                    NSEnabled = true;
                     break;
                 //case HCMode.Compass:
                 //    EWVisability = false;
                 //    NSVisability = false;
                 //    break;
                 case HCMode.Guiding:
-                    EWVisability = false;
-                    NSVisability = false;
+                    EWEnabled = false;
+                    NSEnabled = false;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -2920,7 +2937,7 @@ namespace GS.Server.SkyTelescope
                     Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
-                StartSlew(FlipEW && EWVisability ? SlewDirection.SlewRight : SlewDirection.SlewLeft);
+                StartSlew(FlipEW && EWEnabled ? SlewDirection.SlewRight : SlewDirection.SlewLeft);
             }
             catch (Exception ex)
             {
@@ -2994,7 +3011,7 @@ namespace GS.Server.SkyTelescope
                     Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
-                StartSlew(FlipEW && EWVisability ? SlewDirection.SlewLeft : SlewDirection.SlewRight);
+                StartSlew(FlipEW && EWEnabled ? SlewDirection.SlewLeft : SlewDirection.SlewRight);
             }
             catch (Exception ex)
             {
@@ -3068,7 +3085,7 @@ namespace GS.Server.SkyTelescope
                     Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
-                StartSlew(FlipNS && NSVisability ? SlewDirection.SlewDown : SlewDirection.SlewUp);
+                StartSlew(FlipNS && NSEnabled ? SlewDirection.SlewDown : SlewDirection.SlewUp);
             }
             catch (Exception ex)
             {
@@ -3142,7 +3159,7 @@ namespace GS.Server.SkyTelescope
                     Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
-                StartSlew(FlipNS && NSVisability ? SlewDirection.SlewUp : SlewDirection.SlewDown);
+                StartSlew(FlipNS && NSEnabled ? SlewDirection.SlewUp : SlewDirection.SlewDown);
             }
             catch (Exception ex)
             {
@@ -3589,6 +3606,47 @@ namespace GS.Server.SkyTelescope
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private ICommand _clickMountInfoDialogCommand;
+        public ICommand ClickMountInfoDialogCommand
+        {
+            get
+            {
+                return _clickMountInfoDialogCommand ?? (_clickMountInfoDialogCommand = new RelayCommand(
+                           param => ClickMountInfoDialog()
+                       ));
+            }
+        }
+        private void ClickMountInfoDialog()
+        {
+            try
+            {
+                var canppec = SkyServer.CanPec ? "Supported" : "Not Supported";
+                var msg = $"Mount: {SkyServer.MountName}" + Environment.NewLine;
+                msg += $"Version: {SkyServer.MountVersion}" + Environment.NewLine;
+                msg += $"StepsRa: {SkyServer.StepsPerRevolution[0]}" + Environment.NewLine;
+                msg += $"StepsDec: {SkyServer.StepsPerRevolution[1]}" + Environment.NewLine;
+                msg += $"PPEC: {canppec}" + Environment.NewLine;
+                OpenDialog(msg);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
             }
         }
 
@@ -4447,9 +4505,28 @@ namespace GS.Server.SkyTelescope
                 var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(), gpModel);
                 var file = new Uri(filePath).LocalPath;
                 var import = new ModelImporter();
-                Material material = new DiffuseMaterial(new SolidColorBrush(Colors.Crimson));
+                var color = Colors.Crimson;
+                Material material = new DiffuseMaterial(new SolidColorBrush(color));
                 import.DefaultMaterial = material;
-                Model = import.Load(file);
+                //Model = import.Load(file);
+
+                //color object
+                var a = import.Load(file);
+                Material materialweights = new DiffuseMaterial(new SolidColorBrush(Colors.Black));
+                if (a.Children[0] is GeometryModel3D weights) weights.Material = materialweights;
+
+                var accentColor = Settings.Settings.AccentColor;
+                if (!string.IsNullOrEmpty(accentColor))
+                {
+                    // ReSharper disable once PossibleNullReferenceException
+                    color = (Color)ColorConverter.ConvertFromString(Settings.Settings.AccentColor);
+                    Material materialota = new DiffuseMaterial(new SolidColorBrush(color));
+                    if (a.Children[1] is GeometryModel3D ota) ota.Material = materialota;
+                }
+
+                Material materialbar = new DiffuseMaterial(new SolidColorBrush(Colors.Silver));
+                if (a.Children[2] is GeometryModel3D bar) bar.Material = materialbar;
+                Model = a;
 
                 Xaxis = -90;
                 Yaxis = 90;
@@ -4481,7 +4558,7 @@ namespace GS.Server.SkyTelescope
                 var compassFile = SkyServer.SouthernHemisphere ? compassS : compassN;
                 var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(), compassFile);
                 var file = new Uri(filePath).LocalPath;
-                Compass = MaterialHelper.CreateImageMaterial(file, 80);
+                Compass = MaterialHelper.CreateImageMaterial(file, 100);
             }
             catch (Exception ex)
             {
@@ -4552,6 +4629,19 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        public IList<int> AutoHomeLimits { get; }
+        private int _autoHomeLimit;
+        public int AutoHomeLimit
+        {
+            get => _autoHomeLimit;
+            set
+            {
+                if (_autoHomeLimit == value) return;
+                _autoHomeLimit = value;
+                OnPropertyChanged();
+            }
+        }
+
         private bool _isAutoHomeDialogOpen;
         public bool IsAutoHomeDialogOpen
         {
@@ -4596,6 +4686,7 @@ namespace GS.Server.SkyTelescope
                     AutoHomeContent = new AutoHomeDialog();
                     StartEnabled = true;
                     SkyServer.AutoHomeProgressBar = 0;
+                    AutoHomeLimit = 100;
                     IsAutoHomeDialogOpen = true;
                 }
             }
@@ -4637,7 +4728,7 @@ namespace GS.Server.SkyTelescope
                     StartEnabled = false;
                     SkyServer.AutoHomeProgressBar = 0;
                     SkyServer.AutoHomeStop = false;
-                    SkyServer.AutoHomeAsync();
+                    SkyServer.AutoHomeAsync(AutoHomeLimit);
                 }
             }
             catch (Exception ex)

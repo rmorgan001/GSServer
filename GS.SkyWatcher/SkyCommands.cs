@@ -2406,7 +2406,6 @@ namespace GS.SkyWatcher
         {
             try
             {
-                //skyWatcher.AxisStop(_axis);
                 skyWatcher.SetAxisPosition(_axis, BasicMath.DegToRad(_position));
                 Successful = true;
             }

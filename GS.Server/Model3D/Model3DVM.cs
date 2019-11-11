@@ -52,6 +52,7 @@ namespace GS.Server.Model3D
             MonitorLog.LogToMonitor(monitorItem);
 
             SkyServer.StaticPropertyChanged += PropertyChangedSkyServer;
+            Settings.Settings.StaticPropertyChanged += PropertyChangedSettings;
 
             LoadTopBar();
             LoadCompass();
@@ -93,6 +94,45 @@ namespace GS.Server.Model3D
                          break;
                  }
              });
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Property changes from option settings
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PropertyChangedSettings(object sender, PropertyChangedEventArgs e)
+        {
+            try
+            {
+                ThreadContext.BeginInvokeOnUiThread(
+                    delegate
+                    {
+                        switch (e.PropertyName)
+                        {
+                            case "AccentColor":
+                                LoadGEM();
+                                break;
+                        }
+                    });
             }
             catch (Exception ex)
             {
@@ -196,9 +236,30 @@ namespace GS.Server.Model3D
                 var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(), gpModel);
                 var file = new Uri(filePath).LocalPath;
                 var import = new ModelImporter();
-                Material material = new DiffuseMaterial(new SolidColorBrush(Colors.Crimson));
+                var color = Colors.Crimson;
+                Material material = new DiffuseMaterial(new SolidColorBrush(color));
                 import.DefaultMaterial = material;
-                Model = import.Load(file);
+                //Model = import.Load(file);
+
+                //color weights
+                var a = import.Load(file);
+                Material materialweights = new DiffuseMaterial(new SolidColorBrush(Colors.Black));
+                if (a.Children[0] is GeometryModel3D weights) weights.Material = materialweights;
+
+                //color OTA
+                var accentColor = Settings.Settings.AccentColor;
+                if (!string.IsNullOrEmpty(accentColor))
+                {
+                    // ReSharper disable once PossibleNullReferenceException
+                    color = (Color) ColorConverter.ConvertFromString(Settings.Settings.AccentColor);
+                    Material materialota = new DiffuseMaterial(new SolidColorBrush(color));
+                    if (a.Children[1] is GeometryModel3D ota) ota.Material = materialota;
+                }
+
+                //color weight bar
+                Material materialbar = new DiffuseMaterial(new SolidColorBrush(Colors.Silver));
+                if (a.Children[2] is GeometryModel3D bar) bar.Material = materialbar;
+                Model = a;
 
                 Xaxis = -90;
                 Yaxis = 90;
@@ -231,7 +292,7 @@ namespace GS.Server.Model3D
                 var compassFile = SkyServer.SouthernHemisphere ? compassS : compassN;
                 var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(), compassFile);
                 var file = new Uri(filePath).LocalPath;
-                Compass = MaterialHelper.CreateImageMaterial(file, 20);
+                Compass = MaterialHelper.CreateImageMaterial(file, 80);
             }
             catch (Exception ex)
             {

@@ -14,8 +14,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using System.ComponentModel;
-using System.Configuration;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -42,6 +40,7 @@ namespace GS.Shared
                 if (_serverDevice == value) return;
                 _serverDevice = value;
                 Properties.Monitor.Default.ServerDevice = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -55,6 +54,7 @@ namespace GS.Shared
                 if (_telescope == value) return;
                 _telescope = value;
                 Properties.Monitor.Default.Telescope = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -68,6 +68,7 @@ namespace GS.Shared
                 if (_information == value) return;
                 _information = value;
                 Properties.Monitor.Default.Information = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -81,6 +82,7 @@ namespace GS.Shared
                 if (_data == value) return;
                 _data = value;
                 Properties.Monitor.Default.Data = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -94,6 +96,7 @@ namespace GS.Shared
                 if (_warning == value) return;
                 _warning = value;
                 Properties.Monitor.Default.Warning = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -107,6 +110,7 @@ namespace GS.Shared
                 if (_error == value) return;
                 _error = value;
                 Properties.Monitor.Default.Error = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -120,6 +124,7 @@ namespace GS.Shared
                 if (_other == value) return;
                 _other = value;
                 Properties.Monitor.Default.Other = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -133,6 +138,7 @@ namespace GS.Shared
                 if (_driver == value) return;
                 _driver = value;
                 Properties.Monitor.Default.Driver = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -146,6 +152,7 @@ namespace GS.Shared
                 if (_interface == value) return;
                 _interface = value;
                 Properties.Monitor.Default.Interface = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -159,6 +166,7 @@ namespace GS.Shared
                 if (_server == value) return;
                 _server = value;
                 Properties.Monitor.Default.Server = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -172,6 +180,7 @@ namespace GS.Shared
                 if (_mount == value) return;
                 _mount = value;
                 Properties.Monitor.Default.Mount = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -185,6 +194,7 @@ namespace GS.Shared
                 if (_logMonitor == value) return;
                 _logMonitor = value;
                 Properties.Monitor.Default.LogMonitor = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -198,6 +208,7 @@ namespace GS.Shared
                 if (_logCharting == value) return;
                 _logCharting = value;
                 Properties.Monitor.Default.LogCharting = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -215,6 +226,7 @@ namespace GS.Shared
                 if (_logSession == value) return;
                 _logSession = value;
                 Properties.Monitor.Default.LogSession = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
             }
         }
 
@@ -227,6 +239,7 @@ namespace GS.Shared
                 if (_startMonitor == value) return;
                 _startMonitor = value;
                 Properties.Monitor.Default.StartMonitor = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -281,36 +294,21 @@ namespace GS.Shared
         }
 
         /// <summary>
-        /// output setting to the monitor for logging
+        /// output to session log
         /// </summary>
-        public static void LogSettings()
+        /// <param name="method"></param>
+        /// <param name="value"></param>
+        private static void LogSetting(string method, string value)
         {
-            var settingsProperties = Properties.Monitor.Default.Properties.OfType<SettingsProperty>().OrderBy(s => s.Name);
-            const int itemsinrow = 4;
-            var count = 0;
-            var msg = string.Empty;
-            foreach (var currentProperty in settingsProperties)
-            {
-                msg += $"{currentProperty.Name}={Properties.Monitor.Default[currentProperty.Name]},";
-                count++;
-                if (count < itemsinrow) continue;
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                count = 0;
-                msg = string.Empty;
-            }
-
-            if (msg.Length <= 0) return;
-            {
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
-                MonitorLog.LogToMonitor(monitorItem);
-            }
+            var monitorItem = new MonitorEntry
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = $"{method}", Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
+            MonitorLog.LogToMonitor(monitorItem);
         }
 
+        /// <summary>
+        /// property event notification
+        /// </summary>
+        /// <param name="propertyName"></param>
         private static void OnStaticPropertyChanged([CallerMemberName] string propertyName = null)
         {
             StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));

@@ -80,8 +80,6 @@ namespace GS.Server.Main
                         { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Loading MainWindowVM" };
                     MonitorLog.LogToMonitor(monitorItem);
 
-                    Settings.Settings.LogSettings();
-
                     AppCount = GSServer.AppCount;
                     Settings.Settings.Load();
                     if (Properties.Server.Default.StartMinimized)

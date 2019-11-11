@@ -14,8 +14,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using System.ComponentModel;
-using System.Configuration;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -42,6 +40,7 @@ namespace GS.Server.Settings
                 if (_charting == value) return;
                 _charting = value;
                 Properties.Server.Default.Charting = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -55,6 +54,7 @@ namespace GS.Server.Settings
                 if (_focuser == value) return;
                 _focuser = value;
                 Properties.Server.Default.Focuser = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -68,6 +68,7 @@ namespace GS.Server.Settings
                 if (_gamepad == value) return;
                 _gamepad = value;
                 Properties.Server.Default.Gamepad = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -81,6 +82,7 @@ namespace GS.Server.Settings
                 if (_notes == value) return;
                 _notes = value;
                 Properties.Server.Default.Notes = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -94,6 +96,7 @@ namespace GS.Server.Settings
                 if (_skyWatcher == value) return;
                 _skyWatcher = value;
                 Properties.Server.Default.SkyWatcher = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -107,6 +110,7 @@ namespace GS.Server.Settings
                 if (_model3d == value) return;
                 _model3d = value;
                 Properties.Server.Default.Model3D = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -120,6 +124,7 @@ namespace GS.Server.Settings
                 if (_sleepMode == value) return;
                 _sleepMode = value;
                 Properties.Server.Default.SleepMode = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -133,6 +138,7 @@ namespace GS.Server.Settings
                 if (_startMinimized == value) return;
                 _startMinimized = value;
                 Properties.Server.Default.StartMinimized = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -146,6 +152,7 @@ namespace GS.Server.Settings
                 if (_startOnTop == value) return;
                 _startOnTop = value;
                 Properties.Server.Default.StartOnTop = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -159,6 +166,7 @@ namespace GS.Server.Settings
                 if (_voiceActive == value) return;
                 _voiceActive = value;
                 Properties.Server.Default.VoiceActive = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -172,6 +180,7 @@ namespace GS.Server.Settings
                 if (_voiceName == value) return;
                 _voiceName = value;
                 Properties.Server.Default.VoiceName = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -185,6 +194,7 @@ namespace GS.Server.Settings
                 if (_voiceVolume == value) return;
                 _voiceVolume = value;
                 Properties.Server.Default.VoiceVolume = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -198,6 +208,7 @@ namespace GS.Server.Settings
                 if (_darkSkyKey == value) return;
                 _darkSkyKey = value;
                 Properties.Server.Default.DarkSkyKey = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -211,6 +222,7 @@ namespace GS.Server.Settings
                 if (_darkTheme == value) return;
                 _darkTheme = value;
                 Properties.Server.Default.DarkTheme = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -224,6 +236,7 @@ namespace GS.Server.Settings
                 if (_primaryColor == value) return;
                 _primaryColor = value;
                 Properties.Server.Default.PrimaryColor = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -237,6 +250,7 @@ namespace GS.Server.Settings
                 if (_accentColor == value) return;
                 _accentColor = value;
                 Properties.Server.Default.AccentColor = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -245,6 +259,9 @@ namespace GS.Server.Settings
 
         #region Methods      
 
+        /// <summary>
+        /// will upgrade if necessary
+        /// </summary>
         public static void Load()
         {
             Upgrade();
@@ -268,6 +285,9 @@ namespace GS.Server.Settings
 
         }
 
+        /// <summary>
+        /// upgrade and set new version
+        /// </summary>
         public static void Upgrade()
         {
             var assembly = Assembly.GetExecutingAssembly().GetName().Version;
@@ -279,40 +299,31 @@ namespace GS.Server.Settings
             Save();
         }
 
+        /// <summary>
+        /// save and reload
+        /// </summary>
         public static void Save()
         {
             Properties.Server.Default.Save();
             Properties.Server.Default.Reload();
         }
 
-        public static void LogSettings()
+        /// <summary>
+        /// output to session log
+        /// </summary>
+        /// <param name="method"></param>
+        /// <param name="value"></param>
+        private static void LogSetting(string method, string value)
         {
-            var settingsProperties = Properties.Server.Default.Properties.OfType<SettingsProperty>().OrderBy(s => s.Name);
-            const int itemsinrow = 4;
-            var count = 0;
-            var msg = string.Empty;
-            foreach (var currentProperty in settingsProperties)
-            {
-                msg += $"{currentProperty.Name}={Properties.Server.Default[currentProperty.Name]},";
-                count++;
-                if (count < itemsinrow) continue;
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                count = 0;
-                msg = string.Empty;
-            }
-
-            if (msg.Length <= 0) return;
-            {
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
-                MonitorLog.LogToMonitor(monitorItem);
-            }
+            var monitorItem = new MonitorEntry
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = $"{method}", Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
+            MonitorLog.LogToMonitor(monitorItem);
         }
 
+        /// <summary>
+        /// property event notification
+        /// </summary>
+        /// <param name="propertyName"></param>
         private static void OnStaticPropertyChanged([CallerMemberName] string propertyName = null)
         {
             StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));

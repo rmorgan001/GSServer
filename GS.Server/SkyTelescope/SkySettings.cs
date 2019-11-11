@@ -16,7 +16,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -46,6 +45,7 @@ namespace GS.Server.SkyTelescope
                 if (_canAlignMode == value) return;
                 _canAlignMode = value;
                 Properties.SkyTelescope.Default.CanAlignMode = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -59,6 +59,7 @@ namespace GS.Server.SkyTelescope
                 if (_canAltAz == value) return;
                 _canAltAz = value;
                 Properties.SkyTelescope.Default.CanAltAz = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -72,6 +73,7 @@ namespace GS.Server.SkyTelescope
                 if (_canDoesRefraction == value) return;
                 _canDoesRefraction = value;
                 Properties.SkyTelescope.Default.CanDoesRefraction = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -85,6 +87,7 @@ namespace GS.Server.SkyTelescope
                 if (_canDualAxisPulseGuide == value) return;
                 _canDualAxisPulseGuide = value;
                 Properties.SkyTelescope.Default.CanDualAxisPulseGuide = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -98,6 +101,7 @@ namespace GS.Server.SkyTelescope
                 if (_canEquatorial == value) return;
                 _canEquatorial = value;
                 Properties.SkyTelescope.Default.CanEquatorial = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -111,6 +115,7 @@ namespace GS.Server.SkyTelescope
                 if (_canFindHome == value) return;
                 _canFindHome = value;
                 Properties.SkyTelescope.Default.CanFindHome = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -124,6 +129,7 @@ namespace GS.Server.SkyTelescope
                 if (_canLatLongElev == value) return;
                 _canLatLongElev = value;
                 Properties.SkyTelescope.Default.CanLatLongElev = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -137,6 +143,7 @@ namespace GS.Server.SkyTelescope
                 if (_canOptics == value) return;
                 _canOptics = value;
                 Properties.SkyTelescope.Default.CanOptics = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -150,6 +157,7 @@ namespace GS.Server.SkyTelescope
                 if (_canPark == value) return;
                 _canPark = value;
                 Properties.SkyTelescope.Default.CanPark = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -163,6 +171,7 @@ namespace GS.Server.SkyTelescope
                 if (_canPulseGuide == value) return;
                 _canPulseGuide = value;
                 Properties.SkyTelescope.Default.CanPulseGuide = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -176,6 +185,7 @@ namespace GS.Server.SkyTelescope
                 if (_canSetEquRates == value) return;
                 _canSetEquRates = value;
                 Properties.SkyTelescope.Default.CanSetEquRates = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -189,6 +199,7 @@ namespace GS.Server.SkyTelescope
                 if (_canSetDeclinationRate == value) return;
                 _canSetDeclinationRate = value;
                 Properties.SkyTelescope.Default.CanSetDeclinationRate = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -202,6 +213,7 @@ namespace GS.Server.SkyTelescope
                 if (_canSetGuideRates == value) return;
                 _canSetGuideRates = value;
                 Properties.SkyTelescope.Default.CanSetGuideRates = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -215,6 +227,7 @@ namespace GS.Server.SkyTelescope
                 if (_canSetPark == value) return;
                 _canSetPark = value;
                 Properties.SkyTelescope.Default.CanSetPark = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -228,6 +241,7 @@ namespace GS.Server.SkyTelescope
                 if (_canSetPierSide == value) return;
                 _canSetPierSide = value;
                 Properties.SkyTelescope.Default.CanSetPierSide = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -241,6 +255,7 @@ namespace GS.Server.SkyTelescope
                 if (_canSetRightAscensionRate == value) return;
                 _canSetRightAscensionRate = value;
                 Properties.SkyTelescope.Default.CanSetRightAscensionRate = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -254,6 +269,7 @@ namespace GS.Server.SkyTelescope
                 if (_canSetTracking == value) return;
                 _canSetTracking = value;
                 Properties.SkyTelescope.Default.CanSetTracking = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -267,6 +283,7 @@ namespace GS.Server.SkyTelescope
                 if (_canSiderealTime == value) return;
                 _canSiderealTime = value;
                 Properties.SkyTelescope.Default.CanSiderealTime = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -280,6 +297,7 @@ namespace GS.Server.SkyTelescope
                 if (_canSlew == value) return;
                 _canSlew = value;
                 Properties.SkyTelescope.Default.CanSlew = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -293,6 +311,7 @@ namespace GS.Server.SkyTelescope
                 if (_canSlewAltAz == value) return;
                 _canSlewAltAz = value;
                 Properties.SkyTelescope.Default.CanSlewAltAz = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -306,6 +325,7 @@ namespace GS.Server.SkyTelescope
                 if (_canSlewAltAzAsync == value) return;
                 _canSlewAltAzAsync = value;
                 Properties.SkyTelescope.Default.CanSlewAltAzAsync = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -319,6 +339,7 @@ namespace GS.Server.SkyTelescope
                 if (_canSlewAsync == value) return;
                 _canSlewAsync = value;
                 Properties.SkyTelescope.Default.CanSlewAsync = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -332,6 +353,7 @@ namespace GS.Server.SkyTelescope
                 if (_canSync == value) return;
                 _canSync = value;
                 Properties.SkyTelescope.Default.CanSync = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -345,6 +367,7 @@ namespace GS.Server.SkyTelescope
                 if (_canSyncAltAz == value) return;
                 _canSyncAltAz = value;
                 Properties.SkyTelescope.Default.CanSyncAltAz = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -358,6 +381,7 @@ namespace GS.Server.SkyTelescope
                 if (_canTrackingRates == value) return;
                 _canTrackingRates = value;
                 Properties.SkyTelescope.Default.CanTrackingRates = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -371,6 +395,7 @@ namespace GS.Server.SkyTelescope
                 if (_canUnpark == value) return;
                 _canUnpark = value;
                 Properties.SkyTelescope.Default.CanUnpark = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -384,6 +409,7 @@ namespace GS.Server.SkyTelescope
                 if (_noSyncPastMeridian == value) return;
                 _noSyncPastMeridian = value;
                 Properties.SkyTelescope.Default.NoSyncPastMeridian = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -397,6 +423,7 @@ namespace GS.Server.SkyTelescope
                 if (_numMoveAxis == value) return;
                 _numMoveAxis = value;
                 Properties.SkyTelescope.Default.NumMoveAxis = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -410,6 +437,7 @@ namespace GS.Server.SkyTelescope
                 if (_versionOne == value) return;
                 _versionOne = value;
                 Properties.SkyTelescope.Default.VersionOne = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -427,6 +455,7 @@ namespace GS.Server.SkyTelescope
                 if (_alignmentMode == value) return;
                 _alignmentMode = value;
                 Properties.SkyTelescope.Default.AlignmentMode = value.ToString();
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -440,6 +469,7 @@ namespace GS.Server.SkyTelescope
                 if (_equatorialCoordinateType == value) return;
                 _equatorialCoordinateType = value;
                 Properties.SkyTelescope.Default.EquatorialCoordinateType = value.ToString();
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -453,6 +483,7 @@ namespace GS.Server.SkyTelescope
                 if (_trackingRate == value) return;
                 _trackingRate = value;
                 Properties.SkyTelescope.Default.TrackingRate = value.ToString();
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
 
                 var monitorItem = new MonitorEntry
@@ -470,10 +501,7 @@ namespace GS.Server.SkyTelescope
                 if (_hcSpeed == value) return;
                 _hcSpeed = value;
                 Properties.SkyTelescope.Default.HcSpeed = value.ToString();
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
             }
         }
 
@@ -486,10 +514,7 @@ namespace GS.Server.SkyTelescope
                 if (_hcMode == value) return;
                 _hcMode = value;
                 Properties.SkyTelescope.Default.HCMode = value.ToString();
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
             }
         }
 
@@ -502,12 +527,9 @@ namespace GS.Server.SkyTelescope
                 if (_alternatingPpec == value) return;
                 _alternatingPpec = value;
                 Properties.SkyTelescope.Default.AlternatingPPEC = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
                 SkyServer.SkyTasks(MountTaskName.AlternatingPpec);
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
@@ -520,6 +542,7 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(_apertureArea - value) < 0.0) return;
                 _apertureArea = value;
                 Properties.SkyTelescope.Default.ApertureArea = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -533,6 +556,7 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(_apertureDiameter - value) < 0.0) return;
                 _apertureDiameter = value;
                 Properties.SkyTelescope.Default.ApertureDiameter = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -546,11 +570,8 @@ namespace GS.Server.SkyTelescope
                 if (AtPark == value) return;
                 _atPark = value;
                 Properties.SkyTelescope.Default.AtPark = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem); 
             }
         }
 
@@ -563,6 +584,7 @@ namespace GS.Server.SkyTelescope
                 if (_autoTrack == value) return;
                 _autoTrack = value;
                 Properties.SkyTelescope.Default.AutoTrack = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -576,11 +598,8 @@ namespace GS.Server.SkyTelescope
                 if (DecBacklash == value) return;
                 _decBacklash = value;
                 Properties.SkyTelescope.Default.DecBacklash = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
@@ -593,12 +612,9 @@ namespace GS.Server.SkyTelescope
                 if (_decPulseToGoTo == value) return;
                 _decPulseToGoTo = value;
                 Properties.SkyTelescope.Default.DecPulseToGoTo = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
                 SkyServer.SkyTasks(MountTaskName.DecPulseToGoTo);
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
@@ -611,11 +627,8 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(_elevation - value) <= 0) return;
                 _elevation = value;
                 Properties.SkyTelescope.Default.Elevation = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
@@ -628,11 +641,8 @@ namespace GS.Server.SkyTelescope
                 if (_encoders == value) return;
                 _encoders = value;
                 Properties.SkyTelescope.Default.EncodersOn = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 SkyServer.SkyTasks(MountTaskName.Encoders);
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
@@ -645,11 +655,8 @@ namespace GS.Server.SkyTelescope
                 if (_fullCurrent == value) return;
                 _fullCurrent = value;
                 Properties.SkyTelescope.Default.FullCurrent = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 SkyServer.SkyTasks(MountTaskName.FullCurrent);
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
@@ -662,6 +669,7 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(_focalLength - value) <= 0) return;
                 _focalLength = value;
                 Properties.SkyTelescope.Default.FocalLength = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -674,6 +682,7 @@ namespace GS.Server.SkyTelescope
             {
                 _gotoPrecision = value;
                 Properties.SkyTelescope.Default.GotoPrecision = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -687,6 +696,7 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(_guideRateOffsetX - value) < 0.0) return;
                 _guideRateOffsetX = value;
                 Properties.SkyTelescope.Default.GuideRateOffsetX = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
                 SkyServer.SetGuideRates();
             }
@@ -701,6 +711,7 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(GuideRateOffsetY - value) < 0.00001) return;
                 _guideRateOffsetY = value;
                 Properties.SkyTelescope.Default.GuideRateOffsetY = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
                 SkyServer.SetGuideRates();
             }
@@ -715,6 +726,7 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(_homeAxisX - value) <= 0) return;
                 _homeAxisX = value;
                 Properties.SkyTelescope.Default.HomeAxisX = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -728,6 +740,7 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(_homeAxisY - value) <= 0) return;
                 _homeAxisY = value;
                 Properties.SkyTelescope.Default.HomeAxisY = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -741,11 +754,8 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(HourAngleLimit - value) < 0.00001) return;
                 _hourAngleLimit = value;
                 Properties.SkyTelescope.Default.HourAngleLimit = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
@@ -758,6 +768,7 @@ namespace GS.Server.SkyTelescope
                 if (_homeWarning == value) return;
                 _homeWarning = value;
                 Properties.SkyTelescope.Default.HomeWarning = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -771,6 +782,7 @@ namespace GS.Server.SkyTelescope
                 if (_instrumentDescription == value) return;
                 _instrumentDescription = value;
                 Properties.SkyTelescope.Default.InstrumentDescription = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -784,6 +796,7 @@ namespace GS.Server.SkyTelescope
                 if (_instrumentName == value) return;
                 _instrumentName = value;
                 Properties.SkyTelescope.Default.InstrumentName = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -797,12 +810,8 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(KingRate - value) < 0.0000000001) return;
                 _kingRate = value;
                 Properties.SkyTelescope.Default.KingRate = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
-
             }
         }
         
@@ -815,13 +824,8 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(Latitude - value) < 0.00001) return;
                 _latitude = value;
                 Properties.SkyTelescope.Default.Latitude = value;
-
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 SkyServer.SkyTasks(MountTaskName.SetSouthernHemisphere);
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
-
                 OnStaticPropertyChanged();
             }
         }
@@ -835,12 +839,7 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(Longitude - value) < 0.00001) return;
                 _longitude = value;
                 Properties.SkyTelescope.Default.Longitude = value;
-                OnStaticPropertyChanged();
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
-
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -854,11 +853,8 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(LunarRate - value) < 0.0000000001) return;
                 _lunarRate = value;
                 Properties.SkyTelescope.Default.LunarRate = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
@@ -871,12 +867,9 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(MaxSlewRate - value) < 0.00001) return;
                 _maxSlewRate = value;
                 Properties.SkyTelescope.Default.MaximumSlewRate = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
                 SkyServer.SetSlewRates(value);
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
@@ -889,6 +882,7 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(_parkAxisX - value) <= 0) return;
                 _parkAxisX = value;
                 Properties.SkyTelescope.Default.ParkAxisX = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -902,6 +896,7 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(_parkAxisY - value) <= 0) return;
                 _parkAxisY = value;
                 Properties.SkyTelescope.Default.ParkAxisY = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -915,11 +910,8 @@ namespace GS.Server.SkyTelescope
                 if (RaBacklash == value) return;
                 _raBacklash = value;
                 Properties.SkyTelescope.Default.RaBacklash = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
@@ -932,11 +924,8 @@ namespace GS.Server.SkyTelescope
                 if (_refraction == value) return;
                 _refraction = value;
                 Properties.SkyTelescope.Default.Refraction = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
@@ -948,6 +937,7 @@ namespace GS.Server.SkyTelescope
             {
                 if (_raTrackingOffset.Equals(value)) return;
                 _raTrackingOffset = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -961,11 +951,8 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(_siderealRate - value) < 0.0000000001) return;
                 _siderealRate = value;
                 Properties.SkyTelescope.Default.SiderealRate = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
@@ -978,6 +965,7 @@ namespace GS.Server.SkyTelescope
                 if (_displayInterval == value) return;
                 _displayInterval = value;
                 Properties.SkyTelescope.Default.DisplayInterval = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -991,12 +979,9 @@ namespace GS.Server.SkyTelescope
                 if (St4Guiderate == value) return;
                 _st4Guiderate = value;
                 Properties.SkyTelescope.Default.St4Guiderate = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
                 SkyServer.SkyTasks(MountTaskName.SetSt4Guiderate);
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
@@ -1009,11 +994,8 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(SolarRate - value) < 0.0000000001) return;
                 _solarRate = value;
                 Properties.SkyTelescope.Default.SolarRate = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
@@ -1026,6 +1008,7 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(_temperature - value) < 0) return;
                 _temperature = value;
                 Properties.SkyTelescope.Default.Temperature = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -1039,6 +1022,7 @@ namespace GS.Server.SkyTelescope
                 if (_uTCDateOffset == value) return;
                 _uTCDateOffset = value;
                 Properties.SkyTelescope.Default.UTCDateOffset = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -1053,6 +1037,7 @@ namespace GS.Server.SkyTelescope
                 _parkPositions = value.OrderBy(ParkPosition => ParkPosition.Name).ToList();
                 var output = JsonConvert.SerializeObject(_parkPositions);
                 Properties.SkyTelescope.Default.ParkPositions = output;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{output}");
                 OnStaticPropertyChanged();
             }
         }
@@ -1066,6 +1051,7 @@ namespace GS.Server.SkyTelescope
                 if (_parkName == value) return;
                 _parkName = value;
                 Properties.SkyTelescope.Default.ParkName = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -1074,6 +1060,9 @@ namespace GS.Server.SkyTelescope
 
         #region Methods
 
+        /// <summary>
+        /// will upgrade if necessary
+        /// </summary>
         public static void Load()
         {
             Upgrade();
@@ -1176,6 +1165,9 @@ namespace GS.Server.SkyTelescope
             ParkPositions = JsonConvert.DeserializeObject<List<ParkPosition>>(pp);
         }
 
+        /// <summary>
+        /// upgrade and set new version
+        /// </summary>
         public static void Upgrade()
         {
             var assembly = Assembly.GetExecutingAssembly().GetName().Version;
@@ -1187,64 +1179,31 @@ namespace GS.Server.SkyTelescope
             Save();
         }
 
+        /// <summary>
+        /// save and reload
+        /// </summary>
         public static void Save()
         {
             Properties.SkyTelescope.Default.Save();
             Properties.SkyTelescope.Default.Reload();
         }
 
-        public static void LogSettings()
+        /// <summary>
+        /// output to session log
+        /// </summary>
+        /// <param name="method"></param>
+        /// <param name="value"></param>
+        private static void LogSetting(string method, string value)
         {
-           var settingsProperties = Properties.SkyTelescope.Default.Properties.OfType<SettingsProperty>().OrderBy(s => s.Name);
-           const int itemsinrow = 4;
-            var count = 0;
-            var msg = string.Empty;
-            foreach (var currentProperty in settingsProperties)
-            {
-                msg += $"{currentProperty.Name}={Properties.SkyTelescope.Default[currentProperty.Name]},";
-                count ++;
-                if (count < itemsinrow) continue;
-
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = Principles.HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Server,
-                    Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{msg}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                count = 0;
-                msg = string.Empty;
-            }
-
-            if (msg.Length <= 0) return;
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = Principles.HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Server,
-                    Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{msg}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-            }
+            var monitorItem = new MonitorEntry
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = $"{method}", Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
+            MonitorLog.LogToMonitor(monitorItem);
         }
 
-        public static Dictionary<string,string> SettingsList()
-        {
-            var settingsProperties = Properties.SkyTelescope.Default.Properties.OfType<SettingsProperty>()
-                .OrderBy(s => s.Name);
-
-            return settingsProperties.ToDictionary(currentProperty => currentProperty.Name, currentProperty => Properties.SkyTelescope.Default[currentProperty.Name].ToString());
-        }
-
+        /// <summary>
+        /// property event notification
+        /// </summary>
+        /// <param name="propertyName"></param>
         private static void OnStaticPropertyChanged([CallerMemberName] string propertyName = null)
         {
             StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));

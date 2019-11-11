@@ -62,6 +62,11 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="msgContinueFlip">Accept to flip mount</system:String>
     <system:String x:Key="cbtipPark">Park Positions</system:String>
     <system:String x:Key="btnAutoHome">AutoHome</system:String>
+    <system:String x:Key="msgAutoHomeComplete">Auto Home Complete</system:String>
+    <system:String x:Key="msgAutoHomeStart">Start</system:String>
+    <system:String x:Key="msgAutoHomeLimit">Max degrees to move:</system:String>
+    <system:String x:Key="cbtipAutoHomeLimit">Limit in degrees</system:String>
+    <system:String x:Key="cbhintAutoHomeLimit">Degrees</system:String>
 
     <!--Bottom Status bar-->
     <system:String x:Key="tbHome">Home</system:String>
@@ -310,7 +315,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="msgParkDelete">Delete park position name?</system:String>
 
     <!--Exceptions -->
-    <system:String x:Key="exParked">Cannot track when parked</system:String>
+    <system:String x:Key="exParked">Unpark first</system:String>
 
     <!--Options Monitor -->
     <system:String x:Key="lbMonitor">Monitor</system:String>

@@ -82,6 +82,7 @@ namespace GS.Server.Charting
                             MonitorLog.LogToMonitor(monitorItem);
 
                             ChartSettings.Load();
+                            //ChartSettings.LogChartSettings();
                             LoadChart();
                             _version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 

@@ -145,7 +145,7 @@ namespace GS.SerialTester
                 counter++;
 
                 // var receivedData = IncomingData;
-                var receivedData = RecieveResponse();
+                var receivedData = ReceiveResponse();
                 receivedData = receivedData?.Trim();
                 receivedData = receivedData?.Replace("\0", string.Empty);
                 if (string.IsNullOrEmpty(receivedData))
@@ -232,7 +232,7 @@ namespace GS.SerialTester
         /// Read serial port buffer - skywatcher original source
         /// </summary>
         /// <returns></returns>
-        private string RecieveResponse()
+        private string ReceiveResponse()
         {
             // format "::e1\r=020883\r"
             var mBuffer = new StringBuilder(15);

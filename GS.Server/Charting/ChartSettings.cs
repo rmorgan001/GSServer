@@ -15,8 +15,6 @@
  */
 
 using System.ComponentModel;
-using System.Configuration;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -42,6 +40,7 @@ namespace GS.Server.Charting
                 if (_thirdColor == value) return;
                 _thirdColor = value;
                 Properties.Chart.Default.ThirdColor = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
 
             }
@@ -56,6 +55,7 @@ namespace GS.Server.Charting
                 if (_fourthColor == value) return;
                 _fourthColor = value;
                 Properties.Chart.Default.FourthColor = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -69,6 +69,7 @@ namespace GS.Server.Charting
                 if (_raColor == value) return;
                 _raColor = value;
                 Properties.Chart.Default.RaColor = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -82,6 +83,7 @@ namespace GS.Server.Charting
                 if (_decColor == value) return;
                 _decColor = value;
                 Properties.Chart.Default.DecColor = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -95,6 +97,7 @@ namespace GS.Server.Charting
                 if (_invertRa == value) return;
                 _invertRa = value;
                 Properties.Chart.Default.InvertRa = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -108,6 +111,7 @@ namespace GS.Server.Charting
                 if (_invertDec == value) return;
                 _invertDec = value;
                 Properties.Chart.Default.InvertDec = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -121,6 +125,7 @@ namespace GS.Server.Charting
                 if (_invertThird == value) return;
                 _invertThird = value;
                 Properties.Chart.Default.InvertThird = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -134,6 +139,7 @@ namespace GS.Server.Charting
                 if (_invertFourth == value) return;
                 _invertFourth = value;
                 Properties.Chart.Default.InvertFourth = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -147,6 +153,7 @@ namespace GS.Server.Charting
                 if (_raLine == value) return;
                 _raLine = value;
                 Properties.Chart.Default.RaLine = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -160,6 +167,7 @@ namespace GS.Server.Charting
                 if (_raBar == value) return;
                 _raBar = value;
                 Properties.Chart.Default.RaBar = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -173,6 +181,7 @@ namespace GS.Server.Charting
                 if (_raStep == value) return;
                 _raStep = value;
                 Properties.Chart.Default.RaStep = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -186,6 +195,7 @@ namespace GS.Server.Charting
                 if (_decLine == value) return;
                 _decLine = value;
                 Properties.Chart.Default.DecLine = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -199,6 +209,7 @@ namespace GS.Server.Charting
                 if (_decBar == value) return;
                 _decBar = value;
                 Properties.Chart.Default.DecBar = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -212,6 +223,7 @@ namespace GS.Server.Charting
                 if (_decStep == value) return;
                 _decStep = value;
                 Properties.Chart.Default.DecStep = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -225,6 +237,7 @@ namespace GS.Server.Charting
                 if (_thirdLine == value) return;
                 _thirdLine = value;
                 Properties.Chart.Default.ThirdLine = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -238,6 +251,7 @@ namespace GS.Server.Charting
                 if (_thirdBar == value) return;
                 _thirdBar = value;
                 Properties.Chart.Default.ThirdBar = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -251,6 +265,7 @@ namespace GS.Server.Charting
                 if (_thirdStep == value) return;
                 _thirdStep = value;
                 Properties.Chart.Default.ThirdStep = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -264,6 +279,7 @@ namespace GS.Server.Charting
                 if (_fourthLine == value) return;
                 _fourthLine = value;
                 Properties.Chart.Default.FourthLine = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -277,6 +293,7 @@ namespace GS.Server.Charting
                 if (_fourthBar == value) return;
                 _fourthBar = value;
                 Properties.Chart.Default.FourthBar = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -290,6 +307,7 @@ namespace GS.Server.Charting
                 if (_fourthStep == value) return;
                 _fourthStep = value;
                 Properties.Chart.Default.FourthStep = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -303,6 +321,7 @@ namespace GS.Server.Charting
                 if (_phdHostText == value) return;
                 _phdHostText = value;
                 Properties.Chart.Default.PhdHostText = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -316,7 +335,7 @@ namespace GS.Server.Charting
                 if (_showInArcseconds == value) return;
                 _showInArcseconds = value;
                 Properties.Chart.Default.ShowInArcseconds = value;
-                //SetChartName();
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -330,6 +349,7 @@ namespace GS.Server.Charting
                 if (_baseIndexPosition == value) return;
                 _baseIndexPosition = value;
                 Properties.Chart.Default.BaseIndexPosition = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -343,6 +363,7 @@ namespace GS.Server.Charting
                 if (_disableAnimations == value) return;
                 _disableAnimations = value;
                 Properties.Chart.Default.DisableAnimations = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -356,6 +377,7 @@ namespace GS.Server.Charting
                 if (_axisMinSeconds == value) return;
                 _axisMinSeconds = value;
                 Properties.Chart.Default.AxisMinSeconds = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -369,7 +391,7 @@ namespace GS.Server.Charting
                 if (_animationTime == value) return;
                 _animationTime = value;
                 Properties.Chart.Default.AnimationTime = value;
-               // AnimationsSpeed = TimeSpan.FromMilliseconds(value * 100);
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -383,6 +405,7 @@ namespace GS.Server.Charting
                 if (_lineSmoothness == value) return;
                 _lineSmoothness = value;
                 Properties.Chart.Default.LineSmoothness = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -447,38 +470,19 @@ namespace GS.Server.Charting
         }
 
         /// <summary>
-        /// output setting to the monitor for logging
+        /// output to session log
         /// </summary>
-        public static void LogSettings()
+        /// <param name="method"></param>
+        /// <param name="value"></param>
+        private static void LogSetting(string method, string value)
         {
-            var settingsProperties = Properties.Chart.Default.Properties.OfType<SettingsProperty>().OrderBy(s => s.Name);
-            const int itemsinrow = 4;
-            var count = 0;
-            var msg = string.Empty;
-            foreach (var currentProperty in settingsProperties)
-            {
-                msg += $"{currentProperty.Name}={Properties.Chart.Default[currentProperty.Name]},";
-                count++;
-                if (count < itemsinrow) continue;
-
-                var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                count = 0;
-                msg = string.Empty;
-            }
-
-            if (msg.Length <= 0) return;
-            {
-                var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
-                MonitorLog.LogToMonitor(monitorItem);
-            }
+            var monitorItem = new MonitorEntry
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = $"{method}", Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
+            MonitorLog.LogToMonitor(monitorItem);
         }
 
         /// <summary>
-        /// 
+        /// property event notification
         /// </summary>
         /// <param name="propertyName"></param>
         private static void OnStaticPropertyChanged([CallerMemberName] string propertyName = null)

@@ -20,7 +20,8 @@ namespace ColorPicker
         #region Public Properties
         public Color SelectedColor
         {
-            get { return colorPicker.SelectedColor; }
+            get => colorPicker.SelectedColor;
+            set => colorPicker.SelectedColor = value;
         }
         #endregion
 

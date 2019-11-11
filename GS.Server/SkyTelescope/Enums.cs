@@ -79,6 +79,7 @@ namespace GS.Server.SkyTelescope
         public enum MountTaskName
         {
             AlternatingPpec,
+            CanPpec,
             DecPulseToGoTo,
             Encoders,
             FullCurrent,

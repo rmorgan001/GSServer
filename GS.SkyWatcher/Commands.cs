@@ -768,7 +768,7 @@ namespace GS.SkyWatcher
                                 // send the request
                                 var cmdData = SendRequest(axis, command, cmdDataStr);
                                 // receive the response
-                                responseString = RecieveResponse(axis, command, cmdData);
+                                responseString = ReceiveResponse(axis, command, cmdData);
                                 if (!string.IsNullOrEmpty(responseString)) break;
                                 _retryCount++;
 
@@ -950,7 +950,7 @@ namespace GS.SkyWatcher
         /// Read serial port buffer - skywatcher original source
         /// </summary>
         /// <returns></returns>
-        private string RecieveResponse()
+        private string ReceiveResponse()
         {
             // format "::e1\r=020883\r"
             var mBuffer = new StringBuilder(15);
@@ -978,7 +978,7 @@ namespace GS.SkyWatcher
         /// Constructs a string from the responce
         /// </summary>
         /// <returns></returns>
-        private string RecieveResponse(AxisId axis, char command, string cmdDataStr)
+        private string ReceiveResponse(AxisId axis, char command, string cmdDataStr)
         {
             //var sw  = Stopwatch.StartNew();
             //while (sw.Elapsed.TotalMilliseconds < 1000)
@@ -1000,7 +1000,7 @@ namespace GS.SkyWatcher
             //}
             //sw.Stop();
 
-            var receivedData = RecieveResponse();
+            var receivedData = ReceiveResponse();
 
             var monitorItem = new MonitorEntry
                 { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{cmdDataStr},{receivedData}" };

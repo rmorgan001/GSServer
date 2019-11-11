@@ -53,6 +53,7 @@ namespace GS.Server.Gamepad
                 GamepadSettings.Load();
                 SkyTelescope();
                 Settings();
+                //GamepadSettings.LogGamepadSettings();
                 IsGamepadRunning = GamepadSettings.Startup;
             }
             catch (Exception ex)

@@ -54,15 +54,13 @@ namespace ColorPicker
         public Color SelectedColor
         {
             get => selectedColor;
-            private set
+            set
             {
-                if (selectedColor != value)
-                {
-                    selectedColor = value;
-                    CreateAlphaLinearBrush();
-                    UpdateTextBoxes();
-                    UpdateInk();
-                }
+                if (selectedColor == value) return;
+                selectedColor = value;
+                CreateAlphaLinearBrush();
+                UpdateTextBoxes();
+                UpdateInk();
             }
         }
         #endregion
@@ -73,7 +71,7 @@ namespace ColorPicker
         /// </summary>
         private void ColorPicker_Loaded(object sender, RoutedEventArgs e)
         {
-            SelectedColor = Colors.Black;
+            //SelectedColor = Colors.Black;
         }
 
         /// <summary>

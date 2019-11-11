@@ -58,9 +58,7 @@
                         <Button Padding="2" Command="Open" ToolTip="{DynamicResource btntipNOpen}"><md:PackIcon Kind="FileDocumentOutline"/></Button>
                         <Button Padding="2" Command="Save" ToolTip="{DynamicResource btntipNSave}"><md:PackIcon Kind="ContentSave"/></Button>
                         <Button Padding="2" Command="SaveAs" ToolTip="{DynamicResource btntipNSaveAs}"><md:PackIcon Kind="FileReplace"/></Button>
-                        <Button Name="btPrint" Padding="2" ToolTip="{DynamicResource btntipNPrint}" Click="BtPrint_OnClick">
-                                        <md:PackIcon Kind="Printer"/>
-                                    </Button>
+                        <Button Name="btPrint" Padding="2" ToolTip="{DynamicResource btntipNPrint}" Click="BtPrint_OnClick"><md:PackIcon Kind="Printer"/></Button>
                         <Button Padding="2" Command="Cut" ToolTip="{DynamicResource btntipNCut}" ToolBar.OverflowMode="AsNeeded"><md:PackIcon Kind="ContentCut"/></Button>
                         <Button Padding="2" Command="Copy" ToolTip="{DynamicResource btntipNCopy}" ToolBar.OverflowMode="AsNeeded"><md:PackIcon Kind="ContentCopy"/></Button>
                         <Button Padding="2" Command="Paste" ToolTip="{DynamicResource btntipNPaste}" ToolBar.OverflowMode="AsNeeded">
@@ -175,7 +173,7 @@
             </md:ColorZone>
             <RichTextBox Grid.Row="2" x:Name="rtbEditor" AcceptsTab="True" AcceptsReturn="True" SpellCheck.IsEnabled="False" 
                          FontFamily="Segoe UI" FontSize="14" VerticalScrollBarVisibility="Auto" Unloaded="RtbEditor_OnUnloaded" TextOptions.TextFormattingMode="Display"
-                             TextOptions.TextRenderingMode="Auto"  MinHeight="200" MinWidth="700" Foreground="{DynamicResource MaterialDesignBody}"
+                             TextOptions.TextRenderingMode="Auto"  MinHeight="200" MinWidth="700" Foreground="{DynamicResource MaterialDesignBody}" 
                              KeyDown="RtbEditor_OnKeyDown" SelectionChanged="RtbEditor_SelectionChanged" Background="{DynamicResource MaterialDesignPaper}"/>
         </Grid>
     <!--</md:DrawerHost>-->

@@ -48,6 +48,18 @@ namespace GS.Server.Helpers
             }
         }
 
+        private static bool _voicePause;
+        internal static bool VoicePause
+        {
+            get => _voicePause;
+            set
+            {
+                if (_voicePause == value) return;
+                _voicePause = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static bool VoiceValid
         {
             get
@@ -93,6 +105,7 @@ namespace GS.Server.Helpers
             _synthesizer.SpeakCompleted += Synthesizer_SpeakCompleted;
             GetVoices();
             if (!VoiceValid) VoiceActive = false;
+            VoicePause = false;
         }
 
         public static void Speak(string text)
@@ -101,6 +114,7 @@ namespace GS.Server.Helpers
             {
                 if (!VoiceValid) return;
                 if (!VoiceActive) return;
+                if (VoicePause) return;
                 _synthesizer.SelectVoice(VoiceName);
                 _synthesizer.Rate = Rate;
                 _synthesizer.Volume = Volume;
@@ -122,6 +136,7 @@ namespace GS.Server.Helpers
             {
                 if (!VoiceValid) return;
                 if (!VoiceActive) return;
+                if (VoicePause) return;
                 _synthesizer.SelectVoice(VoiceName);
                 _synthesizer.Rate = Rate;
                 _synthesizer.Volume = Volume;

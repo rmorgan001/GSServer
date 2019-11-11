@@ -305,7 +305,8 @@ namespace GS.Principles
             {
                 if (_disposed)
                 {
-                    throw new ObjectDisposedException("Timer");
+                    return;
+                    // throw new ObjectDisposedException("Timer");
                 }
 
                 if (value < Capabilities.periodMin || value > Capabilities.periodMax)

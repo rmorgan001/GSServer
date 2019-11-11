@@ -6,8 +6,20 @@
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d">
-    <StackPanel Orientation="Horizontal"  VerticalAlignment="Center" HorizontalAlignment="Center">
-            <ToggleButton Width="20" Height="20" ToolTip="{DynamicResource tbOnOff}" Style="{StaticResource MaterialDesignActionLightToggleButton}"
+    <StackPanel Orientation="Horizontal"  VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding PecEnabled}">
+        <StackPanel.Style>
+            <Style TargetType="StackPanel">
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.3" />
+                    </Trigger>
+                    <Trigger Property="IsEnabled" Value="True">
+                        <Setter Property="Opacity" Value="1" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </StackPanel.Style>
+        <ToggleButton Width="20" Height="20" ToolTip="{DynamicResource tbOnOff}" Style="{StaticResource MaterialDesignActionLightToggleButton}"
                           IsChecked="{Binding PpecOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Label Content="{DynamicResource lbPpec}"/>
             <md:DialogHost Margin="5,0,0,0" CloseOnClickAway="True" IsOpen="{Binding IsPpecDialogOpen}" DialogContent="{Binding PpecContent}">

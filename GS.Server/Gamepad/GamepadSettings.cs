@@ -20,6 +20,8 @@ using System.Configuration;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using GS.Shared;
 
 namespace GS.Server.Gamepad
 {
@@ -41,6 +43,7 @@ namespace GS.Server.Gamepad
                 if (_startup == value) return;
                 _startup = value;
                 Properties.Gamepad.Default.Startup = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -54,11 +57,11 @@ namespace GS.Server.Gamepad
                 if (_delay == value) return;
                 _delay = value;
                 Properties.Gamepad.Default.Delay = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
-
-
+        
         /// <summary>
         /// will upgrade if necessary
         /// </summary>
@@ -93,6 +96,10 @@ namespace GS.Server.Gamepad
             Properties.Gamepad.Default.Reload();
         }
 
+        /// <summary>
+        /// store for the gamepad keys
+        /// </summary>
+        /// <returns></returns>
         public static Dictionary<string, string> LoadSettings()
         {
             var settingsDict = new Dictionary<string, string>();
@@ -112,11 +119,28 @@ namespace GS.Server.Gamepad
                 var data = Properties.Gamepad.Default.GetType().GetProperty(currentProperty.Name)?.GetValue(Properties.Gamepad.Default, null);
                 if (data != null) val = data.ToString();
                 settingsDict.Add(key, val);
+                LogSetting("Gamepad", $"{key} {val}");
             }
 
             return settingsDict;
         }
 
+        /// <summary>
+        /// output to session log
+        /// </summary>
+        /// <param name="method"></param>
+        /// <param name="value"></param>
+        private static void LogSetting(string method, string value)
+        {
+            var monitorItem = new MonitorEntry
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = $"{method}", Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
+            MonitorLog.LogToMonitor(monitorItem);
+        }
+
+        /// <summary>
+        /// output gamepad keys to settings
+        /// </summary>
+        /// <param name="settingsDict"></param>
         public static void SaveSettings( Dictionary<string, string> settingsDict)
         {
             if (settingsDict == null) return;
@@ -126,45 +150,61 @@ namespace GS.Server.Gamepad
                 {
                     case "tracking":
                         Properties.Gamepad.Default.tracking = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"tracking {setting.Value}");
                         break;
                     case "stop":
                         Properties.Gamepad.Default.stop = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"stop {setting.Value}");
                         break;
                     case "park":
                         Properties.Gamepad.Default.park = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"park {setting.Value}");
                         break;
                     case "home":
                         Properties.Gamepad.Default.home = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"home {setting.Value}");
                         break;
                     case "speeddown":
                         Properties.Gamepad.Default.speeddown = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"speeddown {setting.Value}");
                         break;
                     case "speedup":
                         Properties.Gamepad.Default.speedup = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"speedup {setting.Value}");
                         break;
                     case "up":
                         Properties.Gamepad.Default.up = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"up {setting.Value}");
                         break;
                     case "down":
                         Properties.Gamepad.Default.down = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"down {setting.Value}");
                         break;
                     case "left":
                         Properties.Gamepad.Default.left = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"left {setting.Value}");
                         break;
                     case "right":
                         Properties.Gamepad.Default.right = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"right {setting.Value}");
                         break;
                     case "volumedown":
                         Properties.Gamepad.Default.volumedown = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"volumedown {setting.Value}");
                         break;
                     case "volumeup":
                         Properties.Gamepad.Default.volumeup = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"volumeup {setting.Value}");
                         break;
                 }
             }
             Save();
         }
 
+        /// <summary>
+        /// property event notification
+        /// </summary>
+        /// <param name="propertyName"></param>
         private static void OnStaticPropertyChanged([CallerMemberName] string propertyName = null)
         {
             StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));

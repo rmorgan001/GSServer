@@ -9,9 +9,6 @@
              xmlns:domain="clr-namespace:GS.Server.Domain"
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d"  d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
-    <UserControl.Resources>
-        <BooleanToVisibilityConverter  x:Key="BoolToVis"/>
-    </UserControl.Resources>
     <Border Margin="0,0,10,0" BorderBrush="DimGray"  BorderThickness="3" CornerRadius="5" Background="{DynamicResource MaterialDesignToolBarBackground}">
         <Grid Width="250" Height="175">
         <Grid.RowDefinitions>
@@ -76,14 +73,38 @@
                     Orientation="Vertical" Minimum="1" Maximum="8" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" 
                     Value="{Binding HcSpeed, Mode=TwoWay, Delay=800}" ToolTip="{DynamicResource sltipSpeed}"/>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,-5" Visibility="{Binding NSVisability, Converter={StaticResource BoolToVis}}">
-                <ToggleButton HorizontalAlignment="Center" Width="20" Height="10" ToolTip="{DynamicResource tbtntipFlipNS}"
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,-5" IsEnabled="{Binding NSEnabled}">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.3" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="True">
+                                    <Setter Property="Opacity" Value="1" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <ToggleButton HorizontalAlignment="Center" Width="20" Height="10" ToolTip="{DynamicResource tbtntipFlipNS}"
                               Style="{StaticResource MaterialDesignSwitchToggleButton}"
                               IsChecked="{Binding FlipNS, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{DynamicResource lbFlipNS}"/>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="0,-5,0,0" Visibility="{Binding EWVisability, Converter={StaticResource BoolToVis}}">
-                <ToggleButton HorizontalAlignment="Center" Width="20" Height="10"
+                <StackPanel Orientation="Horizontal" Margin="0,-5,0,0"  IsEnabled="{Binding EWEnabled}">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.3" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="True">
+                                <Setter Property="Opacity" Value="1" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                    <ToggleButton HorizontalAlignment="Center" Width="20" Height="10"
                               Style="{StaticResource MaterialDesignSwitchToggleButton}" ToolTip="{DynamicResource tbtntipFlipEW}"
                               IsChecked="{Binding FlipEW, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{DynamicResource lbFlipEW}"/>

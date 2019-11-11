@@ -130,7 +130,20 @@ namespace GS.Server.AutoHome
         /// <param name="axis"></param>
         private void ResetHomeSensor(AxisId axis)
         {
-            var _ = new SkySetHomePositionIndex(0, axis);
+            var reset = new SkySetHomePositionIndex(SkyQueue.NewId, axis);
+            //var _ = (long)SkyQueue.GetCommandResult(reset).Result;
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod().Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{reset.Successful},{axis}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
         }
 
         /// <summary>
@@ -144,22 +157,48 @@ namespace GS.Server.AutoHome
             var _ = new SkyAxisStop(0, axis);
             if (SkyServer.Tracking) SkyServer.Tracking = false;
             //StartCount = GetEncoderCount(axis);
-            const double degrees = 5.0;
             var totalmove = 0.0;
             // ReSharper disable once RedundantAssignment
             var clockwise = false;
+            var startovers = 0;
             bool? status;
-            int slew;
+            bool? loopstatus = null;
             SkyServer.AutoHomeProgressBar += 5;
 
+            // slew away from those that start at home position
+            var slew = SlewAxis(3.3, axis);
+            totalmove += 3.3;
+            if (slew != 0) return slew;
+
+
             #region 5 degree loops to look for sensor
-            for (var i = 0; i < 20; i++)
+            for (var i = 0; i <= (maxmove / 5); i++)
             {
                 if (SkyServer.AutoHomeStop) return -3; //stop requested
-                
+                if (totalmove >= maxmove) return -2; // home not found
+                if (startovers >= 2) return -4; // too many restarts
+
                 status = GetValidStatus(axis);
-                
                 var laststatus = status;
+                // check status last loop vs this loop and see if status changed
+                if (status != null && loopstatus != null) // home not found and not first loop
+                {
+                    if (status != loopstatus) // status changed but no detection of home
+                    {
+                        slew = SlewAxis(2.7, axis, clockwise); //slew 5 degrees
+                        if (slew != 0) return slew;
+                        status = GetHomeSensorStatus(axis); // check sensor
+                        if (status != null)
+                        {
+                            i = 0;
+                            //totalmove = 0.0;
+                            startovers++;
+                            continue; //start over
+                        }
+                        break; //found home
+                    }
+                    if (totalmove >= maxmove) return -2; // home not found
+                }
                 switch (status)
                 {
                     case null:
@@ -174,32 +213,31 @@ namespace GS.Server.AutoHome
 
                 SkyServer.AutoHomeProgressBar += 1;
 
-                slew = SlewAxis(degrees, axis, clockwise); //slew 5 degrees
+                slew = SlewAxis(5.0, axis, clockwise); //slew 5 degrees
                 if (slew != 0) return slew;
-                totalmove += Math.Abs(degrees); // keep track of how far moved
+                totalmove += 5.0; // keep track of how far moved
                 status = GetHomeSensorStatus(axis); // check sensor
+                loopstatus = status;
                 if (status != null) // home not found
                 {
-                    if (status != laststatus) // status changed but no detection of home
+                    if (status == laststatus) continue;
+                    slew = SlewAxis(2.5, axis, clockwise); //slew 5 degrees
+                    if (slew != 0) return slew;
+                    status = GetHomeSensorStatus(axis); // check sensor
+                    loopstatus = status;
+                    if (status != null)
                     {
-                        slew = SlewAxis(degrees + 2.5, axis, clockwise); //slew 5 degrees
-                        if (slew != 0) return slew;
-                        status = GetHomeSensorStatus(axis); // check sensor
-                        if (status != null)
-                        {
-                            i = 0;
-                            totalmove = 0.0;
-                            continue; //start over
-                        }
-                        break; //found home
+                        i = 0;
+                        //totalmove = 0.0;
+                        startovers++;
+                        continue; //start over
                     }
-                    if (totalmove >= maxmove) return -2; // home not found
                 }
-                else
-                {
-                    break;//found home
-                } 
+                break;//found home
             }
+            if (SkyServer.AutoHomeStop) return -3; //stop requested
+            if (totalmove >= maxmove) return -2; // home not found
+            if (startovers >= 2) return -4; // too many restarts
             #endregion
 
             #region slew to detected home
@@ -293,13 +331,13 @@ namespace GS.Server.AutoHome
 
             while (SkyServer.IsSlewing)
             {
-                Console.WriteLine(@"slewing");
-                Thread.Sleep(100);
+                //Console.WriteLine(@"slewing");
+                Thread.Sleep(300);
             }
 
             var _ = new SkyAxisStop(0, axis);
 
-            Thread.Sleep(1500);
+            //Thread.Sleep(1500);
             return 0;
         }
 
@@ -336,8 +374,7 @@ namespace GS.Server.AutoHome
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
             }
-
-
+            
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
@@ -353,13 +390,12 @@ namespace GS.Server.AutoHome
             while (SkyServer.IsSlewing)
             {
                 //Console.WriteLine(@"slewing");
-                Thread.Sleep(100);
+                Thread.Sleep(300);
             }
 
             var _ = new SkyAxisStop(0, axis);
-            SkyServer.TrackingSpeak = true;
 
-            Thread.Sleep(1500);
+            //Thread.Sleep(1500);
             return 0;
         }
     }

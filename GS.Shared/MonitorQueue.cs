@@ -227,7 +227,7 @@ namespace GS.Shared
                 entry.Type != MonitorType.Data) return;
             switch (entry.Method)
             {
-                case "RecieveResponse": // skywatcher
+                case "ReceiveResponse": // skywatcher
                     if (entry.Message.Contains(":j1"))
                     {
                         var msg = entry.Message.Split(',');
