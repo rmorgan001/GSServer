@@ -19,7 +19,7 @@ You can download the installable version at https://groups.io/g/GSS/files . loca
 * Monitor driver, server, and mount data live
 * Autohome process for axes with home sensors
 
-![Alt text](Docs/gsserver1.jpg?raw=true "GSServer")
+![Alt text](Docs/gsserver2.jpg?raw=true "GSServer")
 
 Installable version at https://groups.io/g/GSS/files .  located in the files section.
 
