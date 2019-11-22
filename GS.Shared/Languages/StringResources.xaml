@@ -67,6 +67,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="msgAutoHomeLimit">Max degrees to move:</system:String>
     <system:String x:Key="cbtipAutoHomeLimit">Limit in degrees</system:String>
     <system:String x:Key="cbhintAutoHomeLimit">Degrees</system:String>
+    <system:String x:Key="msgDecOffset">Side Saddle Offset:</system:String>
+    <system:String x:Key="cbhintDecOffset">Degrees</system:String>
 
     <!--Bottom Status bar-->
     <system:String x:Key="tbHome">Home</system:String>

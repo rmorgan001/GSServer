@@ -53,7 +53,7 @@ namespace GS.Server.SkyTelescope
         internal static double[] AxesAppToMount(double[] axes)
         {
             var a = new[] { axes[0], axes[1] };
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
                     if (SkyServer.SouthernHemisphere)
@@ -96,7 +96,7 @@ namespace GS.Server.SkyTelescope
         internal static double[] AxesMountToApp(double[] axes)
         {
             var a = new[] { axes[0], axes[1] };
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
                     if (SkyServer.SouthernHemisphere)

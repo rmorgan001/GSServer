@@ -117,6 +117,7 @@ namespace GS.Server.SkyTelescope
                     St4Guiderates = new List<double> {1.0, 0.75, 0.50, 0.25, 0.125};
                     Temperatures = new List<double>(Numbers.InclusiveRange(-50, 60,1.0));
                     AutoHomeLimits = new List<int>(Enumerable.Range(20, 160));
+                    DecOffsets = new List<int>(){0, -90, 90};
 
                     // initial view items
                     AtPark = SkyServer.AtPark;
@@ -207,6 +208,9 @@ namespace GS.Server.SkyTelescope
                      case "ParkPositions":
                          OnPropertyChanged($"ParkPositions");
                          break;
+                     case "DecBacklash":
+                         DecBacklash = SkySettings.DecBacklash;
+                         break;
                  }
              });
             }
@@ -252,9 +256,12 @@ namespace GS.Server.SkyTelescope
                             case "CanPec":
                                 PecEnabled = SkyServer.CanPec;
                                 break;
-                                case "DeclinationXform":
+                            case "DeclinationXform":
                                  Declination = _util.DegreesToDMS(SkyServer.DeclinationXform, "° ", ":", "", 2);
                                  break;
+                            case "CanHomeSensor":
+                                AutoHomeEnabled = SkyServer.CanHomeSensor;
+                                break;
                             case "OpenSetupDialog":
                                 OpenSetupDialog = SkyServer.OpenSetupDialog;
                                 break;
@@ -611,22 +618,22 @@ namespace GS.Server.SkyTelescope
         }
         public int ComPort
         {
-            get => SkySystem.ComPort;
+            get => SkySettings.ComPort;
             set
             {
-                if (value == SkySystem.ComPort) return;
-                SkySystem.ComPort = value;
+                if (value == SkySettings.ComPort) return;
+                SkySettings.ComPort = value;
                 OnPropertyChanged();
             }
         }
 
         public SerialSpeed BaudRate
         {
-            get => SkySystem.BaudRate;
+            get => SkySettings.BaudRate;
             set
             {
-                if (value == SkySystem.BaudRate) return;
-                SkySystem.BaudRate = value;
+                if (value == SkySettings.BaudRate) return;
+                SkySettings.BaudRate = value;
                 OnPropertyChanged();
             }
         }
@@ -671,11 +678,14 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private int _decBacklash;
         public int DecBacklash
         {
-            get => SkySettings.DecBacklash;
+            get => _decBacklash;
             set
             {
+                if (_decBacklash == value) return;
+                _decBacklash = value;
                 SkySettings.DecBacklash = value;
                 OnPropertyChanged();
             }
@@ -783,11 +793,11 @@ namespace GS.Server.SkyTelescope
 
         public MountType Mount
         {
-            get => SkySystem.Mount;
+            get => SkySettings.Mount;
             set
             {
-                if (value == SkySystem.Mount) return;
-                SkySystem.Mount = value;
+                if (value == SkySettings.Mount) return;
+                SkySettings.Mount = value;
                 OnPropertyChanged();
             }
         }
@@ -3583,7 +3593,7 @@ namespace GS.Server.SkyTelescope
             if (SkyServer.AtPark ) return;
             if (!SkySettings.HomeWarning) return;
 
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
                     break;
@@ -3624,11 +3634,13 @@ namespace GS.Server.SkyTelescope
             try
             {
                 var canppec = SkyServer.CanPec ? "Supported" : "Not Supported";
+                var canhome = SkyServer.CanHomeSensor ? "Supported" : "Not Supported";
                 var msg = $"Mount: {SkyServer.MountName}" + Environment.NewLine;
                 msg += $"Version: {SkyServer.MountVersion}" + Environment.NewLine;
                 msg += $"StepsRa: {SkyServer.StepsPerRevolution[0]}" + Environment.NewLine;
                 msg += $"StepsDec: {SkyServer.StepsPerRevolution[1]}" + Environment.NewLine;
                 msg += $"PPEC: {canppec}" + Environment.NewLine;
+                msg += $"Home Sensor: {canhome}" + Environment.NewLine;
                 OpenDialog(msg);
             }
             catch (Exception ex)
@@ -4581,7 +4593,7 @@ namespace GS.Server.SkyTelescope
         {
             if (!ModelOn) return;
 
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
                     Yaxis = Math.Round(SkyServer.ActualAxisX, 3);
@@ -4599,6 +4611,18 @@ namespace GS.Server.SkyTelescope
         #endregion
 
         #region AutoHome Dialog
+
+        private bool _autohomeEnabled;
+        public bool AutoHomeEnabled
+        {
+            get => _autohomeEnabled;
+            set
+            {
+                if (_autohomeEnabled == value) return;
+                _autohomeEnabled = value;
+                OnPropertyChanged();
+            }
+        }
 
         private bool _startEnabled;
         public bool StartEnabled
@@ -4625,6 +4649,19 @@ namespace GS.Server.SkyTelescope
                     IsAutoHomeDialogOpen = false;
                     SkyServer.AutoHomeProgressBar = 0;
                 }
+                OnPropertyChanged();
+            }
+        }
+
+        public IList<int> DecOffsets { get; }
+        private int _decoffset;
+        public int DecOffset
+        {
+            get => _decoffset;
+            set
+            {
+                if (_decoffset == value) return;
+                _decoffset = value;
                 OnPropertyChanged();
             }
         }
@@ -4683,6 +4720,11 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
+                    if (!SkyServer.CanHomeSensor)
+                    {
+                        OpenDialog("Mount doesn't support a home sensor");
+                        return;
+                    }
                     AutoHomeContent = new AutoHomeDialog();
                     StartEnabled = true;
                     SkyServer.AutoHomeProgressBar = 0;
@@ -4728,7 +4770,7 @@ namespace GS.Server.SkyTelescope
                     StartEnabled = false;
                     SkyServer.AutoHomeProgressBar = 0;
                     SkyServer.AutoHomeStop = false;
-                    SkyServer.AutoHomeAsync(AutoHomeLimit);
+                    SkyServer.AutoHomeAsync(AutoHomeLimit,DecOffset);
                 }
             }
             catch (Exception ex)

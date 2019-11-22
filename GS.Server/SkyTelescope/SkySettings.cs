@@ -16,11 +16,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO.Ports;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using ASCOM.DeviceInterface;
+using ASCOM.Utilities;
 using GS.Shared;
 using Newtonsoft.Json;
 
@@ -96,7 +98,7 @@ namespace GS.Server.SkyTelescope
         public static bool CanEquatorial
         {
             get => _canEquatorial;
-            set
+            private set
             {
                 if (_canEquatorial == value) return;
                 _canEquatorial = value;
@@ -236,7 +238,7 @@ namespace GS.Server.SkyTelescope
         public static bool CanSetPierSide
         {
             get => _canSetPierSide;
-            set
+            private set
             {
                 if (_canSetPierSide == value) return;
                 _canSetPierSide = value;
@@ -460,6 +462,19 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static SerialSpeed _baudRate;
+        public static SerialSpeed BaudRate
+        {
+            get => _baudRate;
+            set
+            {
+                if (_baudRate == value) return;
+                _baudRate = value;
+                Properties.SkyTelescope.Default.BaudRate = value.ToString();
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
+            }
+        }
+
         private static EquatorialCoordinateType _equatorialCoordinateType;
         public static EquatorialCoordinateType EquatorialCoordinateType
         {
@@ -505,6 +520,19 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static Handshake _handShake;
+        public static Handshake HandShake
+        {
+            get => _handShake;
+            private set
+            {
+                if (_handShake == value) return;
+                _handShake = value;
+                Properties.SkyTelescope.Default.HandShake = value.ToString();
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
+            }
+        }
+
         private static HCMode _hcMode;
         public static HCMode HcMode
         {
@@ -515,6 +543,21 @@ namespace GS.Server.SkyTelescope
                 _hcMode = value;
                 Properties.SkyTelescope.Default.HCMode = value.ToString();
                 LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
+            }
+        }
+
+        private static MountType _mount;
+        public static MountType Mount
+        {
+            get => _mount;
+            set
+            {
+                if (Mount == value) return;
+                _mount = value;
+                Properties.SkyTelescope.Default.Mount = $"{value}";
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
+                SkyServer.IsMountRunning = false;
+                OnStaticPropertyChanged();
             }
         }
 
@@ -589,6 +632,34 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static int _comPort;
+        public static int ComPort
+        {
+            get => _comPort;
+            set
+            {
+                if (_comPort == value) return;
+                _comPort = value;
+                Properties.SkyTelescope.Default.ComPort = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static int _dataBits;
+        public static int DataBits
+        {
+            get => _dataBits;
+            private set
+            {
+                if (_dataBits == value) return;
+                _dataBits = value;
+                Properties.SkyTelescope.Default.DataBits = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static int _decBacklash;
         public static int DecBacklash
         {
@@ -615,6 +686,20 @@ namespace GS.Server.SkyTelescope
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
                 SkyServer.SkyTasks(MountTaskName.DecPulseToGoTo);
+            }
+        }
+
+        private static bool _dtrEnable;
+        public static bool DtrEnable
+        {
+            get => _dtrEnable;
+            private set
+            {
+                if (_dtrEnable == value) return;
+                _dtrEnable = value;
+                Properties.SkyTelescope.Default.DTREnable = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
             }
         }
 
@@ -915,6 +1000,20 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static int _readTimeout;
+        public static int ReadTimeout
+        {
+            get => _readTimeout;
+            private set
+            {
+                if (_readTimeout == value) return;
+                _readTimeout = value;
+                Properties.SkyTelescope.Default.ReadTimeout = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static bool _refraction;
         public static bool Refraction
         {
@@ -937,6 +1036,20 @@ namespace GS.Server.SkyTelescope
             {
                 if (_raTrackingOffset.Equals(value)) return;
                 _raTrackingOffset = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static bool _rtsEnable;
+        public static bool RtsEnable
+        {
+            get => _rtsEnable;
+            private set
+            {
+                if (_rtsEnable == value) return;
+                _rtsEnable = value;
+                Properties.SkyTelescope.Default.RTSEnable = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
@@ -1110,15 +1223,24 @@ namespace GS.Server.SkyTelescope
             HcSpeed = hparse;
             var hcmodebol = Enum.TryParse<HCMode>(Properties.SkyTelescope.Default.HCMode, true, out var hcparse);
             if (!hcmodebol) hcparse = HCMode.Guiding;// getting rid of compass mode
-            HcMode = hcparse;  
+            HcMode = hcparse;
+            Enum.TryParse<MountType>(Properties.SkyTelescope.Default.Mount, true, out var mountparse);
+            Mount = mountparse;
+            Enum.TryParse<Handshake>(Properties.SkyTelescope.Default.HandShake, true, out var hsparse);
+            HandShake = hsparse;
+            Enum.TryParse<SerialSpeed>(Properties.SkyTelescope.Default.BaudRate, true, out var brateparse);
+            BaudRate = brateparse;
 
             AlternatingPpec = Properties.SkyTelescope.Default.AlternatingPPEC;
             ApertureArea = Properties.SkyTelescope.Default.ApertureArea;
             ApertureDiameter = Properties.SkyTelescope.Default.ApertureDiameter;
             AtPark = Properties.SkyTelescope.Default.AtPark;
             AutoTrack = Properties.SkyTelescope.Default.AutoTrack;
+            ComPort = Properties.SkyTelescope.Default.ComPort;
+            DataBits = Properties.SkyTelescope.Default.DataBits;
             DecBacklash = Properties.SkyTelescope.Default.DecBacklash;
             DecPulseToGoTo = Properties.SkyTelescope.Default.DecPulseToGoTo;
+            DtrEnable = Properties.SkyTelescope.Default.DTREnable;
             Elevation = Properties.SkyTelescope.Default.Elevation;
             Encoders = Properties.SkyTelescope.Default.EncodersOn;
             FocalLength = Properties.SkyTelescope.Default.FocalLength;
@@ -1141,8 +1263,10 @@ namespace GS.Server.SkyTelescope
             ParkAxisY = Properties.SkyTelescope.Default.ParkAxisY;
             ParkName = Properties.SkyTelescope.Default.ParkName;
             RaBacklash = Properties.SkyTelescope.Default.RaBacklash;
+            ReadTimeout = Properties.SkyTelescope.Default.ReadTimeout;
             Refraction = Properties.SkyTelescope.Default.Refraction;
             RaTrackingOffset = Properties.SkyTelescope.Default.RATrackingOffset;
+            RtsEnable = Properties.SkyTelescope.Default.RTSEnable;
             SiderealRate = Properties.SkyTelescope.Default.SiderealRate;
             DisplayInterval = Properties.SkyTelescope.Default.DisplayInterval;
             SolarRate = Properties.SkyTelescope.Default.SolarRate;

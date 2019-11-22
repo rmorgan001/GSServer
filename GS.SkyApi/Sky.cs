@@ -254,6 +254,17 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
+        public int DecBacklash
+        {
+            get => SkySettings.DecBacklash;
+            set
+            {
+                if (value < 0 || value > 500) return;
+                SkySettings.DecBacklash = value;
+            }
+        }
+
+        /// <inheritdoc />
         public long GetAngleToStep(int axis, double angleinrad)
         {
             ValidateMount();
@@ -513,7 +524,7 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
-        public bool IsServerSkyWatcher => SkySystem.Mount == Server.SkyTelescope.MountType.SkyWatcher;
+        public bool IsServerSkyWatcher => SkySettings.Mount == Server.SkyTelescope.MountType.SkyWatcher;
 
         /// <inheritdoc />
         public bool IsSlewing(int axis)
@@ -901,6 +912,10 @@ namespace GS.SkyApi
         /// q Does mount support WiFi
         /// </summary>
         bool CanWifi { get; }
+        /// <summary>
+        /// Sets the amount of steps added to Dec for reverse backlash pulse
+        /// </summary>
+        int DecBacklash { get; set; }
         /// <summary>
         /// Gets the number of steps from the angle in rad
         /// </summary>

@@ -313,7 +313,7 @@ namespace GS.Server.Model3D
 
         private void Rotate()
         {
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
                     Yaxis = Math.Round(SkyServer.ActualAxisX, 3);

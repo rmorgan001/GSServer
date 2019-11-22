@@ -132,7 +132,7 @@
                                         </md:ToggleButtonAssist.OnContent>
                                     </ToggleButton>
                         <ComboBox Name="cbFontFamily" ToolTip="{DynamicResource btntipNFont}" Width="100" DropDownClosed="CbFontFamily_DropDownClosed" />
-                        <ComboBox Name="cbFontSize" ToolTip="{DynamicResource btntipNFontSize}" DropDownClosed="CbFontSize_DropDownClosed" SelectedValuePath="Content"/>
+                        <ComboBox Name="cbFontSize" ToolTip="{DynamicResource btntipNFontSize}" DropDownClosed="CbFontSize_DropDownClosed" />
                         <Button Padding="2" Click="BtForground_Click" ToolTip="{DynamicResource btntipNFontForground}" ToolBar.OverflowMode="AsNeeded">
                             <md:PackIcon Kind="Paintbrush" Name="Paintbrush"/>
                                     </Button>

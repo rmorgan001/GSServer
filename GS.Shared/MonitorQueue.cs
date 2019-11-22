@@ -115,8 +115,9 @@ namespace GS.Shared
             _instanceFileName = $"{DateTime.Now:yyyy-dd-MM-HH}.txt";
             DeleteFiles("GSSessionLog", 7, _logPath);
             DeleteFiles("GSErrorLog", 7, _logPath);
-            DeleteFiles("GSErrorLog", 7, _logPath);
-            DeleteFiles("GSChartingLog", 7, _logPath);
+            DeleteFiles("GSChartingLog", 7, _logPath); 
+            DeleteFiles("GSMonitorLog", 7, _logPath);
+
 
             _monitorBlockingCollection = new BlockingCollection<MonitorEntry>();
             Task.Factory.StartNew(() =>
@@ -269,9 +270,17 @@ namespace GS.Shared
         /// <param name="entry"></param>
         private static void WriteOutSession(MonitorEntry entry)
         {
-            if (!Settings.LogSession) return;
-            ++_sessionIndex;
-            FileWriteAsync(_sessionFile + _instanceFileName,$"{_sessionIndex},{entry.Datetime.ToLocalTime():yyyy:dd:MM:HH:mm:ss.fff},{entry.Device},{entry.Category},{entry.Type},{entry.Thread},{entry.Method},{entry.Message}");
+            try
+            {
+                if (!Settings.LogSession) return;
+                ++_sessionIndex;
+                FileWriteAsync(_sessionFile + _instanceFileName, $"{_sessionIndex},{entry.Datetime.ToLocalTime():yyyy:dd:MM:HH:mm:ss.fff},{entry.Device},{entry.Category},{entry.Type},{entry.Thread},{entry.Method},{entry.Message}");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                //throw;
+            }
         }
 
         /// <summary>
@@ -280,8 +289,16 @@ namespace GS.Shared
         /// <param name="entry"></param>
         private static void WriteOutErrors(MonitorEntry entry)
         {
-            ++_errIndex;
-            FileWriteAsync(_errorFile + _instanceFileName,$"{_errIndex},{entry.Datetime.ToLocalTime():yyyy:dd:MM:HH:mm:ss.fff},{entry.Device},{entry.Category},{entry.Type},{entry.Thread},{entry.Method},{entry.Message}");
+            try
+            {
+                ++_errIndex;
+                FileWriteAsync(_errorFile + _instanceFileName, $"{_errIndex},{entry.Datetime.ToLocalTime():yyyy:dd:MM:HH:mm:ss.fff},{entry.Device},{entry.Category},{entry.Type},{entry.Thread},{entry.Method},{entry.Message}");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+               // throw;
+            }
         }
 
         /// <summary>
@@ -290,8 +307,16 @@ namespace GS.Shared
         /// <param name="entry"></param>
         private static void WriteOutMonitor(MonitorEntry entry)
         {
-            if (!Settings.LogMonitor) return;
-            FileWriteAsync(_monitorFile + _instanceFileName,$"{entry.Index},{entry.Datetime.ToLocalTime():yyyy:dd:MM:HH:mm:ss.fff},{entry.Device},{entry.Category},{entry.Type},{entry.Thread},{entry.Method},{entry.Message}");
+            try
+            {
+                if (!Settings.LogMonitor) return;
+                FileWriteAsync(_monitorFile + _instanceFileName,$"{entry.Index},{entry.Datetime.ToLocalTime():yyyy:dd:MM:HH:mm:ss.fff},{entry.Device},{entry.Category},{entry.Type},{entry.Thread},{entry.Method},{entry.Message}");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+               // throw;
+            }
         }
 
         /// <summary>
@@ -302,15 +327,22 @@ namespace GS.Shared
         /// <param name="append"></param>
         private static async void FileWriteAsync(string filePath, string messaage, bool append = true)
         {
-            await _lockFile.WaitAsync();
             try
             {
+                await _lockFile.WaitAsync();
+
                 Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? throw new InvalidOperationException());
-                using (var stream = new FileStream(filePath, append ? FileMode.Append : FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
+                using (var stream = new FileStream(filePath, append ? FileMode.Append : FileMode.Create,
+                    FileAccess.Write, FileShare.None, 4096, true))
                 using (var sw = new StreamWriter(stream))
                 {
                     await sw.WriteLineAsync(messaage);
                 }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                //throw;
             }
             finally
             {
@@ -326,11 +358,19 @@ namespace GS.Shared
         /// <param name="path"></param>
         private static void DeleteFiles(string name, int daysold, string path)
         {
-            var files = Directory.GetFiles(path);
-            foreach (var file in files)
+            try
             {
-                var fi = new FileInfo(file);
-                if (fi.Name.Contains(name) && fi.CreationTime < (DateTime.Now - new TimeSpan(daysold, 0, 0, 0))) fi.Delete();
+                var files = Directory.GetFiles(path);
+                foreach (var file in files)
+                {
+                    var fi = new FileInfo(file);
+                    if (fi.Name.Contains(name) && fi.CreationTime < (DateTime.Now - new TimeSpan(daysold, 0, 0, 0))) fi.Delete();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                //throw;
             }
         }
 

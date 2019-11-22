@@ -11,10 +11,11 @@
             <RowDefinition />
             <RowDefinition />
             <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Label Grid.Row="0" Content="{DynamicResource btnAutoHome}" HorizontalAlignment="Center"/>
         <ProgressBar Grid.Row="1" HorizontalAlignment="Center" Value="{Binding AutoHomeProgressBar}" md:TransitionAssist.DisableTransitions="True" Height="10" Width="200" />
-        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Center" Margin="0,5,0,0">
+        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Center" Margin="0,5,0,0" IsEnabled="{Binding StartEnabled}">
             <Label Content="{DynamicResource msgAutoHomeLimit}" VerticalAlignment="Bottom"/>
             <ComboBox md:HintAssist.Hint="{DynamicResource cbhintAutoHomeLimit}" MinWidth="10" ToolTip="{DynamicResource cbtipAutoHomeLimit}"  
                       ItemsSource="{Binding AutoHomeLimits}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
@@ -28,7 +29,21 @@
                 </ComboBox.ItemsPanel>
             </ComboBox>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" Grid.Row="3" Margin="0 16 0 0" HorizontalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Grid.Row="3" HorizontalAlignment="Center" Margin="0,5,0,0" IsEnabled="{Binding StartEnabled}">
+            <Label Content="{DynamicResource msgDecOffset}" VerticalAlignment="Bottom"/>
+            <ComboBox md:HintAssist.Hint="{DynamicResource cbhintDecOffset}" MinWidth="10" ToolTip="{DynamicResource cbhintDecOffset}"  
+                      ItemsSource="{Binding DecOffsets}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                <ComboBox.Text>
+                    <Binding Path="DecOffset" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                </ComboBox.Text>
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Row="4" Margin="0 16 0 0" HorizontalAlignment="Center">
             <Button IsEnabled="{Binding StartEnabled}" IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding StartAutoHomeDialogCommand}" Content="{DynamicResource btnStart}"/>
             <Button IsCancel="True"  Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding CancelAutoHomeDialogCommand}" Content="{DynamicResource btnCancel}"/>
         </StackPanel>

@@ -1789,7 +1789,7 @@ namespace ASCOM.GS.Sky.Telescope
         private static void DelayInterval(int additional = 0)
         {
             var delay = additional;
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
                     delay += SkySettings.DisplayInterval;

@@ -20,42 +20,23 @@ using System.IO.Ports;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using ASCOM.Utilities;
 using GS.Shared;
 
 namespace GS.Server.SkyTelescope
 {
     public static class SkySystem
     {
-
-        #region Events
-
         public static event PropertyChangedEventHandler StaticPropertyChanged;
-
-        #endregion
-
-        #region Fields
-
         private static readonly object GetIdLockObj = new object();
         private static long _idCount;
         private static readonly ConcurrentDictionary<long, bool> ConnectStates;
-        //public static Serial Serial;
         public static SerialPort Serial;
-
-        #endregion Fields
 
         static SkySystem()
         {
-            Enum.TryParse<MountType>(Properties.SkyTelescope.Default.Mount, true, out var eparse);
-            Mount = eparse;
-
             ConnectStates = new ConcurrentDictionary<long, bool>();
                 _idCount = 0;
-                //TraceLogger = new TraceLogger("", "GS Server Sky Telescope Trace") { Enabled = TraceLogging };
-
         }
-
-        #region Properties
 
         public static bool Connected => ConnectStates.Count > 0;
 
@@ -98,14 +79,14 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        public static void CloseConnected()
-        {
-            if (ConnectStates.Count <= 0) return;
-            foreach (var cons in ConnectStates)
-            {
-                SetConnected(cons.Key, false);
-            }
-        }
+        //public static void CloseConnected()
+        //{
+        //    if (ConnectStates.Count <= 0) return;
+        //    foreach (var cons in ConnectStates)
+        //    {
+        //        SetConnected(cons.Key, false);
+        //    }
+        //}
 
         public static bool ConnectSerial
         {
@@ -128,14 +109,14 @@ namespace GS.Server.SkyTelescope
 
                         Serial = new SerialPort
                         {
-                            PortName = $"COM{ComPort}",
-                            BaudRate = (int)BaudRate,
-                            ReadTimeout = ReadTimeout,
+                            PortName = $"COM{SkySettings.ComPort}",
+                            BaudRate = (int)SkySettings.BaudRate,
+                            ReadTimeout = SkySettings.ReadTimeout,
                             StopBits = StopBits.One,
-                            DataBits = DataBits,
-                            DtrEnable = DtrEnable,
-                            RtsEnable = RtsEnable,
-                            Handshake = HandShake,
+                            DataBits = SkySettings.DataBits,
+                            DtrEnable = SkySettings.DtrEnable,
+                            RtsEnable = SkySettings.RtsEnable,
+                            Handshake = SkySettings.HandShake,
                             Parity = Parity.None,
                             DiscardNull = true,    
                         };
@@ -162,7 +143,7 @@ namespace GS.Server.SkyTelescope
                         Datetime = Principles.HiResDateTime.UtcNow,
                         Device = MonitorDevice.Telescope,
                         Category = MonitorCategory.Server,
-                        Type = MonitorType.Information,
+                        Type = MonitorType.Warning,
                         Method = MethodBase.GetCurrentMethod().Name,
                         Thread = Thread.CurrentThread.ManagedThreadId,
                         Message = $"{ex.Message},{ex.InnerException?.Message}"
@@ -174,74 +155,6 @@ namespace GS.Server.SkyTelescope
 
             }
         }
-
-        private static bool DtrEnable => Properties.SkyTelescope.Default.DTREnable;
-
-        private static bool RtsEnable => Properties.SkyTelescope.Default.RTSEnable;
-
-        private static int DataBits => Properties.SkyTelescope.Default.DataBits;
-
-        internal static int ComPort
-        {
-            get => Properties.SkyTelescope.Default.ComPort;
-            set
-            {
-                if (ComPort == value) return;
-                Properties.SkyTelescope.Default.ComPort = value;
-            }
-        }
-
-        private static int ReadTimeout => Properties.SkyTelescope.Default.ReadTimeout;
-
-        internal static SerialSpeed BaudRate
-        {
-            get
-            {
-                Enum.TryParse<SerialSpeed>(Properties.SkyTelescope.Default.BaudRate, true, out var eparse);
-                return eparse;
-            }
-            set
-            {
-                if (BaudRate == value) return;
-                Properties.SkyTelescope.Default.BaudRate = $"{value}";
-            }
-        }
-
-        private static Handshake HandShake
-        {
-            get
-            {
-                Enum.TryParse<Handshake>(Properties.SkyTelescope.Default.HandShake, true, out var eparse);
-                return eparse;
-            }
-        }
-
-        public static string Version
-        {
-            get => Properties.SkyTelescope.Default.Version;
-            set
-            {
-                if (Version == value) return;
-                Properties.SkyTelescope.Default.Version = value;
-            }
-        }
-
-        private static MountType _mount;
-        public static MountType Mount
-        {
-            get => _mount;
-            set
-            {
-                if (Mount == value) return;
-                _mount = value;
-                SkyServer.IsMountRunning = false;
-                Properties.SkyTelescope.Default.Mount = $"{value}";  
-            }
-        }
-
-        #endregion Properties
-
-        #region Methods
 
         public static long GetId()
         {
@@ -260,9 +173,5 @@ namespace GS.Server.SkyTelescope
         {
             StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));
         }
-
-        #endregion
-
-
     }
 }

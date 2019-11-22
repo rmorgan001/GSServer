@@ -80,6 +80,7 @@ namespace GS.Server.SkyTelescope
         {
             AlternatingPpec,
             CanPpec,
+            CanHomeSensor,
             DecPulseToGoTo,
             Encoders,
             FullCurrent,

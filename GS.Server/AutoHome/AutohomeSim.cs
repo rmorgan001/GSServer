@@ -30,7 +30,7 @@ namespace GS.Server.AutoHome
             };
             MonitorLog.LogToMonitor(monitorItem); 
 
-            Initialize();
+           Initialize();
         }
 
         /// <summary>
@@ -137,9 +137,10 @@ namespace GS.Server.AutoHome
         /// Start autohome process per axis with max degrees default at 90
         /// </summary>
         /// <param name="axis"></param>
+        /// <param name="offsetdec"></param>
         /// <param name="maxmove"></param>
         /// <returns></returns>
-        public int StartAutoHome(Axis axis, int maxmove = 100)
+        public int StartAutoHome(Axis axis, int maxmove = 100, int offsetdec = 0)
         {
             var _ = new CmdAxisStop(0, axis);
             if (SkyServer.Tracking) SkyServer.Tracking = false;
@@ -279,6 +280,14 @@ namespace GS.Server.AutoHome
 
             //slew to home
             slew = SlewToHome(axis);
+
+            // Dec offset for side saddles
+            if (Math.Abs(offsetdec) > 0 && axis == Axis.Axis2)
+            {
+                slew = SlewAxis(Math.Abs(offsetdec), axis, offsetdec < 0); 
+                if (slew != 0) return slew;
+            }
+
             return slew != 0 ? slew : 0;
         }
 

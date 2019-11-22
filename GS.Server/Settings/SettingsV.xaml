@@ -242,9 +242,9 @@
                             TickFrequency="10" TickPlacement="BottomRight" Orientation="Horizontal" Delay="2" Minimum="1" Maximum="100" Width="170" HorizontalAlignment="Left"/>-->
                                 <ComboBox md:HintAssist.Hint="{DynamicResource tbOVolumeLevel}" MinWidth="10" HorizontalAlignment="Left" ItemsSource="{Binding VolumeList}"
                                           Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{DynamicResource tbOVolumeLevel}">
-                                    <ComboBox.Text>
+                                    <ComboBox.SelectedValue >
                                         <Binding Path="VoiceVolume" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
-                                    </ComboBox.Text>
+                                    </ComboBox.SelectedValue>
                                     <ComboBox.ItemsPanel >
                                         <ItemsPanelTemplate >
                                             <VirtualizingStackPanel  />

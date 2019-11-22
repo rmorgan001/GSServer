@@ -13,10 +13,13 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+using System;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Windows;
 using GS.Shared;
 
 namespace GS.Server.Settings
@@ -255,6 +258,75 @@ namespace GS.Server.Settings
             }
         }
 
+        private static WindowState _windowstate;
+        public static WindowState Windowstate
+        {
+            get => _windowstate;
+            set
+            {
+                _windowstate = value;
+                Properties.Server.Default.WindowState = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static double _windowHeight;
+        public static double Windowheight
+        {
+            get => _windowHeight;
+            set
+            {
+                if (Math.Abs(_windowHeight - value) < 0.1) return;
+                _windowHeight = value;
+                Properties.Server.Default.WindowHeight = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static double _windowWidth;
+        public static double Windowwidth
+        {
+            get => _windowWidth;
+            set
+            {
+                if (Math.Abs(_windowWidth - value) < 0.1) return;
+                _windowWidth = value;
+                Properties.Server.Default.WindowWidth = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static double _windowLeft;
+        public static double Windowleft
+        {
+            get => _windowLeft;
+            set
+            {
+                if (Math.Abs(_windowLeft - value) < 0.1) return;
+                _windowLeft = value;
+                Properties.Server.Default.WindowLeft = value;
+              //  LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static double _windowTop;
+        public static double Windowtop
+        {
+            get => _windowTop;
+            set
+            {
+                if (Math.Abs(_windowTop - value) < 0.1) return;
+                _windowTop = value;
+                Properties.Server.Default.WindowTop = value;
+               // LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Methods      
@@ -282,6 +354,11 @@ namespace GS.Server.Settings
             DarkTheme = Properties.Server.Default.DarkTheme;
             PrimaryColor = Properties.Server.Default.PrimaryColor;
             AccentColor = Properties.Server.Default.AccentColor;
+            Windowheight = Properties.Server.Default.WindowHeight;
+            Windowwidth = Properties.Server.Default.WindowWidth;
+            Windowleft = Properties.Server.Default.WindowLeft;
+            Windowtop = Properties.Server.Default.WindowTop;
+            Windowstate = Properties.Server.Default.WindowState;
 
         }
 

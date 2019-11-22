@@ -260,6 +260,18 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static bool _canhomesensor;
+        public static bool CanHomeSensor
+        {
+            get => _canhomesensor;
+            private set
+            {
+                if (_canhomesensor == value) return;
+                _canhomesensor = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
         public static bool Debug { private get; set; }
 
         // Positions converted from mount
@@ -320,7 +332,7 @@ namespace GS.Server.SkyTelescope
                 }
 
                 object _;
-                switch (SkySystem.Mount)
+                switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
                         _ = new CmdRateAxis(0, Axis.Axis2, _rateAxes.Y);
@@ -362,7 +374,7 @@ namespace GS.Server.SkyTelescope
                 }
 
                 object _;
-                switch (SkySystem.Mount)
+                switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
                         _ = new CmdRateAxis(0, Axis.Axis1, _rateAxes.X);
@@ -396,7 +408,7 @@ namespace GS.Server.SkyTelescope
             {
                 _rateRaDec.Y = Conversions.ArcSec2Deg(value);
                 object _;
-                switch (SkySystem.Mount)
+                switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
                         _ = new CmdRate(0, Axis.Axis2, _rateRaDec.Y);
@@ -427,7 +439,7 @@ namespace GS.Server.SkyTelescope
             {
                 _rateRaDec.X = Conversions.ArcSec2Deg(value);
                 object _;
-                switch (SkySystem.Mount)
+                switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
                         _ = new CmdRate(0, Axis.Axis1, _rateRaDec.X);
@@ -666,7 +678,7 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                switch (SkySystem.Mount)
+                switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
                         _mountrunning = MountQueue.IsRunning;
@@ -1013,7 +1025,7 @@ namespace GS.Server.SkyTelescope
 
             object _;
 
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.SkyWatcher:
                     break;
@@ -1024,6 +1036,11 @@ namespace GS.Server.SkyTelescope
                             break;
                         case MountTaskName.CanPpec:
                             CanPec = false;
+                            break;
+                        case MountTaskName.CanHomeSensor:
+                            var canHomeCmda = new CmdCapabilities(MountQueue.NewId);
+                            var mountinfo = (MountInfo)MountQueue.GetCommandResult(canHomeCmda).Result;
+                            CanHomeSensor = mountinfo.CanHomeSensors;
                             break;
                         case MountTaskName.DecPulseToGoTo:
                             break;
@@ -1120,7 +1137,7 @@ namespace GS.Server.SkyTelescope
         public static bool CanPec
         {
             get => _canpec;
-            set
+            private set
             {
                 if (_canpec == value) return;
                 _canpec = value;
@@ -1204,7 +1221,7 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         private static void CheckPecTraining()
         {
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
                     break;
@@ -1419,7 +1436,7 @@ namespace GS.Server.SkyTelescope
 
             object _;
 
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
                     break;
@@ -1435,6 +1452,10 @@ namespace GS.Server.SkyTelescope
                         case MountTaskName.CanPpec:
                             var SkyMountCanPpec = new SkyCanPpec(SkyQueue.NewId);
                             CanPec = (bool)SkyQueue.GetCommandResult(SkyMountCanPpec).Result;
+                            break;
+                        case MountTaskName.CanHomeSensor:
+                            var canHomeSky = new SkyCanHomeSensors(SkyQueue.NewId);
+                            CanHomeSensor = (bool)SkyQueue.GetCommandResult(canHomeSky).Result;
                             break;
                         case MountTaskName.Capabilities:
                             // populates driver with mount capabilities
@@ -1644,7 +1665,7 @@ namespace GS.Server.SkyTelescope
             var tracking = Tracking;
             //Tracking = false;
 
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
                     SimTasks(MountTaskName.StopAxes);
@@ -1666,7 +1687,7 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Autohome, Slew home based on mount's home sensor
         /// </summary>
-        public static async void AutoHomeAsync(int degreelimit = 100)
+        public static async void AutoHomeAsync(int degreelimit = 100, int offsetdec = 0)
         {
             try
             {
@@ -1691,19 +1712,19 @@ namespace GS.Server.SkyTelescope
                 Synthesizer.Speak(Application.Current.Resources["msgAutoHomeStart"].ToString());
                 Synthesizer.VoicePause = true;
 
-                switch (SkySystem.Mount)
+                switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
                         var autosim = new AutohomeSim();
                         returncode1 = await Task.Run(() => autosim.StartAutoHome(Axis.Axis1, degreelimit));
                         AutoHomeProgressBar = 50;
-                        returncode2 = await Task.Run(() => autosim.StartAutoHome(Axis.Axis2, degreelimit));
+                        returncode2 = await Task.Run(() => autosim.StartAutoHome(Axis.Axis2, degreelimit, offsetdec));
                         break;
                     case MountType.SkyWatcher:
                         var autossky = new AutohomeSky();
                         returncode1 = await Task.Run(() => autossky.StartAutoHome(AxisId.Axis1, degreelimit));
                         AutoHomeProgressBar = 50;
-                        returncode2 = await Task.Run(() => autossky.StartAutoHome(AxisId.Axis2, degreelimit));
+                        returncode2 = await Task.Run(() => autossky.StartAutoHome(AxisId.Axis2, degreelimit, offsetdec));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -1822,7 +1843,7 @@ namespace GS.Server.SkyTelescope
             Stopwatch stopwatch;
             var axis1Stopped = false;
             var axis2Stopped = false;
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
 
@@ -2129,7 +2150,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"Default Position:{positions[0]},{positions[1]}"
+                Message = $"{positions[0]},{positions[1]}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -2144,7 +2165,7 @@ namespace GS.Server.SkyTelescope
         {
             var actualDegrees = new[] { double.NaN, double.NaN };
             if (!IsMountRunning) return actualDegrees;
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
                     var simPositions = new CmdAxesDegrees(MountQueue.NewId);
@@ -2197,7 +2218,7 @@ namespace GS.Server.SkyTelescope
             IsSlewing = true;
 
             var returncode = 0;
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
                     returncode = await Task.Run(() => SimGoTo(target, trackingState));
@@ -2459,7 +2480,7 @@ namespace GS.Server.SkyTelescope
                     {
                         case SlewDirection.SlewNorth:
                         case SlewDirection.SlewUp:
-                            switch (SkySystem.Mount)
+                            switch (SkySettings.Mount)
                             {
                                 case MountType.Simulator:
                                     change[1] = SideOfPier == PierSide.pierEast ? delta : -delta;
@@ -2473,7 +2494,7 @@ namespace GS.Server.SkyTelescope
                             break;
                         case SlewDirection.SlewSouth:
                         case SlewDirection.SlewDown:
-                            switch (SkySystem.Mount)
+                            switch (SkySettings.Mount)
                             {
                                 case MountType.Simulator:
                                     change[1] = SideOfPier == PierSide.pierWest ? delta : -delta;
@@ -2525,7 +2546,7 @@ namespace GS.Server.SkyTelescope
             SlewState = Math.Abs(change[0]) + Math.Abs(change[1]) > 0 ? SlewType.SlewHandpad : SlewType.SlewNone;
 
             object _;
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
                     _ = new CmdHcSlew(0, Axis.Axis1, change[0]);
@@ -2556,13 +2577,14 @@ namespace GS.Server.SkyTelescope
             var counter = 0;
 
             MonitorEntry monitorItem;
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
                     // defaults
                     SimTasks(MountTaskName.MountName);
                     SimTasks(MountTaskName.MountVersion);
                     SimTasks(MountTaskName.StepsPerRevolution);
+                    SimTasks(MountTaskName.CanHomeSensor);
 
                     // checks if the mount is close enough to home position to set default position. If not use the positions from the mount
                     while ( rawPositions == null)
@@ -2612,6 +2634,7 @@ namespace GS.Server.SkyTelescope
                     SkyTasks(MountTaskName.InitialiseAxes);
                     SkyTasks(MountTaskName.GetOneStepIndicators);
                     SkyTasks(MountTaskName.CanPpec);
+                    SkyTasks(MountTaskName.CanHomeSensor);
 
                     // checks if the mount is close enough to home position to set default position. If not use the positions from the mount
                     while (rawPositions == null)
@@ -2665,11 +2688,11 @@ namespace GS.Server.SkyTelescope
         private static void MountStart()
         {
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{SkySystem.Mount}"};
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{SkySettings.Mount}"};
             MonitorLog.LogToMonitor(monitorItem);
 
             Defaults();
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
                     MountQueue.Start();
@@ -2680,7 +2703,7 @@ namespace GS.Server.SkyTelescope
                     SkySystem.ConnectSerial = false;
                     SkySystem.ConnectSerial = true;
                     if (!SkySystem.ConnectSerial)
-                        throw new SkyServerException(ErrorCode.ErrSerialFailed, $"Serial Failed COM{SkySystem.ComPort}");
+                        throw new SkyServerException(ErrorCode.ErrSerialFailed, $"Serial Failed COM{SkySettings.ComPort}");
 
                     // Start up
                     SkyQueue.Start(SkySystem.Serial);
@@ -2714,7 +2737,7 @@ namespace GS.Server.SkyTelescope
         private static void MountStop()
         {
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{SkySystem.Mount}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{SkySettings.Mount}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             if (MountQueue.IsRunning)
@@ -2807,7 +2830,7 @@ namespace GS.Server.SkyTelescope
                     if (direction == GuideDirections.guideEast) raGuideRate = -raGuideRate;
                 }
 
-                switch (SkySystem.Mount)
+                switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
                         _ = new CmdAxisPulse(0, Axis.Axis1, raGuideRate, duration, SkySettings.RaBacklash, Declination);
@@ -2840,7 +2863,7 @@ namespace GS.Server.SkyTelescope
                 if (direction != LastDecDirection) backlashswitch = SkySettings.DecBacklash;
                 LastDecDirection = direction;
 
-                switch (SkySystem.Mount)
+                switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
                         decGuideRate = decGuideRate > 0 ? -Math.Abs(decGuideRate) : Math.Abs(decGuideRate);
@@ -2895,7 +2918,7 @@ namespace GS.Server.SkyTelescope
             if (!IsMountRunning) return;
             if (Tracking)Tracking = false;
 
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
                     SimTasks(MountTaskName.StopAxes);
@@ -3048,7 +3071,7 @@ namespace GS.Server.SkyTelescope
             }
 
             dynamic _;
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
                     _ = new CmdAxisTracking(0, Axis.Axis1, rateChange);
@@ -3120,7 +3143,7 @@ namespace GS.Server.SkyTelescope
 
             var cl = ChooseClosestPosition(ActualAxisX, position, alt);
             if (cl != "b") return null;
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
                     if (SouthernHemisphere) alt[0] = 180 - alt[0];
@@ -3251,7 +3274,7 @@ namespace GS.Server.SkyTelescope
 
             if (!AxesStopValidate())
             {
-                switch (SkySystem.Mount)
+                switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
                         SimTasks(MountTaskName.StopAxes);
@@ -3286,7 +3309,7 @@ namespace GS.Server.SkyTelescope
             var trackingstate = Tracking;
 
             _altAzSync = new Vector(targetAzimuth, targetAltitude);
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
                     SimTasks(MountTaskName.StopAxes);
@@ -3324,7 +3347,7 @@ namespace GS.Server.SkyTelescope
 
             var trackingstate = Tracking;
 
-            switch (SkySystem.Mount)
+            switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
                     SimTasks(MountTaskName.StopAxes);

@@ -10,6 +10,7 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10,0,0,0">
                 <Label FontSize="15" VerticalAlignment="Bottom" Content="{DynamicResource lbName}"  Foreground="{DynamicResource PrimaryHueLightBrush}"/>
                 <Label VerticalAlignment="Bottom" Content="{Binding Version}" Foreground="{DynamicResource PrimaryHueLightBrush}"/>
+                <Label VerticalAlignment="Bottom" Content="{Binding MountType}" Foreground="{DynamicResource PrimaryHueLightBrush}" ContentStringFormat="({0})"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5 0">
                 <Label VerticalAlignment="Center" Content="{DynamicResource lbApps}" Foreground="{DynamicResource PrimaryHueLightBrush}"/>

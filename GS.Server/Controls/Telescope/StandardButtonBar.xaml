@@ -60,7 +60,7 @@
         </md:DialogHost>
         <md:DialogHost VerticalAlignment="Bottom" IsOpen="{Binding IsAutoHomeDialogOpen}" DialogContent="{Binding AutoHomeContent}">
             <Button Margin="5" Width="100" Height="25" ToolTip="{DynamicResource btnAutoHome}" HorizontalAlignment="Left"
-                    Style="{StaticResource MaterialDesignRaisedDarkButton}" 
+                    Style="{StaticResource MaterialDesignRaisedDarkButton}" IsEnabled="{Binding AutoHomeEnabled}" 
                     Command="{Binding OpenAutoHomeDialogCommand}" Content="{DynamicResource btnAutoHome}"/>
         </md:DialogHost>
     </StackPanel>

@@ -48,7 +48,6 @@ namespace GS.Server.Main
         private GamepadVM _gamepadVM;
         private Model3DVM _model3dVM;
         public static MainWindowVM _mainWindowVm;
-        public readonly Languages _languages;
 
         private double _tempHeight = 510;
         private double _tempWidth = 850;
@@ -65,11 +64,12 @@ namespace GS.Server.Main
                 using (new WaitCursor())
                 {
                     //Load language resource file
-                    _languages = new Languages();
-                    _languages.SetLanguageDictionary();
+                    var languages = new Languages();
+                    languages.SetLanguageDictionary();
 
                     //setup property info from the GSServer
                     GSServer.StaticPropertyChanged += PropertyChangedServer;
+                    SkySettings.StaticPropertyChanged += PropertyChangedSettings;
                     Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
                     var monitorItem = new MonitorEntry
@@ -81,13 +81,13 @@ namespace GS.Server.Main
                     MonitorLog.LogToMonitor(monitorItem);
 
                     AppCount = GSServer.AppCount;
+                    MountType = SkySettings.Mount;
                     Settings.Settings.Load();
-                    if (Properties.Server.Default.StartMinimized)
-                        Properties.Server.Default.WindowState = WindowState.Minimized;
+                    if (Settings.Settings.StartMinimized)
+                        Settings.Settings.Windowstate = WindowState.Minimized;
 
                     _mainWindowVm = this;
 
-                    //todo maybe search for installed drivers and load only them
                     // Sets up the Tab menu items
                     UpdateTabViewModel("SkyWatcher");
                     UpdateTabViewModel("Focuser");
@@ -112,7 +112,6 @@ namespace GS.Server.Main
 
                 throw;
             }
-
         }
 
         private void PropertyChangedServer(object sender, PropertyChangedEventArgs e)
@@ -121,6 +120,16 @@ namespace GS.Server.Main
             {
                 case "AppCount":
                     AppCount = GSServer.AppCount;
+                    break;
+            }
+        }
+
+        private void PropertyChangedSettings(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "Mount":
+                    MountType = SkySettings.Mount;
                     break;
             }
         }
@@ -147,6 +156,17 @@ namespace GS.Server.Main
             }
         }
 
+        private MountType _mounttype;
+        public MountType MountType
+        {
+            get => _mounttype;
+            set
+            {
+                _mounttype = value;
+                OnPropertyChanged();
+            }
+        }
+
         private ICommand _minimizeWindowCommand;
         public ICommand MinimizeWindowCommand
         {
@@ -159,7 +179,7 @@ namespace GS.Server.Main
         }
         private void MinimizeWindow()
         {
-            Properties.Server.Default.WindowState = WindowState.Minimized;
+            Windowstate = WindowState.Minimized;
         }
 
         private ICommand _maxmizeWindowCommand;
@@ -174,7 +194,7 @@ namespace GS.Server.Main
         }
         private void MaxmizeWindow()
         {
-            Properties.Server.Default.WindowState = Properties.Server.Default.WindowState != WindowState.Maximized ? WindowState.Maximized : WindowState.Normal;
+            Windowstate = Windowstate != WindowState.Maximized ? WindowState.Maximized : WindowState.Normal;
         }
 
         private ICommand _normalWindowCommand;
@@ -189,7 +209,7 @@ namespace GS.Server.Main
         }
         private void NormalWindow()
         {
-            Properties.Server.Default.WindowState = WindowState.Normal;
+            Windowstate = WindowState.Normal;
         }
 
         public void Dispose()
@@ -212,7 +232,7 @@ namespace GS.Server.Main
             switch (name)
             {
                 case "Focuser":
-                    if (Properties.Server.Default.Focuser)
+                    if (Settings.Settings.Focuser)
                     {
                         if (!PageViewModels.Contains(_focuserVM))
                         {
@@ -231,7 +251,7 @@ namespace GS.Server.Main
                     }
                     break;
                 case "Charts":
-                    if (Properties.Server.Default.Charting)
+                    if (Settings.Settings.Charting)
                     {
                         if (!PageViewModels.Contains(_chartingVM))
                         {
@@ -250,7 +270,7 @@ namespace GS.Server.Main
                     }
                     break;
                 case "Notes":
-                    if (Properties.Server.Default.Notes)
+                    if (Settings.Settings.Notes)
                     {
                         if (!PageViewModels.Contains(_notesVM))
                         {
@@ -269,7 +289,7 @@ namespace GS.Server.Main
                     }
                     break;
                 case "SkyWatcher":
-                    if (Properties.Server.Default.SkyWatcher)
+                    if (Settings.Settings.SkyWatcher)
                     {
                         if (!PageViewModels.Contains(_skyTelescopeVM))
                         {
@@ -288,7 +308,7 @@ namespace GS.Server.Main
                     }
                     break;
                 case "Gamepad":
-                    if (Properties.Server.Default.Gamepad)
+                    if (Settings.Settings.Gamepad)
                     {
                         if (!PageViewModels.Contains(_gamepadVM))
                         {
@@ -312,7 +332,7 @@ namespace GS.Server.Main
                     SettingsRadioVisable = true;
                     break;
                 case "Model3D":
-                    if (Properties.Server.Default.Model3D)
+                    if (Settings.Settings.Model3D)
                     {
                         if (!PageViewModels.Contains(_model3dVM))
                         {
@@ -557,6 +577,55 @@ namespace GS.Server.Main
             }
         }
 
+        public WindowState Windowstate
+        {
+            get => Settings.Settings.Windowstate;
+            set
+            {
+                Settings.Settings.Windowstate = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double Windowheight
+        {
+            get => Settings.Settings.Windowheight;
+            set
+            {
+                Settings.Settings.Windowheight = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double Windowwidth
+        {
+            get => Settings.Settings.Windowwidth;
+            set
+            {
+                Settings.Settings.Windowwidth = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double Windowleft
+        {
+            get => Settings.Settings.Windowleft;
+            set
+            {
+                Settings.Settings.Windowleft = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double Windowtop
+        {
+            get => Settings.Settings.Windowtop;
+            set
+            {
+                Settings.Settings.Windowtop = value;
+                OnPropertyChanged();
+            }
+        }
 
         private ICommand _resetWindowCommand;
         public ICommand ResetWindowCommand
@@ -570,24 +639,24 @@ namespace GS.Server.Main
         }
         private void ResetWindow()
         {
-            var h = Properties.Server.Default.WindowHeight;
-            var w = Properties.Server.Default.WindowWidth;
+            var h = Windowheight;
+            var w = Windowwidth;
 
             if (Math.Abs(h - 510) > 0 || Math.Abs(w - 850) > 0)
             {
-                _tempHeight = Properties.Server.Default.WindowHeight;
-                _tempWidth = Properties.Server.Default.WindowWidth;
-                _tempWindowState = Properties.Server.Default.WindowState;
+                _tempHeight = Windowheight;
+                _tempWidth = Windowwidth;
+                _tempWindowState = Windowstate;
 
-                Properties.Server.Default.WindowState = WindowState.Normal;
-                Properties.Server.Default.WindowHeight = 510;
-                Properties.Server.Default.WindowWidth = 850;
+                Windowstate = WindowState.Normal;
+                Windowheight = 510;
+                Windowwidth = 850;
             }
             else
             {
-                Properties.Server.Default.WindowState = _tempWindowState;
-                Properties.Server.Default.WindowHeight = _tempHeight;
-                Properties.Server.Default.WindowWidth = _tempWidth;
+                Windowstate = _tempWindowState;
+                Windowheight = _tempHeight;
+                Windowwidth = _tempWidth;
             }
         }
         #endregion
