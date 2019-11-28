@@ -64,13 +64,9 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    DebugVisability = false;
                     _skyTelescopeVM = this;
-
-                    LoadImages();
-
-                    //Show in Tab?
-                    if (!Properties.Server.Default.SkyWatcher) return;
+                    LoadImages();  // load front image
+                    if (!Properties.Server.Default.SkyWatcher) return; // Show in Tab?
 
                     var monitorItem = new MonitorEntry
                     {
@@ -83,13 +79,6 @@ namespace GS.Server.SkyTelescope
                         Message = "Loading SkyTelescopeVM"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
-
-                    // defaults for the view
-                    // FrameworkCompatibilityPreferences.KeepTextBoxDisplaySynchronizedWithTextProperty = false;
-                    RightAscension = "00h 00m 00s";
-                    Declination = "00° 00m 00s";
-                    Azimuth = "00° 00m 00s";
-                    Altitude = "00° 00m 00s";
 
                     // Deals with applications trying to open the setup dialog more than once. 
                     OpenSetupDialog = SkyServer.OpenSetupDialog;
@@ -105,12 +94,15 @@ namespace GS.Server.SkyTelescope
                     Synthesizer._staticPropertyChanged += PropertyChangedSynthesizer;
                     Settings.Settings.StaticPropertyChanged += PropertyChangedSettings;
 
+                    // dropdown lists
                     GuideRateOffsetXs = new List<double>(Numbers.InclusiveRange(10, 100,10));
                     GuideRateOffsetYs = new List<double>(Numbers.InclusiveRange(10, 100, 10));
                     MaxSlewRates = new List<double>(Numbers.InclusiveRange(2.0, 5));
                     HourAngleLimits = new List<double>(Numbers.InclusiveRange(0, 45, 1));
-                    LatitudeRange = new List<int>(Enumerable.Range(-89, 179));
-                    LongitudeRange = new List<int>(Enumerable.Range(-179, 359));
+                    LatitudeRange = new List<int>(Enumerable.Range(0, 179));
+                    LatitudeRangeNS = new List<string>() { "N", "S" };
+                    LongitudeRange = new List<int>(Enumerable.Range(0, 179));
+                    LongitudeRangeEW = new List<string>() { "E", "W" };
                     Hours = new List<int>(Enumerable.Range(0, 24));
                     Minutes = new List<int>(Enumerable.Range(0, 60));
                     Seconds = new List<int>(Enumerable.Range(0, 60));
@@ -119,17 +111,18 @@ namespace GS.Server.SkyTelescope
                     AutoHomeLimits = new List<int>(Enumerable.Range(20, 160));
                     DecOffsets = new List<int>(){0, -90, 90};
 
-                    // initial view items
+                    // defaults
                     AtPark = SkyServer.AtPark;
                     ConnectButtonContent = Application.Current.Resources["btnConnect"].ToString();
                     VoiceState = Synthesizer.VoiceActive;
-
-                    ParkSelection = ParkPositions.FirstOrDefault();
-                    ParkSelectionSetting = ParkPositions.FirstOrDefault();
-
-                    //set HC toggles for flip
-                    SetHCFlipsVisability();
-
+                    ParkSelection = ParkPositions.FirstOrDefault(); 
+                    ParkSelectionSetting = ParkPositions.FirstOrDefault(); 
+                    SetHCFlipsVisability(); 
+                    DebugVisability = false;
+                    RightAscension = "00h 00m 00s";
+                    Declination = "00° 00m 00s";
+                    Azimuth = "00° 00m 00s";
+                    Altitude = "00° 00m 00s";
                 }
 
                 // check to make sure window is visable then connect if requested.
@@ -320,6 +313,9 @@ namespace GS.Server.SkyTelescope
                                 break;
                             case "AutoHomeProgressBar":
                                 AutoHomeProgressBar = SkyServer.AutoHomeProgressBar;
+                                break;
+                            case "ParkSelected":
+                                ParkSelection = SkyServer.ParkSelected;
                                 break;
                             }
                         });
@@ -678,14 +674,11 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private int _decBacklash;
         public int DecBacklash
         {
-            get => _decBacklash;
+            get => SkySettings.DecBacklash;
             set
             {
-                if (_decBacklash == value) return;
-                _decBacklash = value;
                 SkySettings.DecBacklash = value;
                 OnPropertyChanged();
             }
@@ -902,6 +895,18 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        public IList<string> LatitudeRangeNS { get; }
+        public string Lat0
+        {
+            get => SkySettings.Latitude < 0 ? "S" : "N";
+            set
+            {
+                var a = Math.Abs(SkySettings.Latitude);
+                SkySettings.Latitude = value == "S" ? -a : a;
+                OnPropertyChanged();
+            }
+        }
+
         public IList<int> LatitudeRange { get; }
         public int Lat1
         {
@@ -909,11 +914,12 @@ namespace GS.Server.SkyTelescope
             {
                 var sec = (int)Math.Round(SkySettings.Latitude * 3600);
                 var deg = sec / 3600;
-                return deg;
+                return Math.Abs(deg);
             }
             set
             {
-                var l = Principles.Units.Deg2Dou(value, Lat2, Lat3);
+                var l = Math.Abs(Principles.Units.Deg2Dou(value, Lat2, Lat3));
+                if (Lat0 == "S") l = -l;
                 if (Math.Abs(l - SkySettings.Latitude) < 0.00001) return;
                 SkySettings.Latitude = l;
                 OnPropertyChanged();
@@ -928,11 +934,12 @@ namespace GS.Server.SkyTelescope
                 var sec = (int)Math.Round(SkySettings.Latitude * 3600);
                 sec = Math.Abs(sec % 3600);
                 var min = sec / 60;
-                return min;
+                return Math.Abs(min);
             }
             set
             {
-                var l = Principles.Units.Deg2Dou(Lat1, value, Lat3);
+                var l = Math.Abs(Principles.Units.Deg2Dou(Lat1, value, Lat3));
+                if (Lat0 == "S") l = -l;
                 if (Math.Abs(l - SkySettings.Latitude) < 0.00001) return;
                 SkySettings.Latitude = l;
                 OnPropertyChanged();
@@ -947,13 +954,26 @@ namespace GS.Server.SkyTelescope
                 var sec = SkySettings.Latitude * 3600;
                 sec = Math.Abs(sec % 3600);
                 sec %= 60;
-                return Math.Round(sec,3);
+                return Math.Abs(Math.Round(sec,3));
             }
             set
             {
-                var l = Principles.Units.Deg2Dou(Lat1, Lat2, value);
+                var l = Math.Abs(Principles.Units.Deg2Dou(Lat1, Lat2, value));
+                if (Lat0 == "S") l = -l;
                 if (Math.Abs(l - SkySettings.Latitude) < 0.00001) return;
                 SkySettings.Latitude = l;
+                OnPropertyChanged();
+            }
+        }
+
+        public IList<string> LongitudeRangeEW { get; }
+        public string Long0
+        {
+            get => SkySettings.Longitude < 0 ? "W" : "E";
+            set
+            {
+                var a = Math.Abs(SkySettings.Longitude);
+                SkySettings.Longitude = value == "W" ? -a : a;
                 OnPropertyChanged();
             }
         }
@@ -965,11 +985,12 @@ namespace GS.Server.SkyTelescope
             {
                 var sec = (int)Math.Round(SkySettings.Longitude * 3600);
                 var deg = sec / 3600;
-                return deg;
+                return Math.Abs(deg);
             }
             set
             {
-                var l = Principles.Units.Deg2Dou(value, Long2, Long3);
+                var l = Math.Abs(Principles.Units.Deg2Dou(value, Long2, Long3));
+                if (Long0 == "W") l = -l;
                 if (Math.Abs(l - SkySettings.Longitude) < 0.00001) return;
                 SkySettings.Longitude = l;
                 OnPropertyChanged();
@@ -983,11 +1004,12 @@ namespace GS.Server.SkyTelescope
                 var sec = (int)Math.Round(SkySettings.Longitude * 3600);
                 sec = Math.Abs(sec % 3600);
                 var min = sec / 60;
-                return min;
+                return Math.Abs(min);
             }
             set
             {
                 var l = Principles.Units.Deg2Dou(Long1, value, Long3);
+                if (Long0 == "W") l = -l;
                 if (Math.Abs(l - SkySettings.Longitude) < 0.00001) return;
                 SkySettings.Longitude = l;
                 OnPropertyChanged();
@@ -1001,11 +1023,12 @@ namespace GS.Server.SkyTelescope
                 var sec = SkySettings.Longitude * 3600;
                 sec = Math.Abs(sec % 3600);
                 sec %= 60;
-                return Math.Round(sec, 3);
+                return Math.Abs(Math.Round(sec, 3));
             }
             set
             {
                 var l = Principles.Units.Deg2Dou(Long1, Long2, value);
+                if (Long0 == "W") l = -l;
                 if (Math.Abs(l - SkySettings.Longitude) < 0.00001) return;
                 SkySettings.Longitude = l;
                 OnPropertyChanged();
@@ -1014,6 +1037,7 @@ namespace GS.Server.SkyTelescope
 
         private void UpdateLongitude()
         {
+            OnPropertyChanged($"Long0");
             OnPropertyChanged($"Long1");
             OnPropertyChanged($"Long2");
             OnPropertyChanged($"Long3");
@@ -1021,6 +1045,7 @@ namespace GS.Server.SkyTelescope
 
         private void UpdateLatitude()
         {
+            OnPropertyChanged($"Lat0");
             OnPropertyChanged($"Lat1");
             OnPropertyChanged($"Lat2");
             OnPropertyChanged($"Lat3");
@@ -1452,8 +1477,19 @@ namespace GS.Server.SkyTelescope
             set
             {
                 if (_parkSelection == value) return;
-                _parkSelection = value;
-                SkyServer.ParkSelected = value;
+
+                var found = ParkPositions.Find(x => x.Name == value.Name && Math.Abs(x.X - value.X) <= 0 && Math.Abs(x.Y - value.Y) <= 0);
+                if (found == null) // did not find match in list
+                {
+                    ParkPositions.Add(value);
+                    _parkSelection = value;
+                    SkyServer.ParkSelected = value;
+                }
+                else
+                {
+                    _parkSelection = found;
+                    SkyServer.ParkSelected = found;
+                }
                 OnPropertyChanged();
             }
         }
@@ -1796,6 +1832,7 @@ namespace GS.Server.SkyTelescope
                     }
                     else
                     {
+                        SkyServer.ParkSelected = ParkSelection;
                         SkyServer.GoToPark();
                     }
                     var monitorItem = new MonitorEntry
@@ -3395,6 +3432,18 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private bool _limittracking;
+        public bool LimitTracking
+        {
+            get => _limittracking;
+            set
+            {
+                _limittracking = value;
+                SkySettings.LimitTracking = value;
+                OnPropertyChanged();
+            }
+        }
+
         private bool _warningstate;
         public bool WarningState
         {
@@ -3511,6 +3560,107 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private bool _isLimitDialogOpen;
+        public bool IsLimitDialogOpen
+        {
+            get => _isLimitDialogOpen;
+            set
+            {
+                if (_isLimitDialogOpen == value) return;
+                _isLimitDialogOpen = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private object _limitContent;
+        public object LimitContent
+        {
+            get => _limitContent;
+            set
+            {
+                if (_limitContent == value) return;
+                _limitContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openLimitDialogCommand;
+        public ICommand OpenLimitDialogCommand
+        {
+            get
+            {
+                return _openLimitDialogCommand ?? (_openLimitDialogCommand = new RelayCommand(
+                           param => OpenLimitDialog()
+                       ));
+            }
+        }
+        private void OpenLimitDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    LimitTracking = SkySettings.LimitTracking;
+                    LimitContent = new LimitDialog();
+                    IsLimitDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private ICommand _okLimitDialogCommand;
+        public ICommand OkLimitDialogCommand
+        {
+            get
+            {
+                return _okLimitDialogCommand ?? (_okLimitDialogCommand = new RelayCommand(
+                           param => OkLimitDialog()
+                       ));
+            }
+        }
+        private void OkLimitDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    IsLimitDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message);
+            }
+        }
+
         private ICommand _clearWarningCommand;
         public ICommand ClearWarningCommand
         {
@@ -3524,21 +3674,6 @@ namespace GS.Server.SkyTelescope
         private void ClearWarningState()
         {
             MonitorQueue.WarningState = false;
-        }
-
-        private ICommand _clearLimitCommand;
-        public ICommand ClearLimitCommand
-        {
-            get
-            {
-                return _clearLimitCommand ?? (_clearLimitCommand = new RelayCommand(
-                           param => ClearLimitAlarm()
-                       ));
-            }
-        }
-        private void ClearLimitAlarm()
-        {
-            SkyServer.LimitAlarm = false;
         }
 
         private ICommand _clearErrorsCommand;

@@ -86,6 +86,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="ictipVoice">Voice</system:String>
     <system:String x:Key="ictipMonitor">Monitor</system:String>
     <system:String x:Key="btntipConnected">Click for mount information</system:String>
+    <system:String x:Key="lbLimitOptions">Limit Options</system:String>
+    <system:String x:Key="lbLimitTracking">Turn off tracking</system:String>
 
     <!--Hand Controller-->
     <system:String x:Key="btntipW">W</system:String>
@@ -315,7 +317,11 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="msgHome3">Click the 'Set Home' button before or after obtaining a polar alignment.</system:String>
     <system:String x:Key="msgParkNewName">Add new park position name?</system:String>
     <system:String x:Key="msgParkDelete">Delete park position name?</system:String>
-
+    <system:String x:Key="cbtipLat0">North or South</system:String>
+    <system:String x:Key="cbhintLat0">N/S</system:String>
+    <system:String x:Key="cbtipLong0">East or West</system:String>
+    <system:String x:Key="cbhintLong0">E/W</system:String>
+    
     <!--Exceptions -->
     <system:String x:Key="exParked">Unpark first</system:String>
 

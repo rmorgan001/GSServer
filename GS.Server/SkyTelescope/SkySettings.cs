@@ -915,6 +915,20 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static bool _limitTracking;
+        public static bool LimitTracking
+        {
+            get => _limitTracking;
+            set
+            {
+                if (_limitTracking == value) return;
+                _limitTracking = value;
+                Properties.SkyTelescope.Default.LimitTracking = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static double _longitude;
         public static double Longitude
         {
@@ -1256,6 +1270,7 @@ namespace GS.Server.SkyTelescope
             InstrumentName = Properties.SkyTelescope.Default.InstrumentName;
             KingRate = Properties.SkyTelescope.Default.KingRate;
             Latitude = Properties.SkyTelescope.Default.Latitude;
+            LimitTracking = Properties.SkyTelescope.Default.LimitTracking;
             Longitude = Properties.SkyTelescope.Default.Longitude;
             LunarRate = Properties.SkyTelescope.Default.LunarRate;
             MaxSlewRate = Properties.SkyTelescope.Default.MaximumSlewRate;

@@ -148,14 +148,14 @@ namespace GS.Simulator
             }
 
             // execute pulse
-            _ioserial.Send($"slew,{axis},{guiderate}");
+            _ioserial.Send($"pulse,{axis},{guiderate}");
             var sw = Stopwatch.StartNew();
             while (sw.Elapsed.TotalMilliseconds < duration)
             {
                 //do something while waiting
             }
             sw.Reset();
-            _ioserial.Send($"slew,{axis},{0}");
+            _ioserial.Send($"pulse,{axis},{0}");
 
             
             if (MonitorPulse)

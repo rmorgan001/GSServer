@@ -1066,5 +1066,17 @@ namespace GS.Server.Properties {
                 this["DecPulseToGoTo"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool LimitTracking {
+            get {
+                return ((bool)(this["LimitTracking"]));
+            }
+            set {
+                this["LimitTracking"] = value;
+            }
+        }
     }
 }

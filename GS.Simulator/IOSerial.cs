@@ -13,6 +13,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+using System.Reflection;
+using System.Threading;
+using GS.Principles;
+using GS.Shared;
+
 namespace GS.Simulator
 {
     internal class IOSerial
@@ -30,6 +36,11 @@ namespace GS.Simulator
         {
             //if (Queues.Serial.Connected) return null; 
             var received = _controllers.Command(command.ToLower().Trim());
+            
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{command}={received}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
             return received;
         }
 

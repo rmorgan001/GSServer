@@ -211,16 +211,17 @@ namespace GS.SkyWatcher
             backlashsteps = Math.Abs(backlashsteps);
             var arcsecs = duration / 1000.0 * Math.Abs(guiderate) * 3600.0;
 
-            switch (axis)
+            if (backlashsteps == 0) // Check for minimum pulse or a pulse less than 1 step
             {
-                //Check for minimum pulse or a pulse less than 1 step
-                case AxisId.Axis1 when _stepsPerSecond[0] * arcsecs < 1.0:
-                case AxisId.Axis2 when _stepsPerSecond[1] * arcsecs < 1.0:
-                    return;
+                switch (axis)
+                {
+                    case AxisId.Axis1 when _stepsPerSecond[0] * arcsecs < 1.0:
+                    case AxisId.Axis2 when _stepsPerSecond[1] * arcsecs < 1.0:
+                        return;
+                }
             }
 
-            // setup to log and graph the pulse
-            var pulseEntry = new PulseEntry();
+            var pulseEntry = new PulseEntry(); // setup to log and graph the pulse
             if (MonitorPulse)
             {
                 pulseEntry.Axis = (int) axis;
@@ -234,23 +235,19 @@ namespace GS.SkyWatcher
             {
                 var rate = SouthernHemisphere ? -Math.Abs(_trackingRates[0]) : Math.Abs(_trackingRates[0]);
 
-                // Calculate mount speed
-                var speedInt = CalculateSpeed(AxisId.Axis1, rate + BasicMath.DegToRad(guiderate));
+                var speedInt = CalculateSpeed(AxisId.Axis1, rate + BasicMath.DegToRad(guiderate)); // Calculate mount speed
                 
-                // Convert lash to extra pulse duration in milliseconds
-                if (backlashsteps > 0)
+                if (backlashsteps > 0) // Convert lash to extra pulse duration in milliseconds
                 {
                     var lashduration = backlashsteps / _stepsPerSecond[0] / 3600 / Math.Abs(guiderate) * 1000;
                     duration += (int) lashduration;
                 }
 
-                // implements the alternating PPEC 
-                if (_ppecOn && AlternatingPpec) SetPpec(AxisId.Axis1, false);
+                if (_ppecOn && AlternatingPpec) SetPpec(AxisId.Axis1, false);// implements the alternating PPEC 
 
                 if (MonitorPulse) pulseEntry.PositionStart = _commands.GetAxisPositionCounter(AxisId.Axis1);
 
-                // Send pulse to axis
-                _commands.SetStepSpeed(AxisId.Axis1, speedInt);
+                _commands.SetStepSpeed(AxisId.Axis1, speedInt); // Send pulse to axis
 
                 // get the start time :I ran in the SetStepSpeed and calc difference from now
                 pulseEntry.StartTime = _commands.LastI1RunTime;
@@ -258,24 +255,18 @@ namespace GS.SkyWatcher
                 var timespan = Principles.HiResDateTime.UtcNow - pulseEntry.StartTime; 
                 var msspan = duration - timespan.TotalMilliseconds; // 10 - 5
 
-                // keep checking time difference until duration is met
-                if (msspan > 0 && msspan < duration) // 10 - 50
+                if (msspan > 0 && msspan < duration) // checking duration is met
                 {
                     var sw1 = Stopwatch.StartNew();
-                    while (sw1.Elapsed.TotalMilliseconds < msspan)
-                    {
-                        //do something while waiting
-                    }
+                    while (sw1.Elapsed.TotalMilliseconds < msspan){Thread.Sleep(1);} // loop while counting to duration
                 }
 
                 pulseEntry.EndTime = Principles.HiResDateTime.UtcNow;
                 if (MonitorPulse) pulseEntry.PositionEnd = _commands.GetAxisPositionCounter(AxisId.Axis1);
-                
-                // set speed back to current tracking speed
-                _commands.SetStepSpeed(AxisId.Axis1, _trackingSpeeds[0]);
 
-                // implements the alternating PPEC
-                if (_ppecOn && AlternatingPpec) SetPpec(AxisId.Axis1, true);
+                _commands.SetStepSpeed(AxisId.Axis1, _trackingSpeeds[0]); // set speed back to current tracking speed
+
+                if (_ppecOn && AlternatingPpec) SetPpec(AxisId.Axis1, true); // implements the alternating PPEC
 
                 if (MonitorPulse)
                 {
@@ -289,9 +280,9 @@ namespace GS.SkyWatcher
                 {
                     // Turns the pulse into steps and does a goto which is faster than using guiderate
                     var stepsNeeded = (int)(arcsecs * _stepsPerSecond[1]);
-                    if (stepsNeeded < 1) return;
                     stepsNeeded += backlashsteps;
-                    if (guiderate < double.Epsilon) stepsNeeded = -stepsNeeded;
+                    if (stepsNeeded < 1) return;
+                    if (guiderate < 0) stepsNeeded = -stepsNeeded;
 
                     //Firmware for the EQ8 and EQ6 can't move a single step so this conpensates, 2015B3 corrects this 
                     if (!CanOneStepDec) // check if mount is capable of small steps in goto mode
@@ -332,6 +323,7 @@ namespace GS.SkyWatcher
                     }
 
                     if (MonitorPulse) pulseEntry.PositionStart = _commands.GetAxisPositionCounter(AxisId.Axis2);
+
                     pulseEntry.StartTime = Principles.HiResDateTime.UtcNow;
 
                     AxisMoveSteps(AxisId.Axis2, stepsNeeded);
@@ -347,35 +339,32 @@ namespace GS.SkyWatcher
                 }
                 else
                 {
-                    // Convert lash to extra pulse duration in milliseconds
-                    if (backlashsteps > 0)
+                    var lashduration = 0.0;
+                    if (backlashsteps > 0) // Convert lash to extra pulse duration in milliseconds
                     {
-                        // convert backlash
-                        var lashduration = backlashsteps / _stepsPerSecond[1] / 3600 / Math.Abs(guiderate) * 1000;
-
-                        //add the lash time to duration
-                        duration += (int) lashduration;
+                        lashduration = backlashsteps / _stepsPerSecond[1] / 3600 / Math.Abs(guiderate) * 1000; // convert backlash
+                        duration += (int) lashduration; // add the lash time to duration
                     }
 
                     if (MonitorPulse) pulseEntry.PositionStart = _commands.GetAxisPositionCounter(AxisId.Axis2);
                     
-                    // Send pulse to axis  
-                    AxisSlew(AxisId.Axis2, guiderate);
+                    AxisSlew(AxisId.Axis2, guiderate); // Send pulse to axis 
 
-                    // get last runtime and wait out the rest of the duration
-                    pulseEntry.StartTime = _commands.LastJ2RunTime;
+                    pulseEntry.StartTime = _commands.LastJ2RunTime; // get last runtime and wait out the rest of the duration
 
                     var timespan = Principles.HiResDateTime.UtcNow - pulseEntry.StartTime;
                     var msspan = duration - timespan.TotalMilliseconds; // 10 - 5
 
-                    // keep checking time difference until duration is met
-                    if (msspan > 0 && msspan < duration) // 10 - 50
+
+                    var monitorItemTest = new MonitorEntry
+                        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Test={msspan}:{lashduration}" };
+                    MonitorLog.LogToMonitor(monitorItemTest);
+
+
+                    if (msspan > 0 && msspan < duration) // checking duration is met
                     {
                         var sw3 = Stopwatch.StartNew();
-                        while (sw3.Elapsed.TotalMilliseconds < msspan)
-                        {
-                            //do something while waiting
-                        }
+                        while (sw3.Elapsed.TotalMilliseconds < msspan){} //do something while waiting;
                     }
 
                     pulseEntry.EndTime = Principles.HiResDateTime.UtcNow;
@@ -390,11 +379,7 @@ namespace GS.SkyWatcher
                 }
             }
 
-            if (MonitorPulse)
-            {
-                //send to monitor
-                MonitorLog.LogToMonitor(pulseEntry);
-            }
+            if (MonitorPulse) MonitorLog.LogToMonitor(pulseEntry); //send to monitor
         }
 
         /// <summary>

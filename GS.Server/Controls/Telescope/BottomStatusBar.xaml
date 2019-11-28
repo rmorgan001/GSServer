@@ -125,7 +125,8 @@
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
-        <Button Grid.Column="5" Command="{Binding ClearLimitCommand}" Style="{StaticResource MaterialDesignFlatButton}" Width="60" ToolTip="{DynamicResource btntipAxisLimit}">
+        <md:DialogHost Grid.Column="5" IsOpen="{Binding IsLimitDialogOpen}" DialogContent="{Binding LimitContent}">
+            <Button Command="{Binding OpenLimitDialogCommand}" Style="{StaticResource MaterialDesignFlatButton}" Width="60" ToolTip="{DynamicResource btntipAxisLimit}">
                 <md:PackIcon Kind="WarningCircle" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left"  >
                     <md:PackIcon.Style>
                         <Style TargetType="md:PackIcon">
@@ -144,6 +145,7 @@
                     </md:PackIcon.Style>
                 </md:PackIcon>
             </Button>
+        </md:DialogHost>
         <Button Grid.Column="6" Command="{Binding ClearWarningCommand}" Style="{StaticResource MaterialDesignFlatButton}" Width="60" ToolTip="{DynamicResource btntipWarnings}">
                 <md:PackIcon Kind="WarningBox" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left" >
                     <md:PackIcon.Style>

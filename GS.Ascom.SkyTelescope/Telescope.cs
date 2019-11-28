@@ -1422,7 +1422,9 @@ namespace ASCOM.GS.Sky.Telescope
 
                 CheckCapability(SkySettings.CanSlew, "TargetDeclination", true);
                 CheckRange(value, -90, 90, "TargetDeclination");
-                var radec = Transforms.CoordTypeToInternal(RightAscension, value);
+                var ra = SkyServer.TargetRa;
+                if (double.IsNaN(ra)) ra = RightAscension;
+                var radec = Transforms.CoordTypeToInternal(ra, value);
                 SkyServer.TargetDec = radec.Y;
             }
         }
@@ -1453,7 +1455,9 @@ namespace ASCOM.GS.Sky.Telescope
 
                 CheckCapability(SkySettings.CanSlew, "TargetRightAscension", true);
                 CheckRange(value, 0, 24, "TargetRightAscension");
-                var radec = Transforms.CoordTypeToInternal(value, TargetDeclination); 
+                var dec = SkyServer.TargetDec;
+                if (double.IsNaN(dec)) dec = Declination;
+                var radec = Transforms.CoordTypeToInternal(value, dec); 
                 SkyServer.TargetRa = radec.X;
             }
         }

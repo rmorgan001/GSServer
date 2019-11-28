@@ -358,7 +358,7 @@ namespace GS.SkyWatcher
             _axesStatus[(int)axis].SlewingForward = (response[1] & 0x02) == 0;
             _axesStatus[(int)axis].HighSpeed = (response[1] & 0x04) != 0;
             _axesStatus[(int)axis].NotInitialized = (response[3] & 1) == 0;
-            _axesStatus[(int)axis].StepSpeed = GetLastSlewSpeed(axis).ToString();
+            //_axesStatus[(int)axis].StepSpeed = GetLastSlewSpeed(axis).ToString();
             return _axesStatus[(int)axis];
         }
 

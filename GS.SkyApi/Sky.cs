@@ -457,6 +457,20 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
+        public double GuideRateDeclination
+        {
+            get => SkyServer.GuideRateDec;
+            set => SkyServer.GuideRateDec = value;
+        }
+
+        /// <inheritdoc />
+        public double GuideRateRightAscension
+        {
+            get => SkyServer.GuideRateRa;
+            set => SkyServer.GuideRateRa = value;
+        }
+
+        /// <inheritdoc />
         public void InitializeAxes()
         {
             var monitorItem = new MonitorEntry
@@ -1021,6 +1035,14 @@ namespace GS.SkyApi
         /// </summary>
         /// <returns></returns>
         long[] GetStepTimeFreq();
+        /// <summary>
+        /// The current Declination guide rate 
+        /// </summary>
+        double GuideRateDeclination { get; set; }
+        /// <summary>
+        /// The current Right Ascension guide rate 
+        /// </summary>
+        double GuideRateRightAscension { get; set; }
         /// <summary>
         /// F Initial the target axis
         /// </summary>
