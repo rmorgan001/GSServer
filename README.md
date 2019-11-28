@@ -101,34 +101,13 @@ Can be found at https://groups.io/g/GSS/topics
 * Andrew Johansen & Colm Brazel
 * SkywatcherEQ8 members at https://groups.yahoo.com/neo/groups/SkywatcherEQ8/info
 
-## Updates
+## Release Dates
 
 1.0.0.8 released 12 July 2019
-* Added Full Current Option
-* Corrected EQ6 :q command returning !0 Abnormal response
-
 1.0.0.10 released 28 July 2019
-* UI bug fixes and enhancements 
-   
 1.0.0.11 released 23 Aug 2019
-* User can resize application window
-* Ascom conformance changes
-* Goto strategy changed when within meridian limits setting
-* Manual Flip SOP button added
-* Corrected sync issue after a flip
-* Added color themes
-
 1.0.0.16 released 28 Sept 2019
-* New Hand Controler Modes
-* New Reset Settings
-* Park Correction
-* Abort Slew Correction for tracking
-* IsSlewing correction for CCD Commander
-
 1.0.0.17 released 9 Oct 2019
-* Added park poistions
-* Added 3d model
-
 1.0.0.18 released 1 Nov 2019
-* Added AutoHome process
-* Notes enhancements
+1.0.0.21 released 28 Nov 2019
+
