@@ -3,7 +3,7 @@ GS Server is SkyWatcher ASCOM telescope driver for use with astronomy software a
 
 You can download the installable version at [Groups.io](https://groups.io/g/GSS/files) (located in the files section) or downlaod from [Google Drive](https://drive.google.com/open?id=1_sRJypUBVD81YH4YMJzuCDS9R7_FG3Pc)
 
-Join us on Facebook at https://www.facebook.com/groups/517303835383709/
+Join us on [Facebook](https://www.facebook.com/groups/517303835383709/)
 
 ## Features
 
@@ -71,7 +71,7 @@ See also the list of [contributors](https://github.com/your/project/contributors
 
 ## Support
 
-Can be found at https://groups.io/g/GSS/topics
+Can be found at [Groups.io](https://groups.io/g/GSS)
 
 ## License
 
@@ -97,7 +97,7 @@ Can be found at https://groups.io/g/GSS/topics
 * Hat tip to anyone whose code was used
 * ASCOM development team
 * Andrew Johansen & Colm Brazel
-* SkywatcherEQ8 members at https://groups.yahoo.com/neo/groups/SkywatcherEQ8/info
+* SkywatcherEQ8 members at [Groups.io](https://groups.io/g/SkywatcherEQ8)
 
 ## Release Dates
 
