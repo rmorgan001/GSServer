@@ -1,9 +1,9 @@
 # GSServer - ASCOM Synta/SkyWatcher Mount Driver
 GS Server is SkyWatcher ASCOM telescope driver for use with astronomy software and SkyWatcher and Orion mounts.  It is built using C#, WPF, and a variation of MVVM.
 
-You can download the installable version at https://groups.io/g/GSS/files . located in the files section.
+You can download the installable version at [Groups.io](https://groups.io/g/GSS/files) (located in the files section) or downlaod from [Google Drive](https://drive.google.com/open?id=1_sRJypUBVD81YH4YMJzuCDS9R7_FG3Pc)
 
-Join us on Facebook at https://www.facebook.com/groups/517303835383709/
+Join us on [Facebook](https://www.facebook.com/groups/517303835383709/)
 
 ## Features
 
@@ -22,8 +22,6 @@ Join us on Facebook at https://www.facebook.com/groups/517303835383709/
 * Autohome process for axes with home sensors
 
 ![Alt text](Docs/gsserver2.jpg?raw=true "GSServer")
-
-Installable version at https://groups.io/g/GSS/files .  located in the files section.
 
 ## Solution Projects
 
@@ -73,7 +71,7 @@ See also the list of [contributors](https://github.com/your/project/contributors
 
 ## Support
 
-Can be found at https://groups.io/g/GSS/topics
+Can be found at [Groups.io](https://groups.io/g/GSS)
 
 ## License
 
@@ -99,36 +97,15 @@ Can be found at https://groups.io/g/GSS/topics
 * Hat tip to anyone whose code was used
 * ASCOM development team
 * Andrew Johansen & Colm Brazel
-* SkywatcherEQ8 members at https://groups.yahoo.com/neo/groups/SkywatcherEQ8/info
+* SkywatcherEQ8 members at [Groups.io](https://groups.io/g/SkywatcherEQ8)
 
-## Updates
+## Release Dates
 
 1.0.0.8 released 12 July 2019
-* Added Full Current Option
-* Corrected EQ6 :q command returning !0 Abnormal response
-
 1.0.0.10 released 28 July 2019
-* UI bug fixes and enhancements 
-   
 1.0.0.11 released 23 Aug 2019
-* User can resize application window
-* Ascom conformance changes
-* Goto strategy changed when within meridian limits setting
-* Manual Flip SOP button added
-* Corrected sync issue after a flip
-* Added color themes
-
 1.0.0.16 released 28 Sept 2019
-* New Hand Controler Modes
-* New Reset Settings
-* Park Correction
-* Abort Slew Correction for tracking
-* IsSlewing correction for CCD Commander
-
 1.0.0.17 released 9 Oct 2019
-* Added park poistions
-* Added 3d model
-
 1.0.0.18 released 1 Nov 2019
-* Added AutoHome process
-* Notes enhancements
+1.0.0.21 released 28 Nov 2019
+
