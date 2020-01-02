@@ -243,7 +243,7 @@ namespace GS.Shared
                 OnStaticPropertyChanged();
             }
         }
-        
+
         #endregion
 
         /// <summary>
@@ -301,7 +301,7 @@ namespace GS.Shared
         private static void LogSetting(string method, string value)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = $"{method}", Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = $"{method}", Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
             MonitorLog.LogToMonitor(monitorItem);
         }
 

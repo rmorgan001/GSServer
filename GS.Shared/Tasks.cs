@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace GS.Shared
 {
-    static class Tasks
+    public static class Tasks
     {
         /// <summary>
         /// a extension method version that incorporates cancellation of the timeout when the original task completes as suggested
@@ -38,6 +38,19 @@ namespace GS.Shared
                 timeoutCancellationTokenSource.Cancel();
                 return await task;  // Very important in order to propagate exceptions
             }
+        }
+
+        /// <summary>
+        /// This method depends on the system clock. This means that the time delay will approximately equal
+        /// the resolution of the system clock if the millisecondsDelay argument is less than the resolution
+        /// of the system clock, which is approximately 15 milliseconds on Windows systems.
+        /// </summary>
+        /// <param name="ms"></param>
+        public static async void DelayHandler(int ms)
+        {
+            // whatever you need to do before delay goes here         
+            await Task.Delay(ms);
+            // whatever you need to do after delay.
         }
     }
 }

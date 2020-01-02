@@ -13,12 +13,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using GS.Principles;
+using GS.Shared;
 using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
-using GS.Principles;
-using GS.Shared;
 
 namespace GS.Simulator
 {
@@ -39,6 +39,8 @@ namespace GS.Simulator
         internal static bool IsConnected => IOSerial.IsConnected;
         internal MountInfo MountInfo { get; private set; }
         internal bool MonitorPulse { private get; set; }
+        internal bool PulseRaRunning { get; private set; }
+        internal bool PulseDecRunning { get; private set; }
 
         #endregion
 
@@ -79,7 +81,7 @@ namespace GS.Simulator
             //put in for capture tracking in charts
             var stepsx = _ioserial.Send($"steps,{Axis.Axis1}");
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"tracking,{null},{stepsx}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"tracking,{null},{stepsx}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             var y = Convert.ToDouble(_ioserial.Send($"degrees,{Axis.Axis2}"));
@@ -118,16 +120,34 @@ namespace GS.Simulator
         /// <returns></returns>
         internal bool AxisPulse(Axis axis, double guiderate, int duration, int backlash, double declination = 0)
         {
+
+            if (axis == Axis.Axis1)
+            {
+                PulseRaRunning = true;
+            }
+            else
+            {
+                PulseDecRunning = true;
+            }
+
             var arcsecs = duration / 1000.0 * Conversions.Deg2ArcSec(Math.Abs(guiderate));
 
             switch (axis)
             {
                 case Axis.Axis1:
                     //Check for minimum pulse or a pulse less than 1 step
-                    if (arcsecs < .0002) return false;
+                    if (arcsecs < .0002)
+                    {
+                        PulseRaRunning = false;
+                        return false;
+                    }
                     break;
                 case Axis.Axis2:
-                    if (arcsecs < .0002) return false;
+                    if (arcsecs < .0002)
+                    {
+                        PulseDecRunning = false;
+                        return false;
+                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
@@ -156,18 +176,26 @@ namespace GS.Simulator
             }
             sw.Reset();
             _ioserial.Send($"pulse,{axis},{0}");
+            if (axis == Axis.Axis1)
+            {
+                PulseRaRunning = false;
+            }
+            else
+            {
+                PulseDecRunning = false;
+            }
 
-            
+
             if (MonitorPulse)
             {
                 var loc1 = AxisSteps();
-                pulseEntry.PositionEnd = loc1[(int) axis];
+                pulseEntry.PositionEnd = loc1[(int)axis];
                 pulseEntry.EndTime = HiResDateTime.UtcNow;
                 pulseEntry.AltPPECon = false;
                 pulseEntry.PPECon = false;
                 MonitorLog.LogToMonitor(pulseEntry);
             }
-            
+
             return false;
         }
 

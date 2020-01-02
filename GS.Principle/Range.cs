@@ -119,8 +119,8 @@ namespace GS.Principles
         /// <returns></returns>
         public static double[] RangeAltAz(double[] altaz)
         {
-           double[] altAz = { Range90(altaz[0]), Range360(altaz[1]) };
-           return altAz;
+            double[] altAz = { Range90(altaz[0]), Range360(altaz[1]) };
+            return altAz;
         }
 
         /// <summary>

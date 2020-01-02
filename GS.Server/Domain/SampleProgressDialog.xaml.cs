@@ -7,7 +7,7 @@ namespace GS.Server.Domain
     /// </summary>
     [ComVisible(false)]
     public partial class SampleProgressDialog
-    { 
+    {
         public SampleProgressDialog()
         {
             InitializeComponent();

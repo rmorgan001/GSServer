@@ -13,17 +13,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using System.Drawing;
-using System.Windows;
-using System.Windows.Threading;
 using GS.Principles;
 using GS.Server.Domain;
 using GS.Server.Helpers;
@@ -34,6 +23,17 @@ using GS.Shared;
 using LiveCharts.Defaults;
 using LiveCharts.Geared;
 using MaterialDesignThemes.Wpf;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace GS.Server.Charting
 {
@@ -51,6 +51,7 @@ namespace GS.Server.Charting
         private CancellationToken _ctPulse;
         private double _stepsPerSecond;
         private readonly string _version;
+        private bool _disposed;
         // j1
         private long _jstartpos;
         private DateTime _jstarttime;
@@ -58,7 +59,7 @@ namespace GS.Server.Charting
         private GuiderImpl _phd;
         private CancellationTokenSource _ctsPhd;
         private CancellationToken _ctPhd;
-        private bool _taskRunning;   
+        private bool _taskRunning;
         //test data
         private CancellationTokenSource _ctsChart;
         private MediaTimer mediaTimer;
@@ -72,50 +73,50 @@ namespace GS.Server.Charting
         #region VM Items
 
         public ChartingVM()
+        {
+            try
+            {
+                using (new WaitCursor())
                 {
-                    try
-                    {
-                        using (new WaitCursor())
-                        {
-                            var monitorItem = new MonitorEntry
-                                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading ChartingVM" };
-                            MonitorLog.LogToMonitor(monitorItem);
+                    var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading ChartingVM" };
+                    MonitorLog.LogToMonitor(monitorItem);
 
-                            ChartSettings.Load();
-                            //ChartSettings.LogChartSettings();
-                            LoadChart();
-                            _version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                    ChartSettings.Load();
+                    //ChartSettings.LogChartSettings();
+                    LoadChart();
+                    _version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-                            // Pulse events
-                            MonitorQueue.StaticPropertyChanged += PropertyChangedMonitor;
-                            // Phd events
-                            GuiderImpl.PropertyChanged += PropertyChangedGuiding;
-                            // Settings
-                            ChartSettings.StaticPropertyChanged += PropertyChangedSettings;
+                    // Pulse events
+                    MonitorQueue.StaticPropertyChanged += PropertyChangedMonitor;
+                    // Phd events
+                    GuiderImpl.PropertyChanged += PropertyChangedGuiding;
+                    // Settings
+                    ChartSettings.StaticPropertyChanged += PropertyChangedSettings;
 
                     // X axis second timer
-                    _xAxisTimer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(1)};
-                            _xAxisTimer.Tick += XAxisTimer_Tick;
+                    _xAxisTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+                    _xAxisTimer.Tick += XAxisTimer_Tick;
 
-                            // combo selections
-                            ColorsList = new List<string>();
-                            foreach (KnownColor colorValue in Enum.GetValues(typeof(KnownColor)))
-                            {
-                                var color = Color.FromKnownColor(colorValue);
-                                if (!ColorsList.Contains(color.Name) && !color.IsSystemColor)
-                                { ColorsList.Add(color.Name); }
-                            }
-                        }
-                    }
-                    catch (Exception ex)
+                    // combo selections
+                    ColorsList = new List<string>();
+                    foreach (KnownColor colorValue in Enum.GetValues(typeof(KnownColor)))
                     {
-                        var monitorItem = new MonitorEntry
-                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" GuidingVM: {ex.Message}, {ex.StackTrace}" };
-                        MonitorLog.LogToMonitor(monitorItem);
-
-                        OpenDialog(ex.Message);
+                        var color = Color.FromKnownColor(colorValue);
+                        if (!ColorsList.Contains(color.Name) && !color.IsSystemColor)
+                        { ColorsList.Add(color.Name); }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" GuidingVM: {ex.Message}, {ex.StackTrace}" };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message);
+            }
+        }
 
         private string _phdBadgeContent;
         public string PhdBadgeContent
@@ -162,13 +163,12 @@ namespace GS.Server.Charting
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime =  HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
             }
         }
-
         private void PropertyChangedGuiding(object sender, PropertyChangedEventArgs e)
         {
             try
@@ -187,13 +187,12 @@ namespace GS.Server.Charting
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime =  HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
             }
         }
-
         private void PropertyChangedSettings(object sender, PropertyChangedEventArgs e)
         {
             try
@@ -207,24 +206,41 @@ namespace GS.Server.Charting
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
             }
         }
-
         public void Dispose()
         {
-            _ctsChart?.Dispose();
-            _phd?.Dispose();
-            RaValues?.Dispose();
-            DecValues?.Dispose();
-            ThirdValues?.Dispose();
-            FourthValues?.Dispose();
-            mediaTimer?.Stop();
+            Dispose(disposing: true);
+            GC.SuppressFinalize(obj: this);
         }
+        private void Dispose(bool disposing)
+        {
+            // Check to see if Dispose has already been called.
+            if (_disposed) return;
+            // If disposing equals true, dispose all managed
+            // and unmanaged resources.
+            if (disposing)
+            {
+                // Dispose managed resources.
+                _ctsChart?.Dispose();
+                _ctsPulse?.Dispose();
+                _phd?.Dispose();
+                RaValues?.Dispose();
+                DecValues?.Dispose();
+                ThirdValues?.Dispose();
+                FourthValues?.Dispose();
+                mediaTimer?.Stop();
+                Charting?.Dispose();
+            }
 
+            // Note disposing has been done.
+            _disposed = true;
+        }
+        
         private ICommand _clickStartChartingCommand;
         public ICommand ClickStartChartingCommand
         {
@@ -242,6 +258,7 @@ namespace GS.Server.Charting
                 {
                     switch (DataType)
                     {
+                        case ChartTypes.Rejected:
                         case ChartTypes.Steps:
                         case ChartTypes.Execute:
                         case ChartTypes.Duration:
@@ -260,7 +277,7 @@ namespace GS.Server.Charting
                 IsCharting = false;
 
                 var monitorItem = new MonitorEntry
-                    { Datetime =  HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}, {ex.StackTrace}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}, {ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -288,7 +305,7 @@ namespace GS.Server.Charting
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime =  HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}, {ex.StackTrace}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}, {ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -326,9 +343,13 @@ namespace GS.Server.Charting
 
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime =  HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}, {ex.StackTrace}"
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $" {ex.Message}, {ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -360,7 +381,7 @@ namespace GS.Server.Charting
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime =  HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -434,7 +455,7 @@ namespace GS.Server.Charting
         }
 
         private bool _isCharting;
-        private bool  IsCharting
+        private bool IsCharting
         {
             get => _isCharting;
             set
@@ -863,7 +884,7 @@ namespace GS.Server.Charting
                 OnPropertyChanged();
             }
         }
-       
+
         private TimeSpan _animationsSpeed;
         public TimeSpan AnimationsSpeed
         {
@@ -991,6 +1012,7 @@ namespace GS.Server.Charting
             ChartName = string.Empty;
             switch (DataType)
             {
+                case ChartTypes.Rejected:
                 case ChartTypes.Steps:
                 case ChartTypes.Execute:
                 case ChartTypes.Duration:
@@ -1031,6 +1053,9 @@ namespace GS.Server.Charting
                     IsCharting = true;
                     if (TestData) RunTestdata();
                     if (PhdConnected()) _phd?.PixelScale();
+
+                   // var res = _phd?.Call("get_camera_frame_size");
+
                     _stepsPerSecond = SkyServer.StepsPerRevolution[0] / 360.0 / 3600;
                     DataToLog(ChartItemCode.Data, $"Version={_version}");
                     DataToLog(ChartItemCode.Data, $"StepsPerRevolution={SkyServer.StepsPerRevolution[0]}");
@@ -1063,23 +1088,79 @@ namespace GS.Server.Charting
         private void PulseProcess(PulseEntry entry)
         {
             if (entry == null) return;
-            
+
             switch (entry.Axis)
             {
                 case 0:
                     if (RaCheckBox)
                     {
-                        var ra = new DateTimePoint {DateTime = entry.StartTime.ToLocalTime(), Value = PulseConversion(entry)};
-                        RaValues.Add(ra);
-                        EntryToLog(ChartItemCode.RaValue, ra);
+                        var ra = new DateTimePoint { DateTime = entry.StartTime.ToLocalTime(), Value = PulseConversion(entry) };
+                        switch (DataType)
+                        {
+                            case ChartTypes.Steps:
+                                if (entry.Rejected) break;
+                                    RaValues.Add(ra);
+                                    EntryToLog(ChartItemCode.RaValue, ra);
+                                break;
+                            case ChartTypes.Execute:
+                                if (entry.Rejected) break;
+                                    RaValues.Add(ra);
+                                    EntryToLog(ChartItemCode.RaValue, ra);
+                                break;
+                            case ChartTypes.Duration:
+                                if (entry.Rejected) break;
+                                    RaValues.Add(ra);
+                                    EntryToLog(ChartItemCode.RaValue, ra);
+                                break;
+                            case ChartTypes.Tracking:
+                                if (entry.Rejected) break;
+                                    RaValues.Add(ra);
+                                    EntryToLog(ChartItemCode.RaValue, ra);
+                                break;
+                            case ChartTypes.Rejected:
+                                if (!entry.Rejected) break;
+                                    RaValues.Add(ra);
+                                    EntryToLog(ChartItemCode.RaValue, ra);
+                                break;
+                            default:
+                                return;
+                        }
                     }
                     break;
                 case 1:
                     if (DecCheckBox)
                     {
                         var dec = new DateTimePoint { DateTime = entry.StartTime.ToLocalTime(), Value = PulseConversion(entry) };
-                        DecValues.Add(dec);
-                        EntryToLog(ChartItemCode.DecValue, dec);
+                        switch (DataType)
+                        {
+                            case ChartTypes.Steps:
+                                if (entry.Rejected) break;
+                                    DecValues.Add(dec);
+                                    EntryToLog(ChartItemCode.DecValue, dec);
+                                break;
+                            case ChartTypes.Execute:
+                                if (entry.Rejected) break;
+                                    DecValues.Add(dec);
+                                    EntryToLog(ChartItemCode.DecValue, dec);
+                                break;
+                            case ChartTypes.Duration:
+                                if (entry.Rejected) break;
+                                    DecValues.Add(dec);
+                                    EntryToLog(ChartItemCode.DecValue, dec);
+                                break;
+                            case ChartTypes.Tracking:
+                                if (entry.Rejected) break;
+                                    DecValues.Add(dec);
+                                    EntryToLog(ChartItemCode.DecValue, dec);
+                                break;
+                            case ChartTypes.Rejected:
+                                if (!entry.Rejected) break;
+                                    DecValues.Add(dec);
+                                    EntryToLog(ChartItemCode.DecValue, dec);
+                                break;
+                            default:
+                                return;
+                        }
                     }
 
                     break;
@@ -1091,26 +1172,30 @@ namespace GS.Server.Charting
 
         }
 
-        private double PulseConversion(PulseEntry item)
+        private double PulseConversion(PulseEntry entry)
         {
             double val = 0;
             switch (DataType)
             {
                 case ChartTypes.Steps:
-                    var difsteps = Math.Abs(item.PositionEnd - item.PositionStart);
+                    var difsteps = Math.Abs(entry.PositionEnd - entry.PositionStart);
                     val = ShowInArcseconds ? difsteps / _stepsPerSecond : difsteps;
                     break;
                 case ChartTypes.Execute:
-                    var ex = (item.EndTime - item.StartTime).TotalMilliseconds;
-                    val = ShowInArcseconds ? (ex / 1000.0) * Math.Abs(item.Rate) * 3600 : ex;
+                    var ex = (entry.EndTime - entry.StartTime).TotalMilliseconds;
+                    val = ShowInArcseconds ? (ex / 1000.0) * Math.Abs(entry.Rate) * 3600 : ex;
                     break;
                 case ChartTypes.Duration:
-                    var dur = Math.Abs(item.Duration);
-                    val = ShowInArcseconds ? (dur / 1000.0) * Math.Abs(item.Rate) * 3600 : dur;
+                    var dur = Math.Abs(entry.Duration);
+                    val = ShowInArcseconds ? (dur / 1000.0) * Math.Abs(entry.Rate) * 3600 : dur;
+                    break;
+                case ChartTypes.Rejected:
+                    var dur1 = Math.Abs(entry.Duration);
+                    val = ShowInArcseconds ? (dur1 / 1000.0) * Math.Abs(entry.Rate) * 3600 : dur1;
                     break;
             }
-            val = item.Rate < 0 ? -val : +val;
-            switch (item.Axis)
+            val = entry.Rate < 0 ? -val : +val;
+            switch (entry.Axis)
             {
                 case 0 when InvertRa:
                 case 1 when InvertDec:
@@ -1120,9 +1205,9 @@ namespace GS.Server.Charting
             val = ((int)(val * 1000)) / 1000.00; // set decimal points for chart speed
             return val;
         }
- 
+
         #endregion
-       
+
         #region CmdJ
 
         private void Cmdj1Charting()
@@ -1174,9 +1259,9 @@ namespace GS.Server.Charting
             {
                 var ra = new DateTimePoint { DateTime = entry.Datetime.ToLocalTime(), Value = Cmdj1Conversion(entry) };
                 RaValues.Add(ra);
-                EntryToLog(ChartItemCode.RaValue,ra);
+                EntryToLog(ChartItemCode.RaValue, ra);
             }
-            
+
             // Max items on the chart
             if (RaValues.Count > MaxPoints) RaValues.RemoveAt(0);
             if (DecValues.Count > MaxPoints) DecValues.RemoveAt(0);
@@ -1186,7 +1271,7 @@ namespace GS.Server.Charting
         {
             var msg = entry.Message.Split(',');
             if (msg.Length < 2) return 0;
-            var islong =  long.TryParse(msg[2],out var position);
+            var islong = long.TryParse(msg[2], out var position);
             if (!islong) position = 0;
             if (_jstarttime == new DateTime(1900, 01, 01))
             {
@@ -1196,8 +1281,8 @@ namespace GS.Server.Charting
 
             var trackingrate = SkyServer.CurrentTrackingRate();
             if (SkyServer.SouthernHemisphere) trackingrate = -trackingrate;
-             var steps = (position - _jstartpos) / _stepsPerSecond;
-            var time = (entry.Datetime - _jstarttime).TotalSeconds; 
+            var steps = (position - _jstartpos) / _stepsPerSecond;
+            var time = (entry.Datetime - _jstarttime).TotalSeconds;
             var tracking = (trackingrate * 3600);
             var y = steps - time * tracking;
 
@@ -1255,7 +1340,7 @@ namespace GS.Server.Charting
             catch (GuiderException ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime =  HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 switch (ex.ErrorCode)
@@ -1272,7 +1357,7 @@ namespace GS.Server.Charting
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime =  HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message);
             }
@@ -1294,7 +1379,7 @@ namespace GS.Server.Charting
         private void PhdProcess(GuideStep entry)
         {
             if (entry == null) return;
-            if(!PhdConnected()) return;
+            if (!PhdConnected()) return;
 
             if (Math.Abs(_phd.LastPixelScale) <= 0.0)
             {
@@ -1337,7 +1422,7 @@ namespace GS.Server.Charting
             PhdBadgeContent = con ? "on" : "";
             return con;
         }
-     
+
         #endregion
 
         #region Dialog  
@@ -1395,7 +1480,7 @@ namespace GS.Server.Charting
             IsDialogOpen = true;
 
             var monitorItem = new MonitorEntry
-                { Datetime =  HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {msg}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {msg}" };
             MonitorLog.LogToMonitor(monitorItem);
         }
 
@@ -1486,7 +1571,7 @@ namespace GS.Server.Charting
             _ctsChart?.Dispose();
             _ctsChart = null;
             mediaTimer = null;
-        } 
+        }
         private async void ChartLoopAsync()
         {
             var r = new Random();
@@ -1516,7 +1601,7 @@ namespace GS.Server.Charting
                                     Thread.Sleep(300);
                                     var end = start + r.Next(0, 6);
 
-                                    var pulse = new PulseEntry { PositionStart = start, PositionEnd = end};
+                                    var pulse = new PulseEntry { PositionStart = start, PositionEnd = end };
                                     if (end % 2 == 0)
                                     {
                                         pulse.Rate = -0.002089028;
@@ -1526,8 +1611,8 @@ namespace GS.Server.Charting
                                         pulse.Rate = 0.002089028;
                                     }
 
-                                    pulse.StartTime =  HiResDateTime.UtcNow - TimeSpan.FromMilliseconds(r.Next(20, 150));
-                                    pulse.EndTime =  HiResDateTime.UtcNow;
+                                    pulse.StartTime = HiResDateTime.UtcNow - TimeSpan.FromMilliseconds(r.Next(20, 150));
+                                    pulse.EndTime = HiResDateTime.UtcNow;
 
                                     pulse.Duration = r.Next(1, 50);
                                     start = end;
@@ -1551,7 +1636,7 @@ namespace GS.Server.Charting
                                         Device = MonitorDevice.Telescope,
                                         Category = MonitorCategory.Mount,
                                         Type = MonitorType.Data,
-                                        Datetime =  HiResDateTime.UtcNow,
+                                        Datetime = HiResDateTime.UtcNow,
                                         Message = $":j1,{hexstr}"
                                     };
 
@@ -1571,42 +1656,42 @@ namespace GS.Server.Charting
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime =  HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" Message:{ex.Message} Stack:{ex.StackTrace}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" Message:{ex.Message} Stack:{ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 IsDataOn = false;
                 OpenDialog(ex.Message);
             }
-        }   
+        }
         // multimedia  /.06-.08 0-1.0%CPU intermidant jumps(2)
         private void Timer4()
         {
             SkyServer.StepsPerRevolution = new long[] { 11136000, 11136000 };
-            mediaTimer = new MediaTimer { Period = 500};
+            mediaTimer = new MediaTimer { Period = 500 };
             mediaTimer.Tick += TestDatajEvent;
-            mediaTimer.Start(); 
+            mediaTimer.Start();
         }
         private void TestDatajEvent(object sender, EventArgs e)
         {
             var hex = $"{Numbers.LongToHex(startJ)}";
-                var hexstr = $"={hex}";
-                var num = Strings.StringToLong(hexstr);
-                startJ += 65;
+            var hexstr = $"={hex}";
+            var num = Strings.StringToLong(hexstr);
+            startJ += 65;
 
-                var entry = new MonitorEntry
-                {
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Mount,
-                    Type = MonitorType.Data,
-                    Datetime =  HiResDateTime.UtcNow,
-                    Message = $":j1,{hexstr},{num}"
-                };
-               // MonitorQueue.WriteOutCmdj(entry);
-                Cmdj1Process(entry);
+            var entry = new MonitorEntry
+            {
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Mount,
+                Type = MonitorType.Data,
+                Datetime = HiResDateTime.UtcNow,
+                Message = $":j1,{hexstr},{num}"
+            };
+            // MonitorQueue.WriteOutCmdj(entry);
+            Cmdj1Process(entry);
         }
-        
+
         #endregion
     }
 
-    public enum ChartTypes { Steps, Execute, Duration, Tracking }
+    public enum ChartTypes { Steps, Execute, Duration, Tracking, Rejected }
 }

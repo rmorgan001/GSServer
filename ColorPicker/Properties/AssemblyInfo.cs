@@ -28,13 +28,13 @@ using System.Windows;
 
 //[assembly: NeutralResourcesLanguage("en-US" , UltimateResourceFallbackLocation.MainAssembly)]
 
-[assembly:ThemeInfo(
+[assembly: ThemeInfo(
     ResourceDictionaryLocation.None, //Speicherort themenspezifischer Ressourcenverzeichnisse
-                             //(wird verwendet, wenn eine Ressource auf der Seite nicht gefunden werden kann, 
-                             // oder im Anwendungsressourcenverzeichnis nicht gefunden werden kann)
+                                     //(wird verwendet, wenn eine Ressource auf der Seite nicht gefunden werden kann, 
+                                     // oder im Anwendungsressourcenverzeichnis nicht gefunden werden kann)
     ResourceDictionaryLocation.SourceAssembly //Speicherort des generischen Ressourcenverzeichnisses
-                             //(wird verwendet, wenn eine Ressource auf der Seite nicht gefunden werden kann, 
-                             // in der Anwendung oder in anderen themenspezifischen Ressourcenverzeichnissen nicht gefunden werden kann)
+                                              //(wird verwendet, wenn eine Ressource auf der Seite nicht gefunden werden kann, 
+                                              // in der Anwendung oder in anderen themenspezifischen Ressourcenverzeichnissen nicht gefunden werden kann)
 )]
 
 // Versionsinformationen für eine Assembly bestehen aus den folgenden vier Werten:

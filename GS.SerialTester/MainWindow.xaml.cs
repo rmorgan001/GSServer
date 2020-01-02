@@ -124,7 +124,7 @@ namespace GS.SerialTester
             var sw = Stopwatch.StartNew();
             while (sw.Elapsed.TotalMilliseconds < 100)
             {
-                
+
             }
             serial?.Close();
         }
@@ -158,9 +158,9 @@ namespace GS.SerialTester
                 if (Interval < 11.0 && zoomcounter < 30)
                 {
                     zoomcounter++;
-                    if (zoomcounter < 12)zoomtxt = zoom.Substring(0, zoomcounter);
+                    if (zoomcounter < 12) zoomtxt = zoom.Substring(0, zoomcounter);
                 }
-                
+
                 InvokeOnUiThread(
                     delegate
                     {

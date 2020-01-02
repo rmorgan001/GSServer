@@ -110,7 +110,7 @@ namespace GS.Server.Helpers
     /// </summary>
     internal struct INPUT
     {
-        #pragma warning disable 0649
+#pragma warning disable 0649
         public int TYPE;
         public int dx;
         public int dy;
@@ -118,6 +118,6 @@ namespace GS.Server.Helpers
         public int dwFlags;
         public int time;
         public IntPtr dwExtraInfo;
-        #pragma warning restore  0649
+#pragma warning restore 0649
     }
 }

@@ -13,12 +13,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using System;
-using System.Reflection;
-using System.Threading;
 using ASCOM.DeviceInterface;
 using GS.Principles;
 using GS.Shared;
+using System;
+using System.Reflection;
+using System.Threading;
 
 namespace GS.Server.SkyTelescope
 {
@@ -157,8 +157,8 @@ namespace GS.Server.SkyTelescope
         /// <param name="altAz"></param>
         /// <returns></returns>
         internal static double[] AltAzToAxesYX(double[] altAz)
-        { 
-            var axes = new []{altAz[0],altAz[1]};
+        {
+            var axes = new[] { altAz[0], altAz[1] };
             double lst;
             switch (SkySettings.AlignmentMode)
             {
@@ -195,9 +195,9 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
             axes = Range.RangeAxesXY(axes);
-            
+
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Range:{axes[0]},{axes[1]}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Range:{axes[0]},{axes[1]}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             return new[] { axes[1], axes[0] };
@@ -262,7 +262,7 @@ namespace GS.Server.SkyTelescope
         /// <returns></returns>
         internal static double[] AxesXYToRaDec(double[] axes)
         {
-            var raDec = new[]{ axes[0], axes[1] };
+            var raDec = new[] { axes[0], axes[1] };
             switch (SkySettings.AlignmentMode)
             {
                 case AlignmentModes.algAltAz:
@@ -297,7 +297,7 @@ namespace GS.Server.SkyTelescope
         /// <returns></returns>
         internal static double[] RaDecToAxesXY(double[] raDec)
         {
-            var axes = new[] { raDec[0], raDec[1]};
+            var axes = new[] { raDec[0], raDec[1] };
             switch (SkySettings.AlignmentMode)
             {
                 case AlignmentModes.algAltAz:
@@ -321,7 +321,7 @@ namespace GS.Server.SkyTelescope
                     var b = AxesAppToMount(axes);
                     var alt = SkyServer.CheckAlternatePosition(b);
                     if (alt != null) axes = alt;
-                    
+
                     return axes;
                 case AlignmentModes.algPolar:
                     axes[0] = (SkyServer.SiderealTime - axes[0]) * 15.0;

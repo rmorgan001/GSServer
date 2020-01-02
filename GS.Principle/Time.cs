@@ -13,12 +13,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using System;
 using ASCOM.Utilities;
+using System;
 
 namespace GS.Principles
 {
-    public class Time: IDisposable
+    public class Time : IDisposable
     {
         private static readonly Util util = new Util();
 
@@ -166,12 +166,12 @@ namespace GS.Principles
             {
                 while (d < 0.0)
                 {
-                    d = d + 360.0;
+                    d += 360.0;
                 }
             }
             else
             {
-                while (d > 360.0)d = d - 360.0;
+                while (d > 360.0) d -= 360.0;
             }
             if (nutation)
             {
@@ -179,41 +179,41 @@ namespace GS.Principles
                 var e = 125.04452 - 1934.136261 * b;
                 if (e < 0.0)
                 {
-                    while (e < 0.0) e = e + 360.0;
+                    while (e < 0.0) e += 360.0;
                 }
                 else
                 {
-                    while (e > 360.0) e = e - 360.0;
+                    while (e > 360.0) e -= 360.0;
                 }
                 //calculat L mean longitude of the Sun
                 var f = 280.4665 + 36000.7698 * b;
                 if (f < 0.0)
                 {
-                    while (f < 0.0) f = f + 360.0;
+                    while (f < 0.0) f += 360.0;
                 }
                 else
                 {
-                    while (f > 360.0) f = f - 360.0;
+                    while (f > 360.0) f -= 360.0;
                 }
                 //calculate L1 mean longitude of the Moon
                 var g = 218.3165 + 481267.8813 * b;
                 if (g < 0.0)
                 {
-                    while (g < 0) g = g + 360.0;
+                    while (g < 0) g += 360.0;
                 }
                 else
                 {
-                    while (g > 360.0) g = g - 360.0;
+                    while (g > 360.0) g -= 360.0;
                 }
                 //calculate e Obliquity of the Ecliptic
                 var h = 23.439 - 0.0000004 * b;
                 if (h < 0.0)
                 {
-                    while (h < 0.0) h = h + 360.0;
+                    while (h < 0.0) h += 360.0;
                 }
                 else
                 {
-                    while (h > 360.0) h = h - 360.0;
+                    while (h > 360.0) h -= 360.0;
                 }
                 var i = (-17.2 * Math.Sin(e)) - (1.32 * Math.Sin(2 * f)) - (0.23 * Math.Sin(2 * g)) + (0.21 * Math.Sin(2 * e));
                 var j = (i * Math.Cos(h)) / 3600;               // Nutation correction for true values
@@ -292,7 +292,7 @@ namespace GS.Principles
         public static void TimerDelay(int ms)
         {
             var i = 0;
-            var mediaTimer = new MediaTimer {Mode = TimerMode.OneShot, Period = ms};
+            var mediaTimer = new MediaTimer { Mode = TimerMode.OneShot, Period = ms };
             mediaTimer.Tick += (s, args) => i = 1;
             mediaTimer.Start();
             while (i == 0) { }

@@ -13,6 +13,14 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using GS.Server.Domain;
+using GS.Server.Helpers;
+using GS.Server.Main;
+using GS.Server.SkyTelescope;
+using GS.Shared;
+using MaterialDesignColors;
+using MaterialDesignThemes.Wpf;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,14 +31,6 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
-using GS.Server.Domain;
-using GS.Server.Helpers;
-using GS.Server.Main;
-using GS.Server.SkyTelescope;
-using GS.Shared;
-using MaterialDesignColors;
-using MaterialDesignThemes.Wpf;
-using Microsoft.Win32;
 
 namespace GS.Server.Settings
 {
@@ -75,7 +75,7 @@ namespace GS.Server.Settings
                     SleepMode = Settings.SleepMode;
 
                     // Theme Colors
-                    PrimaryColors = (IList<Swatch>) new SwatchesProvider().Swatches;
+                    PrimaryColors = (IList<Swatch>)new SwatchesProvider().Swatches;
                     var primaryColors = PrimaryColors as Swatch[] ?? PrimaryColors.ToArray();
                     AccentColors = primaryColors.Where(item => item.IsAccented).ToList();
                     PrimaryColor = primaryColors.First(item => item.Name.Equals(Settings.PrimaryColor));
@@ -91,7 +91,7 @@ namespace GS.Server.Settings
                 }
             }
             catch (Exception ex)
-            { 
+            {
                 var monitorItem = new MonitorEntry
                 { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
@@ -126,7 +126,7 @@ namespace GS.Server.Settings
                                 DarkTheme = Settings.DarkTheme;
                                 break;
                             case "PrimaryColor":
-                               // PrimaryColor = Settings.PrimaryColor;
+                                // PrimaryColor = Settings.PrimaryColor;
                                 break;
                             case "AccentColor":
                                 //AccentColor = Settings.AccentColor;
@@ -164,12 +164,12 @@ namespace GS.Server.Settings
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
             }
-        }      
+        }
 
         #endregion
 
@@ -377,7 +377,7 @@ namespace GS.Server.Settings
                 OnPropertyChanged();
             }
         }
-        
+
         public bool HomeWarning
         {
             get => SkySettings.HomeWarning;
@@ -398,7 +398,7 @@ namespace GS.Server.Settings
             get => _skyTelescopeSettings;
             set
             {
-                _skyTelescopeSettings = value; 
+                _skyTelescopeSettings = value;
                 OnPropertyChanged();
             }
         }
@@ -442,7 +442,7 @@ namespace GS.Server.Settings
             get => _monitorSettings;
             set
             {
-                _monitorSettings = value; 
+                _monitorSettings = value;
                 OnPropertyChanged();
             }
 
@@ -573,7 +573,7 @@ namespace GS.Server.Settings
                         Shared.Properties.Monitor.Default.Save();
                         Shared.Properties.Monitor.Default.Reload();
                     }
-                    
+
                     IsSettingsResetDialogOpen = false;
                     OpenDialog(Application.Current.Resources["msgRestart"].ToString());
                     ClearSettings();
@@ -1037,7 +1037,7 @@ namespace GS.Server.Settings
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -1066,7 +1066,7 @@ namespace GS.Server.Settings
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -1095,7 +1095,7 @@ namespace GS.Server.Settings
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);

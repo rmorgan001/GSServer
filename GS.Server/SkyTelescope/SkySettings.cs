@@ -13,6 +13,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using ASCOM.DeviceInterface;
+using ASCOM.Utilities;
+using GS.Shared;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -21,10 +25,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using ASCOM.DeviceInterface;
-using ASCOM.Utilities;
-using GS.Shared;
-using Newtonsoft.Json;
 
 namespace GS.Server.SkyTelescope
 {
@@ -502,7 +502,7 @@ namespace GS.Server.SkyTelescope
                 OnStaticPropertyChanged();
 
                 var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
                 MonitorLog.LogToMonitor(monitorItem);
             }
         }
@@ -899,7 +899,7 @@ namespace GS.Server.SkyTelescope
                 OnStaticPropertyChanged();
             }
         }
-        
+
         private static double _latitude;
         public static double Latitude
         {
@@ -969,6 +969,20 @@ namespace GS.Server.SkyTelescope
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
                 SkyServer.SetSlewRates(value);
+            }
+        }
+
+        private static bool _modelOn;
+        public static bool ModelOn
+        {
+            get => _modelOn;
+            set
+            {
+                if (_modelOn == value) return;
+                _modelOn = value;
+                Properties.SkyTelescope.Default.ModelOn = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
             }
         }
 
@@ -1160,7 +1174,7 @@ namespace GS.Server.SkyTelescope
             get => _parkPositions;
             set
             {
-               // if (_parkPositions == value) return;
+                // if (_parkPositions == value) return;
                 _parkPositions = value.OrderBy(ParkPosition => ParkPosition.Name).ToList();
                 var output = JsonConvert.SerializeObject(_parkPositions);
                 Properties.SkyTelescope.Default.ParkPositions = output;
@@ -1274,6 +1288,7 @@ namespace GS.Server.SkyTelescope
             Longitude = Properties.SkyTelescope.Default.Longitude;
             LunarRate = Properties.SkyTelescope.Default.LunarRate;
             MaxSlewRate = Properties.SkyTelescope.Default.MaximumSlewRate;
+            ModelOn = Properties.SkyTelescope.Default.ModelOn;
             ParkAxisX = Properties.SkyTelescope.Default.ParkAxisX;
             ParkAxisY = Properties.SkyTelescope.Default.ParkAxisY;
             ParkName = Properties.SkyTelescope.Default.ParkName;
@@ -1290,7 +1305,7 @@ namespace GS.Server.SkyTelescope
             UTCDateOffset = Properties.SkyTelescope.Default.UTCDateOffset;
 
             //first time load from old park positions
-           var pp = Properties.SkyTelescope.Default.ParkPositions;
+            var pp = Properties.SkyTelescope.Default.ParkPositions;
             if (string.IsNullOrEmpty(pp))
             {
                 var pp1 = new ParkPosition { Name = "Default", X = ParkAxisX, Y = ParkAxisY };
@@ -1335,7 +1350,7 @@ namespace GS.Server.SkyTelescope
         private static void LogSetting(string method, string value)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = $"{method}", Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = $"{method}", Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
             MonitorLog.LogToMonitor(monitorItem);
         }
 

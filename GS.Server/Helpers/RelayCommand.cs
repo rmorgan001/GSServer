@@ -13,12 +13,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using GS.Shared;
 using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Input;
-using GS.Shared;
 
 namespace GS.Server.Helpers
 {
@@ -74,7 +74,7 @@ namespace GS.Server.Helpers
         [DebuggerStepThrough]
         public bool CanExecute(object parameter)
         {
-           // return _canExecute?.Invoke(parameter) ?? true;
+            // return _canExecute?.Invoke(parameter) ?? true;
             return _canExecute?.Invoke(parameter) ?? true;
         }
 
@@ -94,10 +94,10 @@ namespace GS.Server.Helpers
         public void Execute(object parameter)
         {
             var str = _execute.Method.Name;
-            if(str.Contains("<get_")) str = Strings.GetTxtBetween(str, "<get_", ">");
+            if (str.Contains("<get_")) str = Strings.GetTxtBetween(str, "<get_", ">");
 
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message =$"{str}"};
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{str}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             _execute(parameter);

@@ -72,7 +72,7 @@ namespace GS.LogView.Helpers
         [DebuggerStepThrough]
         public bool CanExecute(object parameter)
         {
-           // return _canExecute?.Invoke(parameter) ?? true;
+            // return _canExecute?.Invoke(parameter) ?? true;
             return _canExecute?.Invoke(parameter) ?? true;
         }
 

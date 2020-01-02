@@ -64,7 +64,7 @@
     <ApplicationIcon>Resources\greenswamp1.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>1.0.0.21</AssemblyVersion>
+    <AssemblyVersion>1.0.0.22</AssemblyVersion>
     <AssemblyPublicKeyToken>565de7938946fba7</AssemblyPublicKeyToken>
   </PropertyGroup>
   <PropertyGroup>
@@ -315,6 +315,7 @@
     <Compile Include="SkyTelescope\Axes.cs" />
     <Compile Include="SkyTelescope\Enums.cs" />
     <Compile Include="SkyTelescope\ParkPosition.cs" />
+    <Compile Include="SkyTelescope\PulseStatusQueue.cs" />
     <Compile Include="SkyTelescope\Transforms.cs" />
     <Compile Include="SkyTelescope\SkySettings.cs" />
     <Compile Include="SkyTelescope\SkySystem.cs" />

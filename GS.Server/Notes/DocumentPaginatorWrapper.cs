@@ -28,20 +28,20 @@ namespace GS.Server.Notes
         private readonly Size m_Margin;
         private readonly DocumentPaginator m_Paginator;
         private Typeface m_Typeface;
-        
+
         public DocumentPaginatorWrapper(DocumentPaginator paginator, Size pageSize, Size margin)
         {
             m_PageSize = pageSize;
             m_Margin = margin;
             m_Paginator = paginator;
-            m_Paginator.PageSize = new Size(m_PageSize.Width - margin.Width * 2,m_PageSize.Height - margin.Height * 2);
+            m_Paginator.PageSize = new Size(m_PageSize.Width - margin.Width * 2, m_PageSize.Height - margin.Height * 2);
         }
 
         private Rect Move(Rect rect)
         {
-            return rect.IsEmpty ? rect : new Rect(rect.Left + m_Margin.Width, rect.Top + m_Margin.Height,rect.Width, rect.Height);
+            return rect.IsEmpty ? rect : new Rect(rect.Left + m_Margin.Width, rect.Top + m_Margin.Height, rect.Width, rect.Height);
         }
-        
+
         public override DocumentPage GetPage(int pageNumber)
         {
             var page = m_Paginator.GetPage(pageNumber);
@@ -67,7 +67,7 @@ namespace GS.Server.Notes
             newpage.Children.Add(background); // Scale down page and center
             var smallerPage = new ContainerVisual();
             smallerPage.Children.Add(page.Visual);
-            smallerPage.Transform = new MatrixTransform(0.95, 0, 0, 0.95,0.025 * page.ContentBox.Width, 0.025 * page.ContentBox.Height);
+            smallerPage.Transform = new MatrixTransform(0.95, 0, 0, 0.95, 0.025 * page.ContentBox.Width, 0.025 * page.ContentBox.Height);
             newpage.Children.Add(smallerPage);
             newpage.Children.Add(title);
             newpage.Transform = new TranslateTransform(m_Margin.Width, m_Margin.Height);
@@ -77,7 +77,7 @@ namespace GS.Server.Notes
         public override bool IsPageCountValid => m_Paginator.IsPageCountValid;
 
         public override int PageCount => m_Paginator.PageCount;
-        
+
         public override Size PageSize
         {
             get => m_Paginator.PageSize;

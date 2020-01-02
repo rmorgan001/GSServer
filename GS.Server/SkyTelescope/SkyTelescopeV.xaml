@@ -98,7 +98,7 @@
                             <Binding Path="AlignmentMode" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
                         </ComboBox.Text>
                     </ComboBox>
-                    <ComboBox Grid.Row="2" Grid.Column="0" md:HintAssist.Hint="{DynamicResource cbhintRaGuiding}" MinWidth="10" Margin="0,0,0,0" ToolTip="{DynamicResource cbhintRaGuiding}"
+                        <ComboBox Grid.Row="2" Grid.Column="0" md:HintAssist.Hint="{DynamicResource cbhintRaGuiding}" MinWidth="10" Margin="0,0,0,0" ToolTip="{DynamicResource cbhintRaGuiding}"
                               ItemsSource="{Binding GuideRateOffsetXs}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         <ComboBox.SelectedItem>
                             <Binding Path="GuideRateOffsetX" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">

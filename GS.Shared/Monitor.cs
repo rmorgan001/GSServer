@@ -144,7 +144,7 @@ namespace GS.Shared
         public static void ResetIndex()
         {
             MonitorQueue.ResetMonitorIndex();
-           // _index = 0;
+            // _index = 0;
         }
 
         /// <summary>
@@ -343,7 +343,7 @@ namespace GS.Shared
     /// <summary>
     /// individual Monitor Item
     /// </summary>
-    public class MonitorEntry 
+    public class MonitorEntry
     {
         public DateTime Datetime { get; set; }
         public int Index { get; set; }
@@ -371,7 +371,7 @@ namespace GS.Shared
         public bool PPECon { get; set; }
         public bool AltPPECon { get; set; }
         public double Declination { get; set; }
-
+        public bool Rejected { get; set; }
     }
 
 }

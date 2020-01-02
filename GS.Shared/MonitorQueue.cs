@@ -62,7 +62,7 @@ namespace GS.Shared
         private static async void FlipOffWarningState()
         {
             if (!WarningState) return;
-            await Task.Delay(100 );
+            await Task.Delay(100);
             WarningState = false;
         }
 
@@ -115,7 +115,7 @@ namespace GS.Shared
             _instanceFileName = $"{DateTime.Now:yyyy-dd-MM-HH}.txt";
             DeleteFiles("GSSessionLog", 7, _logPath);
             DeleteFiles("GSErrorLog", 7, _logPath);
-            DeleteFiles("GSChartingLog", 7, _logPath); 
+            DeleteFiles("GSChartingLog", 7, _logPath);
             DeleteFiles("GSMonitorLog", 7, _logPath);
 
 
@@ -196,7 +196,7 @@ namespace GS.Shared
                     WriteOutSession(entry);
                     break;
             }
-          
+
             // Output monitor window
             if (Settings.StartMonitor)
             {
@@ -241,14 +241,14 @@ namespace GS.Shared
                         entry.Message = $"{msg[0].Trim()},{msg[1]},{msgval}";
                         //send to charting and log
                         CmdjSentEntry = entry;
-                      //  WriteOutCmdj(entry);
+                        //  WriteOutCmdj(entry);
                     }
                     break;
                 case "AxesDegrees":  // from simulator
                     if (entry.Message.Contains("tracking"))
                     {
                         CmdjSentEntry = entry;
-                       // WriteOutCmdj(entry);
+                        // WriteOutCmdj(entry);
                     }
                     break;
             }
@@ -297,7 +297,7 @@ namespace GS.Shared
             catch (Exception e)
             {
                 Console.WriteLine(e);
-               // throw;
+                // throw;
             }
         }
 
@@ -310,12 +310,12 @@ namespace GS.Shared
             try
             {
                 if (!Settings.LogMonitor) return;
-                FileWriteAsync(_monitorFile + _instanceFileName,$"{entry.Index},{entry.Datetime.ToLocalTime():yyyy:dd:MM:HH:mm:ss.fff},{entry.Device},{entry.Category},{entry.Type},{entry.Thread},{entry.Method},{entry.Message}");
+                FileWriteAsync(_monitorFile + _instanceFileName, $"{entry.Index},{entry.Datetime.ToLocalTime():yyyy:dd:MM:HH:mm:ss.fff},{entry.Device},{entry.Category},{entry.Type},{entry.Thread},{entry.Method},{entry.Message}");
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-               // throw;
+                // throw;
             }
         }
 

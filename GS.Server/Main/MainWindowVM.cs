@@ -13,6 +13,16 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using GS.Server.Charting;
+using GS.Server.Domain;
+using GS.Server.Focuser;
+using GS.Server.Gamepad;
+using GS.Server.Helpers;
+using GS.Server.Model3D;
+using GS.Server.Notes;
+using GS.Server.Settings;
+using GS.Server.SkyTelescope;
+using GS.Shared;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -21,16 +31,6 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
-using GS.Server.Domain;
-using GS.Server.Focuser;
-using GS.Server.Charting;
-using GS.Server.Gamepad;
-using GS.Server.Helpers;
-using GS.Server.Model3D;
-using GS.Server.Notes;
-using GS.Server.Settings;
-using GS.Server.SkyTelescope;
-using GS.Shared;
 
 namespace GS.Server.Main
 {
@@ -73,11 +73,11 @@ namespace GS.Server.Main
                     Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
                     var monitorItem = new MonitorEntry
-                        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{Assembly.GetExecutingAssembly()}" };
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{Assembly.GetExecutingAssembly()}" };
                     MonitorLog.LogToMonitor(monitorItem);
 
                     monitorItem = new MonitorEntry
-                        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Loading MainWindowVM" };
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Loading MainWindowVM" };
                     MonitorLog.LogToMonitor(monitorItem);
 
                     AppCount = GSServer.AppCount;
@@ -103,11 +103,11 @@ namespace GS.Server.Main
 
                 }
 
-            } 
-            catch (Exception ex) 
+            }
+            catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 throw;
@@ -216,7 +216,7 @@ namespace GS.Server.Main
         {
             _skyTelescopeVM?.Dispose();
             _chartingVM?.Dispose();
-           // _notesV?.Dispose();
+            // _notesV?.Dispose();
         }
 
         #endregion
@@ -377,7 +377,7 @@ namespace GS.Server.Main
                 .FirstOrDefault(vm => vm == viewModel);
 
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{viewModel}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{viewModel}" };
             MonitorLog.LogToMonitor(monitorItem);
         }
 
@@ -668,7 +668,7 @@ namespace GS.Server.Main
             SkyServer.IsMountRunning = false;
 
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "MainWindow Closing" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "MainWindow Closing" };
             MonitorLog.LogToMonitor(monitorItem);
 
             if (Application.Current.MainWindow != null) Application.Current.MainWindow.Close();
@@ -703,9 +703,9 @@ namespace GS.Server.Main
         {
             get
             {
-                    return _openCloseDialogCommand ?? (_openCloseDialogCommand = new RelayCommand(
-                               param => OpenCloseDialog()
-                           ));
+                return _openCloseDialogCommand ?? (_openCloseDialogCommand = new RelayCommand(
+                           param => OpenCloseDialog()
+                       ));
             }
         }
         private void OpenCloseDialog()
@@ -717,7 +717,7 @@ namespace GS.Server.Main
             else
             {
                 CloseContent = new CloseDialog();
-                IsCloseDialogOpen = true;      
+                IsCloseDialogOpen = true;
             }
         }
 

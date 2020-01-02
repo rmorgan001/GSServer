@@ -13,6 +13,17 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using ASCOM.DeviceInterface;
+using ASCOM.Utilities;
+using GS.Principles;
+using GS.Server.Cdc;
+using GS.Server.Domain;
+using GS.Server.Gps;
+using GS.Server.Helpers;
+using GS.Server.Main;
+using GS.Shared;
+using HelixToolkit.Wpf;
+using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -26,17 +37,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
-using ASCOM.DeviceInterface;
-using ASCOM.Utilities;
-using GS.Principles;
-using GS.Server.Cdc;
-using GS.Server.Domain;
-using GS.Server.Gps;
-using GS.Server.Helpers;
-using GS.Server.Main;
-using GS.Shared;
-using HelixToolkit.Wpf;
-using MaterialDesignThemes.Wpf;
+
 
 namespace GS.Server.SkyTelescope
 {
@@ -53,11 +54,6 @@ namespace GS.Server.SkyTelescope
 
         #endregion
 
-        #region View Model Items
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public SkyTelescopeVM()
         {
             try
@@ -95,7 +91,7 @@ namespace GS.Server.SkyTelescope
                     Settings.Settings.StaticPropertyChanged += PropertyChangedSettings;
 
                     // dropdown lists
-                    GuideRateOffsetXs = new List<double>(Numbers.InclusiveRange(10, 100,10));
+                    GuideRateOffsetXs = new List<double>(Numbers.InclusiveRange(10, 100, 10));
                     GuideRateOffsetYs = new List<double>(Numbers.InclusiveRange(10, 100, 10));
                     MaxSlewRates = new List<double>(Numbers.InclusiveRange(2.0, 5));
                     HourAngleLimits = new List<double>(Numbers.InclusiveRange(0, 45, 1));
@@ -106,18 +102,18 @@ namespace GS.Server.SkyTelescope
                     Hours = new List<int>(Enumerable.Range(0, 24));
                     Minutes = new List<int>(Enumerable.Range(0, 60));
                     Seconds = new List<int>(Enumerable.Range(0, 60));
-                    St4Guiderates = new List<double> {1.0, 0.75, 0.50, 0.25, 0.125};
-                    Temperatures = new List<double>(Numbers.InclusiveRange(-50, 60,1.0));
+                    St4Guiderates = new List<double> { 1.0, 0.75, 0.50, 0.25, 0.125 };
+                    Temperatures = new List<double>(Numbers.InclusiveRange(-50, 60, 1.0));
                     AutoHomeLimits = new List<int>(Enumerable.Range(20, 160));
-                    DecOffsets = new List<int>(){0, -90, 90};
+                    DecOffsets = new List<int>() { 0, -90, 90 };
 
                     // defaults
                     AtPark = SkyServer.AtPark;
                     ConnectButtonContent = Application.Current.Resources["btnConnect"].ToString();
                     VoiceState = Synthesizer.VoiceActive;
-                    ParkSelection = ParkPositions.FirstOrDefault(); 
-                    ParkSelectionSetting = ParkPositions.FirstOrDefault(); 
-                    SetHCFlipsVisability(); 
+                    ParkSelection = ParkPositions.FirstOrDefault();
+                    ParkSelectionSetting = ParkPositions.FirstOrDefault();
+                    SetHCFlipsVisability();
                     DebugVisability = false;
                     RightAscension = "00h 00m 00s";
                     Declination = "00° 00m 00s";
@@ -147,6 +143,8 @@ namespace GS.Server.SkyTelescope
                 OpenDialog(ex.Message);
             }
         }
+
+        #region View Model Items
 
         /// <summary>
         /// Enable or Disable screen items if connected
@@ -238,85 +236,85 @@ namespace GS.Server.SkyTelescope
                 ThreadContext.BeginInvokeOnUiThread(
              delegate
                         {
-                        switch (e.PropertyName)
+                            switch (e.PropertyName)
                             {
-                            case "Altitude":
-                                Altitude = _util.DegreesToDMS(SkyServer.Altitude, "° ", ":", "", 2);
-                                break;
-                            case "Azimuth":
-                                Azimuth = _util.DegreesToDMS(SkyServer.Azimuth, "° ", ":", "", 2);
-                                break;
-                            case "CanPec":
-                                PecEnabled = SkyServer.CanPec;
-                                break;
-                            case "DeclinationXform":
-                                 Declination = _util.DegreesToDMS(SkyServer.DeclinationXform, "° ", ":", "", 2);
-                                 break;
-                            case "CanHomeSensor":
-                                AutoHomeEnabled = SkyServer.CanHomeSensor;
-                                break;
-                            case "OpenSetupDialog":
-                                OpenSetupDialog = SkyServer.OpenSetupDialog;
-                                break;
-                            case "RightAscensionXform":
-                                RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXform, "h ", ":", "", 2);
-                                Rotate();
-                                GetDebugProperties();
-                                break;
-                            case "IsHome":
-                                IsHome = SkyServer.IsHome;
-                                break;
-                            case "AtPark":
-                                AtPark = SkyServer.AtPark;
-                                break;
-                            case "IsSlewing":
-                                IsSlewing = SkyServer.IsSlewing;
-                                break;
-                            case "Tracking":
-                                IsTracking = SkyServer.Tracking;
-                                break;
-                            case "IsSideOfPier":
-                                IsSideOfPier = SkyServer.IsSideOfPier;
-                                break;
-                            case "LimitAlarm":
-                                LimitAlarm = SkyServer.LimitAlarm;
-                                break;
-                            case "MountError":
-                                MountError = SkyServer.MountError;
-                                break;
-                            case "AlertState":
-                                AlertState = SkyServer.AlertState;
-                                break;
-                            case "PecTrainInProgress":
-                                PecTrainInProgress = SkyServer.PecTrainInProgress;
-                                break;
-                            case "PecOn":
-                                PpecOn = SkyServer.Pec;
-                                break;
-                            case "PecTrainOn":
-                                PecTrainOn = SkyServer.PecTraining;
-                                break;
-                            case "Longitude":
-                                UpdateLongitude();
-                                break;
-                            case "Latitude":
-                                UpdateLatitude();
-                                break;
-                            case "Elevation":
-                                Elevation = SkySettings.Elevation;
-                                break;
-                            case "IsSimulatorConnected":
-                                // no status kept for the simulator
-                                break;
-                            case "IsMountRunning":
-                                MountState = SkyServer.IsMountRunning;
-                                break;
-                            case "AutoHomeProgressBar":
-                                AutoHomeProgressBar = SkyServer.AutoHomeProgressBar;
-                                break;
-                            case "ParkSelected":
-                                ParkSelection = SkyServer.ParkSelected;
-                                break;
+                                case "Altitude":
+                                    Altitude = _util.DegreesToDMS(SkyServer.Altitude, "° ", ":", "", 2);
+                                    break;
+                                case "Azimuth":
+                                    Azimuth = _util.DegreesToDMS(SkyServer.Azimuth, "° ", ":", "", 2);
+                                    break;
+                                case "CanPec":
+                                    PecEnabled = SkyServer.CanPec;
+                                    break;
+                                case "DeclinationXform":
+                                    Declination = _util.DegreesToDMS(SkyServer.DeclinationXform, "° ", ":", "", 2);
+                                    break;
+                                case "CanHomeSensor":
+                                    AutoHomeEnabled = SkyServer.CanHomeSensor;
+                                    break;
+                                case "OpenSetupDialog":
+                                    OpenSetupDialog = SkyServer.OpenSetupDialog;
+                                    break;
+                                case "RightAscensionXform":
+                                    RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXform, "h ", ":", "", 2);
+                                    Rotate();
+                                    GetDebugProperties();
+                                    break;
+                                case "IsHome":
+                                    IsHome = SkyServer.IsHome;
+                                    break;
+                                case "AtPark":
+                                    AtPark = SkyServer.AtPark;
+                                    break;
+                                case "IsSlewing":
+                                    IsSlewing = SkyServer.IsSlewing;
+                                    break;
+                                case "Tracking":
+                                    IsTracking = SkyServer.Tracking;
+                                    break;
+                                case "IsSideOfPier":
+                                    IsSideOfPier = SkyServer.IsSideOfPier;
+                                    break;
+                                case "LimitAlarm":
+                                    LimitAlarm = SkyServer.LimitAlarm;
+                                    break;
+                                case "MountError":
+                                    MountError = SkyServer.MountError;
+                                    break;
+                                case "AlertState":
+                                    AlertState = SkyServer.AlertState;
+                                    break;
+                                case "PecTrainInProgress":
+                                    PecTrainInProgress = SkyServer.PecTrainInProgress;
+                                    break;
+                                case "PecOn":
+                                    PpecOn = SkyServer.Pec;
+                                    break;
+                                case "PecTrainOn":
+                                    PecTrainOn = SkyServer.PecTraining;
+                                    break;
+                                case "Longitude":
+                                    UpdateLongitude();
+                                    break;
+                                case "Latitude":
+                                    UpdateLatitude();
+                                    break;
+                                case "Elevation":
+                                    Elevation = SkySettings.Elevation;
+                                    break;
+                                case "IsSimulatorConnected":
+                                    // no status kept for the simulator
+                                    break;
+                                case "IsMountRunning":
+                                    MountState = SkyServer.IsMountRunning;
+                                    break;
+                                case "AutoHomeProgressBar":
+                                    AutoHomeProgressBar = SkyServer.AutoHomeProgressBar;
+                                    break;
+                                case "ParkSelected":
+                                    ParkSelection = SkyServer.ParkSelected;
+                                    break;
                             }
                         });
             }
@@ -547,7 +545,7 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         public void Dispose()
         {
-            ((IDisposable) _util)?.Dispose();
+            ((IDisposable)_util)?.Dispose();
         }
 
         public IList<string> ImageFiles;
@@ -567,8 +565,8 @@ namespace GS.Server.SkyTelescope
         {
             //image size Width="253" Height="340"
             var random = new Random();
-            ImageFiles = new List<string> { "M33.png", "M74.png", "NGC6992.png"};
-            ImageFile = "../Resources/" +  ImageFiles[random.Next(ImageFiles.Count)];
+            ImageFiles = new List<string> { "M33.png", "M74.png", "NGC6992.png" };
+            ImageFile = "../Resources/" + ImageFiles[random.Next(ImageFiles.Count)];
         }
 
         #endregion
@@ -597,19 +595,21 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        public IList<int> ComPorts { get
+        public IList<int> ComPorts
+        {
+            get
             {
-               var ports = new List<int>();
-               foreach (var item in System.IO.Ports.SerialPort.GetPortNames())
-               {
+                var ports = new List<int>();
+                foreach (var item in System.IO.Ports.SerialPort.GetPortNames())
+                {
                     if (string.IsNullOrEmpty(item)) continue;
                     var tmp = Strings.GetNumberFromString(item);
                     if (tmp.HasValue)
                     {
                         ports.Add((int)tmp);
                     }
-               }
-               return ports;
+                }
+                return ports;
             }
         }
         public int ComPort
@@ -760,7 +760,7 @@ namespace GS.Server.SkyTelescope
             {
                 SkySettings.AlignmentMode = value;
                 OnPropertyChanged();
-                
+
             }
         }
 
@@ -806,7 +806,7 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-        
+
         public IList<double> GuideRateOffsetYs { get; }
         public double GuideRateOffsetY
         {
@@ -954,7 +954,7 @@ namespace GS.Server.SkyTelescope
                 var sec = SkySettings.Latitude * 3600;
                 sec = Math.Abs(sec % 3600);
                 sec %= 60;
-                return Math.Abs(Math.Round(sec,3));
+                return Math.Abs(Math.Round(sec, 3));
             }
             set
             {
@@ -1088,14 +1088,14 @@ namespace GS.Server.SkyTelescope
 
                     var parkToUpdate = ParkPositions.FirstOrDefault(p => p.Name == ParkSelectionSetting.Name);
                     if (parkToUpdate == null) return;
-                    
+
                     parkToUpdate.X = parkcoords[0];
                     parkToUpdate.Y = parkcoords[1];
                     SkySettings.ParkPositions = ParkPositions;
                     OpenDialog($"Position saved to {parkToUpdate.Name}");
                     Synthesizer.Speak(Application.Current.Resources["vceParkSet"].ToString());
                 }
-}
+            }
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
@@ -1610,7 +1610,7 @@ namespace GS.Server.SkyTelescope
                 using (new WaitCursor())
                 {
                     if (string.IsNullOrEmpty(ParkNewName)) return;
-                    var pp = new ParkPosition {Name = ParkNewName.Trim()};
+                    var pp = new ParkPosition { Name = ParkNewName.Trim() };
                     ParkPositions.Add(pp);
                     SkySettings.ParkPositions = ParkPositions;
                     ParkSelectionSetting = pp;
@@ -2859,7 +2859,7 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private void SetHCFlipsVisability ()
+        private void SetHCFlipsVisability()
         {
             switch (HcMode)
             {
@@ -3186,7 +3186,7 @@ namespace GS.Server.SkyTelescope
                 OpenDialog(ex.Message);
             }
         }
-        
+
         private ICommand _hcMouseDownDownCommand;
         public ICommand HcMouseDownDownCommand
         {
@@ -3351,7 +3351,7 @@ namespace GS.Server.SkyTelescope
             set
             {
                 _atpark = value;
-                ParkButtonContent = value ? Application.Current.Resources["btnUnPark"].ToString() : Application.Current.Resources["btnPark"].ToString(); 
+                ParkButtonContent = value ? Application.Current.Resources["btnUnPark"].ToString() : Application.Current.Resources["btnPark"].ToString();
                 ParkBadgeContent = value ? SkySettings.ParkName : ""; //Application.Current.Resources["btnhintPark"].ToString()
                 OnPropertyChanged();
             }
@@ -3508,7 +3508,7 @@ namespace GS.Server.SkyTelescope
             set
             {
                 ScreenEnabled = value;
-                ConnectButtonContent = value ? Application.Current.Resources["btnDisConnect"].ToString() : Application.Current.Resources["btnConnect"].ToString(); 
+                ConnectButtonContent = value ? Application.Current.Resources["btnDisConnect"].ToString() : Application.Current.Resources["btnConnect"].ToString();
             }
         }
 
@@ -3707,7 +3707,8 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                   SkyServer.IsMountRunning = !SkyServer.IsMountRunning;
+                    SkyServer.IsMountRunning = !SkyServer.IsMountRunning;
+                    ModelOn = SkySettings.ModelOn;
                 }
 
                 if (SkyServer.IsMountRunning)
@@ -3725,7 +3726,7 @@ namespace GS.Server.SkyTelescope
 
         private void HomePositionCheck()
         {
-            if (SkyServer.AtPark ) return;
+            if (SkyServer.AtPark) return;
             if (!SkySettings.HomeWarning) return;
 
             switch (SkySettings.Mount)
@@ -3776,6 +3777,9 @@ namespace GS.Server.SkyTelescope
                 msg += $"StepsDec: {SkyServer.StepsPerRevolution[1]}" + Environment.NewLine;
                 msg += $"PPEC: {canppec}" + Environment.NewLine;
                 msg += $"Home Sensor: {canhome}" + Environment.NewLine;
+                msg += $"Ra Min Pulse: {Math.Ceiling(SkyServer.MinPulseRa)}ms" + Environment.NewLine;
+                msg += $"Dec Min Pulse: {Math.Ceiling(SkyServer.MinPulseDec)}ms" + Environment.NewLine;
+
                 OpenDialog(msg);
             }
             catch (Exception ex)
@@ -3850,7 +3854,7 @@ namespace GS.Server.SkyTelescope
         private void OpenDialog(string msg)
         {
             if (msg != null) DialogMsg = msg;
-             DialogContent = new DialogOK();
+            DialogContent = new DialogOK();
             IsDialogOpen = true;
 
             var monitorItem = new MonitorEntry
@@ -4157,7 +4161,7 @@ namespace GS.Server.SkyTelescope
                 using (new WaitCursor())
                 {
                     var gpsHardware = new GpsHardware(GpsComPort);
-                        gpsHardware.GpsOn();
+                    gpsHardware.GpsOn();
                     var stopwatch = new Stopwatch();
                     stopwatch.Start();
 
@@ -4179,7 +4183,7 @@ namespace GS.Server.SkyTelescope
                     }
                     else
                     {
-                        OpenDialog(Application.Current.Resources["msgGPSNoDataFound"].ToString() +  GpsComPort);
+                        OpenDialog(Application.Current.Resources["msgGPSNoDataFound"].ToString() + GpsComPort);
 
                     }
                 }
@@ -4592,10 +4596,12 @@ namespace GS.Server.SkyTelescope
                 _modelOn = value;
                 if (value)
                 {
+                    Rotate();
                     LoadGEM();
                     LoadCompass();
-                    Rotate();
                 }
+
+                SkySettings.ModelOn = value;
                 OnPropertyChanged();
             }
         }
@@ -4648,6 +4654,10 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
+                Xaxis = -90;
+                Yaxis = 90;
+                Zaxis = -20;
+
                 const string gpModel = @"Models/GEM1.obj";
                 var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(), gpModel);
                 var file = new Uri(filePath).LocalPath;
@@ -4675,9 +4685,6 @@ namespace GS.Server.SkyTelescope
                 if (a.Children[2] is GeometryModel3D bar) bar.Material = materialbar;
                 Model = a;
 
-                Xaxis = -90;
-                Yaxis = 90;
-                Zaxis = -20;
             }
             catch (Exception ex)
             {
@@ -4905,7 +4912,7 @@ namespace GS.Server.SkyTelescope
                     StartEnabled = false;
                     SkyServer.AutoHomeProgressBar = 0;
                     SkyServer.AutoHomeStop = false;
-                    SkyServer.AutoHomeAsync(AutoHomeLimit,DecOffset);
+                    SkyServer.AutoHomeAsync(AutoHomeLimit, DecOffset);
                 }
             }
             catch (Exception ex)

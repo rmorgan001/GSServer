@@ -16,7 +16,7 @@ namespace GS.Server.SkyTelescope
 
         private void SkyTelescopeV_OnLoaded(object sender, RoutedEventArgs e)
         {
-          
+
         }
     }
 }

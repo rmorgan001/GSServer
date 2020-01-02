@@ -307,7 +307,7 @@ namespace GS.LogView
             get => _animationTime;
             set
             {
-                if(_animationTime == value) return;
+                if (_animationTime == value) return;
                 _animationTime = value;
                 Properties.LogView.Default.AnimationTime = value;
                 OnStaticPropertyChanged();
@@ -333,7 +333,7 @@ namespace GS.LogView
             get => _lineSize;
             set
             {
-                if (Math.Abs(_lineSize - value) <= 0 ) return;
+                if (Math.Abs(_lineSize - value) <= 0) return;
                 _lineSize = value;
                 Properties.LogView.Default.LineSize = value;
                 OnStaticPropertyChanged();

@@ -13,16 +13,16 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using System;
-using System.Reflection;
-using System.Threading;
-using System.Windows.Input;
 using GS.Principles;
 using GS.Server.Domain;
 using GS.Server.Helpers;
 using GS.Server.Main;
 using GS.Shared;
 using MaterialDesignThemes.Wpf;
+using System;
+using System.Reflection;
+using System.Threading;
+using System.Windows.Input;
 
 namespace GS.Server.Notes
 {
@@ -31,18 +31,36 @@ namespace GS.Server.Notes
         public string TopName => "Notes";
         public string BottomName => "";
         public int Uid => 3;
+        private bool _disposed;
 
 
         public NotesVM()
         {
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading NotesVM" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading NotesVM" };
             MonitorLog.LogToMonitor(monitorItem);
         }
 
         public void Dispose()
         {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(obj: this);
+        }
 
+        private void Dispose(bool disposing)
+        {
+            // Check to see if Dispose has already been called.
+            if (_disposed) return;
+            // If disposing equals true, dispose all managed
+            // and unmanaged resources.
+            if (disposing)
+            {
+                // Dispose managed resources.
+
+            }
+
+            // Note disposing has been done.
+            _disposed = true;
         }
 
         #region Error  

@@ -13,6 +13,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using GS.Principles;
+using GS.Shared;
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -20,8 +22,6 @@ using System.IO.Ports;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using GS.Principles;
-using GS.Shared;
 
 namespace GS.SkyWatcher
 {
@@ -97,7 +97,7 @@ namespace GS.SkyWatcher
         /// <returns></returns>
         public static ISkyCommand GetCommandResult(ISkyCommand command)
         {
-            if (!IsRunning || _cts.IsCancellationRequested || !_skyWatcher.IsConnected) 
+            if (!IsRunning || _cts.IsCancellationRequested || !_skyWatcher.IsConnected)
             {
                 var e = new MountControlException(ErrorCode.ErrQueueFailed, "Queue not running");
                 command.Exception = e;
@@ -105,7 +105,7 @@ namespace GS.SkyWatcher
                 return command;
             }
             var sw = Stopwatch.StartNew();
-            while (sw.Elapsed.TotalMilliseconds < 7000 )
+            while (sw.Elapsed.TotalMilliseconds < 7000)
             {
                 if (_resultsDictionary == null) break;
                 var success = _resultsDictionary.TryRemove(command.Id, out var result);
@@ -137,7 +137,7 @@ namespace GS.SkyWatcher
             catch (Exception e)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{command.Id},{e.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{command.Id},{e.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 command.Exception = e;

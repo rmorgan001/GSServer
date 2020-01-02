@@ -17,108 +17,108 @@ using System;
 
 namespace GS.Server.SkyTelescope
 {
-        public enum HCMode
-        {
-            Axes,
-            Guiding
-        }
-
-        public enum SlewType
-        {
-            SlewNone,
-            SlewSettle,
-            SlewMoveAxis,
-            SlewRaDec,
-            SlewAltAz,
-            SlewPark,
-            SlewHome,
-            SlewHandpad,
-            SlewComplete
-        }
-
-        [Flags]
-        public enum SlewSpeed
-        {
-            One = 1,
-            Two = 2,
-            Three = 3,
-            Four = 4,
-            Five = 5,
-            Six = 6,
-            Seven = 7,
-            Eight = 8
-        }
-
-        public enum SlewDirection
-        {
-            SlewNorth,
-            SlewSouth,
-            SlewEast,
-            SlewWest,
-            SlewUp,
-            SlewDown,
-            SlewLeft,
-            SlewRight,
-            SlewNone
-        }
-
-        public enum PointingState
-        {
-            Normal,
-            ThroughThePole
-        }
-
-        public enum TrackingMode
-        {
-            Off,
-            AltAz,
-            EqN,
-            EqS
-        }
-
-        public enum MountTaskName
-        {
-            AlternatingPpec,
-            CanPpec,
-            CanHomeSensor,
-            DecPulseToGoTo,
-            Encoders,
-            FullCurrent,
-            GetOneStepIndicators,
-            LoadDefaults,
-            StopAxes,
-            InitialiseAxes,
-            InstantStopAxes,
-            SetSouthernHemisphere,
-            SyncAxes,
-            SyncTarget,
-            SyncAltAz,
-            MonitorPulse,
-            Pec,
-            PecTraining,
-            Capabilities,
-            SetHomePositions,
-            SetSt4Guiderate,
-            SkySetSnapPort,
-            MountName,
-            GetAxisVersions,
-            GetAxisStrVersions,
-            MountVersion,
-            StepsPerRevolution
+    public enum HCMode
+    {
+        Axes,
+        Guiding
     }
 
-        public enum MountType
-        {
-            Simulator,
-            SkyWatcher
-        }
+    public enum SlewType
+    {
+        SlewNone,
+        SlewSettle,
+        SlewMoveAxis,
+        SlewRaDec,
+        SlewAltAz,
+        SlewPark,
+        SlewHome,
+        SlewHandpad,
+        SlewComplete
+    }
 
-        public enum ErrorCode
-        {
-            ErrMount = 1,
-            ErrExecutingCommand = 2,
-            ErrUnableToDeqeue = 3,
-            ErrSerialFailed = 4
-        };
+    [Flags]
+    public enum SlewSpeed
+    {
+        One = 1,
+        Two = 2,
+        Three = 3,
+        Four = 4,
+        Five = 5,
+        Six = 6,
+        Seven = 7,
+        Eight = 8
+    }
+
+    public enum SlewDirection
+    {
+        SlewNorth,
+        SlewSouth,
+        SlewEast,
+        SlewWest,
+        SlewUp,
+        SlewDown,
+        SlewLeft,
+        SlewRight,
+        SlewNone
+    }
+
+    public enum PointingState
+    {
+        Normal,
+        ThroughThePole
+    }
+
+    public enum TrackingMode
+    {
+        Off,
+        AltAz,
+        EqN,
+        EqS
+    }
+
+    public enum MountTaskName
+    {
+        AlternatingPpec,
+        CanPpec,
+        CanHomeSensor,
+        DecPulseToGoTo,
+        Encoders,
+        FullCurrent,
+        GetOneStepIndicators,
+        LoadDefaults,
+        StopAxes,
+        InitialiseAxes,
+        InstantStopAxes,
+        SetSouthernHemisphere,
+        SyncAxes,
+        SyncTarget,
+        SyncAltAz,
+        MonitorPulse,
+        Pec,
+        PecTraining,
+        Capabilities,
+        SetHomePositions,
+        SetSt4Guiderate,
+        SkySetSnapPort,
+        MountName,
+        GetAxisVersions,
+        GetAxisStrVersions,
+        MountVersion,
+        StepsPerRevolution
+    }
+
+    public enum MountType
+    {
+        Simulator,
+        SkyWatcher
+    }
+
+    public enum ErrorCode
+    {
+        ErrMount = 1,
+        ErrExecutingCommand = 2,
+        ErrUnableToDeqeue = 3,
+        ErrSerialFailed = 4
+    };
 
 }

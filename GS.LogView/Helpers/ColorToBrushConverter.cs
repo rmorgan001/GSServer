@@ -33,7 +33,7 @@ namespace GS.LogView.Helpers
 
             if (value is string)
             {
-                return value.Equals(string.Empty) ? new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)) : new SolidColorBrush(ParseString((string) value));
+                return value.Equals(string.Empty) ? new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)) : new SolidColorBrush(ParseString((string)value));
             }
 
 

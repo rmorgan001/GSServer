@@ -1,4 +1,13 @@
-﻿using System;
+﻿using ASCOM.Utilities;
+using ColorPicker;
+using DarkSkyApi;
+using DarkSkyApi.Models;
+using GS.Principles;
+using GS.Server.Domain;
+using GS.Server.SkyTelescope;
+using GS.Shared;
+using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -14,15 +23,6 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using GS.Server.SkyTelescope;
-using Microsoft.Win32;
-using ASCOM.Utilities;
-using ColorPicker;
-using DarkSkyApi;
-using DarkSkyApi.Models;
-using GS.Principles;
-using GS.Server.Domain;
-using GS.Shared;
 
 namespace GS.Server.Notes
 {
@@ -57,7 +57,7 @@ namespace GS.Server.Notes
                 }
                 else
                 {
-                    _fontforegroundcolor = (SolidColorBrush) rtbEditor.Foreground;
+                    _fontforegroundcolor = (SolidColorBrush)rtbEditor.Foreground;
                 }
                 Paintbrush.Foreground = _fontforegroundcolor;
 
@@ -95,14 +95,14 @@ namespace GS.Server.Notes
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
             }
         }
 
         #region Notes
-        
+
         private bool _isDialogOpen;
         public bool IsDialogOpen
         {
@@ -138,7 +138,7 @@ namespace GS.Server.Notes
                 OnPropertyChanged();
             }
         }
-        
+
         public void OpenDialog1(string msg)
         {
             if (msg == null) return;
@@ -616,7 +616,8 @@ namespace GS.Server.Notes
             {
                 var colorDialog = new ColorDialog
                 {
-                    Owner = Window.GetWindow(this), SelectedColor = _fontbackgroundcolor.Color
+                    Owner = Window.GetWindow(this),
+                    SelectedColor = _fontbackgroundcolor.Color
                 };
                 var b = colorDialog.ShowDialog();
                 if (b == null) return;
@@ -647,7 +648,7 @@ namespace GS.Server.Notes
 
         }
 
-       #endregion
+        #endregion
 
         #region bottom menu bar
 
@@ -771,7 +772,7 @@ namespace GS.Server.Notes
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
             }
@@ -790,7 +791,7 @@ namespace GS.Server.Notes
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
             }
@@ -989,7 +990,7 @@ namespace GS.Server.Notes
         #endregion
 
         #region Events
-        
+
         private void RtbEditor_SelectionChanged(object sender, RoutedEventArgs e)
         {
             try
@@ -1110,7 +1111,7 @@ namespace GS.Server.Notes
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Notes, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog1(ex.Message);
             }

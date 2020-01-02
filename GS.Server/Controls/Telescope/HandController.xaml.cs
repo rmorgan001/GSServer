@@ -6,7 +6,7 @@ namespace GS.Server.Controls.Telescope
     /// Interaction logic for HandController.xaml
     /// </summary>
     [ComVisible(false)]
-    public partial class HandController 
+    public partial class HandController
     {
         public HandController()
         {

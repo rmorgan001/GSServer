@@ -80,7 +80,7 @@ namespace GS.Principles
             var o = Units.Rad2Deg(Math.Atan2(l, m));
             var p = Range.Range360(n);
             var q = Range.Range90(o);
-            var HaDec2AltAz = new[]{q,p};
+            var HaDec2AltAz = new[] { q, p };
             return HaDec2AltAz;
         }
 
@@ -142,7 +142,7 @@ namespace GS.Principles
         /// <param name="latitude">In decimal degrees</param>
         /// <param name="lst">In decimal hours</param>
         /// <returns>Ra in decimal hours, Dec in decimal degrees</returns>
-        public static double[] AltAz2RaDec( double altitude, double azimuth, double latitude, double lst)
+        public static double[] AltAz2RaDec(double altitude, double azimuth, double latitude, double lst)
         {
             var a = AltAz2Ra(altitude, azimuth, latitude, lst);
             var b = AltAz2Dec(altitude, azimuth, latitude);
@@ -158,7 +158,7 @@ namespace GS.Principles
         /// <param name="azimuth">In decimal degrees</param>
         /// <param name="latitude">In decimal degrees</param>
         /// <returns>Declination in decimal degrees</returns>
-        public static double AltAz2Dec( double altitude, double azimuth, double latitude)
+        public static double AltAz2Dec(double altitude, double azimuth, double latitude)
         {
             var a = Units.Deg2Rad(azimuth);
             var b = Units.Deg2Rad(altitude);
@@ -184,7 +184,7 @@ namespace GS.Principles
         /// <param name="latitude">In decimal degrees</param>
         /// <param name="lst">In decimal hours</param>
         /// <returns>Right Ascension in decimal hours</returns>
-        public static double AltAz2Ra( double altitude, double azimuth, double latitude, double lst)
+        public static double AltAz2Ra(double altitude, double azimuth, double latitude, double lst)
         {
             var a = Units.Deg2Rad(azimuth);
             var b = Units.Deg2Rad(altitude);

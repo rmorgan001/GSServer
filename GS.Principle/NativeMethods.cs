@@ -27,7 +27,7 @@ namespace GS.Principles
 
         // Creates and starts the timer.
         [DllImport("winmm.dll", EntryPoint = "timeSetEvent")]
-        internal static extern int TimeSetEvent(int delay, int resolution, MediaTimer.TimeProc proc,ref int user, int mode);
+        internal static extern int TimeSetEvent(int delay, int resolution, MediaTimer.TimeProc proc, ref int user, int mode);
 
         // Stops and destroys the timer.
         [DllImport("winmm.dll", EntryPoint = "timeKillEvent")]

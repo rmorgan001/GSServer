@@ -215,7 +215,7 @@ namespace GS.Simulator
         public DateTime CreatedUtc { get; }
         public bool Successful { get; set; }
         public Exception Exception { get; set; }
-        public dynamic Result { get;}
+        public dynamic Result { get; }
         private readonly Axis _axis;
 
         public CmdAxisStop(long id, Axis axis)
@@ -653,10 +653,75 @@ namespace GS.Simulator
         }
     }
 
+    public class CmdPulseDecRunning : IMountCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; private set; }
+
+        public CmdPulseDecRunning(long id)
+        {
+            Id = id;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            Successful = false;
+            MountQueue.AddCommand(this);
+        }
+
+        public void Execute(Actions actions)
+        {
+            try
+            {
+                Result = actions.PulseDecRunning;
+                Successful = true;
+
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
+
+    public class CmdPulseRaRunning : IMountCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; private set; }
+
+        public CmdPulseRaRunning(long id)
+        {
+            Id = id;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            Successful = false;
+            MountQueue.AddCommand(this);
+        }
+
+        public void Execute(Actions actions)
+        {
+            try
+            {
+                Result = actions.PulseRaRunning;
+                Successful = true;
+
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
     /// <summary>
     /// Gets Steps Per Revolution
     /// </summary>
-    public class CmdSpr: IMountCommand
+    public class CmdSpr : IMountCommand
     {
         public long Id { get; }
         public DateTime CreatedUtc { get; }

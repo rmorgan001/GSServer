@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace GS.Shared
 {
-    public class Charting
+    public class Charting : IDisposable
     {
         #region Fields
 
@@ -30,6 +30,7 @@ namespace GS.Shared
         private static readonly string _logPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         private readonly string _chartingFile = Path.Combine(_logPath, "GSServer\\GSChartingLog");
         private static readonly SemaphoreSlim _lockFile = new SemaphoreSlim(1);
+        private bool _disposed;
 
         #endregion
 
@@ -61,7 +62,7 @@ namespace GS.Shared
 
         private void ProcessChartQueueItem(ChartEntry entry)
         {
-           // if (!LogCharting) return;           
+            // if (!LogCharting) return;           
             var message = string.Empty;
             switch (entry.ItemCode)
             {
@@ -77,7 +78,7 @@ namespace GS.Shared
                     message = $"{(int)entry.ItemCode}\t{entry.X:yyyy:dd:MM:HH:mm:ss.fff}\t{entry.Y}";
                     break;
             }
-           if(message != string.Empty) FileWriteAsync(_chartingFile + _instanceFileName, message);
+            if (message != string.Empty) FileWriteAsync(_chartingFile + _instanceFileName, message);
         }
 
         /// <summary>
@@ -121,6 +122,32 @@ namespace GS.Shared
         }
 
         #endregion
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            // This object will be cleaned up by the Dispose method.
+            // Therefore, you should call GC.SupressFinalize to
+            // take this object off the finalization queue
+            // and prevent finalization code for this object
+            // from executing a second time.
+            GC.SuppressFinalize( obj: this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            // Check to see if Dispose has already been called.
+            if (_disposed) return;
+            // If disposing equals true, dispose all managed
+            // and unmanaged resources.
+            if (disposing)
+            {
+                // Dispose managed resources.
+                _chartBlockingCollection.Dispose();
+            }
+
+            // Note disposing has been done.
+            _disposed = true;
+        }
     }
 
     #region enums
@@ -147,7 +174,7 @@ namespace GS.Shared
     public class ChartEntry
     {
         public ChartItemCode ItemCode { get; set; }
-        public  DateTime X { get; set; }
+        public DateTime X { get; set; }
         public double Y { get; set; }
         public string Data { get; set; }
     }

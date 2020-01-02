@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Ink;
 
 namespace ColorPicker
 {
@@ -30,7 +30,7 @@ namespace ColorPicker
 	/// </summary>
     public partial class ColorPickerControl
     {
-		#region Data
+        #region Data
         private readonly DrawingAttributes drawingAttributes = new DrawingAttributes();
         private Color selectedColor = Colors.Transparent;
         private Boolean IsMouseDown;
@@ -210,5 +210,5 @@ namespace ColorPicker
             IsMouseDown = false;
         }
         #endregion
-	}
+    }
 }

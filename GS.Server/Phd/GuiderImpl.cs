@@ -13,6 +13,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,8 +24,6 @@ using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace GS.Server.Phd
 {
@@ -513,12 +513,12 @@ namespace GS.Server.Phd
         public override void Connect()
         {
 
-                var port = (ushort)(4400 + m_instance - 1);
-                if (!m_conn.Connect(m_host, port))
-                {
-                    throw new GuiderException(ErrorCode.NewConnection, $"Could not connect to PHD2 instance {m_instance} on {m_host}");
-                }
-   
+            var port = (ushort)(4400 + m_instance - 1);
+            if (!m_conn.Connect(m_host, port))
+            {
+                throw new GuiderException(ErrorCode.NewConnection, $"Could not connect to PHD2 instance {m_instance} on {m_host}");
+            }
+
 
             m_terminate = false;
             //PhdLoopAsync();
@@ -558,16 +558,19 @@ namespace GS.Server.Phd
 
             // wait for response
             JObject response = null;
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-            while (stopwatch.Elapsed.TotalMilliseconds < 5000)
+
+            var stopwatch = Stopwatch.StartNew();
+            while (stopwatch.Elapsed.TotalMilliseconds < 10000)
             {
-                if (m_response == null) continue;
+                if (m_response == null)
+                {
+                    Thread.Sleep(10);
+                    continue;
+                }
                 response = m_response;
                 m_response = null;
                 break;
             }
-            stopwatch.Stop();
 
             //lock (m_sync)
             //{
@@ -579,10 +582,10 @@ namespace GS.Server.Phd
 
             if (!Failed(response)) return response;
             if (response != null)
-                    throw new GuiderException(ErrorCode.NoResponse, (string) response["error"]["message"]);
+                throw new GuiderException(ErrorCode.NoResponse, (string)response["error"]["message"]);
 
             return response;
-           // }
+            // }
         }
 
         private static JObject SettleParam(double settlePixels, double settleTime, double settleTimeout)

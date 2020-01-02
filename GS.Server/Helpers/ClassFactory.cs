@@ -102,7 +102,7 @@ namespace GS.Server.Helpers
 
         public ClassFactory(Type type)
         {
-           // // LocalSystem.TraceLogItem("ClassFactory", "Start of initialisation");
+            // // LocalSystem.TraceLogItem("ClassFactory", "Start of initialisation");
             _mClassType = type;
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
@@ -114,10 +114,10 @@ namespace GS.Server.Helpers
 
             foreach (var T in type.GetInterfaces())			// Save all of the implemented interfaces
             {
-           //     // LocalSystem.TraceLogItem("ClassFactory", "Adding Type: " + T.FullName);
+                //     // LocalSystem.TraceLogItem("ClassFactory", "Adding Type: " + T.FullName);
                 _mInterfaceTypes.Add(T);
             }
-          //  // LocalSystem.TraceLogItem("ClassFactory", "Completed initialisation");
+            //  // LocalSystem.TraceLogItem("ClassFactory", "Completed initialisation");
         }
 
         #endregion
@@ -146,25 +146,25 @@ namespace GS.Server.Helpers
                 Flags,
                 out _mCookie
                 );
-         //   // LocalSystem.TraceLogItem("RegisterClassObject", "GUID: " + _mClassId + ", Cookie: " + _mCookie);
+            //   // LocalSystem.TraceLogItem("RegisterClassObject", "GUID: " + _mClassId + ", Cookie: " + _mCookie);
             return (i == 0);
         }
 
         public void RevokeClassObject()
         {
-         //   // LocalSystem.TraceLogItem("RevokeClassObject", _mCookie.ToString());
+            //   // LocalSystem.TraceLogItem("RevokeClassObject", _mCookie.ToString());
             NativeMethods.CoRevokeClassObject(_mCookie);
         }
 
         public static void ResumeClassObjects()
         {
-         //   // LocalSystem.TraceLogItem("ResumeClassObjects", "Called");
+            //   // LocalSystem.TraceLogItem("ResumeClassObjects", "Called");
             NativeMethods.CoResumeClassObjects();
         }
 
         public static void SuspendClassObjects()
         {
-          //  // LocalSystem.TraceLogItem("SuspendClassObjects", "Called");
+            //  // LocalSystem.TraceLogItem("SuspendClassObjects", "Called");
             NativeMethods.CoSuspendClassObjects();
         }
         #endregion
@@ -175,7 +175,7 @@ namespace GS.Server.Helpers
         //
         void IClassFactory.CreateInstance(IntPtr pUnkOuter, ref Guid riid, out IntPtr ppvObject)
         {
-         //   // LocalSystem.TraceLogItem("CreateInstance", "GUID: " + riid);
+            //   // LocalSystem.TraceLogItem("CreateInstance", "GUID: " + riid);
             IntPtr nullPtr = new IntPtr(0);
             ppvObject = nullPtr;
 
@@ -213,14 +213,14 @@ namespace GS.Server.Helpers
 
         void IClassFactory.LockServer(bool bLock)
         {
-        //    // LocalSystem.TraceLogItem("LockServer", "Lock server: " + bLock);
+            //    // LocalSystem.TraceLogItem("LockServer", "Lock server: " + bLock);
             if (bLock)
                 GSServer.CountLock();
             else
-          //      LocalServer.UncountLock();
-            // Always attempt to see if we need to shutdown this server application.
-        //    // LocalSystem.TraceLogItem("LockServer", "Calling ExitIf to check whether we can exit the server");
-            GSServer.ExitIf();
+                //      LocalServer.UncountLock();
+                // Always attempt to see if we need to shutdown this server application.
+                //    // LocalSystem.TraceLogItem("LockServer", "Calling ExitIf to check whether we can exit the server");
+                GSServer.ExitIf();
         }
         #endregion
     }

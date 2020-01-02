@@ -1,12 +1,12 @@
-﻿using System;
-using LiveCharts.Events;
+﻿using LiveCharts.Events;
+using System;
 
 namespace GS.LogView
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow 
+    public partial class MainWindow
     {
         public MainWindow()
         {
@@ -44,7 +44,7 @@ namespace GS.LogView
             }
 
         }
-        
+
         public void Dispose()
         {
             var vm = (MainWindowVM)DataContext;

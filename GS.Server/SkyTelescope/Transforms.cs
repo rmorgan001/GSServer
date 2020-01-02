@@ -13,9 +13,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using System.Windows;
 using ASCOM.Astrometry.Transform;
 using ASCOM.DeviceInterface;
+using System.Windows;
 
 namespace GS.Server.SkyTelescope
 {
@@ -132,7 +132,7 @@ namespace GS.Server.SkyTelescope
             {
                 case EquatorialCoordinateType.equJ2000:
                     radec.X = xform.RAJ2000;
-                    radec.Y = xform.DecJ2000; 
+                    radec.Y = xform.DecJ2000;
                     break;
                 case EquatorialCoordinateType.equTopocentric:
                     radec.X = rightAscension;

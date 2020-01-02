@@ -13,10 +13,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using System;
-using System.Reflection;
-using System.Threading;
-using System.Windows.Input;
 using GS.Principles;
 using GS.Server.Domain;
 using GS.Server.Helpers;
@@ -24,6 +20,10 @@ using GS.Server.Main;
 using GS.Server.SkyTelescope;
 using GS.Shared;
 using MaterialDesignThemes.Wpf;
+using System;
+using System.Reflection;
+using System.Threading;
+using System.Windows.Input;
 
 namespace GS.Server.Focuser
 {
@@ -38,7 +38,7 @@ namespace GS.Server.Focuser
         public FocuserVM()
         {
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading FocuserVM" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading FocuserVM" };
             MonitorLog.LogToMonitor(monitorItem);
 
             SkyTelescope();
@@ -46,7 +46,7 @@ namespace GS.Server.Focuser
 
         private bool SkyTelescope()
         {
-            if(_skyTelescopeVM == null) _skyTelescopeVM = SkyTelescopeVM._skyTelescopeVM;
+            if (_skyTelescopeVM == null) _skyTelescopeVM = SkyTelescopeVM._skyTelescopeVM;
             return _skyTelescopeVM != null;
         }
 

@@ -13,9 +13,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using GS.Principles;
 using System;
 using System.Threading;
-using GS.Principles;
 
 namespace GS.Simulator
 {
@@ -76,7 +76,7 @@ namespace GS.Simulator
         //private const double SlewSpeedThree = 1.0 * _maxrate;
         private const double SlewSpeedFour = 1.5 * _maxrate;
         //private const double SlewSpeedFive = 2.0 * _maxrate;
-        private const double SlewSpeedSix = 2.5* _maxrate;
+        private const double SlewSpeedSix = 2.5 * _maxrate;
         //private const double SlewSpeedSeven = 3.0 * _maxrate;
         private const double SlewSpeedEight = 3.4 * _maxrate;
 
@@ -86,8 +86,8 @@ namespace GS.Simulator
 
         private double DegreesX { get; set; }
         private double DegreesY { get; set; }
-        private int StepsX => (int) (DegreesX * 36000);
-        private int StepsY => (int) (DegreesY * 36000);
+        private int StepsX => (int)(DegreesX * 36000);
+        private int StepsY => (int)(DegreesY * 36000);
         private double HcX { get; set; }
         private double HcY { get; set; }
         private int HomeSensorX { get; set; }
@@ -409,7 +409,7 @@ namespace GS.Simulator
             {
                 change = SlewSpeedFour * sign;
             }
-            else if (delta < 1 )
+            else if (delta < 1)
             {
                 change = SlewSpeedSix * sign;
             }
@@ -418,7 +418,7 @@ namespace GS.Simulator
                 change = SlewSpeedEight * sign;
             }
 
-            return change * interval ;
+            return change * interval;
         }
 
         /// <summary>
@@ -608,7 +608,7 @@ namespace GS.Simulator
             changeY += Tracking(Axis.Axis2, seconds);
 
             // Hand controls
-            changeX +=  HandControl(Axis.Axis1, seconds);
+            changeX += HandControl(Axis.Axis1, seconds);
             changeY += HandControl(Axis.Axis2, seconds);
 
             // Slewing
@@ -632,32 +632,32 @@ namespace GS.Simulator
             switch (axis)
             {
                 case Axis.Axis1:
-                   // if (DegreesX > 110 || DegreesX < 70) return;
-                   if (DegreesX > 90 && _homeSensorX )
-                   {
-                       HomeSensorX = 90 * 36000;
-                       _homeSensorX = false;
-                   }
-                   if (DegreesX < 90 && !_homeSensorX)
-                   {
-                       HomeSensorX = 90 * 36000;
-                       _homeSensorX = true;
-                   }
-                   break;
+                    // if (DegreesX > 110 || DegreesX < 70) return;
+                    if (DegreesX > 90 && _homeSensorX)
+                    {
+                        HomeSensorX = 90 * 36000;
+                        _homeSensorX = false;
+                    }
+                    if (DegreesX < 90 && !_homeSensorX)
+                    {
+                        HomeSensorX = 90 * 36000;
+                        _homeSensorX = true;
+                    }
+                    break;
                 case Axis.Axis2:
-                   // if (DegreesY > 110 || DegreesY < 70) return;
-                   if (DegreesY > 90.0 && _homeSensorY)
-                   {
-                       HomeSensorY = 90 * 36000;
-                       _homeSensorY = false;
-                   }
+                    // if (DegreesY > 110 || DegreesY < 70) return;
+                    if (DegreesY > 90.0 && _homeSensorY)
+                    {
+                        HomeSensorY = 90 * 36000;
+                        _homeSensorY = false;
+                    }
 
-                   if (DegreesY < 90.0 && !_homeSensorY)
-                   {
-                       HomeSensorY = 90 * 36000;
-                       _homeSensorY = true;
-                   }
-                   break;
+                    if (DegreesY < 90.0 && !_homeSensorY)
+                    {
+                        HomeSensorY = 90 * 36000;
+                        _homeSensorY = true;
+                    }
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
             }
@@ -746,5 +746,5 @@ namespace GS.Simulator
                     break;
             }
         }
-    } 
+    }
 }

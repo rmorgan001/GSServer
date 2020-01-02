@@ -14,6 +14,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using GS.Shared;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
@@ -21,7 +22,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using GS.Shared;
 
 namespace GS.Server.Gamepad
 {
@@ -61,7 +61,7 @@ namespace GS.Server.Gamepad
                 OnStaticPropertyChanged();
             }
         }
-        
+
         /// <summary>
         /// will upgrade if necessary
         /// </summary>
@@ -133,7 +133,7 @@ namespace GS.Server.Gamepad
         private static void LogSetting(string method, string value)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = $"{method}", Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = $"{method}", Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
             MonitorLog.LogToMonitor(monitorItem);
         }
 
@@ -141,7 +141,7 @@ namespace GS.Server.Gamepad
         /// output gamepad keys to settings
         /// </summary>
         /// <param name="settingsDict"></param>
-        public static void SaveSettings( Dictionary<string, string> settingsDict)
+        public static void SaveSettings(Dictionary<string, string> settingsDict)
         {
             if (settingsDict == null) return;
             foreach (var setting in settingsDict)

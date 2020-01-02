@@ -13,6 +13,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using ASCOM.Utilities;
+using GS.Shared;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,8 +22,6 @@ using System.Globalization;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using ASCOM.Utilities;
-using GS.Shared;
 
 namespace GS.Server.Gps
 {
@@ -48,7 +48,7 @@ namespace GS.Server.Gps
             {
                 _gpsRunning = value;
                 if (!value)
-                { 
+                {
                     _ctsGps?.Cancel();
                     _ctsGps?.Dispose();
                     _ctsGps = null;
@@ -127,7 +127,7 @@ namespace GS.Server.Gps
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message},{ex.StackTrace}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message},{ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 GpsRunning = false;

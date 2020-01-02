@@ -13,12 +13,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using ASCOM.DeviceInterface;
+using GS.Server.SkyTelescope;
 using System;
 using System.Collections;
 using System.Globalization;
 using System.Runtime.InteropServices;
-using ASCOM.DeviceInterface;
-using GS.Server.SkyTelescope;
 
 namespace ASCOM.GS.Sky.Telescope
 {

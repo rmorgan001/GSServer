@@ -452,37 +452,37 @@
                                 </lvc:CartesianChart.Resources>
                                 <lvc:CartesianChart.Series>
                                     <geared:GLineSeries Title="Dec" PointGeometrySize="{Binding PointSize, Mode=TwoWay}" PointGeometry="{x:Static lvc:DefaultGeometries.Circle}" PointForeground="{Binding DecColor}" 
-                                                        Stroke="{Binding DecColor}" StrokeThickness="{Binding LineSize, Mode=TwoWay}" Visibility="{Binding DecLine, Converter={StaticResource BoolToVis}}" 
+                                                        Stroke="{Binding DecColor}" StrokeThickness="{Binding LineSize, Mode=TwoWay}" Visibility="{Binding DecLine,Mode=TwoWay, Converter={StaticResource BoolToVis}}" 
                                                         Values="{Binding DecValues, Mode=TwoWay}" LineSmoothness="{Binding LineSmoothness}" Fill="Transparent"  DataLabels="False" />
-                                    <geared:GColumnSeries Title="Dec" Stroke="{Binding DecColor}" StrokeThickness="{Binding LineSize, Mode=TwoWay}" Fill="{Binding DecColor}" 
-                                                          Visibility="{Binding DecBar, Converter={StaticResource BoolToVis}}" Values="{Binding DecValues, Mode=TwoWay}" 
-                                                          ColumnPadding="1" MaxColumnWidth="5" DataLabels="False" />
+                                    <geared:GColumnSeries Title="Dec" PointGeometry="{x:Static lvc:DefaultGeometries.None}"  
+                                                          Stroke="{Binding DecColor}" StrokeThickness="{Binding LineSize, Mode=TwoWay}" Visibility="{Binding DecBar, Mode=TwoWay, Converter={StaticResource BoolToVis}}" 
+                                                          Values="{Binding DecValues, Mode=TwoWay}" Fill="{Binding DecColor}" ColumnPadding="1" MaxColumnWidth="5" DataLabels="False" Foreground="{Binding DecColor}"/>
                                     <geared:GStepLineSeries Title="Dec" PointGeometrySize="{Binding PointSize, Mode=TwoWay}" PointGeometry="{x:Static lvc:DefaultGeometries.Circle}" Stroke="{Binding DecColor}" 
-                                                            StrokeThickness="{Binding LineSize, Mode=TwoWay}" Visibility="{Binding DecStep, Converter={StaticResource BoolToVis}}" 
+                                                            StrokeThickness="{Binding LineSize, Mode=TwoWay}" Visibility="{Binding DecStep, Mode=TwoWay,Converter={StaticResource BoolToVis}}" 
                                                             Values="{Binding DecValues, Mode=TwoWay}" Fill="Transparent" DataLabels="False"/>
 
                                     <geared:GLineSeries Title="Ra" PointGeometrySize="{Binding PointSize, Mode=TwoWay}" PointGeometry="{x:Static lvc:DefaultGeometries.Circle}" PointForeground="{Binding RaColor}" 
-                                                        Stroke="{Binding RaColor}" StrokeThickness="{Binding LineSize, Mode=TwoWay}" Visibility="{Binding RaLine, Converter={StaticResource BoolToVis}}"  
+                                                        Stroke="{Binding RaColor}" StrokeThickness="{Binding LineSize, Mode=TwoWay}" Visibility="{Binding RaLine, Mode=TwoWay,Converter={StaticResource BoolToVis}}"  
                                                         Values="{Binding RaValues, Mode=TwoWay}" LineSmoothness="{Binding LineSmoothness}" Fill="Transparent" DataLabels="False"/>
                                     <geared:GColumnSeries Title="Ra" Stroke="{Binding RaColor}" StrokeThickness="{Binding LineSize, Mode=TwoWay}" Fill="{Binding RaColor}"  
-                                                          Visibility="{Binding RaBar, Converter={StaticResource BoolToVis}}" Values="{Binding RaValues, Mode=TwoWay}" 
+                                                          Visibility="{Binding RaBar, Mode=TwoWay,Converter={StaticResource BoolToVis}}" Values="{Binding RaValues, Mode=TwoWay}" 
                                                           ColumnPadding="1" MaxColumnWidth="5"  DataLabels="False" />
                                     <geared:GStepLineSeries Title="Ra" PointGeometrySize="{Binding PointSize, Mode=TwoWay}" PointGeometry="{x:Static lvc:DefaultGeometries.Circle}" Stroke="{Binding RaColor}" 
-                                                            StrokeThickness="{Binding LineSize, Mode=TwoWay}" Visibility="{Binding RaStep, Converter={StaticResource BoolToVis}}" 
+                                                            StrokeThickness="{Binding LineSize, Mode=TwoWay}" Visibility="{Binding RaStep, Mode=TwoWay,Converter={StaticResource BoolToVis}}" 
                                                             Values="{Binding RaValues, Mode=TwoWay}" Fill="Transparent"  DataLabels="False"/>
 
                                     <geared:GLineSeries Title="Third" PointGeometrySize="{Binding PointSize, Mode=TwoWay}" PointGeometry="{x:Static lvc:DefaultGeometries.Circle}" PointForeground="{Binding ThirdColor}" 
-                                                        Stroke="{Binding ThirdColor}" StrokeThickness="{Binding LineSize, Mode=TwoWay}" Visibility="{Binding ThirdLine, Converter={StaticResource BoolToVis}}"  
+                                                        Stroke="{Binding ThirdColor}" StrokeThickness="{Binding LineSize, Mode=TwoWay}" Visibility="{Binding ThirdLine, Mode=TwoWay,Converter={StaticResource BoolToVis}}"  
                                                         Values="{Binding ThirdValues, Mode=TwoWay}" LineSmoothness="{Binding LineSmoothness}" Fill="Transparent" DataLabels="False"/>
                                     <geared:GColumnSeries Title="Third" Stroke="{Binding ThirdColor}" StrokeThickness="{Binding LineSize, Mode=TwoWay}" Fill="{Binding ThirdColor}"  
-                                                          Visibility="{Binding ThirdBar, Converter={StaticResource BoolToVis}}" Values="{Binding ThirdValues, Mode=TwoWay}" 
+                                                          Visibility="{Binding ThirdBar, Mode=TwoWay,Converter={StaticResource BoolToVis}}" Values="{Binding ThirdValues, Mode=TwoWay}" 
                                                           ColumnPadding="1" MaxColumnWidth="5" DataLabels="False" />
                                     <geared:GStepLineSeries Title="Third" PointGeometrySize="{Binding PointSize, Mode=TwoWay}" PointGeometry="{x:Static lvc:DefaultGeometries.Circle}" Stroke="{Binding ThirdColor}" 
                                                             StrokeThickness="{Binding LineSize, Mode=TwoWay}" Visibility="{Binding ThirdStep, Converter={StaticResource BoolToVis}}" 
                                                             Values="{Binding ThirdValues, Mode=TwoWay}" Fill="Transparent"  DataLabels="False"/>
 
                                     <geared:GLineSeries Title="Fourth" PointGeometrySize="{Binding PointSize, Mode=TwoWay}" PointGeometry="{x:Static lvc:DefaultGeometries.Circle}" PointForeground="{Binding FourthColor}" 
-                                                        Stroke="{Binding FourthColor}" StrokeThickness="{Binding LineSize, Mode=TwoWay}" Visibility="{Binding FourthLine, Converter={StaticResource BoolToVis}}"  
+                                                        Stroke="{Binding FourthColor}" StrokeThickness="{Binding LineSize, Mode=TwoWay}" Visibility="{Binding FourthLine, Mode=TwoWay, Converter={StaticResource BoolToVis}}"  
                                                         Values="{Binding FourthValues, Mode=TwoWay}" LineSmoothness="{Binding LineSmoothness}" Fill="Transparent" DataLabels="False"/>
                                     <geared:GColumnSeries Title="Fourth" Stroke="{Binding FourthColor}" StrokeThickness="{Binding LineSize, Mode=TwoWay}" Fill="{Binding FourthColor}"  
                                                           Visibility="{Binding FourthBar, Converter={StaticResource BoolToVis}}" Values="{Binding FourthValues, Mode=TwoWay}" 

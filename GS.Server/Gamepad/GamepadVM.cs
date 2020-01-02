@@ -13,12 +13,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using System;
-using System.Diagnostics;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Input;
 using GS.Principles;
 using GS.Server.Domain;
 using GS.Server.Helpers;
@@ -27,6 +21,12 @@ using GS.Server.Settings;
 using GS.Server.SkyTelescope;
 using GS.Shared;
 using MaterialDesignThemes.Wpf;
+using System;
+using System.Diagnostics;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace GS.Server.Gamepad
 {
@@ -47,7 +47,7 @@ namespace GS.Server.Gamepad
             try
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading GamepadVM" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading GamepadVM" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 GamepadSettings.Load();
@@ -188,7 +188,7 @@ namespace GS.Server.Gamepad
                 OnPropertyChanged();
             }
         }
-        
+
         private string _right;
         public string Right
         {
@@ -329,7 +329,7 @@ namespace GS.Server.Gamepad
                                 }
                             }
                             else
-                            { 
+                            {
                                 for (var i = 0; i < gamepadButtons.Length; i++)
                                 {
                                     if (!gamepadButtons[i]) continue;
@@ -528,7 +528,7 @@ namespace GS.Server.Gamepad
         private int DoGamepadCommand(int id, bool value, string command)
         {
             var returnId = -1;
-            if (!SkyServer.IsMountRunning) return returnId; 
+            if (!SkyServer.IsMountRunning) return returnId;
             if (command == null) return returnId;
             if (ctsGamepad.IsCancellationRequested) return returnId;
             ThreadContext.InvokeOnUiThread(delegate
@@ -1003,7 +1003,7 @@ namespace GS.Server.Gamepad
         {
             try
             {
-               _gamepad?.SaveSettings();
+                _gamepad?.SaveSettings();
             }
             catch (Exception ex)
             {

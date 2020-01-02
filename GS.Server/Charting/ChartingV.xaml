@@ -54,6 +54,8 @@
                         </Grid.ColumnDefinitions>
                         <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Pulse Charts:</Label>
                         <StackPanel Orientation="Horizontal" Grid.Row="0"  Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center">
+                            <RadioButton GroupName="DataType" Margin="10,0,0,0" VerticalAlignment="Center" ToolTip="Time to execute pulse" Style="{StaticResource MaterialDesignRadioButton}"
+                                         IsChecked="{Binding DataType, Converter={StaticResource EBC}, ConverterParameter={x:Static local:ChartTypes.Rejected}}">Rejected</RadioButton>
                             <RadioButton GroupName="DataType" Margin="20,0,0,0" VerticalAlignment="Center" ToolTip="Pulse in steps" Style="{StaticResource MaterialDesignRadioButton}"
                                      IsChecked="{Binding DataType, Converter={StaticResource EBC}, ConverterParameter={x:Static local:ChartTypes.Steps}}">Microsteps</RadioButton>
                             <RadioButton GroupName="DataType" Margin="10,0,0,0" VerticalAlignment="Center" ToolTip="Pulse length in time" Style="{StaticResource MaterialDesignRadioButton}"

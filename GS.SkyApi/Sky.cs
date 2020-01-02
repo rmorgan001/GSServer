@@ -13,15 +13,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using GS.Server.Helpers;
+using GS.Server.SkyTelescope;
+using GS.Shared;
+using GS.SkyWatcher;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
-using GS.Shared;
-using GS.SkyWatcher;
-using GS.Server.Helpers;
-using GS.Server.SkyTelescope;
 
 namespace GS.SkyApi
 {
@@ -48,7 +48,7 @@ namespace GS.SkyApi
                 ValidateMount();
 
                 var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AscomOn = value;
@@ -59,7 +59,7 @@ namespace GS.SkyApi
         public void AxisGoToTarget(int axis, double targetPosition)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{targetPosition}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{targetPosition}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -72,7 +72,7 @@ namespace GS.SkyApi
         public void AxisMoveSteps(int axis, long steps)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{steps}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{steps}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -85,7 +85,7 @@ namespace GS.SkyApi
         public void AxisPulse(int axis, double guiderate, int duration, int backlashsteps = 0)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{guiderate},{duration}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{guiderate},{duration}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -98,7 +98,7 @@ namespace GS.SkyApi
         public void AxisSlew(int axis, double rate)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{rate}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{rate}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -111,7 +111,7 @@ namespace GS.SkyApi
         public void AxisStop(int axis)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -124,7 +124,7 @@ namespace GS.SkyApi
         public void AxisStopInstant(int axis)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -228,7 +228,7 @@ namespace GS.SkyApi
                 return results.Result;
             }
         }
-        
+
         /// <inheritdoc />
         public bool CanPpec
         {
@@ -240,7 +240,7 @@ namespace GS.SkyApi
                 return results.Result;
             }
         }
-        
+
         /// <inheritdoc />
         public bool CanWifi
         {
@@ -442,7 +442,7 @@ namespace GS.SkyApi
         public long[] GetStepsPerRevolution()
         {
             ValidateMount();
-            var command = new  SkyGetStepsPerRevolution(SkyQueue.NewId);
+            var command = new SkyGetStepsPerRevolution(SkyQueue.NewId);
             var results = GetResult(command);
             return results.Result;
         }
@@ -474,7 +474,7 @@ namespace GS.SkyApi
         public void InitializeAxes()
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Started" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Started" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -491,7 +491,7 @@ namespace GS.SkyApi
                 var results = GetResult(command);
                 return results.Result;
             }
-        } 
+        }
 
         /// <inheritdoc />
         public bool IsPpecInTrainingOn
@@ -504,7 +504,7 @@ namespace GS.SkyApi
                 return results.Result;
             }
         }
-        
+
         /// <inheritdoc />
         public bool IsPpecOn
         {
@@ -516,7 +516,7 @@ namespace GS.SkyApi
                 return results.Result;
             }
         }
-        
+
         /// <inheritdoc />
         public bool IsFullStop(int axis)
         {
@@ -598,19 +598,19 @@ namespace GS.SkyApi
         public void SkySetAlternatingPpec(bool on)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{on}"};
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{on}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
-            var command = new SkySetAlternatingPpec(SkyQueue.NewId,on);
-             GetResult(command);
+            var command = new SkySetAlternatingPpec(SkyQueue.NewId, on);
+            GetResult(command);
         }
 
         /// <inheritdoc />
         public void SetAxisPosition(int axis, double position)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{position}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{position}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -623,7 +623,7 @@ namespace GS.SkyApi
         public void SetBreakPointIncrement(int axis, long stepsCount)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{stepsCount}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{stepsCount}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -636,7 +636,7 @@ namespace GS.SkyApi
         public void SetDecPulseToGoTo(bool on)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{on}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{on}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -648,7 +648,7 @@ namespace GS.SkyApi
         public void SetEncoder(int axis, bool on)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{on}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{on}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -661,7 +661,7 @@ namespace GS.SkyApi
         public void SetFullCurrentLowSpeed(int axis, bool on)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{on}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{on}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -674,7 +674,7 @@ namespace GS.SkyApi
         public void SetGotoTargetIncrement(int axis, long stepsCount)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{stepsCount}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{stepsCount}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -687,7 +687,7 @@ namespace GS.SkyApi
         public void SetHomePositionIndex(int axis)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -700,7 +700,7 @@ namespace GS.SkyApi
         public void StartMotion(int axis)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -713,7 +713,7 @@ namespace GS.SkyApi
         public void SetMotionMode(int axis, int func, int direction)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{func},{direction}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{func},{direction}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -726,7 +726,7 @@ namespace GS.SkyApi
         public void SetPpec(int axis, bool on)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{on}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{on}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -739,7 +739,7 @@ namespace GS.SkyApi
         public void SetPpecTrain(int axis, bool on)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -752,7 +752,7 @@ namespace GS.SkyApi
         public void SetStepSpeed(int axis, long stepSpeed)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{stepSpeed}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{stepSpeed}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -765,7 +765,7 @@ namespace GS.SkyApi
         public void SetTargetPosition(int axis, double position)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{position}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{position}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
@@ -779,7 +779,7 @@ namespace GS.SkyApi
         /// </summary>
         private void ValidateMount()
         {
-            if (!IsServerSkyWatcher) {throw new Exception("Server not set to correct mount type");}
+            if (!IsServerSkyWatcher) { throw new Exception("Server not set to correct mount type"); }
             if (!IsConnected) throw new Exception("Mount not connected");
         }
 
@@ -797,14 +797,14 @@ namespace GS.SkyApi
                 case 2:
                     return AxisId.Axis2;
                 default:
-                    var exception =  new ArgumentOutOfRangeException();
+                    var exception = new ArgumentOutOfRangeException();
                     var monitorItem = new MonitorEntry
-                        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}" };
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}" };
                     MonitorLog.LogToMonitor(monitorItem);
 
                     throw exception;
             }
-            
+
         }
 
         /// <summary>
@@ -822,7 +822,7 @@ namespace GS.SkyApi
                 var exception = new Exception("Timeout processing command");
 
                 var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{exception}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{exception}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 throw exception;
@@ -832,7 +832,7 @@ namespace GS.SkyApi
                 if (result.Successful) return result;
 
                 var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{result.Exception}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{result.Exception}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 throw result.Exception;

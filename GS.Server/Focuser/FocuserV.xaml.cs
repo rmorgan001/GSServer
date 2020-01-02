@@ -6,7 +6,7 @@ namespace GS.Server.Focuser
     /// Interaction logic for FocuserView.xaml
     /// </summary>
     [ComVisible(false)]
-    public partial class FocuserView 
+    public partial class FocuserView
     {
         public FocuserView()
         {

@@ -25,7 +25,7 @@ namespace GS.Server.Helpers
     {
         public static string GetDocumentXaml(DependencyObject obj)
         {
-            return (string) obj.GetValue(DocumentXamlProperty);
+            return (string)obj.GetValue(DocumentXamlProperty);
         }
 
         public static void SetDocumentXaml(DependencyObject obj, string value)
@@ -43,7 +43,7 @@ namespace GS.Server.Helpers
                     BindsTwoWayByDefault = true,
                     PropertyChangedCallback = (obj, e) =>
                     {
-                        var richTextBox = (RichTextBox) obj;
+                        var richTextBox = (RichTextBox)obj;
 
                         // Parse the XAML to a document (or use XamlReader.Parse())
                         var xaml = GetDocumentXaml(richTextBox);

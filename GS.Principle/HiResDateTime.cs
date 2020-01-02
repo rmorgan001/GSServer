@@ -49,7 +49,7 @@ namespace GS.Principles
                 }
                 double endTimestamp = Stopwatch.GetTimestamp();
                 var durationInTicks = (endTimestamp - starttimestamp.Value) / Stopwatch.Frequency * TicksMultiplier;
-                if (!(durationInTicks >= maxidle)) return starttime.Value.AddTicks((long) durationInTicks);
+                if (!(durationInTicks >= maxidle)) return starttime.Value.AddTicks((long)durationInTicks);
                 starttimestamp.Value = Stopwatch.GetTimestamp();
                 starttime.Value = DateTime.UtcNow;
                 return starttime.Value;

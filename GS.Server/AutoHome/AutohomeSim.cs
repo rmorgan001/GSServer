@@ -1,17 +1,32 @@
-﻿using System;
-using System.Reflection;
-using System.Threading;
+﻿/* Copyright(C) 2019  Rob Morgan (robert.morgan.e@gmail.com)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 using GS.Principles;
 using GS.Server.SkyTelescope;
 using GS.Shared;
 using GS.Simulator;
+using System;
+using System.Reflection;
+using System.Threading;
 
 namespace GS.Server.AutoHome
 {
     public class AutohomeSim
     {
-       // private int StartCount { get; set; }
-        private int TripPosition { get; set;}
+        // private int StartCount { get; set; }
+        private int TripPosition { get; set; }
 
         /// <summary>
         /// autohome for the simulator
@@ -28,9 +43,9 @@ namespace GS.Server.AutoHome
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = "Start"
             };
-            MonitorLog.LogToMonitor(monitorItem); 
+            MonitorLog.LogToMonitor(monitorItem);
 
-           Initialize();
+            Initialize();
         }
 
         /// <summary>
@@ -104,7 +119,7 @@ namespace GS.Server.AutoHome
                     case false:
                         return false;
                     case null:
-                        SlewAxis(1, axis );
+                        SlewAxis(1, axis);
                         break;
                 }
             }
@@ -118,7 +133,7 @@ namespace GS.Server.AutoHome
         private void ResetHomeSensor(Axis axis)
         {
             var reset = new CmdHomeSensorReset(MountQueue.NewId, axis);
-           // var _ = (int)MountQueue.GetCommandResult(reset).Result;
+            // var _ = (int)MountQueue.GetCommandResult(reset).Result;
 
             var monitorItem = new MonitorEntry
             {
@@ -216,7 +231,7 @@ namespace GS.Server.AutoHome
                     {
                         i = 0;
                         //totalmove = 0.0;
-                        startovers ++;
+                        startovers++;
                         continue; //start over
                     }
                 }
@@ -235,7 +250,7 @@ namespace GS.Server.AutoHome
             SkyServer.AutoHomeProgressBar += 5;
 
             #region 3.7 degree slew away from home for a validation move
-            slew = SlewAxis(3.7, axis ); // slew away from home
+            slew = SlewAxis(3.7, axis); // slew away from home
             if (slew != 0) return slew;
             status = GetValidStatus(axis);
             switch (status)
@@ -284,7 +299,7 @@ namespace GS.Server.AutoHome
             // Dec offset for side saddles
             if (Math.Abs(offsetdec) > 0 && axis == Axis.Axis2)
             {
-                slew = SlewAxis(Math.Abs(offsetdec), axis, offsetdec < 0); 
+                slew = SlewAxis(Math.Abs(offsetdec), axis, offsetdec < 0);
                 if (slew != 0) return slew;
             }
 
@@ -330,9 +345,9 @@ namespace GS.Server.AutoHome
         /// <param name="degrees"></param>
         /// <param name="direction"></param>
         /// <param name="axis"></param>
-        private int SlewAxis(double degrees,  Axis axis, bool direction = false)
+        private int SlewAxis(double degrees, Axis axis, bool direction = false)
         {
-            if (SkyServer.AutoHomeStop) return -3 ; //stop requested
+            if (SkyServer.AutoHomeStop) return -3; //stop requested
 
             if (SkyServer.Tracking)
             {

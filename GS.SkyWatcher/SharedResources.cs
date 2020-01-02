@@ -28,7 +28,7 @@ namespace GS.SkyWatcher
         {
         }
 
-        public MountControlException(ErrorCode err): base($"Mount: {err}")
+        public MountControlException(ErrorCode err) : base($"Mount: {err}")
         {
             ErrorCode = err;
         }
@@ -38,7 +38,7 @@ namespace GS.SkyWatcher
             ErrorCode = err;
         }
 
-        public MountControlException(ErrorCode err, string message, Exception inner): base($"Mount: {err}, {message}", inner)
+        public MountControlException(ErrorCode err, string message, Exception inner) : base($"Mount: {err}, {message}", inner)
         {
             ErrorCode = err;
         }
@@ -118,7 +118,7 @@ namespace GS.SkyWatcher
         public bool HighSpeed;
         public bool NotInitialized;
         public string StepSpeed;
-        
+
         public void SetFullStop()
         {
             FullStop = true;
@@ -142,7 +142,7 @@ namespace GS.SkyWatcher
             HighSpeed = highspeed;
         }
 
-        
+
         //// Mask for axis status
         //public const long AXIS_FULL_STOPPED = 0x0001;		// 該軸處於完全停止狀態
         //public const long AXIS_SLEWING = 0x0002;			// 該軸處於恒速運行狀態
@@ -171,24 +171,24 @@ namespace GS.SkyWatcher
         ErrAlignFailed = 200,		    // Calibration telescope failed
         ErrUnimplement = 300,           // Unimplemented method
         ErrWrongAlignmentData = 400,	// The alignment data is incorect.
-        ErrQueueFailed=500,             // Queue timeout or not running
+        ErrQueueFailed = 500,             // Queue timeout or not running
         ErrTooManyRetries = 501         // retries hit max limit
     };
 
     public enum Mountid
     {
-         // Telescope ID, they must be started from 0 and coded continuously.
-         IdCelestronAz = 0,				// Celestron Alt/Az Mount
-         IdCelestronEq = 1,				// Celestron EQ Mount
-         IdSkywatcherAz = 2,			    // Skywatcher Alt/Az Mount
-         IdSkywatcherEq = 3,			    // Skywatcher EQ Mount
-         IdOrionEqg = 4,				    // Orion EQ Mount
-         IdOrionTeletrack = 5,			// Orion TeleTrack Mount
-         IdEqEmulator = 6,				// EQ Mount Emulator
-         IdAzEmulator = 7,				// Alt/Az Mount Emulator
-         IdNexstargt80 = 8,				// NexStarGT-80 mount
-         IdNexstargt114 = 9,				// NexStarGT-114 mount
-         IdStarseeker80 = 10,			    // NexStarGT-80 mount
-         IdStarseeker114 = 11,			// NexStarGT-114 mount
+        // Telescope ID, they must be started from 0 and coded continuously.
+        IdCelestronAz = 0,              // Celestron Alt/Az Mount
+        IdCelestronEq = 1,              // Celestron EQ Mount
+        IdSkywatcherAz = 2,             // Skywatcher Alt/Az Mount
+        IdSkywatcherEq = 3,             // Skywatcher EQ Mount
+        IdOrionEqg = 4,                 // Orion EQ Mount
+        IdOrionTeletrack = 5,           // Orion TeleTrack Mount
+        IdEqEmulator = 6,               // EQ Mount Emulator
+        IdAzEmulator = 7,               // Alt/Az Mount Emulator
+        IdNexstargt80 = 8,              // NexStarGT-80 mount
+        IdNexstargt114 = 9,             // NexStarGT-114 mount
+        IdStarseeker80 = 10,                // NexStarGT-80 mount
+        IdStarseeker114 = 11,			// NexStarGT-114 mount
     }
 }

@@ -126,7 +126,7 @@ namespace GS.Principles
             _timeProcOneShot = TimerOneShotEventCallback;
             _tickRaiser = OnTick;
         }
-        
+
         /// <summary>
         /// Starts the timer.
         /// </summary>
@@ -143,7 +143,7 @@ namespace GS.Principles
 
             // If the periodic event callback should be used.
             var userCtx = 0;
-            _timerID = NativeMethods.TimeSetEvent(Period, Resolution, Mode == TimerMode.Periodic ? _timeProcPeriodic : _timeProcOneShot, ref userCtx,(int) Mode);
+            _timerID = NativeMethods.TimeSetEvent(Period, Resolution, Mode == TimerMode.Periodic ? _timeProcPeriodic : _timeProcOneShot, ref userCtx, (int)Mode);
 
             // If the timer was created successfully.
             if (_timerID != 0)
@@ -502,7 +502,7 @@ namespace GS.Principles
         }
     }
 
-    
+
     /// <summary>
     /// Represents information about the multimedia Timer's capabilities.
     /// </summary>

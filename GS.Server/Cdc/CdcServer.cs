@@ -13,18 +13,18 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using ASCOM.Utilities;
+using GS.Shared;
 using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Windows;
-using ASCOM.Utilities;
-using GS.Shared;
 
 namespace GS.Server.Cdc
 {
-    internal sealed class CdcServer: IDisposable
+    internal sealed class CdcServer : IDisposable
     {
         private TcpClient _tcpClient;
         private const string _crlf = "\r\n";

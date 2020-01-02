@@ -14,13 +14,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using GS.Shared;
 using System;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows;
-using GS.Shared;
 
 namespace GS.Server.Settings
 {
@@ -308,7 +308,7 @@ namespace GS.Server.Settings
                 if (Math.Abs(_windowLeft - value) < 0.1) return;
                 _windowLeft = value;
                 Properties.Server.Default.WindowLeft = value;
-              //  LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                //  LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -322,7 +322,7 @@ namespace GS.Server.Settings
                 if (Math.Abs(_windowTop - value) < 0.1) return;
                 _windowTop = value;
                 Properties.Server.Default.WindowTop = value;
-               // LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                // LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -393,7 +393,7 @@ namespace GS.Server.Settings
         private static void LogSetting(string method, string value)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = $"{method}", Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = $"{method}", Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
             MonitorLog.LogToMonitor(monitorItem);
         }
 

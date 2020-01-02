@@ -13,6 +13,13 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using GS.LogView.Helpers;
+using GS.Shared;
+using LiveCharts;
+using LiveCharts.Defaults;
+using LiveCharts.Geared;
+using MaterialDesignThemes.Wpf;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,13 +31,6 @@ using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
-using GS.LogView.Helpers;
-using GS.Shared;
-using LiveCharts;
-using LiveCharts.Defaults;
-using LiveCharts.Geared;
-using MaterialDesignThemes.Wpf;
-using Microsoft.Win32;
 using Color = System.Drawing.Color;
 
 namespace GS.LogView
@@ -135,7 +135,7 @@ namespace GS.LogView
             ThirdValues?.Dispose();
             FourthValues?.Dispose();
         }
-        
+
         private string _version;
         public string Version
         {
@@ -184,7 +184,7 @@ namespace GS.LogView
             }
             catch (Exception ex)
             {
-               OpenDialog($"{ex.Message}");
+                OpenDialog($"{ex.Message}");
             }
         }
 
@@ -246,7 +246,7 @@ namespace GS.LogView
         public ICommand MouseDataHoverCommand => _mouseDataHoverCommand ?? (_mouseDataHoverCommand = new RelayCommand(DataHoverCommand));
         private void DataHoverCommand(object chartPoint)
         {
-            DisplayLogLine((ChartPoint) chartPoint);
+            DisplayLogLine((ChartPoint)chartPoint);
         }
 
         #endregion
@@ -717,7 +717,7 @@ namespace GS.LogView
                 OnPropertyChanged();
             }
         }
-        
+
         private string _rangetxt;
         public string RangeTxt
         {
@@ -895,7 +895,7 @@ namespace GS.LogView
         }
 
         private GearedValues<DateTimePoint> _raValues;
-        public GearedValues<DateTimePoint> RaValues 
+        public GearedValues<DateTimePoint> RaValues
         {
             get => _raValues;
             set
@@ -949,7 +949,7 @@ namespace GS.LogView
             DisableAnimations = true;
             AnimationTimes = new List<int>(Enumerable.Range(0, 11));
             Smoothness = new List<int>(Enumerable.Range(0, 11));
-            LineSizes = new List<double>(Numbers.InclusiveRange(.5,5));
+            LineSizes = new List<double>(Numbers.InclusiveRange(.5, 5));
             PointSizes = new List<int>(Enumerable.Range(0, 21));
             LineSize = 1.5;
             ClearCharts();
@@ -964,7 +964,7 @@ namespace GS.LogView
             var openFileDialog = new OpenFileDialog
             {
                 Filter = "Text files (*.txt)|*.txt",
-                Multiselect = false, 
+                Multiselect = false,
             };
             return openFileDialog.ShowDialog() != true ? null : openFileDialog.FileName;
         }
@@ -981,7 +981,7 @@ namespace GS.LogView
             LogItems = null;
             var logitem = new List<LogItem>();
             using (var fileStream = File.OpenRead(filename))
-               
+
             using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, BufferSize))
             {
                 string readline;
@@ -994,7 +994,7 @@ namespace GS.LogView
                         if (readline.Length <= 0 && linecount > 100000) continue;
 
                         var line = readline.Split('\t');
-                        if (line.Length < 2){ continue; }
+                        if (line.Length < 2) { continue; }
 
                         var res = Enum.TryParse(line[0].Trim(), out ChartItemCode a);
                         if (res) { item.ItemCode = a; } else { continue; }
@@ -1026,7 +1026,7 @@ namespace GS.LogView
         private void ParseLog()
         {
             if (LogItems == null) return;
-            if (LogItems.Count <= 0 ) return;
+            if (LogItems.Count <= 0) return;
             var index = 0;
             IndexItems = null;
             var indexItems = new List<IndexItem>();
@@ -1109,7 +1109,7 @@ namespace GS.LogView
                 {
                     var findfirst = LogItems.Find(x => x.Index == indexitem.Index && x.X > new DateTime(2000, 1, 1));
                     if (findfirst != null) indexitem.StartTime = findfirst.X;
-                    var findlast = LogItems.FindLast(x => x.Index == indexitem.Index && x.X > new DateTime(2000,1,1));
+                    var findlast = LogItems.FindLast(x => x.Index == indexitem.Index && x.X > new DateTime(2000, 1, 1));
                     if (findlast != null) indexitem.EndTime = findlast.X;
                     if (findfirst == null || findlast == null)
                     {
@@ -1141,7 +1141,7 @@ namespace GS.LogView
             ClearCharts();
             if (IndexItems == null || LogItems == null) return;
             if (IndexItems.Count <= 0 || LogItems.Count <= 0) return;
-            
+
             // pull index record
             var indexItem = IndexItems.Find(x => x.Index == index);
             if (indexItem == null) return;
@@ -1155,7 +1155,7 @@ namespace GS.LogView
         private void LoadData(IndexItem indexItem)
         {
             if (LogItems == null) return;
-            
+
             // pull log records
             var logitems = LogItems.FindAll(x => x.Index == indexItem.Index);
             if (logitems.Count == 0) return;
@@ -1205,7 +1205,7 @@ namespace GS.LogView
 
             StrRaLineOne = string.Empty;
             RangeTxt = string.Empty;
-            if(DataItems.Count > 0) DataItems.Clear();
+            if (DataItems.Count > 0) DataItems.Clear();
             LogLineTextBlock = string.Empty;
         }
 
@@ -1217,9 +1217,9 @@ namespace GS.LogView
         {
             try
             {
-                var dtp = (DateTimePoint) chartPoint.Instance;
+                var dtp = (DateTimePoint)chartPoint.Instance;
                 var findfirst = LogItems.Find(x => x.X == dtp.DateTime && (Math.Abs(x.Y).Equals(Math.Abs(dtp.Value))));
-                if(findfirst != null) LogLineTextBlock = findfirst.Line = findfirst.Line.Replace("\t", " | "); 
+                if (findfirst != null) LogLineTextBlock = findfirst.Line = findfirst.Line.Replace("\t", " | ");
             }
             catch (Exception ex)
             {

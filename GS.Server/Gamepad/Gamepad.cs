@@ -13,12 +13,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using GS.Shared;
+using SharpDX.DirectInput;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
-using GS.Shared;
-using SharpDX.DirectInput;
 
 namespace GS.Server.Gamepad
 {

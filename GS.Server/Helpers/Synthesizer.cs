@@ -13,6 +13,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using GS.Principles;
+using GS.Shared;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,8 +22,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Speech.Synthesis;
 using System.Threading;
-using GS.Principles;
-using GS.Shared;
 
 namespace GS.Server.Helpers
 {
@@ -31,12 +31,12 @@ namespace GS.Server.Helpers
         public static event PropertyChangedEventHandler _staticPropertyChanged;
 
         private static IList<string> VoiceNames;
-        
+
         private static string VoiceName => Settings.Settings.VoiceName;
 
         private static int Rate { get; }
 
-        private static int Volume => Settings.Settings.VoiceVolume; 
+        private static int Volume => Settings.Settings.VoiceVolume;
 
         internal static bool VoiceActive
         {
@@ -125,7 +125,7 @@ namespace GS.Server.Helpers
             {
                 VoiceActive = false;
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{text},{e.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{text},{e.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
             }
         }
@@ -148,7 +148,7 @@ namespace GS.Server.Helpers
             {
                 VoiceActive = false;
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{text},{bol},{e.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{text},{bol},{e.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
             }
 

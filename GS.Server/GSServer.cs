@@ -13,6 +13,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using ASCOM;
+using GS.Server.Helpers;
+using GS.Shared;
+using Microsoft.Win32;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,17 +28,13 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Threading;
-using Microsoft.Win32;
-using GS.Shared;
-using GS.Server.Helpers;
-using ASCOM;
 using System.Windows.Forms;
 using Application = System.Windows.Forms.Application;
 using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace GS.Server
 {
-    public static class GSServer 
+    public static class GSServer
     {
         #region Fields
 
@@ -165,7 +165,7 @@ namespace GS.Server
                 SaveAllAppSettings();
 
                 var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Server Exiting"};
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Server Exiting" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 var wParam = new UIntPtr(0);
@@ -199,7 +199,7 @@ namespace GS.Server
                     var msg = @"Unable to locate drivers directory - " + assyPath;
 
                     var monitorItem = new MonitorEntry
-                        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
                     MonitorLog.LogToMonitor(monitorItem);
 
                     return false;
@@ -210,15 +210,15 @@ namespace GS.Server
             var dllfiles = dir.GetFiles("*.dll");
             if (dllfiles.Length == 0)
             {
-                 var msg = @"Unable to locate any drivers - " + assyPath;
+                var msg = @"Unable to locate any drivers - " + assyPath;
 
-                 var monitorItem = new MonitorEntry
-                     { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
-                 MonitorLog.LogToMonitor(monitorItem);
+                var monitorItem = new MonitorEntry
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
+                MonitorLog.LogToMonitor(monitorItem);
 
                 return false;
             }
-            
+
             foreach (var fi in dllfiles)
             {
                 var aPath = fi.FullName;
@@ -241,7 +241,7 @@ namespace GS.Server
                         if (attrbutes.Length > 0)
                         {
                             var monitorItem = new MonitorEntry
-                                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{type.Assembly}" };
+                            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{type.Assembly}" };
                             MonitorLog.LogToMonitor(monitorItem);
 
                             _comObjectTypes.Add(type); //PWGS - much simpler
@@ -252,7 +252,7 @@ namespace GS.Server
                             var a = (GssAttribute)gssAttrbutes[0];
 
                             var monitorItem = new MonitorEntry
-                                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{type.Assembly},{a.DisplayName}" };
+                            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{type.Assembly},{a.DisplayName}" };
                             MonitorLog.LogToMonitor(monitorItem);
 
                             _comObjectTypes.Add(type); //PWGS - much simpler
@@ -262,7 +262,7 @@ namespace GS.Server
                 catch (BadImageFormatException ex)
                 {
                     var monitorItem = new MonitorEntry
-                        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                     MonitorLog.LogToMonitor(monitorItem);
 
                     // Probably an attempt to load a Win32 DLL (i.e. not a .net assembly)
@@ -271,7 +271,7 @@ namespace GS.Server
                 catch (Exception ex)
                 {
                     var monitorItem = new MonitorEntry
-                        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                     MonitorLog.LogToMonitor(monitorItem);
 
                     return false;
@@ -318,7 +318,7 @@ namespace GS.Server
                     MessageBoxIcon.Warning);
 
                 var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
             }
@@ -327,7 +327,7 @@ namespace GS.Server
                 MessageBox.Show(ex.ToString(), @"GSServer", MessageBoxButtons.OK, MessageBoxIcon.Stop);
 
                 var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
             }
         }
@@ -388,12 +388,12 @@ namespace GS.Server
             }
             catch (Exception ex)
             {
-               // // LocalSystem.TraceLogItem("GreenSwamp Localserver", ex.Message);
+                // // LocalSystem.TraceLogItem("GreenSwamp Localserver", ex.Message);
                 var msg = @"Error while registering the server:" + ex;
                 MessageBox.Show(msg, @"GS Server", MessageBoxButtons.OK, MessageBoxIcon.Stop);
 
                 var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 return;
@@ -476,7 +476,7 @@ namespace GS.Server
                         @"GS Server", MessageBoxButtons.OK, MessageBoxIcon.Stop);
 
                     var monitorItem = new MonitorEntry
-                        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                     MonitorLog.LogToMonitor(monitorItem);
 
                     bFail = true;
@@ -551,7 +551,7 @@ namespace GS.Server
                 catch (Exception ex)
                 {
                     var monitorItem = new MonitorEntry
-                        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message},{ex.Source},{ex.StackTrace},{ex.InnerException}"};
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message},{ex.Source},{ex.StackTrace},{ex.InnerException}" };
                     MonitorLog.LogToMonitor(monitorItem);
 
                 }
@@ -572,10 +572,10 @@ namespace GS.Server
                 _classFactories.Add(factory);
                 if (factory.RegisterClassObject()) continue;
                 var msg = @"Failed to register class factory for " + type.Name;
-                MessageBox.Show(msg,@"GSServer", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                MessageBox.Show(msg, @"GSServer", MessageBoxButtons.OK, MessageBoxIcon.Stop);
 
                 var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 return;
@@ -648,7 +648,7 @@ namespace GS.Server
         /// </summary>
         private static void GarbageCollection_DoWork(object sender, DoWorkEventArgs e)
         {
-            var interval = (int) e.Argument;
+            var interval = (int)e.Argument;
             while (!_bgWorker.CancellationPending)
             {
                 Thread.Sleep(interval);
@@ -672,9 +672,9 @@ namespace GS.Server
         [STAThread]
         private static void Main(string[] args)
         {
-            
+
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Main Thread" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Main Thread" };
             MonitorLog.LogToMonitor(monitorItem);
 
             if (!LoadComObjectAssemblies()) return; // Load served COM class assemblies, get types
@@ -705,24 +705,24 @@ namespace GS.Server
             catch (Exception ex)
             {
                 monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message},{ex.Source},{ex.StackTrace},{ex.InnerException}"};
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message},{ex.Source},{ex.StackTrace},{ex.InnerException}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 var str = $"Fatal error in GS Server: {ex.Message}";
 
                 monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer: {str}, {ex.StackTrace}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer: {str}, {ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 var exi = ex.InnerException;
                 if (ex.InnerException != null)
                 {
                     monitorItem = new MonitorEntry
-                        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer: {exi?.InnerException?.Message}, {exi?.InnerException?.StackTrace}" };
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer: {exi?.InnerException?.Message}, {exi?.InnerException?.StackTrace}" };
                     MonitorLog.LogToMonitor(monitorItem);
                 }
 
-                MessageBox.Show(str);throw;
+                MessageBox.Show(str); throw;
             }
             finally
             {

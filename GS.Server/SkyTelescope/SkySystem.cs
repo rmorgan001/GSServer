@@ -13,6 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using GS.Shared;
 using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
@@ -20,7 +21,6 @@ using System.IO.Ports;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using GS.Shared;
 
 namespace GS.Server.SkyTelescope
 {
@@ -35,7 +35,7 @@ namespace GS.Server.SkyTelescope
         static SkySystem()
         {
             ConnectStates = new ConcurrentDictionary<long, bool>();
-                _idCount = 0;
+            _idCount = 0;
         }
 
         public static bool Connected => ConnectStates.Count > 0;
@@ -47,7 +47,7 @@ namespace GS.Server.SkyTelescope
             {
                 var notAlreadyPresent = ConnectStates.TryAdd(id, true);
 
-                if (Connected) if (!SkyServer.IsMountRunning) SkyServer.IsMountRunning = true; 
+                if (Connected) if (!SkyServer.IsMountRunning) SkyServer.IsMountRunning = true;
 
                 var monitorItem = new MonitorEntry
                 {
@@ -118,7 +118,7 @@ namespace GS.Server.SkyTelescope
                             RtsEnable = SkySettings.RtsEnable,
                             Handshake = SkySettings.HandShake,
                             Parity = Parity.None,
-                            DiscardNull = true,    
+                            DiscardNull = true,
                         };
                         Serial.Open();
                     }

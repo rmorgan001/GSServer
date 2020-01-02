@@ -14,13 +14,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System;
-using System.ComponentModel;
-using System.Reflection;
-using System.Threading;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Media3D;
 using ASCOM.Utilities;
 using GS.Principles;
 using GS.Server.Domain;
@@ -30,15 +23,23 @@ using GS.Server.SkyTelescope;
 using GS.Shared;
 using HelixToolkit.Wpf;
 using MaterialDesignThemes.Wpf;
+using System;
+using System.ComponentModel;
+using System.Reflection;
+using System.Threading;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Media3D;
 
 
 namespace GS.Server.Model3D
 {
-    public class Model3DVM : ObservableObject, IPageVM
+    public class Model3DVM : ObservableObject, IPageVM, IDisposable
     {
         public string TopName => "";
         public string BottomName => "3D";
         public int Uid => 5;
+        private bool _disposed;
 
         #region Model
 
@@ -48,7 +49,7 @@ namespace GS.Server.Model3D
         public Model3DVM()
         {
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading Model3D" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading Model3D" };
             MonitorLog.LogToMonitor(monitorItem);
 
             SkyServer.StaticPropertyChanged += PropertyChangedSkyServer;
@@ -251,7 +252,7 @@ namespace GS.Server.Model3D
                 if (!string.IsNullOrEmpty(accentColor))
                 {
                     // ReSharper disable once PossibleNullReferenceException
-                    color = (Color) ColorConverter.ConvertFromString(Settings.Settings.AccentColor);
+                    color = (Color)ColorConverter.ConvertFromString(Settings.Settings.AccentColor);
                     Material materialota = new DiffuseMaterial(new SolidColorBrush(color));
                     if (a.Children[1] is GeometryModel3D ota) ota.Material = materialota;
                 }
@@ -489,7 +490,7 @@ namespace GS.Server.Model3D
         }
 
         private ICommand _runMessageDialog;
-        
+
         public ICommand RunMessageDialogCommand
         {
             get
@@ -516,5 +517,27 @@ namespace GS.Server.Model3D
         }
 
         #endregion
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(obj: this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            // Check to see if Dispose has already been called.
+            if (_disposed) return;
+            // If disposing equals true, dispose all managed
+            // and unmanaged resources.
+            if (disposing)
+            {
+                // Dispose managed resources.
+                _util.Dispose();
+            }
+
+            // Note disposing has been done.
+            _disposed = true;
+        }
     }
 }
