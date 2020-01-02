@@ -101,11 +101,12 @@ Can be found at [Groups.io](https://groups.io/g/GSS)
 
 ## Release Dates
 
-1.0.0.8 released 12 July 2019
-1.0.0.10 released 28 July 2019
-1.0.0.11 released 23 Aug 2019
-1.0.0.16 released 28 Sept 2019
-1.0.0.17 released 9 Oct 2019
-1.0.0.18 released 1 Nov 2019
-1.0.0.21 released 28 Nov 2019
-
+* 1.0.0.8 released 12 July 2019
+* 1.0.0.10 released 28 July 2019
+* 1.0.0.11 released 23 Aug 2019
+* 1.0.0.16 released 28 Sept 2019
+* 1.0.0.17 released 9 Oct 2019
+* 1.0.0.18 released 1 Nov 2019
+* 1.0.0.21 released 28 Nov 2019
+* 1.0.0.21 released 28 Nov 2019
+* 1.0.0.22 release 2 Jan 2020
