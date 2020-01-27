@@ -8,10 +8,10 @@
         xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
         xmlns:settings="clr-namespace:GS.Server.Settings"
         xmlns:mcontrol = "clr-namespace:GS.Server.Controls.Main"
-        xmlns:charting="clr-namespace:GS.Server.Charting"
         xmlns:notes="clr-namespace:GS.Server.Notes"
         xmlns:gamepad="clr-namespace:GS.Server.Gamepad"
         xmlns:model3D="clr-namespace:GS.Server.Model3D"
+        xmlns:pulses="clr-namespace:GS.Server.Pulses"
         mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanResizeWithGrip"  WindowStyle="None" 
         WindowState="{Binding Windowstate}"
         Height="{Binding Windowheight, Mode=TwoWay}" 
@@ -35,9 +35,6 @@
         <DataTemplate DataType="{x:Type skyTelescope:SkyTelescopeVM}">
             <skyTelescope:SkyTelescopeV />
         </DataTemplate>
-        <DataTemplate DataType="{x:Type charting:ChartingVM}">
-            <charting:ChartingV />
-        </DataTemplate>
         <DataTemplate DataType="{x:Type focuser:FocuserVM}">
               <focuser:FocuserView />
         </DataTemplate>
@@ -52,6 +49,9 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type model3D:Model3DVM}">
             <model3D:Model3DV />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type pulses:PulsesVM}">
+            <pulses:PulsesV />
         </DataTemplate>
     </Window.Resources>
     <Window.TaskbarItemInfo>

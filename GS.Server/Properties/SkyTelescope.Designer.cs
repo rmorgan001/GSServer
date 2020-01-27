@@ -12,7 +12,7 @@ namespace GS.Server.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.3.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.4.0.0")]
     internal sealed partial class SkyTelescope : global::System.Configuration.ApplicationSettingsBase {
         
         private static SkyTelescope defaultInstance = ((SkyTelescope)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new SkyTelescope())));
@@ -253,7 +253,7 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        [global::System.Configuration.DefaultSettingValueAttribute("20")]
         public double HourAngleLimit {
             get {
                 return ((double)(this["HourAngleLimit"]));
@@ -1088,6 +1088,42 @@ namespace GS.Server.Properties {
             }
             set {
                 this["ModelOn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        public int MinPulseRa {
+            get {
+                return ((int)(this["MinPulseRa"]));
+            }
+            set {
+                this["MinPulseRa"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        public int MinPulseDec {
+            get {
+                return ((int)(this["MinPulseDec"]));
+            }
+            set {
+                this["MinPulseDec"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
+        public int SyncLimit {
+            get {
+                return ((int)(this["SyncLimit"]));
+            }
+            set {
+                this["SyncLimit"] = value;
             }
         }
     }

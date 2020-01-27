@@ -179,10 +179,6 @@
                             <TextBlock Margin="10 0" VerticalAlignment="Center">Focuser</TextBlock>
                             </StackPanel>-->
                             <StackPanel Orientation="Horizontal" Width="Auto">
-                                <CheckBox Height="25" Width="25" IsChecked="{Binding Charting}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOCharts}"/>
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource tbOCharts}"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Width="Auto">
                                 <CheckBox Height="25" Width="25" IsChecked="{Binding Notes}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbONotes}"/>
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource tbONotes}"/>
                             </StackPanel>
@@ -193,6 +189,10 @@
                             <StackPanel Orientation="Horizontal" Width="Auto">
                                 <CheckBox Height="25" Width="25" IsChecked="{Binding Model3D}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOModel3D}"/>
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource tbOModel3D}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Width="Auto">
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding Pulses}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{DynamicResource tbOPulses}"/>
+                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource tbOPulses}"/>
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left">
@@ -316,10 +316,6 @@
                             <StackPanel Orientation="Horizontal">
                                 <CheckBox Height="25" Width="25" IsChecked="{Binding SkyTelescopeSettings}" ToolTip="{DynamicResource cbSkyTelescopeSettings}"  Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource cbSkyTelescopeSettings}"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox Height="25" Width="25" IsChecked="{Binding ChartSettings}" ToolTip="{DynamicResource cbChartsSettings}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource cbChartsSettings}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <CheckBox Height="25" Width="25" IsChecked="{Binding GamepadSettings}" ToolTip="{DynamicResource cbGamepadSettings}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>

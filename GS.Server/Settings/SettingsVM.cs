@@ -116,9 +116,6 @@ namespace GS.Server.Settings
                     {
                         switch (e.PropertyName)
                         {
-                            case "Charting":
-                                Charting = Settings.Charting;
-                                break;
                             case "Focuser":
                                 Focuser = Settings.Focuser;
                                 break;
@@ -208,17 +205,6 @@ namespace GS.Server.Settings
             }
         }
 
-        public bool Charting
-        {
-            get => Settings.Charting;
-            set
-            {
-                Settings.Charting = value;
-                _mainWindowVm.UpdateTabViewModel("Charts");
-                OnPropertyChanged();
-            }
-        }
-
         public bool Notes
         {
             get => Settings.Notes;
@@ -237,6 +223,17 @@ namespace GS.Server.Settings
             {
                 Settings.Model3D = value;
                 _mainWindowVm.UpdateTabViewModel("Model3D");
+                OnPropertyChanged();
+            }
+        }
+
+        public bool Pulses
+        {
+            get => Settings.Pulses;
+            set
+            {
+                Settings.Pulses = value;
+                _mainWindowVm.UpdateTabViewModel("Pulses");
                 OnPropertyChanged();
             }
         }
@@ -414,17 +411,6 @@ namespace GS.Server.Settings
             }
         }
 
-        private bool _chartSettings;
-        public bool ChartSettings
-        {
-            get => _chartSettings;
-            set
-            {
-                _chartSettings = value;
-                OnPropertyChanged();
-            }
-        }
-
         private bool _gamepadSettings;
         public bool GamepadSettings
         {
@@ -452,7 +438,6 @@ namespace GS.Server.Settings
         {
             SkyTelescopeSettings = false;
             ServerSettings = false;
-            ChartSettings = false;
             GamepadSettings = false;
             MonitorSettings = false;
         }
@@ -495,7 +480,7 @@ namespace GS.Server.Settings
         {
             try
             {
-                if (!SkyTelescopeSettings && !ServerSettings && !ChartSettings && !GamepadSettings && !MonitorSettings)
+                if (!SkyTelescopeSettings && !ServerSettings && !GamepadSettings && !MonitorSettings)
                 {
                     OpenDialog(Application.Current.Resources["tbNoResetSettings"].ToString());
                     return;
@@ -551,13 +536,6 @@ namespace GS.Server.Settings
                         Properties.Server.Default.Reset();
                         Properties.Server.Default.Save();
                         Properties.Server.Default.Reload();
-                    }
-
-                    if (ChartSettings)
-                    {
-                        Properties.Chart.Default.Reset();
-                        Properties.Chart.Default.Save();
-                        Properties.Chart.Default.Reload();
                     }
 
                     if (GamepadSettings)

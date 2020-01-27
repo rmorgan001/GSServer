@@ -1913,10 +1913,12 @@ namespace GS.SkyWatcher
         public Exception Exception { get; set; }
         public dynamic Result { get; }
         private readonly int _duration;
+        private readonly AxisId _axis;
 
-        public SkySetMinPulseDuration(long id, int duration)
+        public SkySetMinPulseDuration(long id, AxisId axis, int duration)
         {
             Id = id;
+            _axis = axis;
             _duration = duration;
             CreatedUtc = Principles.HiResDateTime.UtcNow;
             Successful = false;
@@ -1928,7 +1930,10 @@ namespace GS.SkyWatcher
         {
             try
             {
-                skyWatcher.MinPulseDuration = _duration;
+                if (_axis == AxisId.Axis1)
+                {skyWatcher.MinPulseDurationRa = _duration;}
+                else
+                { skyWatcher.MinPulseDurationDec = _duration; }
                 Successful = true;
             }
             catch (Exception e)

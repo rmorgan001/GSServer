@@ -89,6 +89,8 @@ namespace GS.Server.SkyTelescope
         StopAxes,
         InitialiseAxes,
         InstantStopAxes,
+        MinPulseRa,
+        MinPulseDec,
         SetSouthernHemisphere,
         SyncAxes,
         SyncTarget,

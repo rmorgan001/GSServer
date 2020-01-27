@@ -560,11 +560,11 @@ namespace GS.Server.Phd
             JObject response = null;
 
             var stopwatch = Stopwatch.StartNew();
-            while (stopwatch.Elapsed.TotalMilliseconds < 10000)
+            while (stopwatch.Elapsed.TotalMilliseconds < 5000)
             {
                 if (m_response == null)
                 {
-                    Thread.Sleep(10);
+                    //Thread.Sleep(10);
                     continue;
                 }
                 response = m_response;
@@ -580,9 +580,12 @@ namespace GS.Server.Phd
             //    var response = m_response;
             //    m_response = null;
 
-            if (!Failed(response)) return response;
+            
             if (response != null)
-                throw new GuiderException(ErrorCode.NoResponse, (string)response["error"]["message"]);
+            {
+                if (!Failed(response)) return response;
+                throw new GuiderException(ErrorCode.NoResponse, (string) response["error"]["message"]);
+            }
 
             return response;
             // }
@@ -857,7 +860,11 @@ namespace GS.Server.Phd
         public override double PixelScale()
         {
             var res = Call("get_pixel_scale");
-            var r = (double)res["result"];
+            double r = 0;
+            if (res != null)
+            {
+                r = (double)res["result"];
+            }
             LastPixelScale = r;
             return r;
         }

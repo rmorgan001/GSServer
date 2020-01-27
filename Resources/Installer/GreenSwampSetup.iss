@@ -4,10 +4,10 @@
 #define MyAppExeName "GS.Server.exe"
 
 [Setup]
-AppVerName=ASCOM GS Server 1.0.0.22
-AppVersion=1.0.0.22
-VersionInfoVersion=1.0.0.22
-OutputBaseFilename="ASCOMGSServer10022Setup"
+AppVerName=ASCOM GS Server 1.0.0.23
+AppVersion=1.0.0.23
+VersionInfoVersion=1.0.0.23
+OutputBaseFilename="ASCOMGSServer10023Setup"
 AppID={{0ff78bd6-6149-4536-9252-3da68b94f7c2}
 AppName=GS Server
 AppPublisher=Robert Morgan <robert.morgan.e@gmail.com>
@@ -56,7 +56,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; \
 
 [Icons]
 Name: "{group}\GS Server"; Filename: "{app}\GS.Server.exe"
-Name: "{group}\GS Log Viewer"; Filename: "{app}\GS.LogView.exe"
+Name: "{group}\GS Chart Viewer"; Filename: "{app}\GS.ChartViewer.exe"
 Name: "{group}\GS Serial Tester"; Filename: "{app}\GS.SerialTester.exe"
 Name: "{group}\GS Manual"; Filename: "{app}\GSS Manual.pdf"
 Name: "{userdesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon

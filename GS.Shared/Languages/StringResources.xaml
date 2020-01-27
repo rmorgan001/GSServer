@@ -32,6 +32,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="rbtnOptions">Options</system:String>
     <system:String x:Key="rbtnGamepad">Gamepad</system:String>
     <system:String x:Key="rbtnModel3D">3D</system:String>
+    <system:String x:Key="rbtnPulses">Pulses</system:String>
     <system:String x:Key="btntipWindowFlip">Flip Window Size</system:String>
 
     <!--Top bar-->
@@ -123,6 +124,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnGoTo">GoTo</system:String>
     <system:String x:Key="btntipGoTo">Slew to coordinates</system:String>
     <system:String x:Key="msgTargetBelow">Target Below Horizon</system:String>
+    <system:String x:Key="btnSync">Sync</system:String>
+    <system:String x:Key="msgSync">Warning: please verify coordinates!</system:String>
     
     <!--Backlash -->
     <system:String x:Key="sldtipBacklash">Dec Backlash</system:String>
@@ -321,7 +324,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="cbhintLat0">N/S</system:String>
     <system:String x:Key="cbtipLong0">East or West</system:String>
     <system:String x:Key="cbhintLong0">E/W</system:String>
-    
+    <system:String x:Key="cbhintMinPulseDec">Minimum Dec Pulse</system:String>
+    <system:String x:Key="cbhintMinPulseRa">Minimum Ra Pulse</system:String>
+
     <!--Exceptions -->
     <system:String x:Key="exParked">Unpark first</system:String>
 
@@ -387,26 +392,17 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="tbOSettings">Reset Settings</system:String>
     <system:String x:Key="btnResetSettings">Reset</system:String>
 
-    <!--Charts -->
-    <system:String x:Key="tbtntipCOpen">Open</system:String>
-    <system:String x:Key="btnCStart">Start</system:String>
-    <system:String x:Key="btnCClear">Clear</system:String>
-    <system:String x:Key="btnCPhd">PHD2</system:String>
-    <system:String x:Key="lbCRa">RA</system:String>
-    <system:String x:Key="lbCDec">Dec</system:String>
-    <system:String x:Key="btnCAutoY">AutoY</system:String>
-    <system:String x:Key="lbCW">W</system:String>
-    <system:String x:Key="lbCE">E</system:String>
-    <system:String x:Key="lbCN">N</system:String>
-    <system:String x:Key="lbCS">S</system:String>
-    <system:String x:Key="badgeCStart">on</system:String>
-    <system:String x:Key="badgeCPhdStart">on</system:String>
-    <system:String x:Key="masArcSec">arcsec</system:String>
-    <system:String x:Key="msgCTurnOnTracking">Turn mount tracking on to run</system:String>
-    <system:String x:Key="msgCEstRate">Estimating Rate:</system:String>
-
-
     <!--3DModel -->
     <system:String x:Key="lb3dSettings">Settings</system:String>
+
+    <!--Pulses -->
+    <system:String x:Key="tbOPulses">Pulses</system:String>
+    <system:String x:Key="btnPulsesStart">Start</system:String>
+    <system:String x:Key="btnPulsesClear">Clear</system:String>
+    <system:String x:Key="btnPulsesSize">Fit</system:String>
+    <system:String x:Key="bdgPulsesStart">On</system:String>
+    <system:String x:Key="btnPulsesPause">Pause</system:String>
+    <system:String x:Key="bdgPulsesPause">On</system:String>
+    <system:String x:Key="bdgPhdStart">On</system:String>
 </ResourceDictionary>
  

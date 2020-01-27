@@ -936,7 +936,7 @@ namespace ASCOM.GS.Sky.Telescope
             if (!SkyServer.AscomOn) return;
 
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{Direction},{Duration}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{Direction},{Duration}") };
             MonitorLog.LogToMonitor(monitorItem);
 
             if (SkyServer.AtPark) throw new ParkedException();
@@ -1292,7 +1292,9 @@ namespace ASCOM.GS.Sky.Telescope
             var dec = SkyServer.TargetDec;
 
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ra},{dec}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message =
+                    FormattableString.Invariant($"{ra},{dec}")
+            };
             MonitorLog.LogToMonitor(monitorItem);
 
             CheckCapability(SkySettings.CanSlew, "SlewToTarget");
@@ -1318,7 +1320,7 @@ namespace ASCOM.GS.Sky.Telescope
             var dec = SkyServer.TargetDec;
 
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ra},{dec}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{ra},{dec}") };
             MonitorLog.LogToMonitor(monitorItem);
 
             CheckCapability(SkySettings.CanSlewAsync, "SlewToTargetAsync");
@@ -1357,6 +1359,7 @@ namespace ASCOM.GS.Sky.Telescope
             CheckRange(Altitude, -90, 90, "SyncToAltAz", "Altitude");
             CheckParked("SyncToAltAz");
             CheckTracking(false, "SyncToAltAz");
+            CheckAltAzSync(Altitude, Azimuth, "SyncToAltAz");
             SkyServer.AtPark = false;
             SkyServer.SyncToAltAzm(Azimuth, Altitude);
             DelayInterval();
@@ -1384,6 +1387,7 @@ namespace ASCOM.GS.Sky.Telescope
             CheckParked("SyncToCoordinates");
             CheckTracking(true, "SyncToCoordinates");
             var radec = Transforms.CoordTypeToInternal(RightAscension, Declination);
+            CheckRaDecSync(radec.X, radec.Y, "SyncToCoordinates");
             SkyServer.TargetDec = radec.Y;
             SkyServer.TargetRa = radec.X;
             SkyServer.AtPark = false;
@@ -1412,6 +1416,7 @@ namespace ASCOM.GS.Sky.Telescope
             CheckRange(SkyServer.TargetDec, -90, 90, "SyncToTarget", "TargetDeclination");
             CheckParked("SyncToTarget");
             CheckTracking(true, "SyncToTarget");
+            CheckRaDecSync(SkyServer.TargetRa, SkyServer.TargetDec, "SyncToTarget");
             SkyServer.AtPark = false;
             SkyServer.SyncToTargetRaDec();
             DelayInterval();
@@ -1632,7 +1637,7 @@ namespace ASCOM.GS.Sky.Telescope
             var success = Enum.IsDefined(typeof(DriveRates), enumValue);
             if (success) return;
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{propertyOrMethod},{enumValue}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{propertyOrMethod},{enumValue}") };
             MonitorLog.LogToMonitor(monitorItem);
 
             throw new InvalidValueException("TrackingRate invalid");
@@ -1784,10 +1789,50 @@ namespace ASCOM.GS.Sky.Telescope
             if (raDecSlew == SkyServer.Tracking) return;
 
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{SkyServer.Tracking},{raDecSlew},{method}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{SkyServer.Tracking},{raDecSlew},{method}") };
             MonitorLog.LogToMonitor(monitorItem);
 
             throw new InvalidOperationException($"{method} is not allowed when tracking is {SkyServer.Tracking}");
+        }
+
+        /// <summary>
+        /// Checks the sync is too far from the current position
+        /// </summary>
+        /// <param name="ra">Syncing Ra to check</param>
+        /// <param name="dec">Syncing Dec to check</param>
+        /// <param name="method">The method name</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object,System.Object)")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "GS.Shared.MonitorEntry.set_Message(System.String)")]
+        private static void CheckRaDecSync(double ra, double dec, string method)
+        {
+            var pass = SkyServer.CheckRaDecSyncLimit(ra, dec);
+            if (pass) return;
+
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{ra},{dec},{method}") };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            throw new InvalidOperationException($"{method} out of sync limits");
+        }
+
+        /// <summary>
+        /// Checks the sync is too far from the current Alt/Az position
+        /// </summary>
+        /// <param name="alt">Syncing Ra to check</param>
+        /// <param name="az">Syncing az to check</param>
+        /// <param name="method">The method name</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object,System.Object)")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "GS.Shared.MonitorEntry.set_Message(System.String)")]
+        private static void  CheckAltAzSync(double alt, double az, string method)
+        {
+            var pass = SkyServer.CheckAltAzSyncLimit(alt, az);
+            if (pass) return;
+
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{alt},{az},{method}") };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            throw new InvalidOperationException($"{method} out of sync limits");
         }
 
         /// <summary>

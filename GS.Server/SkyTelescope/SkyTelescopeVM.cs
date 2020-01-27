@@ -38,7 +38,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
-
 namespace GS.Server.SkyTelescope
 {
     public sealed class SkyTelescopeVM : ObservableObject, IPageVM, IDisposable
@@ -60,10 +59,6 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    _skyTelescopeVM = this;
-                    LoadImages();  // load front image
-                    if (!Properties.Server.Default.SkyWatcher) return; // Show in Tab?
-
                     var monitorItem = new MonitorEntry
                     {
                         Datetime = HiResDateTime.UtcNow,
@@ -75,6 +70,10 @@ namespace GS.Server.SkyTelescope
                         Message = "Loading SkyTelescopeVM"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
+
+                    _skyTelescopeVM = this;
+                    LoadImages();  // load front image
+                    if (!Properties.Server.Default.SkyWatcher) return; // Show in Tab?
 
                     // Deals with applications trying to open the setup dialog more than once. 
                     OpenSetupDialog = SkyServer.OpenSetupDialog;
@@ -106,6 +105,7 @@ namespace GS.Server.SkyTelescope
                     Temperatures = new List<double>(Numbers.InclusiveRange(-50, 60, 1.0));
                     AutoHomeLimits = new List<int>(Enumerable.Range(20, 160));
                     DecOffsets = new List<int>() { 0, -90, 90 };
+                    MinPulseList = new List<int>(Enumerable.Range(5, 46));
 
                     // defaults
                     AtPark = SkyServer.AtPark;
@@ -119,6 +119,7 @@ namespace GS.Server.SkyTelescope
                     Declination = "00° 00m 00s";
                     Azimuth = "00° 00m 00s";
                     Altitude = "00° 00m 00s";
+                    ModelOn = SkySettings.ModelOn;
                 }
 
                 // check to make sure window is visable then connect if requested.
@@ -201,6 +202,15 @@ namespace GS.Server.SkyTelescope
                          break;
                      case "DecBacklash":
                          DecBacklash = SkySettings.DecBacklash;
+                         break;
+                     case "MinPulseDec":
+                         MinPulseDec = SkySettings.MinPulseDec;
+                         break;
+                     case "MinPulseRa":
+                         MinPulseRa = SkySettings.MinPulseRa;
+                         break;
+                     case "ModelOn":
+                         ModelOn = SkySettings.ModelOn;
                          break;
                  }
              });
@@ -565,7 +575,7 @@ namespace GS.Server.SkyTelescope
         {
             //image size Width="253" Height="340"
             var random = new Random();
-            ImageFiles = new List<string> { "M33.png", "M74.png", "NGC6992.png" };
+            ImageFiles = new List<string> { "M33.png", "M74.png", "NGC6992.png", "Orion.png" };
             ImageFile = "../Resources/" + ImageFiles[random.Next(ImageFiles.Count)];
         }
 
@@ -594,7 +604,6 @@ namespace GS.Server.SkyTelescope
                 }
             }
         }
-
         public IList<int> ComPorts
         {
             get
@@ -622,7 +631,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public SerialSpeed BaudRate
         {
             get => SkySettings.BaudRate;
@@ -633,7 +641,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public double SiderealRate
         {
             get => SkySettings.SiderealRate;
@@ -643,7 +650,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public double LunarRate
         {
             get => SkySettings.LunarRate;
@@ -653,7 +659,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public double SolarRate
         {
             get => SkySettings.SolarRate;
@@ -663,7 +668,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public double KingRate
         {
             get => SkySettings.KingRate;
@@ -673,7 +677,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public int DecBacklash
         {
             get => SkySettings.DecBacklash;
@@ -683,7 +686,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public IList<double> St4Guiderates { get; }
         public double St4Guiderate
         {
@@ -741,7 +743,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public IList<double> HourAngleLimits { get; }
         public double HourAngleLimit
         {
@@ -752,7 +753,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public AlignmentModes AlignmentMode
         {
             get => SkySettings.AlignmentMode;
@@ -763,7 +763,6 @@ namespace GS.Server.SkyTelescope
 
             }
         }
-
         public EquatorialCoordinateType EquatorialCoordinateType
         {
             get => SkySettings.EquatorialCoordinateType;
@@ -773,7 +772,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public DriveRates TrackingRate
         {
             get => SkySettings.TrackingRate;
@@ -783,7 +781,25 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
+        public IList<int> MinPulseList { get; }
+        public int MinPulseDec
+        {
+            get => SkySettings.MinPulseDec;
+            set
+            {
+                SkySettings.MinPulseDec = value;
+                OnPropertyChanged();
+            }
+        }
+        public int MinPulseRa
+        {
+            get => SkySettings.MinPulseRa;
+            set
+            {
+                SkySettings.MinPulseRa = value;
+                OnPropertyChanged();
+            }
+        }
         public MountType Mount
         {
             get => SkySettings.Mount;
@@ -794,7 +810,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public IList<double> GuideRateOffsetXs { get; }
         public double GuideRateOffsetX
         {
@@ -806,7 +821,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public IList<double> GuideRateOffsetYs { get; }
         public double GuideRateOffsetY
         {
@@ -818,7 +832,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public IList<double> MaxSlewRates { get; }
         public double MaxSlewRate
         {
@@ -829,7 +842,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public IList<double> Temperatures { get; }
         public double Temperature
         {
@@ -840,7 +852,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public bool EncodersOn
         {
             get => SkySettings.Encoders;
@@ -851,7 +862,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public bool FullCurrent
         {
             get => SkySettings.FullCurrent;
@@ -862,7 +872,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public bool AlternatingPpec
         {
             get => SkySettings.AlternatingPpec;
@@ -873,7 +882,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public bool DecPulseToGoTo
         {
             get => SkySettings.DecPulseToGoTo;
@@ -884,7 +892,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public bool Refraction
         {
             get => SkySettings.Refraction;
@@ -894,7 +901,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public IList<string> LatitudeRangeNS { get; }
         public string Lat0
         {
@@ -906,7 +912,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public IList<int> LatitudeRange { get; }
         public int Lat1
         {
@@ -925,7 +930,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public IList<int> Minutes { get; }
         public int Lat2
         {
@@ -945,7 +949,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public IList<int> Seconds { get; }
         public double Lat3
         {
@@ -965,7 +968,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public IList<string> LongitudeRangeEW { get; }
         public string Long0
         {
@@ -977,7 +979,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public IList<int> LongitudeRange { get; }
         public int Long1
         {
@@ -996,7 +997,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public int Long2
         {
             get
@@ -1015,7 +1015,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public double Long3
         {
             get
@@ -1034,7 +1033,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         private void UpdateLongitude()
         {
             OnPropertyChanged($"Long0");
@@ -1042,7 +1040,6 @@ namespace GS.Server.SkyTelescope
             OnPropertyChanged($"Long2");
             OnPropertyChanged($"Long3");
         }
-
         private void UpdateLatitude()
         {
             OnPropertyChanged($"Lat0");
@@ -1050,7 +1047,6 @@ namespace GS.Server.SkyTelescope
             OnPropertyChanged($"Lat2");
             OnPropertyChanged($"Lat3");
         }
-
         public double Elevation
         {
             get => SkySettings.Elevation;
@@ -1256,7 +1252,6 @@ namespace GS.Server.SkyTelescope
         #endregion
 
         #region Debug
-
         private void GetDebugProperties()
         {
             if (!DebugVisability) return;
@@ -2384,6 +2379,10 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
+        public double GoToDec => Principles.Units.Deg2Dou(DecDegrees, DecMinutes, DecSeconds);
+        public double GoToRa => Principles.Units.Ra2Dou(RaHours, RaMinutes, RaSeconds);
+        public string GoToDecString => _util.DegreesToDMS(GoToDec, "° ", "m ", "s", 3);
+        public string GoToRaString => _util.HoursToHMS(GoToRa, "h ", "m ", "s", 3);
 
         private ICommand _populateGoToRaDec;
         public ICommand PopulateGoToRaDecCommand
@@ -2433,6 +2432,7 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        // goto dialog
         private bool _isRaGoToDialogOpen;
         public bool IsRaGoToDialogOpen
         {
@@ -2527,8 +2527,8 @@ namespace GS.Server.SkyTelescope
                         return;
                     }
 
-                    var vec = Transforms.CoordTypeToInternal(GoToRa, GoToDec);
-                    SkyServer.SlewRaDec(vec.X, vec.Y);
+                    var radec = Transforms.CoordTypeToInternal(GoToRa, GoToDec);
+                    SkyServer.SlewRaDec(radec.X, radec.Y);
                     IsRaGoToDialogOpen = false;
                 }
             }
@@ -2551,12 +2551,6 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        public double GoToDec => Principles.Units.Deg2Dou(DecDegrees, DecMinutes, DecSeconds);
-        public double GoToRa => Principles.Units.Ra2Dou(RaHours, RaMinutes, RaSeconds);
-
-        public string GoToDecString => _util.DegreesToDMS(GoToDec, "° ", "m ", "s", 3);
-        public string GoToRaString => _util.HoursToHMS(GoToRa, "h ", "m ", "s", 3);
-
         private ICommand _cancelRaGoToDialogCommand;
         public ICommand CancelRaGoToDialogCommand
         {
@@ -2572,6 +2566,174 @@ namespace GS.Server.SkyTelescope
             try
             {
                 IsRaGoToDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+        }
+
+        // Sync dialog
+        private bool _isRaGoToSyncDialogOpen;
+        public bool IsRaGoToSyncDialogOpen
+        {
+            get => _isRaGoToSyncDialogOpen;
+            set
+            {
+                if (_isRaGoToSyncDialogOpen == value) return;
+                _isRaGoToSyncDialogOpen = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private object _raGoToSyncContent;
+        public object RaGoToSyncContent
+        {
+            get => _raGoToSyncContent;
+            set
+            {
+                if (_raGoToSyncContent == value) return;
+                _raGoToSyncContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openRaGoToSyncDialogCmd;
+        public ICommand OpenRaGoToSyncDialogCmd
+        {
+            get
+            {
+                return _openRaGoToSyncDialogCmd ?? (_openRaGoToSyncDialogCmd = new RelayCommand(
+                           param => OpenRaGoToSyncDialog()
+                       ));
+            }
+        }
+        private void OpenRaGoToSyncDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    var AltAz = Coordinate.RaDec2AltAz(GoToRa, GoToDec, SkyServer.SiderealTime,
+                        SkySettings.Latitude);
+                    if (AltAz[0] < 0)
+                    {
+                        OpenDialog($"{Application.Current.Resources["msgTargetBelow"]}: {AltAz[1]} Alt: {AltAz[0]}");
+                        return;
+                    }
+
+                    RaGoToSyncContent = new RaGoToSyncDialog();
+                    IsRaGoToSyncDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private ICommand _acceptRaGoToSyncDialogCmd;
+        public ICommand AcceptRaGoToSyncDialogCmd
+        {
+            get
+            {
+                return _acceptRaGoToSyncDialogCmd ?? (_acceptRaGoToSyncDialogCmd = new RelayCommand(
+                           param => AcceptRaGoToSyncDialog()
+                       ));
+            }
+        }
+        private void AcceptRaGoToSyncDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (!SkySettings.CanSlewAsync) return;
+                    if (SkyServer.IsSlewing)
+                    {
+                        OpenDialog("Mount is slewing");
+                        return;
+                    }
+                    if (AtPark)
+                    {
+                        BlinkParked();
+                        return;
+                    }
+
+                    var radec = Transforms.CoordTypeToInternal(GoToRa, GoToDec);
+                    var result = SkyServer.CheckRaDecSyncLimit(radec.X, radec.Y);
+
+                    if (!result)
+                    {
+                        OpenDialog("Outside of Sync limits");
+                        return;
+                    }
+                    SkyServer.TargetDec = radec.Y;
+                    SkyServer.TargetRa = radec.X;
+                    SkyServer.SyncToTargetRaDec();
+                    IsRaGoToSyncDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private ICommand _cancelRaGoToSyncDialogCmd;
+        public ICommand CancelRaGoToSyncDialogCmd
+        {
+            get
+            {
+                return _cancelRaGoToSyncDialogCmd ?? (_cancelRaGoToSyncDialogCmd = new RelayCommand(
+                           param => CancelRaGoToSyncDialog()
+                       ));
+            }
+        }
+        private void CancelRaGoToSyncDialog()
+        {
+            try
+            {
+                IsRaGoToSyncDialogOpen = false;
             }
             catch (Exception ex)
             {
@@ -3708,7 +3870,7 @@ namespace GS.Server.SkyTelescope
                 using (new WaitCursor())
                 {
                     SkyServer.IsMountRunning = !SkyServer.IsMountRunning;
-                    ModelOn = SkySettings.ModelOn;
+                   // ModelOn = SkySettings.ModelOn;
                 }
 
                 if (SkyServer.IsMountRunning)
@@ -3777,8 +3939,8 @@ namespace GS.Server.SkyTelescope
                 msg += $"StepsDec: {SkyServer.StepsPerRevolution[1]}" + Environment.NewLine;
                 msg += $"PPEC: {canppec}" + Environment.NewLine;
                 msg += $"Home Sensor: {canhome}" + Environment.NewLine;
-                msg += $"Ra Min Pulse: {Math.Ceiling(SkyServer.MinPulseRa)}ms" + Environment.NewLine;
-                msg += $"Dec Min Pulse: {Math.Ceiling(SkyServer.MinPulseDec)}ms" + Environment.NewLine;
+                msg += $"Ra Steps/Arcsec: {Math.Round(SkyServer.StepsPerRevolution[0] / 360.0 / 3600,2)}" + Environment.NewLine;
+                msg += $"Dec Steps/Arcsec: {Math.Round(SkyServer.StepsPerRevolution[1] / 360.0 / 3600,2)}" + Environment.NewLine;
 
                 OpenDialog(msg);
             }
@@ -4586,22 +4748,18 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private bool _modelOn;
         public bool ModelOn
         {
-            get => _modelOn;
+            get => SkySettings.ModelOn;
             set
             {
-                if (_modelOn == value) return;
-                _modelOn = value;
+                SkySettings.ModelOn = value;
                 if (value)
                 {
                     Rotate();
                     LoadGEM();
                     LoadCompass();
                 }
-
-                SkySettings.ModelOn = value;
                 OnPropertyChanged();
             }
         }
@@ -4702,7 +4860,6 @@ namespace GS.Server.SkyTelescope
                 OpenDialog(ex.Message);
             }
         }
-
         private void LoadCompass()
         {
             try
@@ -4730,7 +4887,6 @@ namespace GS.Server.SkyTelescope
                 OpenDialog(ex.Message);
             }
         }
-
         private void Rotate()
         {
             if (!ModelOn) return;

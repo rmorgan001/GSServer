@@ -170,7 +170,37 @@
                             </ItemsPanelTemplate>
                         </ComboBox.ItemsPanel>
                     </ComboBox>
-                    <ComboBox Grid.Row="3" Grid.Column="1" md:HintAssist.Hint="{DynamicResource cbhintTracking}" MinWidth="10" Margin="10,0,0,0" ToolTip="{DynamicResource cbhintTracking}"
+                        <ComboBox Grid.Row="3" Grid.Column="1" md:HintAssist.Hint="{DynamicResource cbhintMinPulseDec}" MinWidth="10" Margin="10,0,5,0" ToolTip="{DynamicResource cbhintMinPulseDec}"
+                                  ItemsSource="{Binding MinPulseList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                            <ComboBox.SelectedItem>
+                                <Binding Path="MinPulseDec" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </ComboBox.SelectedItem>
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                        </ComboBox>
+                        <ComboBox Grid.Row="4" Grid.Column="1" md:HintAssist.Hint="{DynamicResource cbhintMinPulseRa}" MinWidth="10" Margin="10,0,5,0" ToolTip="{DynamicResource cbhintMinPulseRa}"
+                                  ItemsSource="{Binding MinPulseList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                            <ComboBox.SelectedItem>
+                                <Binding Path="MinPulseRa" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </ComboBox.SelectedItem>
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                        </ComboBox>
+                        <ComboBox Grid.Row="3" Grid.Column="2" md:HintAssist.Hint="{DynamicResource cbhintTracking}" MinWidth="10" Margin="10,0,5,0" ToolTip="{DynamicResource cbhintTracking}"
                               ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type deviceInterface:DriveRates}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         <ComboBox.SelectedItem>
                             <Binding Path="TrackingRate" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -200,7 +230,7 @@
                             </ItemsPanelTemplate>
                         </ComboBox.ItemsPanel>
                     </ComboBox>
-                    <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,0">
+                    <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,0">
                         <md:PopupBox StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{DynamicResource pbtipReset}">
                             <Grid Width="150" >
                                 <Grid.RowDefinitions>
@@ -224,7 +254,7 @@
                             </TextBox.Text>
                         </TextBox>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,0">
+                    <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,0">
                         <md:PopupBox StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{DynamicResource pbtipReset}">
                             <Grid Width="150">
                                 <Grid.RowDefinitions>
@@ -248,7 +278,7 @@
                             </TextBox.Text>
                         </TextBox>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,0">
+                    <StackPanel Orientation="Horizontal" Grid.Row="7" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,0">
                         <md:PopupBox  StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{DynamicResource pbtipReset}">
                             <Grid Width="150">
                                 <Grid.RowDefinitions>
@@ -272,7 +302,7 @@
                             </TextBox.Text>
                         </TextBox>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Grid.Row="7" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,0">
+                    <StackPanel Orientation="Horizontal" Grid.Row="8" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,0">
                         <md:PopupBox  StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{DynamicResource pbtipReset}">
                             <Grid Width="150">
                                 <Grid.RowDefinitions>
@@ -326,7 +356,7 @@
                                       IsChecked="{Binding DebugVisability, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{DynamicResource lbDiagnostics}"/>
                     </StackPanel>
-                    <Border Margin="0,0,4,0" Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2" BorderThickness="3" BorderBrush="DimGray" CornerRadius="5"
+                    <Border Margin="0,0,4,0" Grid.Row="8" Grid.Column="3" Grid.ColumnSpan="2" BorderThickness="3" BorderBrush="DimGray" CornerRadius="5"
                             Background="{DynamicResource MaterialDesignToolBarBackground}">
                             <StackPanel Orientation="Horizontal" >
                             <ComboBox md:HintAssist.Hint="{DynamicResource cbtipPark}" Margin="15,0,0,0" ToolTip="{DynamicResource cbtipPark}" Width="125"
@@ -442,8 +472,7 @@
                         </ComboBox>
                             <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="{DynamicResource lbLongitude}"/>
                                 <ComboBox Grid.Row="2" Grid.Column="1" md:HintAssist.Hint="{DynamicResource cbhintLong0}" Margin="10,5,0,0" ToolTip="{DynamicResource cbtipLong0}"
-                                      ItemsSource="{Binding LongitudeRangeEW}"
-                                      Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                                      ItemsSource="{Binding LongitudeRangeEW}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                 <ComboBox.SelectedItem>
                                     <Binding Path="Long0" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                         <Binding.ValidationRules>

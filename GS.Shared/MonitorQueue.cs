@@ -41,6 +41,7 @@ namespace GS.Shared
         private static readonly string _errorFile = Path.Combine(_logPath, "GSServer\\GSErrorLog");
         private static readonly string _sessionFile = Path.Combine(_logPath, "GSServer\\GSSessionLog");
         private static readonly SemaphoreSlim _lockFile = new SemaphoreSlim(1);
+        const string fmt = "000000#";
         #endregion
 
         #region Properties
@@ -186,6 +187,7 @@ namespace GS.Shared
                 // Output error log
                 case MonitorType.Error:
                     WriteOutErrors(entry);
+                    WriteOutSession(entry);
                     break;
                 // Output session log
                 case MonitorType.Warning:
@@ -274,7 +276,7 @@ namespace GS.Shared
             {
                 if (!Settings.LogSession) return;
                 ++_sessionIndex;
-                FileWriteAsync(_sessionFile + _instanceFileName, $"{_sessionIndex},{entry.Datetime.ToLocalTime():yyyy:dd:MM:HH:mm:ss.fff},{entry.Device},{entry.Category},{entry.Type},{entry.Thread},{entry.Method},{entry.Message}");
+                FileWriteAsync(_sessionFile + _instanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{_sessionIndex.ToString(fmt)},{entry.Device},{entry.Category},{entry.Type},{entry.Thread},{entry.Method},{entry.Message}");
             }
             catch (Exception e)
             {
@@ -292,7 +294,7 @@ namespace GS.Shared
             try
             {
                 ++_errIndex;
-                FileWriteAsync(_errorFile + _instanceFileName, $"{_errIndex},{entry.Datetime.ToLocalTime():yyyy:dd:MM:HH:mm:ss.fff},{entry.Device},{entry.Category},{entry.Type},{entry.Thread},{entry.Method},{entry.Message}");
+                FileWriteAsync(_errorFile + _instanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{_errIndex.ToString(fmt)},{entry.Device},{entry.Category},{entry.Type},{entry.Thread},{entry.Method},{entry.Message}");
             }
             catch (Exception e)
             {
@@ -310,7 +312,7 @@ namespace GS.Shared
             try
             {
                 if (!Settings.LogMonitor) return;
-                FileWriteAsync(_monitorFile + _instanceFileName, $"{entry.Index},{entry.Datetime.ToLocalTime():yyyy:dd:MM:HH:mm:ss.fff},{entry.Device},{entry.Category},{entry.Type},{entry.Thread},{entry.Method},{entry.Message}");
+                FileWriteAsync(_monitorFile + _instanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{entry.Index.ToString(fmt)},{entry.Device},{entry.Category},{entry.Type},{entry.Thread},{entry.Method},{entry.Message}"); //YYYY-MM-DD HH:MM:SS.fff
             }
             catch (Exception e)
             {

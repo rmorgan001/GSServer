@@ -972,6 +972,36 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static int _minPulseDec;
+        public static int MinPulseDec
+        {
+            get => _minPulseDec;
+            set
+            {
+                if (_minPulseDec == value) return;
+                _minPulseDec = value;
+                Properties.SkyTelescope.Default.MinPulseDec = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+                SkyServer.SkyTasks(MountTaskName.MinPulseDec);
+            }
+        }
+
+        private static int _minPulseRa;
+        public static int MinPulseRa
+        {
+            get => _minPulseRa;
+            set
+            {
+                if (_minPulseRa == value) return;
+                _minPulseRa = value;
+                Properties.SkyTelescope.Default.MinPulseRa = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+                SkyServer.SkyTasks(MountTaskName.MinPulseRa);
+            }
+        }
+
         private static bool _modelOn;
         public static bool ModelOn
         {
@@ -1140,6 +1170,19 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static int _syncLimit;
+        public static int SyncLimit
+        {
+            get => _syncLimit;
+            private set
+            {
+                if (_syncLimit == value) return;
+                _syncLimit = value;
+                Properties.SkyTelescope.Default.SyncLimit = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static double _temperature;
         public static double Temperature
         {
@@ -1288,6 +1331,8 @@ namespace GS.Server.SkyTelescope
             Longitude = Properties.SkyTelescope.Default.Longitude;
             LunarRate = Properties.SkyTelescope.Default.LunarRate;
             MaxSlewRate = Properties.SkyTelescope.Default.MaximumSlewRate;
+            MinPulseDec = Properties.SkyTelescope.Default.MinPulseDec;
+            MinPulseRa = Properties.SkyTelescope.Default.MinPulseRa;
             ModelOn = Properties.SkyTelescope.Default.ModelOn;
             ParkAxisX = Properties.SkyTelescope.Default.ParkAxisX;
             ParkAxisY = Properties.SkyTelescope.Default.ParkAxisY;
@@ -1301,6 +1346,7 @@ namespace GS.Server.SkyTelescope
             DisplayInterval = Properties.SkyTelescope.Default.DisplayInterval;
             SolarRate = Properties.SkyTelescope.Default.SolarRate;
             St4Guiderate = Properties.SkyTelescope.Default.St4Guiderate;
+            SyncLimit = Properties.SkyTelescope.Default.SyncLimit;
             Temperature = Properties.SkyTelescope.Default.Temperature;
             UTCDateOffset = Properties.SkyTelescope.Default.UTCDateOffset;
 

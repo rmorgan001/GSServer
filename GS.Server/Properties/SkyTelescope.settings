@@ -60,7 +60,7 @@
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="HourAngleLimit" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">10</Value>
+      <Value Profile="(Default)">20</Value>
     </Setting>
     <Setting Name="KingRate" Type="System.Double" Scope="User">
       <Value Profile="(Default)">15.0369</Value>
@@ -268,6 +268,15 @@
     </Setting>
     <Setting Name="ModelOn" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="MinPulseRa" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">20</Value>
+    </Setting>
+    <Setting Name="MinPulseDec" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">20</Value>
+    </Setting>
+    <Setting Name="SyncLimit" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">30</Value>
     </Setting>
   </Settings>
 </SettingsFile>

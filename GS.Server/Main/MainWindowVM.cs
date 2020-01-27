@@ -13,7 +13,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using GS.Server.Charting;
 using GS.Server.Domain;
 using GS.Server.Focuser;
 using GS.Server.Gamepad;
@@ -31,6 +30,7 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using GS.Server.Pulses;
 
 namespace GS.Server.Main
 {
@@ -41,12 +41,12 @@ namespace GS.Server.Main
         private IPageVM _currentPageViewModel;
         private List<IPageVM> _pageViewModels;
         private SkyTelescopeVM _skyTelescopeVM;
-        private ChartingVM _chartingVM;
         private FocuserVM _focuserVM;
         private NotesVM _notesVM;
         private SettingsVM _settingsVM;
         private GamepadVM _gamepadVM;
         private Model3DVM _model3dVM;
+        private PulsesVM _pulsesVM;
         public static MainWindowVM _mainWindowVm;
 
         private double _tempHeight = 510;
@@ -96,6 +96,7 @@ namespace GS.Server.Main
                     UpdateTabViewModel("Settings");
                     UpdateTabViewModel("Gamepad");
                     UpdateTabViewModel("Model3D");
+                    UpdateTabViewModel("Pulses");
 
                     // Set starting page
                     CurrentPageViewModel = PageViewModels[0];
@@ -215,7 +216,6 @@ namespace GS.Server.Main
         public void Dispose()
         {
             _skyTelescopeVM?.Dispose();
-            _chartingVM?.Dispose();
             // _notesV?.Dispose();
         }
 
@@ -248,25 +248,6 @@ namespace GS.Server.Main
                             PageViewModels.Remove(_focuserVM);
                         }
                         FocuserRadioVisable = false;
-                    }
-                    break;
-                case "Charts":
-                    if (Settings.Settings.Charting)
-                    {
-                        if (!PageViewModels.Contains(_chartingVM))
-                        {
-                            _chartingVM = new ChartingVM();
-                            PageViewModels.Add(_chartingVM);
-                        }
-                        ChartingRadioVisable = true;
-                    }
-                    else
-                    {
-                        if (PageViewModels.Contains(_chartingVM))
-                        {
-                            PageViewModels.Remove(_chartingVM);
-                        }
-                        ChartingRadioVisable = false;
                     }
                     break;
                 case "Notes":
@@ -348,6 +329,25 @@ namespace GS.Server.Main
                             PageViewModels.Remove(_model3dVM);
                         }
                         Model3DRadioVisable = false;
+                    }
+                    break;
+                case "Pulses":
+                    if (Settings.Settings.Pulses)
+                    {
+                        if (!PageViewModels.Contains(_pulsesVM))
+                        {
+                            _pulsesVM = new PulsesVM();
+                            PageViewModels.Add(_pulsesVM);
+                        }
+                        PulsesRadioVisable = true;
+                    }
+                    else
+                    {
+                        if (PageViewModels.Contains(_pulsesVM))
+                        {
+                            PageViewModels.Remove(_pulsesVM);
+                        }
+                        PulsesRadioVisable = false;
                     }
                     break;
             }
@@ -434,22 +434,6 @@ namespace GS.Server.Main
                 if (_skyWatcherRadioVisable == value) return;
                 _skyWatcherRadioVisable = value;
                 OnPropertyChanged();
-            }
-        }
-
-        private bool _chartingVMRadio;
-        public bool ChartingVMRadioRadio
-        {
-            get => _chartingVMRadio;
-            set
-            {
-                using (new WaitCursor())
-                {
-                    if (_chartingVMRadio == value) return;
-                    _chartingVMRadio = value;
-                    if (value) ChangeViewModel(_chartingVM);
-                    OnPropertyChanged();
-                }
             }
         }
 
@@ -573,6 +557,34 @@ namespace GS.Server.Main
             {
                 if (_model3dRadioVisable == value) return;
                 _model3dRadioVisable = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _pulsesVMRadio;
+        public bool PulsesVMRadioRadio
+        {
+            get => _pulsesVMRadio;
+            set
+            {
+                using (new WaitCursor())
+                {
+                    if (_pulsesVMRadio == value) return;
+                    _pulsesVMRadio = value;
+                    if (value) ChangeViewModel(_pulsesVM);
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _pulsesRadioVisable;
+        public bool PulsesRadioVisable
+        {
+            get => _pulsesRadioVisable;
+            set
+            {
+                if (_pulsesRadioVisable == value) return;
+                _pulsesRadioVisable = value;
                 OnPropertyChanged();
             }
         }

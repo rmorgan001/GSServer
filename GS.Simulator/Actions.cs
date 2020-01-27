@@ -165,6 +165,8 @@ namespace GS.Simulator
                 var loc = AxisSteps();
                 if (MonitorPulse) pulseEntry.PositionStart = loc[(int)axis];
                 pulseEntry.StartTime = HiResDateTime.UtcNow;
+                //todo change back to 20
+                if (duration < 20)pulseEntry.Rejected = true;
             }
 
             // execute pulse

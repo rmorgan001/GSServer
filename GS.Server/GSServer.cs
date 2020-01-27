@@ -74,7 +74,6 @@ namespace GS.Server
             Properties.Server.Default.Save();
             Properties.SkyTelescope.Default.Save();
             Properties.Gamepad.Default.Save();
-            Properties.Chart.Default.Save();
             Shared.Settings.Save();
         }
 

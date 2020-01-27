@@ -64,7 +64,7 @@
     <ApplicationIcon>Resources\greenswamp1.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>1.0.0.22</AssemblyVersion>
+    <AssemblyVersion>1.0.0.23</AssemblyVersion>
     <AssemblyPublicKeyToken>565de7938946fba7</AssemblyPublicKeyToken>
   </PropertyGroup>
   <PropertyGroup>
@@ -168,7 +168,6 @@
     <Compile Include="Cdc\CdcDialog.xaml.cs">
       <DependentUpon>CdcDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Charting\ChartSettings.cs" />
     <Compile Include="Controls\Main\WindowTitleBar.xaml.cs">
       <DependentUpon>WindowTitleBar.xaml</DependentUpon>
     </Compile>
@@ -199,6 +198,7 @@
     <Compile Include="Controls\Telescope\PPECBar.xaml.cs">
       <DependentUpon>PPECBar.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Domain\InvertBooleanConvertor.cs" />
     <Compile Include="Domain\LimitDialog.xaml.cs">
       <DependentUpon>LimitDialog.xaml</DependentUpon>
     </Compile>
@@ -231,6 +231,9 @@
     <Compile Include="Domain\NotifyPropertyChangedExtension.cs" />
     <Compile Include="Domain\AutoHomeDialog.xaml.cs">
       <DependentUpon>AutoHomeDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Domain\RaGoToSyncDialog.xaml.cs">
+      <DependentUpon>RaGoToSyncDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Domain\ResetSettingsDialog.xaml.cs">
       <DependentUpon>ResetSettingsDialog.xaml</DependentUpon>
@@ -286,21 +289,16 @@
     <Compile Include="Notes\NotesVM.cs" />
     <Compile Include="Phd\Guider.cs" />
     <Compile Include="Phd\GuiderImpl.cs" />
-    <Compile Include="Properties\Chart.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Chart.settings</DependentUpon>
+    <Compile Include="Pulses\PulsesV.xaml.cs">
+      <DependentUpon>PulsesV.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pulses\PulsesVM.cs" />
     <Compile Include="Properties\Gamepad.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Gamepad.settings</DependentUpon>
     </Compile>
     <Compile Include="Properties\Server.cs" />
-    <Compile Include="Charting\ChartingV.xaml.cs">
-      <DependentUpon>ChartingV.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Charting\ChartingVM.cs" />
     <Compile Include="Properties\SkyTelescope.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -404,6 +402,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Domain\RaGoToSyncDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Domain\ResetSettingsDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -450,15 +452,15 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Charting\ChartingV.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Model3D\Model3DV.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Notes\NotesV.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Pulses\PulsesV.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -503,10 +505,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
-    <None Include="Properties\Chart.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Chart.Designer.cs</LastGenOutput>
-    </None>
     <None Include="Properties\Gamepad.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Gamepad.Designer.cs</LastGenOutput>
@@ -586,7 +584,9 @@
   <ItemGroup>
     <Resource Include="Resources\NGC6992.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\Orion.png" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="Models\compassN.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

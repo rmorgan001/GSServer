@@ -118,6 +118,20 @@ namespace GS.Server.Settings
             }
         }
 
+        private static bool _pulses;
+        public static bool Pulses
+        {
+            get => _pulses;
+            set
+            {
+                if (_pulses == value) return;
+                _pulses = value;
+                Properties.Server.Default.Pulses= value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static bool _sleepMode;
         public static bool SleepMode
         {
@@ -344,6 +358,7 @@ namespace GS.Server.Settings
             Notes = Properties.Server.Default.Notes;
             SkyWatcher = Properties.Server.Default.SkyWatcher;
             Model3D = Properties.Server.Default.Model3D;
+            Pulses = Properties.Server.Default.Pulses;
             SleepMode = Properties.Server.Default.SleepMode;
             StartMinimized = Properties.Server.Default.StartMinimized;
             StartOnTop = Properties.Server.Default.StartOnTop;
