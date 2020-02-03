@@ -521,7 +521,7 @@ namespace GS.Server.Model3D
         public void Dispose()
         {
             Dispose(disposing: true);
-            GC.SuppressFinalize(obj: this);
+            //GC.SuppressFinalize(obj: this);
         }
 
         private void Dispose(bool disposing)

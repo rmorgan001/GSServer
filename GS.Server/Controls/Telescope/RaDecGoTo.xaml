@@ -22,7 +22,7 @@
             <ColumnDefinition Width="80"/>
         </Grid.ColumnDefinitions>
         <Label Grid.Row="0" Grid.Column="1" Content="{DynamicResource lbRa}" VerticalAlignment="Center"/>
-        <ComboBox Grid.Row="0" Grid.Column="2" md:HintAssist.Hint="{DynamicResource hintHours}"  IsEditable="True" Width="55"
+            <ComboBox Grid.Row="0" Grid.Column="2" md:HintAssist.Hint="{DynamicResource cbhintHours}"  IsEditable="True" Width="55"
                                   ItemsSource="{Binding Hours}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
             <ComboBox.Text>
                 <Binding Path="RaHours" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -38,8 +38,8 @@
                 </ItemsPanelTemplate>
             </ComboBox.ItemsPanel>
         </ComboBox>
-        <ComboBox Grid.Row="0" Grid.Column="3" md:HintAssist.Hint="{DynamicResource hintMinutes}" IsEditable="True" Width="55"
-                                ItemsSource="{Binding Minutes}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
+            <ComboBox Grid.Row="0" Grid.Column="3" md:HintAssist.Hint="{DynamicResource cbhintMinutes}" IsEditable="True" Width="55"
+                                ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
             <ComboBox.Text>
                 <Binding Path="RaMinutes" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
                     <Binding.ValidationRules>
@@ -54,8 +54,8 @@
                 </ItemsPanelTemplate>
             </ComboBox.ItemsPanel>
         </ComboBox>
-        <ComboBox Grid.Row="0" Grid.Column="4" md:HintAssist.Hint="{DynamicResource hintSeconds}" IsEditable="True" Width="70"
-                                ItemsSource="{Binding Seconds}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
+            <ComboBox Grid.Row="0" Grid.Column="4" md:HintAssist.Hint="{DynamicResource cbhintSeconds}" IsEditable="True" Width="70"
+                                ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
             <ComboBox.Text>
                 <Binding Path="RaSeconds" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
                     <Binding.ValidationRules>
@@ -71,8 +71,8 @@
             </ComboBox.ItemsPanel>
         </ComboBox>
             <Label Grid.Row="1" Grid.Column="1" Content="{DynamicResource lbDec}" VerticalAlignment="Center"/>
-        <ComboBox Grid.Row="1" Grid.Column="2" md:HintAssist.Hint="{DynamicResource hintDegrees}"  IsEditable="True" Width="55"
-                                  ItemsSource="{Binding LatitudeRange}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
+            <ComboBox Grid.Row="1" Grid.Column="2" md:HintAssist.Hint="{DynamicResource cbhintDegrees}"  IsEditable="True" Width="55"
+                                  ItemsSource="{Binding DecRange}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
             <ComboBox.Text>
                 <Binding Path="DecDegrees" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
                     <Binding.ValidationRules>
@@ -87,8 +87,8 @@
                 </ItemsPanelTemplate>
             </ComboBox.ItemsPanel>
         </ComboBox>
-        <ComboBox Grid.Row="1" Grid.Column="3" md:HintAssist.Hint="{DynamicResource hintMinutes}" IsEditable="True" Width="55"
-                                  ItemsSource="{Binding Minutes}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
+            <ComboBox Grid.Row="1" Grid.Column="3" md:HintAssist.Hint="{DynamicResource cbhintMinutes}" IsEditable="True" Width="55"
+                                  ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
             <ComboBox.Text>
                 <Binding Path="DecMinutes" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
                     <Binding.ValidationRules>
@@ -103,8 +103,8 @@
                 </ItemsPanelTemplate>
             </ComboBox.ItemsPanel>
         </ComboBox>
-        <ComboBox Grid.Row="1" Grid.Column="4" md:HintAssist.Hint="{DynamicResource hintSeconds}" IsEditable="True" Width="70"
-                  ItemsSource="{Binding Minutes}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
+            <ComboBox Grid.Row="1" Grid.Column="4" md:HintAssist.Hint="{DynamicResource cbhintSeconds}" IsEditable="True" Width="70"
+                  ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
             <ComboBox.Text>
                 <Binding Path="DecSeconds" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
                     <Binding.ValidationRules>

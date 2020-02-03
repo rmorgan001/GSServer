@@ -99,7 +99,7 @@
                         </ComboBox.Text>
                     </ComboBox>
                         <ComboBox Grid.Row="2" Grid.Column="0" md:HintAssist.Hint="{DynamicResource cbhintRaGuiding}" MinWidth="10" Margin="0,0,0,0" ToolTip="{DynamicResource cbhintRaGuiding}"
-                              ItemsSource="{Binding GuideRateOffsetXs}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                              ItemsSource="{Binding GuideRateOffsetList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         <ComboBox.SelectedItem>
                             <Binding Path="GuideRateOffsetX" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                 <Binding.ValidationRules>
@@ -114,7 +114,7 @@
                         </ComboBox.ItemsPanel>
                     </ComboBox>
                     <ComboBox Grid.Row="2" Grid.Column="1" md:HintAssist.Hint="{DynamicResource cbhintDecGuiding}" MinWidth="10" Margin="10,0,0,0" ToolTip="{DynamicResource cbhintDecGuiding}"
-                              ItemsSource="{Binding GuideRateOffsetYs}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                              ItemsSource="{Binding GuideRateOffsetList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         <ComboBox.SelectedItem>
                             <Binding Path="GuideRateOffsetY" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                 <Binding.ValidationRules>
@@ -424,8 +424,8 @@
                                     </ItemsPanelTemplate>
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
-                            <ComboBox Grid.Row="1" Grid.Column="2" IsEnabled="True" md:HintAssist.Hint="{DynamicResource hintDegrees}" Margin="10,0,0,0" ToolTip="{DynamicResource hintDegrees}"
-                                ItemsSource="{Binding LatitudeRange}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                                <ComboBox Grid.Row="1" Grid.Column="2" IsEnabled="True" md:HintAssist.Hint="{DynamicResource cbhintDegrees}" Margin="10,0,0,0" ToolTip="{DynamicResource cbhintDegrees}"
+                                ItemsSource="{Binding Range179}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                 <ComboBox.SelectedItem>
                                     <Binding Path="Lat1" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                         <Binding.ValidationRules>
@@ -439,8 +439,8 @@
                                     </ItemsPanelTemplate>
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
-                            <ComboBox Grid.Row="1" Grid.Column="3" IsEnabled="True" md:HintAssist.Hint="{DynamicResource hintMinutes}" Margin="10,0,0,0" ToolTip="{DynamicResource hintMinutes}"
-                            ItemsSource="{Binding Minutes}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                                <ComboBox Grid.Row="1" Grid.Column="3" IsEnabled="True" md:HintAssist.Hint="{DynamicResource cbhintMinutes}" Margin="10,0,0,0" ToolTip="{DynamicResource cbhintMinutes}"
+                            ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.SelectedItem>
                                 <Binding Path="Lat2" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
@@ -454,8 +454,8 @@
                                 </ItemsPanelTemplate>
                             </ComboBox.ItemsPanel>
                         </ComboBox>
-                            <ComboBox Grid.Row="1" Grid.Column="4" IsEnabled="True" md:HintAssist.Hint="{DynamicResource hintSeconds}" IsEditable="True" Margin="10,0,0,0" ToolTip="{DynamicResource hintSeconds}"
-                           ItemsSource="{Binding Seconds}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                                <ComboBox Grid.Row="1" Grid.Column="4" IsEnabled="True" md:HintAssist.Hint="{DynamicResource cbhintSeconds}" IsEditable="True" Margin="10,0,0,0" ToolTip="{DynamicResource cbhintSeconds}"
+                           ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.Text>
                                 <Binding Path="Lat3" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
@@ -486,8 +486,8 @@
                                     </ItemsPanelTemplate>
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
-                            <ComboBox Grid.Row="2" Grid.Column="2" md:HintAssist.Hint="{DynamicResource hintDegrees}" Margin="10,5,0,0" ToolTip="{DynamicResource hintDegrees}"
-                            ItemsSource="{Binding LongitudeRange}"
+                                <ComboBox Grid.Row="2" Grid.Column="2" md:HintAssist.Hint="{DynamicResource cbhintDegrees}" Margin="10,5,0,0" ToolTip="{DynamicResource cbhintDegrees}"
+                            ItemsSource="{Binding Range179}"
                             Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.SelectedItem>
                             <Binding Path="Long1" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -502,8 +502,8 @@
                             </ItemsPanelTemplate>
                         </ComboBox.ItemsPanel>
                         </ComboBox>
-                            <ComboBox Grid.Row="2" Grid.Column="3" md:HintAssist.Hint="{DynamicResource hintMinutes}"  Margin="10,5,0,0" ToolTip="{DynamicResource hintMinutes}"
-                            ItemsSource="{Binding Minutes}"
+                                <ComboBox Grid.Row="2" Grid.Column="3" md:HintAssist.Hint="{DynamicResource cbhintMinutes}"  Margin="10,5,0,0" ToolTip="{DynamicResource cbhintMinutes}"
+                            ItemsSource="{Binding Range60}"
                             Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.SelectedItem>
                                 <Binding Path="Long2" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -518,8 +518,8 @@
                                 </ItemsPanelTemplate>
                             </ComboBox.ItemsPanel>
                         </ComboBox>
-                            <ComboBox Grid.Row="2" Grid.Column="4" md:HintAssist.Hint="{DynamicResource hintSeconds}" IsEditable="True" Margin="10,5,0,0" ToolTip="{DynamicResource hintSeconds}"
-                            ItemsSource="{Binding Seconds}"
+                                <ComboBox Grid.Row="2" Grid.Column="4" md:HintAssist.Hint="{DynamicResource cbhintSeconds}" IsEditable="True" Margin="10,5,0,0" ToolTip="{DynamicResource cbhintSeconds}"
+                            ItemsSource="{Binding Range60}"
                             Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.Text>
                                 <Binding Path="Long3" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">

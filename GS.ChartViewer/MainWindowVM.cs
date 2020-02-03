@@ -49,6 +49,9 @@ namespace GS.ChartViewer
 
         public MainWindowVM()
         {
+            //Load language resource file
+            Languages.SetLanguageDictionary(false, LanguageApp.GSChartViewer);
+
             Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             LoadDefaults();
         }
@@ -121,27 +124,6 @@ namespace GS.ChartViewer
             Properties.ChartViewer.Default.WindowState = WindowState.Minimized;
         }
 
-        private ICommand _clickPulsesSizeCmd;
-        public ICommand ClickPulsesSizeCmd
-        {
-            get
-            {
-                return _clickPulsesSizeCmd ?? (_clickPulsesSizeCmd = new RelayCommand(param => PulsesSizeCmd()));
-            }
-            set => _clickPulsesSizeCmd = value;
-        }
-        private void PulsesSizeCmd()
-        {
-            try
-            {
-                ResizeXy();
-            }
-            catch (Exception ex)
-            {
-                OpenDialog(ex.Message);
-            }
-        }
-
         private ICommand _clickPulsesZoomCmd;
         public ICommand ClickPulsesZoomCmd
         {
@@ -204,6 +186,29 @@ namespace GS.ChartViewer
                     {
                         if (a is GScatterSeries series) series.Visibility = a.IsSeriesVisible ? Visibility.Collapsed : Visibility.Visible;
                     }
+
+                    switch (title.ValueSet)
+                    {
+                        case ChartValueSet.Values1:
+                            Chart1Toggle = !Chart1Toggle;
+                            break;
+                        case ChartValueSet.Values2:
+                            Chart2Toggle = !Chart2Toggle;
+                            break;
+                        case ChartValueSet.Values3:
+                            Chart3Toggle = !Chart3Toggle;
+                            break;
+                        case ChartValueSet.Values4:
+                            Chart4Toggle = !Chart4Toggle;
+                            break;
+                        case ChartValueSet.Values5:
+                            Chart5Toggle = !Chart5Toggle;
+                            break;
+                        case ChartValueSet.Values6:
+                            Chart6Toggle = !Chart6Toggle;
+                            break;
+
+                    }
                 }
             }
             catch (Exception ex)
@@ -212,6 +217,28 @@ namespace GS.ChartViewer
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private ICommand _clickPulsesSizeCmd;
+        public ICommand ClickPulsesSizeCmd
+        {
+            get
+            {
+                return _clickPulsesSizeCmd ?? (_clickPulsesSizeCmd = new RelayCommand(param => PulsesSizeCmd()));
+            }
+            set => _clickPulsesSizeCmd = value;
+        }
+        private void PulsesSizeCmd()
+        {
+            try
+            {
+                AxisXMax = AxisXMin + TimeSpan.FromMinutes(1).Ticks;
+                ResizeY();
+            }
+            catch (Exception ex)
+            {
                 OpenDialog(ex.Message);
             }
         }
@@ -229,7 +256,7 @@ namespace GS.ChartViewer
         {
             try
             {
-                ResizeX();
+                AxisXMax = AxisXMin + TimeSpan.FromMinutes(1).Ticks;
             }
             catch (Exception ex)
             {
@@ -271,7 +298,7 @@ namespace GS.ChartViewer
         {
             try
             {
-                var t = (EndDateTicks - StartDateTicks) * .1;
+                var t = (EndDateTicks - StartDateTicks) * .03;
                 AxisXMax += (t);
             }
             catch (Exception ex)
@@ -293,7 +320,7 @@ namespace GS.ChartViewer
         {
             try
             {
-                var t = (EndDateTicks - StartDateTicks) * .1;
+                var t = (EndDateTicks - StartDateTicks) * .03;
                 if (AxisXMax > (AxisXMin + t))
                 {
                     AxisXMax -= t;
@@ -549,8 +576,7 @@ namespace GS.ChartViewer
 
                 ClearChart();
                 ChartsQuality(ChartQuality);
-                SetXaxisLimits(indexitem.StartTime, indexitem.EndTime);
-
+                
                 foreach (var linearray in log.Select(line => line.Split(',')))
                 {
                     var result = Enum.TryParse<ChartLogCode>(linearray[0], true, out var code);
@@ -561,66 +587,9 @@ namespace GS.ChartViewer
 
                 StartDateTicks = indexitem.StartTime.Ticks;
                 EndDateTicks = indexitem.EndTime.Ticks;
-                ResizeXy();
+                SetXaxisLimits(indexitem.StartTime, indexitem.StartTime + TimeSpan.FromMinutes(1));
+                ResizeY();
             }
-        }
-        private void ClearChart()
-        {
-           ChartCollection?.Clear();
-           TitleItems?.Clear();
-           DataKeys.Clear();
-           LogText?.Clear();
-           SelectedLog?.Clear();
-           Chart1Values?.Clear();
-           Chart2Values?.Clear();
-           Chart3Values?.Clear();
-           Chart4Values?.Clear();
-           Chart5Values?.Clear();
-           Chart6Values?.Clear();
-        }
-        private void ChartsQuality(Quality chartQuality)
-        {
-            Chart1Values.WithQuality(chartQuality);
-            Chart2Values.WithQuality(chartQuality);
-            Chart3Values.WithQuality(chartQuality);
-            Chart4Values.WithQuality(chartQuality);
-            Chart5Values.WithQuality(chartQuality);
-            Chart6Values.WithQuality(chartQuality);
-        }
-        private void ResizeXy()
-        {
-            ResizeX();
-            ResizeY();
-        }
-        private void ResizeX()
-        {
-            var indexitem = SelectedIndex;
-            if (indexitem == null) return;
-            var index = indexitem.RecNo - 1;
-            if (index > Logs.Count) return;
-
-            SetXaxisLimits(indexitem.StartTime, indexitem.EndTime);
-
-            //AxisXMin = double.NaN;
-            //AxisXMax = double.NaN;
-
-        }
-        private void ResizeY()
-        {
-            var indexitem = SelectedIndex;
-            if (indexitem == null) return;
-            var index = indexitem.RecNo - 1;
-            if (index > Logs.Count) return;
-
-            AxisYMax = _maxPoint;
-            AxisYMin = _minPoint;
-
-           //AxisYMax -= double.NaN;
-           // AxisYMin += double.NaN;
-
-           // AxisYMin = double.NaN;
-           // AxisYMax = double.NaN;
-
         }
         private void LoadLogLine(ChartLogCode code, string[] linearray)
         {
@@ -633,7 +602,7 @@ namespace GS.ChartViewer
                     break;
                 case ChartLogCode.Data:
                     if (linearray.Length < 3) break;
-                    var pair = new DataKey{Key = linearray[2],Value = linearray[3]};
+                    var pair = new DataKey { Key = linearray[2], Value = linearray[3] };
                     DataKeys.Add(pair);
                     if (pair.Key == "Scale")
                     {
@@ -650,7 +619,7 @@ namespace GS.ChartViewer
                     if (!result) break;
                     result = Enum.TryParse<ChartValueSet>(linearray[3], true, out var valueSet);
                     if (!result) break;
-                    var pointModel = new PointModel{DateTime = datetime,Value = value};
+                    var pointModel = new PointModel { DateTime = datetime, Value = value };
                     switch (valueSet)
                     {
                         case ChartValueSet.Values1:
@@ -687,21 +656,27 @@ namespace GS.ChartViewer
                     {
                         case ChartValueSet.Values1:
                             values = Chart1Values;
+                            Chart1Toggle = true;
                             break;
                         case ChartValueSet.Values2:
                             values = Chart2Values;
+                            Chart2Toggle = true;
                             break;
                         case ChartValueSet.Values3:
                             values = Chart3Values;
+                            Chart3Toggle = true;
                             break;
                         case ChartValueSet.Values4:
                             values = Chart4Values;
+                            Chart4Toggle = true;
                             break;
                         case ChartValueSet.Values5:
                             values = Chart5Values;
+                            Chart5Toggle = true;
                             break;
                         case ChartValueSet.Values6:
                             values = Chart6Values;
+                            Chart6Toggle = true;
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -711,7 +686,7 @@ namespace GS.ChartViewer
                     int scaleat;
                     var brush = new SolidColorBrush();
                     var title = string.Empty;
-                    
+
                     switch (chartSeriesType)
                     {
                         case ChartSeriesType.GLineSeries:
@@ -719,6 +694,7 @@ namespace GS.ChartViewer
                             int.TryParse(linearray[9], out scaleat);
                             title = linearray[4];
                             brush = (SolidColorBrush)(new BrushConverter().ConvertFrom(linearray[5]));
+                            ChartColor(chartValueSet, brush);
                             var gLineSeries = NewGLineSeries(title, values, pointsize, brush, scaleat);
                             ChartCollection.Add(gLineSeries);
                             break;
@@ -727,6 +703,7 @@ namespace GS.ChartViewer
                             int.TryParse(linearray[9], out scaleat);
                             title = linearray[4];
                             brush = (SolidColorBrush)(new BrushConverter().ConvertFrom(linearray[5]));
+                            ChartColor(chartValueSet, brush);
                             var gColumnSeries = NewGColumnSeries(title, values, pointsize, brush, scaleat);
                             ChartCollection.Add(gColumnSeries);
                             break;
@@ -735,6 +712,7 @@ namespace GS.ChartViewer
                             int.TryParse(linearray[9], out scaleat);
                             title = linearray[4];
                             brush = (SolidColorBrush)(new BrushConverter().ConvertFrom(linearray[5]));
+                            ChartColor(chartValueSet, brush);
                             var gStepLineSeries = NewGStepLineSeries(title, values, pointsize, brush, scaleat);
                             ChartCollection.Add(gStepLineSeries);
                             break;
@@ -743,6 +721,7 @@ namespace GS.ChartViewer
                             int.TryParse(linearray[9], out scaleat);
                             title = linearray[4];
                             brush = (SolidColorBrush)(new BrushConverter().ConvertFrom(linearray[5]));
+                            ChartColor(chartValueSet, brush);
                             var gScatterSeries = NewGScatterSeries(title, values, pointsize, brush, scaleat);
                             ChartCollection.Add(gScatterSeries);
                             break;
@@ -750,19 +729,101 @@ namespace GS.ChartViewer
 
                     if (!string.IsNullOrEmpty(title))
                     {
-                        var titleItem = new TitleItem {TitleName = title, Fill = brush};
+                        var titleItem = new TitleItem { TitleName = title, Fill = brush, ValueSet = chartValueSet };
                         TitleItems.Add(titleItem);
                     }
-                    
+
                     break;
             }
+        }
+        private void ClearChart()
+        {
+           ChartCollection?.Clear();
+           TitleItems?.Clear();
+           DataKeys.Clear();
+           LogText?.Clear();
+           SelectedLog?.Clear();
+           Chart1Values?.Clear();
+           Chart2Values?.Clear();
+           Chart3Values?.Clear();
+           Chart4Values?.Clear();
+           Chart5Values?.Clear();
+           Chart6Values?.Clear();
+           _maxPoint = 0;
+           _minPoint = 0;
+
+           Chart1Toggle = false;
+           Chart2Toggle = false;
+           Chart3Toggle = false;
+           Chart4Toggle = false;
+           Chart5Toggle = false;
+           Chart6Toggle = false;
+        }
+
+        private void ChartColor(ChartValueSet valueset, Brush col)
+        {
+            switch (valueset)
+            {
+                case ChartValueSet.Values1:
+                    Chart1Color = col;
+                    break;
+                case ChartValueSet.Values2:
+                    Chart2Color = col;
+                    break;
+                case ChartValueSet.Values3:
+                    Chart3Color = col;
+                    break;
+                case ChartValueSet.Values4:
+                    Chart4Color = col;
+                    break;
+                case ChartValueSet.Values5:
+                    Chart5Color = col;
+                    break;
+                case ChartValueSet.Values6:
+                    Chart6Color = col;
+                    break;
+            }
+        }
+        private void ChartsQuality(Quality chartQuality)
+        {
+            Chart1Values.WithQuality(chartQuality);
+            Chart2Values.WithQuality(chartQuality);
+            Chart3Values.WithQuality(chartQuality);
+            Chart4Values.WithQuality(chartQuality);
+            Chart5Values.WithQuality(chartQuality);
+            Chart6Values.WithQuality(chartQuality);
+        }
+        private void ResizeY()
+        {
+            var indexitem = SelectedIndex;
+            if (indexitem == null) return;
+            var index = indexitem.RecNo - 1;
+            if (index > Logs.Count) return;
+
+            var max = 0.0;
+            if (Math.Abs(_maxPoint) >= Math.Abs(_minPoint))
+            {
+                max = Math.Abs(_minPoint);
+            }
+
+            if (Math.Abs(_minPoint) > Math.Abs(_maxPoint))
+            {
+                max = Math.Abs(_minPoint);
+            }
+            AxisYMax = max;
+            AxisYMin = -max;
+
+            //AxisYMax = _maxPoint;
+            //AxisYMin = _minPoint;
+
+
         }
         private void SetXaxisLimits(DateTime start, DateTime end)
         {
             AxisXMin = start.Ticks - TimeSpan.FromSeconds(5).Ticks;
             AxisXMax = end.Ticks + TimeSpan.FromSeconds(5).Ticks;
         }
-        public static Brush ToBrush(Color color)
+        private static Brush ToBrush(Color color)
         {
             return new SolidColorBrush(System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B));
         }
@@ -914,7 +975,6 @@ namespace GS.ChartViewer
                 OnPropertyChanged();
             }
         }
-
         public void Dispose()
         {
 
@@ -1123,7 +1183,6 @@ namespace GS.ChartViewer
                 OnPropertyChanged();
             }
         }
-
         public IList<int> AxisMinSecondsRange { get; set; }
 
         private int _axisXSeconds;
@@ -1252,8 +1311,8 @@ namespace GS.ChartViewer
             }
         }
 
-        private string _chart1Color;
-        public string Chart1Color
+        private Brush _chart1Color;
+        public Brush Chart1Color
         {
             get => _chart1Color;
             set
@@ -1330,8 +1389,8 @@ namespace GS.ChartViewer
             }
         }
 
-        private string _chart2Color;
-        public string Chart2Color
+        private Brush _chart2Color;
+        public Brush Chart2Color
         {
             get => _chart2Color;
             set
@@ -1408,8 +1467,8 @@ namespace GS.ChartViewer
             }
         }
 
-        private string _chart3Color;
-        public string Chart3Color
+        private Brush _chart3Color;
+        public Brush Chart3Color
         {
             get => _chart3Color;
             set
@@ -1486,8 +1545,8 @@ namespace GS.ChartViewer
             }
         }
 
-        private string _chart4Color;
-        public string Chart4Color
+        private Brush _chart4Color;
+        public Brush Chart4Color
         {
             get => _chart4Color;
             set
@@ -1564,8 +1623,8 @@ namespace GS.ChartViewer
             }
         }
 
-        private string _chart5Color;
-        public string Chart5Color
+        private Brush _chart5Color;
+        public Brush Chart5Color
         {
             get => _chart5Color;
             set
@@ -1642,8 +1701,8 @@ namespace GS.ChartViewer
             }
         }
 
-        private string _chart6Color;
-        public string Chart6Color
+        private Brush _chart6Color;
+        public Brush Chart6Color
         {
             get => _chart6Color;
             set

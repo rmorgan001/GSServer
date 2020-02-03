@@ -22,7 +22,7 @@ namespace GS.ChartViewer
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindowV
+    public partial class MainWindowV :IDisposable
     {
         public MainWindowV()
         {
@@ -61,10 +61,9 @@ namespace GS.ChartViewer
 
         }
 
+
         public void Dispose()
         {
-           // var vm = (MainWindowVM)DataContext;
-
         }
     }
 }

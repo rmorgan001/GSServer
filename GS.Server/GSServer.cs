@@ -531,8 +531,6 @@ namespace GS.Server
                 Registry.ClassesRoot.DeleteSubKey($"CLSID\\{clsid}", false);
                 try
                 {
-
-
                     var gssAttrbutes = type.GetCustomAttributes(typeof(GssAttribute), false);
                     if (gssAttrbutes.Length <= 0)
                     {

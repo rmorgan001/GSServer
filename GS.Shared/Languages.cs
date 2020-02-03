@@ -15,42 +15,102 @@
 //  */
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Windows;
 
 namespace GS.Shared
 {
-    public class Languages
+    public static class Languages
     {
-        public void SetLanguageDictionary()
+        static Languages()
         {
-            SetLanguageDictionary(Thread.CurrentThread.CurrentCulture);
+            var langs = new List<string>(){ "en-US" };
+            SupportedLanguages = langs;
         }
-
-        public void SetLanguageDictionary(CultureInfo cultureInfo)
+        public static void SetLanguageDictionary(bool local, LanguageApp app)
         {
-            SetLanguageDictionary(cultureInfo.ToString());
+            if (local)
+            {
+                SetLanguageDictionary(Thread.CurrentThread.CurrentCulture.ToString(), app);
+            }
+            else
+            {
+                var lang = Settings.Language;
+                SetLanguageDictionary(DoesCultureExist(lang) ? lang : "en-US", app);
+            }
         }
-
-        public void SetLanguageDictionary(string cultureInfo)
+        private static bool DoesCultureExist(string cultureName)
+        {
+            return CultureInfo.GetCultures(CultureTypes.AllCultures).Any(culture => string.Equals(culture.Name, cultureName, StringComparison.CurrentCultureIgnoreCase));
+        }
+        private static void SetLanguageDictionary(string cultureInfo, LanguageApp app)
         {
             var dict = new ResourceDictionary();
-            switch (cultureInfo)
+            switch (app)
             {
-                case "en-US":
-                    dict.Source = new Uri("GS.Shared;component/Languages/StringResources.xaml", UriKind.Relative);
+                case LanguageApp.GSServer:
+                    switch (cultureInfo)
+                    {
+                        case "en-US":
+                            dict.Source = new Uri("GS.Shared;component/Languages/StringResServer_en-us.xaml", UriKind.Relative);
+                            break;
+                        //case "fr-CA":
+                        //    dict.Source = new Uri("GS.Shared;component/Languages/StringResources.fr-CA.xaml", UriKind.Relative);
+                        //    break;
+                        default:
+                            dict.Source = new Uri("GS.Shared;component/Languages/StringResServer_en-us.xaml", UriKind.Relative);
+                            break;
+                    }
                     break;
-                //case "fr-CA":
-                //    dict.Source = new Uri("GS.Shared;component/Languages/StringResources.fr-CA.xaml", UriKind.Relative);
-                //    break;
-                default:
-                    dict.Source = new Uri("GS.Shared;component/Languages/StringResources.xaml", UriKind.Relative);
+                case LanguageApp.GSChartViewer:
+                    switch (cultureInfo)
+                    {
+                        case "en-US":
+                            dict.Source = new Uri("GS.Shared;component/Languages/StringResChart_en-us.xaml", UriKind.Relative);
+                            break;
+                        //case "fr-CA":
+                        //    dict.Source = new Uri("GS.Shared;component/Languages/StringResources.fr-CA.xaml", UriKind.Relative);
+                        //    break;
+                        default:
+                            dict.Source = new Uri("GS.Shared;component/Languages/StringResChart_en-us.xaml", UriKind.Relative);
+                            break;
+                    }
+                    break;
+                case LanguageApp.GSUtilities:
+                    switch (cultureInfo)
+                    {
+                        case "en-US":
+                            dict.Source = new Uri("GS.Shared;component/Languages/StringResUtil_en-us.xaml", UriKind.Relative);
+                            break;
+                        //case "fr-CA":
+                        //    dict.Source = new Uri("GS.Shared;component/Languages/StringResources.fr-CA.xaml", UriKind.Relative);
+                        //    break;
+                        default:
+                            dict.Source = new Uri("GS.Shared;component/Languages/StringResUtil_en-us.xaml", UriKind.Relative);
+                            break;
+                    }
                     break;
             }
+
+            if (dict.Source == null) { throw new Exception("Language source missing"); }
+            
             Application.Current.Resources.MergedDictionaries.Add(dict);
         }
+        public static List<string> SupportedLanguages { get; set; }
+        public static string Language
+        {
+            get => Settings.Language;
+            set => Settings.Language = DoesCultureExist(value) ? value : "en-US";
+        }
+    }
 
-
+    public enum LanguageApp
+    {
+        GSServer = 1,
+        GSChartViewer = 2,
+        GSUtilities = 3
     }
 }

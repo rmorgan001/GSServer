@@ -90,17 +90,15 @@ namespace GS.Server.SkyTelescope
                     Settings.Settings.StaticPropertyChanged += PropertyChangedSettings;
 
                     // dropdown lists
-                    GuideRateOffsetXs = new List<double>(Numbers.InclusiveRange(10, 100, 10));
-                    GuideRateOffsetYs = new List<double>(Numbers.InclusiveRange(10, 100, 10));
+                    GuideRateOffsetList = new List<double>(Numbers.InclusiveRange(10, 100, 10));
                     MaxSlewRates = new List<double>(Numbers.InclusiveRange(2.0, 5));
                     HourAngleLimits = new List<double>(Numbers.InclusiveRange(0, 45, 1));
-                    LatitudeRange = new List<int>(Enumerable.Range(0, 179));
+                    Range179 = new List<int>(Enumerable.Range(0, 179));
                     LatitudeRangeNS = new List<string>() { "N", "S" };
-                    LongitudeRange = new List<int>(Enumerable.Range(0, 179));
                     LongitudeRangeEW = new List<string>() { "E", "W" };
+                    DecRange = new List<int>(Enumerable.Range(-90, 181));
                     Hours = new List<int>(Enumerable.Range(0, 24));
-                    Minutes = new List<int>(Enumerable.Range(0, 60));
-                    Seconds = new List<int>(Enumerable.Range(0, 60));
+                    Range60 = new List<int>(Enumerable.Range(0, 60));
                     St4Guiderates = new List<double> { 1.0, 0.75, 0.50, 0.25, 0.125 };
                     Temperatures = new List<double>(Numbers.InclusiveRange(-50, 60, 1.0));
                     AutoHomeLimits = new List<int>(Enumerable.Range(20, 160));
@@ -575,7 +573,7 @@ namespace GS.Server.SkyTelescope
         {
             //image size Width="253" Height="340"
             var random = new Random();
-            ImageFiles = new List<string> { "M33.png", "M74.png", "NGC6992.png", "Orion.png" };
+            ImageFiles = new List<string> { "M33.png", "Horsehead.png", "NGC6992.png", "Orion.png" };
             ImageFile = "../Resources/" + ImageFiles[random.Next(ImageFiles.Count)];
         }
 
@@ -810,7 +808,7 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-        public IList<double> GuideRateOffsetXs { get; }
+        public IList<double> GuideRateOffsetList { get; }
         public double GuideRateOffsetX
         {
             get => SkySettings.GuideRateOffsetX * 100;
@@ -821,7 +819,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-        public IList<double> GuideRateOffsetYs { get; }
         public double GuideRateOffsetY
         {
             get => SkySettings.GuideRateOffsetY * 100;
@@ -912,7 +909,7 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-        public IList<int> LatitudeRange { get; }
+        public IList<int> Range179 { get; }
         public int Lat1
         {
             get
@@ -925,12 +922,12 @@ namespace GS.Server.SkyTelescope
             {
                 var l = Math.Abs(Principles.Units.Deg2Dou(value, Lat2, Lat3));
                 if (Lat0 == "S") l = -l;
-                if (Math.Abs(l - SkySettings.Latitude) < 0.00001) return;
+                if (Math.Abs(l - SkySettings.Latitude) < 0.0000000000001 ) return;
                 SkySettings.Latitude = l;
                 OnPropertyChanged();
             }
         }
-        public IList<int> Minutes { get; }
+        public IList<int> Range60 { get; }
         public int Lat2
         {
             get
@@ -944,12 +941,11 @@ namespace GS.Server.SkyTelescope
             {
                 var l = Math.Abs(Principles.Units.Deg2Dou(Lat1, value, Lat3));
                 if (Lat0 == "S") l = -l;
-                if (Math.Abs(l - SkySettings.Latitude) < 0.00001) return;
+                if (Math.Abs(l - SkySettings.Latitude) < 0.0000000000001) return;
                 SkySettings.Latitude = l;
                 OnPropertyChanged();
             }
         }
-        public IList<int> Seconds { get; }
         public double Lat3
         {
             get
@@ -963,7 +959,7 @@ namespace GS.Server.SkyTelescope
             {
                 var l = Math.Abs(Principles.Units.Deg2Dou(Lat1, Lat2, value));
                 if (Lat0 == "S") l = -l;
-                if (Math.Abs(l - SkySettings.Latitude) < 0.00001) return;
+                if (Math.Abs(l - SkySettings.Latitude) < 0.0000000000001) return;
                 SkySettings.Latitude = l;
                 OnPropertyChanged();
             }
@@ -979,7 +975,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-        public IList<int> LongitudeRange { get; }
         public int Long1
         {
             get
@@ -992,7 +987,7 @@ namespace GS.Server.SkyTelescope
             {
                 var l = Math.Abs(Principles.Units.Deg2Dou(value, Long2, Long3));
                 if (Long0 == "W") l = -l;
-                if (Math.Abs(l - SkySettings.Longitude) < 0.00001) return;
+                if (Math.Abs(l - SkySettings.Longitude) < 0.0000000000001) return;
                 SkySettings.Longitude = l;
                 OnPropertyChanged();
             }
@@ -1010,7 +1005,7 @@ namespace GS.Server.SkyTelescope
             {
                 var l = Principles.Units.Deg2Dou(Long1, value, Long3);
                 if (Long0 == "W") l = -l;
-                if (Math.Abs(l - SkySettings.Longitude) < 0.00001) return;
+                if (Math.Abs(l - SkySettings.Longitude) < 0.0000000000001) return;
                 SkySettings.Longitude = l;
                 OnPropertyChanged();
             }
@@ -1028,7 +1023,7 @@ namespace GS.Server.SkyTelescope
             {
                 var l = Principles.Units.Deg2Dou(Long1, Long2, value);
                 if (Long0 == "W") l = -l;
-                if (Math.Abs(l - SkySettings.Longitude) < 0.00001) return;
+                if (Math.Abs(l - SkySettings.Longitude) < 0.0000000000001) return;
                 SkySettings.Longitude = l;
                 OnPropertyChanged();
             }
@@ -2343,6 +2338,8 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
+
+        public IList<int> DecRange { get; }
 
         private double _decdegrees;
         public double DecDegrees

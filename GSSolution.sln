@@ -19,9 +19,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GS.Simulator", "GS.Simulato
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColorPicker", "ColorPicker\ColorPicker.csproj", "{6813ECB1-B6B3-49F4-9070-9E4DFEF34FAE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GS.SerialTester", "GS.SerialTester\GS.SerialTester.csproj", "{34638981-3D0B-422A-A36D-6E6A79A0BB45}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GS.ChartViewer", "GS.ChartViewer\GS.ChartViewer.csproj", "{EAF5DB3A-99A5-451C-B626-7B3BF7423F7D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GS.Utilities", "GS.Utilities\GS.Utilities.csproj", "{A0CF4007-724A-45EB-9609-C5FA97A3043E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,18 +129,6 @@ Global
 		{6813ECB1-B6B3-49F4-9070-9E4DFEF34FAE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6813ECB1-B6B3-49F4-9070-9E4DFEF34FAE}.Release|x86.ActiveCfg = Release|Any CPU
 		{6813ECB1-B6B3-49F4-9070-9E4DFEF34FAE}.Release|x86.Build.0 = Release|Any CPU
-		{34638981-3D0B-422A-A36D-6E6A79A0BB45}.AppVeyor|Any CPU.ActiveCfg = Release|Any CPU
-		{34638981-3D0B-422A-A36D-6E6A79A0BB45}.AppVeyor|Any CPU.Build.0 = Release|Any CPU
-		{34638981-3D0B-422A-A36D-6E6A79A0BB45}.AppVeyor|x86.ActiveCfg = Release|Any CPU
-		{34638981-3D0B-422A-A36D-6E6A79A0BB45}.AppVeyor|x86.Build.0 = Release|Any CPU
-		{34638981-3D0B-422A-A36D-6E6A79A0BB45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{34638981-3D0B-422A-A36D-6E6A79A0BB45}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{34638981-3D0B-422A-A36D-6E6A79A0BB45}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{34638981-3D0B-422A-A36D-6E6A79A0BB45}.Debug|x86.Build.0 = Debug|Any CPU
-		{34638981-3D0B-422A-A36D-6E6A79A0BB45}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{34638981-3D0B-422A-A36D-6E6A79A0BB45}.Release|Any CPU.Build.0 = Release|Any CPU
-		{34638981-3D0B-422A-A36D-6E6A79A0BB45}.Release|x86.ActiveCfg = Release|Any CPU
-		{34638981-3D0B-422A-A36D-6E6A79A0BB45}.Release|x86.Build.0 = Release|Any CPU
 		{EAF5DB3A-99A5-451C-B626-7B3BF7423F7D}.AppVeyor|Any CPU.ActiveCfg = Release|Any CPU
 		{EAF5DB3A-99A5-451C-B626-7B3BF7423F7D}.AppVeyor|Any CPU.Build.0 = Release|Any CPU
 		{EAF5DB3A-99A5-451C-B626-7B3BF7423F7D}.AppVeyor|x86.ActiveCfg = Release|Any CPU
@@ -153,6 +141,18 @@ Global
 		{EAF5DB3A-99A5-451C-B626-7B3BF7423F7D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EAF5DB3A-99A5-451C-B626-7B3BF7423F7D}.Release|x86.ActiveCfg = Release|Any CPU
 		{EAF5DB3A-99A5-451C-B626-7B3BF7423F7D}.Release|x86.Build.0 = Release|Any CPU
+		{A0CF4007-724A-45EB-9609-C5FA97A3043E}.AppVeyor|Any CPU.ActiveCfg = Release|Any CPU
+		{A0CF4007-724A-45EB-9609-C5FA97A3043E}.AppVeyor|Any CPU.Build.0 = Release|Any CPU
+		{A0CF4007-724A-45EB-9609-C5FA97A3043E}.AppVeyor|x86.ActiveCfg = Release|Any CPU
+		{A0CF4007-724A-45EB-9609-C5FA97A3043E}.AppVeyor|x86.Build.0 = Release|Any CPU
+		{A0CF4007-724A-45EB-9609-C5FA97A3043E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0CF4007-724A-45EB-9609-C5FA97A3043E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0CF4007-724A-45EB-9609-C5FA97A3043E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A0CF4007-724A-45EB-9609-C5FA97A3043E}.Debug|x86.Build.0 = Debug|Any CPU
+		{A0CF4007-724A-45EB-9609-C5FA97A3043E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0CF4007-724A-45EB-9609-C5FA97A3043E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0CF4007-724A-45EB-9609-C5FA97A3043E}.Release|x86.ActiveCfg = Release|Any CPU
+		{A0CF4007-724A-45EB-9609-C5FA97A3043E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

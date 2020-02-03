@@ -1885,7 +1885,7 @@ namespace ASCOM.GS.Sky.Telescope
             // tried destructor from objectbase and doesn't work
             // disposed seems to not run, not sure why
             Dispose(true);
-            GC.SuppressFinalize(this);
+            //GC.SuppressFinalize(this);
         }
 
         private void Dispose(bool disposing)

@@ -275,21 +275,39 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
-        public long[] GetAxisVersions()
+        public long GetAxisVersion(int axis)
         {
             ValidateMount();
+            var validAxis = ValidateAxis(axis);
             var command = new SkyGetAxisVersions(SkyQueue.NewId);
             var results = GetResult(command);
-            return results.Result;
+            switch (validAxis)
+            {
+                case AxisId.Axis1:
+                    return results.Result[0];
+                case AxisId.Axis2:
+                    return results.Result[1];
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         /// <inheritdoc />
-        public string[] GetAxisStringVersions()
+        public string GetAxisStringVersion(int axis)
         {
             ValidateMount();
+            var validAxis = ValidateAxis(axis);
             var command = new SkyGetAxisStringVersions(SkyQueue.NewId);
             var results = GetResult(command);
-            return results.Result;
+            switch (validAxis)
+            {
+                case AxisId.Axis1:
+                    return results.Result[0];
+                case AxisId.Axis2:
+                    return results.Result[1];
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         /// <inheritdoc />
@@ -323,21 +341,39 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
-        public double[] GetFactorRadRateToInt()
+        public double GetFactorRadRateToInt(int axis)
         {
             ValidateMount();
+            var validAxis = ValidateAxis(axis);
             var command = new SkyGetFactorRadRateToInt(SkyQueue.NewId);
             var results = GetResult(command);
-            return results.Result;
+            switch (validAxis)
+            {
+                case AxisId.Axis1:
+                    return results.Result[0];
+                case AxisId.Axis2:
+                    return results.Result[1];
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         /// <inheritdoc />
-        public long[] GetHighSpeedRatio()
+        public long GetHighSpeedRatio(int axis)
         {
             ValidateMount();
+            var validAxis = ValidateAxis(axis);
             var command = new SkyGetHighSpeedRatio(SkyQueue.NewId);
             var results = GetResult(command);
-            return results.Result;
+            switch (validAxis)
+            {
+                case AxisId.Axis1:
+                    return results.Result[0];
+                case AxisId.Axis2:
+                    return results.Result[1];
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         /// <inheritdoc />
@@ -371,12 +407,21 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
-        public long[] GetLowSpeedGotoMargin()
+        public long GetLowSpeedGotoMargin(int axis)
         {
             ValidateMount();
+            var validAxis = ValidateAxis(axis);
             var command = new SkyGetLowSpeedGotoMargin(SkyQueue.NewId);
             var results = GetResult(command);
-            return results.Result;
+            switch (validAxis)
+            {
+                case AxisId.Axis1:
+                    return results.Result[0];
+                case AxisId.Axis2:
+                    return results.Result[1];
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         /// <inheritdoc />
@@ -390,12 +435,21 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
-        public bool[] GetOneStepIndicators()
+        public bool GetOneStepIndicator(int axis)
         {
             ValidateMount();
+            var validAxis = ValidateAxis(axis);
             var command = new SkyGetOneStepIndicators(SkyQueue.NewId);
             var results = GetResult(command);
-            return results.Result;
+            switch (validAxis)
+            {
+                case AxisId.Axis1:
+                    return results.Result[0];
+                case AxisId.Axis2:
+                    return results.Result[1];
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         /// <inheritdoc />
@@ -439,21 +493,39 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
-        public long[] GetStepsPerRevolution()
+        public long GetStepsPerRevolution(int axis)
         {
             ValidateMount();
+            var validAxis = ValidateAxis(axis);
             var command = new SkyGetStepsPerRevolution(SkyQueue.NewId);
             var results = GetResult(command);
-            return results.Result;
+            switch (validAxis)
+            {
+                case AxisId.Axis1:
+                    return results.Result[0];
+                case AxisId.Axis2:
+                    return results.Result[1];
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         /// <inheritdoc />
-        public long[] GetStepTimeFreq()
+        public long GetStepTimeFreq(int axis)
         {
             ValidateMount();
+            var validAxis = ValidateAxis(axis);
             var command = new SkyGetStepTimeFreq(SkyQueue.NewId);
             var results = GetResult(command);
-            return results.Result;
+            switch (validAxis)
+            {
+                case AxisId.Axis1:
+                    return results.Result[0];
+                case AxisId.Axis2:
+                    return results.Result[1];
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         /// <inheritdoc />
@@ -847,13 +919,14 @@ namespace GS.SkyApi
         /// <summary>
         /// Tells GSS not to process any ASCOM moment commands for external programs using the ASCOM driver. 
         /// </summary>
-        /// <returns></returns>
+        /// <returns>bool</returns>
         bool AscomOn { get; set; }
         /// <summary>
         /// Move axis number of microsteps, not marked as slewing
         /// </summary>
         /// <param name="axis">>axis number 1 or 2</param>
         /// <param name="steps">number of microsteps</param>
+        /// <returns>nothing</returns>
         void AxisMoveSteps(int axis, long steps);
         /// <summary>
         /// Send a pulse command
@@ -862,12 +935,14 @@ namespace GS.SkyApi
         /// <param name="guiderate">Guiderate degrees, 15.041/3600*.5, negative value denotes direction</param>
         /// <param name="duration">length of pulse in milliseconds, aways positive numbers</param>
         /// <param name="backlashsteps">Positive microsteps added for backlash</param>
+        /// <returns>nothing</returns>
         void AxisPulse(int axis, double guiderate, int duration, int backlashsteps = 0);
         /// <summary>
         /// Goto position in degrees
         /// </summary>
         /// <param name="axis">axis number 1 or 2</param>
         /// <param name="targetPosition">position in degrees</param>
+        /// <returns>nothing</returns>
         void AxisGoToTarget(int axis, double targetPosition);
         /// <summary>
         /// Slew axis based on a rate in degrees.  Use this for small movements
@@ -875,6 +950,7 @@ namespace GS.SkyApi
         /// </summary>
         /// <param name="axis">axis number 1 or 2</param>
         /// <param name="rate">rate/sec in degrees</param>
+        /// <returns>nothing</returns>
         void AxisSlew(int axis, double rate);
         /// <summary>
         /// K Slows to a stop movement of an Axis 
@@ -885,6 +961,7 @@ namespace GS.SkyApi
         /// L Abruptly stops movement of an Axis
         /// </summary>
         /// <param name="axis">axis number 1 or 2</param>
+        /// <returns>nothing</returns>
         void AxisStopInstant(int axis);
         /// <summary>
         /// q Axes slews must start independently 
@@ -935,43 +1012,50 @@ namespace GS.SkyApi
         /// </summary>
         /// <param name="axis"></param>
         /// <param name="angleinrad"></param>
-        /// <returns></returns>
+        /// <returns>Steps in rad</returns>
         long GetAngleToStep(int axis, double angleinrad);
         /// <summary>
-        /// e Gets versions of each axis in long format
+        /// e Gets versions of axis in long format
         /// </summary>
-        long[] GetAxisVersions();
+        /// <param name="axis"></param>
+        /// <returns>long axis version</returns>
+        long GetAxisVersion(int axis);
         /// <summary>
-        /// e Gets versions of each axis in string readable format
+        /// e Gets version of axis in string readable format
         /// </summary>
-        string[] GetAxisStringVersions();
+        /// <param name="axis"></param>
+        /// <returns>string axis version as string</returns>
+        string GetAxisStringVersion(int axis);
         /// <summary>
         /// j Gets current axis position in degrees
         /// </summary>
         /// <param name="axis">axis number 1 or 2</param>
-        /// <returns>position in degrees</returns>
+        /// <returns>Get Current Axis position as double</returns>
         double GetAxisPosition(int axis);
         /// <summary>
         /// j Gets axis poistion counter
         /// </summary>
         /// <param name="axis">axis number 1 or 2</param>
-        /// <returns>Cardinal encoder count</returns>
+        /// <returns>Cardinal encoder count as long</returns>
         long GetAxisPositionCounter(int axis);
         /// <summary>
         /// d Gets Axis Current Encoder count
         /// </summary>
         /// <param name="axis">axis number 1 or 2</param>
+        /// <returns>count as double</returns>
         double GetEncoderCount(int axis);
         /// <summary>
         /// Multiply the value of radians/second by this factor to get a 32-bit integer for the set speed used by the motor board.
         /// </summary>
+        /// <param name="axis">axis number 1 or 2</param>
         /// <returns>factor used to get the speed</returns>
-        double[] GetFactorRadRateToInt();
+        double GetFactorRadRateToInt(int axis);
         /// <summary>
         /// Inquire motor high speed ratio
         /// </summary>
+        /// <param name="axis">axis number 1 or 2</param>
         /// <returns>Ratio used to determine high speed</returns>
-        long[] GetHighSpeedRatio();
+        long GetHighSpeedRatio(int axis);
         /// <summary>
         /// q Get Home position 
         /// </summary>
@@ -990,18 +1074,20 @@ namespace GS.SkyApi
         /// <summary>
         /// Margin used to move from high speed to low speed
         /// </summary>
+        /// <param name="axis">axis number 1 or 2</param>
         /// <returns></returns>
-        long[] GetLowSpeedGotoMargin();
+        long GetLowSpeedGotoMargin(int axis);
         /// <summary>
         /// e Gets the complete version string
         /// </summary>
         /// <returns></returns>
         string GetMotorCardVersion(int axis);
         /// <summary>
-        /// Runs a motor test to see of each axis can move one step in GoTo mode
+        /// Runs a motor test to see of axis can move one step in GoTo mode
         /// </summary>
-        /// <returns>Result of each axis test, 0=axis1 1=axis2</returns>
-        bool[] GetOneStepIndicators();
+        /// <param name="axis">axis number 1 or 2</param>
+        /// <returns>Result of each axis test</returns>
+        bool GetOneStepIndicator(int axis);
         /// <summary>
         /// s Inquire PEC Period ":s(*1)", where *1: '1'= CH1, '2'= CH2, '3'= Both.
         /// </summary>
@@ -1028,13 +1114,15 @@ namespace GS.SkyApi
         /// <summary>
         /// a Steps per revolution
         /// </summary>
+        /// <param name="axis">axis number 1 or 2</param>
         /// <returns>Step Count</returns>
-        long[] GetStepsPerRevolution();
+        long GetStepsPerRevolution(int axis);
         /// <summary>
         /// b Frequency of stepping timer
         /// </summary>
-        /// <returns></returns>
-        long[] GetStepTimeFreq();
+        /// <param name="axis">axis number 1 or 2</param>
+        /// <returns>Frequency of stepping timer</returns>
+        long GetStepTimeFreq(int axis);
         /// <summary>
         /// The current Declination guide rate 
         /// </summary>
@@ -1044,7 +1132,7 @@ namespace GS.SkyApi
         /// </summary>
         double GuideRateRightAscension { get; set; }
         /// <summary>
-        /// F Initial the target axis
+        /// F Initialize both Axes
         /// </summary>
         void InitializeAxes();
         /// <summary>

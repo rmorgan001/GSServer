@@ -35,9 +35,6 @@
                 <RadioButton Grid.Column="2" FontSize="16" IsChecked="{Binding FocuserVMRadioRadio}"
                              Visibility="{Binding Path=FocuserRadioVisable, Converter={StaticResource BoolToVis}}"
                              Style="{StaticResource MaterialDesignTabRadioButton}" Content="{DynamicResource rbtnFocuser}"/>
-                <RadioButton Grid.Column="3" FontSize="16" IsChecked="{Binding ChartingVMRadioRadio}"
-                             Visibility="{Binding Path=ChartingRadioVisable, Converter={StaticResource BoolToVis}}"
-                             Style="{StaticResource MaterialDesignTabRadioButton}" Content="{DynamicResource rbtnCharts}"/>
                 <RadioButton Grid.Column="4" FontSize="16" IsChecked="{Binding NotesVMRadioRadio}"
                              Visibility="{Binding Path=NotesRadioVisable, Converter={StaticResource BoolToVis}}"
                              Style="{StaticResource MaterialDesignTabRadioButton}" Content="{DynamicResource rbtnNotes}"/>

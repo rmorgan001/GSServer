@@ -1073,6 +1073,8 @@ namespace GS.SkyWatcher
                 AxisMoveSteps(AxisId.Axis2, -count2);
             }
 
+            stopwatch.Stop();
+
             monitorItem = new MonitorEntry
             { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Axis2,{count2},{CanOneStepDec}" };
             MonitorLog.LogToMonitor(monitorItem);

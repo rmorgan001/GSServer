@@ -43,7 +43,7 @@ using System.Threading.Tasks;
 
 namespace GS.Server.Pulses
 {
-    public class PulsesVM : ObservableObject, IPageVM
+    public class PulsesVM : ObservableObject, IPageVM, IDisposable
     {
         #region Fields
         public string TopName => "";
@@ -1967,6 +1967,20 @@ namespace GS.Server.Pulses
         }
 
         #endregion
+
+        public void Dispose()
+        {
+            _cts?.Dispose();
+            _phd?.Dispose();
+            _ctsPhd?.Dispose();
+            RaDur?.Dispose();
+            RaRej?.Dispose();
+            DecDur?.Dispose();
+            DecRej?.Dispose();
+            RaPhd?.Dispose();
+            DecPhd?.Dispose();
+            _xAxisTimer?.Stop();
+        }
     }
     
 

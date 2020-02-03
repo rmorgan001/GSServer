@@ -14,6 +14,7 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -26,7 +27,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -202,10 +202,12 @@
     <ProjectReference Include="..\GS.Principle\GS.Principles.csproj">
       <Project>{c2bc2641-3b32-4940-b124-61adec0dac28}</Project>
       <Name>GS.Principles</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\GS.Shared\GS.Shared.csproj">
       <Project>{63e824c8-585d-45fc-88e4-7e119f0c7773}</Project>
       <Name>GS.Shared</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

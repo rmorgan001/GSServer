@@ -199,6 +199,7 @@ namespace GS.Shared
     {
         public string TitleName { get; set; }
         public Brush Fill { get; set; }
+        public ChartValueSet ValueSet { get; set; }
     }
     public enum ChartValueSet
     {

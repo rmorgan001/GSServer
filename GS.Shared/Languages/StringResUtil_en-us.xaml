@@ -1,0 +1,73 @@
+﻿<!--/* Copyright(C) 2019  Rob Morgan (robert.morgan.e@gmail.com)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see<https://www.gnu.org/licenses/> .
+*/-->
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!--Window Title bar-->
+    <system:String x:Key="lbName">GS Server</system:String>
+    <system:String x:Key="lbApps">Connected Applications:</system:String>
+    <system:String x:Key="tbCloseApps">Application(s) still connected. Accept to close anyway?</system:String>
+    <system:String x:Key="taskbarDescription">GreenSwamp Server</system:String>
+
+    <!--Dialog -->
+    <system:String x:Key="btnAccept">Accept</system:String>
+    <system:String x:Key="btnCancel">Cancel</system:String>
+    <system:String x:Key="btnOk">Ok</system:String>
+    <system:String x:Key="btnStart">Start</system:String>
+    <system:String x:Key="btnDiaStop">Stop</system:String>
+
+    <!--Converters -->
+    <system:String x:Key="cvtInvNumber">Invalid Number</system:String>
+    <system:String x:Key="cvtColorToBrush">ColorToBurshConverter only supports converting from Color and String</system:String>
+    <system:String x:Key="cvtEnumErr1">Type must be for an Enum</system:String>
+    <system:String x:Key="cvtEnumErr2">The EnumType must be specified</system:String>
+    <system:String x:Key="cvtInvIP">Invalid IP</system:String>
+    <system:String x:Key="cvtRequired">Required</system:String>
+
+    <!--Utilities-->
+    <system:String x:Key="cbDelLogFiles">Log Files</system:String>
+    <system:String x:Key="cbDelSettings">Settings</system:String>
+    <system:String x:Key="btnDelFiles">Delete</system:String>
+    <system:String x:Key="msgDelFiles">Delete GS files and settings</system:String>
+    <system:String x:Key="btnExit">Exit</system:String>
+    <system:String x:Key="btnDelAccept">Accept</system:String>
+    <system:String x:Key="btnDelCancel">Cancel</system:String>
+    <system:String x:Key="msgDelFilesOk">Accept to delete?</system:String>
+    <system:String x:Key="msgDelLogFiles">Log files deleted</system:String>
+    <system:String x:Key="msgDelSettings">Setting files deleted</system:String>
+    <system:String x:Key="msgDelSettingsVer">Setting versions deleted</system:String>
+    <system:String x:Key="msgDelCloseApps">Close any open GS applications</system:String>
+    <system:String x:Key="msgUtilLockTitle">Running test: is GS Server running or locked</system:String>
+    <system:String x:Key="btnUtilCheck">Check</system:String>
+    <system:String x:Key="btnUtilChooser">Chooser</system:String>
+    <system:String x:Key="btnUtilChooserTitle">Connection test: to the telescope driver</system:String>
+    <system:String x:Key="btnUtilStart">Start</system:String>
+    <system:String x:Key="btnUtilStop">Stop</system:String>
+    <system:String x:Key="tbUtilSerial">Serial Test:</system:String>
+    <system:String x:Key="tbUtilComPort">ComPort</system:String>
+    <system:String x:Key="tbUtilTimeout">Timeout Occured Event #</system:String>
+    <system:String x:Key="tbUtilProcessName">Process Name:</system:String>
+    <system:String x:Key="tbUtilId">Id:</system:String>
+    <system:String x:Key="tbUtilLocks">Locks:</system:String>
+    <system:String x:Key="tbUtilCounter">Counter:</system:String>
+    <system:String x:Key="tbUtilTimer">Timer:</system:String>
+    <system:String x:Key="tbUtilNothing">Nothing found</system:String>
+    <system:String x:Key="tbUtilBaudRate">BaudRate</system:String>
+    <system:String x:Key="tbUtilInterval">Interval</system:String>
+</ResourceDictionary>
+ 

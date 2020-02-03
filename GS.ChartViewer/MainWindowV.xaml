@@ -88,7 +88,7 @@
                     <RowDefinition Height="200"/>
                     <RowDefinition Height="10"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="60"/>
                     </Grid.RowDefinitions>
                 <ToggleButton Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False" x:Name="MenuToggleButton"
                       Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}"
@@ -113,11 +113,11 @@
                                 <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="35"/>
                                 </Grid.ColumnDefinitions>
-                            <Label Grid.Row="0" Grid.Column="0">#</Label>
-                            <Label Grid.Row="0" Grid.Column="1">Start</Label>
-                            <Label Grid.Row="0" Grid.Column="2">End</Label>
-                            <Label Grid.Row="0" Grid.Column="3">Length</Label>
-                            <Label Grid.Row="0" Grid.Column="4">Type</Label>
+                                <Label Grid.Row="0" Grid.Column="0" Content="{DynamicResource lbChartNumber}"/>
+                                <Label Grid.Row="0" Grid.Column="1" Content="{DynamicResource lbChartStart}"/>
+                                <Label Grid.Row="0" Grid.Column="2" Content="{DynamicResource lbChartEnd}"/>
+                                <Label Grid.Row="0" Grid.Column="3" Content="{DynamicResource lbChartLength}"/>
+                                <Label Grid.Row="0" Grid.Column="4" Content="{DynamicResource lbChartType}"/>
                             <ListView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="6" ItemsSource="{Binding Path=IndexItems}" SelectedItem="{Binding SelectedIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                                 <ListView.ItemTemplate>
                                     <DataTemplate DataType="{x:Type local:IndexItem}">
@@ -144,10 +144,10 @@
                         </Grid>
                     </Border>
                     <StackPanel Margin="15,0,15,0" Grid.Row="0" Grid.Column="1" Orientation="Vertical">
-                        <Button Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickOpenFileCommand}">Open File</Button>
+                            <Button Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickOpenFileCommand}" Content="{DynamicResource btnChartOpen}"/>
 
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0" >
-                            <ComboBox md:HintAssist.Hint="Quality" MinWidth="10" ToolTip="Quality" Width="65"
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,0" >
+                                <ComboBox md:HintAssist.Hint="{DynamicResource cbChartQuality}" MinWidth="10" ToolTip="{DynamicResource cbChartQuality}" Width="65"
                                       ItemsSource="{Binding Source={helpers:EnumBindingSource {x:Type enums:Quality}}}"
                                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" HorizontalAlignment="Left">
                                 <ComboBox.Text>
@@ -160,8 +160,8 @@
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
                                 <StackPanel Orientation="Vertical" Margin="15,0,0,0">
-                                    <TextBlock Margin="0,0,10,10" Text="View Log"/>
-                                    <ToggleButton IsChecked="{Binding LogTextVis, Mode=TwoWay}" Style="{StaticResource MaterialDesignSwitchAccentToggleButton}" ToolTip="View Raw Log">
+                                    <TextBlock Margin="0,0,10,10" Text="{DynamicResource tbChartViewLog}"/>
+                                    <ToggleButton IsChecked="{Binding LogTextVis, Mode=TwoWay}" Style="{StaticResource MaterialDesignSwitchAccentToggleButton}" ToolTip="{DynamicResource btnChartViewLog}">
                                         <md:PackIcon Kind="Pin" RenderTransformOrigin=".5,.5">
                                             <md:PackIcon.RenderTransform>
                                                 <RotateTransform Angle="45" />
@@ -179,31 +179,31 @@
                                 <Button Margin="5,0,0,0" Height="30" ToolTip="Fit Y" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesSizeYCmd}" Content="Y"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"  Margin="0,5,0,0">
-                                <TextBlock VerticalAlignment="Center" Margin="0,0,0,0" Text="Zoom:"/>
+                                <TextBlock VerticalAlignment="Center" Margin="0,0,0,0" Text="{DynamicResource tbChartZoom}"/>
                                 <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Xy" Command="{Binding Path=ClickPulsesZoomCmd}" CommandParameter="Xy" IsChecked="True" />
                                 <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="X" Command="{Binding Path=ClickPulsesZoomCmd}" CommandParameter="X"/>
                                 <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Y" Command="{Binding Path=ClickPulsesZoomCmd}" CommandParameter="Y"/>
                            </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"  Margin="0,5,0,0">
-                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="X Shrink" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickPulsesXDownCmd}">
+                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="{DynamicResource btntipChartShrink}" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickPulsesXDownCmd}">
                                     <md:PackIcon
                                         Kind="ArrowLeft"
                                         Height="24"
                                         Width="24" />
                                 </Button>
-                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="X Expand" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickPulsesXUpCmd}">
+                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="{DynamicResource btntipChartExpand}" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickPulsesXUpCmd}">
                                     <md:PackIcon
                                         Kind="ArrowRight"
                                         Height="24"
                                         Width="24" />
                                     </Button>
-                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="Y Up" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickPulsesYUpCmd}">
+                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="{DynamicResource btntipChartUp}" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickPulsesYUpCmd}">
                                     <md:PackIcon
                                         Kind="ArrowUp"
                                         Height="24"
                                         Width="24" />
                                 </Button>
-                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="Y Down" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickPulsesYDownCmd}">
+                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="{DynamicResource btntipChartDown}" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickPulsesYDownCmd}">
                                     <md:PackIcon
                                         Kind="ArrowDown"
                                         Height="24"
@@ -258,7 +258,7 @@
                 </Grid>
                 <GridSplitter Margin="0,5,0,0" Grid.Row="2" Height="4" HorizontalAlignment="Stretch"  />
                     <lvc:CartesianChart Grid.Row="3" Margin="5,0,0,0" Foreground="DarkGray" Hoverable="True" Zoom="{Binding Zoom, Mode=TwoWay}" LegendLocation="Top"  DataTooltip="{x:Null}"
-                                    DisableAnimations="{Binding DisableAnimations, Mode=OneWay}" Series="{Binding ChartCollection, IsAsync=True}" AnimationsSpeed="{Binding AnimationsSpeed, Mode=OneWay}">
+                                    DisableAnimations="{Binding DisableAnimations, Mode=OneWay}" Series="{Binding ChartCollection}" AnimationsSpeed="{Binding AnimationsSpeed, Mode=OneWay}">
                         <lvc:CartesianChart.Resources>
                             <Style TargetType="lvc:DefaultTooltip">
                                 <Setter Property="Background" Value="{DynamicResource PrimaryHueDarkBrush}"/>
@@ -275,7 +275,7 @@
                             </Style>
                         </lvc:CartesianChart.Resources>
                         <lvc:CartesianChart.AxisX >
-                            <lvc:Axis FontSize="15" DisableAnimations="True" Foreground="DarkGray" ShowLabels="True" Title="Timeline (X)" RangeChanged="Axis_OnRangeChanged"
+                            <lvc:Axis FontSize="15" DisableAnimations="True" Foreground="DarkGray" ShowLabels="True" Title="{DynamicResource titChartTimeline}" RangeChanged="Axis_OnRangeChanged"
                                       LabelFormatter="{Binding FormatterX, Mode=TwoWay}" MaxValue="{Binding AxisXMax, Mode=TwoWay}" MinValue="{Binding AxisXMin, Mode=TwoWay}" Unit="{Binding AxisXUnit, Mode=TwoWay}"/>
                         </lvc:CartesianChart.AxisX>
                         <lvc:CartesianChart.AxisY>
@@ -315,8 +315,21 @@
                         </Style>
                     </ListView.ItemContainerStyle>
                 </ListView>
-                    <lvc:CartesianChart Margin="10,0,10,0" Grid.Row="4" DisableAnimations="True" ScrollMode="X" Hoverable="False" Background="Transparent" ScrollBarFill="#25FFFFFF" 
-                                         DataTooltip="{x:Null}" ScrollHorizontalFrom="{Binding AxisXMin, Mode=TwoWay}" ScrollHorizontalTo="{Binding AxisXMax, Mode=TwoWay}" >
+                    <lvc:CartesianChart Margin="10,0,10,0"  Grid.Row="4" DisableAnimations="True" Zoom="Y" ScrollMode="X" Hoverable="False" Background="Transparent" ScrollBarFill="#25FFFFFF" DataTooltip="{x:Null}" 
+                                        ScrollHorizontalFrom="{Binding AxisXMin, Mode=TwoWay}" ScrollHorizontalTo="{Binding AxisXMax, Mode=TwoWay}" >
+                        <lvc:CartesianChart.Resources>
+                            <Style TargetType="lvc:Separator">
+                                <Setter Property="IsEnabled" Value="False"></Setter>
+                            </Style>
+                        </lvc:CartesianChart.Resources>
+                        <lvc:CartesianChart.Series>
+                            <enums:GLineSeries Values="{Binding Chart1Values}" Visibility="{Binding Chart1Toggle, Converter={StaticResource BoolToVis}, Mode=TwoWay}" Stroke="{Binding Chart1Color, Mode=TwoWay}" StrokeThickness="1" Fill="Transparent" PointGeometry="{x:Null}" AreaLimit="0" LineSmoothness="0"/>
+                            <enums:GLineSeries Values="{Binding Chart2Values}" Visibility="{Binding Chart2Toggle, Converter={StaticResource BoolToVis}, Mode=TwoWay}" Stroke="{Binding Chart2Color, Mode=TwoWay}" StrokeThickness="1" Fill="Transparent" PointGeometry="{x:Null}" AreaLimit="0" LineSmoothness="0"/>
+                            <enums:GLineSeries Values="{Binding Chart3Values}" Visibility="{Binding Chart3Toggle, Converter={StaticResource BoolToVis}, Mode=TwoWay}" Stroke="{Binding Chart3Color, Mode=TwoWay}" StrokeThickness="1" Fill="Transparent" PointGeometry="{x:Null}" AreaLimit="0" LineSmoothness="0"/>
+                            <enums:GLineSeries Values="{Binding Chart4Values}" Visibility="{Binding Chart4Toggle, Converter={StaticResource BoolToVis}, Mode=TwoWay}" Stroke="{Binding Chart4Color, Mode=TwoWay}" StrokeThickness="1" Fill="Transparent" PointGeometry="{x:Null}" AreaLimit="0" LineSmoothness="0"/>
+                            <enums:GLineSeries Values="{Binding Chart5Values}" Visibility="{Binding Chart5Toggle, Converter={StaticResource BoolToVis}, Mode=TwoWay}" Stroke="{Binding Chart5Color, Mode=TwoWay}" StrokeThickness="1" Fill="Transparent" PointGeometry="{x:Null}" AreaLimit="0" LineSmoothness="0"/>
+                            <enums:GLineSeries Values="{Binding Chart6Values}" Visibility="{Binding Chart6Toggle, Converter={StaticResource BoolToVis}, Mode=TwoWay}" Stroke="{Binding Chart6Color, Mode=TwoWay}" StrokeThickness="1" Fill="Transparent" PointGeometry="{x:Null}" AreaLimit="0" LineSmoothness="0"/>
+                        </lvc:CartesianChart.Series>
                         <lvc:CartesianChart.AxisX >
                             <lvc:Axis ShowLabels="False" DisableAnimations="True" MaxValue="{Binding EndDateTicks, Mode=TwoWay}" MinValue="{Binding StartDateTicks, Mode=TwoWay}"/>
                         </lvc:CartesianChart.AxisX>

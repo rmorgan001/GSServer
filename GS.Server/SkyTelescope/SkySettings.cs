@@ -778,7 +778,7 @@ namespace GS.Server.SkyTelescope
             get => _guideRateOffsetX;
             set
             {
-                if (Math.Abs(_guideRateOffsetX - value) < 0.0) return;
+                if (Math.Abs(_guideRateOffsetX - value) < 0.0000000000001) return;
                 _guideRateOffsetX = value;
                 Properties.SkyTelescope.Default.GuideRateOffsetX = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
@@ -793,7 +793,7 @@ namespace GS.Server.SkyTelescope
             get => _guideRateOffsetY;
             set
             {
-                if (Math.Abs(GuideRateOffsetY - value) < 0.00001) return;
+                if (Math.Abs(GuideRateOffsetY - value) < 0.0000000000001) return;
                 _guideRateOffsetY = value;
                 Properties.SkyTelescope.Default.GuideRateOffsetY = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
@@ -808,7 +808,7 @@ namespace GS.Server.SkyTelescope
             get => _homeAxisX;
             private set
             {
-                if (Math.Abs(_homeAxisX - value) <= 0) return;
+                if (Math.Abs(_homeAxisX - value) <= 0.0000000000001) return;
                 _homeAxisX = value;
                 Properties.SkyTelescope.Default.HomeAxisX = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
@@ -822,7 +822,7 @@ namespace GS.Server.SkyTelescope
             get => _homeAxisY;
             private set
             {
-                if (Math.Abs(_homeAxisY - value) <= 0) return;
+                if (Math.Abs(_homeAxisY - value) <= 0.0000000000001) return;
                 _homeAxisY = value;
                 Properties.SkyTelescope.Default.HomeAxisY = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
@@ -836,7 +836,7 @@ namespace GS.Server.SkyTelescope
             get => _hourAngleLimit;
             set
             {
-                if (Math.Abs(HourAngleLimit - value) < 0.00001) return;
+                if (Math.Abs(HourAngleLimit - value) < 0.0000000000001) return;
                 _hourAngleLimit = value;
                 Properties.SkyTelescope.Default.HourAngleLimit = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
@@ -892,7 +892,7 @@ namespace GS.Server.SkyTelescope
             get => _kingRate;
             set
             {
-                if (Math.Abs(KingRate - value) < 0.0000000001) return;
+                if (Math.Abs(KingRate - value) < 0.0000000000001) return;
                 _kingRate = value;
                 Properties.SkyTelescope.Default.KingRate = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
@@ -906,7 +906,7 @@ namespace GS.Server.SkyTelescope
             get => _latitude;
             set
             {
-                if (Math.Abs(Latitude - value) < 0.00001) return;
+                if (Math.Abs(Latitude - value) < 0.0000000000001) return;
                 _latitude = value;
                 Properties.SkyTelescope.Default.Latitude = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
@@ -935,7 +935,7 @@ namespace GS.Server.SkyTelescope
             get => _longitude;
             set
             {
-                if (Math.Abs(Longitude - value) < 0.00001) return;
+                if (Math.Abs(Longitude - value) <  0.0000000000001) return;
                 _longitude = value;
                 Properties.SkyTelescope.Default.Longitude = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
@@ -949,7 +949,7 @@ namespace GS.Server.SkyTelescope
             get => _lunarRate;
             set
             {
-                if (Math.Abs(LunarRate - value) < 0.0000000001) return;
+                if (Math.Abs(LunarRate - value) < 0.0000000000001) return;
                 _lunarRate = value;
                 Properties.SkyTelescope.Default.LunarRate = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
@@ -963,7 +963,7 @@ namespace GS.Server.SkyTelescope
             get => _maxSlewRate;
             set
             {
-                if (Math.Abs(MaxSlewRate - value) < 0.00001) return;
+                if (Math.Abs(MaxSlewRate - value) < 0.0000000000001) return;
                 _maxSlewRate = value;
                 Properties.SkyTelescope.Default.MaximumSlewRate = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
@@ -1022,7 +1022,7 @@ namespace GS.Server.SkyTelescope
             get => _parkAxisX;
             set
             {
-                if (Math.Abs(_parkAxisX - value) <= 0) return;
+                if (Math.Abs(_parkAxisX - value) <= 0.0000000000001) return;
                 _parkAxisX = value;
                 Properties.SkyTelescope.Default.ParkAxisX = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
@@ -1036,7 +1036,7 @@ namespace GS.Server.SkyTelescope
             get => _parkAxisY;
             set
             {
-                if (Math.Abs(_parkAxisY - value) <= 0) return;
+                if (Math.Abs(_parkAxisY - value) <= 0.0000000000001) return;
                 _parkAxisY = value;
                 Properties.SkyTelescope.Default.ParkAxisY = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
@@ -1119,7 +1119,7 @@ namespace GS.Server.SkyTelescope
             get => _siderealRate;
             set
             {
-                if (Math.Abs(_siderealRate - value) < 0.0000000001) return;
+                if (Math.Abs(_siderealRate - value) < 0.0000000000001) return;
                 _siderealRate = value;
                 Properties.SkyTelescope.Default.SiderealRate = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
@@ -1162,7 +1162,7 @@ namespace GS.Server.SkyTelescope
             get => _solarRate;
             set
             {
-                if (Math.Abs(SolarRate - value) < 0.0000000001) return;
+                if (Math.Abs(SolarRate - value) < 0.0000000000001) return;
                 _solarRate = value;
                 Properties.SkyTelescope.Default.SolarRate = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");

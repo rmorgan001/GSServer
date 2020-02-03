@@ -64,8 +64,7 @@ namespace GS.Server.Main
                 using (new WaitCursor())
                 {
                     //Load language resource file
-                    var languages = new Languages();
-                    languages.SetLanguageDictionary();
+                    Languages.SetLanguageDictionary(false, LanguageApp.GSServer);
 
                     //setup property info from the GSServer
                     GSServer.StaticPropertyChanged += PropertyChangedServer;
@@ -362,7 +361,7 @@ namespace GS.Server.Main
                 {
                     if (_currentPageViewModel == value) return;
                     _currentPageViewModel = value;
-                    Memory.FlushMemory();
+                    //Memory.Collect();
                     OnPropertyChanged();
                 }
             }
@@ -654,7 +653,7 @@ namespace GS.Server.Main
             var h = Windowheight;
             var w = Windowwidth;
 
-            if (Math.Abs(h - 510) > 0 || Math.Abs(w - 850) > 0)
+            if (Math.Abs(h - 510) > 1 || Math.Abs(w - 850) > 1)
             {
                 _tempHeight = Windowheight;
                 _tempWidth = Windowwidth;
@@ -670,6 +669,7 @@ namespace GS.Server.Main
                 Windowheight = _tempHeight;
                 Windowwidth = _tempWidth;
             }
+          
         }
         #endregion
 

@@ -22,12 +22,11 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="lbName">GS Server</system:String>
     <system:String x:Key="lbApps">Connected Applications:</system:String>
     <system:String x:Key="tbCloseApps">Application(s) still connected. Accept to close anyway?</system:String>
-    <system:String x:Key="taskbarDescription">GreenSweep Server</system:String>
+    <system:String x:Key="taskbarDescription">GreenSwamp Server</system:String>
 
     <!--Tab bar-->
     <system:String x:Key="rbtnSkyWatcher">SkyWatcher</system:String>
     <system:String x:Key="rbtnFocuser">Focuser</system:String>
-    <system:String x:Key="rbtnCharts">Charts</system:String>
     <system:String x:Key="rbtnNotes">Notes</system:String> 
     <system:String x:Key="rbtnOptions">Options</system:String>
     <system:String x:Key="rbtnGamepad">Gamepad</system:String>
@@ -43,9 +42,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!--Standard button bar-->
     <system:String x:Key="btnHome">Home</system:String>
-    <system:String x:Key="btnhintHome">Home</system:String>
     <system:String x:Key="badgeHome">home</system:String>
-    <system:String x:Key="btntipHome">Slew to home position</system:String>
+    <system:String x:Key="btntipHome">Slew home position</system:String>
     <system:String x:Key="btnPark">Park</system:String>
     <system:String x:Key="btnUnPark">UnPark</system:String>
     <system:String x:Key="btnhintPark">Parked</system:String>
@@ -177,14 +175,14 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnCdcLong">Longitude:</system:String>
     <system:String x:Key="btnCdcEle">Elevation:</system:String>
     <system:String x:Key="tbCdcAccept">Accept Coordinates?</system:String>
-    <system:String x:Key="CdcOBNotFound">Observatory information not found.</system:String>
-    <system:String x:Key="CdcNotFound">Server not found.</system:String>
+    <system:String x:Key="msgOBNotFound">Observatory information not found.</system:String>
+    <system:String x:Key="msgCdcNotFound">Server not found.</system:String>
 
     <!--Edits -->
-    <system:String x:Key="hintHours">Hours</system:String>
-    <system:String x:Key="hintMinutes">Minutes</system:String>
-    <system:String x:Key="hintSeconds">Seconds</system:String>
-    <system:String x:Key="hintDegrees">Degrees</system:String>
+    <system:String x:Key="cbhintHours">Hours</system:String>
+    <system:String x:Key="cbhintMinutes">Minutes</system:String>
+    <system:String x:Key="cbhintSeconds">Seconds</system:String>
+    <system:String x:Key="cbhintDegrees">Degrees</system:String>
     
     <!--Dialog -->
     <system:String x:Key="btnAccept">Accept</system:String>
@@ -330,7 +328,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--Exceptions -->
     <system:String x:Key="exParked">Unpark first</system:String>
 
-    <!--Options Monitor -->
+    <!--Options and Monitor -->
     <system:String x:Key="lbMonitor">Monitor</system:String>
     <system:String x:Key="tbtipOClose">Close</system:String>
     <system:String x:Key="lbODevice">Device:</system:String>
@@ -391,6 +389,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="cbMonitorSettings">Monitor</system:String>
     <system:String x:Key="tbOSettings">Reset Settings</system:String>
     <system:String x:Key="btnResetSettings">Reset</system:String>
+    <system:String x:Key="cbLanguage">Languages</system:String>
 
     <!--3DModel -->
     <system:String x:Key="lb3dSettings">Settings</system:String>
@@ -404,5 +403,6 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnPulsesPause">Pause</system:String>
     <system:String x:Key="bdgPulsesPause">On</system:String>
     <system:String x:Key="bdgPhdStart">On</system:String>
+
 </ResourceDictionary>
  

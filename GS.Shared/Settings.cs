@@ -185,6 +185,20 @@ namespace GS.Shared
             }
         }
 
+        private static string _language;
+        public static string Language
+        {
+            get => _language;
+            set
+            {
+                if (_language == value) return;
+                _language = value;
+                Properties.Monitor.Default.Language = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static bool _logMonitor;
         public static bool LogMonitor
         {
@@ -266,6 +280,7 @@ namespace GS.Shared
             Mount = Properties.Monitor.Default.Mount;
             LogMonitor = Properties.Monitor.Default.LogMonitor;
             StartMonitor = Properties.Monitor.Default.StartMonitor;
+            Language = Properties.Monitor.Default.Language;
             LogCharting = Properties.Monitor.Default.LogCharting;
             LogSession = Properties.Monitor.Default.LogSession;
         }

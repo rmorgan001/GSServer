@@ -30,7 +30,7 @@ using System.Windows.Input;
 
 namespace GS.Server.Gamepad
 {
-    public class GamepadVM : ObservableObject, IPageVM
+    public class GamepadVM : ObservableObject, IPageVM, IDisposable
     {
         public string TopName => "";
         public string BottomName => "Gamepad";
@@ -1147,5 +1147,13 @@ namespace GS.Server.Gamepad
         }
 
         #endregion
+
+        public void Dispose()
+        {
+            _skyTelescopeVM?.Dispose();
+            ctsGamepad?.Dispose();
+            _settingsVM?.Dispose();
+            _gamepad?.Dispose();
+        }
     }
 }

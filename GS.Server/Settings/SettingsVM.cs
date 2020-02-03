@@ -34,7 +34,7 @@ using System.Windows.Input;
 
 namespace GS.Server.Settings
 {
-    public class SettingsVM : ObservableObject, IPageVM
+    public class SettingsVM : ObservableObject, IPageVM, IDisposable
     {
         #region fields
 
@@ -201,6 +201,18 @@ namespace GS.Server.Settings
             {
                 Settings.Gamepad = value;
                 _mainWindowVm.UpdateTabViewModel("Gamepad");
+                OnPropertyChanged();
+            }
+        }
+
+        public List<string> Langs => Languages.SupportedLanguages;
+
+        public string Lang
+        {
+            get => Languages.Language;
+            set
+            {
+                Languages.Language = value;
                 OnPropertyChanged();
             }
         }
@@ -1198,6 +1210,11 @@ namespace GS.Server.Settings
         }
 
         #endregion
+
+        public void Dispose()
+        {
+            _mainWindowVm?.Dispose();
+        }
     }
 
 }
