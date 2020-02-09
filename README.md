@@ -9,27 +9,33 @@ GS Server is SkyWatcher ASCOM telescope driver for use with astronomy software a
 
 ## Features
 
-* Gamepad support
+* Autohome process for mount with home sensors
+* New Dec guiding alternative
+* PEC support for mounts that support PPEC
 * GPS NMEA support for lat/long/elevation information
-* CdC Observatory lat/long/elevation push/pull
+* CdC push/pull for Observatory locations 
 * Local DarkSky weather conditions
-* PHD2 plotting along with mount steps or pulse information for tracking
-* Log Viewer for viewing Charting logs
-* Keep observing notes or logs
-* Session, Error, and Charting Logs
+* PHD2 plotting along with pulse information
+* ChartViewer for viewing plots after sessions
+* Take and save observing notes
+* Session, Error, and Monitor logs for troubleshooting
 * Built in simulator for testing
-* Synthesized speech commands
-* No Sleep mode to keep screensaver off
-* Monitor driver, server, and mount data live
-* Autohome process for axes with home sensors
+* Synthesized voice commands
+* No Sleep Mode to keep screensaver off
+* Monitor raw mount commands live
+* Gamepad support
+* 3d model representation of mount position
+* Multiple park positions
+* Full and half current tracking for battery power source
+* Theme support with primary and secondary colors
 
 ## Solution Projects
 
 * ASCOM.GS.Sky.Telescope - COM/.Net Class Library implementing the ASCOM device interface for V3 telescope driver.
 * ColorPicker - from another source
-* GS.LogView - Log viewer for the charting data
+* GS.ChartViewer - Viewer for the charting data
 * Principles - Class Library that contains a number of fundamental methods including Coordinates, Conversions, Hi Resoulution dates,               Julian dates, Timers, Time, and unit functions.
-* GS.SerialTester - WPF application that connects then runs in a loop getting the axes poistions.  Good for testing cables.
+* GS.Utilities - WPF application for troubleshooting GS Server.
 * GS.Server - ASCOM local server and organizes the view models 
 * GS.Shared - Common code
 * GS.Simulator - Complete simulator that mimic a synta mount
