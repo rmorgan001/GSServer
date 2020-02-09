@@ -34,7 +34,7 @@ GS Server is SkyWatcher ASCOM telescope driver for use with astronomy software a
 * GS.SkyApi - API for the server
 * GS.SkyWatcher - Synta codes and mount controls
 
-![Alt text](Docs/GSScreens.jpg?raw=true "GSScreens")
+## ScreenShots here http://www.greenswamp.org/screenshots
 
 ## Built With
 
