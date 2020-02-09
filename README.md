@@ -3,6 +3,8 @@ GS Server is SkyWatcher ASCOM telescope driver for use with astronomy software a
 
 ## http://www.greenswamp.org/
 
+![Alt text](Docs/gsserver2.jpg?raw=true "GSServer")
+
 ## Features
 
 * Gamepad support
@@ -18,8 +20,6 @@ GS Server is SkyWatcher ASCOM telescope driver for use with astronomy software a
 * No Sleep mode to keep screensaver off
 * Monitor driver, server, and mount data live
 * Autohome process for axes with home sensors
-
-![Alt text](Docs/gsserver2.jpg?raw=true "GSServer")
 
 ## Solution Projects
 
