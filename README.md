@@ -1,42 +1,46 @@
 # GSServer - ASCOM Synta/SkyWatcher Mount Driver
 GS Server is SkyWatcher ASCOM telescope driver for use with astronomy software and SkyWatcher and Orion mounts.  It is built using C#, WPF, and a variation of MVVM.
 
-You can download the installable version at [Groups.io](https://groups.io/g/GSS/files) (located in the files section) or downlaod from [Google Drive](https://drive.google.com/open?id=1_sRJypUBVD81YH4YMJzuCDS9R7_FG3Pc)
+## http://www.greenswamp.org/
 
-Join us on [Facebook](https://www.facebook.com/groups/517303835383709/)
+![Alt text](Docs/gsserver2.jpg?raw=true "GSServer")
+
+## ScreenShots here http://www.greenswamp.org/screenshots
 
 ## Features
 
-* Gamepad support
+* Autohome process for mount with home sensors
+* New Dec guiding alternative
+* PEC support for mounts that support PPEC
 * GPS NMEA support for lat/long/elevation information
-* CdC Observatory lat/long/elevation push/pull
+* CdC push/pull for Observatory locations 
 * Local DarkSky weather conditions
-* PHD2 plotting along with mount steps or pulse information for tracking
-* Log Viewer for viewing Charting logs
-* Keep observing notes or logs
-* Session, Error, and Charting Logs
+* PHD2 plotting along with pulse information
+* ChartViewer for viewing plots after sessions
+* Take and save observing notes
+* Session, Error, and Monitor logs for troubleshooting
 * Built in simulator for testing
-* Synthesized speach commands
-* No Sleep mode to keep screensaver off
-* Monitor driver, server, and mount data live
-* Autohome process for axes with home sensors
-
-![Alt text](Docs/gsserver2.jpg?raw=true "GSServer")
+* Synthesized voice commands
+* No Sleep Mode to keep screensaver off
+* Monitor raw mount commands live
+* Gamepad support
+* 3d model representation of mount position
+* Multiple park positions
+* Full and half current tracking for battery power source
+* Theme support with primary and secondary colors
 
 ## Solution Projects
 
 * ASCOM.GS.Sky.Telescope - COM/.Net Class Library implementing the ASCOM device interface for V3 telescope driver.
 * ColorPicker - from another source
-* GS.LogView - Log viewer for the charting data
+* GS.ChartViewer - Viewer for the charting data
 * Principles - Class Library that contains a number of fundamental methods including Coordinates, Conversions, Hi Resoulution dates,               Julian dates, Timers, Time, and unit functions.
-* GS.SerialTester - WPF application that connects then runs in a loop getting the axes poistions.  Good for testing cables.
+* GS.Utilities - WPF application for troubleshooting GS Server.
 * GS.Server - ASCOM local server and organizes the view models 
 * GS.Shared - Common code
 * GS.Simulator - Complete simulator that mimic a synta mount
 * GS.SkyApi - API for the server
 * GS.SkyWatcher - Synta codes and mount controls
-
-![Alt text](Docs/GSScreens.jpg?raw=true "GSScreens")
 
 ## Built With
 
@@ -101,12 +105,8 @@ Can be found at [Groups.io](https://groups.io/g/GSS)
 
 ## Release Dates
 
-* 1.0.0.8 released 12 July 2019
-* 1.0.0.10 released 28 July 2019
-* 1.0.0.11 released 23 Aug 2019
-* 1.0.0.16 released 28 Sept 2019
-* 1.0.0.17 released 9 Oct 2019
-* 1.0.0.18 released 1 Nov 2019
 * 1.0.0.21 released 28 Nov 2019
 * 1.0.0.21 released 28 Nov 2019
 * 1.0.0.22 release 2 Jan 2020
+* 1.0.0.24 release 30 Jan 2020
+
