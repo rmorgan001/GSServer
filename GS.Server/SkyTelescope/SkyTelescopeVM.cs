@@ -23,6 +23,7 @@ using GS.Server.Helpers;
 using GS.Server.Main;
 using GS.Shared;
 using HelixToolkit.Wpf;
+using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
@@ -33,6 +34,7 @@ using System.Linq;
 using System.Management;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -49,6 +51,8 @@ namespace GS.Server.SkyTelescope
         public string BottomName => "Telescope";
         public int Uid => 0;
         public static SkyTelescopeVM _skyTelescopeVM;
+        private CancellationTokenSource _ctsPark;
+        private CancellationToken _ctPark;
         private readonly string _directoryPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase);
 
         #endregion
@@ -118,6 +122,8 @@ namespace GS.Server.SkyTelescope
                     Azimuth = "00° 00m 00s";
                     Altitude = "00° 00m 00s";
                     ModelOn = SkySettings.ModelOn;
+                    SetTrackingIcon(SkySettings.TrackingRate);
+
                 }
 
                 // check to make sure window is visable then connect if requested.
@@ -209,6 +215,9 @@ namespace GS.Server.SkyTelescope
                          break;
                      case "ModelOn":
                          ModelOn = SkySettings.ModelOn;
+                         break;
+                     case "TrackingRate":
+                         TrackingRate = SkySettings.TrackingRate;
                          break;
                  }
              });
@@ -547,14 +556,6 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        /// <inheritdoc />
-        /// <summary>
-        /// CA1001: Types that own disposable fields should be disposable
-        /// </summary>
-        public void Dispose()
-        {
-            ((IDisposable)_util)?.Dispose();
-        }
 
         public IList<string> ImageFiles;
         private string _imageFile;
@@ -776,6 +777,7 @@ namespace GS.Server.SkyTelescope
             set
             {
                 SkySettings.TrackingRate = value;
+                SetTrackingIcon(value);
                 OnPropertyChanged();
             }
         }
@@ -922,7 +924,7 @@ namespace GS.Server.SkyTelescope
             {
                 var l = Math.Abs(Principles.Units.Deg2Dou(value, Lat2, Lat3));
                 if (Lat0 == "S") l = -l;
-                if (Math.Abs(l - SkySettings.Latitude) < 0.0000000000001 ) return;
+                if (Math.Abs(l - SkySettings.Latitude) < 0.0000000000001) return;
                 SkySettings.Latitude = l;
                 OnPropertyChanged();
             }
@@ -1313,7 +1315,6 @@ namespace GS.Server.SkyTelescope
             {
                 if (value == _debugVisability) return;
                 _debugVisability = value;
-                SkyServer.Debug = value;
                 OnPropertyChanged();
                 if (!value) return;
                 MountAxisX = SkyServer.MountAxisX.ToString(CultureInfo.InvariantCulture);
@@ -2299,6 +2300,299 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private string _schedulerBadgeContent;
+        public string SchedulerBadgeContent
+        {
+            get => _schedulerBadgeContent;
+            set
+            {
+                if (_schedulerBadgeContent == value) return;
+                _schedulerBadgeContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isSchedulerDialogOpen;
+        public bool IsSchedulerDialogOpen
+        {
+            get => _isSchedulerDialogOpen;
+            set
+            {
+                if (_isSchedulerDialogOpen == value) return;
+                _isSchedulerDialogOpen = value;
+                ScreenEnabled = !value;
+                OnPropertyChanged();
+            }
+        }
+
+        private object _schedulerContent;
+        public object SchedulerContent
+        {
+            get => _schedulerContent;
+            set
+            {
+                if (_schedulerContent == value) return;
+                _schedulerContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openSchedulerDialogCmd;
+        public ICommand OpenSchedulerDialogCmd
+        {
+            get
+            {
+                return _openSchedulerDialogCmd ?? (_openSchedulerDialogCmd = new RelayCommand(
+                           param => OpenSchedulerDialog()
+                       ));
+            }
+        }
+        private void OpenSchedulerDialog()
+        {
+            try
+            {
+                SchedulerContent = new SchedulerDialog();
+                IsSchedulerDialogOpen = true;
+                if (ScheduleParkOn) return;
+                FutureParkDate = DateTime.Now + TimeSpan.FromSeconds(60);
+                FutureParkTime = $"{DateTime.Now + TimeSpan.FromSeconds(60):HH:mm}";
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+
+        }
+
+        private ICommand _acceptSchedulerDialogCmd;
+        public ICommand AcceptSchedulerDialogCmd
+        {
+            get
+            {
+                return _acceptSchedulerDialogCmd ?? (_acceptSchedulerDialogCmd = new RelayCommand(
+                           param => AcceptSchedulerDialog()
+                       ));
+            }
+        }
+        private void AcceptSchedulerDialog()
+        {
+            try
+            {
+                IsSchedulerDialogOpen = false;
+
+            }
+            catch (Exception ex)
+            {
+                IsSchedulerDialogOpen = false;
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private ICommand _cancelSchedulerDialogCmd;
+        public ICommand CancelSchedulerDialogCmd
+        {
+            get
+            {
+                return _cancelSchedulerDialogCmd ?? (_cancelSchedulerDialogCmd = new RelayCommand(
+                           param => CancelSchedulerDialog()
+                       ));
+            }
+        }
+        private void CancelSchedulerDialog()
+        {
+            try
+            {
+                IsSchedulerDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private bool _scheduleparkon;
+        public bool ScheduleParkOn
+        {
+            get => _scheduleparkon;
+            set
+            {
+                if (_scheduleparkon == value) return;
+                if (value)
+                {
+                    if (!ValidParkEvent()) {return;}
+                    _ctsPark = new CancellationTokenSource();
+                    _ctPark = _ctsPark.Token;
+                    var oktime = TimeSpan.TryParse(FutureParkTime, out var ftime);
+                    var okdate = DateTime.TryParse(FutureParkDate.ToString(), out var fdate);
+                    if (okdate && oktime)
+                    {
+                        var fdatetime = fdate.Date + ftime;
+                        ScheduleAction(ClickPark, fdatetime, _ctPark);
+
+                        var monitorItem = new MonitorEntry
+                        {
+                            Datetime = HiResDateTime.UtcNow,
+                            Device = MonitorDevice.Telescope,
+                            Category = MonitorCategory.Interface,
+                            Type = MonitorType.Information,
+                            Method = MethodBase.GetCurrentMethod().Name,
+                            Thread = Thread.CurrentThread.ManagedThreadId,
+                            Message = $"Park:{fdatetime}"
+                        };
+                        MonitorLog.LogToMonitor(monitorItem);
+                    }
+                }
+                else
+                {
+                    if (_ctsPark != null)
+                    {
+                        if (!_ctsPark.IsCancellationRequested)
+                        {
+                            _ctsPark?.Cancel();
+                        }
+                        _ctsPark?.Dispose();
+                        SchedulerBadgeContent = string.Empty;
+                    }
+                }
+                _scheduleparkon = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _futureparktime;
+        public string FutureParkTime
+        {
+            get => _futureparktime;
+            set
+            {
+                if (_futureparktime == value) return;
+                ScheduleParkOn = false;
+                _futureparktime = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private DateTime? _futureParkDate;
+        public DateTime? FutureParkDate
+        {
+            get => _futureParkDate;
+            set
+            {
+                if (_futureParkDate == value) return;
+                ScheduleParkOn = false;
+                _futureParkDate = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool ValidParkEvent()
+        {
+            var oktime = TimeSpan.TryParse(FutureParkTime, out var ftime);
+            if (!oktime)
+            {
+                OpenDialog("Invalid time");
+                return false;
+            }
+            var okdate = DateTime.TryParse(FutureParkDate.ToString(), out var fdate);
+            if (!okdate)
+            {
+                OpenDialog("Invalid Date");
+                return false;
+            }
+            var fdatetime = fdate.Date + ftime;
+            if (fdatetime < DateTime.Now)
+            {
+                OpenDialog("Invalid Date and time");
+                return false;
+            }
+
+            return true;
+        }
+
+        public async void ScheduleAction(Action action, DateTime ExecutionTime, CancellationToken token )
+        {
+            try
+            {
+                SchedulerBadgeContent = "On";
+                await Task.Delay((int)ExecutionTime.Subtract(DateTime.Now).TotalMilliseconds, token);
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Information,
+                    Method = "ScheduleAction",
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{action.Method}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                if (!SkyServer.AtPark)
+                {
+                    action();
+                }
+                ScheduleParkOn = false;
+                SchedulerBadgeContent = string.Empty;
+            }
+            catch (TaskCanceledException ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Information,
+                    Method = "ScheduleAction",
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Information,
+                    Method = "ScheduleAction",
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+
+            }
+
+        }
         #endregion
 
         #region RA Coord GoTo Control
@@ -3553,16 +3847,37 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private bool _trackingon;
-        public bool TrackingOn
+        private string _trackinRateIcon;
+        public string TrackingRateIcon
         {
-            get => _trackingon;
+            get => _trackinRateIcon;
             set
             {
-                if (TrackingOn == value) return;
-                _trackingon = value;
-                SkyServer.Tracking = value;
+                if (_trackinRateIcon == value) return;
+                _trackinRateIcon = value;
                 OnPropertyChanged();
+            }
+        }
+
+        private void SetTrackingIcon(DriveRates rate)
+        {
+            switch (rate)
+            {
+                case DriveRates.driveSidereal:
+                    TrackingRateIcon = "Earth";
+                    break;
+                case DriveRates.driveLunar:
+                    TrackingRateIcon = "NightSky";
+                    break;
+                case DriveRates.driveSolar:
+                    TrackingRateIcon = "WhiteBalanceSunny";
+                    break;
+                case DriveRates.driveKing:
+                    TrackingRateIcon = "ChessKing";
+                    break;
+                default:
+                    TrackingRateIcon = "Help";
+                    break;
             }
         }
 
@@ -3638,7 +3953,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public bool MonitorState
         {
             get => Shared.Settings.StartMonitor;
@@ -3867,7 +4181,7 @@ namespace GS.Server.SkyTelescope
                 using (new WaitCursor())
                 {
                     SkyServer.IsMountRunning = !SkyServer.IsMountRunning;
-                   // ModelOn = SkySettings.ModelOn;
+                    // ModelOn = SkySettings.ModelOn;
                 }
 
                 if (SkyServer.IsMountRunning)
@@ -3936,8 +4250,8 @@ namespace GS.Server.SkyTelescope
                 msg += $"StepsDec: {SkyServer.StepsPerRevolution[1]}" + Environment.NewLine;
                 msg += $"PPEC: {canppec}" + Environment.NewLine;
                 msg += $"Home Sensor: {canhome}" + Environment.NewLine;
-                msg += $"Ra Steps/Arcsec: {Math.Round(SkyServer.StepsPerRevolution[0] / 360.0 / 3600,2)}" + Environment.NewLine;
-                msg += $"Dec Steps/Arcsec: {Math.Round(SkyServer.StepsPerRevolution[1] / 360.0 / 3600,2)}" + Environment.NewLine;
+                msg += $"Ra Steps/Arcsec: {Math.Round(SkyServer.StepsPerRevolution[0] / 360.0 / 3600, 2)}" + Environment.NewLine;
+                msg += $"Dec Steps/Arcsec: {Math.Round(SkyServer.StepsPerRevolution[1] / 360.0 / 3600, 2)}" + Environment.NewLine;
 
                 OpenDialog(msg);
             }
@@ -4733,6 +5047,51 @@ namespace GS.Server.SkyTelescope
 
         #region Viewport3D
 
+        private bool _cameraVis;
+        public bool CameraVis
+        {
+            get => _cameraVis;
+            set
+            {
+                if (_cameraVis == value) return;
+                _cameraVis = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Point3D _position;
+        public Point3D Position
+        {
+            get => _position;
+            set
+            {
+                _position = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Vector3D _lookDirection;
+        public Vector3D LookDirection
+        {
+            get => _lookDirection;
+            set
+            {
+                _lookDirection = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Vector3D _upDirection;
+        public Vector3D UpDirection
+        {
+            get => _upDirection;
+            set
+            {
+                _upDirection = value;
+                OnPropertyChanged();
+            }
+        }
+
         private System.Windows.Media.Media3D.Model3D _model;
         public System.Windows.Media.Media3D.Model3D Model
         {
@@ -4744,7 +5103,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public bool ModelOn
         {
             get => SkySettings.ModelOn;
@@ -4804,14 +5162,29 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         private void LoadGEM()
         {
             try
             {
+                CameraVis = false;
+
+                LookDirection = new Vector3D(-1.2, -140, -133);
+                UpDirection = new Vector3D(-.006, -0.6, 0.7);
+                Position = new Point3D(.7, 139.7, 184.2);
+
+                //Camera = new PerspectiveCamera
+                //{
+                //    LookDirection = new Vector3D(-1.2, -140, -133),
+                //    UpDirection = new Vector3D(-.006, -0.6, 0.7),
+                //    Position = new Point3D(.7, 139.7, 184.2),
+                //    NearPlaneDistance = 0.001,
+                //    FarPlaneDistance = double.PositiveInfinity,
+                //    FieldOfView = 60
+                //};
+
                 Xaxis = -90;
                 Yaxis = 90;
-                Zaxis = -20;
+                Zaxis = -30;
 
                 const string gpModel = @"Models/GEM1.obj";
                 var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(), gpModel);
@@ -4820,7 +5193,6 @@ namespace GS.Server.SkyTelescope
                 var color = Colors.Crimson;
                 Material material = new DiffuseMaterial(new SolidColorBrush(color));
                 import.DefaultMaterial = material;
-                //Model = import.Load(file);
 
                 //color object
                 var a = import.Load(file);
@@ -4830,16 +5202,20 @@ namespace GS.Server.SkyTelescope
                 var accentColor = Settings.Settings.AccentColor;
                 if (!string.IsNullOrEmpty(accentColor))
                 {
-                    // ReSharper disable once PossibleNullReferenceException
-                    color = (Color)ColorConverter.ConvertFromString(Settings.Settings.AccentColor);
-                    Material materialota = new DiffuseMaterial(new SolidColorBrush(color));
-                    if (a.Children[1] is GeometryModel3D ota) ota.Material = materialota;
-                }
+                    var swatches = new SwatchesProvider().Swatches;
+                    foreach (var swatch in swatches)
+                    {
+                        if (swatch.Name != Settings.Settings.AccentColor) continue;
+                        var converter = new BrushConverter();
+                        var brush = (Brush)converter.ConvertFromString(swatch.ExemplarHue.Color.ToString());
 
+                        Material materialota = new DiffuseMaterial(brush);
+                        if (a.Children[1] is GeometryModel3D ota) ota.Material = materialota;
+                    }
+                }
                 Material materialbar = new DiffuseMaterial(new SolidColorBrush(Colors.Silver));
                 if (a.Children[2] is GeometryModel3D bar) bar.Material = materialbar;
                 Model = a;
-
             }
             catch (Exception ex)
             {
@@ -4950,6 +5326,7 @@ namespace GS.Server.SkyTelescope
 
         public IList<int> DecOffsets { get; }
         private int _decoffset;
+
         public int DecOffset
         {
             get => _decoffset;
@@ -5169,6 +5546,38 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        #endregion
+
+        #region Dispose
+        public void Dispose()
+        {
+            Dispose(true);
+            _ctsPark?.Cancel();
+            _ctsPark?.Dispose();
+            // GC.SuppressFinalize(this);
+        }
+        // NOTE: Leave out the finalizer altogether if this class doesn't
+        // own unmanaged resources itself, but leave the other methods
+        // exactly as they are.
+        ~SkyTelescopeVM()
+        {
+            // Finalizer calls Dispose(false)
+            Dispose(false);
+        }
+        // The bulk of the clean-up code is implemented in Dispose(bool)
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _util?.Dispose();
+            }
+            // free native resources if there are any.
+            //if (nativeResource != IntPtr.Zero)
+            //{
+            //    Marshal.FreeHGlobal(nativeResource);
+            //    nativeResource = IntPtr.Zero;
+            //}
+        }
         #endregion
     }
 }

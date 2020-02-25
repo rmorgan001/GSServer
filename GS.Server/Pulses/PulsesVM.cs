@@ -17,7 +17,13 @@ using GS.Principles;
 using GS.Server.Domain;
 using GS.Server.Helpers;
 using GS.Server.Main;
+using GS.Server.Phd;
+using GS.Server.SkyTelescope;
 using GS.Shared;
+using LiveCharts;
+using LiveCharts.Configurations;
+using LiveCharts.Geared;
+using LiveCharts.Wpf;
 using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
@@ -26,24 +32,18 @@ using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using GS.Server.Phd;
-using GS.Server.SkyTelescope;
-using LiveCharts;
-using LiveCharts.Configurations;
-using LiveCharts.Geared;
-using LiveCharts.Wpf;
 using Brush = System.Windows.Media.Brush;
 using Color = System.Drawing.Color;
-using System.Threading.Tasks;
 
 
 namespace GS.Server.Pulses
 {
-    public class PulsesVM : ObservableObject, IPageVM, IDisposable
+    public sealed class PulsesVM : ObservableObject, IPageVM, IDisposable
     {
         #region Fields
         public string TopName => "";
@@ -69,9 +69,12 @@ namespace GS.Server.Pulses
                 {
                     var monitorItem = new MonitorEntry
                     {
-                        Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server,
-                        Category = MonitorCategory.Interface, Type = MonitorType.Information,
-                        Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId,
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Server,
+                        Category = MonitorCategory.Interface,
+                        Type = MonitorType.Information,
+                        Method = MethodBase.GetCurrentMethod().Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
                         Message = " Loading PulsesVM"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
@@ -88,7 +91,7 @@ namespace GS.Server.Pulses
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -427,7 +430,7 @@ namespace GS.Server.Pulses
                     if (IsPulsing)
                     {
                         StartPulses();
-                        if(RaPhdToggle || DecPhdToggle) ClickPhdConnectCmd.Execute(null);
+                        if (RaPhdToggle || DecPhdToggle) ClickPhdConnectCmd.Execute(null);
                         return;
                     }
                     PhdClose();
@@ -650,7 +653,7 @@ namespace GS.Server.Pulses
         {
             try
             {
-               Zoom = (string)param;
+                Zoom = (string)param;
             }
             catch (Exception ex)
             {
@@ -685,7 +688,7 @@ namespace GS.Server.Pulses
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -709,7 +712,7 @@ namespace GS.Server.Pulses
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -1113,7 +1116,7 @@ namespace GS.Server.Pulses
             AnimationTimes = new List<int>(Enumerable.Range(0, 10));
             Smoothness = new List<int>(Enumerable.Range(0, 10));
             PointSizes = new List<int>(Enumerable.Range(0, 20));
-            ScaleList = new List<ChartScale>(){ChartScale.Arcsecs, ChartScale.Milliseconds, ChartScale.Steps};
+            ScaleList = new List<ChartScale>() { ChartScale.Arcsecs, ChartScale.Milliseconds, ChartScale.Steps };
 
             AnimationTime = 0;
             AnimationsDisabled = true;
@@ -1163,7 +1166,7 @@ namespace GS.Server.Pulses
             DecPhdPtSz = 0;
             DecPhdToggle = false;
             DecPhdInvert = false;
-            DecPhdColor = "Red"; 
+            DecPhdColor = "Red";
         }
         private void StartPulses()
         {
@@ -1184,28 +1187,28 @@ namespace GS.Server.Pulses
 
                 if (RaDurToggle)
                 {
-                    var titleItem = CreateSeries(RaDurColor, RaDurTitle, RaDurSeries, RaDur, ChartValueSet.Values1, RaDurPtSz,0);
+                    var titleItem = CreateSeries(RaDurColor, RaDurTitle, RaDurSeries, RaDur, ChartValueSet.Values1, RaDurPtSz, 0);
                     if (titleItem != null) TitleItems.Add(titleItem);
                 }
                 if (RaRejToggle)
                 {
-                    var titleItem = CreateSeries(RaRejColor, RaRejTitle, RaRejSeries, RaRej, ChartValueSet.Values3, RaRejPtSz,0);
+                    var titleItem = CreateSeries(RaRejColor, RaRejTitle, RaRejSeries, RaRej, ChartValueSet.Values3, RaRejPtSz, 0);
                     if (titleItem != null) TitleItems.Add(titleItem);
                 }
                 if (RaPhdToggle)
                 {
                     RaPhd = new GearedValues<PointModel>();
-                    var titleItem = CreateSeries(RaPhdColor, RaPhdTitle, RaPhdSeries, RaPhd, ChartValueSet.Values5, RaPhdPtSz,0);
+                    var titleItem = CreateSeries(RaPhdColor, RaPhdTitle, RaPhdSeries, RaPhd, ChartValueSet.Values5, RaPhdPtSz, 0);
                     if (titleItem != null) TitleItems.Add(titleItem);
                 }
                 if (DecDurToggle)
                 {
-                    var titleItem = CreateSeries(DecDurColor, DecDurTitle, DecDurSeries, DecDur, ChartValueSet.Values2, DecDurPtSz,0);
+                    var titleItem = CreateSeries(DecDurColor, DecDurTitle, DecDurSeries, DecDur, ChartValueSet.Values2, DecDurPtSz, 0);
                     if (titleItem != null) TitleItems.Add(titleItem);
                 }
                 if (DecRejToggle)
                 {
-                    var titleItem = CreateSeries(DecRejColor, DecRejTitle, DecRejSeries, DecRej, ChartValueSet.Values4, DecRejPtSz,0);
+                    var titleItem = CreateSeries(DecRejColor, DecRejTitle, DecRejSeries, DecRej, ChartValueSet.Values4, DecRejPtSz, 0);
                     if (titleItem != null) TitleItems.Add(titleItem);
                 }
                 if (DecPhdToggle)
@@ -1397,7 +1400,7 @@ namespace GS.Server.Pulses
             LogGScatterSeries(series, set);
             return series;
         }
-        private static GStepLineSeries NewGStepLineSeries(string title, IChartValues values, ChartValueSet set, int pointsize, Brush color,int scaleat)
+        private static GStepLineSeries NewGStepLineSeries(string title, IChartValues values, ChartValueSet set, int pointsize, Brush color, int scaleat)
         {
             var series = new GStepLineSeries()
             {
@@ -1412,7 +1415,7 @@ namespace GS.Server.Pulses
                 Title = title,
                 Values = values
             };
-            
+
             LogGStepLineSeries(series, set);
             return series;
         }
@@ -1429,15 +1432,15 @@ namespace GS.Server.Pulses
                 case ChartSeriesType.GColumnSeries:
                     var cSeries = NewGColumnSeries(title, values, seriesSet, pointsize, brush, scaleat);
                     PulsesCollection.Add(cSeries);
-                    return titleItem; 
+                    return titleItem;
                 case ChartSeriesType.GStepLineSeries:
                     var sSeries = NewGStepLineSeries(title, values, seriesSet, pointsize, brush, scaleat);
                     PulsesCollection.Add(sSeries);
-                    return titleItem; 
+                    return titleItem;
                 case ChartSeriesType.GScatterSeries:
                     var scSeries = NewGScatterSeries(title, values, seriesSet, pointsize, brush, scaleat);
                     PulsesCollection.Add(scSeries);
-                    return titleItem; 
+                    return titleItem;
             }
 
             return null;
@@ -1788,7 +1791,7 @@ namespace GS.Server.Pulses
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -1803,11 +1806,11 @@ namespace GS.Server.Pulses
         private void LogStart()
         {
             PulsesLogging.LogStart(ChartType.Pulses);
-            PulsesLogging.LogData("GSVersion",$"{Assembly.GetExecutingAssembly().GetName().Version}");
-            PulsesLogging.LogData("MountName",$"{SkyServer.MountName}");
-            PulsesLogging.LogData("MountVersion",$"{SkyServer.MountVersion}");
-            PulsesLogging.LogData("RaStepsPerSecond",$"{RaStepsPerSecond}");
-            PulsesLogging.LogData("DecStepsPerSecond",$"{DecStepsPerSecond}");
+            PulsesLogging.LogData("GSVersion", $"{Assembly.GetExecutingAssembly().GetName().Version}");
+            PulsesLogging.LogData("MountName", $"{SkyServer.MountName}");
+            PulsesLogging.LogData("MountVersion", $"{SkyServer.MountVersion}");
+            PulsesLogging.LogData("RaStepsPerSecond", $"{RaStepsPerSecond}");
+            PulsesLogging.LogData("DecStepsPerSecond", $"{DecStepsPerSecond}");
             PulsesLogging.LogData("AnimationTime", $"{AnimationTime}");
             PulsesLogging.LogData("LineSmoothness", $"{LineSmoothness}");
             PulsesLogging.LogData("Scale", $"{Scale}");
@@ -1818,14 +1821,14 @@ namespace GS.Server.Pulses
         private static void LogGColumnSeries(GColumnSeries series, ChartValueSet set)
         {
             if (series == null) return;
-            var str =$"{set},{series.Title},{series.Stroke},{series.StrokeThickness},{series.Fill},{series.MinWidth},{series.ScalesYAt},{series.MaxColumnWidth},";
-            if (!string.IsNullOrEmpty(str)) PulsesLogging.LogSeries("GColumnSeries",str);
+            var str = $"{set},{series.Title},{series.Stroke},{series.StrokeThickness},{series.Fill},{series.MinWidth},{series.ScalesYAt},{series.MaxColumnWidth},";
+            if (!string.IsNullOrEmpty(str)) PulsesLogging.LogSeries("GColumnSeries", str);
         }
         private static void LogGLineSeries(LineSeries series, ChartValueSet set)
         {
             if (series == null) return;
             var str = $"{set},{series.Title},{series.Stroke},{series.StrokeThickness},{series.Fill},{series.MinWidth},{series.ScalesYAt},{series.PointGeometrySize},{series.LineSmoothness}";
-            if (!string.IsNullOrEmpty(str)) PulsesLogging.LogSeries("GLineSeries",str);
+            if (!string.IsNullOrEmpty(str)) PulsesLogging.LogSeries("GLineSeries", str);
         }
         private static void LogGStepLineSeries(GStepLineSeries series, ChartValueSet set)
         {
@@ -1968,21 +1971,43 @@ namespace GS.Server.Pulses
 
         #endregion
 
+        #region Dispose
         public void Dispose()
         {
-            _cts?.Dispose();
-            _phd?.Dispose();
-            _ctsPhd?.Dispose();
-            RaDur?.Dispose();
-            RaRej?.Dispose();
-            DecDur?.Dispose();
-            DecRej?.Dispose();
-            RaPhd?.Dispose();
-            DecPhd?.Dispose();
-            _xAxisTimer?.Stop();
+            Dispose(true);
+            // GC.SuppressFinalize(this);
         }
+        // NOTE: Leave out the finalizer altogether if this class doesn't
+        // own unmanaged resources itself, but leave the other methods
+        // exactly as they are.
+        ~PulsesVM()
+        {
+            // Finalizer calls Dispose(false)
+            Dispose(false);
+        }
+        // The bulk of the clean-up code is implemented in Dispose(bool)
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _cts?.Dispose();
+                _phd?.Dispose();
+                _ctsPhd?.Dispose();
+                RaDur?.Dispose();
+                RaRej?.Dispose();
+                DecDur?.Dispose();
+                DecRej?.Dispose();
+                RaPhd?.Dispose();
+                DecPhd?.Dispose();
+                _xAxisTimer?.Stop();
+            }
+            // free native resources if there are any.
+            //if (nativeResource != IntPtr.Zero)
+            //{
+            //    Marshal.FreeHGlobal(nativeResource);
+            //    nativeResource = IntPtr.Zero;
+            //}
+        }
+        #endregion
     }
-    
-
-
 }

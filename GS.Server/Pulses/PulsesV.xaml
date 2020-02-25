@@ -9,7 +9,6 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:shared="clr-namespace:GS.Shared;assembly=GS.Shared"
              xmlns:enums="clr-namespace:LiveCharts.Geared;assembly=LiveCharts.Geared"
-             TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d">
     <UserControl.Resources>
         <domain:ColorToBrushConverter x:Key="ColorToBrush"/>
@@ -18,9 +17,9 @@
     <Grid>
         <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Center"  CloseOnClickAway="True" 
                        IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
-        <md:DrawerHost BorderThickness="0" IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" BorderBrush="{DynamicResource MaterialDesignDivider}" >
+        <md:DrawerHost BorderThickness="0" IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" BorderBrush="{StaticResource MaterialDesignDivider}" >
         <md:DrawerHost.LeftDrawerContent>
-            <Grid Width="750">
+            <Grid Width="650">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40" />
                     <RowDefinition Height="Auto"/>
@@ -34,7 +33,7 @@
                         CommandParameter="{x:Static Dock.Left}"
                         IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"/>
                 </Grid>
-                    <Grid Grid.Row="1" Background="{DynamicResource MaterialDesignPaper}" Margin="10,0,0,0" IsEnabled="{Binding Path=IsPulsing, Converter={StaticResource InvBol}}">
+                    <Grid Grid.Row="1" Background="{StaticResource MaterialDesignPaper}" Margin="10,0,0,0" IsEnabled="{Binding Path=IsPulsing, Converter={StaticResource InvBol}}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30"/>
                             <RowDefinition Height="30"/>
@@ -393,7 +392,7 @@
                         </ComboBox>
                         <CheckBox Grid.Row="8" Grid.Column="5" Margin="10,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Style="{StaticResource MaterialDesignCheckBox}" IsChecked="{Binding DecPhdInvert}" />
                     </Grid>
-                    <Grid Grid.Row="2" Background="{DynamicResource MaterialDesignPaper}" Margin="10,20,0,0" IsEnabled="{Binding Path=IsPulsing, Converter={StaticResource InvBol}}">
+                    <Grid Grid.Row="2" Background="{StaticResource MaterialDesignPaper}" Margin="10,20,0,0" IsEnabled="{Binding Path=IsPulsing, Converter={StaticResource InvBol}}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="40"/>
                             <RowDefinition Height="10"/>
@@ -513,21 +512,21 @@
                 <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <ToggleButton Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False" x:Name="MenuToggleButton"
-                Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" ToolTip="{DynamicResource tbtntipCOpen}"
+                Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" ToolTip="{StaticResource tbtntipOpen}"
                 Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
                 <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Center" >
                     <md:Badged Badge="{Binding StartBadgeContent}" VerticalAlignment="Center">
-                        <Button Margin="10,0,0,0" Height="30" Width="80" ToolTip="{DynamicResource btnPulsesStart}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesStartCmd}"
-                                Content="{DynamicResource btnPulsesStart}"/>
+                        <Button Margin="10,0,0,0" Height="30" Width="80" ToolTip="{StaticResource btnPulsesStart}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesStartCmd}"
+                                Content="{StaticResource btnPulsesStart}"/>
                     </md:Badged>
-                    <Button Margin="15,0,0,0" Height="30" Width="80" ToolTip="{DynamicResource btnPulsesClear}"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesClearCmd}"
-                            Content="{DynamicResource btnPulsesClear}"/>
+                    <Button Margin="15,0,0,0" Height="30" Width="80" ToolTip="{StaticResource btnPulsesClear}"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesClearCmd}"
+                            Content="{StaticResource btnPulsesClear}"/>
                     <md:Badged Badge="{Binding PauseBadgeContent}" VerticalAlignment="Center">
                         <Button Margin="10,0,0,0" Height="30" Width="80" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesPauseCmd}"
-                                Content="{DynamicResource btnPulsesPause}"/>
+                                Content="{StaticResource btnPulsesPause}"/>
                     </md:Badged>
                     <Button Margin="10,0,0,0" Height="30" Width="80" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesSizeCmd}"
-                            Content="{DynamicResource btnPulsesSize}"/>
+                            Content="{StaticResource btnPulsesSize}"/>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock VerticalAlignment="Center" Margin="10,0,0,0" Text="Zoom:"/>
                         <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="X" Command="{Binding Path=ClickPulsesZoomCmd}" CommandParameter="X"/>

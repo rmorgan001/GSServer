@@ -4,9 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-             TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d">
-    <StackPanel Orientation="Horizontal"  VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding PecEnabled}">
+    <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  HorizontalAlignment="Center" IsEnabled="{Binding PecEnabled}">
         <StackPanel.Style>
             <Style TargetType="StackPanel">
                 <Style.Triggers>
@@ -19,29 +18,29 @@
                 </Style.Triggers>
             </Style>
         </StackPanel.Style>
-        <ToggleButton Width="20" Height="20" ToolTip="{DynamicResource tbOnOff}" Style="{StaticResource MaterialDesignActionLightToggleButton}"
+        <ToggleButton Width="20" Height="20" ToolTip="{StaticResource tbOnOff}" Style="{StaticResource MaterialDesignActionLightToggleButton}"
                           IsChecked="{Binding PpecOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            <Label Content="{DynamicResource lbPpec}"/>
-            <md:DialogHost Margin="5,0,0,0" CloseOnClickAway="True" IsOpen="{Binding IsPpecDialogOpen}" DialogContent="{Binding PpecContent}">
-                <ToggleButton  HorizontalAlignment="Center" Width="20" Height="20" ToolTip="{DynamicResource tbStartTrainingMode}"
-                              IsChecked="{Binding PecTrainOn}" Style="{StaticResource MaterialDesignActionLightToggleButton}"
-                              Command="{Binding OpenPpecDialogCommand}"/>
-            </md:DialogHost>
-            <Label Content="{DynamicResource lbPpecTraining}"/>
-        <md:PackIcon Margin="5,0,0,0" Kind="Timer" Width="25" Height="25" ToolTip="{DynamicResource ictipPpecTimer}">
-                <md:PackIcon.Style>
-                    <Style TargetType="md:PackIcon">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding PecTrainInProgress}" Value="True">
-                                <Setter Property="Foreground" Value="LimeGreen"></Setter>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding PecTrainInProgress}" Value="False">
-                                <Setter Property="Foreground" Value="{DynamicResource PrimaryHueDarkBrush}" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </md:PackIcon.Style>
-            </md:PackIcon>
-            <Label Content="{DynamicResource lbInTraining}"/>
+        <Label Content="{StaticResource lbPpec}"/>
+        <md:DialogHost Margin="5,0,0,0" CloseOnClickAway="True" IsOpen="{Binding IsPpecDialogOpen}" DialogContent="{Binding PpecContent}">
+            <ToggleButton  HorizontalAlignment="Center" Width="20" Height="20" ToolTip="{StaticResource tbStartTrainingMode}"
+                          IsChecked="{Binding PecTrainOn}" Style="{StaticResource MaterialDesignActionLightToggleButton}"
+                          Command="{Binding OpenPpecDialogCommand}"/>
+        </md:DialogHost>
+        <Label Content="{StaticResource lbPpecTraining}"/>
+        <md:PackIcon Margin="5,0,0,0" Kind="Timer" Width="25" Height="25" ToolTip="{StaticResource ictipPpecTimer}">
+            <md:PackIcon.Style>
+                <Style TargetType="md:PackIcon">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding PecTrainInProgress}" Value="True">
+                            <Setter Property="Foreground" Value="LimeGreen"></Setter>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding PecTrainInProgress}" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </md:PackIcon.Style>
+        </md:PackIcon>
+        <Label Content="{StaticResource lbInTraining}"/>
     </StackPanel>
 </UserControl>

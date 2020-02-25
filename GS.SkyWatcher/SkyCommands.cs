@@ -1931,7 +1931,7 @@ namespace GS.SkyWatcher
             try
             {
                 if (_axis == AxisId.Axis1)
-                {skyWatcher.MinPulseDurationRa = _duration;}
+                { skyWatcher.MinPulseDurationRa = _duration; }
                 else
                 { skyWatcher.MinPulseDurationDec = _duration; }
                 Successful = true;

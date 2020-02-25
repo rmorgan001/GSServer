@@ -42,7 +42,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!--Standard button bar-->
     <system:String x:Key="btnHome">Home</system:String>
-    <system:String x:Key="badgeHome">home</system:String>
+    <system:String x:Key="badgeHome">Home</system:String>
     <system:String x:Key="btntipHome">Slew home position</system:String>
     <system:String x:Key="btnPark">Park</system:String>
     <system:String x:Key="btnUnPark">UnPark</system:String>
@@ -68,6 +68,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="cbhintAutoHomeLimit">Degrees</system:String>
     <system:String x:Key="msgDecOffset">Side Saddle Offset:</system:String>
     <system:String x:Key="cbhintDecOffset">Degrees</system:String>
+    <system:String x:Key="btntipScheduler">Scheduler</system:String>
+    <system:String x:Key="btnScheduler">Scheduler</system:String>
 
     <!--Bottom Status bar-->
     <system:String x:Key="tbHome">Home</system:String>
@@ -79,9 +81,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="tbTracking">Tracking</system:String>
     <system:String x:Key="tbtipTracking">Tracking</system:String>
     <system:String x:Key="tbtipSOP">Side of Pier</system:String>
-    <system:String x:Key="btntipAxisLimit">Axis limit</system:String>
-    <system:String x:Key="btntipWarnings">Click to reset</system:String>
-    <system:String x:Key="btntipErrors">Click to reset</system:String>
+    <system:String x:Key="btntipAxisLimit">Axis limit, click for options</system:String>
+    <system:String x:Key="btntipWarnings">Warnings, click to reset</system:String>
+    <system:String x:Key="btntipErrors">Errors, click to reset</system:String>
     <system:String x:Key="ictipVoice">Voice</system:String>
     <system:String x:Key="ictipMonitor">Monitor</system:String>
     <system:String x:Key="btntipConnected">Click for mount information</system:String>
@@ -153,6 +155,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="tbhintGPSlewLeft">Slew Left</system:String>
     <system:String x:Key="tbhintGPSlewRight">Slew Right</system:String>
     <system:String x:Key="tbhintGPSave">Save</system:String>
+    <system:String x:Key="tbhintGPSidereal">Rate Sidereal</system:String>
+    <system:String x:Key="tbhintGPLunar">Rate Lunar</system:String>
+    <system:String x:Key="tbhintGPSolar">Rate Solar</system:String>
+    <system:String x:Key="tbhintGPKing">Rate King</system:String>
 
     <!--GPS -->
     <system:String x:Key="cbhintGPSCom">Com Port</system:String>
@@ -163,7 +169,6 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnGPSEle">Elevation:</system:String>
     <system:String x:Key="tbGPSAccept">Accept Coordinates?</system:String>
     <system:String x:Key="msgGPSNoDataFound">No data found on COM port </system:String>
-
 
     <!--CdC -->
     <system:String x:Key="tbhintCdcIP">IP Address</system:String>
@@ -215,6 +220,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="vceSlewComplete">Slewing Complete</system:String>
     <system:String x:Key="vceHome">Home</system:String>
     <system:String x:Key="vceHomeSet">Home Set</system:String>
+    <system:String x:Key="vceSidereal">Sidereal</system:String>
+    <system:String x:Key="vceSolar">Solar</system:String>
+    <system:String x:Key="vceLunar">Lunar</system:String>
+    <system:String x:Key="vceKing">King</system:String>
 
     <!--Converters -->
     <system:String x:Key="cvtInvNumber">Invalid Number</system:String>
@@ -324,6 +333,12 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="cbhintLong0">E/W</system:String>
     <system:String x:Key="cbhintMinPulseDec">Minimum Dec Pulse</system:String>
     <system:String x:Key="cbhintMinPulseRa">Minimum Ra Pulse</system:String>
+    <system:String x:Key="linkWebsiteCheck">Check website for updates</system:String>
+    <system:String x:Key="msgSchTitle">Scheduled Events</system:String>
+    <system:String x:Key="msgSchCol1">On/Off</system:String>
+    <system:String x:Key="msgSchCol2">Action</system:String>
+    <system:String x:Key="msgSchCol3">Date</system:String>
+    <system:String x:Key="msgSchCol4">Time</system:String>
 
     <!--Exceptions -->
     <system:String x:Key="exParked">Unpark first</system:String>
@@ -390,9 +405,18 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="tbOSettings">Reset Settings</system:String>
     <system:String x:Key="btnResetSettings">Reset</system:String>
     <system:String x:Key="cbLanguage">Languages</system:String>
+    <system:String x:Key="cbHardware">Acceleration Off</system:String>
+    <system:String x:Key="tbRender">Render Capability</system:String>
 
     <!--3DModel -->
     <system:String x:Key="lb3dSettings">Settings</system:String>
+    <system:String x:Key="tb3DHud">Coordinates</system:String>
+    <system:String x:Key="btn3DEdit">Edit</system:String>
+    <system:String x:Key="cb3DCamera">Camera Info</system:String>
+    <system:String x:Key="cb3DRaAxis">RA Axis</system:String>
+    <system:String x:Key="cb3DDecAxis">Dec Axis</system:String>
+    <system:String x:Key="cb3DTopBar">Top coords bar</system:String>
+
 
     <!--Pulses -->
     <system:String x:Key="tbOPulses">Pulses</system:String>
@@ -403,6 +427,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnPulsesPause">Pause</system:String>
     <system:String x:Key="bdgPulsesPause">On</system:String>
     <system:String x:Key="bdgPhdStart">On</system:String>
+    <system:String x:Key="tbtntipOpen">Open</system:String>
+
 
 </ResourceDictionary>
  

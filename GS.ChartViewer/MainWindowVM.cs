@@ -13,6 +13,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using GS.ChartViewer.Helpers;
+using GS.Principles;
+using GS.Shared;
+using LiveCharts;
+using LiveCharts.Configurations;
+using LiveCharts.Geared;
+using LiveCharts.Wpf;
+using MaterialDesignThemes.Wpf;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,15 +33,6 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using GS.ChartViewer.Helpers;
-using GS.Principles;
-using GS.Shared;
-using LiveCharts;
-using LiveCharts.Configurations;
-using LiveCharts.Geared;
-using LiveCharts.Wpf;
-using MaterialDesignThemes.Wpf;
-using Microsoft.Win32;
 using Brush = System.Windows.Media.Brush;
 using Color = System.Drawing.Color;
 
@@ -142,7 +142,7 @@ namespace GS.ChartViewer
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -403,71 +403,73 @@ namespace GS.ChartViewer
             var loadedLogs = new List<List<string>>();
             using (var fileStream = File.OpenRead(filename))
 
-            using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, BufferSize))
             {
-                string readline;
-                List<string> chartlog = null;
-                while ((readline = streamReader.ReadLine()) != null)
+                using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, BufferSize))
                 {
-                    var recBad = true;
-                    try
+                    string readline;
+                    List<string> chartlog = null;
+                    while ((readline = streamReader.ReadLine()) != null)
                     {
-                        if (readline.Length <= 0) continue;
-
-                        var line = readline.Split(',');
-                        if (line.Length < 2) continue;
-
-                        var result = Enum.TryParse(line[0].Trim(), out ChartLogCode code);
-                        if (result)
+                        var recBad = true;
+                        try
                         {
-                            switch (code)
-                            {
-                                case ChartLogCode.Start:
-                                    if (chartlog == null)
-                                    {
-                                        chartlog = new List<string> {readline};
-                                    }
-                                    else
-                                    {
-                                        if(chartlog.Count > 1) loadedLogs.Add(chartlog);
-                                        chartlog = new List<string> { readline };
-                                    }
-                                    break;
-                                case ChartLogCode.Info:
-                                    chartlog?.Add(readline);
-                                    break;
-                                case ChartLogCode.Data:
-                                    chartlog?.Add(readline);
-                                    break;
-                                case ChartLogCode.Point:
-                                    chartlog?.Add(readline);
-                                    break;
-                                case ChartLogCode.Series:
-                                    chartlog?.Add(readline);
-                                    break;
-                                default:
-                                    BadLineCount++;
-                                    continue;
-                            }
-                            recBad = false;
-                            LineCount++;
-                        }
-                    }
-                    catch (IndexOutOfRangeException)
-                    {
-                        BadLineCount++;
-                        continue;
-                    }
-                    catch (Exception ex)
-                    {
-                        OpenDialog(ex.Message);
-                        return false;
-                    }
+                            if (readline.Length <= 0) continue;
 
-                    if (recBad) BadLineCount++;
+                            var line = readline.Split(',');
+                            if (line.Length < 2) continue;
+
+                            var result = Enum.TryParse(line[0].Trim(), out ChartLogCode code);
+                            if (result)
+                            {
+                                switch (code)
+                                {
+                                    case ChartLogCode.Start:
+                                        if (chartlog == null)
+                                        {
+                                            chartlog = new List<string> { readline };
+                                        }
+                                        else
+                                        {
+                                            if (chartlog.Count > 1) loadedLogs.Add(chartlog);
+                                            chartlog = new List<string> { readline };
+                                        }
+                                        break;
+                                    case ChartLogCode.Info:
+                                        chartlog?.Add(readline);
+                                        break;
+                                    case ChartLogCode.Data:
+                                        chartlog?.Add(readline);
+                                        break;
+                                    case ChartLogCode.Point:
+                                        chartlog?.Add(readline);
+                                        break;
+                                    case ChartLogCode.Series:
+                                        chartlog?.Add(readline);
+                                        break;
+                                    default:
+                                        BadLineCount++;
+                                        continue;
+                                }
+                                recBad = false;
+                                LineCount++;
+                            }
+                        }
+                        catch (IndexOutOfRangeException)
+                        {
+                            BadLineCount++;
+                            continue;
+                        }
+                        catch (Exception ex)
+                        {
+                            OpenDialog(ex.Message);
+                            return false;
+                        }
+
+                        if (recBad) BadLineCount++;
+                    }
+                    // check for log with no stop or end of file
+                    if (chartlog?.Count > 0) loadedLogs.Add(chartlog);
                 }
-                // check for log with no stop or end of file
-                if (chartlog?.Count > 0) loadedLogs.Add(chartlog);
             }
 
             if (LineCount <= 0)
@@ -499,14 +501,18 @@ namespace GS.ChartViewer
                     var lastline = list.Last().Split(',');
                     if (firstline.Length < 1) continue;
                     var pass = DateTime.TryParseExact(firstline[1].Trim(), "yyyy-MM-dd HH:mm:ss.fff", null, System.Globalization.DateTimeStyles.None, out var startTime);
-                    if(!pass) continue;
+                    if (!pass) continue;
                     pass = DateTime.TryParseExact(lastline[1].Trim(), "yyyy-MM-dd HH:mm:ss.fff", null, System.Globalization.DateTimeStyles.None, out var endTime);
                     if (!pass) continue;
 
                     recno++;
                     var indexItem = new IndexItem
                     {
-                       RecNo = recno, StartTime = startTime, EndTime = endTime, TimeLength = endTime - startTime, Type = type
+                        RecNo = recno,
+                        StartTime = startTime,
+                        EndTime = endTime,
+                        TimeLength = endTime - startTime,
+                        Type = type
                     };
                     index.Add(indexItem);
                 }
@@ -576,13 +582,13 @@ namespace GS.ChartViewer
 
                 ClearChart();
                 ChartsQuality(ChartQuality);
-                
+
                 foreach (var linearray in log.Select(line => line.Split(',')))
                 {
                     var result = Enum.TryParse<ChartLogCode>(linearray[0], true, out var code);
                     if (!result) continue;
                     LoadLogLine(code, linearray);
-                    LogText.Add(string.Join(",",linearray));
+                    LogText.Add(string.Join(",", linearray));
                 }
 
                 StartDateTicks = indexitem.StartTime.Ticks;
@@ -738,26 +744,26 @@ namespace GS.ChartViewer
         }
         private void ClearChart()
         {
-           ChartCollection?.Clear();
-           TitleItems?.Clear();
-           DataKeys.Clear();
-           LogText?.Clear();
-           SelectedLog?.Clear();
-           Chart1Values?.Clear();
-           Chart2Values?.Clear();
-           Chart3Values?.Clear();
-           Chart4Values?.Clear();
-           Chart5Values?.Clear();
-           Chart6Values?.Clear();
-           _maxPoint = 0;
-           _minPoint = 0;
+            ChartCollection?.Clear();
+            TitleItems?.Clear();
+            DataKeys.Clear();
+            LogText?.Clear();
+            SelectedLog?.Clear();
+            Chart1Values?.Clear();
+            Chart2Values?.Clear();
+            Chart3Values?.Clear();
+            Chart4Values?.Clear();
+            Chart5Values?.Clear();
+            Chart6Values?.Clear();
+            _maxPoint = 0;
+            _minPoint = 0;
 
-           Chart1Toggle = false;
-           Chart2Toggle = false;
-           Chart3Toggle = false;
-           Chart4Toggle = false;
-           Chart5Toggle = false;
-           Chart6Toggle = false;
+            Chart1Toggle = false;
+            Chart2Toggle = false;
+            Chart3Toggle = false;
+            Chart4Toggle = false;
+            Chart5Toggle = false;
+            Chart6Toggle = false;
         }
 
         private void ChartColor(ChartValueSet valueset, Brush col)
@@ -922,9 +928,9 @@ namespace GS.ChartViewer
             get => _selectedIndex;
             set
             {
-                    _selectedIndex = value;
-                    LoadLogByIndex(value);
-                    OnPropertyChanged();
+                _selectedIndex = value;
+                LoadLogByIndex(value);
+                OnPropertyChanged();
             }
         }
 
@@ -989,7 +995,7 @@ namespace GS.ChartViewer
                 OnPropertyChanged();
             }
         }
-        
+
         private int _animationsSpeed;
         public int AnimationsSpeed
         {

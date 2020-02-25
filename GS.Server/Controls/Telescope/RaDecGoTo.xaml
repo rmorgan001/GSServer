@@ -5,24 +5,22 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:GS.Server.Domain"
-             xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
-             TextOptions.TextFormattingMode="Display"
-             mc:Ignorable="d"  d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+             mc:Ignorable="d" >
     <Border Margin="0,0,10,0" BorderBrush="DimGray"  BorderThickness="3" CornerRadius="5">
-    <Grid Background="{DynamicResource MaterialDesignToolBarBackground}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="45"/>
-            <RowDefinition Height="45"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="80"/>
-            <ColumnDefinition Width="40"/>
-            <ColumnDefinition Width="60"/>
-            <ColumnDefinition Width="70"/>
-            <ColumnDefinition Width="80"/>
-        </Grid.ColumnDefinitions>
-        <Label Grid.Row="0" Grid.Column="1" Content="{DynamicResource lbRa}" VerticalAlignment="Center"/>
-            <ComboBox Grid.Row="0" Grid.Column="2" md:HintAssist.Hint="{DynamicResource cbhintHours}"  IsEditable="True" Width="55"
+        <Grid Background="{StaticResource MaterialDesignToolBarBackground}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="45"/>
+                <RowDefinition Height="45"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="40"/>
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="80"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Row="0" Grid.Column="1" Content="{StaticResource lbRa}" VerticalAlignment="Center"/>
+            <ComboBox Grid.Row="0" Grid.Column="2" md:HintAssist.Hint="{StaticResource cbhintHours}"  IsEditable="True" Width="55"
                                   ItemsSource="{Binding Hours}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
             <ComboBox.Text>
                 <Binding Path="RaHours" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -37,100 +35,100 @@
                     <VirtualizingStackPanel />
                 </ItemsPanelTemplate>
             </ComboBox.ItemsPanel>
-        </ComboBox>
-            <ComboBox Grid.Row="0" Grid.Column="3" md:HintAssist.Hint="{DynamicResource cbhintMinutes}" IsEditable="True" Width="55"
+            </ComboBox>
+            <ComboBox Grid.Row="0" Grid.Column="3" md:HintAssist.Hint="{StaticResource cbhintMinutes}" IsEditable="True" Width="55"
                                 ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
-            <ComboBox.Text>
-                <Binding Path="RaMinutes" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
-                    <Binding.ValidationRules>
-                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
-                        <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
-                    </Binding.ValidationRules>
-                </Binding>
-            </ComboBox.Text>
-            <ComboBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel />
-                </ItemsPanelTemplate>
-            </ComboBox.ItemsPanel>
-        </ComboBox>
-            <ComboBox Grid.Row="0" Grid.Column="4" md:HintAssist.Hint="{DynamicResource cbhintSeconds}" IsEditable="True" Width="70"
+                <ComboBox.Text>
+                    <Binding Path="RaMinutes" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                        <Binding.ValidationRules>
+                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                            <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </ComboBox.Text>
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
+            <ComboBox Grid.Row="0" Grid.Column="4" md:HintAssist.Hint="{StaticResource cbhintSeconds}" IsEditable="True" Width="70"
                                 ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
-            <ComboBox.Text>
-                <Binding Path="RaSeconds" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
-                    <Binding.ValidationRules>
-                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
-                        <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
-                    </Binding.ValidationRules>
-                </Binding>
-            </ComboBox.Text>
-            <ComboBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel />
-                </ItemsPanelTemplate>
-            </ComboBox.ItemsPanel>
-        </ComboBox>
-            <Label Grid.Row="1" Grid.Column="1" Content="{DynamicResource lbDec}" VerticalAlignment="Center"/>
-            <ComboBox Grid.Row="1" Grid.Column="2" md:HintAssist.Hint="{DynamicResource cbhintDegrees}"  IsEditable="True" Width="55"
-                                  ItemsSource="{Binding DecRange}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
-            <ComboBox.Text>
-                <Binding Path="DecDegrees" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
-                    <Binding.ValidationRules>
-                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
-                        <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
-                    </Binding.ValidationRules>
-                </Binding>
-            </ComboBox.Text>
-            <ComboBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel />
-                </ItemsPanelTemplate>
-            </ComboBox.ItemsPanel>
-        </ComboBox>
-            <ComboBox Grid.Row="1" Grid.Column="3" md:HintAssist.Hint="{DynamicResource cbhintMinutes}" IsEditable="True" Width="55"
-                                  ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
-            <ComboBox.Text>
-                <Binding Path="DecMinutes" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
-                    <Binding.ValidationRules>
-                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
-                        <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
-                    </Binding.ValidationRules>
-                </Binding>
-            </ComboBox.Text>
-            <ComboBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel />
-                </ItemsPanelTemplate>
-            </ComboBox.ItemsPanel>
-        </ComboBox>
-            <ComboBox Grid.Row="1" Grid.Column="4" md:HintAssist.Hint="{DynamicResource cbhintSeconds}" IsEditable="True" Width="70"
-                  ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
-            <ComboBox.Text>
-                <Binding Path="DecSeconds" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
-                    <Binding.ValidationRules>
-                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
-                        <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
-                    </Binding.ValidationRules>
-                </Binding>
-            </ComboBox.Text>
-            <ComboBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel />
-                </ItemsPanelTemplate>
-            </ComboBox.ItemsPanel>
-        </ComboBox>
-        <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Orientation="Vertical" VerticalAlignment="Center">
-                <Button Margin="0,2,0,0" Height="25" Width="70" ToolTip="{DynamicResource btntipCopy}" 
-                Command="{Binding PopulateGoToRaDecCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{DynamicResource btnCopy}"/>
-            <md:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsRaGoToDialogOpen}" DialogContent="{Binding RaGoToContent}">
-                    <Button Margin="0,3,0,0" Height="25" Width="70" ToolTip="{DynamicResource btntipGoTo}" 
-                    Command="{Binding OpenRaGoToDialogCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{DynamicResource btnGoTo}"/>
-            </md:DialogHost>
-            <md:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsRaGoToSyncDialogOpen}" DialogContent="{Binding RaGoToSyncContent}">
-                    <Button Margin="0,3,0,0" Height="25" Width="70" ToolTip="{DynamicResource btnSync}" 
-                        Command="{Binding OpenRaGoToSyncDialogCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{DynamicResource btnSync}"/>
-            </md:DialogHost>
+                <ComboBox.Text>
+                    <Binding Path="RaSeconds" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                        <Binding.ValidationRules>
+                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                            <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </ComboBox.Text>
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
+            <Label Grid.Row="1" Grid.Column="1" Content="{StaticResource lbDec}" VerticalAlignment="Center"/>
+            <ComboBox Grid.Row="1" Grid.Column="2" md:HintAssist.Hint="{StaticResource cbhintDegrees}"  IsEditable="True" Width="55"
+                                      ItemsSource="{Binding DecRange}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
+                <ComboBox.Text>
+                    <Binding Path="DecDegrees" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                        <Binding.ValidationRules>
+                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                            <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </ComboBox.Text>
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
+            <ComboBox Grid.Row="1" Grid.Column="3" md:HintAssist.Hint="{StaticResource cbhintMinutes}" IsEditable="True" Width="55"
+                                      ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
+                <ComboBox.Text>
+                    <Binding Path="DecMinutes" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                        <Binding.ValidationRules>
+                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                            <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </ComboBox.Text>
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
+            <ComboBox Grid.Row="1" Grid.Column="4" md:HintAssist.Hint="{StaticResource cbhintSeconds}" IsEditable="True" Width="70"
+                      ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
+                <ComboBox.Text>
+                    <Binding Path="DecSeconds" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                        <Binding.ValidationRules>
+                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                            <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </ComboBox.Text>
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
+            <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Orientation="Vertical" VerticalAlignment="Center">
+                    <Button Margin="0,2,0,0" Height="25" Width="70" ToolTip="{StaticResource btntipCopy}" 
+                    Command="{Binding PopulateGoToRaDecCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource btnCopy}"/>
+                <md:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsRaGoToDialogOpen}" DialogContent="{Binding RaGoToContent}">
+                    <Button Margin="0,3,0,0" Height="25" Width="70" ToolTip="{StaticResource btntipGoTo}" 
+                        Command="{Binding OpenRaGoToDialogCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource btnGoTo}"/>
+                </md:DialogHost>
+                <md:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsRaGoToSyncDialogOpen}" DialogContent="{Binding RaGoToSyncContent}">
+                    <Button Margin="0,3,0,0" Height="25" Width="70" ToolTip="{StaticResource btnSync}" 
+                            Command="{Binding OpenRaGoToSyncDialogCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource btnSync}"/>
+                </md:DialogHost>
             </StackPanel>
-        </Grid>
+            </Grid>
     </Border>
 </UserControl>

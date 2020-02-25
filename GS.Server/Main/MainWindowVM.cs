@@ -19,6 +19,7 @@ using GS.Server.Gamepad;
 using GS.Server.Helpers;
 using GS.Server.Model3D;
 using GS.Server.Notes;
+using GS.Server.Pulses;
 using GS.Server.Settings;
 using GS.Server.SkyTelescope;
 using GS.Shared;
@@ -30,7 +31,7 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
-using GS.Server.Pulses;
+using GS.Server.Test;
 
 namespace GS.Server.Main
 {
@@ -47,6 +48,7 @@ namespace GS.Server.Main
         private GamepadVM _gamepadVM;
         private Model3DVM _model3dVM;
         private PulsesVM _pulsesVM;
+        private TestVM _testVM;
         public static MainWindowVM _mainWindowVm;
 
         private double _tempHeight = 510;
@@ -63,9 +65,6 @@ namespace GS.Server.Main
             {
                 using (new WaitCursor())
                 {
-                    //Load language resource file
-                    Languages.SetLanguageDictionary(false, LanguageApp.GSServer);
-
                     //setup property info from the GSServer
                     GSServer.StaticPropertyChanged += PropertyChangedServer;
                     SkySettings.StaticPropertyChanged += PropertyChangedSettings;
@@ -96,10 +95,13 @@ namespace GS.Server.Main
                     UpdateTabViewModel("Gamepad");
                     UpdateTabViewModel("Model3D");
                     UpdateTabViewModel("Pulses");
+                    UpdateTabViewModel("Test");
 
                     // Set starting page
                     CurrentPageViewModel = PageViewModels[0];
                     SkyWatcherVMRadio = true;
+
+                    TopMost = Properties.Server.Default.StartOnTop;
 
                 }
 
@@ -167,6 +169,18 @@ namespace GS.Server.Main
             }
         }
 
+        private bool _topMost;
+        public bool TopMost
+        {
+            get => _topMost;
+            set
+            {
+                if (_topMost == value) return;
+                _topMost = value;
+                OnPropertyChanged();
+            }
+        }
+
         private ICommand _minimizeWindowCommand;
         public ICommand MinimizeWindowCommand
         {
@@ -180,6 +194,7 @@ namespace GS.Server.Main
         private void MinimizeWindow()
         {
             Windowstate = WindowState.Minimized;
+            Memory.FlushMemory();
         }
 
         private ICommand _maxmizeWindowCommand;
@@ -210,12 +225,6 @@ namespace GS.Server.Main
         private void NormalWindow()
         {
             Windowstate = WindowState.Normal;
-        }
-
-        public void Dispose()
-        {
-            _skyTelescopeVM?.Dispose();
-            // _notesV?.Dispose();
         }
 
         #endregion
@@ -347,6 +356,25 @@ namespace GS.Server.Main
                             PageViewModels.Remove(_pulsesVM);
                         }
                         PulsesRadioVisable = false;
+                    }
+                    break;
+                case "Test":
+                    if (SkyServer.TestTab)
+                    {
+                        if (!PageViewModels.Contains(_testVM))
+                        {
+                            _testVM = new TestVM();
+                            PageViewModels.Add(_testVM);
+                        }
+                        TestRadioVisable = true;
+                    }
+                    else
+                    {
+                        if (PageViewModels.Contains(_testVM))
+                        {
+                            PageViewModels.Remove(_testVM);
+                        }
+                        TestRadioVisable = false;
                     }
                     break;
             }
@@ -588,6 +616,34 @@ namespace GS.Server.Main
             }
         }
 
+        private bool _testVMRadio;
+        public bool TestVMRadioRadio
+        {
+            get => _testVMRadio;
+            set
+            {
+                using (new WaitCursor())
+                {
+                    if (_testVMRadio == value) return;
+                    _testVMRadio = value;
+                    if (value) ChangeViewModel(_testVM);
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _testRadioVisable;
+        public bool TestRadioVisable
+        {
+            get => _testRadioVisable;
+            set
+            {
+                if (_testRadioVisable == value) return;
+                _testRadioVisable = value;
+                OnPropertyChanged();
+            }
+        }
+
         public WindowState Windowstate
         {
             get => Settings.Settings.Windowstate;
@@ -669,7 +725,7 @@ namespace GS.Server.Main
                 Windowheight = _tempHeight;
                 Windowwidth = _tempWidth;
             }
-          
+
         }
         #endregion
 
@@ -765,6 +821,44 @@ namespace GS.Server.Main
             IsCloseDialogOpen = false;
         }
 
+        #endregion
+
+        #region Dispose
+        public void Dispose()
+        {
+            Dispose(true);
+            // GC.SuppressFinalize(this);
+        }
+        // NOTE: Leave out the finalizer altogether if this class doesn't
+        // own unmanaged resources itself, but leave the other methods
+        // exactly as they are.
+        ~MainWindowVM()
+        {
+            // Finalizer calls Dispose(false)
+            Dispose(false);
+        }
+        // The bulk of the clean-up code is implemented in Dispose(bool)
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _skyTelescopeVM?.Dispose();
+                _focuserVM?.Dispose();
+                _notesVM?.Dispose();
+                _settingsVM?.Dispose();
+                _gamepadVM?.Dispose();
+                _model3dVM?.Dispose();
+                _pulsesVM?.Dispose();
+                _mainWindowVm?.Dispose();
+                _testVM?.Dispose();
+            }
+            // free native resources if there are any.
+            //if (nativeResource != IntPtr.Zero)
+            //{
+            //    Marshal.FreeHGlobal(nativeResource);
+            //    nativeResource = IntPtr.Zero;
+            //}
+        }
         #endregion
     }
 }

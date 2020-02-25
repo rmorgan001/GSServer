@@ -64,7 +64,7 @@
     <ApplicationIcon>Resources\greenswamp1.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>1.0.0.24</AssemblyVersion>
+    <AssemblyVersion>1.0.0.26</AssemblyVersion>
     <AssemblyPublicKeyToken>565de7938946fba7</AssemblyPublicKeyToken>
   </PropertyGroup>
   <PropertyGroup>
@@ -90,8 +90,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Resources\DarkSky\DarkSkyApi.dll</HintPath>
     </Reference>
-    <Reference Include="HelixToolkit.Wpf, Version=2.9.0.0, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
-      <HintPath>..\packages\HelixToolkit.Wpf.2.9.0\lib\net45\HelixToolkit.Wpf.dll</HintPath>
+    <Reference Include="HelixToolkit, Version=2.10.0.0, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
+      <HintPath>..\packages\HelixToolkit.2.10.0\lib\netstandard1.1\HelixToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="HelixToolkit.Wpf, Version=2.10.0.0, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
+      <HintPath>..\packages\HelixToolkit.Wpf.2.10.0\lib\net45\HelixToolkit.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="LiveCharts, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
       <HintPath>..\packages\LiveCharts.0.9.7\lib\net45\LiveCharts.dll</HintPath>
@@ -111,11 +114,11 @@
       <HintPath>..\Resources\MaterialDesign\Signed999\MaterialDesignThemes.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.0.1\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.3\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="ReachFramework" />
     <Reference Include="SharpDX, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
@@ -192,12 +195,21 @@
     <Compile Include="Controls\Telescope\Debug.xaml.cs">
       <DependentUpon>Debug.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Telescope\SmallBar.xaml.cs">
+      <DependentUpon>SmallBar.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Telescope\StandardButtonBar.xaml.cs">
       <DependentUpon>StandardButtonBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Telescope\PPECBar.xaml.cs">
       <DependentUpon>PPECBar.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Domain\BoolToVisHideConverter.cs" />
+    <Compile Include="Domain\FutureDateValidationRule.cs" />
+    <Compile Include="Domain\SchedulerDialog.xaml.cs">
+      <DependentUpon>SchedulerDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Domain\HyperlinkExtensions.cs" />
     <Compile Include="Domain\InvertBooleanConvertor.cs" />
     <Compile Include="Domain\LimitDialog.xaml.cs">
       <DependentUpon>LimitDialog.xaml</DependentUpon>
@@ -253,6 +265,7 @@
     <Compile Include="Domain\SampleProgressDialog.xaml.cs">
       <DependentUpon>SampleProgressDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Domain\SimpleDateValidationRule.cs" />
     <Compile Include="Focuser\FocuserV.xaml.cs">
       <DependentUpon>FocuserV.xaml</DependentUpon>
     </Compile>
@@ -287,6 +300,7 @@
       <DependentUpon>NotesV.xaml</DependentUpon>
     </Compile>
     <Compile Include="Notes\NotesVM.cs" />
+    <Compile Include="Test\Oscillation.cs" />
     <Compile Include="Phd\Guider.cs" />
     <Compile Include="Phd\GuiderImpl.cs" />
     <Compile Include="Pulses\PulsesV.xaml.cs">
@@ -330,6 +344,10 @@
     <Compile Include="Controls\Telescope\TopCoordsBar.xaml.cs">
       <DependentUpon>TopCoordsBar.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Test\TestV.xaml.cs">
+      <DependentUpon>TestV.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Test\TestVM.cs" />
     <Page Include="Cdc\CdcDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -366,11 +384,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Controls\Telescope\SmallBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\Telescope\StandardButtonBar.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\Telescope\PPECBar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Domain\SchedulerDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -475,6 +501,10 @@
     <Page Include="Controls\Telescope\TopCoordsBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Test\TestV.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -595,5 +625,6 @@
   <ItemGroup>
     <Resource Include="Resources\Horsehead.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

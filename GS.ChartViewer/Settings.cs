@@ -38,7 +38,7 @@ namespace GS.ChartViewer
             {
                 if (_thirdColor == value) return;
                 _thirdColor = value;
-               // Properties.LogView.Default.ThirdColor = value;
+                // Properties.LogView.Default.ThirdColor = value;
                 OnStaticPropertyChanged();
 
             }

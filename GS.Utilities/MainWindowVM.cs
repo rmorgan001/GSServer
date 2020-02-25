@@ -1,4 +1,9 @@
-﻿using System;
+﻿using ASCOM.DriverAccess;
+using GS.Shared;
+using GS.Utilities.Dialogs;
+using GS.Utilities.Helpers;
+using MaterialDesignThemes.Wpf;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
@@ -11,18 +16,13 @@ using System.Threading;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
-using ASCOM.DriverAccess;
-using GS.Shared;
-using GS.Utilities.Dialogs;
-using GS.Utilities.Helpers;
-using MaterialDesignThemes.Wpf;
 using Timer = System.Timers.Timer;
 
 namespace GS.Utilities
 {
     internal class MainWindowVM : ObservableObject, IDisposable
     {
-        private static readonly string _docDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) ;
+        private static readonly string _docDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         private static readonly string _logDir = Path.Combine(_docDir, "GSServer");
 
         private static readonly string _commonDir =
@@ -62,7 +62,7 @@ namespace GS.Utilities
         }
 
         #region Settings
-        
+
         private string _version;
         public string Version
         {
@@ -103,8 +103,8 @@ namespace GS.Utilities
             ScreenEnabled = true;
 
             //Speed Test
-            BaudRates = new List<int>(){9600,19200,38400,57600,115200};
-            ComPortList = new List<int>(Enumerable.Range(0,20));
+            BaudRates = new List<int>() { 9600, 19200, 38400, 57600, 115200 };
+            ComPortList = new List<int>(Enumerable.Range(0, 20));
             IntervalList = new List<double>(InclusiveRange(100, 500, 50));
             Interval = 300.0;
             ComPort = 1;
@@ -121,7 +121,7 @@ namespace GS.Utilities
         #endregion
 
         #region Commands
-        
+
         private ICommand _clickCloseAppCommand;
         public ICommand ClickCloseAppCommand
         {
@@ -188,7 +188,7 @@ namespace GS.Utilities
                 var progID = util.Choose("ASCOM.GS.Sky.Telescope");
                 if (progID != null)
                 {
-                    var t = new Telescope(progID) {Connected = true};
+                    var t = new Telescope(progID) { Connected = true };
                     msg = $"v{t.DriverVersion}, {t.DriverInfo}";
                     t.Connected = false;
                     t.Dispose();
@@ -256,7 +256,7 @@ namespace GS.Utilities
             set
             {
                 if (_serMsg == value) { return; }
-                _serMsg = value.Replace("\r", ""); 
+                _serMsg = value.Replace("\r", "");
                 OnPropertyChanged();
             }
         }
@@ -267,7 +267,7 @@ namespace GS.Utilities
             get => _zoomCounter;
             set
             {
-                if (_zoomCounter == value){return;}
+                if (_zoomCounter == value) { return; }
                 _zoomCounter = value;
                 OnPropertyChanged();
             }
@@ -325,7 +325,7 @@ namespace GS.Utilities
                             $"{Application.Current.Resources["tbUtilCounter"]} {counter} {Application.Current.Resources["tbUtilTimer"]} {_startTime.Elapsed:hh\\:mm\\:ss\\.fff}, {commandStr} {receivedData} {zoomtxt}";
                     });
                 aTimer.Interval = Interval;
-                
+
             }
             catch (Exception ex)
             {
@@ -435,7 +435,7 @@ namespace GS.Utilities
                     serial.Open();
                     //serial.DataReceived += DataReceived;
 
-                    aTimer = new Timer {Interval = Interval};
+                    aTimer = new Timer { Interval = Interval };
                     // Hook up the Elapsed event for the timer. 
                     aTimer.Elapsed += OnTimedEvent;
                     // Have the timer fire repeated events (true is the default)
@@ -531,7 +531,7 @@ namespace GS.Utilities
                     OpenDialog(combindedString);
                 }
 
-                if (msg == string.Empty){msg = $"{Application.Current.Resources["tbUtilNothing"]}";}
+                if (msg == string.Empty) { msg = $"{Application.Current.Resources["tbUtilNothing"]}"; }
 
                 FileLocked = msg;
             }
@@ -545,7 +545,7 @@ namespace GS.Utilities
         [ConditionalAttribute("DEBUG")]
         private void DebugSetFilePath()
         {
-             _gsFilePath = "C:\\Users\\Rob\\source\\repos\\GSSolution\\Builds\\Debug\\GS.Server.exe";
+            _gsFilePath = "C:\\Users\\Rob\\source\\repos\\GSSolution\\Builds\\Debug\\GS.Server.exe";
         }
 
         #endregion
@@ -778,7 +778,7 @@ namespace GS.Utilities
         {
             IsDelDialogOpen = false;
         }
-        
+
         #endregion
 
         #region Dialog  

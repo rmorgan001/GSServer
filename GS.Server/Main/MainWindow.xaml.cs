@@ -1,6 +1,6 @@
-﻿using System;
+﻿using GS.Server.Helpers;
+using System;
 using System.Runtime.InteropServices;
-using GS.Server.Helpers;
 
 namespace GS.Server.Main
 {
@@ -23,12 +23,12 @@ namespace GS.Server.Main
 
         private void StartOnTop()
         {
-            Topmost = true;
+            // Topmost = true;
         }
 
         private void MainWindow_OnContentRendered(object sender, EventArgs e)
         {
-            Topmost = Properties.Server.Default.StartOnTop;
+            //  Topmost = Properties.Server.Default.StartOnTop;
             Memory.FlushMemory();
         }
 

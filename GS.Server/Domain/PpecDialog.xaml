@@ -9,10 +9,10 @@
             <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <TextBlock VerticalAlignment="Center" Margin="10 0" Text="{DynamicResource tbStartTraining}"/>
+        <TextBlock VerticalAlignment="Center" Margin="10 0" Text="{StaticResource tbStartTraining}"/>
         <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0 16 0 0">
-            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding AcceptPpecDialogCommand}" Content="{DynamicResource btnAccept}"/>
-            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding CancelPpecDialogCommand}" Content="{DynamicResource btnCancel}"/>
+            <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptPpecDialogCommand}" Content="{StaticResource btnAccept}"/>
+            <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelPpecDialogCommand}" Content="{StaticResource btnCancel}"/>
         </StackPanel>
     </Grid>
     </UserControl>

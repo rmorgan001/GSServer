@@ -580,11 +580,11 @@ namespace GS.Server.Phd
             //    var response = m_response;
             //    m_response = null;
 
-            
+
             if (response != null)
             {
                 if (!Failed(response)) return response;
-                throw new GuiderException(ErrorCode.NoResponse, (string) response["error"]["message"]);
+                throw new GuiderException(ErrorCode.NoResponse, (string)response["error"]["message"]);
             }
 
             return response;

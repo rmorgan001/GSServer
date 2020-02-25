@@ -34,7 +34,7 @@ using System.Windows.Input;
 
 namespace GS.Server.Settings
 {
-    public class SettingsVM : ObservableObject, IPageVM, IDisposable
+    public sealed class SettingsVM : ObservableObject, IPageVM, IDisposable
     {
         #region fields
 
@@ -44,6 +44,7 @@ namespace GS.Server.Settings
         private readonly MainWindowVM _mainWindowVm;
         public static SettingsVM _settingsVM;
         private readonly CancellationToken _cts;
+        private readonly CancellationToken _ctsMonitor;
 
         #endregion
 
@@ -61,6 +62,7 @@ namespace GS.Server.Settings
 
                     //token to cancel UI updates
                     _cts = new CancellationToken();
+                    _ctsMonitor = new CancellationToken();
 
                     //subscribe to Server property changes
                     Settings.StaticPropertyChanged += PropertyChangedServer;
@@ -88,6 +90,8 @@ namespace GS.Server.Settings
                     VolumeList = new List<int>(Numbers.InclusiveIntRange(0, 100));
 
                     ClearSettings();
+
+                    RenderCapability = (System.Windows.Media.RenderCapability.Tier >> 16).ToString();
                 }
             }
             catch (Exception ex)
@@ -182,7 +186,6 @@ namespace GS.Server.Settings
                 OnPropertyChanged();
             }
         }
-
         public bool Focuser
         {
             get => Settings.Focuser;
@@ -190,6 +193,33 @@ namespace GS.Server.Settings
             {
                 Settings.Focuser = value;
                 _mainWindowVm.UpdateTabViewModel("Focuser");
+                OnPropertyChanged();
+            }
+        }
+
+        public bool DisableHardwareAcceleration
+        {
+            get => Settings.DisableHardwareAcceleration;
+            set
+            {
+                Settings.DisableHardwareAcceleration = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _renderCapability;
+        /// <remarks>
+        /// 0x00000000	0	No graphics hardware acceleration is available for the application on the device. All graphics features use software acceleration. The DirectX version level is less than version 9.0.
+        /// 0x00010000	1	Most of the graphics features of WPF will use hardware acceleration if the necessary system resources are available and have not been exhausted.This corresponds to a DirectX version that is greater than or equal to 9.0.
+        /// 0x00020000	2	Most of the graphics features of WPF will use hardware acceleration provided the necessary system resources have not been exhausted.This corresponds to a DirectX version that is greater than or equal to 9.0.
+        /// </remarks>
+        public string RenderCapability
+        {
+            get => _renderCapability;
+            set
+            {
+                if (_renderCapability == value) return;
+                _renderCapability = value;
                 OnPropertyChanged();
             }
         }
@@ -204,9 +234,7 @@ namespace GS.Server.Settings
                 OnPropertyChanged();
             }
         }
-
         public List<string> Langs => Languages.SupportedLanguages;
-
         public string Lang
         {
             get => Languages.Language;
@@ -216,7 +244,6 @@ namespace GS.Server.Settings
                 OnPropertyChanged();
             }
         }
-
         public bool Notes
         {
             get => Settings.Notes;
@@ -227,7 +254,6 @@ namespace GS.Server.Settings
                 OnPropertyChanged();
             }
         }
-
         public bool Model3D
         {
             get => Settings.Model3D;
@@ -238,7 +264,6 @@ namespace GS.Server.Settings
                 OnPropertyChanged();
             }
         }
-
         public bool Pulses
         {
             get => Settings.Pulses;
@@ -249,7 +274,6 @@ namespace GS.Server.Settings
                 OnPropertyChanged();
             }
         }
-
         private SleepMode _sleepMode;
         public bool SleepMode
         {
@@ -276,7 +300,6 @@ namespace GS.Server.Settings
                 OnPropertyChanged();
             }
         }
-
         public bool StartMinimized
         {
             get => Settings.StartMinimized;
@@ -286,7 +309,6 @@ namespace GS.Server.Settings
                 OnPropertyChanged();
             }
         }
-
         public bool StartOnTop
         {
             get => Settings.StartOnTop;
@@ -296,9 +318,7 @@ namespace GS.Server.Settings
                 OnPropertyChanged();
             }
         }
-
         public IList<string> VoiceNames => Synthesizer.GetVoices();
-
         public string VoiceName
         {
             get => Settings.VoiceName;
@@ -309,7 +329,6 @@ namespace GS.Server.Settings
                 OnPropertyChanged();
             }
         }
-
         public bool VoiceActive
         {
             get => Settings.VoiceActive;
@@ -322,7 +341,6 @@ namespace GS.Server.Settings
                 RaisePropertyChanged("VoiceActive");
             }
         }
-
         public IList<int> VolumeList { get; }
         public int VoiceVolume
         {
@@ -334,7 +352,6 @@ namespace GS.Server.Settings
                 OnPropertyChanged();
             }
         }
-
         public bool DarkTheme
         {
             get => Settings.DarkTheme;
@@ -344,7 +361,6 @@ namespace GS.Server.Settings
                 OnPropertyChanged();
             }
         }
-
         public IList<Swatch> PrimaryColors { get; }
         private Swatch _primaryColor;
         public Swatch PrimaryColor
@@ -358,7 +374,6 @@ namespace GS.Server.Settings
                 OnPropertyChanged();
             }
         }
-
         public IList<Swatch> AccentColors { get; }
         private Swatch _accentColor;
         public Swatch AccentColor
@@ -372,7 +387,6 @@ namespace GS.Server.Settings
                 OnPropertyChanged();
             }
         }
-
         public IList<int> IntervalList { get; }
         private int _displayInterval;
         public int DisplayInterval
@@ -386,7 +400,6 @@ namespace GS.Server.Settings
                 OnPropertyChanged();
             }
         }
-
         public bool HomeWarning
         {
             get => SkySettings.HomeWarning;
@@ -401,6 +414,7 @@ namespace GS.Server.Settings
         #endregion
 
         #region Reset Settings
+
         private bool _skyTelescopeSettings;
         public bool SkyTelescopeSettings
         {
@@ -643,7 +657,7 @@ namespace GS.Server.Settings
                                 UpdateUi(MonitorQueue.MonitorEntry);
                                 break;
                         }
-                    });
+                    }, _ctsMonitor);
             }
             catch (Exception ex)
             {
@@ -990,7 +1004,7 @@ namespace GS.Server.Settings
                         {
                             Clipboard.SetText(streamReader.ReadToEnd());
                         }
-                        stream.Close();
+                        //stream.Close();
                         OpenDialog("Copied to Clipboard");
                     }
                 }
@@ -1211,10 +1225,34 @@ namespace GS.Server.Settings
 
         #endregion
 
+        #region Dispose
         public void Dispose()
         {
-            _mainWindowVm?.Dispose();
+            Dispose(true);
+            // GC.SuppressFinalize(this);
         }
+        // NOTE: Leave out the finalizer altogether if this class doesn't
+        // own unmanaged resources itself, but leave the other methods
+        // exactly as they are.
+        ~SettingsVM()
+        {
+            // Finalizer calls Dispose(false)
+            Dispose(false);
+        }
+        // The bulk of the clean-up code is implemented in Dispose(bool)
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _mainWindowVm?.Dispose();
+            }
+            // free native resources if there are any.
+            //if (nativeResource != IntPtr.Zero)
+            //{
+            //    Marshal.FreeHGlobal(nativeResource);
+            //    nativeResource = IntPtr.Zero;
+            //}
+        }
+        #endregion
     }
-
 }

@@ -770,7 +770,7 @@ namespace GS.SkyWatcher
                                 var cmdData = SendRequest(axis, command, cmdDataStr);
                                 // receive the response
                                 responseString = ReceiveResponse(axis, command, cmdData);
-                                if (!string.IsNullOrEmpty(responseString)){ break; }
+                                if (!string.IsNullOrEmpty(responseString)) { break; }
 
                                 _retryCount++;
                                 monitorItem = new MonitorEntry
@@ -791,7 +791,7 @@ namespace GS.SkyWatcher
                             if (string.IsNullOrEmpty(responseString))
                             {
                                 // sometimes :j will not return a response so this is used to ignore it
-                                if (ignoreWarnings) {return null;}
+                                if (ignoreWarnings) { return null; }
 
                                 // serial issue stop axes
                                 SendRequest(AxisId.Axis1, 'K', null);
@@ -803,7 +803,7 @@ namespace GS.SkyWatcher
                         }
                         catch (TimeoutException ex)
                         {
-                            if (ignoreWarnings) {return null;}
+                            if (ignoreWarnings) { return null; }
 
                             MountConnected = false;
                             throw axis == AxisId.Axis1

@@ -11,7 +11,7 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <StackPanel Orientation="Vertical" Grid.Row="0" HorizontalAlignment="Center">
-            <TextBlock Margin="0,0,0,10" Text="{DynamicResource msgSync}"/>
+            <TextBlock Margin="0,0,0,10" Text="{StaticResource msgSync}"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
                 <TextBlock Text="RA: "/>  
                 <TextBlock Text="{Binding GoToRaString}"/>
@@ -21,10 +21,10 @@
                 <TextBlock Text="{Binding GoToDecString}"/>
             </StackPanel>
         </StackPanel>
-        <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,10,0,0" Text="{DynamicResource tbAcptCoords}"/>
+        <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,10,0,0" Text="{StaticResource tbAcptCoords}"/>
         <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="0 16 0 0" HorizontalAlignment="Center" >
-            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding AcceptRaGoToSyncDialogCmd}" Content="{DynamicResource btnAccept}"/>
-            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding CancelRaGoToSyncDialogCmd}" Content="{DynamicResource btnCancel}"/>
+            <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptRaGoToSyncDialogCmd}" Content="{StaticResource btnAccept}"/>
+            <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelRaGoToSyncDialogCmd}" Content="{StaticResource btnCancel}"/>
         </StackPanel>
     </Grid>
     </UserControl>

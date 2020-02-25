@@ -5,7 +5,7 @@ namespace GS.Utilities
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindowV 
+    public partial class MainWindowV
     {
         public MainWindowV()
         {

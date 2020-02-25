@@ -29,6 +29,7 @@ using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Threading;
 using System.Windows.Forms;
+using GS.Server.SkyTelescope;
 using Application = System.Windows.Forms.Application;
 using MessageBox = System.Windows.Forms.MessageBox;
 
@@ -625,7 +626,9 @@ namespace GS.Server
                         UnregisterObjects(); //Unregister each served object
                         bRet = false;
                         break;
-
+                    case @"/test":
+                        SkyServer.TestTab = true;
+                        break;
                     default:
                         MessageBox.Show(
                             @"Unknown argument: " + args[0] + @"Valid are : -register, -unregister and -embedding",

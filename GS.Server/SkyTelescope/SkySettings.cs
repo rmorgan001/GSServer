@@ -935,7 +935,7 @@ namespace GS.Server.SkyTelescope
             get => _longitude;
             set
             {
-                if (Math.Abs(Longitude - value) <  0.0000000000001) return;
+                if (Math.Abs(Longitude - value) < 0.0000000000001) return;
                 _longitude = value;
                 Properties.SkyTelescope.Default.Longitude = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");

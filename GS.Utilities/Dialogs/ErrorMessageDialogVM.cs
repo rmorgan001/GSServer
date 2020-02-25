@@ -14,9 +14,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using GS.Utilities.Helpers;
 using System;
 using System.ComponentModel;
-using GS.Utilities.Helpers;
 
 namespace GS.Utilities.Dialogs
 {

@@ -9,7 +9,7 @@
              xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
              xmlns:enums="clr-namespace:ASCOM.Utilities;assembly=ASCOM.Utilities"
              xmlns:deviceInterface="clr-namespace:ASCOM.DeviceInterface;assembly=ASCOM.DeviceInterfaces"
-             Loaded="SkyTelescopeV_OnLoaded" TextOptions.TextFormattingMode="Display"
+             Loaded="SkyTelescopeV_OnLoaded" 
              mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
     <UserControl.Resources>
         <BooleanToVisibilityConverter  x:Key="BoolToVis"/>
@@ -17,7 +17,7 @@
     <Grid>
         <md:DialogHost HorizontalAlignment="Center" CloseOnClickAway="True" IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" Background="Transparent"/>
         <md:DrawerHost HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0"  
-                    IsLeftDrawerOpen="{Binding OpenSetupDialog}" BorderBrush="{DynamicResource MaterialDesignDivider}">
+                    IsLeftDrawerOpen="{Binding OpenSetupDialog}" BorderBrush="{StaticResource MaterialDesignDivider}">
             <!-- switched lines for opendialog so COM can open the settings IsLeftDrawerOpen="{Binding OpenSetupDialog}"-->
             <!--IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}"-->
             <md:DrawerHost.LeftDrawerContent>
@@ -42,12 +42,12 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5">
-                        <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" Content="{DynamicResource lbSettings}"/>
-                        <ToggleButton Grid.Row="0" HorizontalAlignment="Right" ToolTip="{DynamicResource tbClose}"
+                            <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" Content="{StaticResource lbSettings}"/>
+                        <ToggleButton Grid.Row="0" HorizontalAlignment="Right" ToolTip="{StaticResource tbClose}"
                             Style="{StaticResource MaterialDesignHamburgerToggleButton}"  Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
                             CommandParameter="{x:Static Dock.Left}" IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked}"/>
                     </Grid>
-                    <ComboBox Grid.Row="1" Grid.Column="0" md:HintAssist.Hint="{DynamicResource cbhintPorts}" MinWidth="10" Margin="0,0,0,0" ToolTip="{DynamicResource cbhintPorts}"  
+                    <ComboBox Grid.Row="1" Grid.Column="0" md:HintAssist.Hint="{StaticResource cbhintPorts}" MinWidth="10" Margin="0,0,0,0" ToolTip="{StaticResource cbhintPorts}"  
                               ItemsSource="{Binding ComPorts}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         <ComboBox.SelectedItem>
                             <Binding Path="ComPort" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -62,7 +62,7 @@
                             </ItemsPanelTemplate>
                         </ComboBox.ItemsPanel>
                     </ComboBox>
-                    <ComboBox Grid.Row="1" Grid.Column="1" md:HintAssist.Hint="{DynamicResource cbhintBaud}" MinWidth="10" Margin="10,0,0,0" ToolTip="{DynamicResource cbhintBaud}"
+                    <ComboBox Grid.Row="1" Grid.Column="1" md:HintAssist.Hint="{StaticResource cbhintBaud}" MinWidth="10" Margin="10,0,0,0" ToolTip="{StaticResource cbhintBaud}"
                               ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type enums:SerialSpeed}}}"
                               Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         <ComboBox.Text>
@@ -74,7 +74,7 @@
                             </ItemsPanelTemplate>
                         </ComboBox.ItemsPanel>
                     </ComboBox>
-                    <ComboBox Grid.Row="1" Grid.Column="3" md:HintAssist.Hint="{DynamicResource cbhintEquatorial}" MinWidth="10" Margin="10,0,0,0" ToolTip="{DynamicResource cbhintEquatorial}"
+                    <ComboBox Grid.Row="1" Grid.Column="3" md:HintAssist.Hint="{StaticResource cbhintEquatorial}" MinWidth="10" Margin="10,0,0,0" ToolTip="{StaticResource cbhintEquatorial}"
                               ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type deviceInterface:EquatorialCoordinateType}}}" 
                               Style="{StaticResource MaterialDesignFloatingHintComboBox}"> 
                         <ComboBox.ItemsPanel>
@@ -86,7 +86,7 @@
                                 <Binding Path="EquatorialCoordinateType" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
                         </ComboBox.Text>
                     </ComboBox>
-                    <ComboBox Grid.Row="1" Grid.Column="4" md:HintAssist.Hint="{DynamicResource cbhintAlignment}" MinWidth="10" Margin="10,0,0,0" ToolTip="{DynamicResource cbhintAlignment}"
+                    <ComboBox Grid.Row="1" Grid.Column="4" md:HintAssist.Hint="{StaticResource cbhintAlignment}" MinWidth="10" Margin="10,0,0,0" ToolTip="{StaticResource cbhintAlignment}"
                               ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type deviceInterface:AlignmentModes}}}"
                               Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEnabled="False">
                         <ComboBox.ItemsPanel>
@@ -98,7 +98,7 @@
                             <Binding Path="AlignmentMode" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
                         </ComboBox.Text>
                     </ComboBox>
-                        <ComboBox Grid.Row="2" Grid.Column="0" md:HintAssist.Hint="{DynamicResource cbhintRaGuiding}" MinWidth="10" Margin="0,0,0,0" ToolTip="{DynamicResource cbhintRaGuiding}"
+                        <ComboBox Grid.Row="2" Grid.Column="0" md:HintAssist.Hint="{StaticResource cbhintRaGuiding}" MinWidth="10" Margin="0,0,0,0" ToolTip="{StaticResource cbhintRaGuiding}"
                               ItemsSource="{Binding GuideRateOffsetList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         <ComboBox.SelectedItem>
                             <Binding Path="GuideRateOffsetX" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -113,7 +113,7 @@
                             </ItemsPanelTemplate>
                         </ComboBox.ItemsPanel>
                     </ComboBox>
-                    <ComboBox Grid.Row="2" Grid.Column="1" md:HintAssist.Hint="{DynamicResource cbhintDecGuiding}" MinWidth="10" Margin="10,0,0,0" ToolTip="{DynamicResource cbhintDecGuiding}"
+                    <ComboBox Grid.Row="2" Grid.Column="1" md:HintAssist.Hint="{StaticResource cbhintDecGuiding}" MinWidth="10" Margin="10,0,0,0" ToolTip="{StaticResource cbhintDecGuiding}"
                               ItemsSource="{Binding GuideRateOffsetList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         <ComboBox.SelectedItem>
                             <Binding Path="GuideRateOffsetY" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -128,7 +128,7 @@
                             </ItemsPanelTemplate>
                         </ComboBox.ItemsPanel>
                     </ComboBox>
-                    <ComboBox Grid.Row="1" Grid.Column="2" md:HintAssist.Hint="{DynamicResource cbhintMount}" MinWidth="10" Margin="10,0,0,0" ToolTip="{DynamicResource cbhintMount}"
+                    <ComboBox Grid.Row="1" Grid.Column="2" md:HintAssist.Hint="{StaticResource cbhintMount}" MinWidth="10" Margin="10,0,0,0" ToolTip="{StaticResource cbhintMount}"
                               ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type skyTelescope:MountType}}}"
                               Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         <ComboBox.ItemsPanel>
@@ -140,7 +140,7 @@
                             <Binding Path="Mount" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
                         </ComboBox.Text>
                     </ComboBox>
-                    <ComboBox Grid.Row="2" Grid.Column="4" md:HintAssist.Hint="{DynamicResource cbhintMaxSlew}" MinWidth="10" Margin="10,0,0,0" ToolTip="{DynamicResource cbhintMaxSlew}"
+                    <ComboBox Grid.Row="2" Grid.Column="4" md:HintAssist.Hint="{StaticResource cbhintMaxSlew}" MinWidth="10" Margin="10,0,0,0" ToolTip="{StaticResource cbhintMaxSlew}"
                               ItemsSource="{Binding MaxSlewRates}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         <ComboBox.SelectedItem>
                             <Binding Path="MaxSlewRate" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -155,7 +155,7 @@
                             </ItemsPanelTemplate>
                         </ComboBox.ItemsPanel>
                     </ComboBox>
-                    <ComboBox Grid.Row="2" Grid.Column="3" md:HintAssist.Hint="{DynamicResource cbhintMeridian}" MinWidth="10" Margin="10,0,0,0" ToolTip="{DynamicResource cbhintMeridian}"
+                    <ComboBox Grid.Row="2" Grid.Column="3" md:HintAssist.Hint="{StaticResource cbhintMeridian}" MinWidth="10" Margin="10,0,0,0" ToolTip="{StaticResource cbhintMeridian}"
                               ItemsSource="{Binding HourAngleLimits}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         <ComboBox.SelectedItem>
                             <Binding Path="HourAngleLimit" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -170,7 +170,7 @@
                             </ItemsPanelTemplate>
                         </ComboBox.ItemsPanel>
                     </ComboBox>
-                        <ComboBox Grid.Row="3" Grid.Column="1" md:HintAssist.Hint="{DynamicResource cbhintMinPulseDec}" MinWidth="10" Margin="10,0,5,0" ToolTip="{DynamicResource cbhintMinPulseDec}"
+                        <ComboBox Grid.Row="3" Grid.Column="1" md:HintAssist.Hint="{StaticResource cbhintMinPulseDec}" MinWidth="10" Margin="10,0,5,0" ToolTip="{StaticResource cbhintMinPulseDec}"
                                   ItemsSource="{Binding MinPulseList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.SelectedItem>
                                 <Binding Path="MinPulseDec" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -185,7 +185,7 @@
                                 </ItemsPanelTemplate>
                             </ComboBox.ItemsPanel>
                         </ComboBox>
-                        <ComboBox Grid.Row="4" Grid.Column="1" md:HintAssist.Hint="{DynamicResource cbhintMinPulseRa}" MinWidth="10" Margin="10,0,5,0" ToolTip="{DynamicResource cbhintMinPulseRa}"
+                        <ComboBox Grid.Row="4" Grid.Column="1" md:HintAssist.Hint="{StaticResource cbhintMinPulseRa}" MinWidth="10" Margin="10,0,5,0" ToolTip="{StaticResource cbhintMinPulseRa}"
                                   ItemsSource="{Binding MinPulseList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.SelectedItem>
                                 <Binding Path="MinPulseRa" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -200,7 +200,7 @@
                                 </ItemsPanelTemplate>
                             </ComboBox.ItemsPanel>
                         </ComboBox>
-                        <ComboBox Grid.Row="3" Grid.Column="2" md:HintAssist.Hint="{DynamicResource cbhintTracking}" MinWidth="10" Margin="10,0,5,0" ToolTip="{DynamicResource cbhintTracking}"
+                        <ComboBox Grid.Row="3" Grid.Column="2" md:HintAssist.Hint="{StaticResource cbhintTracking}" MinWidth="10" Margin="10,0,5,0" ToolTip="{StaticResource cbhintTracking}"
                               ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type deviceInterface:DriveRates}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         <ComboBox.SelectedItem>
                             <Binding Path="TrackingRate" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -215,7 +215,7 @@
                             </ItemsPanelTemplate>
                         </ComboBox.ItemsPanel>
                     </ComboBox>
-                    <ComboBox Grid.Row="2" Grid.Column="2" md:HintAssist.Hint="{DynamicResource cbhintST4}" MinWidth="10" Margin="10,0,0,0" ToolTip="{DynamicResource cbhintST4}" 
+                    <ComboBox Grid.Row="2" Grid.Column="2" md:HintAssist.Hint="{StaticResource cbhintST4}" MinWidth="10" Margin="10,0,0,0" ToolTip="{StaticResource cbhintST4}" 
                               ItemsSource="{Binding St4Guiderates}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         <ComboBox.SelectedItem>
                             <Binding Path="St4Guiderate" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -231,18 +231,18 @@
                         </ComboBox.ItemsPanel>
                     </ComboBox>
                     <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,0">
-                        <md:PopupBox StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{DynamicResource pbtipReset}">
+                        <md:PopupBox StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{StaticResource pbtipReset}">
                             <Grid Width="150" >
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="30" />
                                     <RowDefinition Height="40" />
                                 </Grid.RowDefinitions>
-                                <Label Grid.Row="0" HorizontalAlignment="Center" Content="{DynamicResource lbReset}"/>
-                                <Button Grid.Row="1" HorizontalAlignment="Center" Content="{DynamicResource btnAccept}"  
+                                <Label Grid.Row="0" HorizontalAlignment="Center" Content="{StaticResource lbReset}"/>
+                                <Button Grid.Row="1" HorizontalAlignment="Center" Content="{StaticResource btnAccept}"  
                                         Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ClickResetSiderealRateCommand}"/>
                             </Grid>
                         </md:PopupBox>
-                        <TextBox  md:HintAssist.Hint="{DynamicResource tbhintSidereal}" Width="110" ToolTip="{DynamicResource tbhintSidereal}"
+                        <TextBox  md:HintAssist.Hint="{StaticResource tbhintSidereal}" Width="110" ToolTip="{StaticResource tbhintSidereal}"
                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" >
                             <TextBox.Text>
                                 <Binding Path="SiderealRate" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -255,18 +255,18 @@
                         </TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,0">
-                        <md:PopupBox StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{DynamicResource pbtipReset}">
+                        <md:PopupBox StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{StaticResource pbtipReset}">
                             <Grid Width="150">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="30" />
                                     <RowDefinition Height="40" />
                                 </Grid.RowDefinitions>
-                                <Label Grid.Row="0" HorizontalAlignment="Center" Content="{DynamicResource lbReset}"/>
-                                <Button Grid.Row="1" HorizontalAlignment="Center" Content="{DynamicResource btnAccept}" 
+                                <Label Grid.Row="0" HorizontalAlignment="Center" Content="{StaticResource lbReset}"/>
+                                <Button Grid.Row="1" HorizontalAlignment="Center" Content="{StaticResource btnAccept}" 
                                         Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ClickResetSolarRateCommand}"/>
                             </Grid>
                         </md:PopupBox>
-                        <TextBox md:HintAssist.Hint="{DynamicResource tbhintSolar}" Width="110" ToolTip="{DynamicResource tbhintSolar}"
+                        <TextBox md:HintAssist.Hint="{StaticResource tbhintSolar}" Width="110" ToolTip="{StaticResource tbhintSolar}"
                              Style="{StaticResource MaterialDesignFloatingHintTextBox}" >
                             <TextBox.Text>
                                 <Binding Path="SolarRate" Mode="TwoWay" UpdateSourceTrigger="LostFocus" >
@@ -279,18 +279,18 @@
                         </TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Grid.Row="7" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,0">
-                        <md:PopupBox  StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{DynamicResource pbtipReset}">
+                        <md:PopupBox  StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{StaticResource pbtipReset}">
                             <Grid Width="150">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="30" />
                                     <RowDefinition Height="40" />
                                 </Grid.RowDefinitions>
-                                <Label Grid.Row="0" HorizontalAlignment="Center" Content="{DynamicResource lbReset}"/>
-                                <Button Grid.Row="1" HorizontalAlignment="Center" Content="{DynamicResource btnAccept}" 
+                                <Label Grid.Row="0" HorizontalAlignment="Center" Content="{StaticResource lbReset}"/>
+                                <Button Grid.Row="1" HorizontalAlignment="Center" Content="{StaticResource btnAccept}" 
                                         Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ClickResetLunarRateCommand}"/>
                             </Grid>
                         </md:PopupBox>
-                        <TextBox md:HintAssist.Hint="{DynamicResource tbhintLunar}" Width="110" ToolTip="{DynamicResource tbhintLunar}"
+                        <TextBox md:HintAssist.Hint="{StaticResource tbhintLunar}" Width="110" ToolTip="{StaticResource tbhintLunar}"
                              Style="{StaticResource MaterialDesignFloatingHintTextBox}">
                             <TextBox.Text>
                                 <Binding Path="LunarRate" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -303,18 +303,18 @@
                         </TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Grid.Row="8" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,0">
-                        <md:PopupBox  StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{DynamicResource pbtipReset}">
+                        <md:PopupBox  StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{StaticResource pbtipReset}">
                             <Grid Width="150">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="30" />
                                     <RowDefinition Height="40" />
                                 </Grid.RowDefinitions>
-                                <Label Grid.Row="0" HorizontalAlignment="Center" Content="{DynamicResource lbReset}"/>
-                                <Button Grid.Row="1" HorizontalAlignment="Center" Content="{DynamicResource btnAccept}" 
+                                <Label Grid.Row="0" HorizontalAlignment="Center" Content="{StaticResource lbReset}"/>
+                                <Button Grid.Row="1" HorizontalAlignment="Center" Content="{StaticResource btnAccept}" 
                                         Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ClickResetKingRateCommand}"/>
                             </Grid>
                         </md:PopupBox>
-                        <TextBox md:HintAssist.Hint="{DynamicResource tbhintKing}" Width="110" ToolTip="{DynamicResource tbhintKing}"
+                        <TextBox md:HintAssist.Hint="{StaticResource tbhintKing}" Width="110" ToolTip="{StaticResource tbhintKing}"
                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" >
                             <TextBox.Text>
                                 <Binding Path="KingRate" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -327,39 +327,39 @@
                         </TextBox>
                     </StackPanel>
                     <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,0,0,0">
-                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{DynamicResource lbRefraction}"
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource lbRefraction}"
                                       IsChecked="{Binding Refraction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{DynamicResource lbRefraction}"/>
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbRefraction}"/>
                     </StackPanel>
                     <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,0,0,0">
-                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}"  HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{DynamicResource lbEncoders}"
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}"  HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource lbEncoders}"
                                       IsChecked="{Binding EncodersOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{DynamicResource lbEncoders}"/>
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbEncoders}"/>
                     </StackPanel>
                     <StackPanel Grid.Row="5" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,0,0,0">
-                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{DynamicResource lbAltPPEC}"
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource lbAltPPEC}"
                                       IsChecked="{Binding AlternatingPpec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{DynamicResource lbAltPPEC}"/>
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbAltPPEC}"/>
                     </StackPanel>
                     <StackPanel Grid.Row="6" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,0,0,0">
-                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{DynamicResource lbGoToDecPulse}"
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource lbGoToDecPulse}"
                                       IsChecked="{Binding DecPulseToGoTo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{DynamicResource lbGoToDecPulse}"/>
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbGoToDecPulse}"/>
                     </StackPanel>
                     <StackPanel Grid.Row="7" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,0,0,0">
-                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{DynamicResource lbFullCurrent}"
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource lbFullCurrent}"
                                       IsChecked="{Binding FullCurrent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{DynamicResource lbFullCurrent}"/>
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbFullCurrent}"/>
                     </StackPanel>
                     <StackPanel Grid.Row="8" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,0,0,0">
-                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{DynamicResource lbDiagnostics}"
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource lbDiagnostics}"
                                       IsChecked="{Binding DebugVisability, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{DynamicResource lbDiagnostics}"/>
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbDiagnostics}"/>
                     </StackPanel>
                     <Border Margin="0,0,4,0" Grid.Row="8" Grid.Column="3" Grid.ColumnSpan="2" BorderThickness="3" BorderBrush="DimGray" CornerRadius="5"
-                            Background="{DynamicResource MaterialDesignToolBarBackground}">
+                            Background="{StaticResource MaterialDesignToolBarBackground}">
                             <StackPanel Orientation="Horizontal" >
-                            <ComboBox md:HintAssist.Hint="{DynamicResource cbtipPark}" Margin="15,0,0,0" ToolTip="{DynamicResource cbtipPark}" Width="125"
+                            <ComboBox md:HintAssist.Hint="{StaticResource cbtipPark}" Margin="15,0,0,0" ToolTip="{StaticResource cbtipPark}" Width="125"
                                       ItemsSource="{Binding ParkPositions}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEditable="False">
                                 <ComboBox.SelectedItem>
                                         <Binding Path="ParkSelectionSetting" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -387,12 +387,12 @@
                                 <md:PackIcon Kind="Minus" Height="22" Width="22" />
                             </Button>
                         </md:DialogHost>
-                                <Button Margin="10,0,0,0" Content="Set" ToolTip="{DynamicResource btnSetPark}" 
+                                <Button Margin="10,0,0,0" Content="Set" ToolTip="{StaticResource btnSetPark}" 
                                         Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSaveParkCommand}" />
                             </StackPanel>
                         </Border>
                     <Border Margin="3" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3" Grid.RowSpan="4" CornerRadius="5" BorderThickness="3" BorderBrush="DimGray"
-                            Background="{DynamicResource MaterialDesignToolBarBackground}"  >
+                            Background="{StaticResource MaterialDesignToolBarBackground}"  >
                         <Grid Margin="10,0,10,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
@@ -407,9 +407,9 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" HorizontalAlignment="Center" Content="{DynamicResource lbOBL}"/>
-                            <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="{DynamicResource lbLatitude}"/>
-                                <ComboBox Grid.Row="1" Grid.Column="1" IsEnabled="True" md:HintAssist.Hint="{DynamicResource cbhintLat0}" Margin="10,0,0,0" ToolTip="{DynamicResource cbtipLat0}"
+                            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" HorizontalAlignment="Center" Content="{StaticResource lbOBL}"/>
+                            <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="{StaticResource lbLatitude}"/>
+                                <ComboBox Grid.Row="1" Grid.Column="1" IsEnabled="True" md:HintAssist.Hint="{StaticResource cbhintLat0}" Margin="10,0,0,0" ToolTip="{StaticResource cbtipLat0}"
                                       ItemsSource="{Binding LatitudeRangeNS}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                 <ComboBox.SelectedItem>
                                     <Binding Path="Lat0" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -424,7 +424,7 @@
                                     </ItemsPanelTemplate>
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
-                                <ComboBox Grid.Row="1" Grid.Column="2" IsEnabled="True" md:HintAssist.Hint="{DynamicResource cbhintDegrees}" Margin="10,0,0,0" ToolTip="{DynamicResource cbhintDegrees}"
+                                <ComboBox Grid.Row="1" Grid.Column="2" IsEnabled="True" md:HintAssist.Hint="{StaticResource cbhintDegrees}" Margin="10,0,0,0" ToolTip="{StaticResource cbhintDegrees}"
                                 ItemsSource="{Binding Range179}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                 <ComboBox.SelectedItem>
                                     <Binding Path="Lat1" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -439,7 +439,7 @@
                                     </ItemsPanelTemplate>
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
-                                <ComboBox Grid.Row="1" Grid.Column="3" IsEnabled="True" md:HintAssist.Hint="{DynamicResource cbhintMinutes}" Margin="10,0,0,0" ToolTip="{DynamicResource cbhintMinutes}"
+                                <ComboBox Grid.Row="1" Grid.Column="3" IsEnabled="True" md:HintAssist.Hint="{StaticResource cbhintMinutes}" Margin="10,0,0,0" ToolTip="{StaticResource cbhintMinutes}"
                             ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.SelectedItem>
                                 <Binding Path="Lat2" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -454,7 +454,7 @@
                                 </ItemsPanelTemplate>
                             </ComboBox.ItemsPanel>
                         </ComboBox>
-                                <ComboBox Grid.Row="1" Grid.Column="4" IsEnabled="True" md:HintAssist.Hint="{DynamicResource cbhintSeconds}" IsEditable="True" Margin="10,0,0,0" ToolTip="{DynamicResource cbhintSeconds}"
+                                <ComboBox Grid.Row="1" Grid.Column="4" IsEnabled="True" md:HintAssist.Hint="{StaticResource cbhintSeconds}" IsEditable="True" Margin="10,0,0,0" ToolTip="{StaticResource cbhintSeconds}"
                            ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.Text>
                                 <Binding Path="Lat3" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -470,8 +470,8 @@
                                 </ItemsPanelTemplate>
                             </ComboBox.ItemsPanel>
                         </ComboBox>
-                            <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="{DynamicResource lbLongitude}"/>
-                                <ComboBox Grid.Row="2" Grid.Column="1" md:HintAssist.Hint="{DynamicResource cbhintLong0}" Margin="10,5,0,0" ToolTip="{DynamicResource cbtipLong0}"
+                            <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="{StaticResource lbLongitude}"/>
+                                <ComboBox Grid.Row="2" Grid.Column="1" md:HintAssist.Hint="{StaticResource cbhintLong0}" Margin="10,5,0,0" ToolTip="{StaticResource cbtipLong0}"
                                       ItemsSource="{Binding LongitudeRangeEW}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                 <ComboBox.SelectedItem>
                                     <Binding Path="Long0" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -486,7 +486,7 @@
                                     </ItemsPanelTemplate>
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
-                                <ComboBox Grid.Row="2" Grid.Column="2" md:HintAssist.Hint="{DynamicResource cbhintDegrees}" Margin="10,5,0,0" ToolTip="{DynamicResource cbhintDegrees}"
+                                <ComboBox Grid.Row="2" Grid.Column="2" md:HintAssist.Hint="{StaticResource cbhintDegrees}" Margin="10,5,0,0" ToolTip="{StaticResource cbhintDegrees}"
                             ItemsSource="{Binding Range179}"
                             Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.SelectedItem>
@@ -502,7 +502,7 @@
                             </ItemsPanelTemplate>
                         </ComboBox.ItemsPanel>
                         </ComboBox>
-                                <ComboBox Grid.Row="2" Grid.Column="3" md:HintAssist.Hint="{DynamicResource cbhintMinutes}"  Margin="10,5,0,0" ToolTip="{DynamicResource cbhintMinutes}"
+                                <ComboBox Grid.Row="2" Grid.Column="3" md:HintAssist.Hint="{StaticResource cbhintMinutes}"  Margin="10,5,0,0" ToolTip="{StaticResource cbhintMinutes}"
                             ItemsSource="{Binding Range60}"
                             Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.SelectedItem>
@@ -518,7 +518,7 @@
                                 </ItemsPanelTemplate>
                             </ComboBox.ItemsPanel>
                         </ComboBox>
-                                <ComboBox Grid.Row="2" Grid.Column="4" md:HintAssist.Hint="{DynamicResource cbhintSeconds}" IsEditable="True" Margin="10,5,0,0" ToolTip="{DynamicResource cbhintSeconds}"
+                                <ComboBox Grid.Row="2" Grid.Column="4" md:HintAssist.Hint="{StaticResource cbhintSeconds}" IsEditable="True" Margin="10,5,0,0" ToolTip="{StaticResource cbhintSeconds}"
                             ItemsSource="{Binding Range60}"
                             Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.Text>
@@ -535,8 +535,8 @@
                                 </ItemsPanelTemplate>
                             </ComboBox.ItemsPanel>
                         </ComboBox>
-                            <ComboBox Grid.Row="3" Grid.Column="2" md:HintAssist.Hint="{DynamicResource cbTemperature}" IsEditable="True" Margin="10,5,0,0"
-                                  ItemsSource="{Binding Temperatures}" ToolTip="{DynamicResource cbtipTemperature}"
+                            <ComboBox Grid.Row="3" Grid.Column="2" md:HintAssist.Hint="{StaticResource cbTemperature}" IsEditable="True" Margin="10,5,0,0"
+                                  ItemsSource="{Binding Temperatures}" ToolTip="{StaticResource cbtipTemperature}"
                                   Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.Text>
                                 <Binding Path="Temperature" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -552,7 +552,7 @@
                                 </ItemsPanelTemplate>
                             </ComboBox.ItemsPanel>
                         </ComboBox>
-                            <TextBox Grid.Row="3" Grid.Column="3" ToolTip="{DynamicResource tbtipMeters}" md:HintAssist.Hint="{DynamicResource tbElevation}"  Margin="10,0,0,0"
+                            <TextBox Grid.Row="3" Grid.Column="3" ToolTip="{StaticResource tbtipMeters}" md:HintAssist.Hint="{StaticResource tbElevation}"  Margin="10,0,0,0"
                                      Style="{StaticResource MaterialDesignFloatingHintTextBox}">
                             <TextBox.Text>
                                 <Binding Path="Elevation" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -565,16 +565,16 @@
                         </TextBox>
                         <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center">
                             <md:DialogHost IsOpen="{Binding IsGpsDialogOpen}" DialogContent="{Binding GpsContent}">
-                                    <Button VerticalAlignment="Bottom" Width="60" Content="{DynamicResource btnGPS}" ToolTip="{DynamicResource btntipGPS}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding OpenGpsDialogCommand}"/>
+                                    <Button VerticalAlignment="Bottom" Width="60" Content="{StaticResource btnGPS}" ToolTip="{StaticResource btntipGPS}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding OpenGpsDialogCommand}"/>
                             </md:DialogHost>
                             <md:DialogHost Margin="10,0,0,0" IsOpen="{Binding IsCdcDialogOpen}" DialogContent="{Binding CdcContent}">
-                                    <Button VerticalAlignment="Bottom" Width="60" Content="{DynamicResource btnCdC}" ToolTip="{DynamicResource btntipCdC}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding OpenCdcDialogCommand}"/>
+                                    <Button VerticalAlignment="Bottom" Width="60" Content="{StaticResource btnCdC}" ToolTip="{StaticResource btntipCdC}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding OpenCdcDialogCommand}"/>
                             </md:DialogHost>
                         </StackPanel>
                     </Grid>
                     </Border>
                     <StackPanel Orientation="Horizontal" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Center"  HorizontalAlignment="Center">
-                        <Button  Margin="10 0" Width="100" Content="{DynamicResource btnClose}" ToolTip="{DynamicResource btnCloseSave}"
+                        <Button  Margin="10 0" Width="100" Content="{StaticResource btnClose}" ToolTip="{StaticResource btnCloseSave}"
                                 Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickCloseSettingsCommand}"/>
                     </StackPanel>
                 </Grid>
@@ -590,7 +590,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
-                    <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding OpenSetupDialog}" x:Name="MenuToggleButton" ToolTip="{DynamicResource tbtipOpen}"
+                    <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding OpenSetupDialog}" x:Name="MenuToggleButton" ToolTip="{StaticResource tbtipOpen}"
                                   Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}"  IsHitTestVisible="True"
                                   Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
                 </StackPanel>
@@ -619,16 +619,14 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0">
                             <telescope:RaDecGoTo IsEnabled="{Binding ScreenEnabled}"/>
-                            <telescope:HandController Margin="0,10,0,0" IsEnabled="{Binding ScreenEnabled}" />
+                            <telescope:HandController IsEnabled="{Binding ScreenEnabled}" />
                             <telescope:Backlash IsEnabled="{Binding ScreenEnabled}"/>
                             <telescope:PpecBar IsEnabled="{Binding ScreenEnabled}"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1" >
-                            <StackPanel Orientation="Vertical">
-                                <telescope:StandardButtonBar IsEnabled="{Binding ScreenEnabled}"/>
-                            </StackPanel>
-                            <Border Margin="20,0,0,0" CornerRadius="5" BorderThickness="3" BorderBrush="DimGray" HorizontalAlignment="Stretch"  VerticalAlignment="Center" 
-                                    Background="{DynamicResource MaterialDesignToolBarBackground}" >
+                            <telescope:StandardButtonBar IsEnabled="{Binding ScreenEnabled}"/>
+                            <Border Margin="15,0,0,0" CornerRadius="5" BorderThickness="3" BorderBrush="DimGray" HorizontalAlignment="Stretch"  VerticalAlignment="Center" 
+                                    Background="{StaticResource MaterialDesignToolBarBackground}" >
                                 <Border.Effect>
                                     <DropShadowEffect BlurRadius="10"  Opacity=".5" ShadowDepth="10"/>
                                 </Border.Effect>
@@ -637,14 +635,13 @@
                                         <ImageBrush ImageSource="{Binding ImageFile}" Stretch="UniformToFill"/>
                                     </Grid.Background>
                                     <telescope:HelixViewport3D IsEnabled="{Binding ScreenEnabled}" Visibility="{Binding ModelOn, Converter={StaticResource BoolToVis}}"/>
-                                <StackPanel>
-                                    <telescope:Debug IsEnabled="{Binding ScreenEnabled}" Visibility="{Binding DebugVisability, Converter={StaticResource BoolToVis}}"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Left"  IsEnabled="{Binding ScreenEnabled}" Margin="5">
-                                    <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="3DView"
-                                                  IsChecked="{Binding ModelOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                    <Label Content="3D"/>
-                                </StackPanel>
+                                    <StackPanel>
+                                        <telescope:Debug IsEnabled="{Binding ScreenEnabled}" Visibility="{Binding DebugVisability, Converter={StaticResource BoolToVis}}"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Left" IsEnabled="{Binding ScreenEnabled}" Margin="5">
+                                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="3DView" IsChecked="{Binding ModelOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <Label Content="3D" />
+                                    </StackPanel>
                                 </Grid>
                             </Border>
                     </StackPanel>
@@ -652,7 +649,7 @@
                 </ScrollViewer>
                 <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center">
                     <telescope:BottomStatusBar IsEnabled="{Binding ScreenEnabled}"/>
-                    <Button Width="120" Height="30" ToolTip="{DynamicResource btntipConnect}"
+                    <Button Margin="5,0,0,0" Width="120" Height="30" ToolTip="{StaticResource btntipConnect}"
                             Command="{Binding ClickConnectCommand}" Content="{Binding ConnectButtonContent}" Style="{StaticResource MaterialDesignRaisedDarkButton}"/>
                 </StackPanel>
             </Grid>

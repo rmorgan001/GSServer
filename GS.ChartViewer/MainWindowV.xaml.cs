@@ -14,15 +14,15 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System;
 using LiveCharts.Events;
+using System;
 
 namespace GS.ChartViewer
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindowV :IDisposable
+    public sealed partial class MainWindowV : IDisposable
     {
         public MainWindowV()
         {
@@ -61,9 +61,34 @@ namespace GS.ChartViewer
 
         }
 
-
+        #region Dispose
         public void Dispose()
         {
+            Dispose(true);
+            // GC.SuppressFinalize(this);
         }
+        // NOTE: Leave out the finalizer altogether if this class doesn't
+        // own unmanaged resources itself, but leave the other methods
+        // exactly as they are.
+        ~MainWindowV()
+        {
+            // Finalizer calls Dispose(false)
+            Dispose(false);
+        }
+        // The bulk of the clean-up code is implemented in Dispose(bool)
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+
+            }
+            // free native resources if there are any.
+            //if (nativeResource != IntPtr.Zero)
+            //{
+            //    Marshal.FreeHGlobal(nativeResource);
+            //    nativeResource = IntPtr.Zero;
+            //}
+        }
+        #endregion
     }
 }

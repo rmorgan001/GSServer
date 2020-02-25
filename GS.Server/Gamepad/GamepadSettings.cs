@@ -196,6 +196,22 @@ namespace GS.Server.Gamepad
                         Properties.Gamepad.Default.volumeup = setting.Value;
                         LogSetting(MethodBase.GetCurrentMethod().Name, $"volumeup {setting.Value}");
                         break;
+                    case "ratesidereal":
+                        Properties.Gamepad.Default.ratesidereal = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"ratesidereal {setting.Value}");
+                        break;
+                    case "ratelunar":
+                        Properties.Gamepad.Default.ratelunar = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"ratelunar {setting.Value}");
+                        break;
+                    case "ratesolar":
+                        Properties.Gamepad.Default.ratesolar = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"ratesolar {setting.Value}");
+                        break;
+                    case "rateking":
+                        Properties.Gamepad.Default.rateking = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"rateking {setting.Value}");
+                        break;
                 }
             }
             Save();

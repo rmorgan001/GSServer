@@ -9,10 +9,10 @@
             <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10 0" Text="{DynamicResource tbAcceptResetSettings}"/>
+        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10 0" Text="{StaticResource tbAcceptResetSettings}"/>
         <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0 16 0 0" HorizontalAlignment="Center">
-            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding AcceptResetDialogCommand}" Content="{DynamicResource btnAccept}"/>
-            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding CancelResetDialogCommand}" Content="{DynamicResource btnCancel}"/>
+            <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptResetDialogCommand}" Content="{StaticResource btnAccept}"/>
+            <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelResetDialogCommand}" Content="{StaticResource btnCancel}"/>
         </StackPanel>
     </Grid>
     </UserControl>

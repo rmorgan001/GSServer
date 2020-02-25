@@ -10,10 +10,10 @@
             <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,10,0,0" Text="{DynamicResource msgContinueFlip}"/>
+        <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,10,0,0" Text="{StaticResource msgContinueFlip}"/>
         <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="0 16 0 0">
-            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding AcceptFlipDialogCommand}" Content="{DynamicResource btnAccept}"/>
-            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding CancelFlipDialogCommand}" Content="{DynamicResource btnCancel}"/>
+            <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptFlipDialogCommand}" Content="{StaticResource btnAccept}"/>
+            <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelFlipDialogCommand}" Content="{StaticResource btnCancel}"/>
         </StackPanel>
     </Grid>
     </UserControl>

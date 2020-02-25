@@ -12,17 +12,17 @@
         xmlns:gamepad="clr-namespace:GS.Server.Gamepad"
         xmlns:model3D="clr-namespace:GS.Server.Model3D"
         xmlns:pulses="clr-namespace:GS.Server.Pulses"
-        mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanResizeWithGrip"  WindowStyle="None" 
+        xmlns:test="clr-namespace:GS.Server.Test"
+        mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanResizeWithGrip"  WindowStyle="None"  TextOptions.TextFormattingMode="Display"
+        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
+        ContentRendered="MainWindow_OnContentRendered" Closed="MainWindow_OnClosed"  Topmost="{Binding TopMost}"
+        d:DataContext="{d:DesignInstance main:MainWindowVM, IsDesignTimeCreatable=True}" 
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"  Title="GS Server" FontStretch="Normal"
         WindowState="{Binding Windowstate}"
         Height="{Binding Windowheight, Mode=TwoWay}" 
         Width="{Binding Windowwidth, Mode=TwoWay}"
         Left="{Binding Windowleft, Mode=TwoWay}"
-        Top="{Binding Windowtop, Mode=TwoWay}"
-        ContentRendered="MainWindow_OnContentRendered" Closed="MainWindow_OnClosed"  
-        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
-        d:DataContext="{d:DesignInstance main:MainWindowVM, IsDesignTimeCreatable=True}"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        Background="{DynamicResource MaterialDesignPaper}" Title="GS Server" FontStretch="Normal">
+        Top="{Binding Windowtop, Mode=TwoWay}">
     <WindowChrome.WindowChrome>
         <WindowChrome
             ResizeBorderThickness="6"
@@ -53,9 +53,12 @@
         <DataTemplate DataType="{x:Type pulses:PulsesVM}">
             <pulses:PulsesV />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type test:TestVM}">
+            <test:TestV />
+        </DataTemplate>
     </Window.Resources>
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo x:Name="taskBarItemInfo" Description="{DynamicResource taskbarDescription}" />
+        <TaskbarItemInfo x:Name="taskBarItemInfo" Description="{StaticResource taskbarDescription}" />
     </Window.TaskbarItemInfo>
     <Grid Background="{DynamicResource MaterialDesignBody}">
             <Grid.RowDefinitions>

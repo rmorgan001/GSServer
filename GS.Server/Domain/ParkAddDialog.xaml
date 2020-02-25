@@ -6,7 +6,7 @@
         xmlns:domain="clr-namespace:GS.Server.Domain"
         mc:Ignorable="d" >
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="15">
-            <TextBlock Text="{DynamicResource msgParkNewName}"/>
+            <TextBlock Text="{StaticResource msgParkNewName}"/>
             <TextBox Width="120" Margin="0,20,0,20" MaxLength="12">
                 <TextBox.Text>
                     <Binding Path="ParkNewName" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -17,8 +17,8 @@
                 </TextBox.Text>
             </TextBox>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" >
-            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" Content="{DynamicResource btnAccept}" Command="{Binding AcceptParkAddDialogCommand}"/>
-            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}" Content="{DynamicResource btnCancel}" Command="{Binding CancelParkAddDialogCommand}"/>
+            <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource btnAccept}" Command="{Binding AcceptParkAddDialogCommand}"/>
+            <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource btnCancel}" Command="{Binding CancelParkAddDialogCommand}"/>
             </StackPanel>
         </StackPanel>
 

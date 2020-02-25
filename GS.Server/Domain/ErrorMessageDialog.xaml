@@ -12,7 +12,7 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <TextBlock x:Name="Message" Margin="0 6 0 0" FontSize="18" Grid.Row="0"/>
-        <Button Grid.Row="1" IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" HorizontalAlignment="Right" Margin="16 16 16 0"
-                Command="{x:Static md:DialogHost.CloseDialogCommand}" Content="{DynamicResource btnOk}"/>
+        <Button Grid.Row="1" IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" HorizontalAlignment="Right" Margin="16 16 16 0"
+                Command="{x:Static md:DialogHost.CloseDialogCommand}" Content="{StaticResource btnOk}"/>
     </Grid>
 </UserControl>

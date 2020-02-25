@@ -22,11 +22,13 @@ using GS.Server.Main;
 using GS.Server.SkyTelescope;
 using GS.Shared;
 using HelixToolkit.Wpf;
+using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
 using System;
 using System.ComponentModel;
 using System.Reflection;
 using System.Threading;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
@@ -55,11 +57,26 @@ namespace GS.Server.Model3D
             SkyServer.StaticPropertyChanged += PropertyChangedSkyServer;
             Settings.Settings.StaticPropertyChanged += PropertyChangedSettings;
 
+
+            LookDirection = new Vector3D(-1.2, -140, -133);
+            UpDirection = new Vector3D(-.006, -0.6, 0.7);
+            Position = new Point3D(.7, 139.7, 184.2);
+
             LoadTopBar();
             LoadCompass();
             LoadGEM();
             Rotate();
 
+            ActualAxisX = $"--.--";
+            ActualAxisY = $"--.--";
+            CameraVis = false;
+            RaAxisVis = false;
+            DecAxisVis = false;
+            RaVis = true;
+            DecVis = true;
+            AzVis = true;
+            AltVis = true;
+            TopVis = true;
             ScreenEnabled = SkyServer.IsMountRunning;
         }
 
@@ -78,12 +95,15 @@ namespace GS.Server.Model3D
                  switch (e.PropertyName)
                  {
                      case "Altitude":
+                         if (!AltVis) return;
                          Altitude = _util.DegreesToDMS(SkyServer.Altitude, "° ", ":", "", 2);
                          break;
                      case "Azimuth":
+                         if (!AzVis) return;
                          Azimuth = _util.DegreesToDMS(SkyServer.Azimuth, "° ", ":", "", 2);
                          break;
                      case "DeclinationXform":
+                         if (!DecVis) return;
                          Declination = _util.DegreesToDMS(SkyServer.DeclinationXform, "° ", ":", "", 2);
                          break;
                      case "RightAscensionXform":
@@ -92,6 +112,18 @@ namespace GS.Server.Model3D
                          break;
                      case "IsMountRunning":
                          ScreenEnabled = SkyServer.IsMountRunning;
+                         break;
+                     case "SiderealTime":
+                         if (!SideVis) return;
+                         SiderealTime = _util.HoursToHMS(SkyServer.SiderealTime);
+                         break;
+                     case "ActualAxisX":
+                         if (!RaAxisVis) return;
+                         ActualAxisX = $"{Numbers.TruncateD(SkyServer.ActualAxisX, 2)}";
+                         break;
+                     case "ActualAxisY":
+                         if (!DecAxisVis) return;
+                         ActualAxisY = $"{Numbers.TruncateD(SkyServer.ActualAxisY, 3)}";
                          break;
                  }
              });
@@ -173,6 +205,183 @@ namespace GS.Server.Model3D
 
         #region Viewport3D
 
+        private Point3D _position;
+        public Point3D Position
+        {
+            get => _position;
+            set
+            {
+                _position = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Vector3D _lookDirection;
+        public Vector3D LookDirection
+        {
+            get => _lookDirection;
+            set
+            {
+                _lookDirection = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Vector3D _upDirection;
+        public Vector3D UpDirection
+        {
+            get => _upDirection;
+            set
+            {
+                _upDirection = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _raVis;
+        public bool RaVis
+        {
+            get => _raVis;
+            set
+            {
+                if (_raVis == value) return;
+                _raVis = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _decVis;
+        public bool DecVis
+        {
+            get => _decVis;
+            set
+            {
+                if (_decVis == value) return;
+                _decVis = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _azVis;
+        public bool AzVis
+        {
+            get => _azVis;
+            set
+            {
+                if (_azVis == value) return;
+                _azVis = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _altVis;
+        public bool AltVis
+        {
+            get => _altVis;
+            set
+            {
+                if (_altVis == value) return;
+                _altVis = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _sideVis;
+        public bool SideVis
+        {
+            get => _sideVis;
+            set
+            {
+                if (_sideVis == value) return;
+                _sideVis = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _cameraVis;
+        public bool CameraVis
+        {
+            get => _cameraVis;
+            set
+            {
+                if (_cameraVis == value) return;
+                _cameraVis = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _siderealTime;
+        public string SiderealTime
+        {
+            get => _siderealTime;
+            set
+            {
+                if (value == _siderealTime) return;
+                _siderealTime = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _raAxisVis;
+        public bool RaAxisVis
+        {
+            get => _raAxisVis;
+            set
+            {
+                if (_raAxisVis == value) return;
+                _raAxisVis = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _actualAxisX;
+        public string ActualAxisX
+        {
+            get => _actualAxisX;
+            private set
+            {
+                if (_actualAxisX == value) return;
+                _actualAxisX = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _actualAxisY;
+        public string ActualAxisY
+        {
+            get => _actualAxisY;
+            private set
+            {
+                if (_actualAxisY == value) return;
+                _actualAxisY = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _decAxisVis;
+        public bool DecAxisVis
+        {
+            get => _decAxisVis;
+            set
+            {
+                if (_decAxisVis == value) return;
+                _decAxisVis = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _topVis;
+        public bool TopVis
+        {
+            get => _topVis;
+            set
+            {
+                if (_topVis == value) return;
+                _topVis = value;
+                OnPropertyChanged();
+            }
+        }
+
         private System.Windows.Media.Media3D.Model3D _model;
         public System.Windows.Media.Media3D.Model3D Model
         {
@@ -240,7 +449,6 @@ namespace GS.Server.Model3D
                 var color = Colors.Crimson;
                 Material material = new DiffuseMaterial(new SolidColorBrush(color));
                 import.DefaultMaterial = material;
-                //Model = import.Load(file);
 
                 //color weights
                 var a = import.Load(file);
@@ -251,10 +459,16 @@ namespace GS.Server.Model3D
                 var accentColor = Settings.Settings.AccentColor;
                 if (!string.IsNullOrEmpty(accentColor))
                 {
-                    // ReSharper disable once PossibleNullReferenceException
-                    color = (Color)ColorConverter.ConvertFromString(Settings.Settings.AccentColor);
-                    Material materialota = new DiffuseMaterial(new SolidColorBrush(color));
-                    if (a.Children[1] is GeometryModel3D ota) ota.Material = materialota;
+                    var swatches = new SwatchesProvider().Swatches;
+                    foreach (var swatch in swatches)
+                    {
+                        if (swatch.Name != Settings.Settings.AccentColor) continue;
+                        var converter = new BrushConverter();
+                        var brush = (Brush)converter.ConvertFromString(swatch.ExemplarHue.Color.ToString());
+
+                        Material materialota = new DiffuseMaterial(brush);
+                        if (a.Children[1] is GeometryModel3D ota) ota.Material = materialota;
+                    }
                 }
 
                 //color weight bar
@@ -262,9 +476,13 @@ namespace GS.Server.Model3D
                 if (a.Children[2] is GeometryModel3D bar) bar.Material = materialbar;
                 Model = a;
 
+                //var text = new TextBlock { Text = "Testing" };
+                //Overlay.SetPosition3D(text, new Point3D(0, 0, 10));
+                //a.Children.Add(text);
+
                 Xaxis = -90;
                 Yaxis = 90;
-                Zaxis = -20;
+                Zaxis = -30;
 
             }
             catch (Exception ex)
@@ -283,7 +501,6 @@ namespace GS.Server.Model3D
                 OpenDialog(ex.Message);
             }
         }
-
         private void LoadCompass()
         {
             try
@@ -311,7 +528,6 @@ namespace GS.Server.Model3D
                 OpenDialog(ex.Message);
             }
         }
-
         private void Rotate()
         {
             switch (SkySettings.Mount)
@@ -539,5 +755,44 @@ namespace GS.Server.Model3D
             // Note disposing has been done.
             _disposed = true;
         }
+
+    }
+
+    public class Overlay : DependencyObject
+    {
+        /// <summary>
+        /// The position 3 d property.
+        /// </summary>
+        public static readonly DependencyProperty Position3DProperty = DependencyProperty.RegisterAttached(
+            "Position3D", typeof(Point3D), typeof(Overlay));
+
+        /// <summary>
+        /// The get position 3 d.
+        /// </summary>
+        /// <param name="obj">
+        /// The obj.
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public static Point3D GetPosition3D(DependencyObject obj)
+        {
+            return (Point3D)obj.GetValue(Position3DProperty);
+        }
+
+        /// <summary>
+        /// The set position 3 d.
+        /// </summary>
+        /// <param name="obj">
+        /// The obj.
+        /// </param>
+        /// <param name="value">
+        /// The value.
+        /// </param>
+        public static void SetPosition3D(DependencyObject obj, Point3D value)
+        {
+            obj.SetValue(Position3DProperty, value);
+        }
+
+        // Using a DependencyProperty as the backing store for Position3D.  This enables animation, styling, binding, etc...
     }
 }

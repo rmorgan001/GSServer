@@ -12,7 +12,7 @@ namespace GS.Server.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.9.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.4.0.0")]
     internal sealed partial class Gamepad : global::System.Configuration.ApplicationSettingsBase {
         
         private static Gamepad defaultInstance = ((Gamepad)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Gamepad())));
@@ -200,6 +200,54 @@ namespace GS.Server.Properties {
             }
             set {
                 this["Version"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ratesidereal {
+            get {
+                return ((string)(this["ratesidereal"]));
+            }
+            set {
+                this["ratesidereal"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ratelunar {
+            get {
+                return ((string)(this["ratelunar"]));
+            }
+            set {
+                this["ratelunar"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ratesolar {
+            get {
+                return ((string)(this["ratesolar"]));
+            }
+            set {
+                this["ratesolar"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string rateking {
+            get {
+                return ((string)(this["rateking"]));
+            }
+            set {
+                this["rateking"] = value;
             }
         }
     }

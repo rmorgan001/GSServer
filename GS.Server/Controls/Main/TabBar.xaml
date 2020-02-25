@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-             TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
@@ -22,6 +21,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40"/>
@@ -30,26 +30,22 @@
                     <md:PackIcon Kind="Resize" Width="20" Height="20"/>
                 </Button>
                 <RadioButton Grid.Column="1" FontSize="16" IsChecked="{Binding SkyWatcherVMRadio}"  
-                             Visibility="{Binding Path=SkyWatcherRadioVisable, Converter={StaticResource BoolToVis}}"
-                             Style="{StaticResource MaterialDesignTabRadioButton}" Content="{DynamicResource rbtnSkyWatcher}"/>
+                             Visibility="{Binding Path=SkyWatcherRadioVisable, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource rbtnSkyWatcher}"/>
                 <RadioButton Grid.Column="2" FontSize="16" IsChecked="{Binding FocuserVMRadioRadio}"
-                             Visibility="{Binding Path=FocuserRadioVisable, Converter={StaticResource BoolToVis}}"
-                             Style="{StaticResource MaterialDesignTabRadioButton}" Content="{DynamicResource rbtnFocuser}"/>
+                             Visibility="{Binding Path=FocuserRadioVisable, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource rbtnFocuser}"/>
                 <RadioButton Grid.Column="4" FontSize="16" IsChecked="{Binding NotesVMRadioRadio}"
-                             Visibility="{Binding Path=NotesRadioVisable, Converter={StaticResource BoolToVis}}"
-                             Style="{StaticResource MaterialDesignTabRadioButton}" Content="{DynamicResource rbtnNotes}"/>
+                             Visibility="{Binding Path=NotesRadioVisable, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource rbtnNotes}"/>
                 <RadioButton Grid.Column="5" FontSize="16" IsChecked="{Binding SettingsVMRadio}"
-                             Visibility="{Binding Path=SettingsRadioVisable, Converter={StaticResource BoolToVis}}"
-                             Style="{StaticResource MaterialDesignTabRadioButton}" Content="{DynamicResource rbtnOptions}"/>
+                             Visibility="{Binding Path=SettingsRadioVisable, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource rbtnOptions}"/>
                 <RadioButton Grid.Column="6" FontSize="16" IsChecked="{Binding GamepadVMRadioRadio}"
-                             Visibility="{Binding Path=GamepadRadioVisable, Converter={StaticResource BoolToVis}}"
-                             Style="{StaticResource MaterialDesignTabRadioButton}" Content="{DynamicResource rbtnGamepad}"/>
+                             Visibility="{Binding Path=GamepadRadioVisable, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource rbtnGamepad}"/>
                 <RadioButton Grid.Column="7" FontSize="16" IsChecked="{Binding Model3DVMRadioRadio}"
-                             Visibility="{Binding Path=Model3DRadioVisable, Converter={StaticResource BoolToVis}}"
-                             Style="{StaticResource MaterialDesignTabRadioButton}" Content="{DynamicResource rbtnModel3D}"/>
+                             Visibility="{Binding Path=Model3DRadioVisable, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource rbtnModel3D}"/>
                 <RadioButton Grid.Column="8" FontSize="16" IsChecked="{Binding PulsesVMRadioRadio}"
-                             Visibility="{Binding Path=PulsesRadioVisable, Converter={StaticResource BoolToVis}}"
-                             Style="{StaticResource MaterialDesignTabRadioButton}" Content="{DynamicResource rbtnPulses}"/>
+                             Visibility="{Binding Path=PulsesRadioVisable, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource rbtnPulses}"/>
+                <RadioButton Grid.Column="9" FontSize="16" IsChecked="{Binding TestVMRadioRadio}" 
+                             Visibility="{Binding Path=TestRadioVisable, Converter={StaticResource BoolToVis}}" 
+                             Style="{StaticResource MaterialDesignTabRadioButton}" Content="Test" />
             </Grid>
         </ScrollViewer>
     </md:ColorZone>

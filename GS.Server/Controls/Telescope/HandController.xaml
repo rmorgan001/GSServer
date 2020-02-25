@@ -7,10 +7,9 @@
              xmlns:helpers="clr-namespace:GS.Server.Helpers"
              xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
              xmlns:domain="clr-namespace:GS.Server.Domain"
-             TextOptions.TextFormattingMode="Display"
-             mc:Ignorable="d"  d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
-    <Border Margin="0,0,10,0" BorderBrush="DimGray"  BorderThickness="3" CornerRadius="5" Background="{DynamicResource MaterialDesignToolBarBackground}">
-        <Grid Width="250" Height="175">
+             mc:Ignorable="d" >
+    <Border Margin="0,5,10,0" BorderBrush="DimGray"  BorderThickness="3" CornerRadius="5" Background="{StaticResource MaterialDesignToolBarBackground}">
+        <Grid Width="250" Height="175" Margin="4">
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition />
@@ -22,33 +21,32 @@
             <ColumnDefinition />
             <ColumnDefinition Width="80"/>
         </Grid.ColumnDefinitions>
-        <Button Grid.Row="1" Grid.Column="0" Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{DynamicResource btntipW}"
+        <Button Grid.Row="1" Grid.Column="0" Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{StaticResource btntipW}"
                 helpers:MouseBehaviour.MouseLeftButtonDownCommand="{Binding HcMouseDownLeftCommand}"
                 helpers:MouseBehaviour.MouseLeftButtonUpCommand="{Binding HcMouseUpLeftCommand}">
             <md:PackIcon Kind="ArrowLeft" />
         </Button>
-        <Button Grid.Row="0" Grid.Column="1"  Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{DynamicResource btntipN}"
+        <Button Grid.Row="0" Grid.Column="1"  Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{StaticResource btntipN}"
                 helpers:MouseBehaviour.MouseLeftButtonDownCommand="{Binding HcMouseDownUpCommand}"
                 helpers:MouseBehaviour.MouseLeftButtonUpCommand="{Binding HcMouseUpUpCommand}">
             <md:PackIcon Kind="ArrowUp" />
         </Button>
-        <Button Grid.Row="1" Grid.Column="2" Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{DynamicResource btntipE}"
+        <Button Grid.Row="1" Grid.Column="2" Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{StaticResource btntipE}"
                 helpers:MouseBehaviour.MouseLeftButtonDownCommand="{Binding HcMouseDownRightCommand}"
                 helpers:MouseBehaviour.MouseLeftButtonUpCommand="{Binding HcMouseUpRightCommand}">
             <md:PackIcon Kind="ArrowRight" />
         </Button>
-        <Button Grid.Row="2" Grid.Column="1" Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{DynamicResource btntipS}"               
+        <Button Grid.Row="2" Grid.Column="1" Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{StaticResource btntipS}"               
                 helpers:MouseBehaviour.MouseLeftButtonDownCommand="{Binding HcMouseDownDownCommand}"
                 helpers:MouseBehaviour.MouseLeftButtonUpCommand="{Binding HcMouseUpDownCommand}">
             <md:PackIcon Kind="ArrowDown" />
         </Button>
-        <Button Grid.Row="1" Grid.Column="1"  Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{DynamicResource btntipHcStop}"
-                Style="{DynamicResource MaterialDesignRaisedLightButton}"
+        <Button Grid.Row="1" Grid.Column="1"  Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{StaticResource btntipHcStop}" Style="{StaticResource MaterialDesignRaisedLightButton}"
                 helpers:MouseBehaviour.MouseLeftButtonDownCommand="{Binding HcMouseDownStopCommand}">
             <md:PackIcon Kind="ArrowAll" />
         </Button>
         <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="3" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Top">
-            <ComboBox md:HintAssist.Hint="{DynamicResource lbMode}" ToolTip="{DynamicResource cbtipMode}" Height="40"
+            <ComboBox md:HintAssist.Hint="{StaticResource lbMode}" ToolTip="{StaticResource cbtipMode}" Height="40"
                       ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type skyTelescope:HCMode}}}" 
                       Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                 <ComboBox.ItemsPanel>
@@ -61,7 +59,7 @@
                 </ComboBox.Text>
             </ComboBox>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
-                <Label Content="{DynamicResource lbSpeed}">
+                <Label Content="{StaticResource lbSpeed}">
                     <Label.LayoutTransform>
                         <TransformGroup>
                             <RotateTransform Angle="90" />
@@ -71,27 +69,9 @@
                 </Label>
                 <Slider MinHeight="90" HorizontalAlignment="Center" IsSnapToTickEnabled="True" TickFrequency="1" TickPlacement="Both" 
                     Orientation="Vertical" Minimum="1" Maximum="8" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" 
-                    Value="{Binding HcSpeed, Mode=TwoWay, Delay=800}" ToolTip="{DynamicResource sltipSpeed}"/>
+                    Value="{Binding HcSpeed, Mode=TwoWay, Delay=800}" ToolTip="{StaticResource sltipSpeed}"/>
             </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,-5" IsEnabled="{Binding NSEnabled}">
-                    <StackPanel.Style>
-                        <Style TargetType="StackPanel">
-                            <Style.Triggers>
-                                <Trigger Property="IsEnabled" Value="False">
-                                    <Setter Property="Opacity" Value="0.3" />
-                                </Trigger>
-                                <Trigger Property="IsEnabled" Value="True">
-                                    <Setter Property="Opacity" Value="1" />
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </StackPanel.Style>
-                    <ToggleButton HorizontalAlignment="Center" Width="20" Height="10" ToolTip="{DynamicResource tbtntipFlipNS}"
-                              Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                              IsChecked="{Binding FlipNS, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{DynamicResource lbFlipNS}"/>
-            </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,-5,0,0"  IsEnabled="{Binding EWEnabled}">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,-5" IsEnabled="{Binding NSEnabled}">
                 <StackPanel.Style>
                     <Style TargetType="StackPanel">
                         <Style.Triggers>
@@ -104,11 +84,29 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
-                    <ToggleButton HorizontalAlignment="Center" Width="20" Height="10"
-                              Style="{StaticResource MaterialDesignSwitchToggleButton}" ToolTip="{DynamicResource tbtntipFlipEW}"
-                              IsChecked="{Binding FlipEW, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{DynamicResource lbFlipEW}"/>
+                <ToggleButton HorizontalAlignment="Center" Width="20" Height="10" ToolTip="{StaticResource tbtntipFlipNS}"
+                          Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                          IsChecked="{Binding FlipNS, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbFlipNS}"/>
             </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,-5,0,0"  IsEnabled="{Binding EWEnabled}">
+            <StackPanel.Style>
+                <Style TargetType="StackPanel">
+                    <Style.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.3" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="True">
+                            <Setter Property="Opacity" Value="1" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Style>
+                <ToggleButton HorizontalAlignment="Center" Width="20" Height="10"
+                          Style="{StaticResource MaterialDesignSwitchToggleButton}" ToolTip="{StaticResource tbtntipFlipEW}"
+                          IsChecked="{Binding FlipEW, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbFlipEW}"/>
+        </StackPanel>
         </StackPanel>
     </Grid>
         </Border>

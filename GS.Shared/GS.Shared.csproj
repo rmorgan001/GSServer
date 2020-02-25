@@ -41,6 +41,7 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
@@ -51,6 +52,8 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Charting.cs" />
+    <Compile Include="Enums.cs" />
+    <Compile Include="GSColors.cs" />
     <Compile Include="GssAttribute.cs" />
     <Compile Include="Languages.cs" />
     <Compile Include="Monitor.cs" />

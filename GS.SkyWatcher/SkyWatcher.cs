@@ -16,6 +16,7 @@
 using GS.Shared;
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO.Ports;
 using System.Reflection;
 using System.Threading;
@@ -45,7 +46,7 @@ namespace GS.SkyWatcher
         private long[] _lowSpeedGotoMargin = new long[2];
         private long[] _breakSteps = new long[2];
         private readonly double[] _stepsPerSecond = new double[2];
-        
+
         #endregion
 
         #region Properties
@@ -62,6 +63,7 @@ namespace GS.SkyWatcher
             }
             private set => _ppecOn = value;
         }
+
         private bool _ppecTrainning;
         internal bool IsPpecInTrainingOn
         {
@@ -120,7 +122,7 @@ namespace GS.SkyWatcher
             SetTrackingRate(axis, rate);
 
             var internalSpeed = Math.Abs(rate); // setup a positive speed
-            if (internalSpeed > 500) {internalSpeed = 500;}
+            if (internalSpeed > 500) { internalSpeed = 500; }
 
             var forward = rate > 0.0; // figures out the direction of motion
             var highspeed = false;
@@ -229,7 +231,7 @@ namespace GS.SkyWatcher
                 if (duration < MinPulseDurationRa)
                 {
                     PulseRaRunning = false;
-                    if (!MonitorPulse){ return;}
+                    if (!MonitorPulse) { return; }
                     pulseEntry.Rejected = true;
                     MonitorLog.LogToMonitor(pulseEntry);
                     return;
@@ -245,7 +247,7 @@ namespace GS.SkyWatcher
                 } // implements the alternating PPEC 
 
 
-                if (MonitorPulse) {pulseEntry.PositionStart = _commands.GetAxisPositionCounter(AxisId.Axis1);}
+                if (MonitorPulse) { pulseEntry.PositionStart = _commands.GetAxisPositionCounter(AxisId.Axis1); }
 
                 _commands.SetStepSpeed(AxisId.Axis1, speedInt); // :I Send pulse to axis
 
@@ -301,7 +303,7 @@ namespace GS.SkyWatcher
                         MonitorLog.LogToMonitor(pulseEntry);
                         return;
                     }
-                    if (guiderate < 0){ stepsNeeded = -stepsNeeded;}
+                    if (guiderate < 0) { stepsNeeded = -stepsNeeded; }
 
                     //Firmware for the EQ8 and EQ6 can't move a single step so this conpensates, 2015B3 corrects this 
                     AxisStatus axesstatus;
@@ -347,7 +349,7 @@ namespace GS.SkyWatcher
                         }
                     }
 
-                    if (MonitorPulse){ pulseEntry.PositionStart = _commands.GetAxisPositionCounter(AxisId.Axis2);}
+                    if (MonitorPulse) { pulseEntry.PositionStart = _commands.GetAxisPositionCounter(AxisId.Axis2); }
 
                     pulseEntry.StartTime = Principles.HiResDateTime.UtcNow;
 
@@ -362,7 +364,7 @@ namespace GS.SkyWatcher
                         {
                             axesstatus = _commands.GetAxisStatus(AxisId.Axis2);
                             // Return if the axis has stopped.
-                            if (axesstatus.FullStop){ break;}
+                            if (axesstatus.FullStop) { break; }
                         }
                     }
 
@@ -393,13 +395,13 @@ namespace GS.SkyWatcher
                     if (duration < MinPulseDurationDec)
                     {
                         PulseDecRunning = false;
-                        if (!MonitorPulse){ return;}
+                        if (!MonitorPulse) { return; }
                         pulseEntry.Rejected = true;
                         MonitorLog.LogToMonitor(pulseEntry);
                         return;
                     }
 
-                    if (MonitorPulse){ pulseEntry.PositionStart = _commands.GetAxisPositionCounter(AxisId.Axis2);}
+                    if (MonitorPulse) { pulseEntry.PositionStart = _commands.GetAxisPositionCounter(AxisId.Axis2); }
 
                     AxisSlew(AxisId.Axis2, guiderate); // Send pulse to axis 
 
@@ -411,7 +413,7 @@ namespace GS.SkyWatcher
                     if (msspan > 0 && msspan < duration) // checking duration is met
                     {
                         var sw3 = Stopwatch.StartNew();
-                        while (sw3.Elapsed.TotalMilliseconds < msspan){Thread.Sleep(1);} // do something while waiting;
+                        while (sw3.Elapsed.TotalMilliseconds < msspan) { Thread.Sleep(1); } // do something while waiting;
                     }
 
                     pulseEntry.EndTime = Principles.HiResDateTime.UtcNow;
@@ -432,7 +434,7 @@ namespace GS.SkyWatcher
             if (MonitorPulse)
             {
                 MonitorLog.LogToMonitor(pulseEntry);//send to monitor
-            } 
+            }
 
         }
 
@@ -498,7 +500,7 @@ namespace GS.SkyWatcher
                 {
                     axesstatus = _commands.GetAxisStatus(axis);
                     // Return if the axis has stopped.
-                    if (axesstatus.FullStop){break;}
+                    if (axesstatus.FullStop) { break; }
                 }
             }
 
@@ -564,7 +566,7 @@ namespace GS.SkyWatcher
                 {
                     axesstatus = _commands.GetAxisStatus(axis);
                     // Return if the axis has stopped.
-                    if (axesstatus.FullStop){break;}
+                    if (axesstatus.FullStop) { break; }
                 }
             }
 
@@ -598,11 +600,11 @@ namespace GS.SkyWatcher
             var positions = new double[] { 0, 0 };
 
             var x = _commands.GetAxisPositionNaN(AxisId.Axis1);
-            if (!double.IsNaN(x)) {x = Principles.Units.Rad2Deg1(x);}
+            if (!double.IsNaN(x)) { x = Principles.Units.Rad2Deg1(x); }
             positions[0] = x;
 
             var y = _commands.GetAxisPositionNaN(AxisId.Axis2);
-            if (!double.IsNaN(y)) {y = Principles.Units.Rad2Deg1(y);}
+            if (!double.IsNaN(y)) { y = Principles.Units.Rad2Deg1(y); }
             positions[1] = y;
 
             return positions;
@@ -688,7 +690,7 @@ namespace GS.SkyWatcher
             { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {axis}, {on}" };
             MonitorLog.LogToMonitor(monitorItem);
 
-            if (!CanDualEncoders) {return;}
+            if (!CanDualEncoders) { return; }
             _commands.SetEncoders(axis, on);
         }
 
@@ -699,7 +701,7 @@ namespace GS.SkyWatcher
         /// <param name="on">on=true,off=false</param>
         internal void SetPpec(AxisId axis, bool on)
         {
-            if (!CanPpec) {return;}
+            if (!CanPpec) { return; }
             _commands.SetPpec(axis, on);
         }
 
@@ -710,7 +712,7 @@ namespace GS.SkyWatcher
         /// <param name="on">on=true,off=false</param>
         internal void SetPpecTrain(AxisId axis, bool on)
         {
-            if (!CanPpec) {return;}
+            if (!CanPpec) { return; }
             _commands.SetPpecTrain(axis, on);
         }
 
@@ -721,7 +723,7 @@ namespace GS.SkyWatcher
         /// <param name="on">on=true,off=false</param>
         internal void SetFullCurrent(AxisId axis, bool on)
         {
-            if (!CanHalfTrack) {return;}
+            if (!CanHalfTrack) { return; }
             _commands.SetLowSpeedCurrent(axis, on);
         }
 
@@ -736,7 +738,6 @@ namespace GS.SkyWatcher
             _lowSpeedGotoMargin = _commands.GetLowSpeedGotoMargin();
             _factorRadRateToInt = _commands.GetFactorRadRateToInt();
             _breakSteps = _commands.GetBreakSteps();
-            //GetMotorCardVersion(AxisId.Axis1);
             ParseCapabilities();
             SetStepsPerSecond();
         }
@@ -818,6 +819,24 @@ namespace GS.SkyWatcher
                     break;
                 case "A5":
                     MountType = "AZGTi";
+                    break;
+                case "20":
+                    MountType = "EQ8-R";
+                    break;
+                case "21":
+                    MountType = "EQ8";
+                    break;
+                case "22":
+                    MountType = "AZ-EQ6";
+                    break;
+                case "23":
+                    MountType = "EQ6-R";
+                    break;
+                case "24":
+                    MountType = "NEQ6 PRO";
+                    break;
+                case "25":
+                    MountType = "EQ7";
                     break;
                 default:
                     MountType = "Unknown";
@@ -1012,7 +1031,7 @@ namespace GS.SkyWatcher
                 {
                     axesstatus1 = _commands.GetAxisStatus(AxisId.Axis1);
                     // Break loop if the axis has stopped.
-                    if (axesstatus1.FullStop){break;}
+                    if (axesstatus1.FullStop) { break; }
                     Thread.Sleep(1); // no need to hurry
                     AxisStop(AxisId.Axis1); // force another stop
                 }
@@ -1051,7 +1070,7 @@ namespace GS.SkyWatcher
                 {
                     axesstatus2 = _commands.GetAxisStatus(AxisId.Axis2);
                     // Break loop if the axis has stopped.
-                    if (axesstatus2.FullStop){break;}
+                    if (axesstatus2.FullStop) { break; }
                     Thread.Sleep(1);
                     AxisStop(AxisId.Axis2); // force another stop
                 }
@@ -1084,7 +1103,7 @@ namespace GS.SkyWatcher
 
         #endregion
 
-        #region Helpers
+        #region Methods
 
         private void SetStepsPerSecond()
         {
@@ -1106,90 +1125,198 @@ namespace GS.SkyWatcher
             return (long)Math.Round(r, 0, MidpointRounding.AwayFromZero);
         }
 
+        //private void ParseCapabilities1()
+        //{
+        //    var result = GetCapabilities();
+
+        //    switch (result.Substring(1, 1))
+        //    {
+        //        case "0":
+        //            IsPpecOn = false;
+        //            IsPpecInTrainingOn = false;
+        //            break;
+        //        case "1":
+        //            IsPpecOn = false;
+        //            IsPpecInTrainingOn = true;
+        //            break;
+        //        case "2":
+        //            IsPpecOn = true;
+        //            IsPpecInTrainingOn = false;
+        //            break;
+        //        case "3":
+        //            IsPpecOn = true;
+        //            IsPpecInTrainingOn = true;
+        //            break;
+        //        default:
+        //            IsPpecOn = false;
+        //            IsPpecInTrainingOn = false;
+        //            break;
+        //    }
+
+        //    switch (result.Substring(2, 5))
+        //    {
+        //        case "60001": //EQ8-R
+        //            CanAzEq = false;
+        //            CanHomeSensors = true;
+        //            CanPpec = true;
+        //            CanDualEncoders = false;
+        //            CanWifi = false;
+        //            CanHalfTrack = false;
+        //            CanAxisSlewsIndependent = true;
+        //            CanPolarLed = false;
+        //            break;
+        //        case "76000": //EQ8
+        //            CanAzEq = false;
+        //            CanHomeSensors = true;
+        //            CanPpec = true;
+        //            CanDualEncoders = true;
+        //            CanWifi = false;
+        //            CanHalfTrack = true;
+        //            CanAxisSlewsIndependent = true;
+        //            CanPolarLed = false;
+        //            break;
+        //        case "B3000": //AZEQ6          
+        //            CanAzEq = true;
+        //            CanHomeSensors = false;
+        //            CanPpec = true;
+        //            CanDualEncoders = true;
+        //            CanWifi = false;
+        //            CanHalfTrack = false;
+        //            CanAxisSlewsIndependent = true;
+        //            CanPolarLed = true;
+        //            break;
+        //        case "B6000": //AZEQ5
+        //            CanAzEq = true;
+        //            CanHomeSensors = false;
+        //            CanPpec = true;
+        //            CanDualEncoders = true;
+        //            CanWifi = false;
+        //            CanHalfTrack = true;
+        //            CanAxisSlewsIndependent = true;
+        //            CanPolarLed = false;
+        //            break;
+        //        case "98000":
+        //            CanAzEq = true;
+        //            CanHomeSensors = false;
+        //            CanPpec = false;
+        //            CanDualEncoders = true;
+        //            CanWifi = true;
+        //            CanHalfTrack = true;
+        //            CanAxisSlewsIndependent = true;
+        //            CanPolarLed = false;
+        //            break;
+        //        default:
+        //            CanAzEq = false;
+        //            CanHomeSensors = false;
+        //            CanPpec = false;
+        //            CanDualEncoders = false;
+        //            CanWifi = false;
+        //            CanHalfTrack = false;
+        //            CanPolarLed = false;
+        //            CanAxisSlewsIndependent = false;
+        //            break;
+
+        //    }
+        //}
+
         /// <summary>
-        /// parses results from the q command using =010000
+        /// parses status from the q command using =010000
         /// </summary>
         private void ParseCapabilities()
         {
             var result = GetCapabilities();
+            if (result == null) { return; }
+            if (result.Contains("!")) { return; }
+            if (result.Contains("=")) { result = result.Replace("=", ""); }
+            if (result.Length < 3) { return; }
 
-            switch (result.Substring(1, 1))
+            var code = result.ToCharArray();
+            for (var i = 0; i < code.Length; i++)
             {
-                case "0":
-                    IsPpecOn = false;
-                    IsPpecInTrainingOn = false;
-                    break;
-                case "1":
-                    IsPpecOn = false;
-                    IsPpecInTrainingOn = true;
-                    break;
-                case "2":
-                    IsPpecOn = true;
-                    IsPpecInTrainingOn = false;
-                    break;
-                case "3":
-                    IsPpecOn = true;
-                    IsPpecInTrainingOn = true;
-                    break;
-                default:
-                    IsPpecOn = false;
-                    IsPpecInTrainingOn = false;
-                    break;
-            }
+                var b = Enums.GetFlags((StatusBit)uint.Parse(code[i].ToString(), NumberStyles.HexNumber));
 
-            switch (result.Substring(2, 5))
-            {
-                case "76000":
-                    CanAzEq = false;
-                    CanHomeSensors = true;
-                    CanPpec = true;
-                    CanDualEncoders = true;
-                    CanWifi = false;
-                    CanHalfTrack = true;
-                    CanAxisSlewsIndependent = true;
-                    CanPolarLed = false;
-                    break;
-                case "B3000":
-                    CanAzEq = true;
-                    CanHomeSensors = false;
-                    CanPpec = true;
-                    CanDualEncoders = true;
-                    CanWifi = false;
-                    CanHalfTrack = false;
-                    CanAxisSlewsIndependent = true;
-                    CanPolarLed = true;
-                    break;
-                case "B6000":
-                    CanAzEq = true;
-                    CanHomeSensors = false;
-                    CanPpec = true;
-                    CanDualEncoders = true;
-                    CanWifi = false;
-                    CanHalfTrack = true;
-                    CanAxisSlewsIndependent = true;
-                    CanPolarLed = false;
-                    break;
-                case "98000":
-                    CanAzEq = true;
-                    CanHomeSensors = false;
-                    CanPpec = false;
-                    CanDualEncoders = true;
-                    CanWifi = true;
-                    CanHalfTrack = true;
-                    CanAxisSlewsIndependent = true;
-                    CanPolarLed = false;
-                    break;
-                default:
-                    CanAzEq = false;
-                    CanHomeSensors = false;
-                    CanPpec = false;
-                    CanDualEncoders = false;
-                    CanWifi = false;
-                    CanHalfTrack = false;
-                    CanPolarLed = false;
-                    CanAxisSlewsIndependent = false;
-                    break;
-
+                switch (i)
+                {
+                    case 0:
+                        foreach (var item in b)
+                        {
+                            switch (item)
+                            {
+                                case StatusBit.None: // 0
+                                    IsPpecOn = false;
+                                    IsPpecInTrainingOn = false;
+                                    break;
+                                case StatusBit.A: // 1
+                                    IsPpecInTrainingOn = true;
+                                    break;
+                                case StatusBit.B: // 2
+                                    IsPpecOn = true;
+                                    break;
+                                case StatusBit.C: // 4
+                                case StatusBit.D: // 8
+                                    //not defined
+                                    break;
+                            }
+                        }
+                        break;
+                    case 1:
+                        foreach (var item in b)
+                        {
+                            switch (item)
+                            {
+                                case StatusBit.None: // 0
+                                    CanAzEq = false;
+                                    CanHomeSensors = false;
+                                    CanPpec = false;
+                                    CanDualEncoders = false;
+                                    break;
+                                case StatusBit.A: // 1
+                                    CanDualEncoders = true;
+                                    break;
+                                case StatusBit.B: // 2
+                                    CanPpec = true;
+                                    break;
+                                case StatusBit.C: // 4
+                                    CanHomeSensors = true;
+                                    break;
+                                case StatusBit.D: // 8
+                                    CanAzEq = true;
+                                    break;
+                            }
+                        }
+                        break;
+                    case 2:
+                        foreach (var item in b)
+                        {
+                            switch (item)
+                            {
+                                case StatusBit.None: // 0
+                                    CanWifi = false;
+                                    CanHalfTrack = false;
+                                    CanPolarLed = false;
+                                    CanAxisSlewsIndependent = false;
+                                    break;
+                                case StatusBit.A: // 1
+                                    CanPolarLed = true;
+                                    break;
+                                case StatusBit.B: // 2
+                                    CanAxisSlewsIndependent = true;
+                                    break;
+                                case StatusBit.C: // 4
+                                    CanHalfTrack = true;
+                                    break;
+                                case StatusBit.D: // 8
+                                    CanWifi = true;
+                                    break;
+                            }
+                        }
+                        break;
+                    case 3:
+                    case 4:
+                    case 5:
+                        //not defined all zeros
+                        break;
+                }
             }
         }
 
@@ -1217,11 +1344,21 @@ namespace GS.SkyWatcher
                 speedInt -= 3;
             }
 
-            if (speedInt < 6) {speedInt = 6;}
+            if (speedInt < 6) { speedInt = 6; }
 
             return speedInt;
         }
 
         #endregion
+    }
+
+    [Flags]
+    public enum StatusBit
+    {
+        None = 0,
+        A = 1,
+        B = 1 << 1,
+        C = 1 << 2,
+        D = 1 << 3
     }
 }

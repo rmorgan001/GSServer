@@ -27,7 +27,7 @@ using System.Windows.Input;
 
 namespace GS.Server.Focuser
 {
-    public class FocuserVM : ObservableObject, IPageVM
+    public class FocuserVM : ObservableObject, IPageVM, IDisposable
     {
         public string TopName => "SkyWatcher";
         public string BottomName => "Focuser";
@@ -200,6 +200,36 @@ namespace GS.Server.Focuser
             Console.WriteLine(@"You can intercept the closing event, and cancel here.");
         }
 
+        #endregion
+
+        #region Dispose
+        public void Dispose()
+        {
+            Dispose(true);
+            // GC.SuppressFinalize(this);
+        }
+        // NOTE: Leave out the finalizer altogether if this class doesn't
+        // own unmanaged resources itself, but leave the other methods
+        // exactly as they are.
+        ~FocuserVM()
+        {
+            // Finalizer calls Dispose(false)
+            Dispose(false);
+        }
+        // The bulk of the clean-up code is implemented in Dispose(bool)
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+
+            }
+            // free native resources if there are any.
+            //if (nativeResource != IntPtr.Zero)
+            //{
+            //    Marshal.FreeHGlobal(nativeResource);
+            //    nativeResource = IntPtr.Zero;
+            //}
+        }
         #endregion
     }
 }

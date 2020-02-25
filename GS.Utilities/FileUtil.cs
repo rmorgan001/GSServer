@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 
 // ReSharper disable UnusedMember.Local
 
@@ -26,67 +25,8 @@ namespace GS.Utilities
 {
     public static class FileUtil
     {
-        [StructLayout(LayoutKind.Sequential)]
-        private struct RM_UNIQUE_PROCESS
-        {
-            public readonly int dwProcessId;
-            private readonly System.Runtime.InteropServices.ComTypes.FILETIME ProcessStartTime;
-        }
-
         private const int RmRebootReasonNone = 0;
-        private const int CCH_RM_MAX_APP_NAME = 255;
-        private const int CCH_RM_MAX_SVC_NAME = 63;
-
-        private enum RM_APP_TYPE
-        {
-            RmUnknownApp = 0,
-            RmMainWindow = 1,
-            RmOtherWindow = 2,
-            RmService = 3,
-            RmExplorer = 4,
-            RmConsole = 5,
-            RmCritical = 1000
-        }
-
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        private struct RM_PROCESS_INFO
-        {
-            public readonly RM_UNIQUE_PROCESS Process;
-
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCH_RM_MAX_APP_NAME + 1)]
-            private readonly string strAppName;
-
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCH_RM_MAX_SVC_NAME + 1)]
-            private readonly string strServiceShortName;
-
-            private readonly RM_APP_TYPE ApplicationType;
-            private readonly uint AppStatus;
-            private readonly uint TSSessionId;
-            [MarshalAs(UnmanagedType.Bool)] private readonly bool bRestartable;
-        }
-
-        [DllImport("rstrtmgr.dll", CharSet = CharSet.Unicode)]
-        private static extern int RmRegisterResources(uint pSessionHandle,
-                                              uint nFiles,
-                                              string[] rgsFilenames,
-                                              uint nApplications,
-                                              [In] RM_UNIQUE_PROCESS[] rgApplications,
-                                              uint nServices,
-                                              string[] rgsServiceNames);
-
-        [DllImport("rstrtmgr.dll", CharSet = CharSet.Auto)]
-        private static extern int RmStartSession(out uint pSessionHandle, int dwSessionFlags, string strSessionKey);
-
-        [DllImport("rstrtmgr.dll")]
-        private static extern int RmEndSession(uint pSessionHandle);
-
-        [DllImport("rstrtmgr.dll")]
-        private static extern int RmGetList(uint dwSessionHandle,
-                                    out uint pnProcInfoNeeded,
-                                    ref uint pnProcInfo,
-                                    [In, Out] RM_PROCESS_INFO[] rgAffectedApps,
-                                    ref uint lpdwRebootReasons);
-
+        
         /// <summary>
         /// Find out what process(es) have a lock on the specified file.
         /// </summary>
@@ -102,7 +42,7 @@ namespace GS.Utilities
             var key = Guid.NewGuid().ToString();
             var processes = new List<Process>();
 
-            var res = RmStartSession(out var handle, 0, key);
+            var res = NativeMethods.RmStartSession(out var handle, 0, key);
 
             if (res != 0)
                 throw new Exception("Could not begin restart session.  Unable to determine file locker.");
@@ -115,7 +55,7 @@ namespace GS.Utilities
 
                 var resources = new[] { path }; // Just checking on one resource.
 
-                res = RmRegisterResources(handle, (uint)resources.Length, resources, 0, null, 0, null);
+                res = NativeMethods.RmRegisterResources(handle, (uint)resources.Length, resources, 0, null, 0, null);
 
                 if (res != 0)
                     throw new Exception("Could not register resource.");
@@ -123,16 +63,16 @@ namespace GS.Utilities
                 //Note: there's a race condition here -- the first call to RmGetList() returns
                 //      the total number of process. However, when we call RmGetList() again to get
                 //      the actual processes this number may have increased.
-                res = RmGetList(handle, out var pnProcInfoNeeded, ref pnProcInfo, null, ref lpdwRebootReasons);
+                res = NativeMethods.RmGetList(handle, out var pnProcInfoNeeded, ref pnProcInfo, null, ref lpdwRebootReasons);
 
                 if (res == ERROR_MORE_DATA)
                 {
                     // Create an array to store the process results
-                    var processInfo = new RM_PROCESS_INFO[pnProcInfoNeeded];
+                    var processInfo = new NativeMethods.RM_PROCESS_INFO[pnProcInfoNeeded];
                     pnProcInfo = pnProcInfoNeeded;
 
                     // Get the list
-                    res = RmGetList(handle, out pnProcInfoNeeded, ref pnProcInfo, processInfo, ref lpdwRebootReasons);
+                    res = NativeMethods.RmGetList(handle, out pnProcInfoNeeded, ref pnProcInfo, processInfo, ref lpdwRebootReasons);
 
                     if (res == 0)
                     {
@@ -158,7 +98,7 @@ namespace GS.Utilities
             }
             finally
             {
-                RmEndSession(handle);
+                NativeMethods.RmEndSession(handle);
             }
 
             return processes;

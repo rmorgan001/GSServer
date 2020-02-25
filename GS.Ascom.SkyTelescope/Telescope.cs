@@ -1292,7 +1292,14 @@ namespace ASCOM.GS.Sky.Telescope
             var dec = SkyServer.TargetDec;
 
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message =
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Driver,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod().Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message =
                     FormattableString.Invariant($"{ra},{dec}")
             };
             MonitorLog.LogToMonitor(monitorItem);
@@ -1809,7 +1816,7 @@ namespace ASCOM.GS.Sky.Telescope
             if (pass) return;
 
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{ra},{dec},{method}") };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{ra},{dec},{method}") };
             MonitorLog.LogToMonitor(monitorItem);
 
             throw new InvalidOperationException($"{method} out of sync limits");
@@ -1823,13 +1830,13 @@ namespace ASCOM.GS.Sky.Telescope
         /// <param name="method">The method name</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object,System.Object)")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "GS.Shared.MonitorEntry.set_Message(System.String)")]
-        private static void  CheckAltAzSync(double alt, double az, string method)
+        private static void CheckAltAzSync(double alt, double az, string method)
         {
             var pass = SkyServer.CheckAltAzSyncLimit(alt, az);
             if (pass) return;
 
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{alt},{az},{method}") };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{alt},{az},{method}") };
             MonitorLog.LogToMonitor(monitorItem);
 
             throw new InvalidOperationException($"{method} out of sync limits");

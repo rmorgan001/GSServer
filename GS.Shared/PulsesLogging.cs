@@ -13,6 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using GS.Principles;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -20,11 +21,10 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using GS.Principles;
 
 namespace GS.Shared
 {
-    public static class PulsesLogging 
+    public static class PulsesLogging
     {
         private static readonly BlockingCollection<PulsesLogItem> _chartBlockingCollection;
         private static readonly string _instanceFileName;
@@ -38,7 +38,7 @@ namespace GS.Shared
             {
                 _instanceFileName = $"{DateTime.Now:yyyy-dd-MM}.txt";
                 DeleteFiles("GSPulsesLog", 7, _logPath);
-                
+
                 _chartBlockingCollection = new BlockingCollection<PulsesLogItem>();
                 Task.Factory.StartNew(() =>
                 {

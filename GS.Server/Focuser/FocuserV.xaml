@@ -10,7 +10,7 @@
                        IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
         <md:DrawerHost  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="2" 
             IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" 
-            BorderBrush="{DynamicResource MaterialDesignDivider}">
+            BorderBrush="{StaticResource MaterialDesignDivider}">
         <md:DrawerHost.LeftDrawerContent>
             <Grid Width="700">
                 <Grid.RowDefinitions>

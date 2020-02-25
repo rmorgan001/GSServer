@@ -27,7 +27,7 @@ namespace GS.Shared
     {
         static Languages()
         {
-            var langs = new List<string>(){ "en-US" };
+            var langs = new List<string>() { "en-US" };
             SupportedLanguages = langs;
         }
         public static void SetLanguageDictionary(bool local, LanguageApp app)
@@ -96,7 +96,7 @@ namespace GS.Shared
             }
 
             if (dict.Source == null) { throw new Exception("Language source missing"); }
-            
+
             Application.Current.Resources.MergedDictionaries.Add(dict);
         }
         public static List<string> SupportedLanguages { get; set; }

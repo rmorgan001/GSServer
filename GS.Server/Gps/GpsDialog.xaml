@@ -13,7 +13,7 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,10">
-            <ComboBox md:HintAssist.Hint="{DynamicResource cbhintGPSCom}" ItemsSource="{Binding ComPorts}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+            <ComboBox md:HintAssist.Hint="{StaticResource cbhintGPSCom}" ItemsSource="{Binding ComPorts}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                 <ComboBox.Text>
                     <Binding Path="GpsComPort" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
                 </ComboBox.Text>
@@ -23,32 +23,32 @@
                     </ItemsPanelTemplate>
                 </ComboBox.ItemsPanel>
             </ComboBox>
-            <Button VerticalAlignment="Bottom" Margin="10,0,0,0" IsCancel="True" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding RetrieveGpsDialogCommand}"
-                    Content="{DynamicResource btnGPSRetrieve}"/>
+            <Button VerticalAlignment="Bottom" Margin="10,0,0,0" IsCancel="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding RetrieveGpsDialogCommand}"
+                    Content="{StaticResource btnGPSRetrieve}"/>
         </StackPanel>
         <StackPanel Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Center" Margin="0,5">
             <StackPanel Orientation="Horizontal" >
-                <TextBlock Text="{DynamicResource btnGPSNMEA}"/>
+                <TextBlock Text="{StaticResource btnGPSNMEA}"/>
                 <TextBlock Text="{Binding NmeaSentence}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" >
-                <TextBlock Text="{DynamicResource btnGPSLat}"/>  
+                <TextBlock Text="{StaticResource btnGPSLat}"/>  
                 <TextBlock Text="{Binding GpsLatString}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{DynamicResource btnGPSLong}"/>
+                <TextBlock Text="{StaticResource btnGPSLong}"/>
                 <TextBlock Text="{Binding GpsLongString}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{DynamicResource btnGPSEle}"/>
+                <TextBlock Text="{StaticResource btnGPSEle}"/>
                 <TextBlock Text="{Binding GpsElevation}"/>
                 <TextBlock Text="m"/>
             </StackPanel>
         </StackPanel>
-        <TextBlock Grid.Row="2" Margin="0,10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" Text="{DynamicResource tbGPSAccept}"/>
+        <TextBlock Grid.Row="2" Margin="0,10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource PrimaryHueMidForegroundBrush}" Text="{StaticResource tbGPSAccept}"/>
         <StackPanel Orientation="Horizontal" Grid.Row="3" VerticalAlignment="Center"  Margin="0,5">
-            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" Content="{DynamicResource btnAccept}" Command="{Binding AcceptGpsDialogCommand}"/>
-            <Button IsCancel="True" Margin="8,0,0,0" Style="{DynamicResource MaterialDesignFlatButton}" Content="{DynamicResource btnCancel}" Command="{Binding CancelGpsDialogCommand}"/>
+            <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource btnAccept}" Command="{Binding AcceptGpsDialogCommand}"/>
+            <Button IsCancel="True" Margin="8,0,0,0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource btnCancel}" Command="{Binding CancelGpsDialogCommand}"/>
         </StackPanel>
     </Grid>
     </UserControl>

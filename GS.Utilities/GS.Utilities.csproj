@@ -129,6 +129,7 @@
     <Compile Include="Helpers\ObservableObject.cs" />
     <Compile Include="Helpers\RelayCommand.cs" />
     <Compile Include="MainWindowVM.cs" />
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="Settings.cs" />
     <Page Include="Controls\WindowTitleBar.xaml">
       <Generator>MSBuild:Compile</Generator>

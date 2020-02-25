@@ -48,6 +48,20 @@ namespace GS.Server.Settings
             }
         }
 
+        private static bool _disableHardwareAcceleration;
+        public static bool DisableHardwareAcceleration
+        {
+            get => _disableHardwareAcceleration;
+            set
+            {
+                if (_disableHardwareAcceleration == value) return;
+                _disableHardwareAcceleration = value;
+                Properties.Server.Default.DisableHardwareAcceleration = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+           
         private static bool _focuser;
         public static bool Focuser
         {
@@ -126,7 +140,7 @@ namespace GS.Server.Settings
             {
                 if (_pulses == value) return;
                 _pulses = value;
-                Properties.Server.Default.Pulses= value;
+                Properties.Server.Default.Pulses = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
@@ -354,6 +368,7 @@ namespace GS.Server.Settings
 
             Charting = Properties.Server.Default.Charting;
             Focuser = Properties.Server.Default.Focuser;
+            DisableHardwareAcceleration = Properties.Server.Default.DisableHardwareAcceleration;
             Gamepad = Properties.Server.Default.Gamepad;
             Notes = Properties.Server.Default.Notes;
             SkyWatcher = Properties.Server.Default.SkyWatcher;

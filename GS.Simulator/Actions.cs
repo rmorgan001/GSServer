@@ -166,7 +166,7 @@ namespace GS.Simulator
                 if (MonitorPulse) pulseEntry.PositionStart = loc[(int)axis];
                 pulseEntry.StartTime = HiResDateTime.UtcNow;
                 //todo change back to 20
-                if (duration < 20)pulseEntry.Rejected = true;
+                if (duration < 20) pulseEntry.Rejected = true;
             }
 
             // execute pulse

@@ -9,10 +9,10 @@
             <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <TextBlock VerticalAlignment="Center" Margin="10 0" xml:space="preserve" Text="{DynamicResource tbCloseApps}"/>
+        <TextBlock VerticalAlignment="Center" Margin="10 0" xml:space="preserve" Text="{StaticResource tbCloseApps}"/>
         <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0 16 0 0" HorizontalAlignment="Center">
-            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding AcceptCloseDialogCommand}" Content="{DynamicResource btnAccept}"/>
-            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}" Command="{Binding CancelCloseDialogCommand}" Content="{DynamicResource btnCancel}"/>
+            <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptCloseDialogCommand}" Content="{StaticResource btnAccept}"/>
+            <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelCloseDialogCommand}" Content="{StaticResource btnCancel}"/>
         </StackPanel>
     </Grid>
     </UserControl>

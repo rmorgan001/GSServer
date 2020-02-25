@@ -13,6 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using ASCOM.DeviceInterface;
 using GS.Principles;
 using GS.Server.Domain;
 using GS.Server.Helpers;
@@ -26,11 +27,12 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace GS.Server.Gamepad
 {
-    public class GamepadVM : ObservableObject, IPageVM, IDisposable
+    public sealed class GamepadVM : ObservableObject, IPageVM, IDisposable
     {
         public string TopName => "";
         public string BottomName => "Gamepad";
@@ -41,6 +43,20 @@ namespace GS.Server.Gamepad
         private CancellationTokenSource ctsGamepad;
         private string _focusTextbox;
         private Gamepad _gamepad;
+
+        private int _trackingCount;
+        private int _homeCount;
+        private int _parkCount;
+        private int _stopCount;
+        private int _speedupCount;
+        private int _speeddownCount;
+        private int _volumeupCount;
+        private int _volumedownCount;
+        private int _ratesiderealCount;
+        private int _ratelunarCount;
+        private int _ratesolarCount;
+        private int _ratekingCount;
+
 
         public GamepadVM()
         {
@@ -53,7 +69,6 @@ namespace GS.Server.Gamepad
                 GamepadSettings.Load();
                 SkyTelescope();
                 Settings();
-                //GamepadSettings.LogGamepadSettings();
                 IsGamepadRunning = GamepadSettings.Startup;
             }
             catch (Exception ex)
@@ -244,6 +259,50 @@ namespace GS.Server.Gamepad
             }
         }
 
+        private string _rateSidereal;
+        public string RateSidereal
+        {
+            get => _rateSidereal;
+            set
+            {
+                _rateSidereal = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _rateLunar;
+        public string RateLunar
+        {
+            get => _rateLunar;
+            set
+            {
+                _rateLunar = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _rateSolar;
+        public string RateSolar
+        {
+            get => _rateSolar;
+            set
+            {
+                _rateSolar = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _rateKing;
+        public string RateKing
+        {
+            get => _rateKing;
+            set
+            {
+                _rateKing = value;
+                OnPropertyChanged();
+            }
+        }
+
         private int _delay;
         public int Delay
         {
@@ -291,6 +350,7 @@ namespace GS.Server.Gamepad
                     ThreadContext.InvokeOnUiThread(delegate { windowHandle = Process.GetCurrentProcess().MainWindowHandle; }, ct);
                     _gamepad = new Gamepad(windowHandle);
                     LoadTextboxes();
+                    ResetCounts();
                     EnableTextBoxes = true;
                     var buttontocheck = -1;
                     var povtocheck = new PovPair(-1, 0);
@@ -527,6 +587,10 @@ namespace GS.Server.Gamepad
         /// <returns></returns>
         private int DoGamepadCommand(int id, bool value, string command)
         {
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{id},{value},{command}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
             var returnId = -1;
             if (!SkyServer.IsMountRunning) return returnId;
             if (command == null) return returnId;
@@ -539,42 +603,54 @@ namespace GS.Server.Gamepad
                         if (value)
                         {
                             if (!SkyTelescope()) return;
-                            if (_skyTelescopeVM.ClickHomeCommand.CanExecute(null))
-                                _skyTelescopeVM.ClickHomeCommand.Execute(null);
+                            if (_homeCount == 0)
+                            {
+                                if (_skyTelescopeVM.ClickHomeCommand.CanExecute(null))
+                                    _skyTelescopeVM.ClickHomeCommand.Execute(null);
+                            }
+                            _homeCount++;
                             returnId = id;
                             break;
                         }
                         else
                         {
-
+                            ResetCounts();
                             break;
                         }
                     case "park":
                         if (value)
                         {
                             if (!SkyTelescope()) return;
-                            if (_skyTelescopeVM.ClickParkCommand.CanExecute(null))
-                                _skyTelescopeVM.ClickParkCommand.Execute(null);
+                            if (_parkCount == 0)
+                            {
+                                if (_skyTelescopeVM.ClickParkCommand.CanExecute(null))
+                                    _skyTelescopeVM.ClickParkCommand.Execute(null);
+                            }
+                            _parkCount++;
                             returnId = id;
                             break;
                         }
                         else
                         {
-
+                            ResetCounts();
                             break;
                         }
                     case "stop":
                         if (value)
                         {
                             if (!SkyTelescope()) return;
-                            if (_skyTelescopeVM.ClickStopCommand.CanExecute(null))
-                                _skyTelescopeVM.ClickStopCommand.Execute(null);
+                            if (_stopCount == 0)
+                            {
+                                if (_skyTelescopeVM.ClickStopCommand.CanExecute(null))
+                                    _skyTelescopeVM.ClickStopCommand.Execute(null);
+                            }
+                            _stopCount++;
                             returnId = id;
                             break;
                         }
                         else
                         {
-
+                            ResetCounts();
                             break;
                         }
                     case "up":
@@ -645,71 +721,195 @@ namespace GS.Server.Gamepad
                         if (value)
                         {
                             if (!SkyTelescope()) return;
-                            if (_skyTelescopeVM.HcSpeedupCommand.CanExecute(null))
-                                _skyTelescopeVM.HcSpeedupCommand.Execute(null);
+                            if (_speedupCount == 0)
+                            {
+                                if (_skyTelescopeVM.HcSpeedupCommand.CanExecute(null))
+                                    _skyTelescopeVM.HcSpeedupCommand.Execute(null);
+                            }
+                            _speedupCount++;
                             returnId = id;
                             break;
                         }
                         else
                         {
-
+                            ResetCounts();
                             break;
                         }
                     case "speeddown":
                         if (value)
                         {
                             if (!SkyTelescope()) return;
-                            if (_skyTelescopeVM.HcSpeeddownCommand.CanExecute(null))
-                                _skyTelescopeVM.HcSpeeddownCommand.Execute(null);
+                            if (_speeddownCount == 0)
+                            {
+                                if (_skyTelescopeVM.HcSpeeddownCommand.CanExecute(null))
+                                    _skyTelescopeVM.HcSpeeddownCommand.Execute(null);
+                            }
+                            _speeddownCount++;
                             returnId = id;
                             break;
                         }
                         else
                         {
-
+                            ResetCounts();
                             break;
                         }
                     case "volumeup":
                         if (value)
                         {
                             if (!Settings()) return;
-                            if (_settingsVM.VolumeupCommand.CanExecute(null))
-                                _settingsVM.VolumeupCommand.Execute(null);
+                            if (_volumeupCount == 0)
+                            {
+                                if (_settingsVM.VolumeupCommand.CanExecute(null))
+                                    _settingsVM.VolumeupCommand.Execute(null);
+                            }
+                            _volumeupCount++;
+                            returnId = id;
                             break;
                         }
                         else
                         {
-                            returnId = id;
+                            ResetCounts();
+                            // returnId = id;
                             break;
                         }
                     case "volumedown":
                         if (value)
                         {
                             if (!Settings()) return;
-                            if (_settingsVM.VolumedownCommand.CanExecute(null))
-                                _settingsVM.VolumedownCommand.Execute(null);
+                            if (_volumedownCount == 0)
+                            {
+                                if (_settingsVM.VolumedownCommand.CanExecute(null))
+                                    _settingsVM.VolumedownCommand.Execute(null);
+                            }
+                            _volumedownCount++;
+                            returnId = id;
                             break;
                         }
                         else
                         {
-                            returnId = id;
+                            ResetCounts();
+                            //returnId = id;
                             break;
                         }
                     case "tracking":
                         if (value)
                         {
                             if (!SkyTelescope()) return;
-                            if (_skyTelescopeVM.ClickTrackingCommand.CanExecute(null))
-                                _skyTelescopeVM.ClickTrackingCommand.Execute(null);
+                            if (_trackingCount == 0)
+                            {
+                                if (_skyTelescopeVM.ClickTrackingCommand.CanExecute(null))
+                                    _skyTelescopeVM.ClickTrackingCommand.Execute(null);
+                            }
+                            _trackingCount++;
                             returnId = id;
                             break;
                         }
                         else
                         {
+                            ResetCounts();
+                            break;
+                        }
+                    case "ratesidereal":
+                        if (value)
+                        {
+                            if (_ratesiderealCount == 0)
+                            {
+                                SkySettings.TrackingRate = DriveRates.driveSidereal;
+                                if (SkyServer.Tracking)
+                                {
+                                    SkyServer.TrackingSpeak = false;
+                                    SkyServer.Tracking = false;
+                                    SkyServer.Tracking = true;
+                                    SkyServer.TrackingSpeak = true;
+                                }
+                                Synthesizer.Speak(Application.Current.Resources["vceSidereal"].ToString());
+                            }
+                            _ratesiderealCount++;
+                            returnId = id;
+                            break;
+                        }
+                        else
+                        {
+                            ResetCounts();
+                            break;
+                        }
+                    case "ratelunar":
+                        if (value)
+                        {
+                            if (_ratelunarCount == 0)
+                            {
+                                SkySettings.TrackingRate = DriveRates.driveLunar;
+                                if (SkyServer.Tracking)
+                                {
+                                    SkyServer.TrackingSpeak = false;
+                                    SkyServer.Tracking = false;
+                                    SkyServer.Tracking = true;
+                                    SkyServer.TrackingSpeak = true;
+                                }
 
+                                Synthesizer.Speak(Application.Current.Resources["vceLunar"].ToString());
+                            }
+                            _ratelunarCount++;
+                            returnId = id;
+                            break;
+                        }
+                        else
+                        {
+                            ResetCounts();
+                            break;
+                        }
+                    case "ratesolar":
+                        if (value)
+                        {
+                            if (_ratesolarCount == 0)
+                            {
+                                SkySettings.TrackingRate = DriveRates.driveSolar;
+                                if (SkyServer.Tracking)
+                                {
+                                    SkyServer.TrackingSpeak = false;
+                                    SkyServer.Tracking = false;
+                                    SkyServer.Tracking = true;
+                                    SkyServer.TrackingSpeak = true;
+                                }
+
+                                Synthesizer.Speak(Application.Current.Resources["vceSolar"].ToString());
+                            }
+                            _ratesolarCount++;
+                            returnId = id;
+                            break;
+                        }
+                        else
+                        {
+                            ResetCounts();
+                            break;
+                        }
+                    case "rateking":
+                        if (value)
+                        {
+                            if (_ratekingCount == 0)
+                            {
+                                SkySettings.TrackingRate = DriveRates.driveKing;
+                                if (SkyServer.Tracking)
+                                {
+                                    SkyServer.TrackingSpeak = false;
+                                    SkyServer.Tracking = false;
+                                    SkyServer.Tracking = true;
+                                    SkyServer.TrackingSpeak = true;
+                                }
+
+                                Synthesizer.Speak(Application.Current.Resources["vceKing"].ToString());
+                            }
+                            _ratekingCount++;
+                            returnId = id;
+                            break;
+                        }
+                        else
+                        {
+                            ResetCounts();
                             break;
                         }
                     default:
+                        ResetCounts();
                         returnId = -1;
                         break;
                 }
@@ -763,6 +963,18 @@ namespace GS.Server.Gamepad
                     break;
                 case "volumeup":
                     Volumeup = val;
+                    break;
+                case "ratesidereal":
+                    RateSidereal = val;
+                    break;
+                case "ratelunar":
+                    RateLunar = val;
+                    break;
+                case "ratesolar":
+                    RateSolar = val;
+                    break;
+                case "rateking":
+                    RateKing = val;
                     break;
             }
 
@@ -822,6 +1034,18 @@ namespace GS.Server.Gamepad
                         case "volumeup":
                             Volumeup = val;
                             break;
+                        case "ratesidereal":
+                            RateSidereal = val;
+                            break;
+                        case "ratelunar":
+                            RateLunar = val;
+                            break;
+                        case "ratesolar":
+                            RateSolar = val;
+                            break;
+                        case "rateking":
+                            RateKing = val;
+                            break;
                     }
                 }
             }
@@ -840,6 +1064,22 @@ namespace GS.Server.Gamepad
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message);
             }
+        }
+
+        private void ResetCounts()
+        {
+            _trackingCount = 0;
+            _homeCount = 0;
+            _parkCount = 0;
+            _stopCount = 0;
+            _speedupCount = 0;
+            _speeddownCount = 0;
+            _volumeupCount = 0;
+            _volumedownCount = 0;
+            _ratesiderealCount = 0;
+            _ratelunarCount = 0;
+            _ratesolarCount = 0;
+            _ratekingCount = 0;
         }
 
         private ICommand _clickTextboxGotFocusCommand;
@@ -1148,12 +1388,38 @@ namespace GS.Server.Gamepad
 
         #endregion
 
+        #region Dispose
         public void Dispose()
         {
-            _skyTelescopeVM?.Dispose();
-            ctsGamepad?.Dispose();
-            _settingsVM?.Dispose();
-            _gamepad?.Dispose();
+            Dispose(true);
+            // GC.SuppressFinalize(this);
         }
+        // NOTE: Leave out the finalizer altogether if this class doesn't
+        // own unmanaged resources itself, but leave the other methods
+        // exactly as they are.
+        ~GamepadVM()
+        {
+            // Finalizer calls Dispose(false)
+            Dispose(false);
+        }
+        // The bulk of the clean-up code is implemented in Dispose(bool)
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _skyTelescopeVM?.Dispose();
+                ctsGamepad?.Dispose();
+                _settingsVM?.Dispose();
+                _gamepad?.Dispose();
+            }
+            // free native resources if there are any.
+            //if (nativeResource != IntPtr.Zero)
+            //{
+            //    Marshal.FreeHGlobal(nativeResource);
+            //    nativeResource = IntPtr.Zero;
+            //}
+        }
+        #endregion
+
     }
 }

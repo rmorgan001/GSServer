@@ -310,5 +310,17 @@ namespace GS.Server.Properties {
                 this["Pulses"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DisableHardwareAcceleration {
+            get {
+                return ((bool)(this["DisableHardwareAcceleration"]));
+            }
+            set {
+                this["DisableHardwareAcceleration"] = value;
+            }
+        }
     }
 }

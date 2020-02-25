@@ -4,15 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-             TextOptions.TextFormattingMode="Display" FontSize="15"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors" FontSize="15"
              mc:Ignorable="d">
     <Grid >
         <md:DialogHost HorizontalAlignment="Center" CloseOnClickAway="True"
                        IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
         <!--<md:DrawerHost  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="2" 
             IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" 
-            BorderBrush="{DynamicResource MaterialDesignDivider}">
+            BorderBrush="{StaticResource MaterialDesignDivider}">
         <md:DrawerHost.LeftDrawerContent>
             <Grid Width="700">
                 <Grid.RowDefinitions>
@@ -40,9 +39,9 @@
                 Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}"
                 Style="{StaticResource MaterialDesignHamburgerToggleButton}" IsChecked="False" x:Name="MenuToggleButton"/>-->
                 <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10 10" HorizontalAlignment="Left">
-                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{DynamicResource tbGPOn}"/>
-                <CheckBox ToolTip="{DynamicResource cbtipGPOn}" IsChecked="{Binding IsGamepadRunning}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                <TextBlock Margin="20,0,10,0" VerticalAlignment="Center" Text="{DynamicResource tbGPSen}"/>
+                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource tbGPOn}"/>
+                <CheckBox ToolTip="{StaticResource cbtipGPOn}" IsChecked="{Binding IsGamepadRunning}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
+                <TextBlock Margin="20,0,10,0" VerticalAlignment="Center" Text="{StaticResource tbGPSen}"/>
                     <Slider Name="sDelay" Width="200"  Minimum="50" Maximum="500" AutoToolTipPlacement="BottomRight" 
                             VerticalAlignment="Center"  IsSnapToTickEnabled="True" IsEnabled="{Binding EnableTextBoxes}"
                             Style="{StaticResource MaterialDesignSlider}" Value="{Binding Delay, UpdateSourceTrigger=PropertyChanged, Delay=800}"/>
@@ -61,8 +60,9 @@
                     <ColumnDefinition />
                     <ColumnDefinition />
                     <ColumnDefinition />
+                    <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                    <TextBox Grid.Row="0" Grid.Column="0"  Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{DynamicResource tbhintGPTracking}" 
+                    <TextBox Grid.Row="0" Grid.Column="0"  Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource tbhintGPTracking}" 
                              Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}" >
                     <TextBox.Text>
                         <Binding Path="Tracking" Mode="OneWay" />
@@ -79,7 +79,7 @@
                         </b:EventTrigger>
                     </b:Interaction.Triggers>
                 </TextBox>
-                    <TextBox Grid.Row="1" Grid.Column="0" Width="125" Margin="0,10,0,0" IsReadOnly=" True" md:HintAssist.Hint="{DynamicResource tbhintGPStop}" 
+                    <TextBox Grid.Row="1" Grid.Column="0" Width="125" Margin="0,10,0,0" IsReadOnly=" True" md:HintAssist.Hint="{StaticResource tbhintGPStop}" 
                          Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}" >
                     <TextBox.Text>
                         <Binding Path="Stop"  Mode="OneWay" />
@@ -96,7 +96,7 @@
                         </b:EventTrigger>
                     </b:Interaction.Triggers>
                 </TextBox>
-                    <TextBox Grid.Row="2" Grid.Column="0" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{DynamicResource tbhintGPPark}"
+                    <TextBox Grid.Row="2" Grid.Column="0" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource tbhintGPPark}"
                          Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}" >
                     <TextBox.Text>
                         <Binding Path="Park"  Mode="OneWay" />
@@ -113,7 +113,7 @@
                         </b:EventTrigger>
                     </b:Interaction.Triggers>
                 </TextBox>
-                    <TextBox Grid.Row="3" Grid.Column="0" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{DynamicResource tbhintGPHome}"
+                    <TextBox Grid.Row="3" Grid.Column="0" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource tbhintGPHome}"
                          Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}" >
                     <TextBox.Text>
                         <Binding Path="Home"  Mode="OneWay" />
@@ -130,7 +130,7 @@
                         </b:EventTrigger>
                     </b:Interaction.Triggers>
                 </TextBox>
-                    <TextBox Grid.Row="0" Grid.Column="1" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{DynamicResource tbhintGPSpeedUp}"
+                    <TextBox Grid.Row="0" Grid.Column="1" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource tbhintGPSpeedUp}"
                          Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}" >
                     <TextBox.Text>
                         <Binding Path="Speedup"  Mode="OneWay" />
@@ -147,7 +147,7 @@
                         </b:EventTrigger>
                     </b:Interaction.Triggers>
                 </TextBox>
-                    <TextBox Grid.Row="1" Grid.Column="1" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{DynamicResource tbhintGPSpeedDown}"
+                    <TextBox Grid.Row="1" Grid.Column="1" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource tbhintGPSpeedDown}"
                          Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}" >
                     <TextBox.Text>
                         <Binding Path="Speeddown"  Mode="OneWay" />
@@ -164,7 +164,7 @@
                         </b:EventTrigger>
                     </b:Interaction.Triggers>
                 </TextBox>
-                    <TextBox Grid.Row="2" Grid.Column="1" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{DynamicResource tbhintGPVolumeUp}"
+                    <TextBox Grid.Row="2" Grid.Column="1" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource tbhintGPVolumeUp}"
                          Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}" >
                     <TextBox.Text>
                         <Binding Path="Volumeup"  Mode="OneWay" />
@@ -181,7 +181,7 @@
                         </b:EventTrigger>
                     </b:Interaction.Triggers>
                 </TextBox>
-                    <TextBox Grid.Row="3" Grid.Column="1" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{DynamicResource tbhintGPVolumeDown}"
+                    <TextBox Grid.Row="3" Grid.Column="1" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource tbhintGPVolumeDown}"
                          Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}" >
                     <TextBox.Text>
                         <Binding Path="Volumedown"  Mode="OneWay" />
@@ -198,7 +198,7 @@
                         </b:EventTrigger>
                     </b:Interaction.Triggers>
                 </TextBox>
-                    <TextBox Grid.Row="0" Grid.Column="2" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{DynamicResource tbhintGPSlewUp}"
+                    <TextBox Grid.Row="0" Grid.Column="2" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource tbhintGPSlewUp}"
                          Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}" >
                     <TextBox.Text>
                         <Binding Path="Up"  Mode="OneWay" />
@@ -215,7 +215,7 @@
                         </b:EventTrigger>
                     </b:Interaction.Triggers>
                 </TextBox>
-                    <TextBox Grid.Row="1" Grid.Column="2" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{DynamicResource tbhintGPSlewDown}"
+                    <TextBox Grid.Row="1" Grid.Column="2" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource tbhintGPSlewDown}"
                          Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}" >
                     <TextBox.Text>
                         <Binding Path="Down"  Mode="OneWay" />
@@ -232,7 +232,7 @@
                         </b:EventTrigger>
                     </b:Interaction.Triggers>
                 </TextBox>
-                    <TextBox Grid.Row="2" Grid.Column="2" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{DynamicResource tbhintGPSlewLeft}"
+                    <TextBox Grid.Row="2" Grid.Column="2" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource tbhintGPSlewLeft}"
                          Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}" >
                     <TextBox.Text>
                         <Binding Path="Left"  Mode="OneWay" />
@@ -249,7 +249,7 @@
                         </b:EventTrigger>
                     </b:Interaction.Triggers>
                 </TextBox>
-                    <TextBox Grid.Row="3" Grid.Column="2" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{DynamicResource tbhintGPSlewRight}"
+                    <TextBox Grid.Row="3" Grid.Column="2" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource tbhintGPSlewRight}"
                          Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}" >
                     <TextBox.Text>
                         <Binding Path="Right" Mode="OneWay" />
@@ -266,7 +266,72 @@
                         </b:EventTrigger>
                     </b:Interaction.Triggers>
                 </TextBox>
-                    <Button Grid.Row="4" Grid.ColumnSpan="3" Grid.Column="0" HorizontalAlignment="Center" Content="{DynamicResource tbhintGPSave}" IsEnabled="{Binding EnableTextBoxes}" 
+
+                    <TextBox Grid.Row="0" Grid.Column="3" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource tbhintGPSidereal}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                            <TextBox.Text>
+                                <Binding Path="RateSidereal" Mode="OneWay" />
+                            </TextBox.Text>
+                            <b:Interaction.Triggers>
+                                <b:EventTrigger EventName="GotFocus">
+                                <b:InvokeCommandAction Command="{Binding ClickTextboxGotFocusCommand}" CommandParameter="ratesidereal" />
+                                </b:EventTrigger>
+                                <b:EventTrigger EventName="LostFocus">
+                                    <b:InvokeCommandAction Command="{Binding ClickTextboxLostFocusCommand}" />
+                                </b:EventTrigger>
+                                <b:EventTrigger EventName="PreviewMouseDoubleClick">
+                                <b:InvokeCommandAction Command="{Binding ClickPreviewMouseDoubleClickCommand}" CommandParameter="ratesidereal" />
+                                </b:EventTrigger>
+                            </b:Interaction.Triggers>
+                        </TextBox>
+                    <TextBox Grid.Row="1" Grid.Column="3" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource tbhintGPLunar}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                            <TextBox.Text>
+                                <Binding Path="RateLunar" Mode="OneWay" />
+                            </TextBox.Text>
+                            <b:Interaction.Triggers>
+                                <b:EventTrigger EventName="GotFocus">
+                                <b:InvokeCommandAction Command="{Binding ClickTextboxGotFocusCommand}" CommandParameter="ratelunar" />
+                                </b:EventTrigger>
+                                <b:EventTrigger EventName="LostFocus">
+                                    <b:InvokeCommandAction Command="{Binding ClickTextboxLostFocusCommand}" />
+                                </b:EventTrigger>
+                                <b:EventTrigger EventName="PreviewMouseDoubleClick">
+                                <b:InvokeCommandAction Command="{Binding ClickPreviewMouseDoubleClickCommand}" CommandParameter="ratelunar" />
+                                </b:EventTrigger>
+                            </b:Interaction.Triggers>
+                        </TextBox>
+                    <TextBox Grid.Row="2" Grid.Column="3" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource tbhintGPSolar}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                            <TextBox.Text>
+                                <Binding Path="RateSolar" Mode="OneWay" />
+                            </TextBox.Text>
+                            <b:Interaction.Triggers>
+                                <b:EventTrigger EventName="GotFocus">
+                                <b:InvokeCommandAction Command="{Binding ClickTextboxGotFocusCommand}" CommandParameter="ratesolar" />
+                                </b:EventTrigger>
+                                <b:EventTrigger EventName="LostFocus">
+                                    <b:InvokeCommandAction Command="{Binding ClickTextboxLostFocusCommand}" />
+                                </b:EventTrigger>
+                                <b:EventTrigger EventName="PreviewMouseDoubleClick">
+                                <b:InvokeCommandAction Command="{Binding ClickPreviewMouseDoubleClickCommand}" CommandParameter="ratesolar" />
+                                </b:EventTrigger>
+                            </b:Interaction.Triggers>
+                        </TextBox>
+                    <TextBox Grid.Row="3" Grid.Column="3" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource tbhintGPKing}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                            <TextBox.Text>
+                                <Binding Path="RateKing" Mode="OneWay" />
+                            </TextBox.Text>
+                            <b:Interaction.Triggers>
+                                <b:EventTrigger EventName="GotFocus">
+                                <b:InvokeCommandAction Command="{Binding ClickTextboxGotFocusCommand}" CommandParameter="rateking" />
+                                </b:EventTrigger>
+                                <b:EventTrigger EventName="LostFocus">
+                                    <b:InvokeCommandAction Command="{Binding ClickTextboxLostFocusCommand}" />
+                                </b:EventTrigger>
+                                <b:EventTrigger EventName="PreviewMouseDoubleClick">
+                                <b:InvokeCommandAction Command="{Binding ClickPreviewMouseDoubleClickCommand}" CommandParameter="rateking" />
+                                </b:EventTrigger>
+                            </b:Interaction.Triggers>
+                        </TextBox>
+                    <Button Grid.Row="4" Grid.ColumnSpan="4" Grid.Column="0" HorizontalAlignment="Center" Content="{StaticResource tbhintGPSave}" IsEnabled="{Binding EnableTextBoxes}" 
                         Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSaveCommand}"/>
             </Grid>
                 </ScrollViewer>
