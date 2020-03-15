@@ -31,13 +31,9 @@ namespace GS.Server.Helpers
         public static event PropertyChangedEventHandler _staticPropertyChanged;
 
         private static IList<string> VoiceNames;
-
         private static string VoiceName => Settings.Settings.VoiceName;
-
         private static int Rate { get; }
-
         private static int Volume => Settings.Settings.VoiceVolume;
-
         internal static bool VoiceActive
         {
             get => Settings.Settings.VoiceActive;
@@ -47,7 +43,6 @@ namespace GS.Server.Helpers
                 OnStaticPropertyChanged();
             }
         }
-
         private static bool _voicePause;
         internal static bool VoicePause
         {
@@ -59,7 +54,6 @@ namespace GS.Server.Helpers
                 OnStaticPropertyChanged();
             }
         }
-
         private static bool VoiceValid
         {
             get
@@ -107,7 +101,6 @@ namespace GS.Server.Helpers
             if (!VoiceValid) VoiceActive = false;
             VoicePause = false;
         }
-
         public static void Speak(string text)
         {
             try
@@ -129,7 +122,6 @@ namespace GS.Server.Helpers
                 MonitorLog.LogToMonitor(monitorItem);
             }
         }
-
         public static void SpeakBool(string text, bool bol)
         {
             try
@@ -153,7 +145,6 @@ namespace GS.Server.Helpers
             }
 
         }
-
         public static IList<string> GetVoices()
         {
             VoiceNames = new List<string>();
@@ -165,7 +156,6 @@ namespace GS.Server.Helpers
 
             return VoiceNames;
         }
-
         /// <summary>
         /// called from the setter property.  Used to update UI elements.  propertyname is not required
         /// </summary>

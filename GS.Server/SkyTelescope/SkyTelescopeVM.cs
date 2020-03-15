@@ -4454,15 +4454,24 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private int _gpsComPort;
         public int GpsComPort
         {
-            get => Properties.SkyTelescope.Default.GpsPort;
+            get => SkySettings.GpsComPort;
             set
             {
-                if (value == _gpsComPort) return;
-                _gpsComPort = value;
-                Properties.SkyTelescope.Default.GpsPort = value;
+                if (value == SkySettings.GpsComPort) return;
+                SkySettings.GpsComPort = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public  SerialSpeed GpsBaudRate
+        {
+            get => SkySettings.GpsBaudRate;
+            set
+            {
+                if (value == SkySettings.GpsBaudRate) return;
+                SkySettings.GpsBaudRate = value;
                 OnPropertyChanged();
             }
         }
@@ -4633,7 +4642,7 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    var gpsHardware = new GpsHardware(GpsComPort);
+                    var gpsHardware = new GpsHardware(GpsComPort, GpsBaudRate);
                     gpsHardware.GpsOn();
                     var stopwatch = new Stopwatch();
                     stopwatch.Start();

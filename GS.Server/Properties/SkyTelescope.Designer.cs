@@ -1126,5 +1126,17 @@ namespace GS.Server.Properties {
                 this["SyncLimit"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ps4800")]
+        public string GpsBaudRate {
+            get {
+                return ((string)(this["GpsBaudRate"]));
+            }
+            set {
+                this["GpsBaudRate"] = value;
+            }
+        }
     }
 }

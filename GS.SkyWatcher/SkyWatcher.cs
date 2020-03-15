@@ -794,6 +794,9 @@ namespace GS.SkyWatcher
         internal string GetMotorCardVersion(AxisId axis)
         {
             var result = _commands.GetMotorCardVersion(axis);
+
+            //int value = Convert.ToInt32(result.Substring(5, 2), 16); convert hex to int for possible enum list
+            
             switch (result.Substring(5, 2))
             {
                 case "00":
@@ -812,7 +815,7 @@ namespace GS.SkyWatcher
                     MountType = "EQ8";
                     break;
                 case "05":
-                    MountType = "AZEQ6";
+                    MountType = "AZEQ6/EQ6-R";
                     break;
                 case "06":
                     MountType = "AZEQ5";

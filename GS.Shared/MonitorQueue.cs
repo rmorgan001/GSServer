@@ -113,7 +113,7 @@ namespace GS.Shared
 
         static MonitorQueue()
         {
-            _instanceFileName = $"{DateTime.Now:yyyy-dd-MM-HH}.txt";
+            _instanceFileName = $"{DateTime.Now:yyyy-MM-dd-HH}.txt";
             DeleteFiles("GSSessionLog", 7, _logPath);
             DeleteFiles("GSErrorLog", 7, _logPath);
             DeleteFiles("GSChartingLog", 7, _logPath);

@@ -28,13 +28,15 @@ namespace GS.Server.Gps
     internal class GpsHardware
     {
         private readonly int _gpsPort;
+        private readonly SerialSpeed _gpsSerialSpeed;
         private const int _readTimeout = 15;
         private CancellationTokenSource _ctsGps;
         private bool _gpsRunning;
 
-        internal GpsHardware(int port)
+        internal GpsHardware(int port, SerialSpeed serialSpeed)
         {
             _gpsPort = port;
+            _gpsSerialSpeed = serialSpeed;
         }
 
         internal bool HasData { get; private set; }
@@ -107,7 +109,7 @@ namespace GS.Server.Gps
                         }
                         else
                         {
-                            ConnectSerial();
+                            ConnectSerial( );
 
                             if (HasData)
                             {
@@ -153,7 +155,7 @@ namespace GS.Server.Gps
             var _serial = new Serial
             {
                 Port = _gpsPort,
-                Speed = SerialSpeed.ps4800,
+                Speed =  _gpsSerialSpeed,
                 ReceiveTimeoutMs = 5000,
                 StopBits = SerialStopBits.One,
                 DataBits = 8,

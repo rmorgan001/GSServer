@@ -278,5 +278,8 @@
     <Setting Name="SyncLimit" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">30</Value>
     </Setting>
+    <Setting Name="GpsBaudRate" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ps4800</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

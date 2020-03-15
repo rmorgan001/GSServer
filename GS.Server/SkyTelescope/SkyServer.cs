@@ -3517,11 +3517,33 @@ namespace GS.Server.SkyTelescope
                 return false;
             } // add check later if needed
 
-
+            //convert radec to mount positions
             var xy = Axes.RaDecToAxesXY(new[] { ra, dec });
-            var a = Math.Abs(xy[0]) - Math.Abs(_mountAxisX);
-            var b = Math.Abs(xy[1]) - Math.Abs(_mountAxisY);
-            return !(Math.Abs(a) > SkySettings.SyncLimit || Math.Abs(b) > SkySettings.SyncLimit);
+            var target = Axes.AxesAppToMount(xy);
+
+            //convert current position to mount position
+            var current = Axes.AxesMountToApp(new[] { _mountAxisX, _mountAxisY });
+
+            //compare radec to current postion
+            var a = Math.Abs(target[0]) - Math.Abs(current[0]);
+            var b = Math.Abs(target[1]) - Math.Abs(current[1]);
+            var ret = !(Math.Abs(a) > SkySettings.SyncLimit || Math.Abs(b) > SkySettings.SyncLimit);
+            if (ret) return true;
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Warning,
+                Method = MethodBase.GetCurrentMethod().Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{xy[0]},{xy[1]},{target[0]},{target[1]},{current[0]},{current[1]},{SkySettings.SyncLimit}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            return false;
+
         }
 
         /// <summary>
@@ -3537,11 +3559,34 @@ namespace GS.Server.SkyTelescope
                 return false;
             } // add check later if needed
 
-
+            //convert radec to mount positions
             var yx = Axes.AltAzToAxesYX(new[] { alt, az });
-            var a = Math.Abs(yx[1]) - Math.Abs(_mountAxisX);
-            var b = Math.Abs(yx[0]) - Math.Abs(_mountAxisY);
-            return !(Math.Abs(a) > SkySettings.SyncLimit || Math.Abs(b) > SkySettings.SyncLimit);
+            var target = Axes.AxesAppToMount(new[] { yx[1], yx[0] });
+
+            //convert current position to mount position
+            var current = Axes.AxesMountToApp(new[] { _mountAxisX, _mountAxisY });
+
+            //compare radec to current postion
+            var a = Math.Abs(target[0]) - Math.Abs(current[0]);
+            var b = Math.Abs(target[1]) - Math.Abs(current[1]);
+
+            var ret = !(Math.Abs(a) > SkySettings.SyncLimit || Math.Abs(b) > SkySettings.SyncLimit);
+
+            if (ret) return true;
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Warning,
+                Method = MethodBase.GetCurrentMethod().Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{yx[1]},{yx[0]},{target[0]},{target[1]},{current[0]},{current[1]},{SkySettings.SyncLimit}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            return false;
         }
 
         #endregion

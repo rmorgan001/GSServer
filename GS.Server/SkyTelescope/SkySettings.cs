@@ -475,6 +475,33 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static int _gpsComPort;
+        public static int GpsComPort
+        {
+            get => _gpsComPort;
+            set
+            {
+                if (_gpsComPort == value) return;
+                _gpsComPort = value;
+                Properties.SkyTelescope.Default.GpsPort = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static SerialSpeed _gpsBaudRate;
+        public static SerialSpeed GpsBaudRate
+        {
+            get => _gpsBaudRate;
+            set
+            {
+                if (_gpsBaudRate == value) return;
+                _gpsBaudRate = value;
+                Properties.SkyTelescope.Default.GpsBaudRate = value.ToString();
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
+            }
+        }
+
         private static EquatorialCoordinateType _equatorialCoordinateType;
         public static EquatorialCoordinateType EquatorialCoordinateType
         {
@@ -1301,6 +1328,8 @@ namespace GS.Server.SkyTelescope
             HandShake = hsparse;
             Enum.TryParse<SerialSpeed>(Properties.SkyTelescope.Default.BaudRate, true, out var brateparse);
             BaudRate = brateparse;
+            Enum.TryParse<SerialSpeed>(Properties.SkyTelescope.Default.GpsBaudRate, true, out var grateparse);
+            GpsBaudRate = grateparse;
 
             AlternatingPpec = Properties.SkyTelescope.Default.AlternatingPPEC;
             ApertureArea = Properties.SkyTelescope.Default.ApertureArea;
@@ -1317,6 +1346,7 @@ namespace GS.Server.SkyTelescope
             FocalLength = Properties.SkyTelescope.Default.FocalLength;
             FullCurrent = Properties.SkyTelescope.Default.FullCurrent;
             GotoPrecision = Properties.SkyTelescope.Default.GotoPrecision;
+            GpsComPort = Properties.SkyTelescope.Default.GpsPort;
             GuideRateOffsetY = Properties.SkyTelescope.Default.GuideRateOffsetY;
             GuideRateOffsetX = Properties.SkyTelescope.Default.GuideRateOffsetX;
             HomeAxisX = Properties.SkyTelescope.Default.HomeAxisX;

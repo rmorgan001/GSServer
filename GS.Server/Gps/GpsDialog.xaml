@@ -4,9 +4,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-             mc:Ignorable="d" >
+        xmlns:domain="clr-namespace:GS.Server.Domain"
+        xmlns:enums="clr-namespace:ASCOM.Utilities;assembly=ASCOM.Utilities"
+        mc:Ignorable="d" >
     <Grid Margin="5">
         <Grid.RowDefinitions>
+            <RowDefinition />
             <RowDefinition />
             <RowDefinition />
             <RowDefinition />
@@ -23,10 +26,19 @@
                     </ItemsPanelTemplate>
                 </ComboBox.ItemsPanel>
             </ComboBox>
-            <Button VerticalAlignment="Bottom" Margin="10,0,0,0" IsCancel="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding RetrieveGpsDialogCommand}"
-                    Content="{StaticResource btnGPSRetrieve}"/>
+            <ComboBox md:HintAssist.Hint="{StaticResource cbhintGPSBaud}" MinWidth="10" Margin="10,0,0,0" ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type enums:SerialSpeed}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                <ComboBox.Text>
+                    <Binding Path="GpsBaudRate" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
+                </ComboBox.Text>
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
         </StackPanel>
-        <StackPanel Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Center" Margin="0,5">
+        <Button Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" IsCancel="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding RetrieveGpsDialogCommand}" Content="{StaticResource btnGPSRetrieve}" />
+        <StackPanel Orientation="Vertical" Grid.Row="2" HorizontalAlignment="Center" Margin="0,5">
             <StackPanel Orientation="Horizontal" >
                 <TextBlock Text="{StaticResource btnGPSNMEA}"/>
                 <TextBlock Text="{Binding NmeaSentence}"/>
@@ -45,8 +57,8 @@
                 <TextBlock Text="m"/>
             </StackPanel>
         </StackPanel>
-        <TextBlock Grid.Row="2" Margin="0,10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource PrimaryHueMidForegroundBrush}" Text="{StaticResource tbGPSAccept}"/>
-        <StackPanel Orientation="Horizontal" Grid.Row="3" VerticalAlignment="Center"  Margin="0,5">
+        <TextBlock Grid.Row="3" Margin="0,10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource PrimaryHueMidForegroundBrush}" Text="{StaticResource tbGPSAccept}"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="4" VerticalAlignment="Center"  Margin="0,5">
             <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource btnAccept}" Command="{Binding AcceptGpsDialogCommand}"/>
             <Button IsCancel="True" Margin="8,0,0,0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource btnCancel}" Command="{Binding CancelGpsDialogCommand}"/>
         </StackPanel>

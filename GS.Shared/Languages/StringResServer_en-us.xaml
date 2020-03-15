@@ -162,6 +162,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!--GPS -->
     <system:String x:Key="cbhintGPSCom">Com Port</system:String>
+    <system:String x:Key="cbhintGPSBaud">Baud Rate</system:String>
     <system:String x:Key="btnGPSRetrieve">Retrieve</system:String>
     <system:String x:Key="btnGPSNMEA">NMEA:</system:String>
     <system:String x:Key="btnGPSLat">Latitude:</system:String>
