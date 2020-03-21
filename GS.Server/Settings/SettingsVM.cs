@@ -31,6 +31,7 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using GS.Principles;
 
 namespace GS.Server.Settings
 {
@@ -57,7 +58,7 @@ namespace GS.Server.Settings
                     _settingsVM = this;
 
                     var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Loading SettingsVM" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Loading SettingsVM" };
                     MonitorLog.LogToMonitor(monitorItem);
 
                     //token to cancel UI updates
@@ -66,6 +67,9 @@ namespace GS.Server.Settings
 
                     //subscribe to Server property changes
                     Settings.StaticPropertyChanged += PropertyChangedServer;
+
+                    //subscribe to SkySettings property changes
+                    SkySettings.StaticPropertyChanged += PropertyChangedSkySettings;
 
                     //subscribe to Server property Monitor items
                     MonitorQueue.StaticPropertyChanged += PropertyChangedMonitorQueue;
@@ -97,7 +101,7 @@ namespace GS.Server.Settings
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -165,7 +169,33 @@ namespace GS.Server.Settings
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private void PropertyChangedSkySettings(object sender, PropertyChangedEventArgs e)
+        {
+            try
+            {
+                ThreadContext.InvokeOnUiThread(
+                    delegate
+                    {
+                        switch (e.PropertyName)
+                        {
+                            case "UTCDateOffset":
+                                OnPropertyChanged($"UTCDateOffset");
+                                OnPropertyChanged($"UTCTime"); 
+                                break;
+                        }
+                    }, _cts);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -410,6 +440,29 @@ namespace GS.Server.Settings
                 OnPropertyChanged();
             }
         }
+        
+        #endregion
+
+        #region Time
+
+        public TimeSpan UTCDateOffset => SkySettings.UTCDateOffset;
+
+        public DateTime UTCTime => HiResDateTime.UtcNow.Add(SkySettings.UTCDateOffset);
+
+        private ICommand _clickResetUtcffsetCmd;
+        public ICommand ClickResetUtcOffsetCmd
+        {
+            get
+            {
+                return _clickResetUtcffsetCmd ?? (_clickResetUtcffsetCmd = new RelayCommand(
+                    param => ClickResetUtcOffset()
+                ));
+            }
+        }
+        private void ClickResetUtcOffset()
+        {
+            SkySettings.UTCDateOffset = new TimeSpan();
+        }
 
         #endregion
 
@@ -518,7 +571,7 @@ namespace GS.Server.Settings
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -587,7 +640,7 @@ namespace GS.Server.Settings
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -623,7 +676,7 @@ namespace GS.Server.Settings
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -662,7 +715,7 @@ namespace GS.Server.Settings
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -684,7 +737,7 @@ namespace GS.Server.Settings
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -797,7 +850,7 @@ namespace GS.Server.Settings
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -834,7 +887,7 @@ namespace GS.Server.Settings
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
@@ -882,7 +935,7 @@ namespace GS.Server.Settings
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -912,7 +965,7 @@ namespace GS.Server.Settings
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -963,7 +1016,7 @@ namespace GS.Server.Settings
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -1012,7 +1065,7 @@ namespace GS.Server.Settings
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -1041,7 +1094,7 @@ namespace GS.Server.Settings
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -1070,7 +1123,7 @@ namespace GS.Server.Settings
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -1099,7 +1152,7 @@ namespace GS.Server.Settings
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -1163,7 +1216,7 @@ namespace GS.Server.Settings
             IsDialogOpen = true;
 
             var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
             MonitorLog.LogToMonitor(monitorItem);
         }
 

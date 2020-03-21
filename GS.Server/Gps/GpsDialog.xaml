@@ -7,8 +7,13 @@
         xmlns:domain="clr-namespace:GS.Server.Domain"
         xmlns:enums="clr-namespace:ASCOM.Utilities;assembly=ASCOM.Utilities"
         mc:Ignorable="d" >
-    <Grid Margin="5">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </UserControl.Resources>
+    <Grid Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
             <RowDefinition />
             <RowDefinition />
             <RowDefinition />
@@ -37,29 +42,54 @@
                 </ComboBox.ItemsPanel>
             </ComboBox>
         </StackPanel>
-        <Button Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" IsCancel="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding RetrieveGpsDialogCommand}" Content="{StaticResource btnGPSRetrieve}" />
-        <StackPanel Orientation="Vertical" Grid.Row="2" HorizontalAlignment="Center" Margin="0,5">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0">
+            <CheckBox Margin="5,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Style="{StaticResource MaterialDesignCheckBox}" IsChecked="{Binding GpsGga}" />
+            <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{StaticResource tbGPSGGA}" />
+            <CheckBox Margin="15,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Style="{StaticResource MaterialDesignCheckBox}" IsChecked="{Binding GpsRmc}" />
+            <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{StaticResource tbGPSRMC}"  />
+        </StackPanel>
+        <Button Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Center" IsCancel="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding RetrieveGpsDialogCommand}" Content="{StaticResource btnGPSRetrieve}" />
+        <StackPanel Orientation="Vertical" Grid.Row="3" HorizontalAlignment="Left"  Margin="5,5,0,0">
             <StackPanel Orientation="Horizontal" >
                 <TextBlock Text="{StaticResource btnGPSNMEA}"/>
-                <TextBlock Text="{Binding NmeaSentence}"/>
+                <TextBlock Margin="5,0,0,0" Text="{Binding NmeaTag}" FontWeight="Bold"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" >
-                <TextBlock Text="{StaticResource btnGPSLat}"/>  
-                <TextBlock Text="{Binding GpsLatString}"/>
+                <TextBlock Text="{StaticResource btnGPSLat}"/>
+                <TextBlock Margin="5,0,0,0" Text="{Binding GpsLatString}" FontWeight="Bold"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="{StaticResource btnGPSLong}"/>
-                <TextBlock Text="{Binding GpsLongString}"/>
+                <TextBlock Margin="5,0,0,0" Text="{Binding GpsLongString}" FontWeight="Bold"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="{StaticResource btnGPSEle}"/>
-                <TextBlock Text="{Binding GpsElevation}"/>
-                <TextBlock Text="m"/>
+                <TextBlock Margin="5,0,0,0" Text="{Binding GpsElevation}" FontWeight="Bold"/>
+                <TextBlock Text="m" FontWeight="Bold"/>
             </StackPanel>
         </StackPanel>
-        <TextBlock Grid.Row="3" Margin="0,10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource PrimaryHueMidForegroundBrush}" Text="{StaticResource tbGPSAccept}"/>
-        <StackPanel Orientation="Horizontal" Grid.Row="4" VerticalAlignment="Center"  Margin="0,5">
-            <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource btnAccept}" Command="{Binding AcceptGpsDialogCommand}"/>
+        <StackPanel Orientation="Vertical" Grid.Row="4" HorizontalAlignment="Left" Margin="5,5,0,0">
+            <TextBlock Text="{StaticResource tbGPSLocal}" />
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{StaticResource tbGPSPC}" />
+                <TextBlock Margin="5,0,0,0" Text="{Binding GpsPcTime, StringFormat={}{0:H:mm:ss.fff}}" FontWeight="Bold" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{StaticResource tbGPSGPS}" />
+                <TextBlock Margin="5,0,0,0" Text="{Binding GpsTime, StringFormat={}{0:H:mm:ss.fff}}" FontWeight="Bold" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{StaticResource tbGPSDeviation}" />
+                <TextBlock Margin="5,0,0,0" Text="{Binding GpsSpan, StringFormat={}{0:dd\\:hh\\:mm\\:ss\\.fff}}" FontWeight="Bold" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0" Visibility="{Binding Path=AllowTimeVis, Converter={StaticResource BoolToVis}}">
+                <CheckBox Style="{StaticResource MaterialDesignCheckBox}" IsChecked="{Binding AllowTimeChange}" />
+                <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{StaticResource tbGPSChangeTime}" />
+            </StackPanel>
+        </StackPanel>
+        <TextBlock Grid.Row="5" Margin="0,15,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{StaticResource tbGPSAccept}"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="6" VerticalAlignment="Center"  Margin="0,5">
+            <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource btnAccept}" Command="{Binding AcceptGpsDialogCommand}" IsEnabled="{Binding HasGSPData}"/>
             <Button IsCancel="True" Margin="8,0,0,0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource btnCancel}" Command="{Binding CancelGpsDialogCommand}"/>
         </StackPanel>
     </Grid>

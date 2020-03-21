@@ -33,6 +33,9 @@ namespace GS.Principles
         [DllImport("winmm.dll", EntryPoint = "timeKillEvent")]
         internal static extern int TimeKillEvent(int id);
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        internal static extern bool SetLocalTime(ref Time.SYSTEMTIME time);
+
         #endregion
 
         #region Time

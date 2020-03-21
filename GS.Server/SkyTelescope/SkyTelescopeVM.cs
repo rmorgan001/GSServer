@@ -4404,18 +4404,113 @@ namespace GS.Server.SkyTelescope
 
         #region GPS Dialog
 
-        private string _nmeaSentence;
-        public string NmeaSentence
+        private bool _allowTimeChange;
+        public bool AllowTimeChange
         {
-            get => _nmeaSentence;
+            get => _allowTimeChange;
             set
             {
-                if (_nmeaSentence == value) return;
-                _nmeaSentence = value;
+                if (_allowTimeChange == value) return;
+                _allowTimeChange = value;
                 OnPropertyChanged();
             }
         }
 
+        private bool _allowTimeVis;
+        public bool AllowTimeVis
+        {
+            get => _allowTimeVis;
+            set
+            {
+                if (_allowTimeVis == value) return;
+                _allowTimeVis = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _gpsGga;
+        public bool GpsGga
+        {
+            get => _gpsGga;
+            set
+            {
+                if (_gpsGga == value) return;
+                _gpsGga = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _gpsRmc;
+        public bool GpsRmc
+        {
+            get => _gpsRmc;
+            set
+            {
+                if (_gpsRmc == value) return;
+                _gpsRmc = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private DateTime _gpsPcTime;
+        public DateTime GpsPcTime
+        {
+            get => _gpsPcTime;
+            set
+            {
+                if (_gpsPcTime == value) return;
+                _gpsPcTime = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private DateTime _gpsTime;
+        public DateTime GpsTime
+        {
+            get => _gpsTime;
+            set
+            {
+                if (_gpsTime == value) return;
+                _gpsTime = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private TimeSpan _gpsSpan;
+        public TimeSpan GpsSpan
+        {
+            get => _gpsSpan;
+            set
+            {
+                if (_gpsSpan == value) return;
+                _gpsSpan = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _nmeaTag;
+        public string NmeaTag
+        {
+            get => _nmeaTag;
+            set
+            {
+                if (_nmeaTag == value) return;
+                _nmeaTag = value;
+                OnPropertyChanged();
+            }
+        }
+        private string NmeaSentence { get; set; }
+        private bool _hasGpsData;
+        public bool HasGSPData
+        {
+            get => _hasGpsData;
+            set
+            {
+                if (_hasGpsData == value) return;
+                _hasGpsData = value;
+                OnPropertyChanged();
+            }
+        }
         public double GpsLat { get; set; }
         private string _gpsLatString;
         public string GpsLatString
@@ -4428,7 +4523,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public double GpsLong { get; set; }
         private string _gpsLongString;
         public string GpsLongString
@@ -4441,7 +4535,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         private double _gpsElevation;
         public double GpsElevation
         {
@@ -4453,7 +4546,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         public int GpsComPort
         {
             get => SkySettings.GpsComPort;
@@ -4464,7 +4556,7 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
+        public bool IsGpsRunning { get; set; }
         public  SerialSpeed GpsBaudRate
         {
             get => SkySettings.GpsBaudRate;
@@ -4475,7 +4567,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
         private ICommand _populateGps;
         public ICommand PopulateGpsCommand
         {
@@ -4522,7 +4613,6 @@ namespace GS.Server.SkyTelescope
                 OpenDialog(ex.Message);
             }
         }
-
         private bool _isGpsDialogOpen;
         public bool IsGpsDialogOpen
         {
@@ -4563,6 +4653,21 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
+                    HasGSPData = false;
+                    NmeaTag = "N/A";
+                    GpsLong = 0.0;
+                    GpsLongString = $"{GpsLong}";
+                    GpsLat = 0.0;
+                    GpsLatString = $"{GpsLat}";
+                    GpsElevation = 0.0;
+                    GpsSpan = new TimeSpan(0);
+                    GpsPcTime = new DateTime();
+                    GpsTime = new DateTime();
+                    GpsGga = true;
+                    GpsRmc = false;
+                    AllowTimeChange = false;
+                    AllowTimeVis = SystemInfo.IsAdministrator();
+
                     GpsContent = new GpsDialog();
                     IsGpsDialogOpen = true;
                 }
@@ -4602,9 +4707,38 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    SkySettings.Latitude = GpsLat;
-                    SkySettings.Longitude = GpsLong;
-                    SkySettings.Elevation = GpsElevation;
+                    if (Math.Abs(GpsLat) > 0.0 && Math.Abs(GpsLong) > 0.0)
+                    {
+                        SkySettings.Latitude = GpsLat;
+                        SkySettings.Longitude = GpsLong;
+                        SkySettings.Elevation = GpsElevation;
+                    }
+
+                    if (AllowTimeChange && AllowTimeVis)
+                    {
+                        if (Math.Abs(GpsSpan.TotalSeconds) > 300)
+                        {
+                            OpenDialog(Application.Current.Resources["msgGPSTimeLimit"].ToString());
+                        }
+                        else
+                        {
+                            var msg = Time.SetSystemUTCTime(HiResDateTime.UtcNow.ToLocalTime().Add(GpsSpan));
+                            if (msg != string.Empty) OpenDialog($"{Application.Current.Resources["msgGPSTimeError"]}: {msg}");
+                        }
+                    }
+
+                    var monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Telescope,
+                        Category = MonitorCategory.Interface,
+                        Type = MonitorType.Information,
+                        Method = MethodBase.GetCurrentMethod().Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"{NmeaSentence}"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
+
                     IsGpsDialogOpen = false;
                 }
             }
@@ -4642,16 +4776,18 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    var gpsHardware = new GpsHardware(GpsComPort, GpsBaudRate);
+                    if (!GpsGga && !GpsRmc) return;
+                    if (IsGpsRunning) return;
+                    IsGpsRunning = true;
+                    HasGSPData = false;
+                    var gpsHardware = new GpsHardware(GpsComPort, GpsBaudRate) {Gga = GpsGga, Rmc = GpsRmc};
                     gpsHardware.GpsOn();
-                    var stopwatch = new Stopwatch();
-                    stopwatch.Start();
-
-                    while (stopwatch.Elapsed.Seconds < 10)
+                    var stopwatch = Stopwatch.StartNew();
+                    while (gpsHardware.GpsRunning && stopwatch.Elapsed.TotalSeconds < 30)
                     {
                         if (gpsHardware.HasData) break;
                     }
-                    stopwatch.Reset();
+
                     gpsHardware.GpsOff();
 
                     if (gpsHardware.HasData)
@@ -4661,13 +4797,19 @@ namespace GS.Server.SkyTelescope
                         GpsLat = gpsHardware.Latitude;
                         GpsLatString = _util.DegreesToDMS(GpsLat, "° ", ":", "", 2);
                         GpsElevation = gpsHardware.Altitude;
+                        NmeaTag = gpsHardware.NmeaTag;
+                        GpsPcTime = gpsHardware.PcUtcNow.ToLocalTime();
+                        GpsTime = gpsHardware.TimeStamp.ToLocalTime();
+                        GpsSpan = gpsHardware.TimeSpan;
                         NmeaSentence = gpsHardware.NmeaSentence;
+                        HasGSPData = true;
                     }
                     else
                     {
                         OpenDialog(Application.Current.Resources["msgGPSNoDataFound"].ToString() + GpsComPort);
 
                     }
+
                 }
             }
             catch (Exception ex)
@@ -4683,8 +4825,12 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-
+                IsGpsDialogOpen = false;
                 OpenDialog(ex.Message);
+            }
+            finally
+            {
+                IsGpsRunning = false;
             }
         }
 

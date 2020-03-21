@@ -1224,15 +1224,15 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static int _uTCDateOffset;
-        public static int UTCDateOffset
+        private static TimeSpan _uTCDateOffset;
+        public static TimeSpan UTCDateOffset
         {
             get => _uTCDateOffset;
             set
             {
                 if (_uTCDateOffset == value) return;
                 _uTCDateOffset = value;
-                Properties.SkyTelescope.Default.UTCDateOffset = value;
+                Properties.SkyTelescope.Default.UTCOffset = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
@@ -1378,7 +1378,7 @@ namespace GS.Server.SkyTelescope
             St4Guiderate = Properties.SkyTelescope.Default.St4Guiderate;
             SyncLimit = Properties.SkyTelescope.Default.SyncLimit;
             Temperature = Properties.SkyTelescope.Default.Temperature;
-            UTCDateOffset = Properties.SkyTelescope.Default.UTCDateOffset;
+            UTCDateOffset = Properties.SkyTelescope.Default.UTCOffset;
 
             //first time load from old park positions
             var pp = Properties.SkyTelescope.Default.ParkPositions;

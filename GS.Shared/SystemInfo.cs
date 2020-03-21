@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019  Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2020  Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -13,19 +13,21 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using System.Runtime.InteropServices;
-using System.Windows;
-using System.Windows.Controls;
 
-namespace GS.Server.Domain
+using System.Security.Principal;
+
+namespace GS.Shared
 {
-    [ComVisible(false)]
-    internal class DoubleValidationRule : ValidationRule
+    public class SystemInfo
     {
-        public override ValidationResult Validate(object value, System.Globalization.CultureInfo cultureInfo)
+
+        public static bool IsAdministrator()
         {
-            var canConvert = double.TryParse(value as string, out _);
-            return new ValidationResult(canConvert, Application.Current.Resources["cvtInvNumber"].ToString());
+            using (var identity = WindowsIdentity.GetCurrent())
+            {
+                var principal = new WindowsPrincipal(identity);
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
         }
     }
 }

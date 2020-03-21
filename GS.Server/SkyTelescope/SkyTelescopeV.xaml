@@ -12,7 +12,7 @@
              Loaded="SkyTelescopeV_OnLoaded" 
              mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
     <UserControl.Resources>
-        <BooleanToVisibilityConverter  x:Key="BoolToVis"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </UserControl.Resources>
     <Grid>
         <md:DialogHost HorizontalAlignment="Center" CloseOnClickAway="True" IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" Background="Transparent"/>

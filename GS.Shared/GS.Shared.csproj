@@ -67,6 +67,7 @@
     <Compile Include="PulsesLogging.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Strings.cs" />
+    <Compile Include="SystemInfo.cs" />
     <Compile Include="Tasks.cs" />
     <Compile Include="WaitCursor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

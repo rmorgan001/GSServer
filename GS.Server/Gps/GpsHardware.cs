@@ -38,38 +38,32 @@ namespace GS.Server.Gps
             _gpsPort = port;
             _gpsSerialSpeed = serialSpeed;
         }
-
         internal bool HasData { get; private set; }
-
-        internal bool IsConnected { get; private set; }
-
+        internal bool Rmc { get; set; }
+        internal bool Gga { get; set; }
+        private bool IsConnected { get; set; }
         internal bool GpsRunning
         {
             get => _gpsRunning;
-            set
+            private set
             {
                 _gpsRunning = value;
-                if (!value)
-                {
-                    _ctsGps?.Cancel();
-                    _ctsGps?.Dispose();
-                    _ctsGps = null;
-                }
+                if (value) return;
+                _ctsGps?.Cancel();
+                _ctsGps?.Dispose();
+                _ctsGps = null;
             }
         }
-
         public void GpsOn()
         {
-            GpsRunning = false;
+            GpsRunning = true;
             GpsLoopAsync();
         }
-
         public void GpsOff()
         {
             GpsRunning = false;
         }
-
-
+        
         /// <summary>
         /// Data read from the GPS 
         /// </summary>
@@ -88,37 +82,52 @@ namespace GS.Server.Gps
         /// <summary>
         /// Data read from the GPS 
         /// </summary>
+        internal string NmeaTag { get; private set; }
+
+        /// <summary>
+        /// raw NMEA sentance
+        /// </summary>
         internal string NmeaSentence { get; private set; }
 
+        /// <summary>
+        /// Date and time from the nema sentence
+        /// </summary>
+        internal DateTime TimeStamp { get; private set; }
+
+        /// <summary>
+        /// high res system utc date and time
+        /// </summary>
+        internal DateTime PcUtcNow { get; private set; }
+
+        /// <summary>
+        /// Difference from TimeStamp and PcUtcNow
+        /// </summary>
+        internal TimeSpan TimeSpan { get; private set; }
+
+        /// <summary>
+        /// Main async process
+        /// </summary>
         private async void GpsLoopAsync()
         {
             try
             {
                 if (_ctsGps == null) _ctsGps = new CancellationTokenSource();
                 var ct = _ctsGps.Token;
-                var KeepRunning = true;
                 var task = Task.Run(() =>
                 {
-                    while (KeepRunning)
+                    while (GpsRunning)
                     {
                         if (ct.IsCancellationRequested)
                         {
                             // Clean up here, then...
                             // ct.ThrowIfCancellationRequested();
-                            KeepRunning = false;
+                            GpsRunning = false;
                         }
                         else
                         {
-                            ConnectSerial( );
-
-                            if (HasData)
-                            {
-                                KeepRunning = false;
-                            }
-                            else
-                            {
-                                Thread.Sleep(100);
-                            }
+                            ConnectSerial();
+                            GpsRunning = false;
+                            break;
                         }
                     }
                 }, ct);
@@ -138,19 +147,9 @@ namespace GS.Server.Gps
         }
 
         /// <summary>
-        /// Save properties to telescope hardware profile
-        /// </summary>
-        internal void SaveGpsData()
-        {
-            //TelescopeServer.Latitude = Latitude;
-            //TelescopeServer.Longitude = Longitude;
-            //if (Altitude > 0) TelescopeServer.Elevation = Altitude;
-        }
-
-        /// <summary>
         /// Serial connection to the gps device
         /// </summary>
-        internal void ConnectSerial()
+        private void ConnectSerial()
         {
             var _serial = new Serial
             {
@@ -175,6 +174,7 @@ namespace GS.Server.Gps
             }
             catch (Exception)
             {
+                GpsRunning = false;
                 _serial.Connected = false;
                 _serial.Dispose();
                 throw;
@@ -185,35 +185,94 @@ namespace GS.Server.Gps
         /// <summary>
         ///  Read Global Positioning Data
         /// </summary>
+        /// <remarks>https://gpsd.gitlab.io/gpsd/NMEA.html#_rmc_recommended_minimum_navigation_information</remarks>
         /// <returns></returns>
         private void ReadGpsData(Serial _serial)
         {
-            HasData = false;
+            if (!Gga && !Rmc) return;
             if (!IsConnected) return;
-            string[] gga = { };
-            string[] rmc = { };
-            var _stopwatch = new Stopwatch();
-            _stopwatch.Start();
+            var _stopwatch = Stopwatch.StartNew();
             while (_stopwatch.Elapsed.Seconds < _readTimeout)
             {
+                ClearProperties();
+                HasData = false;
+                PcUtcNow = Principles.HiResDateTime.UtcNow;
                 var receivedData = _serial.ReceiveTerminated("\r\n");
                 if (receivedData.Length <= 0) continue;
                 if (!ValidateCheckSum(receivedData)) continue;
                 var gpsDataArr = receivedData.Split(',');
-                if (gpsDataArr[0] == "$GPGGA") gga = gpsDataArr;
-                if (gpsDataArr[0] == "$GPRMC") rmc = gpsDataArr;
-                if (gga.Length > 0) break;
+
+                if (gpsDataArr[0].Length < 5) continue;
+                var talkerid = gpsDataArr[0].Substring(1, 2);
+                var code = gpsDataArr[0].Substring(3, 3);
+
+                switch (code)
+                {
+                    case "GGA":
+                        if (!Gga) break;
+                        LogNmeaSentence(receivedData);
+                        if (gpsDataArr.Length == 15)
+                        {
+                            ParseGga(talkerid, gpsDataArr);
+                            if (CheckProperties())
+                            {
+                                HasData = true;
+                                return;
+                            }
+                        }
+                        break;
+                    case "RMC":
+                        if (!Rmc) break;
+                        LogNmeaSentence(receivedData);
+                        if (gpsDataArr.Length == 13)
+                        {
+                            ParseRmc(talkerid, gpsDataArr);
+                            if (CheckProperties())
+                            {
+                                HasData = true;
+                                return;
+                            }
+                        }
+                        break;
+                }
             }
-            _stopwatch.Reset();
-            if (gga.Length > 0)
-            {
-                ParseGpgga(gga);
-                HasData = true;
-                return;
-            }
-            if (rmc.Length <= 0) return;
-            ParseGprmc(rmc);
-            HasData = true;
+        }
+
+        /// <summary>
+        /// Write to Monitor the NMEA sentence before being parced
+        /// </summary>
+        /// <param name="sentence"></param>
+        private void LogNmeaSentence(string sentence)
+        {
+            var monitorItem = new MonitorEntry
+                { Datetime = PcUtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{sentence}" };
+            MonitorLog.LogToMonitor(monitorItem);
+            NmeaSentence = sentence;
+        }
+
+        /// <summary>
+        /// Reset Properties
+        /// </summary>
+        private void ClearProperties()
+        {
+            Latitude = 0.0;
+            Longitude = 0.0;
+            Altitude = 0.0;
+            NmeaTag = string.Empty;
+            NmeaSentence = string.Empty;
+            TimeStamp = new DateTime();
+            PcUtcNow = new DateTime();
+            TimeSpan = new TimeSpan(0);
+
+        }
+
+        /// <summary>
+        /// Check if properties are loaded
+        /// </summary>
+        /// <returns></returns>
+        private bool CheckProperties()
+        {
+            return Math.Abs(Latitude) > 0.0 && Math.Abs(Longitude) > 0.0 && NmeaTag != string.Empty;
         }
 
         /// <summary>
@@ -235,11 +294,16 @@ namespace GS.Server.Gps
         }
 
         /// <summary>
-        /// Parse the GPRMC sentence
+        /// Parse the RMC sentence
         /// </summary>
+        /// <example>$--RMC,hhmmss.ss,A,llll.ll,a,yyyyy.yy,a,x.x,x.x,xxxx,x.x,a,m,*hh CR LF></example>
+        /// <param name="talkerid"></param>
         /// <param name="gpsDataArr"></param>
-        private void ParseGprmc(IReadOnlyList<string> gpsDataArr)
+        private void ParseRmc(string talkerid, IReadOnlyList<string> gpsDataArr)
         {
+            NmeaTag = gpsDataArr[0];
+
+            var utctime = gpsDataArr[1];
             var lat = gpsDataArr[3];
             var ns = gpsDataArr[4];
             if (lat != null && ns != null)
@@ -254,15 +318,37 @@ namespace GS.Server.Gps
                 Longitude = ConvertLatLong(lon, ew);
             }
             Altitude = 0;
-            NmeaSentence = "RMC";
+            var utcdate = gpsDataArr[9];
+
+            string timeformat;
+            switch (talkerid)
+            {
+                case "GN":
+                    timeformat = @"hhmmss\.ff";
+                    break;
+                case "GP":
+                    timeformat = @"hhmmss\.fff";
+                    break;
+                default:
+                    timeformat = @"hhmmss\.ff";
+                    break;
+            }
+
+            TimeStamp = ConvertDateTime(utcdate, utctime, timeformat);
+            TimeSpan = TimeStamp - PcUtcNow;
         }
 
         /// <summary>
-        /// Parse the GPGGA sentence
+        /// Parse the GGA sentence
         /// </summary>
+        /// /// <example>$--GGA,hhmmss.ss,llll.ll,a,yyyyy.yy,a,x,xx,x.x,x.x,M,x.x,M,x.x,xxxx*hh CR LF></example>
+        /// <param name="talkerid"></param>
         /// <param name="gpsDataArr"></param>
-        private void ParseGpgga(IReadOnlyList<string> gpsDataArr)
+        private void ParseGga(string talkerid, IReadOnlyList<string> gpsDataArr)
         {
+            NmeaTag = gpsDataArr[0];
+
+            var utctime = gpsDataArr[1];
             var lat = gpsDataArr[2];
             var ns = gpsDataArr[3];
             if (lat != null && ns != null)
@@ -280,7 +366,22 @@ namespace GS.Server.Gps
             double.TryParse(gpsDataArr[9], out var d);
             Altitude = d;
 
-            NmeaSentence = "GGA";
+            string timeformat;
+            switch (talkerid)
+            {
+                case "GN":
+                    timeformat = @"hhmmss\.ff";
+                    break;
+                case "GP":
+                    timeformat = @"hhmmss\.fff";
+                    break;
+                default:
+                    timeformat = @"hhmmss\.ff";
+                    break;
+            }
+
+            TimeStamp = ConvertDateTime(null, utctime, timeformat);
+            TimeSpan = TimeStamp - PcUtcNow;
         }
 
         /// <summary>
@@ -312,6 +413,40 @@ namespace GS.Server.Gps
             catch (Exception)
             {
                 return 0;
+            }
+
+        }
+
+        /// <summary>
+        /// Convert found date and times to a timestamp
+        /// </summary>
+        /// <param name="date"></param>
+        /// <param name="time"></param>
+        /// <param name="timeformat"></param>
+        /// <returns></returns>
+        private DateTime ConvertDateTime(string date, string time, string timeformat)
+        {
+            try
+            {
+                var tmpdate = PcUtcNow.Date;
+                var tmptime = PcUtcNow.TimeOfDay;
+                if (date != null)
+                {
+                    const string format = @"ddMMyy";
+                    if (DateTime.TryParseExact(date, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmpdate)) { }
+                }
+
+                if (time == null) { return tmpdate + tmptime; }
+
+                if (TimeSpan.TryParseExact(time, timeformat, CultureInfo.InvariantCulture, TimeSpanStyles.None, out tmptime)) { }
+                return tmpdate + tmptime;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message},{ex.StackTrace}" };
+                MonitorLog.LogToMonitor(monitorItem);
+                return PcUtcNow;
             }
 
         }

@@ -124,11 +124,13 @@ namespace GS.Server.SkyTelescope
         private static bool _canhomesensor;
         private static double _declinationXform;
         private static Vector _guideRate;
+        private static bool _isAutoHomeRunning;
         private static bool _isHome;
         public static bool _isPulseGuidingRa;
         public static bool _isPulseGuidingDec;
         private static PierSide _isSideOfPier;
         private static bool _isSlewing;
+        private static Exception _lastAutoHomeError;
         private static bool _limitAlarm;
         private static bool _mountrunning;
         private static bool _monitorPulse;
@@ -411,6 +413,19 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
+        /// Checks if the autohome async process is running
+        /// </summary>
+        public static bool IsAutoHomeRunning
+        {
+            get => _isAutoHomeRunning;
+            set
+            {
+                _isAutoHomeRunning = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
+        /// <summary>
         /// UI indicator for at home
         /// </summary>
         public static bool IsHome
@@ -510,6 +525,19 @@ namespace GS.Server.SkyTelescope
             {
                 if (_isPulseGuidingDec || _isPulseGuidingRa) return true;
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the autohome async process is running
+        /// </summary>
+        public static Exception LastAutoHomeError
+        {
+            get => _lastAutoHomeError;
+            set
+            {
+                _lastAutoHomeError = value;
+                OnStaticPropertyChanged();
             }
         }
 
@@ -1852,7 +1880,8 @@ namespace GS.Server.SkyTelescope
             try
             {
                 if (!IsMountRunning) { return; }
-
+                IsAutoHomeRunning = true;
+                LastAutoHomeError = null;
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
@@ -1968,7 +1997,9 @@ namespace GS.Server.SkyTelescope
                     //throw only if not a cancel request
                     if (returncode1 != -3 && returncode2 != -3)
                     {
-                        throw new Exception($"Incomplete: {msgcode1} ({returncode1}), {msgcode2}({returncode2})");
+                        var ex = new Exception($"Incomplete: {msgcode1} ({returncode1}), {msgcode2}({returncode2})");
+                        LastAutoHomeError = ex;
+                        throw ex;
                     }
                 }
 
@@ -1986,11 +2017,13 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
+                LastAutoHomeError = ex;
                 MountError = ex;
             }
             finally
             {
                 AutoHomeProgressBar = 100;
+                IsAutoHomeRunning = false;
                 Synthesizer.VoicePause = false; //make sure pause is off
             }
         }
@@ -3728,7 +3761,11 @@ namespace GS.Server.SkyTelescope
                 }
 
                 // the time is?
-                SiderealTime = Time.Lst(JDate.Epoch2000Days(), _util.JulianDate, false, SkySettings.Longitude);
+                var gsjd = JDate.Ole2Jd(HiResDateTime.UtcNow.Add(SkySettings.UTCDateOffset));
+                //var ascomjd = _util.JulianDate;
+                //var altjd = JDate.Utc2Jd2(HiResDateTime.UtcNow.Add(SkySettings.UTCDateOffset));
+                //var dtsdiff = ascomjd - altjd;
+                SiderealTime = Time.Lst(JDate.Epoch2000Days(), gsjd, false, SkySettings.Longitude);
 
                 // Get raw positions, some are non-responses from mount and are returned as NaN
                 var rawPositions = GetRawPositions();

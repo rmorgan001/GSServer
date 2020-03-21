@@ -54,6 +54,27 @@ namespace GS.SkyApi
                 SkyServer.AscomOn = value;
             }
         }
+        /// <inheritdoc />
+        public void AutoHomeStart(int degreelimit = 100, int offsetdec = 0)
+        {
+            if (!SkyServer.CanHomeSensor)
+            { throw new Exception("Mount doesn't support home sensors"); }
+            if(!SkyServer.IsMountRunning)
+            { throw new Exception("Mount not connected"); }
+            if (degreelimit < 20 || degreelimit > 179)
+            { throw new Exception("Degrees out of limits"); }
+            if (offsetdec < -90 || offsetdec > 90)
+            { throw new Exception("Offset out of limits"); }
+
+            SkyServer.AutoHomeStop = false;
+            SkyServer.AutoHomeAsync(degreelimit, offsetdec);
+        }
+
+        /// <inheritdoc />
+        public void AutoHomeStop()
+        {
+           SkyServer.AutoHomeStop = true;
+        }
 
         /// <inheritdoc />
         public void AxisGoToTarget(int axis, double targetPosition)
@@ -555,6 +576,16 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
+        public bool IsAutoHomeRunning
+        {
+            get
+            {
+                var running = SkyServer.IsAutoHomeRunning;
+                return running;
+            }
+        }
+
+        /// <inheritdoc />
         public bool IsConnected
         {
             get
@@ -642,6 +673,16 @@ namespace GS.SkyApi
             return results.Result;
         }
 
+        /// <inheritdoc />
+        public string LastAutoHomeError
+        {
+            get
+            {
+                var error = SkyServer.LastAutoHomeError.Message;
+                return string.IsNullOrEmpty(error) ? string.Empty : error;
+            }
+        }
+        
         /// <inheritdoc />
         public bool MountType
         {
@@ -922,6 +963,16 @@ namespace GS.SkyApi
         /// <returns>bool</returns>
         bool AscomOn { get; set; }
         /// <summary>
+        /// Starts the AutoHome slew to home sensors
+        /// </summary>
+        /// <param name="degreelimit"></param>
+        /// <param name="offsetdec"></param>
+        void AutoHomeStart(int degreelimit = 100, int offsetdec = 0);
+        /// <summary>
+        /// Stops Autohome from completing
+        /// </summary>
+        void AutoHomeStop();
+        /// <summary>
         /// Move axis number of microsteps, not marked as slewing
         /// </summary>
         /// <param name="axis">>axis number 1 or 2</param>
@@ -1136,6 +1187,10 @@ namespace GS.SkyApi
         /// </summary>
         void InitializeAxes();
         /// <summary>
+        /// Is the autohome process running
+        /// </summary>
+        bool IsAutoHomeRunning { get; }
+        /// <summary>
         /// Is mount in a connected serial state
         /// </summary>
         bool IsConnected { get; }
@@ -1181,6 +1236,10 @@ namespace GS.SkyApi
         /// <param name="axis">axis number 1 or 2</param>
         /// <returns></returns>
         bool IsSlewingTo(int axis);
+        /// <summary>
+        /// Last known error from the AutoHome Process
+        /// </summary>
+        string LastAutoHomeError { get; }
         /// <summary>
         /// e Identify type of mount
         /// </summary>

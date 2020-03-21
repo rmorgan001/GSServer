@@ -157,7 +157,7 @@
                     <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="10,0,0,0"><Hyperlink NavigateUri="http://www.greenswamp.org/home" domain:HyperlinkExtensions.IsExternal="true" Style="{StaticResource MaterialDesignBody2Hyperlink}"><TextBlock Text="{StaticResource linkWebsiteCheck}"/></Hyperlink></TextBlock>
                 </StackPanel>
                 <ScrollViewer Grid.Row="1"  VerticalScrollBarVisibility="Auto">
-                    <Grid Margin="10">
+                    <Grid Margin="10" MinWidth="800">
                         <Grid.RowDefinitions>
                             <RowDefinition />
                             <RowDefinition />
@@ -195,9 +195,9 @@
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource tbOPulses}"/>
                             </StackPanel>
                         </StackPanel>
-                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left">
+                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" >
                             <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" Background="{StaticResource MaterialDesignTextFieldBoxBackground}"  HorizontalAlignment="Left"  Foreground="{StaticResource MaterialDesignColumnHeader}" Text="{StaticResource tbOOptions}"/>
-                            <StackPanel Orientation="Horizontal" Width="Auto">
+                            <StackPanel Orientation="Horizontal" >
                                 <CheckBox Height="25" Width="25" IsChecked="{Binding SleepMode}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource tbOSleepMode}"/>
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource tbOSleepMode}"/>
                         </StackPanel>
@@ -307,6 +307,31 @@
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
                         </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Left" Margin="10,0,0,0">
+                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{StaticResource MaterialDesignTextFieldBoxBackground}" Foreground="{StaticResource MaterialDesignColumnHeader}" Text="{StaticResource tbOPerf}" />
+                            <ComboBox md:HintAssist.Hint="{StaticResource tbhintODisplayInterval}" Width="120" HorizontalAlignment="Left" ToolTip="{StaticResource tbhintODisplayInterval}" ItemsSource="{Binding IntervalList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                                <ComboBox.SelectedItem>
+                                    <Binding Path="DisplayInterval" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </ComboBox.SelectedItem>
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
+                            <StackPanel Orientation="Horizontal" Width="Auto" Margin="0,10,0,0">
+                                <TextBlock Text="{StaticResource tbRender}"></TextBlock>
+                                <TextBlock Text="{Binding RenderCapability}" Margin="10,0,0,0"></TextBlock>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Width="Auto" Margin="0,10,0,0">
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding DisableHardwareAcceleration}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource cbHardware}" />
+                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource cbHardware}" />
+                            </StackPanel>
+                        </StackPanel>
                         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" >
                             <TextBlock Margin="0,0,0,5" VerticalAlignment="Center"  HorizontalAlignment="Left" Background="{StaticResource MaterialDesignTextFieldBoxBackground}"  Foreground="{StaticResource MaterialDesignColumnHeader}" Text="{StaticResource tbOSettings}"/>
                             <StackPanel Orientation="Horizontal">
@@ -346,31 +371,24 @@
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
                         </StackPanel>
-                        <StackPanel Grid.Row="1" Grid.Column="3" Orientation="Vertical" HorizontalAlignment="Left" Margin="10,0,0,0">
-                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center"  HorizontalAlignment="Left" Background="{StaticResource MaterialDesignTextFieldBoxBackground}"  Foreground="{StaticResource MaterialDesignColumnHeader}" Text="{StaticResource tbOPerf}"/>
-                            <ComboBox md:HintAssist.Hint="{StaticResource tbhintODisplayInterval}" Width="120" HorizontalAlignment="Left" ToolTip="{StaticResource tbhintODisplayInterval}"
-                                      ItemsSource="{Binding IntervalList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
-                                <ComboBox.SelectedItem>
-                                    <Binding Path="DisplayInterval" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
-                                        <Binding.ValidationRules>
-                                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
-                                        </Binding.ValidationRules>
-                                    </Binding>
-                                </ComboBox.SelectedItem>
-                                <ComboBox.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <VirtualizingStackPanel />
-                                    </ItemsPanelTemplate>
-                                </ComboBox.ItemsPanel>
-                            </ComboBox>
-                            <StackPanel Orientation="Horizontal" Width="Auto" Margin="0,10,0,0">
-                                <TextBlock Text="{StaticResource tbRender}"></TextBlock>
-                                <TextBlock Text="{Binding RenderCapability}" Margin="10,0,0,0"></TextBlock>
+                        <StackPanel Grid.Row="1" Grid.Column="3" Orientation="Vertical" HorizontalAlignment="Left">
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Background="{StaticResource MaterialDesignTextFieldBoxBackground}" Foreground="{StaticResource MaterialDesignColumnHeader}" Text="{StaticResource tbOUTCOffset}" />
+                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                <md:PopupBox StaysOpen="False" Margin="-10,0,0,0" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{StaticResource pbtipReset}">
+                                    <Grid Width="150">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="40" />
+                                        </Grid.RowDefinitions>
+                                        <Label Grid.Row="0" HorizontalAlignment="Center" Content="{StaticResource lbReset}" />
+                                        <Button Grid.Row="1" HorizontalAlignment="Center" Content="{StaticResource btnAccept}" Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ClickResetUtcOffsetCmd}" />
+                                    </Grid>
+                                </md:PopupBox>
+                                <TextBlock VerticalAlignment="Center" Text="{Binding UTCDateOffset, StringFormat={}{0:G}}" IsEnabled="False" />
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Width="Auto" Margin="0,10,0,0">
-                                <CheckBox Height="25" Width="25" IsChecked="{Binding DisableHardwareAcceleration}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource cbHardware}" />
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource cbHardware}" />
-                            </StackPanel>
+                            <TextBlock Margin="0,5,0,0" VerticalAlignment="Center" Text="{StaticResource tbOLSTAdjusted}" IsEnabled="False" />
+                            <TextBlock Margin="0,5,0,0" VerticalAlignment="Center" Text="{Binding UTCTime, StringFormat={}{0:D}}" IsEnabled="False" />
+                            <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" Text="{Binding UTCTime, StringFormat={}{0:T}}" IsEnabled="False" />
                         </StackPanel>
                     </Grid>
                 </ScrollViewer>

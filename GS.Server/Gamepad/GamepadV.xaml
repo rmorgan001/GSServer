@@ -47,7 +47,7 @@
                             Style="{StaticResource MaterialDesignSlider}" Value="{Binding Delay, UpdateSourceTrigger=PropertyChanged, Delay=800}"/>
                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{Binding ElementName=sDelay, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
-            <ScrollViewer Grid.Row="1"  VerticalScrollBarVisibility="Auto">
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MinWidth="800">
                     <Grid >
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>

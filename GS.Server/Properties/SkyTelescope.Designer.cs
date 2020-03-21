@@ -133,18 +133,6 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int UTCDateOffset {
-            get {
-                return ((int)(this["UTCDateOffset"]));
-            }
-            set {
-                this["UTCDateOffset"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool DisconnectOnPark {
             get {
@@ -1136,6 +1124,18 @@ namespace GS.Server.Properties {
             }
             set {
                 this["GpsBaudRate"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:00:00")]
+        public global::System.TimeSpan UTCOffset {
+            get {
+                return ((global::System.TimeSpan)(this["UTCOffset"]));
+            }
+            set {
+                this["UTCOffset"] = value;
             }
         }
     }

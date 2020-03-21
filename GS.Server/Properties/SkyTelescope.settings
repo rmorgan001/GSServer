@@ -29,9 +29,6 @@
     <Setting Name="DataBits" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">8</Value>
     </Setting>
-    <Setting Name="UTCDateOffset" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
     <Setting Name="DisconnectOnPark" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
@@ -280,6 +277,9 @@
     </Setting>
     <Setting Name="GpsBaudRate" Type="System.String" Scope="User">
       <Value Profile="(Default)">ps4800</Value>
+    </Setting>
+    <Setting Name="UTCOffset" Type="System.TimeSpan" Scope="User">
+      <Value Profile="(Default)">00:00:00</Value>
     </Setting>
   </Settings>
 </SettingsFile>

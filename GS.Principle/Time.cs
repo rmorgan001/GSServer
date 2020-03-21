@@ -15,6 +15,8 @@
  */
 using ASCOM.Utilities;
 using System;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
 
 namespace GS.Principles
 {
@@ -311,6 +313,45 @@ namespace GS.Principles
                 ((IDisposable)util)?.Dispose();
             }
             // free native resources if there are any.
+        }
+
+        /// <summary>
+        /// Change System Time,  expects time in UTC
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        public static string SetSystemUTCTime(DateTime dt)
+        {
+            var systime = new SYSTEMTIME(dt);
+            var ret = NativeMethods.SetLocalTime(ref systime);
+            if (ret) return string.Empty;
+            var error = new Win32Exception(Marshal.GetLastWin32Error()).Message;
+            return error;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct SYSTEMTIME
+        {
+            public readonly ushort Year;
+            public readonly ushort Month;
+            public readonly ushort DayOfWeek;
+            public readonly ushort Day;
+            public readonly ushort Hour;
+            public readonly ushort Minute;
+            public readonly ushort Second;
+            public readonly ushort Milliseconds;
+
+            public SYSTEMTIME(DateTime dt)
+            {
+                Year = (ushort)dt.Year;
+                Month = (ushort)dt.Month;
+                DayOfWeek = (ushort)dt.DayOfWeek;
+                Day = (ushort)dt.Day;
+                Hour = (ushort)dt.Hour;
+                Minute = (ushort)dt.Minute;
+                Second = (ushort)dt.Second;
+                Milliseconds = (ushort)dt.Millisecond;
+            }
         }
     }
 }
