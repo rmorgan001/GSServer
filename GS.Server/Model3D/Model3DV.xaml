@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:telescope="clr-namespace:GS.Server.Controls.Telescope"
+             xmlns:controls="clr-namespace:GS.Server.Controls"
              mc:Ignorable="d">
     <UserControl.Resources>
         <BooleanToVisibilityConverter  x:Key="BoolToVis"/>
@@ -55,15 +55,15 @@
                     <RowDefinition Height="40" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <telescope:TopCoordsBar Grid.Row="0" Grid.Column="0" IsEnabled="{Binding ScreenEnabled}" Visibility="{Binding TopVis, Converter={StaticResource BoolToVis}}" HorizontalAlignment="Center"/>
+                <controls:TopCoordsBar Grid.Row="0" Grid.Column="0" IsEnabled="{Binding ScreenEnabled}" Visibility="{Binding TopVis, Converter={StaticResource BoolToVis}}" HorizontalAlignment="Center"/>
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
                     <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False" x:Name="MenuToggleButton" ToolTip="Open"
                                   Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}"
                                   Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
                 </StackPanel>
-                <telescope:HelixViewport3D Grid.Row="1" Grid.Column="0" IsEnabled="{Binding ScreenEnabled}" >
-                    <telescope:HelixViewport3D.Style>
-                        <Style TargetType="telescope:HelixViewport3D">
+                <controls:HelixViewport3D Grid.Row="1" Grid.Column="0" IsEnabled="{Binding ScreenEnabled}" >
+                    <controls:HelixViewport3D.Style>
+                        <Style TargetType="controls:HelixViewport3D">
                             <Style.Triggers>
                                 <Trigger Property="IsEnabled" Value="False">
                                     <Setter Property="Opacity" Value="0.2" />
@@ -73,8 +73,8 @@
                                 </Trigger>
                             </Style.Triggers>
                         </Style>
-                    </telescope:HelixViewport3D.Style>
-                </telescope:HelixViewport3D>
+                    </controls:HelixViewport3D.Style>
+                </controls:HelixViewport3D>
                 <md:Flipper Grid.Row="1" Grid.Column="0" Style="{DynamicResource MaterialDesignCardFlipper}" Margin="10" VerticalAlignment="Bottom" HorizontalAlignment="Right" >
                     <md:Flipper.FrontContent>
                         <Border Margin="3" CornerRadius="5" BorderThickness="3" BorderBrush="DimGray" Opacity=".6" Background="{StaticResource MaterialDesignToolBarBackground}"  >

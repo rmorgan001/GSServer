@@ -13,7 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using GS.Server.Domain;
+
 using GS.Server.Focuser;
 using GS.Server.Gamepad;
 using GS.Server.Helpers;
@@ -31,6 +31,7 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using GS.Server.Controls.Dialogs;
 using GS.Server.Test;
 
 namespace GS.Server.Main
@@ -729,7 +730,7 @@ namespace GS.Server.Main
         }
         #endregion
 
-        #region Close Button and Dialog     
+        #region Close 
 
         private void CloseServer()
         {

@@ -64,7 +64,7 @@
     <ApplicationIcon>Resources\greenswamp1.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <AssemblyVersion>1.0.1.1</AssemblyVersion>
     <AssemblyPublicKeyToken>565de7938946fba7</AssemblyPublicKeyToken>
   </PropertyGroup>
   <PropertyGroup>
@@ -171,101 +171,96 @@
     <Compile Include="Cdc\CdcDialog.xaml.cs">
       <DependentUpon>CdcDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\Main\WindowTitleBar.xaml.cs">
+    <Compile Include="Controls\WindowTitleBar.xaml.cs">
       <DependentUpon>WindowTitleBar.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\Main\TabBar.xaml.cs">
+    <Compile Include="Controls\TabBar.xaml.cs">
       <DependentUpon>TabBar.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\Telescope\HelixViewport3D.xaml.cs">
+    <Compile Include="Controls\HelixViewport3D.xaml.cs">
       <DependentUpon>HelixViewport3D.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\Telescope\HandController.xaml.cs">
+    <Compile Include="Controls\HandController.xaml.cs">
       <DependentUpon>HandController.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\Telescope\Backlash.xaml.cs">
+    <Compile Include="Controls\Backlash.xaml.cs">
       <DependentUpon>Backlash.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\Telescope\RaDecGoTo.xaml.cs">
+    <Compile Include="Controls\RaDecGoTo.xaml.cs">
       <DependentUpon>RaDecGoTo.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\Telescope\BottomStatusBar.xaml.cs">
+    <Compile Include="Controls\BottomStatusBar.xaml.cs">
       <DependentUpon>BottomStatusBar.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\Telescope\Debug.xaml.cs">
+    <Compile Include="Controls\Debug.xaml.cs">
       <DependentUpon>Debug.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\Telescope\SmallBar.xaml.cs">
-      <DependentUpon>SmallBar.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Telescope\StandardButtonBar.xaml.cs">
+    <Compile Include="Controls\StandardButtonBar.xaml.cs">
       <DependentUpon>StandardButtonBar.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\Telescope\PPECBar.xaml.cs">
+    <Compile Include="Controls\PPECBar.xaml.cs">
       <DependentUpon>PPECBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Domain\BoolToVisHideConverter.cs" />
+    <Compile Include="Domain\ComparisonConverter.cs" />
     <Compile Include="Domain\FutureDateValidationRule.cs" />
-    <Compile Include="Domain\SchedulerDialog.xaml.cs">
+    <Compile Include="Controls\Dialogs\DownloadUpdateDialog.xaml.cs">
+      <DependentUpon>DownloadUpdateDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Dialogs\SchedulerDialog.xaml.cs">
       <DependentUpon>SchedulerDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Domain\HyperlinkExtensions.cs" />
     <Compile Include="Domain\InvertBooleanConvertor.cs" />
-    <Compile Include="Domain\LimitDialog.xaml.cs">
+    <Compile Include="Controls\Dialogs\LimitDialog.xaml.cs">
       <DependentUpon>LimitDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Domain\BoolToRowHeightConverter.cs" />
     <Compile Include="Domain\BoolToVisConverter.cs" />
-    <Compile Include="Domain\ParkDeleteDialog.xaml.cs">
+    <Compile Include="Controls\Dialogs\ParkDeleteDialog.xaml.cs">
       <DependentUpon>ParkDeleteDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Domain\ParkAddDialog.xaml.cs">
+    <Compile Include="Controls\Dialogs\ParkAddDialog.xaml.cs">
       <DependentUpon>ParkAddDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Domain\ColorToBrushConverter.cs" />
     <Compile Include="Domain\EnumBooleanConverter .cs" />
-    <Compile Include="Domain\EnumBindingSourceExtension.cs" />
     <Compile Include="Domain\FlowDocumentToXamlConverter.cs" />
     <Compile Include="Domain\IpAddressValidationRule.cs" />
-    <Compile Include="Domain\DialogOK.xaml.cs">
+    <Compile Include="Controls\Dialogs\DialogOK.xaml.cs">
       <DependentUpon>DialogOK.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Domain\ErrorMessageDialog.xaml.cs">
+    <Compile Include="Controls\Dialogs\ErrorMessageDialog.xaml.cs">
       <DependentUpon>ErrorMessageDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Domain\ErrorMessageDialogVM.cs" />
+    <Compile Include="Controls\Dialogs\ErrorMessageDialogVM.cs" />
     <Compile Include="Domain\IntValidationRule.cs" />
     <Compile Include="Domain\DoubleValidationRule .cs" />
-    <Compile Include="Domain\NotEmptyValidationRule.cs" />
-    <Compile Include="Domain\HomeResetDialog.xaml.cs">
+    <Compile Include="Controls\Dialogs\HomeResetDialog.xaml.cs">
       <DependentUpon>HomeResetDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Domain\NotifyPropertyChangedExtension.cs" />
-    <Compile Include="Domain\AutoHomeDialog.xaml.cs">
+    <Compile Include="Controls\Dialogs\AutoHomeDialog.xaml.cs">
       <DependentUpon>AutoHomeDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Domain\RaGoToSyncDialog.xaml.cs">
+    <Compile Include="Controls\Dialogs\RaGoToSyncDialog.xaml.cs">
       <DependentUpon>RaGoToSyncDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Domain\ResetSettingsDialog.xaml.cs">
+    <Compile Include="Controls\Dialogs\ResetSettingsDialog.xaml.cs">
       <DependentUpon>ResetSettingsDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Domain\PpecDialog.xaml.cs">
+    <Compile Include="Controls\Dialogs\PpecDialog.xaml.cs">
       <DependentUpon>PpecDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Domain\CloseDialog.xaml.cs">
+    <Compile Include="Controls\Dialogs\CloseDialog.xaml.cs">
       <DependentUpon>CloseDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Domain\FlipDialog.xaml.cs">
+    <Compile Include="Controls\Dialogs\FlipDialog.xaml.cs">
       <DependentUpon>FlipDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Domain\RaGoToDialog.xaml.cs">
+    <Compile Include="Controls\Dialogs\RaGoToDialog.xaml.cs">
       <DependentUpon>RaGoToDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Domain\SampleProgressDialog.xaml.cs">
-      <DependentUpon>SampleProgressDialog.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Domain\SimpleDateValidationRule.cs" />
+    <Compile Include="Domain\UtcToLocalDateTimeConverter .cs" />
     <Compile Include="Focuser\FocuserV.xaml.cs">
       <DependentUpon>FocuserV.xaml</DependentUpon>
     </Compile>
@@ -341,7 +336,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
-    <Compile Include="Controls\Telescope\TopCoordsBar.xaml.cs">
+    <Compile Include="Controls\TopCoordsBar.xaml.cs">
       <DependentUpon>TopCoordsBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Test\TestV.xaml.cs">
@@ -352,107 +347,103 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Controls\Main\WindowTitleBar.xaml">
+    <Page Include="Controls\WindowTitleBar.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Controls\Main\TabBar.xaml">
+    <Page Include="Controls\TabBar.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Controls\Telescope\HelixViewport3D.xaml">
+    <Page Include="Controls\HelixViewport3D.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\Telescope\HandController.xaml">
+    <Page Include="Controls\HandController.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\Telescope\Backlash.xaml">
+    <Page Include="Controls\Backlash.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Controls\Telescope\RaDecGoTo.xaml">
+    <Page Include="Controls\RaDecGoTo.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Controls\Telescope\BottomStatusBar.xaml">
+    <Page Include="Controls\BottomStatusBar.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Controls\Telescope\Debug.xaml">
+    <Page Include="Controls\Debug.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Controls\Telescope\SmallBar.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\Telescope\StandardButtonBar.xaml">
+    <Page Include="Controls\StandardButtonBar.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Controls\Telescope\PPECBar.xaml">
+    <Page Include="Controls\PPECBar.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Domain\SchedulerDialog.xaml">
+    <Page Include="Controls\Dialogs\DownloadUpdateDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Domain\LimitDialog.xaml">
+    <Page Include="Controls\Dialogs\SchedulerDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Domain\ParkDeleteDialog.xaml">
+    <Page Include="Controls\Dialogs\LimitDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Domain\ParkAddDialog.xaml">
+    <Page Include="Controls\Dialogs\ParkDeleteDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Domain\DialogOK.xaml">
+    <Page Include="Controls\Dialogs\ParkAddDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Domain\ErrorMessageDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Domain\HomeResetDialog.xaml">
+    <Page Include="Controls\Dialogs\DialogOK.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Domain\AutoHomeDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Domain\RaGoToSyncDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Domain\ResetSettingsDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Domain\PpecDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Domain\CloseDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Domain\FlipDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Domain\RaGoToDialog.xaml">
+    <Page Include="Controls\Dialogs\ErrorMessageDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Domain\SampleProgressDialog.xaml">
+    <Page Include="Controls\Dialogs\HomeResetDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\Dialogs\AutoHomeDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\Dialogs\RaGoToSyncDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\Dialogs\ResetSettingsDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\Dialogs\PpecDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\Dialogs\CloseDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\Dialogs\FlipDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\Dialogs\RaGoToDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -498,7 +489,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\Telescope\TopCoordsBar.xaml">
+    <Page Include="Controls\TopCoordsBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

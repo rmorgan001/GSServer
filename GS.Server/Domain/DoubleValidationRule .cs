@@ -13,6 +13,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,9 +24,9 @@ namespace GS.Server.Domain
     [ComVisible(false)]
     internal class DoubleValidationRule : ValidationRule
     {
-        public override ValidationResult Validate(object value, System.Globalization.CultureInfo cultureInfo)
+        public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            var canConvert = double.TryParse(value as string, out _);
+            var canConvert = double.TryParse(value as string, NumberStyles.Any, cultureInfo, out _);
             return new ValidationResult(canConvert, Application.Current.Resources["cvtInvNumber"].ToString());
         }
     }

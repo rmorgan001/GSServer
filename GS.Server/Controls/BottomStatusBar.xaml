@@ -1,0 +1,250 @@
+﻿<UserControl x:Class="GS.Server.Controls.BottomStatusBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Column="0" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource tbtipHome}" Text="{StaticResource tbHome}">
+            <TextBlock.Style>
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsHome}" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}"></Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsHome}" Value="False">
+                                <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />
+                            </DataTrigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+        </TextBlock>
+        <TextBlock Grid.Column="1" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource tbtipParked}" Text="{StaticResource tbParked}">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
+                    <Setter Property="Background" Value="Transparent"></Setter>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding AtPark}" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}"></Setter>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding AtPark}" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />
+                        </DataTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                        <DataTrigger Binding="{Binding ParkedBlinker}" Value="true">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard RepeatBehavior="5x" >
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.15" BeginTime="0:0:0" />
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.15" BeginTime="0:0:0.15" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+        <TextBlock Grid.Column="2" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource tbtipSlewing}" Text="{StaticResource tbSlewing}">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSlewing}" Value="True">
+                        <Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}"></Setter>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsSlewing}" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />
+                        </DataTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+            </TextBlock>
+        <TextBlock Grid.Column="3" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource tbtipTracking}" Text="{StaticResource tbTracking}">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsTracking}" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}"></Setter>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsTracking}" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />
+                        </DataTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+        <TextBlock Grid.Column="4" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource tbtipSOP}" Text="{Binding IsSideOfPier}" Foreground="DimGray">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SopBlinker}" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />
+                        </DataTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                        <DataTrigger Binding="{Binding SopBlinker}" Value="true">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard RepeatBehavior="5x">
+                                    <ColorAnimation To="Transparent" Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)" 
+                                                        Duration="0:0:0.15" BeginTime="0:0:0"/>
+                                        <ColorAnimation To="DimGray" Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)" 
+                                                        Duration="0:0:0.15" BeginTime="0:0:0.15"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+            </TextBlock>
+        <md:DialogHost Grid.Column="5" IsOpen="{Binding IsLimitDialogOpen}"  DialogContent="{Binding LimitContent}">
+            <Button Command="{Binding OpenLimitDialogCommand}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource btntipAxisLimit}">
+                <md:PackIcon Kind="WarningCircle" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-5">
+                    <md:PackIcon.Style>
+                        <Style TargetType="md:PackIcon">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding LimitAlarm}" Value="True">
+                                    <Setter Property="Foreground" Value="Gold"></Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding LimitAlarm}" Value="False">
+                                    <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />
+                                </DataTrigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </md:PackIcon.Style>
+                </md:PackIcon>
+            </Button>
+        </md:DialogHost>
+        <Button Grid.Column="6" Command="{Binding ClearWarningCommand}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource btntipWarnings}">
+            <md:PackIcon Kind="WarningBox" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-5">
+                <md:PackIcon.Style>
+                    <Style TargetType="md:PackIcon">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding WarningState}" Value="True">
+                                <Setter Property="Foreground" Value="Gold"></Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding WarningState}" Value="False">
+                                <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />
+                            </DataTrigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </md:PackIcon.Style>
+            </md:PackIcon>
+        </Button>
+        <Button Grid.Column="7" Command="{Binding ClearErrorsCommand}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource btntipErrors}">
+            <md:PackIcon Kind="AlarmLight" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-5">
+                <md:PackIcon.Style>
+                    <Style TargetType="md:PackIcon">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding AlertState}" Value="True">
+                                <Setter Property="Foreground" Value="Crimson"></Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding AlertState}" Value="False">
+                                <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />
+                            </DataTrigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </md:PackIcon.Style>
+            </md:PackIcon>
+        </Button>
+        <Button Grid.Column="8" Command="{Binding ClickMountInfoDialogCommand}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource btntipConnected}">
+            <md:PackIcon Kind="Usb" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-5" ToolTip="{StaticResource btntipConnected}">
+                <md:PackIcon.Style>
+                    <Style TargetType="md:PackIcon">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                <Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}"></Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsConnected}" Value="False">
+                                <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />
+                            </DataTrigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </md:PackIcon.Style>
+            </md:PackIcon>
+        </Button>
+        <md:PackIcon Grid.Column="9" Kind="{Binding TrackingRateIcon}" Foreground="{StaticResource SecondaryAccentBrush}" Margin="5 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="{Binding TrackingRate}">
+            <md:PackIcon.Style>
+                <Style TargetType="md:PackIcon">
+                    <Style.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.3" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </md:PackIcon.Style>
+        </md:PackIcon>
+        <md:PackIcon Grid.Column="10" Kind="SpeakerWireless" Margin="5 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="{StaticResource ictipVoice}">
+            <md:PackIcon.Style>
+                <Style TargetType="md:PackIcon">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding VoiceState}" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}"></Setter>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding VoiceState}" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </md:PackIcon.Style>
+        </md:PackIcon>
+        <md:PackIcon Grid.Column="11" Kind="Monitor" Margin="5 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="{StaticResource ictipMonitor}">
+            <md:PackIcon.Style>
+                <Style TargetType="md:PackIcon">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding MonitorState}" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}"></Setter>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding MonitorState}" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </md:PackIcon.Style>
+        </md:PackIcon>
+    </Grid>
+</UserControl>
+  
+ 
+  

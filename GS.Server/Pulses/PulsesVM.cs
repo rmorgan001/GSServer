@@ -14,7 +14,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using GS.Principles;
-using GS.Server.Domain;
 using GS.Server.Helpers;
 using GS.Server.Main;
 using GS.Server.Phd;
@@ -37,6 +36,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using GS.Server.Controls.Dialogs;
 using Brush = System.Windows.Media.Brush;
 using Color = System.Drawing.Color;
 
@@ -1845,7 +1845,7 @@ namespace GS.Server.Pulses
 
         #endregion
 
-        #region Dialog Message
+        #region Dialog 
 
         private string _dialogMsg;
         public string DialogMsg
@@ -1855,6 +1855,18 @@ namespace GS.Server.Pulses
             {
                 if (_dialogMsg == value) return;
                 _dialogMsg = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _dialogCaption;
+        public string DialogCaption
+        {
+            get => _dialogCaption;
+            set
+            {
+                if (_dialogCaption == value) return;
+                _dialogCaption = value;
                 OnPropertyChanged();
             }
         }
@@ -1893,9 +1905,10 @@ namespace GS.Server.Pulses
                        ));
             }
         }
-        private void OpenDialog(string msg)
+        private void OpenDialog(string msg, string caption = null)
         {
             if (msg != null) DialogMsg = msg;
+            DialogCaption = caption ?? Application.Current.Resources["msgDialog"].ToString();
             DialogContent = new DialogOK();
             IsDialogOpen = true;
 

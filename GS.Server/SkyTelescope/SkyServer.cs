@@ -418,7 +418,7 @@ namespace GS.Server.SkyTelescope
         public static bool IsAutoHomeRunning
         {
             get => _isAutoHomeRunning;
-            set
+            private set
             {
                 _isAutoHomeRunning = value;
                 OnStaticPropertyChanged();
@@ -534,7 +534,7 @@ namespace GS.Server.SkyTelescope
         public static Exception LastAutoHomeError
         {
             get => _lastAutoHomeError;
-            set
+            private set
             {
                 _lastAutoHomeError = value;
                 OnStaticPropertyChanged();

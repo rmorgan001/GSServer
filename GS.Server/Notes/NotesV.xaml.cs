@@ -3,7 +3,6 @@ using ColorPicker;
 using DarkSkyApi;
 using DarkSkyApi.Models;
 using GS.Principles;
-using GS.Server.Domain;
 using GS.Server.SkyTelescope;
 using GS.Shared;
 using Microsoft.Win32;
@@ -23,6 +22,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using GS.Server.Controls.Dialogs;
 
 namespace GS.Server.Notes
 {

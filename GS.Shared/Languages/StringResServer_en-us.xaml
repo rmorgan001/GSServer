@@ -23,7 +23,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="lbApps">Connected Applications:</system:String>
     <system:String x:Key="tbCloseApps">Application(s) still connected. Accept to close anyway?</system:String>
     <system:String x:Key="taskbarDescription">GreenSwamp Server</system:String>
-
+    <system:String x:Key="msgClose">Close GS Server</system:String>
     <!--Tab bar-->
     <system:String x:Key="rbtnSkyWatcher">SkyWatcher</system:String>
     <system:String x:Key="rbtnFocuser">Focuser</system:String>
@@ -132,10 +132,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="lbBacklash">Dec Backlash Compensate</system:String>
 
     <!--Debug bar-->
-    <system:String x:Key="tbInternalX">Internal X:</system:String>
-    <system:String x:Key="tbInternalY">Internal Y:</system:String>
-    <system:String x:Key="tbActualX">Actual X:</system:String>
-    <system:String x:Key="tbActualY">Actual Y:</system:String>
+    <system:String x:Key="tbInternalX">MountX:</system:String>
+    <system:String x:Key="tbInternalY">MountY:</system:String>
+    <system:String x:Key="tbActualX">ActualX:</system:String>
+    <system:String x:Key="tbActualY">ActualY:</system:String>
     <system:String x:Key="tbSiderealTime">Sidereal Time:</system:String>
 
     <!--Gamepad-->
@@ -186,9 +186,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnCdcRetrieve">Retrieve</system:String>
     <system:String x:Key="btnCdcSend">Send</system:String>
     <system:String x:Key="btnCdcNMEA">NMEA:</system:String>
-    <system:String x:Key="btnCdcLat">Latitude:</system:String>
-    <system:String x:Key="btnCdcLong">Longitude:</system:String>
-    <system:String x:Key="btnCdcEle">Elevation:</system:String>
+    <system:String x:Key="btnCdcLat">Latitude: </system:String>
+    <system:String x:Key="btnCdcLong">Longitude: </system:String>
+    <system:String x:Key="btnCdcEle">Elevation: </system:String>
     <system:String x:Key="tbCdcAccept">Accept Coordinates?</system:String>
     <system:String x:Key="msgOBNotFound">Observatory information not found.</system:String>
     <system:String x:Key="msgCdcNotFound">Server not found.</system:String>
@@ -205,6 +205,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnOk">Ok</system:String>
     <system:String x:Key="btnStart">Start</system:String>
     <system:String x:Key="btnDiaStop">Stop</system:String>
+    <system:String x:Key="msgDialog">GS Server</system:String>
 
     <!--Synthesizer -->
     <system:String x:Key="vceParked">Parked</system:String>
@@ -335,23 +336,26 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="msgHome1">When starting normally place the mount in the 'Home' position.</system:String>
     <system:String x:Key="msgHome2">Home Position is counterweight down and declination pointing towards the pole.</system:String>
     <system:String x:Key="msgHome3">Click the 'Set Home' button before or after obtaining a polar alignment.</system:String>
-    <system:String x:Key="msgParkNewName">Add new park position name?</system:String>
-    <system:String x:Key="msgParkDelete">Delete park position name?</system:String>
+    <system:String x:Key="msgParkNewName">Add new park position</system:String>
+    <system:String x:Key="msgParkDelete">Delete park position?</system:String>
     <system:String x:Key="cbtipLat0">North or South</system:String>
     <system:String x:Key="cbhintLat0">N/S</system:String>
     <system:String x:Key="cbtipLong0">East or West</system:String>
     <system:String x:Key="cbhintLong0">E/W</system:String>
     <system:String x:Key="cbhintMinPulseDec">Minimum Dec Pulse</system:String>
     <system:String x:Key="cbhintMinPulseRa">Minimum Ra Pulse</system:String>
-    <system:String x:Key="linkWebsiteCheck">Check website for updates</system:String>
-    <system:String x:Key="msgSchTitle">Scheduled Events</system:String>
     <system:String x:Key="msgSchCol1">On/Off</system:String>
     <system:String x:Key="msgSchCol2">Action</system:String>
     <system:String x:Key="msgSchCol3">Date</system:String>
     <system:String x:Key="msgSchCol4">Time</system:String>
+    <system:String x:Key="rbSidereal">Sidereal</system:String>
+    <system:String x:Key="rbSolar">Solar</system:String>
+    <system:String x:Key="rbLunar">Lunar</system:String>
+    <system:String x:Key="rbKing">King</system:String>
 
     <!--Exceptions -->
     <system:String x:Key="exParked">Unpark first</system:String>
+    <system:String x:Key="msgError">Error</system:String>
 
     <!--Options and Monitor -->
     <system:String x:Key="lbMonitor">Monitor</system:String>
@@ -406,6 +410,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="tbhintODisplayInterval">Display Interval (ms)</system:String>
     <system:String x:Key="msgRestart">Settings reset. Please restart GS Server</system:String>
     <system:String x:Key="tbAcceptResetSettings">Accept to reset the selected settings</system:String>
+    <system:String x:Key="msgResetSettings">Reset Settings</system:String>
     <system:String x:Key="tbNoResetSettings">No settings selected</system:String>
     <system:String x:Key="cbServerSettings">Options</system:String>
     <system:String x:Key="cbSkyTelescopeSettings">SkyWatcher</system:String>
@@ -419,6 +424,14 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="tbRender">Render Capability</system:String>
     <system:String x:Key="tbOUTCOffset">UTC OffSet</system:String>
     <system:String x:Key="tbOLSTAdjusted">UTC Adjusted Date:</system:String>
+    <system:String x:Key="tbOLocalAdjusted">Local Adjusted Date:</system:String>
+    <system:String x:Key="btnODownload">Download</system:String>
+    <system:String x:Key="tbOUpdateVer">Available Version: </system:String>
+    <system:String x:Key="tbOCurrentVer">Installed Version: </system:String>
+    <system:String x:Key="btnOCheckUpdates">Check for Updates</system:String>
+    <system:String x:Key="msgONotAvail">Updates not Available</system:String>
+    <system:String x:Key="msgONotFound">Updates not Found</system:String>
+    <system:String x:Key="msgODisconnects">Diconnect mount and connected applications before running</system:String>
 
     <!--3DModel -->
     <system:String x:Key="lb3dSettings">Settings</system:String>

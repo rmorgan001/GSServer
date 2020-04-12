@@ -7,12 +7,12 @@
         xmlns:main="clr-namespace:GS.Server.Main"
         xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
         xmlns:settings="clr-namespace:GS.Server.Settings"
-        xmlns:mcontrol = "clr-namespace:GS.Server.Controls.Main"
         xmlns:notes="clr-namespace:GS.Server.Notes"
         xmlns:gamepad="clr-namespace:GS.Server.Gamepad"
         xmlns:model3D="clr-namespace:GS.Server.Model3D"
         xmlns:pulses="clr-namespace:GS.Server.Pulses"
         xmlns:test="clr-namespace:GS.Server.Test"
+        xmlns:controls="clr-namespace:GS.Server.Controls"
         mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanResizeWithGrip"  WindowStyle="None"  TextOptions.TextFormattingMode="Display"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         ContentRendered="MainWindow_OnContentRendered" Closed="MainWindow_OnClosed"  Topmost="{Binding TopMost}"
@@ -66,12 +66,12 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <mcontrol:WindowTitleBar Grid.Row="0"/>
-            <mcontrol:TabBar Grid.Row="1"/>
-        <Grid Grid.Row="2" Margin="1" Background="{DynamicResource MaterialDesignPaper}">
+            <controls:WindowTitleBar Grid.Row="0"/>
+            <controls:TabBar Grid.Row="1"/>
+            <Grid Grid.Row="2" Margin="1" Background="{DynamicResource MaterialDesignPaper}">
                 <ContentControl Content="{Binding CurrentPageViewModel}"/>
             </Grid>
-        </Grid>
+    </Grid>
 
 </Window>
 

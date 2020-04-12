@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:domain="clr-namespace:GS.Server.Domain"
+             xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              mc:Ignorable="d">
     <Grid>
         <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Center"  CloseOnClickAway="True"
@@ -57,7 +57,7 @@
                                     <ComboBox.SelectedItem>
                                         <Binding Path="Interval" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                             <Binding.ValidationRules>
-                                                <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                                                <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </ComboBox.SelectedItem>
@@ -71,7 +71,7 @@
                                     <ComboBox.SelectedItem>
                                         <Binding Path="StepLash" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                             <Binding.ValidationRules>
-                                                <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                                                <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </ComboBox.SelectedItem>
@@ -85,7 +85,7 @@
                                     <ComboBox.SelectedItem>
                                         <Binding Path="Lash" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                             <Binding.ValidationRules>
-                                                <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                                                <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </ComboBox.SelectedItem>

@@ -9,30 +9,32 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:shared="clr-namespace:GS.Shared;assembly=GS.Shared"
              xmlns:enums="clr-namespace:LiveCharts.Geared;assembly=LiveCharts.Geared"
+             xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              mc:Ignorable="d">
     <UserControl.Resources>
         <domain:ColorToBrushConverter x:Key="ColorToBrush"/>
         <domain:InverseBooleanConverter x:Key="InvBol"/>
     </UserControl.Resources>
-    <Grid>
+    <Grid MinWidth="600">
         <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Center"  CloseOnClickAway="True" 
                        IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
         <md:DrawerHost BorderThickness="0" IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" BorderBrush="{StaticResource MaterialDesignDivider}" >
         <md:DrawerHost.LeftDrawerContent>
-            <Grid Width="650">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="40" />
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <Grid Grid.Row="0" Grid.Column="0" >
-                    <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18">Settings</Label>
-                        <ToggleButton DockPanel.Dock="Top" HorizontalAlignment="Right" Margin="5" ToolTip="Close"
-                        Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
-                        Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
-                        CommandParameter="{x:Static Dock.Left}"
-                        IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"/>
-                </Grid>
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MinWidth="510">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Grid.Column="0" >
+                        <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18">Settings</Label>
+                            <ToggleButton DockPanel.Dock="Top" HorizontalAlignment="Right" Margin="5" ToolTip="Close"
+                            Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
+                            Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
+                            CommandParameter="{x:Static Dock.Left}"
+                            IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"/>
+                    </Grid>
                     <Grid Grid.Row="1" Background="{StaticResource MaterialDesignPaper}" Margin="10,0,0,0" IsEnabled="{Binding Path=IsPulsing, Converter={StaticResource InvBol}}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30"/>
@@ -68,7 +70,7 @@
                             <ComboBox.SelectedItem>
                                 <Binding Path="RaDurColor" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -87,11 +89,11 @@
                             </ComboBox.ItemsPanel>
                         </ComboBox>
                         <ComboBox Grid.Row="1" Grid.Column="3" Margin="10,0,0,0" md:HintAssist.Hint="Chart Type" Width="120" VerticalAlignment="Bottom"
-                                  ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type shared:ChartSeriesType}}}">
+                                  ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type shared:ChartSeriesType}}}">
                             <ComboBox.SelectedItem>
                                 <Binding Path="RaDurSeries" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -105,7 +107,7 @@
                             <ComboBox.SelectedItem>
                                 <Binding Path="RaDurPtSz" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -123,7 +125,7 @@
                             <ComboBox.SelectedItem>
                                 <Binding Path="RaRejColor" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -142,11 +144,11 @@
                             </ComboBox.ItemsPanel>
                         </ComboBox>
                         <ComboBox Grid.Row="2" Grid.Column="3" Margin="10,0,0,0" md:HintAssist.Hint="Chart Type" Width="120" VerticalAlignment="Bottom"
-                                  ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type shared:ChartSeriesType}}}">
+                                  ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type shared:ChartSeriesType}}}">
                             <ComboBox.SelectedItem>
                                 <Binding Path="RaRejSeries" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -160,7 +162,7 @@
                             <ComboBox.SelectedItem>
                                 <Binding Path="RaRejPtSz" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -178,7 +180,7 @@
                             <ComboBox.SelectedItem>
                                 <Binding Path="DecDurColor" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -197,11 +199,11 @@
                             </ComboBox.ItemsPanel>
                         </ComboBox>
                         <ComboBox Grid.Row="4" Grid.Column="3" Margin="10,0,0,0" md:HintAssist.Hint="Chart Type" Width="120" VerticalAlignment="Bottom"
-                                  ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type shared:ChartSeriesType}}}">
+                                  ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type shared:ChartSeriesType}}}">
                             <ComboBox.SelectedItem>
                                 <Binding Path="DecDurSeries" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -215,7 +217,7 @@
                             <ComboBox.SelectedItem>
                                 <Binding Path="DecDurPtSz" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -233,7 +235,7 @@
                             <ComboBox.SelectedItem>
                                 <Binding Path="DecRejColor" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -252,11 +254,11 @@
                             </ComboBox.ItemsPanel>
                         </ComboBox>
                         <ComboBox Grid.Row="5" Grid.Column="3" Margin="10,0,0,0" md:HintAssist.Hint="Chart Type" Width="120" VerticalAlignment="Bottom"
-                                  ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type shared:ChartSeriesType}}}">
+                                  ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type shared:ChartSeriesType}}}">
                             <ComboBox.SelectedItem>
                                 <Binding Path="DecRejSeries" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -270,7 +272,7 @@
                             <ComboBox.SelectedItem>
                                 <Binding Path="DecRejPtSz" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -288,7 +290,7 @@
                             <ComboBox.SelectedItem>
                                 <Binding Path="RaPhdColor" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -307,11 +309,11 @@
                             </ComboBox.ItemsPanel>
                         </ComboBox>
                         <ComboBox Grid.Row="7" Grid.Column="3" Margin="10,0,0,0" md:HintAssist.Hint="Chart Type" Width="120" VerticalAlignment="Bottom"
-                                  ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type shared:ChartSeriesType}}}">
+                                  ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type shared:ChartSeriesType}}}">
                             <ComboBox.SelectedItem>
                                 <Binding Path="RaPhdSeries" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -325,7 +327,7 @@
                             <ComboBox.SelectedItem>
                                 <Binding Path="RaPhdPtSz" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -343,7 +345,7 @@
                             <ComboBox.SelectedItem>
                                 <Binding Path="DecPhdColor" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -362,11 +364,11 @@
                             </ComboBox.ItemsPanel>
                         </ComboBox>
                         <ComboBox Grid.Row="8" Grid.Column="3" Margin="10,0,0,0" md:HintAssist.Hint="Chart Type" Width="120" VerticalAlignment="Bottom"
-                                  ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type shared:ChartSeriesType}}}">
+                                  ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type shared:ChartSeriesType}}}">
                             <ComboBox.SelectedItem>
                                 <Binding Path="DecPhdSeries" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -380,7 +382,7 @@
                             <ComboBox.SelectedItem>
                                 <Binding Path="DecPhdPtSz" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -412,7 +414,7 @@
                             <ComboBox.SelectedItem>
                                 <Binding Path="Scale" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -423,7 +425,7 @@
                             </ComboBox.ItemsPanel>
                         </ComboBox>
                         <ComboBox Grid.Row="0" Grid.Column="2" Margin="10,0,0,0"  md:HintAssist.Hint="Quality" MinWidth="70" ToolTip="Quality"
-                                  ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type enums:Quality}}}"
+                                  ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type enums:Quality}}}"
                                   Style="{StaticResource MaterialDesignFloatingHintComboBox}" HorizontalAlignment="Left">
                             <ComboBox.Text>
                                 <Binding Path="ChartQuality" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
@@ -439,7 +441,7 @@
                             <ComboBox.SelectedItem>
                                 <Binding Path="AnimationTime" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -454,7 +456,7 @@
                             <ComboBox.SelectedItem>
                                 <Binding Path="LineSmoothness" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -469,7 +471,7 @@
                             <ComboBox.SelectedItem>
                                 <Binding Path="AxisXSeconds" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -484,7 +486,7 @@
                             <ComboBox.SelectedItem>
                                 <Binding Path="MaxPoints" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </ComboBox.SelectedItem>
@@ -498,13 +500,14 @@
                             <TextBox.Text>
                                 <Binding Path="PhdHostText" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
                                     <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </TextBox.Text>
                         </TextBox>
                     </Grid>
-            </Grid>
+                </Grid>
+            </ScrollViewer>
         </md:DrawerHost.LeftDrawerContent>
         <Grid Margin="5,5">
             <Grid.RowDefinitions>

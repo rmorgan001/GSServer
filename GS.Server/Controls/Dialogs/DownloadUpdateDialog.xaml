@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="GS.Server.Controls.Dialogs.DownloadUpdateDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" >
+    <GroupBox Header="{StaticResource btnOCheckUpdates}" Margin="5">
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Margin="5">
+                    <TextBlock Text="{StaticResource tbOCurrentVer}"/>
+                    <TextBlock Text="{Binding CurrentVersion}" Margin="5,0,0,0" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="5">
+                    <TextBlock Text="{StaticResource tbOUpdateVer}" />
+                    <TextBlock Text="{Binding UpdatetVersion}" Margin="5,0,0,0"  />
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding ClickDownloadUpdateCmd}" Content="{StaticResource btnODownload}" IsEnabled="{Binding UpdateEnabled}"/>
+                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelUpdateDialogCmd}" Content="{StaticResource btnCancel}"/>
+            </StackPanel>
+        </StackPanel>
+    </GroupBox>
+    </UserControl>

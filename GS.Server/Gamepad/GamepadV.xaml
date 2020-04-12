@@ -29,7 +29,7 @@
                 </Grid>
             </Grid>
         </md:DrawerHost.LeftDrawerContent>-->
-        <Grid>
+        <Grid >
             <Grid.RowDefinitions >
                 <!--<RowDefinition Height="40"/>-->
                 <RowDefinition Height="80"/>
@@ -47,8 +47,8 @@
                             Style="{StaticResource MaterialDesignSlider}" Value="{Binding Delay, UpdateSourceTrigger=PropertyChanged, Delay=800}"/>
                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{Binding ElementName=sDelay, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MinWidth="800">
-                    <Grid >
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MinWidth="510">
+                    <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>

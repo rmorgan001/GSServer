@@ -1,0 +1,16 @@
+﻿<UserControl x:Class="GS.Server.Controls.Dialogs.ResetSettingsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" >
+    <GroupBox Header="{StaticResource msgResetSettings}" Margin="5">
+        <StackPanel Orientation="Vertical">
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10" Text="{StaticResource tbAcceptResetSettings}"/>
+            <StackPanel Orientation="Horizontal"  HorizontalAlignment="Center">
+                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptResetDialogCommand}" Content="{StaticResource btnAccept}"/>
+                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelResetDialogCommand}" Content="{StaticResource btnCancel}"/>
+            </StackPanel>
+        </StackPanel>
+    </GroupBox>
+    </UserControl>

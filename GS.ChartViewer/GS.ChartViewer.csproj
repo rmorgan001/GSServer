@@ -106,22 +106,20 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Helpers\BoolToVisConverter.cs" />
-    <Compile Include="Helpers\EnumBindingSourceExtension.cs" />
-    <Compile Include="Settings.cs" />
+    <Compile Include="Helpers\Settings.cs" />
     <Page Include="Controls\WindowTitleBar.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Helpers\Dialog.xaml">
+    <Page Include="Controls\Dialogs\Dialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Helpers\ErrorMessageDialog.xaml">
+    <Page Include="Controls\Dialogs\ErrorMessageDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="MainWindowV.xaml">
+    <Page Include="Main\MainWindowV.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -135,27 +133,22 @@
     <Compile Include="Controls\WindowTitleBar.xaml.cs">
       <DependentUpon>WindowTitleBar.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\BoolToRowHeightConverter.cs" />
-    <Compile Include="Helpers\ColorToBrushConverter.cs" />
-    <Compile Include="Helpers\Dialog.xaml.cs">
+    <Compile Include="Controls\Dialogs\Dialog.xaml.cs">
       <DependentUpon>Dialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\EnumBooleanConverter .cs" />
-    <Compile Include="Helpers\ErrorMessageDialog.xaml.cs">
+    <Compile Include="Controls\Dialogs\ErrorMessageDialog.xaml.cs">
       <DependentUpon>ErrorMessageDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\ErrorMessageDialogVM.cs" />
-    <Compile Include="Helpers\NotEmptyValidationRule.cs" />
-    <Compile Include="Helpers\NotifyPropertyChangedExtension.cs" />
+    <Compile Include="Controls\Dialogs\ErrorMessageDialogVM.cs" />
     <Compile Include="Helpers\ObservableObject.cs" />
     <Compile Include="Helpers\RelayCommand.cs" />
-    <Compile Include="MainWindowV.xaml.cs">
+    <Compile Include="Main\MainWindowV.xaml.cs">
       <DependentUpon>MainWindowV.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MainWindowVM.cs" />
+    <Compile Include="Main\MainWindowVM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -215,5 +208,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

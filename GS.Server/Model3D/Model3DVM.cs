@@ -16,7 +16,6 @@
 
 using ASCOM.Utilities;
 using GS.Principles;
-using GS.Server.Domain;
 using GS.Server.Helpers;
 using GS.Server.Main;
 using GS.Server.SkyTelescope;
@@ -32,6 +31,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using GS.Server.Controls.Dialogs;
 
 
 namespace GS.Server.Model3D
@@ -607,7 +607,7 @@ namespace GS.Server.Model3D
 
         #endregion
 
-        #region Dialog Message
+        #region Dialog
 
         private string _dialogMsg;
         public string DialogMsg
@@ -629,6 +629,18 @@ namespace GS.Server.Model3D
             {
                 if (_isDialogOpen == value) return;
                 _isDialogOpen = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _dialogCaption;
+        public string DialogCaption
+        {
+            get => _dialogCaption;
+            set
+            {
+                if (_dialogCaption == value) return;
+                _dialogCaption = value;
                 OnPropertyChanged();
             }
         }
@@ -655,9 +667,10 @@ namespace GS.Server.Model3D
                        ));
             }
         }
-        private void OpenDialog(string msg)
+        private void OpenDialog(string msg, string caption = null)
         {
             if (msg != null) DialogMsg = msg;
+            DialogCaption = caption ?? Application.Current.Resources["msgDialog"].ToString();
             DialogContent = new DialogOK();
             IsDialogOpen = true;
 

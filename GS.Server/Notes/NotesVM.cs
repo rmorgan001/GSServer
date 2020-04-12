@@ -14,7 +14,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using GS.Principles;
-using GS.Server.Domain;
 using GS.Server.Helpers;
 using GS.Server.Main;
 using GS.Shared;
@@ -22,7 +21,9 @@ using MaterialDesignThemes.Wpf;
 using System;
 using System.Reflection;
 using System.Threading;
+using System.Windows;
 using System.Windows.Input;
+using GS.Server.Controls.Dialogs;
 
 namespace GS.Server.Notes
 {
@@ -39,7 +40,7 @@ namespace GS.Server.Notes
             MonitorLog.LogToMonitor(monitorItem);
         }
 
-        #region Error  
+        #region Dialog  
 
         private string _DialogMsg;
         public string DialogMsg
@@ -61,6 +62,18 @@ namespace GS.Server.Notes
             {
                 if (_isDialogOpen == value) return;
                 _isDialogOpen = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _dialogCaption;
+        public string DialogCaption
+        {
+            get => _dialogCaption;
+            set
+            {
+                if (_dialogCaption == value) return;
+                _dialogCaption = value;
                 OnPropertyChanged();
             }
         }
@@ -87,9 +100,10 @@ namespace GS.Server.Notes
                        ));
             }
         }
-        private void OpenDialog(string msg)
+        private void OpenDialog(string msg, string caption = null)
         {
             if (msg != null) DialogMsg = msg;
+            DialogCaption = caption ?? Application.Current.Resources["msgDialog"].ToString();
             DialogContent = new DialogOK();
             IsDialogOpen = true;
 

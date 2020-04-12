@@ -7,6 +7,7 @@
              xmlns:shared="clr-namespace:GS.Shared;assembly=GS.Shared"
              xmlns:mdc="clr-namespace:MaterialDesignColors;assembly=MaterialDesignColors"
              xmlns:domain="clr-namespace:GS.Server.Domain"
+             xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -48,9 +49,10 @@
                 </Grid>
             </DataTemplate>
             <domain:ColorToBrushConverter x:Key="ColorToBrush"/>
+            <domain:UtcToLocalDateTimeConverter x:Key="UTCtoLocal" />
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid>
+    <Grid MinWidth="750" >
         <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Center" CloseOnClickAway="True"
                        IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
         <md:DrawerHost HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0" 
@@ -145,7 +147,7 @@
                     </StackPanel>
                 </Grid>
             </md:DrawerHost.LeftDrawerContent>
-            <Grid Margin="5,5"> 
+            <Grid Margin="5,5" > 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30" />
                     <RowDefinition Height="*" />
@@ -154,10 +156,9 @@
                     <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False" x:Name="MenuToggleButton" ToolTip="Open"
                                   Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}"
                                   Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
-                    <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="10,0,0,0"><Hyperlink NavigateUri="http://www.greenswamp.org/home" domain:HyperlinkExtensions.IsExternal="true" Style="{StaticResource MaterialDesignBody2Hyperlink}"><TextBlock Text="{StaticResource linkWebsiteCheck}"/></Hyperlink></TextBlock>
                 </StackPanel>
                 <ScrollViewer Grid.Row="1"  VerticalScrollBarVisibility="Auto">
-                    <Grid Margin="10" MinWidth="800">
+                    <Grid Margin="10" MinHeight="350">
                         <Grid.RowDefinitions>
                             <RowDefinition />
                             <RowDefinition />
@@ -313,7 +314,7 @@
                                 <ComboBox.SelectedItem>
                                     <Binding Path="DisplayInterval" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                         <Binding.ValidationRules>
-                                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                                            <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
                                         </Binding.ValidationRules>
                                     </Binding>
                                 </ComboBox.SelectedItem>
@@ -370,6 +371,10 @@
                                     </ItemsPanelTemplate>
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
+                            <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Bottom" CloseOnClickAway="True" IsOpen="{Binding IsUpdateDialogOpen}" DialogContent="{Binding UpdateDialogContent}">
+                                <Button Margin="0,10,0,0" Height="30" ToolTip="{StaticResource btnOCheckUpdates}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding OpenUpdateDialogCmd}" Content="{StaticResource btnOCheckUpdates}">
+                                </Button>
+                            </md:DialogHost>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Grid.Column="3" Orientation="Vertical" HorizontalAlignment="Left">
                             <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Background="{StaticResource MaterialDesignTextFieldBoxBackground}" Foreground="{StaticResource MaterialDesignColumnHeader}" Text="{StaticResource tbOUTCOffset}" />
@@ -384,11 +389,14 @@
                                         <Button Grid.Row="1" HorizontalAlignment="Center" Content="{StaticResource btnAccept}" Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ClickResetUtcOffsetCmd}" />
                                     </Grid>
                                 </md:PopupBox>
-                                <TextBlock VerticalAlignment="Center" Text="{Binding UTCDateOffset, StringFormat={}{0:G}}" IsEnabled="False" />
+                                <TextBlock VerticalAlignment="Center" Text="{Binding UTCDateOffset, StringFormat={}{0:G}}" />
                             </StackPanel>
-                            <TextBlock Margin="0,5,0,0" VerticalAlignment="Center" Text="{StaticResource tbOLSTAdjusted}" IsEnabled="False" />
-                            <TextBlock Margin="0,5,0,0" VerticalAlignment="Center" Text="{Binding UTCTime, StringFormat={}{0:D}}" IsEnabled="False" />
-                            <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" Text="{Binding UTCTime, StringFormat={}{0:T}}" IsEnabled="False" />
+                            <TextBlock Margin="0,5,0,0" VerticalAlignment="Center" Text="{StaticResource tbOLSTAdjusted}" />
+                            <TextBlock Margin="0,5,0,0" VerticalAlignment="Center" Text="{Binding UTCTime, StringFormat={}{0:D}}" Opacity=".4" />
+                            <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" Text="{Binding UTCTime, StringFormat={}{0:T}}" Opacity=".4" />
+                            <TextBlock Margin="0,5,0,0" VerticalAlignment="Center" Text="{StaticResource tbOLocalAdjusted}" />
+                            <TextBlock Margin="0,5,0,0" VerticalAlignment="Center" Text="{Binding Path=UTCTime, Converter={StaticResource UTCtoLocal}, StringFormat={}{0:D}}" IsEnabled="False" Opacity=".4" />
+                            <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" Text="{Binding Path=UTCTime, Converter={StaticResource UTCtoLocal}, StringFormat={}{0:T}}" IsEnabled="False" Opacity=".4" />
                         </StackPanel>
                     </Grid>
                 </ScrollViewer>

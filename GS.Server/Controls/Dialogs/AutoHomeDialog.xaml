@@ -1,0 +1,46 @@
+﻿<UserControl x:Class="GS.Server.Controls.Dialogs.AutoHomeDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" >
+    <GroupBox Header="{StaticResource btnAutoHome}" Margin="5" >
+            <StackPanel Orientation="Vertical">
+                <ProgressBar Value="{Binding AutoHomeProgressBar}" md:TransitionAssist.DisableTransitions="True" Height="10" Width="200" Foreground="{StaticResource SecondaryAccentBrush}" />
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0" IsEnabled="{Binding StartEnabled}">
+                <Label Content="{StaticResource msgAutoHomeLimit}" VerticalAlignment="Bottom"/>
+                <ComboBox md:HintAssist.Hint="{StaticResource cbhintAutoHomeLimit}" MinWidth="10" ToolTip="{StaticResource cbtipAutoHomeLimit}"  
+                          ItemsSource="{Binding AutoHomeLimits}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                    <ComboBox.Text>
+                        <Binding Path="AutoHomeLimit" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                    </ComboBox.Text>
+                    <ComboBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </ComboBox.ItemsPanel>
+                </ComboBox>
+            </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0" IsEnabled="{Binding StartEnabled}">
+                <Label Content="{StaticResource msgDecOffset}" VerticalAlignment="Bottom"/>
+                <ComboBox md:HintAssist.Hint="{StaticResource cbhintDecOffset}" MinWidth="10" ToolTip="{StaticResource cbhintDecOffset}"  
+                          ItemsSource="{Binding DecOffsets}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                    <ComboBox.Text>
+                        <Binding Path="DecOffset" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                    </ComboBox.Text>
+                    <ComboBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </ComboBox.ItemsPanel>
+                </ComboBox>
+            </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0 10 0 0" HorizontalAlignment="Center">
+                    <Button IsEnabled="{Binding StartEnabled}" IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding StartAutoHomeDialogCommand}" Content="{StaticResource btnStart}"/>
+                    <Button IsCancel="True"  Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelAutoHomeDialogCommand}" Content="{StaticResource btnCancel}"/>
+                </StackPanel>
+            </StackPanel>
+    </GroupBox>
+    </UserControl>
+ 

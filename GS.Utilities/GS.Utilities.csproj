@@ -50,7 +50,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>greenswamp1.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>GS.Utilities.App</StartupObject>
@@ -108,46 +109,39 @@
     <Compile Include="Controls\WindowTitleBar.xaml.cs">
       <DependentUpon>WindowTitleBar.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\DelFilesDialog.xaml.cs">
+    <Compile Include="Controls\Dialogs\DelFilesDialog.xaml.cs">
       <DependentUpon>DelFilesDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FileUtil.cs" />
-    <Compile Include="Helpers\BoolToRowHeightConverter.cs" />
-    <Compile Include="Helpers\BoolToVisConverter.cs" />
-    <Compile Include="Helpers\ColorToBrushConverter.cs" />
-    <Compile Include="Dialogs\Dialog.xaml.cs">
+    <Compile Include="Helpers\FileUtil.cs" />
+    <Compile Include="Controls\Dialogs\Dialog.xaml.cs">
       <DependentUpon>Dialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\EnumBindingSourceExtension.cs" />
-    <Compile Include="Helpers\EnumBooleanConverter .cs" />
-    <Compile Include="Dialogs\ErrorMessageDialog.xaml.cs">
+    <Compile Include="Controls\Dialogs\ErrorMessageDialog.xaml.cs">
       <DependentUpon>ErrorMessageDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\ErrorMessageDialogVM.cs" />
-    <Compile Include="Helpers\NotEmptyValidationRule.cs" />
-    <Compile Include="Helpers\NotifyPropertyChangedExtension.cs" />
+    <Compile Include="Controls\Dialogs\ErrorMessageDialogVM.cs" />
     <Compile Include="Helpers\ObservableObject.cs" />
     <Compile Include="Helpers\RelayCommand.cs" />
-    <Compile Include="MainWindowVM.cs" />
-    <Compile Include="NativeMethods.cs" />
-    <Compile Include="Settings.cs" />
+    <Compile Include="Main\MainWindowVM.cs" />
+    <Compile Include="Helpers\NativeMethods.cs" />
+    <Compile Include="Helpers\Settings.cs" />
     <Page Include="Controls\WindowTitleBar.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Dialogs\Dialog.xaml">
+    <Page Include="Controls\Dialogs\Dialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Dialogs\ErrorMessageDialog.xaml">
+    <Page Include="Controls\Dialogs\ErrorMessageDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Dialogs\DelFilesDialog.xaml">
+    <Page Include="Controls\Dialogs\DelFilesDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="MainWindowV.xaml">
+    <Page Include="Main\MainWindowV.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -158,7 +152,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindowV.xaml.cs">
+    <Compile Include="Main\MainWindowV.xaml.cs">
       <DependentUpon>MainWindowV.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
@@ -214,9 +208,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="greenswamp1.ico" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

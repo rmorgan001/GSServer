@@ -52,9 +52,13 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Charting.cs" />
+    <Compile Include="Domain\EnumBindingSourceExtension.cs" />
+    <Compile Include="Domain\NotEmptyValidationRule.cs" />
+    <Compile Include="Domain\NotifyPropertyChangedExtension.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="GSColors.cs" />
     <Compile Include="GssAttribute.cs" />
+    <Compile Include="HTML.cs" />
     <Compile Include="Languages.cs" />
     <Compile Include="Monitor.cs" />
     <Compile Include="MonitorQueue.cs" />
@@ -102,5 +106,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
