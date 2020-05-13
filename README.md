@@ -106,6 +106,7 @@ Can be found at [Groups.io](https://groups.io/g/GSS)
 
 ## Release Dates
 
+* 1.0.1.1 release 13 May 2020
 * 1.0.1.1 release 12 Apr 2020
 * 1.0.1.0 release 21 Mar 2020
 * 1.0.0.27 release 15 Mar 2020
