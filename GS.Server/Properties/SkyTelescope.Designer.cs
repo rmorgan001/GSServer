@@ -1138,5 +1138,29 @@ namespace GS.Server.Properties {
                 this["UTCOffset"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool HcAntiRa {
+            get {
+                return ((bool)(this["HcAntiRa"]));
+            }
+            set {
+                this["HcAntiRa"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool HcAntiDec {
+            get {
+                return ((bool)(this["HcAntiDec"]));
+            }
+            set {
+                this["HcAntiDec"] = value;
+            }
+        }
     }
 }

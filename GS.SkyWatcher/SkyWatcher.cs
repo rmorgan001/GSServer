@@ -177,6 +177,7 @@ namespace GS.SkyWatcher
             _commands.StartMotion(axis); // J Start motion
             _commands.SetSlewing((int)axis, forward, highspeed); // Set the axis status
             _slewingSpeed[(int)axis] = rate; //store axis rate
+            _commands.GetAxisPositionCounter(axis); // read for plotting
         }
 
         /// <summary>
@@ -446,6 +447,7 @@ namespace GS.SkyWatcher
         {
             _slewingSpeed[(int)axis] = 0;
             _commands.AxisStop(axis);
+            _commands.GetAxisPositionCounter(axis); // read for plotting
         }
 
         /// <summary>
@@ -456,6 +458,7 @@ namespace GS.SkyWatcher
         {
             _slewingSpeed[(int)axis] = 0;
             _commands.AxisStopInstant(axis);
+            _commands.GetAxisPositionCounter(axis); // read for plotting
         }
 
         /// <summary>
@@ -508,6 +511,7 @@ namespace GS.SkyWatcher
             _commands.SetGotoTargetIncrement(axis, movingSteps); // H:
             _commands.SetBreakPointIncrement(axis, 0); // M: send 0 steps
             _commands.StartMotion(axis); // J: Start moving
+            _commands.GetAxisPositionCounter(axis); // read for plotting
         }
 
         /// <summary>
@@ -586,6 +590,7 @@ namespace GS.SkyWatcher
             _commands.SetGotoTargetIncrement(axis, movingSteps); // :H
             _commands.SetBreakPointIncrement(axis, _breakSteps[(int)axis]); // :M
             _commands.StartMotion(axis); // :J
+            _commands.GetAxisPositionCounter(axis); // read for plotting
 
             _targetPositions[(int)axis] = targetPosition;
             _commands.SetSlewingTo((int)axis, forward, highspeed);

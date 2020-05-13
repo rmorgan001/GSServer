@@ -36,7 +36,7 @@ namespace GS.Server.Gamepad
     {
         public string TopName => "";
         public string BottomName => "Gamepad";
-        public int Uid => 2;
+        public int Uid => 3;
 
         private SkyTelescopeVM _skyTelescopeVM;
         private SettingsVM _settingsVM;

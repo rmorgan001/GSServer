@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d">
-    <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  HorizontalAlignment="Center" IsEnabled="{Binding PecEnabled}">
+    <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  IsEnabled="{Binding PecEnabled}">
         <StackPanel.Style>
             <Style TargetType="StackPanel">
                 <Style.Triggers>

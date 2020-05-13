@@ -597,6 +597,16 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
+        public bool IsMountRunning
+        {
+            get => SkyServer.IsMountRunning;
+            set
+            {
+                if (SkyServer.IsMountRunning != value) SkyServer.IsMountRunning = value;
+            }
+        }
+
+        /// <inheritdoc />
         public bool IsPpecInTrainingOn
         {
             get
@@ -887,6 +897,16 @@ namespace GS.SkyApi
             GetResult(command);
         }
 
+        /// <inheritdoc />
+        public void ShutdownServer()
+        {
+            var monitorItem = new MonitorEntry
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "API Shutdown" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            SkyServer.ShutdownServer();
+        }
+        
         /// <summary>
         /// Validate axis number as 1 or 2
         /// </summary>
@@ -1195,6 +1215,10 @@ namespace GS.SkyApi
         /// </summary>
         bool IsConnected { get; }
         /// <summary>
+        /// Starts or Stops mount and connection
+        /// </summary>
+        bool IsMountRunning { get; set; }
+        /// <summary>
         /// q Is the mount collecting PPEC data
         /// </summary>
         bool IsPpecInTrainingOn { get; }
@@ -1329,5 +1353,9 @@ namespace GS.SkyApi
         /// <param name="axis">axis number 1 or 2</param>
         /// <param name="position"></param>
         void SetTargetPosition(int axis, double position);
+        /// <summary>
+        /// shutdown and close the server
+        /// </summary>
+        void ShutdownServer();
     }
 }

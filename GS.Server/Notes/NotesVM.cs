@@ -31,7 +31,7 @@ namespace GS.Server.Notes
     {
         public string TopName => "Notes";
         public string BottomName => "";
-        public int Uid => 3;
+        public int Uid => 1;
 
         public NotesVM()
         {

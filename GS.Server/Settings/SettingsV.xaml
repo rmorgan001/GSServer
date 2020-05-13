@@ -192,6 +192,14 @@
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource tbOModel3D}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Width="Auto">
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding Plot}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource tbOPlot}" />
+                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource tbOPlot}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Width="Auto">
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding PoleLocator}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource tbOPole}" />
+                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource tbOPole}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Width="Auto">
                                 <CheckBox Height="25" Width="25" IsChecked="{Binding Pulses}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource tbOPulses}"/>
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource tbOPulses}"/>
                             </StackPanel>
@@ -308,7 +316,7 @@
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
                         </StackPanel>
-                        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Left" Margin="10,0,0,0">
+                        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Left" Margin="0,20,0,0">
                             <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{StaticResource MaterialDesignTextFieldBoxBackground}" Foreground="{StaticResource MaterialDesignColumnHeader}" Text="{StaticResource tbOPerf}" />
                             <ComboBox md:HintAssist.Hint="{StaticResource tbhintODisplayInterval}" Width="120" HorizontalAlignment="Left" ToolTip="{StaticResource tbhintODisplayInterval}" ItemsSource="{Binding IntervalList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                 <ComboBox.SelectedItem>

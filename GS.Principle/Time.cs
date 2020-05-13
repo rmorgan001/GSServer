@@ -135,6 +135,17 @@ namespace GS.Principles
         }
 
         /// <summary>
+        /// calculating the percentage of X from Y using timespans
+        /// </summary>
+        /// <param name="dividend"></param>
+        /// <param name="divisor"></param>
+        /// <returns></returns>
+        public static double Divide(TimeSpan dividend, TimeSpan divisor)
+        {
+            return dividend.Ticks / (double)divisor.Ticks;
+        }
+
+        /// <summary>
         /// Greenwich Mean Time to Local Sidreal Time
         /// </summary>
         /// <param name="ts">4, 40, 5, 230</param>
@@ -219,7 +230,7 @@ namespace GS.Principles
                 }
                 var i = (-17.2 * Math.Sin(e)) - (1.32 * Math.Sin(2 * f)) - (0.23 * Math.Sin(2 * g)) + (0.21 * Math.Sin(2 * e));
                 var j = (i * Math.Cos(h)) / 3600;               // Nutation correction for true values
-                d = d + j;                                      // True Local Sidereal Time (LST)
+                d += j;                                      // True Local Sidereal Time (LST)
             }
             var m = d * 24.0 / 360.0;
             var Lst = Range.Range24(m);

@@ -829,6 +829,34 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static bool _hcAntiDec;
+        public static bool HcAntiDec
+        {
+            get => _hcAntiDec;
+            set
+            {
+                if (_hcAntiDec == value) return;
+                _hcAntiDec = value;
+                Properties.SkyTelescope.Default.HcAntiDec = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static bool _hcAntiRa;
+        public static bool HcAntiRa
+        {
+            get => _hcAntiRa;
+            set
+            {
+                if (_hcAntiRa == value) return;
+                _hcAntiRa = value;
+                Properties.SkyTelescope.Default.HcAntiRa = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static double _homeAxisX;
         public static double HomeAxisX
         {
@@ -1075,7 +1103,7 @@ namespace GS.Server.SkyTelescope
         public static int RaBacklash
         {
             get => _raBacklash;
-            private set
+            set
             {
                 if (RaBacklash == value) return;
                 _raBacklash = value;
@@ -1345,6 +1373,8 @@ namespace GS.Server.SkyTelescope
             Encoders = Properties.SkyTelescope.Default.EncodersOn;
             FocalLength = Properties.SkyTelescope.Default.FocalLength;
             FullCurrent = Properties.SkyTelescope.Default.FullCurrent;
+            HcAntiDec = Properties.SkyTelescope.Default.HcAntiDec;
+            HcAntiRa = Properties.SkyTelescope.Default.HcAntiRa;
             GotoPrecision = Properties.SkyTelescope.Default.GotoPrecision;
             GpsComPort = Properties.SkyTelescope.Default.GpsPort;
             GuideRateOffsetY = Properties.SkyTelescope.Default.GuideRateOffsetY;

@@ -32,6 +32,8 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using GS.Server.Controls.Dialogs;
+using GS.Server.Plot;
+using GS.Server.PoleLocator;
 using GS.Server.Test;
 
 namespace GS.Server.Main
@@ -48,6 +50,8 @@ namespace GS.Server.Main
         private SettingsVM _settingsVM;
         private GamepadVM _gamepadVM;
         private Model3DVM _model3dVM;
+        private PlotVM _plotVM;
+        private PoleLocatorVM _poleLocatorVM;
         private PulsesVM _pulsesVM;
         private TestVM _testVM;
         public static MainWindowVM _mainWindowVm;
@@ -57,8 +61,6 @@ namespace GS.Server.Main
         private WindowState _tempWindowState = WindowState.Normal;
 
         #endregion
-
-        #region Main Page
 
         public MainWindowVM()
         {
@@ -95,6 +97,8 @@ namespace GS.Server.Main
                     UpdateTabViewModel("Settings");
                     UpdateTabViewModel("Gamepad");
                     UpdateTabViewModel("Model3D");
+                    UpdateTabViewModel("Plot");
+                    UpdateTabViewModel("PoleLocator");
                     UpdateTabViewModel("Pulses");
                     UpdateTabViewModel("Test");
 
@@ -117,6 +121,8 @@ namespace GS.Server.Main
             }
         }
 
+        #region Model
+
         private void PropertyChangedServer(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
@@ -135,97 +141,6 @@ namespace GS.Server.Main
                     MountType = SkySettings.Mount;
                     break;
             }
-        }
-
-        private string _version;
-        public string Version
-        {
-            get => _version;
-            set
-            {
-                _version = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private int _appcount;
-        public int AppCount
-        {
-            get => _appcount;
-            set
-            {
-                _appcount = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private MountType _mounttype;
-        public MountType MountType
-        {
-            get => _mounttype;
-            set
-            {
-                _mounttype = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _topMost;
-        public bool TopMost
-        {
-            get => _topMost;
-            set
-            {
-                if (_topMost == value) return;
-                _topMost = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private ICommand _minimizeWindowCommand;
-        public ICommand MinimizeWindowCommand
-        {
-            get
-            {
-                return _minimizeWindowCommand ?? (_minimizeWindowCommand = new RelayCommand(
-                           param => MinimizeWindow()
-                       ));
-            }
-        }
-        private void MinimizeWindow()
-        {
-            Windowstate = WindowState.Minimized;
-            Memory.FlushMemory();
-        }
-
-        private ICommand _maxmizeWindowCommand;
-        public ICommand MaximizeWindowCommand
-        {
-            get
-            {
-                return _maxmizeWindowCommand ?? (_maxmizeWindowCommand = new RelayCommand(
-                           param => MaxmizeWindow()
-                       ));
-            }
-        }
-        private void MaxmizeWindow()
-        {
-            Windowstate = Windowstate != WindowState.Maximized ? WindowState.Maximized : WindowState.Normal;
-        }
-
-        private ICommand _normalWindowCommand;
-        public ICommand NormalWindowCommand
-        {
-            get
-            {
-                return _normalWindowCommand ?? (_normalWindowCommand = new RelayCommand(
-                           param => NormalWindow()
-                       ));
-            }
-        }
-        private void NormalWindow()
-        {
-            Windowstate = WindowState.Normal;
         }
 
         #endregion
@@ -340,6 +255,44 @@ namespace GS.Server.Main
                         Model3DRadioVisable = false;
                     }
                     break;
+                case "Plot":
+                    if (Settings.Settings.Plot)
+                    {
+                        if (!PageViewModels.Contains(_plotVM))
+                        {
+                            _plotVM = new PlotVM();
+                            PageViewModels.Add(_plotVM);
+                        }
+                        PlotRadioVisable = true;
+                    }
+                    else
+                    {
+                        if (PageViewModels.Contains(_plotVM))
+                        {
+                            PageViewModels.Remove(_plotVM);
+                        }
+                        PlotRadioVisable = false;
+                    }
+                    break;
+                case "PoleLocator":
+                    if (Settings.Settings.PoleLocator)
+                    {
+                        if (!PageViewModels.Contains(_poleLocatorVM))
+                        {
+                            _poleLocatorVM = new PoleLocatorVM();
+                            PageViewModels.Add(_poleLocatorVM);
+                        }
+                        PoleLocatorRadioVisable = true;
+                    }
+                    else
+                    {
+                        if (PageViewModels.Contains(_poleLocatorVM))
+                        {
+                            PageViewModels.Remove(_poleLocatorVM);
+                        }
+                        PoleLocatorRadioVisable = false;
+                    }
+                    break;
                 case "Pulses":
                     if (Settings.Settings.Pulses)
                     {
@@ -408,6 +361,10 @@ namespace GS.Server.Main
             { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{viewModel}" };
             MonitorLog.LogToMonitor(monitorItem);
         }
+
+        #endregion
+
+        #region Radio buttons
 
         private bool _settingsVMRadio;
         public bool SettingsVMRadio
@@ -589,6 +546,63 @@ namespace GS.Server.Main
             }
         }
 
+        private bool _plotVMRadio;
+        public bool PlotVMRadioRadio
+        {
+            get => _plotVMRadio;
+            set
+            {
+                using (new WaitCursor())
+                {
+                    if (_plotVMRadio == value) return;
+                    _plotVMRadio = value;
+                    if (value) ChangeViewModel(_plotVM);
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _plotRadioVisable;
+        public bool PlotRadioVisable
+        {
+            get => _plotRadioVisable;
+            set
+            {
+                if (_plotRadioVisable == value) return;
+                _plotRadioVisable = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+        private bool _poleLocatorVMRadio;
+        public bool PoleLocatorVMRadioRadio
+        {
+            get => _poleLocatorVMRadio;
+            set
+            {
+                using (new WaitCursor())
+                {
+                    if (_poleLocatorVMRadio == value) return;
+                    _poleLocatorVMRadio = value;
+                    if (value) ChangeViewModel(_poleLocatorVM);
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _poleLocatorRadioVisable;
+        public bool PoleLocatorRadioVisable
+        {
+            get => _poleLocatorRadioVisable;
+            set
+            {
+                if (_poleLocatorRadioVisable == value) return;
+                _poleLocatorRadioVisable = value;
+                OnPropertyChanged();
+            }
+        }
+
         private bool _pulsesVMRadio;
         public bool PulsesVMRadioRadio
         {
@@ -643,6 +657,101 @@ namespace GS.Server.Main
                 _testRadioVisable = value;
                 OnPropertyChanged();
             }
+        }
+
+        #endregion
+
+        #region Window Info
+
+        private string _version;
+        public string Version
+        {
+            get => _version;
+            set
+            {
+                _version = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _appcount;
+        public int AppCount
+        {
+            get => _appcount;
+            set
+            {
+                _appcount = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private MountType _mounttype;
+        public MountType MountType
+        {
+            get => _mounttype;
+            set
+            {
+                _mounttype = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _topMost;
+        public bool TopMost
+        {
+            get => _topMost;
+            set
+            {
+                if (_topMost == value) return;
+                _topMost = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _minimizeWindowCommand;
+        public ICommand MinimizeWindowCommand
+        {
+            get
+            {
+                return _minimizeWindowCommand ?? (_minimizeWindowCommand = new RelayCommand(
+                    param => MinimizeWindow()
+                ));
+            }
+        }
+        private void MinimizeWindow()
+        {
+            Windowstate = WindowState.Minimized;
+            Memory.FlushMemory();
+        }
+
+        private ICommand _maxmizeWindowCommand;
+        public ICommand MaximizeWindowCommand
+        {
+            get
+            {
+                return _maxmizeWindowCommand ?? (_maxmizeWindowCommand = new RelayCommand(
+                    param => MaxmizeWindow()
+                ));
+            }
+        }
+        private void MaxmizeWindow()
+        {
+            Windowstate = Windowstate != WindowState.Maximized ? WindowState.Maximized : WindowState.Normal;
+        }
+
+        private ICommand _normalWindowCommand;
+        public ICommand NormalWindowCommand
+        {
+            get
+            {
+                return _normalWindowCommand ?? (_normalWindowCommand = new RelayCommand(
+                    param => NormalWindow()
+                ));
+            }
+        }
+        private void NormalWindow()
+        {
+            Windowstate = WindowState.Normal;
         }
 
         public WindowState Windowstate
@@ -734,13 +843,7 @@ namespace GS.Server.Main
 
         private void CloseServer()
         {
-            SkyServer.IsMountRunning = false;
-
-            var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "MainWindow Closing" };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            if (Application.Current.MainWindow != null) Application.Current.MainWindow.Close();
+            SkyServer.ShutdownServer();
         }
 
         private bool _isCloseDialogOpen;
@@ -852,6 +955,8 @@ namespace GS.Server.Main
                 _pulsesVM?.Dispose();
                 _mainWindowVm?.Dispose();
                 _testVM?.Dispose();
+                _plotVM?.Dispose();
+                _poleLocatorVM?.Dispose();
             }
             // free native resources if there are any.
             //if (nativeResource != IntPtr.Zero)

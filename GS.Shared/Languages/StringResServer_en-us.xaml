@@ -31,14 +31,17 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="rbtnOptions">Options</system:String>
     <system:String x:Key="rbtnGamepad">Gamepad</system:String>
     <system:String x:Key="rbtnModel3D">3D</system:String>
+    <system:String x:Key="rbtnPole">Pole</system:String>
     <system:String x:Key="rbtnPulses">Pulses</system:String>
+    <system:String x:Key="rbtnPlot">Plot</system:String>
     <system:String x:Key="btntipWindowFlip">Flip Window Size</system:String>
 
     <!--Top bar-->
     <system:String x:Key="lbTopRa">Right Ascension:</system:String>
     <system:String x:Key="lbTopDec">Declination:</system:String>
-    <system:String x:Key="lbTopAz">Azimuth:</system:String>
-    <system:String x:Key="lbTopAlt">Altitude:</system:String>
+    <system:String x:Key="lbTopAz">Az:</system:String>
+    <system:String x:Key="lbTopAlt">Alt:</system:String>
+    <system:String x:Key="lbTopLHA">LHA:</system:String>
 
     <!--Standard button bar-->
     <system:String x:Key="btnHome">Home</system:String>
@@ -99,11 +102,17 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="lbSpeed">Speed</system:String>
     <system:String x:Key="sltipSpeed">Slew Speed</system:String>
     <system:String x:Key="tbtntipFlipNS">Reverse N/S direction</system:String>
-    <system:String x:Key="lbFlipNS">Flip N/S</system:String>
+    <system:String x:Key="lbFlipNS">N/S</system:String>
+    <system:String x:Key="lbFlip">Flip Dir</system:String>
     <system:String x:Key="tbtntipFlipEW">Reverse E/W direction</system:String>
-    <system:String x:Key="lbFlipEW">Flip E/W</system:String>
+    <system:String x:Key="lbFlipEW">E/W</system:String>
     <system:String x:Key="lbMode">Mode</system:String>
     <system:String x:Key="cbtipMode">Direction Mode</system:String>
+    <system:String x:Key="lbHcBacklash">Anti-Lash</system:String>
+    <system:String x:Key="lbtipHcAntiBacklash">Anti-Backlash</system:String>
+    <system:String x:Key="lbHcRa">E/W</system:String>
+    <system:String x:Key="lbHcDec">N/S</system:String>
+
 
     <!--PPEC bar-->
     <system:String x:Key="tbStartTraining">Accept to start training</system:String>
@@ -129,7 +138,11 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     
     <!--Backlash -->
     <system:String x:Key="sldtipBacklash">Dec Backlash</system:String>
-    <system:String x:Key="lbBacklash">Dec Backlash Compensate</system:String>
+    <system:String x:Key="lbBacklash">Backlash Compensate:</system:String>
+    <system:String x:Key="lbDecBacklash">Dec</system:String>
+    <system:String x:Key="cbtipDecBacklash">Dec Backlash</system:String>
+    <system:String x:Key="lbRaBacklash">Ra</system:String>
+    <system:String x:Key="cbtipRaBacklash">Ra Backlash</system:String>
 
     <!--Debug bar-->
     <system:String x:Key="tbInternalX">MountX:</system:String>
@@ -169,7 +182,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnGPSLong">Longitude:</system:String>
     <system:String x:Key="btnGPSEle">Elevation:</system:String>
     <system:String x:Key="tbGPSAccept">Accept Coordinates?</system:String>
-    <system:String x:Key="msgGPSNoDataFound">No data found on COM port </system:String>
+    <system:String x:Key="msgGPSNoDataFound">Missing or invalid data found on COM port</system:String>
     <system:String x:Key="tbGPSGGA">GGA</system:String>
     <system:String x:Key="tbGPSRMC">RMC</system:String>
     <system:String x:Key="tbGPSLocal">Local Time Discrepancy</system:String>
@@ -287,6 +300,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnNAlignment">Am</system:String>
     <system:String x:Key="btnNEqType">Eq</system:String>
     <system:String x:Key="btnNOb">Ob</system:String>
+    <system:String x:Key="btntipNSidereal">Sidereal Time</system:String>
+    <system:String x:Key="btnNHa">Ha</system:String>
+    <system:String x:Key="btntipNHa">Hour Angle</system:String>
 
     <!--SkyWatcher Settings -->
     <system:String x:Key="lbSettings">Settings</system:String>
@@ -299,7 +315,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="cbhintDecGuiding">Dec Guiding Rate %</system:String>
     <system:String x:Key="cbhintMount">Mount Type</system:String>
     <system:String x:Key="cbhintMaxSlew">Max Slew Rate deg/sec</system:String>
-    <system:String x:Key="cbhintMeridian">Meridian Limits</system:String>
+    <system:String x:Key="cbhintMeridian">Meridian Limits (deg)</system:String>
     <system:String x:Key="cbhintTracking">Tracking Rate</system:String>
     <system:String x:Key="cbhintST4">ST4 Guiderate</system:String>
     <system:String x:Key="pbtipReset">Reset</system:String>
@@ -432,6 +448,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="msgONotAvail">Updates not Available</system:String>
     <system:String x:Key="msgONotFound">Updates not Found</system:String>
     <system:String x:Key="msgODisconnects">Diconnect mount and connected applications before running</system:String>
+    <system:String x:Key="tbOPole">Pole Locator</system:String>
 
     <!--3DModel -->
     <system:String x:Key="lb3dSettings">Settings</system:String>
@@ -441,7 +458,6 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="cb3DRaAxis">RA Axis</system:String>
     <system:String x:Key="cb3DDecAxis">Dec Axis</system:String>
     <system:String x:Key="cb3DTopBar">Top coords bar</system:String>
-
 
     <!--Pulses -->
     <system:String x:Key="tbOPulses">Pulses</system:String>
@@ -454,6 +470,30 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="bdgPhdStart">On</system:String>
     <system:String x:Key="tbtntipOpen">Open</system:String>
 
+    <!--Plot -->
+    <system:String x:Key="tbOPlot">Plot</system:String>
+    <system:String x:Key="btnPlotStart">Start</system:String>
+    <system:String x:Key="btnPlotClear">Clear</system:String>
+    <system:String x:Key="btnPlotSize">Fit</system:String>
+    <system:String x:Key="bdgPlotStart">On</system:String>
+    <system:String x:Key="btnPlotPause">Pause</system:String>
+    <system:String x:Key="bdgPlotPause">On</system:String>
+    <system:String x:Key="tbPlotZero">Zero Base Axes</system:String>
+    <system:String x:Key="cbPlotYscale">Y - Scale</system:String>
+    <system:String x:Key="cbPlotQuality">Zoom Quality</system:String>
+    <system:String x:Key="cbPlotMaxPoints">Maxium Plot Points</system:String>
+    <system:String x:Key="cbtipPlotMaxPoints">Max Points</system:String>
 
+    <!--Pole Locator -->
+    <system:String x:Key="tbLatitude">Latitude:</system:String>
+    <system:String x:Key="tbLongitude">Longitude:</system:String>
+    <system:String x:Key="tbLST">Sidereal Time:</system:String>
+    <system:String x:Key="tbHADeg">Hour Angle:</system:String>
+    <system:String x:Key="tbHAFlipDeg">HA Flip:</system:String>
+    <system:String x:Key="tbLDate">Local Date:</system:String>
+    <system:String x:Key="tbLTime">Local Time:</system:String>
+    <system:String x:Key="cbMirrorFlip">Flip View</system:String>
+    <system:String x:Key="tbPolaris">Polaris</system:String>
+    <system:String x:Key="tbOctans">Sigma Octantis</system:String>
 </ResourceDictionary>
  

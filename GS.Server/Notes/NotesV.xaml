@@ -166,6 +166,8 @@
                         <Button ToolTip="{StaticResource btntipNEqType}" Click="BtEqSystem_OnClick" Margin="1" Padding="2" Content="{StaticResource btnNEqType}"/>
                         <Button ToolTip="{StaticResource btntipNOb}" Click="BtObservatory_OnClick" Margin="1" Padding="2" Content="{StaticResource btnNOb}"/>
                         <Button ToolTip="{StaticResource btntipNWeather}" Click="BtWeather_OnClick" HorizontalAlignment="Left"  Margin="1" Padding="2" Content="{StaticResource btntipNWeather}"/>
+                        <Button ToolTip="{StaticResource btntipNSidereal}" Padding="2" Click="BtSidereal_OnClick"><md:PackIcon Kind="Earth" /></Button>
+                        <Button ToolTip="{StaticResource btntipNHa}" Click="Ha_OnClick" Margin="1" Padding="2" Content="{StaticResource btnNHa}" />
                         <!--<ComboBox Name="cbSkySettings" ToolTip="Font" Width="100" />-->
                     </ToolBar>
             </ToolBarTray>

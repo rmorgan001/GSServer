@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -58,6 +59,11 @@ namespace GS.Server.SkyTelescope
         private static double SlewSpeedSix;
         private static double SlewSpeedSeven;
         public static double SlewSpeedEight;
+
+        // HC Anti-Backlash
+        private static HcPrevMove HcPrevMoveRa;
+        private static HcPrevMove HcPrevMoveDec;
+        private static readonly IList<double> HcPrevMovesDec = new List<double>();
 
         private static Vector _homeAxes;
         private static Vector _mountAxes;
@@ -131,6 +137,7 @@ namespace GS.Server.SkyTelescope
         private static PierSide _isSideOfPier;
         private static bool _isSlewing;
         private static Exception _lastAutoHomeError;
+        private static double _lha;
         private static bool _limitAlarm;
         private static bool _mountrunning;
         private static bool _monitorPulse;
@@ -545,6 +552,20 @@ namespace GS.Server.SkyTelescope
         /// applies backlash to pulse
         /// </summary>
         private static GuideDirections LastDecDirection { get; set; }
+
+        /// <summary>
+        /// Local Hour Angle
+        /// </summary>
+        public static double Lha
+        {
+            get => _lha;
+            private set
+            {
+                if (Math.Abs(value - _lha) < 0.000000000000001) { return; }
+                _lha = value;
+                OnStaticPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// UI indicator for axes limits
@@ -2354,10 +2375,10 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Gets current converted positions from the mount
+        /// Gets current converted positions from the mount in degrees
         /// </summary>
         /// <returns></returns>
-        private static double[] GetRawPositions()
+        private static double[] GetRawDegrees()
         {
             var actualDegrees = new[] { double.NaN, double.NaN };
             if (!IsMountRunning) { return actualDegrees; }
@@ -2375,6 +2396,45 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
             return actualDegrees;
+        }
+
+        /// <summary>
+        /// Gets current positions from the mount in steps
+        /// </summary>
+        /// <returns></returns>
+        private static double? GetRawSteps(int axis)
+        {
+            if (!IsMountRunning) { return null; }
+            switch (SkySettings.Mount)
+            {
+                case MountType.Simulator:
+                    var simPositions = new CmdAxisSteps(MountQueue.NewId);
+                    var a = (int[])MountQueue.GetCommandResult(simPositions).Result;
+
+                    switch (axis)
+                    {
+                        case 0:
+                            return Convert.ToDouble(a[0]);
+                        case 1:
+                            return Convert.ToDouble(a[1]);
+                        default:
+                            return null;
+                    }
+                case MountType.SkyWatcher:
+                    switch (axis)
+                    {
+                        case 0:
+                            var b = new SkyGetAxisPositionCounter(SkyQueue.NewId, AxisId.Axis1);
+                            return Convert.ToDouble(SkyQueue.GetCommandResult(b).Result);
+                        case 1:
+                            var c = new SkyGetAxisPositionCounter(SkyQueue.NewId, AxisId.Axis2);
+                            return Convert.ToDouble(SkyQueue.GetCommandResult(c).Result);
+                        default:
+                            return null;
+                    }
+                default:
+                    return null;
+            }
         }
 
         /// <summary>
@@ -2592,8 +2652,8 @@ namespace GS.Server.SkyTelescope
                     delta = 0;
                     break;
             }
-
-            // check the button states and implement mode
+            
+            // Check hand control mode and direction
             switch (SkySettings.HcMode)
             {
                 case HCMode.Axes:
@@ -2615,7 +2675,26 @@ namespace GS.Server.SkyTelescope
                         case SlewDirection.SlewRight:
                             change[0] = SouthernHemisphere ? delta : -delta;
                             break;
-                        case SlewDirection.SlewNone:
+                        case SlewDirection.SlewNoneRa:
+                            if (HcPrevMoveRa != null)
+                            {
+                                HcPrevMoveRa.StepEnd = GetRawSteps(0);
+                                if (HcPrevMoveRa.StepEnd.HasValue && HcPrevMoveRa.StepStart.HasValue)
+                                {
+                                    HcPrevMoveRa.StepDiff = Math.Abs(HcPrevMoveRa.StepEnd.Value - HcPrevMoveRa.StepStart.Value);
+                                }
+                            }
+                            break;
+                        case SlewDirection.SlewNoneDec:
+                            if (HcPrevMoveDec != null)
+                            {
+                                HcPrevMoveDec.StepEnd = GetRawSteps(1);
+                                if (HcPrevMoveDec.StepEnd.HasValue && HcPrevMoveDec.StepStart.HasValue)
+                                {
+                                    HcPrevMoveDec.StepDiff = Math.Abs(HcPrevMoveDec.StepEnd.Value - HcPrevMoveDec.StepStart.Value);
+                                    HcPrevMovesDec.Add(HcPrevMoveDec.StepDiff);
+                                }
+                            }
                             break;
                         default:
                             change[0] = 0;
@@ -2662,7 +2741,26 @@ namespace GS.Server.SkyTelescope
                         case SlewDirection.SlewRight:
                             change[0] = SouthernHemisphere ? -delta : delta;
                             break;
-                        case SlewDirection.SlewNone:
+                        case SlewDirection.SlewNoneRa:
+                            if (HcPrevMoveRa != null)
+                            {
+                                HcPrevMoveRa.StepEnd = GetRawSteps(0);
+                                if (HcPrevMoveRa.StepEnd.HasValue && HcPrevMoveRa.StepStart.HasValue)
+                                {
+                                    HcPrevMoveRa.StepDiff = Math.Abs(HcPrevMoveRa.StepEnd.Value - HcPrevMoveRa.StepStart.Value);
+                                }
+                            }
+                            break;
+                        case SlewDirection.SlewNoneDec:
+                            if (HcPrevMoveDec != null)
+                            {
+                                HcPrevMoveDec.StepEnd = GetRawSteps(1);
+                                if (HcPrevMoveDec.StepEnd.HasValue && HcPrevMoveDec.StepStart.HasValue)
+                                {
+                                    HcPrevMoveDec.StepDiff = Math.Abs(HcPrevMoveDec.StepEnd.Value - HcPrevMoveDec.StepStart.Value);
+                                    HcPrevMovesDec.Add(HcPrevMoveDec.StepDiff);
+                                }
+                            }
                             break;
                         default:
                             change[0] = 0;
@@ -2676,6 +2774,7 @@ namespace GS.Server.SkyTelescope
                     break;
             }
 
+            // Log data to Monitor
             if (Math.Abs(change[0]) > 0 || Math.Abs(change[1]) > 0)
             {
                 var monitorItem = new MonitorEntry
@@ -2691,24 +2790,238 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
             }
 
+            // Set appropriate slew state
             SlewState = Math.Abs(change[0]) + Math.Abs(change[1]) > 0 ? SlewType.SlewHandpad : SlewType.SlewNone;
 
+            // Anti-backlash compensate
+            long stepsNeededDec = 0;
+            if (SkySettings.HcAntiDec && SkySettings.DecBacklash > 0 && HcPrevMoveDec != null)
+            {
+                switch (direction)
+                {
+                    case SlewDirection.SlewNorth:
+                    case SlewDirection.SlewUp:
+                    case SlewDirection.SlewSouth:
+                    case SlewDirection.SlewDown:
+                        if (Math.Abs(HcPrevMoveDec.Delta) > 0.000000 &&
+                            Math.Sign(HcPrevMoveDec.Delta) != Math.Sign(change[1]))
+                        {
+                            stepsNeededDec = Convert.ToInt64(HcPrevMovesDec.Sum());
+                            if (stepsNeededDec >= SkySettings.DecBacklash)
+                            {
+                                stepsNeededDec = SkySettings.DecBacklash;
+                            }
+
+                            if (change[1] < 0) stepsNeededDec = -stepsNeededDec;
+                        }
+                        break;
+                }
+            }
+            long stepsNeededRa = 0;
+            if (SkySettings.HcAntiRa && Tracking && SkySettings.RaBacklash > 0 && HcPrevMoveRa != null)
+            {
+                if (direction == SlewDirection.SlewNoneRa)
+                {
+                    if (HcPrevMoveRa.StepEnd.HasValue && HcPrevMoveRa.StepStart.HasValue)
+                    {
+                        if (SouthernHemisphere)
+                        {
+                            if (HcPrevMoveRa.StepEnd.Value > HcPrevMoveRa.StepStart.Value)
+                            {
+                                stepsNeededRa = Convert.ToInt64(HcPrevMoveRa.StepDiff);
+                                if (stepsNeededRa >= SkySettings.RaBacklash) { stepsNeededRa = SkySettings.RaBacklash; }
+                                stepsNeededRa = -Math.Abs(stepsNeededRa);
+                            }
+                        }
+                        else
+                        {
+                            if (HcPrevMoveRa.StepEnd.Value < HcPrevMoveRa.StepStart.Value)
+                            {
+                                stepsNeededRa = Convert.ToInt64(HcPrevMoveRa.StepDiff);
+                                if (stepsNeededRa >= SkySettings.RaBacklash) { stepsNeededRa = SkySettings.RaBacklash; }
+                            }
+                        }
+                    }
+                }
+            }
+
+            //  log anti-lash moves
+            if (Math.Abs(stepsNeededDec) > 0 && HcPrevMoveDec != null)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{HcPrevMoveDec.Delta},{HcPrevMovesDec.Sum()},Anti-Lash,{stepsNeededDec} of {SkySettings.DecBacklash}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+            if (Math.Abs(stepsNeededRa) > 0 && HcPrevMoveRa != null)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{HcPrevMoveRa.Direction},{HcPrevMoveRa.StepDiff},Anti-Lash,{stepsNeededRa} of {SkySettings.RaBacklash}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+            
+            // Track previous direction moves
+            switch (direction)
+            {
+                case SlewDirection.SlewNorth:
+                case SlewDirection.SlewUp:
+                case SlewDirection.SlewSouth:
+                case SlewDirection.SlewDown:
+                    HcPrevMoveDec = new HcPrevMove
+                    {
+                        Direction = direction,
+                        StartDate = HiResDateTime.UtcNow,
+                        Delta = change[1]
+                    };
+                    break;
+                case SlewDirection.SlewEast:
+                case SlewDirection.SlewLeft:
+                case SlewDirection.SlewWest:
+                case SlewDirection.SlewRight:
+                    HcPrevMoveRa = new HcPrevMove
+                    {
+                        Direction = direction,
+                        StartDate = HiResDateTime.UtcNow,
+                        Delta = change[0],
+                        StepStart = GetRawSteps(0),
+                    };
+                    break;
+                case SlewDirection.SlewNoneRa:
+                case SlewDirection.SlewNoneDec:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
+            }
+
+            // Send to mount
             object _;
             switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
+                    //RA Anti-backlash compensate
+                    if (Math.Abs(stepsNeededDec) > 0)
+                    {
+                        HcPrevMovesDec.Clear();
+
+                        var a = new CmdAxesDegrees(MountQueue.NewId);
+                        var b = (double[])MountQueue.GetCommandResult(a).Result;
+                        var arcsecs = Conversions.StepPerArcsec(StepsPerRevolution[1]);
+                        var c = stepsNeededDec / arcsecs;
+                        var d = Conversions.ArcSec2Deg(c);
+                        _ = new CmdAxisGoToTarget(0, Axis.Axis2, b[1] + d);
+
+                        // check for axis stopped
+                        var stopwatch1 = Stopwatch.StartNew();
+                        while (stopwatch1.Elapsed.TotalSeconds <= 2)
+                        {
+                            var deltax = new CmdAxisStatus(MountQueue.NewId, Axis.Axis2);
+                            var axis1Status = (AxisStatus)MountQueue.GetCommandResult(deltax).Result;
+                            if (!axis1Status.Slewing) break; // stopped doesn't report quick enough
+                        }
+                    }
+
+                    // Collect position after lash correction
+                    if (HcPrevMoveDec != null) HcPrevMoveDec.StepStart = GetRawSteps(1);
+
+                    if (Math.Abs(stepsNeededRa) > 0)
+                    {
+                        var a = new CmdAxesDegrees(MountQueue.NewId);
+                        var b = (double[])MountQueue.GetCommandResult(a).Result;
+                        var arcsecs = Conversions.StepPerArcsec(StepsPerRevolution[0]);
+                        var c = (stepsNeededRa)/ arcsecs;
+                        var d = Conversions.ArcSec2Deg(c);
+                        _ = new CmdAxisGoToTarget(0, Axis.Axis1, b[0] + d);
+
+                        // check for axis stopped
+                        var stopwatch1 = Stopwatch.StartNew();
+                        while (stopwatch1.Elapsed.TotalSeconds <= 2)
+                        {
+                            var deltax = new CmdAxisStatus(MountQueue.NewId, Axis.Axis1);
+                            var axis1Status = (AxisStatus)MountQueue.GetCommandResult(deltax).Result;
+                            if (!axis1Status.Slewing) break; // stopped doesn't report quick enough
+                        }
+
+                        GetRawDegrees();
+                    }
                     _ = new CmdHcSlew(0, Axis.Axis1, change[0]);
                     _ = new CmdHcSlew(0, Axis.Axis2, change[1]);
+
                     break;
                 case MountType.SkyWatcher:
-                    SkyHCRate.X = change[0];
+                    // implement anti-backlash
+                    if (Math.Abs(stepsNeededDec) > 0)
+                    {
+                        HcPrevMovesDec.Clear();
+
+                        _ = new SkyAxisMoveSteps(0, AxisId.Axis2, stepsNeededDec);
+
+                        var stopwatch = Stopwatch.StartNew();
+                        while (stopwatch.Elapsed.TotalSeconds <= 2)
+                        {
+                            var statusy = new SkyIsAxisFullStop(SkyQueue.NewId, AxisId.Axis2);
+                            var axis2Stopped = Convert.ToBoolean(SkyQueue.GetCommandResult(statusy).Result);
+
+                            if (!axis2Stopped) { continue; }
+                            break;
+                        }
+                    }
+
+                    // Collect position after lash correction
+                    if (HcPrevMoveDec != null) HcPrevMoveDec.StepStart = GetRawSteps(1);
+
+                    if (Math.Abs(stepsNeededRa) > 0)
+                    {
+                        _ = new SkyAxisMoveSteps(0, AxisId.Axis1, stepsNeededRa);
+                        var stopwatch = Stopwatch.StartNew();
+                        while (stopwatch.Elapsed.TotalSeconds <= 2)
+                        {
+                            var statusx = new SkyIsAxisFullStop(SkyQueue.NewId, AxisId.Axis1);
+                            var axis1Stopped = Convert.ToBoolean(SkyQueue.GetCommandResult(statusx).Result);
+
+                            if (!axis1Stopped) { continue; }
+                            break;
+                        }
+                    }
+                    SkyHCRate.X = change[0]; 
                     SkyHCRate.Y = change[1];
                     var rate = GetSlewRate();
                     _ = new SkyAxisSlew(0, AxisId.Axis1, rate.X);
                     _ = new SkyAxisSlew(0, AxisId.Axis2, rate.Y);
+
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        /// <summary>
+        /// Resets the anti-backlash for the hand controller
+        /// </summary>
+        private static void HcResetPrevMove(MountAxis axis)
+        {
+            switch (axis)
+            {
+                case MountAxis.Dec:
+                    HcPrevMoveDec = null;
+                    break;
+                case MountAxis.Ra:
+                    HcPrevMoveRa = null;
+                    break;
             }
         }
 
@@ -2744,7 +3057,7 @@ namespace GS.Server.SkyTelescope
                             break;
                         }
                         counter++;
-                        rawPositions = GetRawPositions();
+                        rawPositions = GetRawDegrees();
                         if (rawPositions == null || double.IsNaN(rawPositions[0]) || double.IsNaN(rawPositions[1]))
                         {
                             rawPositions = null;
@@ -2801,7 +3114,7 @@ namespace GS.Server.SkyTelescope
                             break;
                         }
                         counter++;
-                        rawPositions = GetRawPositions();
+                        rawPositions = GetRawDegrees();
                         if (rawPositions == null || double.IsNaN(rawPositions[0]) || double.IsNaN(rawPositions[1]))
                         {
                             rawPositions = null;
@@ -2825,7 +3138,7 @@ namespace GS.Server.SkyTelescope
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"MountAxes:{_mountAxes.X},{_mountAxes.Y} Actual:{ActualAxisX},{ActualAxisY}" };
             MonitorLog.LogToMonitor(monitorItem);
 
-            var x = GetRawPositions();
+            var x = GetRawDegrees();
 
             monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Get Positions:{x[0]},{x[1]}" };
@@ -2931,6 +3244,7 @@ namespace GS.Server.SkyTelescope
             if (!IsMountRunning) { return; }
             var rejected = !Tracking || IsSlewing;
 
+            
             if (duration == 0)
             {
                 // stops the current guide command
@@ -2982,6 +3296,7 @@ namespace GS.Server.SkyTelescope
 
             if (_isPulseGuidingRa)
             {
+                HcResetPrevMove(MountAxis.Ra);
                 var raGuideRate = Math.Abs(GuideRateRa);
                 if (SouthernHemisphere)
                 {
@@ -2992,18 +3307,17 @@ namespace GS.Server.SkyTelescope
                     if (direction == GuideDirections.guideEast) { raGuideRate = -raGuideRate; }
                 }
 
-                var rabacklashamount = SkySettings.RaBacklash;
                 var createDateTime = HiResDateTime.UtcNow;
 
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
-                        _ = new CmdAxisPulse(0, Axis.Axis1, raGuideRate, duration, rabacklashamount, Declination);
+                        _ = new CmdAxisPulse(0, Axis.Axis1, raGuideRate, duration, 0, Declination);
                         pulseStatusEntry = new PulseStatusEntry { Axis = (int)Axis.Axis1, Duration = duration, CreateDateTime = createDateTime };
                         PulseStatusQueue.AddPulseStatusEntry(pulseStatusEntry);
                         break;
                     case MountType.SkyWatcher:
-                        _ = new SkyAxisPulse(0, AxisId.Axis1, raGuideRate, duration, rabacklashamount, Declination);
+                        _ = new SkyAxisPulse(0, AxisId.Axis1, raGuideRate, duration, 0, Declination);
                         pulseStatusEntry = new PulseStatusEntry { Axis = (int)AxisId.Axis1, Duration = duration, CreateDateTime = createDateTime };
                         PulseStatusQueue.AddPulseStatusEntry(pulseStatusEntry);
                         break;
@@ -3014,6 +3328,7 @@ namespace GS.Server.SkyTelescope
 
             if (_isPulseGuidingDec)
             {
+                HcResetPrevMove(MountAxis.Dec);
                 var decGuideRate = Math.Abs(GuideRateDec);
                 if (SideOfPier == PierSide.pierEast)
                 {
@@ -3083,6 +3398,9 @@ namespace GS.Server.SkyTelescope
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
+            HcResetPrevMove(MountAxis.Ra);
+            HcResetPrevMove(MountAxis.Dec);
         }
 
         /// <summary>
@@ -3244,6 +3562,20 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
+        /// Shuts down everything and exists
+        /// </summary>
+        public static void ShutdownServer()
+        {
+            IsMountRunning = false;
+
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "MainWindow Closing" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            if (Application.Current.MainWindow != null) Application.Current.MainWindow.Close();
+        }
+
+        /// <summary>
         /// Gets the side of pier using the right ascension, assuming it depends on the
         /// hour angle only.  Used for Destination side of Pier, NOT to determine the mount
         /// pointing state
@@ -3257,7 +3589,7 @@ namespace GS.Server.SkyTelescope
                 return PierSide.pierUnknown;
             }
 
-            var ha = Coordinate.Ra2Ha(rightAscension, SiderealTime);
+            var ha = Coordinate.Ra2Ha12(rightAscension, SiderealTime);
             PierSide sideOfPier;
             if (ha < 0.0 && ha >= -12.0) { sideOfPier = PierSide.pierWest; }
             else if (ha >= 0.0 && ha <= 12.0) { sideOfPier = PierSide.pierEast; }
@@ -3397,6 +3729,9 @@ namespace GS.Server.SkyTelescope
             MonitorLog.LogToMonitor(monitorItem);
 
             //todo might be a good place to reject for axis limits
+
+            HcResetPrevMove(MountAxis.Ra);
+            HcResetPrevMove(MountAxis.Dec);
 
             _targetAxes = targetPosition;
             AtPark = false;
@@ -3659,6 +3994,8 @@ namespace GS.Server.SkyTelescope
 
             Tracking = false;
             TrackingSpeak = true;
+
+
         }
 
         /// <summary>
@@ -3768,7 +4105,7 @@ namespace GS.Server.SkyTelescope
                 SiderealTime = Time.Lst(JDate.Epoch2000Days(), gsjd, false, SkySettings.Longitude);
 
                 // Get raw positions, some are non-responses from mount and are returned as NaN
-                var rawPositions = GetRawPositions();
+                var rawPositions = GetRawDegrees();
                 if (rawPositions == null) { return; }
                 if (double.IsNaN(rawPositions[0]) || double.IsNaN(rawPositions[1])) { return; }
 
@@ -3796,6 +4133,8 @@ namespace GS.Server.SkyTelescope
                 var radec = Axes.AxesXYToRaDec(axes);
                 RightAscension = radec[0];
                 Declination = radec[1];
+
+                Lha = Coordinate.Ra2Ha12(RightAscensionXform, SiderealTime);
 
                 // Track slewing state
                 CheckSlewState();

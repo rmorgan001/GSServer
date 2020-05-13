@@ -59,7 +59,8 @@ namespace GS.Server.SkyTelescope
         SlewDown,
         SlewLeft,
         SlewRight,
-        SlewNone
+        SlewNoneRa,
+        SlewNoneDec
     }
 
     public enum PointingState
@@ -122,5 +123,11 @@ namespace GS.Server.SkyTelescope
         ErrUnableToDeqeue = 3,
         ErrSerialFailed = 4
     };
+
+    public enum MountAxis
+    {
+        Ra,
+        Dec
+    }
 
 }

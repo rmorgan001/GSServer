@@ -9,7 +9,7 @@
              xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              mc:Ignorable="d" >
     <Border Margin="0,5,10,0" BorderBrush="DimGray"  BorderThickness="3" CornerRadius="5" Background="{StaticResource MaterialDesignToolBarBackground}">
-        <Grid Width="250" Height="175" Margin="4">
+        <Grid Width="320" Height="175" Margin="4" >
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition />
@@ -20,6 +20,7 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition Width="80"/>
+                <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <Button Grid.Row="1" Grid.Column="0" Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{StaticResource btntipW}"
                     helpers:MouseBehaviour.MouseLeftButtonDownCommand="{Binding HcMouseDownLeftCommand}"
@@ -45,10 +46,10 @@
                     helpers:MouseBehaviour.MouseLeftButtonDownCommand="{Binding HcMouseDownStopCommand}">
                 <md:PackIcon Kind="ArrowAll" />
             </Button>
-            <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="3" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Top">
-                <ComboBox md:HintAssist.Hint="{StaticResource lbMode}" ToolTip="{StaticResource cbtipMode}" Height="40"
+            <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="3" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Top" >
+                <ComboBox Margin="0,5,0,0"  md:HintAssist.Hint="{StaticResource lbMode}" ToolTip="{StaticResource cbtipMode}" 
                           ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type skyTelescope:HCMode}}}" 
-                          Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                          Style="{StaticResource MaterialDesignFloatingHintComboBox}" FontSize="12">
                     <ComboBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel />
@@ -58,55 +59,32 @@
                         <Binding Path="HcMode" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
                     </ComboBox.Text>
                 </ComboBox>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
-                    <Label Content="{StaticResource lbSpeed}">
-                        <Label.LayoutTransform>
-                            <TransformGroup>
-                                <RotateTransform Angle="90" />
-                                <ScaleTransform ScaleX="-1" ScaleY="-1"/>
-                            </TransformGroup>
-                        </Label.LayoutTransform>
-                    </Label>
-                    <Slider MinHeight="90" HorizontalAlignment="Center" IsSnapToTickEnabled="True" TickFrequency="1" TickPlacement="Both" 
-                        Orientation="Vertical" Minimum="1" Maximum="8" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" 
-                        Value="{Binding HcSpeed, Mode=TwoWay, Delay=800}" ToolTip="{StaticResource sltipSpeed}"/>
+                <!--Flip-->
+                <Label VerticalAlignment="Bottom" Margin="0,5,0,0"  Content="{StaticResource lbFlip}" FontSize="12" />
+                <StackPanel Orientation="Horizontal" Margin="0,-5,0,0" >
+                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource tbtntipFlipEW}" IsChecked="{Binding FlipEW, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding EWEnabled}" />
+                    <Label VerticalAlignment="Bottom" Content="{StaticResource lbFlipEW}" FontSize="12" />
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,-5" IsEnabled="{Binding NSEnabled}">
-                    <StackPanel.Style>
-                        <Style TargetType="StackPanel">
-                            <Style.Triggers>
-                                <Trigger Property="IsEnabled" Value="False">
-                                    <Setter Property="Opacity" Value="0.3" />
-                                </Trigger>
-                                <Trigger Property="IsEnabled" Value="True">
-                                    <Setter Property="Opacity" Value="1" />
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </StackPanel.Style>
-                    <ToggleButton HorizontalAlignment="Center" Width="20" Height="10" ToolTip="{StaticResource tbtntipFlipNS}"
-                              Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                              IsChecked="{Binding FlipNS, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbFlipNS}"/>
+                <StackPanel Orientation="Horizontal" Margin="0,-5,0,0">
+                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource tbtntipFlipNS}" IsChecked="{Binding FlipNS, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding NSEnabled}" />
+                    <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbFlipNS}" FontSize="12" />
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,-5,0,0"  IsEnabled="{Binding EWEnabled}">
-                <StackPanel.Style>
-                    <Style TargetType="StackPanel">
-                        <Style.Triggers>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Opacity" Value="0.3" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="True">
-                                <Setter Property="Opacity" Value="1" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </StackPanel.Style>
-                    <ToggleButton HorizontalAlignment="Center" Width="20" Height="10"
-                              Style="{StaticResource MaterialDesignSwitchToggleButton}" ToolTip="{StaticResource tbtntipFlipEW}"
-                              IsChecked="{Binding FlipEW, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbFlipEW}"/>
+                <!--backlash-->
+                <Label VerticalAlignment="Bottom" Margin="0,0,0,0" Content="{StaticResource lbHcBacklash}" FontSize="12" />
+                <StackPanel Orientation="Horizontal" Margin="0,-5,0,0">
+                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource lbtipHcAntiBacklash}" IsChecked="{Binding HcAntiRa, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbHcRa}" FontSize="12" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,-5,0,0">
+                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource lbtipHcAntiBacklash}" IsChecked="{Binding HcAntiDec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <Label VerticalAlignment="Bottom" Content="{StaticResource lbHcDec}" FontSize="12" />
+                </StackPanel>
             </StackPanel>
+            <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="4" Grid.RowSpan="3" VerticalAlignment="Top">
+                <StackPanel Orientation="Vertical"  Margin="0,10,0,0">
+                    <Slider MinHeight="140" HorizontalAlignment="Center" IsSnapToTickEnabled="True" TickFrequency="1" TickPlacement="Both" Orientation="Vertical" Minimum="1" Maximum="8" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" Value="{Binding HcSpeed, Mode=TwoWay, Delay=800}" ToolTip="{StaticResource sltipSpeed}" />
+                    <Label Content="{StaticResource lbSpeed}" HorizontalAlignment="Center" FontSize="12"/>
+                </StackPanel>
             </StackPanel>
         </Grid>
     </Border>

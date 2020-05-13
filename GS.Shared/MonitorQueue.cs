@@ -109,6 +109,17 @@ namespace GS.Shared
             }
         }
 
+        private static MonitorEntry _cmdj2SentEntry;
+        public static MonitorEntry Cmdj2SentEntry
+        {
+            get => _cmdj2SentEntry;
+            private set
+            {
+                _cmdj2SentEntry = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
         #endregion
 
         static MonitorQueue()
@@ -245,11 +256,30 @@ namespace GS.Shared
                         CmdjSentEntry = entry;
                         //  WriteOutCmdj(entry);
                     }
+                    if (entry.Message.Contains(":j2"))
+                    {
+                        var msg = entry.Message.Split(',');
+                        if (msg.Length < 2) return;
+                        // make sure it a valid mount response
+                        msg[1] = msg[1].Trim();
+                        if (!msg[1].Contains("=")) return;
+                        // convert response
+                        var msgval = Strings.StringToLong(msg[1]);
+                        entry.Message = $"{msg[0].Trim()},{msg[1]},{msgval}";
+                        //send to charting and log
+                        Cmdj2SentEntry = entry;
+                        //  WriteOutCmdj(entry);
+                    }
                     break;
                 case "AxesDegrees":  // from simulator
-                    if (entry.Message.Contains("tracking"))
+                    if (entry.Message.Contains("steps1"))
                     {
                         CmdjSentEntry = entry;
+                        // WriteOutCmdj(entry);
+                    }
+                    if (entry.Message.Contains("steps2"))
+                    {
+                        Cmdj2SentEntry = entry;
                         // WriteOutCmdj(entry);
                     }
                     break;

@@ -198,24 +198,26 @@ namespace GS.Server.Gps
                 HasData = false;
                 PcUtcNow = Principles.HiResDateTime.UtcNow;
                 var receivedData = _serial.ReceiveTerminated("\r\n");
+                //var receivedData = "$GPGGA,010537,2934.2442,N,09816.2099,W,1,05,2.1,227.0,M,-22.2,M,,*76\r\n";
                 if (receivedData.Length <= 0) continue;
-                if (!ValidateCheckSum(receivedData)) continue;
                 var gpsDataArr = receivedData.Split(',');
-
-                if (gpsDataArr[0].Length < 5) continue;
-                var talkerid = gpsDataArr[0].Substring(1, 2);
+                if (gpsDataArr[0].Length < 6) continue;
                 var code = gpsDataArr[0].Substring(3, 3);
+                LogNmeaSentence(receivedData, false);
+
 
                 switch (code)
                 {
                     case "GGA":
                         if (!Gga) break;
-                        LogNmeaSentence(receivedData);
+                        LogNmeaSentence(receivedData, true);
                         if (gpsDataArr.Length == 15)
                         {
-                            ParseGga(talkerid, gpsDataArr);
+                            if (!ValidateCheckSum(receivedData)) return;
+                            ParseGga(gpsDataArr);
                             if (CheckProperties())
                             {
+                                NmeaSentence = receivedData;
                                 HasData = true;
                                 return;
                             }
@@ -223,12 +225,14 @@ namespace GS.Server.Gps
                         break;
                     case "RMC":
                         if (!Rmc) break;
-                        LogNmeaSentence(receivedData);
+                        LogNmeaSentence(receivedData,true);
                         if (gpsDataArr.Length == 13)
                         {
-                            ParseRmc(talkerid, gpsDataArr);
+                            if (!ValidateCheckSum(receivedData)) return;
+                            ParseRmc(gpsDataArr);
                             if (CheckProperties())
                             {
+                                NmeaSentence = receivedData;
                                 HasData = true;
                                 return;
                             }
@@ -242,12 +246,13 @@ namespace GS.Server.Gps
         /// Write to Monitor the NMEA sentence before being parced
         /// </summary>
         /// <param name="sentence"></param>
-        private void LogNmeaSentence(string sentence)
+        /// <param name="valid">Passed prechecks</param>
+        private void LogNmeaSentence(string sentence, bool valid)
         {
+            var terminated = sentence.Contains("\r\n");
             var monitorItem = new MonitorEntry
-                { Datetime = PcUtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{sentence}" };
+                { Datetime = PcUtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{valid},{terminated},{sentence}" };
             MonitorLog.LogToMonitor(monitorItem);
-            NmeaSentence = sentence;
         }
 
         /// <summary>
@@ -280,108 +285,160 @@ namespace GS.Server.Gps
         /// </summary>
         /// <param name="receivedData"></param>
         /// <returns></returns>
-        private static bool ValidateCheckSum(string receivedData)
+        private bool ValidateCheckSum(string receivedData)
         {
             var checkSum = 0;
             var checkChar = Strings.GetTxtBetween(receivedData, "*", "\r");
-            var strToCheck = Strings.GetTxtBetween(receivedData, "$", "*");
-            foreach (var chracter in strToCheck)
+            if (!string.IsNullOrEmpty(checkChar))
             {
-                checkSum = checkSum ^ Convert.ToByte(chracter);
+                var strToCheck = Strings.GetTxtBetween(receivedData, "$", "*");
+                foreach (var chracter in strToCheck)
+                {
+                    checkSum ^= Convert.ToByte(chracter);
+                }
             }
+
             var final = checkSum.ToString("X2");
-            return checkChar == final;
+            var retbol = checkChar == final;
+            if (retbol) return true;
+            var monitorItem = new MonitorEntry
+                { Datetime = PcUtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{receivedData}" };
+            MonitorLog.LogToMonitor(monitorItem);
+            return false;
         }
 
         /// <summary>
         /// Parse the RMC sentence
         /// </summary>
         /// <example>$--RMC,hhmmss.ss,A,llll.ll,a,yyyyy.yy,a,x.x,x.x,xxxx,x.x,a,m,*hh CR LF></example>
-        /// <param name="talkerid"></param>
         /// <param name="gpsDataArr"></param>
-        private void ParseRmc(string talkerid, IReadOnlyList<string> gpsDataArr)
+        private void ParseRmc(IReadOnlyList<string> gpsDataArr)
         {
-            NmeaTag = gpsDataArr[0];
-
-            var utctime = gpsDataArr[1];
-            var lat = gpsDataArr[3];
-            var ns = gpsDataArr[4];
-            if (lat != null && ns != null)
+            try
             {
-                Latitude = ConvertLatLong(lat, ns);
-            }
+                NmeaTag = gpsDataArr[0];
+                var utctime = gpsDataArr[1];
+                var lat = gpsDataArr[3];
+                var ns = gpsDataArr[4];
+                if (lat != null && ns != null)
+                {
+                    Latitude = ConvertLatLong(lat, ns);
+                }
 
-            var lon = gpsDataArr[5];
-            var ew = gpsDataArr[6];
-            if (lon != null && ew != null)
+                var lon = gpsDataArr[5];
+                var ew = gpsDataArr[6];
+                if (lon != null && ew != null)
+                {
+                    Longitude = ConvertLatLong(lon, ew);
+                }
+                Altitude = 0;
+                var utcdate = gpsDataArr[9];
+
+                string timeformat;
+                if (string.IsNullOrEmpty(utctime)) return;
+                if (!utctime.Contains("."))
+                {
+                    utctime += ".00";
+                }
+                var utcarr = utctime.Split('.');
+                if (utcarr.Length != 2) return;
+                switch (utcarr[1].Length)
+                {
+                    case 0:
+                        return;
+                    case 1:
+                        timeformat = @"hhmmss\.f";
+                        break;
+                    case 2:
+                        timeformat = @"hhmmss\.ff";
+                        break;
+                    case 3:
+                        timeformat = @"hhmmss\.fff";
+                        break;
+                    case 4:
+                        timeformat = @"hhmmss\.ffff";
+                        break;
+                    default:
+                        return;
+                }
+
+                TimeStamp = ConvertDateTime(utcdate, utctime, timeformat);
+                TimeSpan = TimeStamp - PcUtcNow;
+            }
+            catch (Exception ex)
             {
-                Longitude = ConvertLatLong(lon, ew);
+                var monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message},{ex.StackTrace}" };
+                MonitorLog.LogToMonitor(monitorItem);
             }
-            Altitude = 0;
-            var utcdate = gpsDataArr[9];
-
-            string timeformat;
-            switch (talkerid)
-            {
-                case "GN":
-                    timeformat = @"hhmmss\.ff";
-                    break;
-                case "GP":
-                    timeformat = @"hhmmss\.fff";
-                    break;
-                default:
-                    timeformat = @"hhmmss\.ff";
-                    break;
-            }
-
-            TimeStamp = ConvertDateTime(utcdate, utctime, timeformat);
-            TimeSpan = TimeStamp - PcUtcNow;
+            
         }
 
         /// <summary>
         /// Parse the GGA sentence
         /// </summary>
         /// /// <example>$--GGA,hhmmss.ss,llll.ll,a,yyyyy.yy,a,x,xx,x.x,x.x,M,x.x,M,x.x,xxxx*hh CR LF></example>
-        /// <param name="talkerid"></param>
         /// <param name="gpsDataArr"></param>
-        private void ParseGga(string talkerid, IReadOnlyList<string> gpsDataArr)
+        private void ParseGga(IReadOnlyList<string> gpsDataArr)
         {
-            NmeaTag = gpsDataArr[0];
-
-            var utctime = gpsDataArr[1];
-            var lat = gpsDataArr[2];
-            var ns = gpsDataArr[3];
-            if (lat != null && ns != null)
+            try
             {
-                Latitude = ConvertLatLong(lat, ns);
-            }
+                NmeaTag = gpsDataArr[0];
+                var utctime = gpsDataArr[1];
+                var lat = gpsDataArr[2];
+                var ns = gpsDataArr[3];
+                if (lat != null && ns != null)
+                {
+                    Latitude = ConvertLatLong(lat, ns);
+                }
 
-            var lon = gpsDataArr[4];
-            var ew = gpsDataArr[5];
-            if (lon != null && ew != null)
+                var lon = gpsDataArr[4];
+                var ew = gpsDataArr[5];
+                if (lon != null && ew != null)
+                {
+                    Longitude = ConvertLatLong(lon, ew);
+                }
+
+                double.TryParse(gpsDataArr[9], out var d);
+                Altitude = d;
+
+                string timeformat;
+                if (string.IsNullOrEmpty(utctime)) return;
+                if (!utctime.Contains("."))
+                {
+                    utctime += ".00";
+                }
+                var utcarr = utctime.Split('.');
+                if (utcarr.Length != 2) return;
+                switch (utcarr[1].Length)
+                {
+                    case 0:
+                        return;
+                    case 1:
+                        timeformat = @"hhmmss\.f";
+                        break;
+                    case 2:
+                        timeformat = @"hhmmss\.ff";
+                        break;
+                    case 3:
+                        timeformat = @"hhmmss\.fff";
+                        break;
+                    case 4:
+                        timeformat = @"hhmmss\.ffff";
+                        break;
+                    default:
+                        return;
+                }
+
+                TimeStamp = ConvertDateTime(null, utctime, timeformat);
+                TimeSpan = TimeStamp - PcUtcNow;
+            }
+            catch (Exception ex)
             {
-                Longitude = ConvertLatLong(lon, ew);
+                var monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message},{ex.StackTrace}" };
+                MonitorLog.LogToMonitor(monitorItem);
             }
-
-            double.TryParse(gpsDataArr[9], out var d);
-            Altitude = d;
-
-            string timeformat;
-            switch (talkerid)
-            {
-                case "GN":
-                    timeformat = @"hhmmss\.ff";
-                    break;
-                case "GP":
-                    timeformat = @"hhmmss\.fff";
-                    break;
-                default:
-                    timeformat = @"hhmmss\.ff";
-                    break;
-            }
-
-            TimeStamp = ConvertDateTime(null, utctime, timeformat);
-            TimeSpan = TimeStamp - PcUtcNow;
         }
 
         /// <summary>
@@ -394,10 +451,14 @@ namespace GS.Server.Gps
         {
             try
             {
-                var num1 = Convert.ToDouble(num) / 100;
-                var num2 = num1.ToString(CultureInfo.InvariantCulture).Split('.');
-                var num3 = num2[0] + "." + (Convert.ToDouble(num2[1]) / 60).ToString("#####");
-                var returnNumber = Convert.ToDouble(num3);
+                const NumberStyles style = NumberStyles.AllowDecimalPoint;
+                double.TryParse(num, style, CultureInfo.InvariantCulture, out var num1);
+                num1 /= 100;
+                var num2 = Math.Truncate(num1);
+                var dec = num1 - Math.Truncate(num1);
+                var intdec = dec * 1000000000;
+                var num3 = (int)(intdec / 60);
+                double.TryParse(num2 + "." + num3, style, CultureInfo.InvariantCulture, out var returnNumber);
                 switch (dir.ToUpper())
                 {
                     case "S":
@@ -410,8 +471,11 @@ namespace GS.Server.Gps
                         return 0;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                var monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message},{ex.StackTrace}" };
+                MonitorLog.LogToMonitor(monitorItem);
                 return 0;
             }
 

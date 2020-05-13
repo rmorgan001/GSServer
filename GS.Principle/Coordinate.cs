@@ -20,7 +20,7 @@ namespace GS.Principles
     public static class Coordinate
     {
         /// <summary>
-        /// Right Ascension to Local Hour Angles
+        /// Right Ascension to Local 12 Hour Angles
         /// </summary>
         /// <remarks>
         /// The hour angle (HA) of an object is equal to the difference between
@@ -30,10 +30,28 @@ namespace GS.Principles
         /// <param name="rightAscension">In decimal hours</param>
         /// <param name="localsiderealtime">In decimal hours</param>
         /// <returns>Local Hour Angles in decimal hours</returns>
-        public static double Ra2Ha(double rightAscension, double localsiderealtime)
+        public static double Ra2Ha12(double rightAscension, double localsiderealtime)
         {
             var a = localsiderealtime - rightAscension;
             var Ra2Ha = Range.Range12(a);
+            return Ra2Ha;
+        }
+
+        /// <summary>
+        /// Right Ascension to Local 24 Hour Angles
+        /// </summary>
+        /// <remarks>
+        /// The hour angle (HA) of an object is equal to the difference between
+        /// the current local sidereal time (LST) and the right ascension of that object.
+        /// Adoped from ASCOM
+        /// </remarks>
+        /// <param name="rightAscension">In decimal hours</param>
+        /// <param name="localsiderealtime">In decimal hours</param>
+        /// <returns>Local Hour Angles in decimal hours</returns>
+        public static double Ra2Ha24(double rightAscension, double localsiderealtime)
+        {
+            var a = localsiderealtime - rightAscension;
+            var Ra2Ha = Range.Range24(a);
             return Ra2Ha;
         }
 
@@ -48,7 +66,7 @@ namespace GS.Principles
         /// <returns>Array of Azmith, Altitude in decimal degrees</returns>
         public static double[] RaDec2AltAz(double rightAscension, double declination, double localsiderealtime, double latitude)
         {
-            var a = Ra2Ha(rightAscension, localsiderealtime);
+            var a = Ra2Ha12(rightAscension, localsiderealtime);
             var RaDec2AltAz = HaDec2AltAz(a, declination, latitude);
             return RaDec2AltAz;
         }

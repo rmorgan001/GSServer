@@ -987,6 +987,60 @@ namespace GS.Server.Notes
 
         }
 
+        private void BtSidereal_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var str = $" Sidereal Time: {_util.HoursToHMS(SkyServer.SiderealTime)}";
+                if (rtbEditor == null) return;
+                rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
+                rtbEditor.CaretPosition?.InsertTextInRun(str);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Notes,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}, {ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog1(ex.Message);
+            }
+
+        }
+
+        private void Ha_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var str = $" Ha: {_util.HoursToHMS(Coordinate.Ra2Ha12(SkyServer.RightAscensionXform,SkyServer.SiderealTime))}";
+                if (rtbEditor == null) return;
+                rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
+                rtbEditor.CaretPosition?.InsertTextInRun(str);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Notes,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}, {ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog1(ex.Message);
+            }
+
+        }
+
         #endregion
 
         #region Events

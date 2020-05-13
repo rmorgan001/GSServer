@@ -64,7 +64,7 @@
     <ApplicationIcon>Resources\greenswamp1.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>1.0.1.1</AssemblyVersion>
+    <AssemblyVersion>1.0.1.3</AssemblyVersion>
     <AssemblyPublicKeyToken>565de7938946fba7</AssemblyPublicKeyToken>
   </PropertyGroup>
   <PropertyGroup>
@@ -90,11 +90,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Resources\DarkSky\DarkSkyApi.dll</HintPath>
     </Reference>
-    <Reference Include="HelixToolkit, Version=2.10.0.0, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
-      <HintPath>..\packages\HelixToolkit.2.10.0\lib\netstandard1.1\HelixToolkit.dll</HintPath>
+    <Reference Include="HelixToolkit, Version=2.11.0.0, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
+      <HintPath>..\packages\HelixToolkit.2.11.0\lib\netstandard1.1\HelixToolkit.dll</HintPath>
     </Reference>
-    <Reference Include="HelixToolkit.Wpf, Version=2.10.0.0, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
-      <HintPath>..\packages\HelixToolkit.Wpf.2.10.0\lib\net45\HelixToolkit.Wpf.dll</HintPath>
+    <Reference Include="HelixToolkit.Wpf, Version=2.11.0.0, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
+      <HintPath>..\packages\HelixToolkit.Wpf.2.11.0\lib\net45\HelixToolkit.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="LiveCharts, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
       <HintPath>..\packages\LiveCharts.0.9.7\lib\net45\LiveCharts.dll</HintPath>
@@ -280,7 +280,6 @@
     <Compile Include="Helpers\MouseBehaviours.cs" />
     <Compile Include="Helpers\NativeMethods.cs" />
     <Compile Include="Helpers\ObjectBase.cs" />
-    <Compile Include="Helpers\RichTextBoxHelper.cs" />
     <Compile Include="Helpers\SleepMode.cs" />
     <Compile Include="Helpers\Synthesizer.cs" />
     <Compile Include="Main\IPageVM.cs" />
@@ -295,6 +294,15 @@
       <DependentUpon>NotesV.xaml</DependentUpon>
     </Compile>
     <Compile Include="Notes\NotesVM.cs" />
+    <Compile Include="Plot\PlotV.xaml.cs">
+      <DependentUpon>PlotV.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Plot\PlotVM.cs" />
+    <Compile Include="PoleLocator\PoleLocatorV.xaml.cs">
+      <DependentUpon>PoleLocatorV.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PoleLocator\PoleLocatorVM.cs" />
+    <Compile Include="SkyTelescope\HcLastMove.cs" />
     <Compile Include="Test\Oscillation.cs" />
     <Compile Include="Phd\Guider.cs" />
     <Compile Include="Phd\GuiderImpl.cs" />
@@ -474,6 +482,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Notes\NotesV.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Plot\PlotV.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoleLocator\PoleLocatorV.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

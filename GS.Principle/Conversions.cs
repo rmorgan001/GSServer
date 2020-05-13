@@ -13,6 +13,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+using System;
+
 namespace GS.Principles
 {
     public static class Conversions
@@ -21,12 +24,13 @@ namespace GS.Principles
         /// Milliseconds to seconds per arcseconds
         /// </summary>
         /// <param name="millseconds"></param>
-        /// <param name="rate">Arcseconds per second</param>
+        /// <param name="rate">Degrees per second</param>
         /// <param name="prate">Perentage of rate</param>
         /// <returns></returns>
-        public static double Ms2Arcsec(int millseconds, double rate, double prate)
+        public static double Ms2Arcsec(double millseconds, double rate, double prate)
         {
-            var a = millseconds / 1000.0;
+            if (Math.Abs(prate) < 0.01) prate = 1;
+             var a = millseconds / 1000.0;
             var b = GuideRate(rate, prate);
             var c = a * b * 3600;
             return c;
@@ -35,11 +39,12 @@ namespace GS.Principles
         /// <summary>
         /// Calculate guiderate from rate in arcseconds per second
         /// </summary>
-        /// <param name="rate"></param>
-        /// <param name="prate"></param>
+        /// <param name="rate">Degrees per second</param>
+        /// <param name="prate">Perentage of rate 0-1.0</param>
         /// <returns></returns>
         public static double GuideRate(double rate, double prate)
         {
+            if (Math.Abs(prate) < 0.01) prate = 1;
             var a = ArcSec2Deg(rate);
             var b = a * prate;
             return b;
@@ -48,12 +53,12 @@ namespace GS.Principles
         /// <summary>
         /// Steps in arcseconds per second
         /// </summary>
-        /// <param name="prate"></param>
+        /// <param name="prate">Perentage of rate 0-1.0</param>
         /// <param name="totalsteps"></param>
         /// <param name="milliseconds"></param>
-        /// <param name="rate"></param>
+        /// <param name="rate">in arcseconds</param>
         /// <returns></returns>
-        public static double Rate2Steps(int milliseconds, double rate, double prate, double totalsteps)
+        public static double Rate2Steps(double milliseconds, double rate, double prate, double totalsteps)
         {
             var a = StepPerArcsec(totalsteps);
             var b = a * Ms2Arcsec(milliseconds, rate, prate);
@@ -67,14 +72,14 @@ namespace GS.Principles
         /// <returns></returns>
         public static double StepPerArcsec(double totalsteps)
         {
-            var a = totalsteps / 360 / 3600;
+            var a = totalsteps / 360 / 3600.0;
             return a;
         }
 
         /// <summary>
         /// Arcseconds to degrees
         /// </summary>
-        /// <param name="arcsec"></param>
+        /// <param name="arcsec">ArcSecond per second</param>
         /// <returns></returns>
         public static double ArcSec2Deg(double arcsec)
         {
@@ -84,7 +89,7 @@ namespace GS.Principles
         /// <summary>
         /// Degrees to Arcseconds
         /// </summary>
-        /// <param name="degrees"></param>
+        /// <param name="degrees">Degrees per second</param>
         /// <returns></returns>
         public static double Deg2ArcSec(double degrees)
         {

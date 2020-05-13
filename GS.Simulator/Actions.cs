@@ -81,10 +81,18 @@ namespace GS.Simulator
             //put in for capture tracking in charts
             var stepsx = _ioserial.Send($"steps,{Axis.Axis1}");
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"tracking,{null},{stepsx}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps1,{null},{stepsx}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             var y = Convert.ToDouble(_ioserial.Send($"degrees,{Axis.Axis2}"));
+
+            //put in for capture tracking in charts
+            var stepsy = _ioserial.Send($"steps,{Axis.Axis2}");
+            monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps2,{null},{stepsy}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+
             var d = new[] { x, y };
             return d;
         }
@@ -270,6 +278,7 @@ namespace GS.Simulator
         internal void HcSlew(Axis axis, double degrees)
         {
             _ioserial.Send($"hc,{axis},{degrees}");
+            AxesDegrees();
         }
 
         /// <summary>

@@ -132,6 +132,34 @@ namespace GS.Server.Settings
             }
         }
 
+        private static bool _plot;
+        public static bool Plot
+        {
+            get => _plot;
+            set
+            {
+                if (_plot == value) return;
+                _plot = value;
+                Properties.Server.Default.Plot = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static bool _poleLocator;
+        public static bool PoleLocator
+        {
+            get => _poleLocator;
+            set
+            {
+                if (_poleLocator == value) return;
+                _poleLocator = value;
+                Properties.Server.Default.PoleLocator = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static bool _pulses;
         public static bool Pulses
         {
@@ -373,6 +401,8 @@ namespace GS.Server.Settings
             Notes = Properties.Server.Default.Notes;
             SkyWatcher = Properties.Server.Default.SkyWatcher;
             Model3D = Properties.Server.Default.Model3D;
+            Plot = Properties.Server.Default.Plot;
+            PoleLocator = Properties.Server.Default.PoleLocator;
             Pulses = Properties.Server.Default.Pulses;
             SleepMode = Properties.Server.Default.SleepMode;
             StartMinimized = Properties.Server.Default.StartMinimized;

@@ -14,6 +14,8 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <Label Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbTopRa}"/>
         <Label Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{StaticResource SecondaryAccentBrush}" Content="{Binding RightAscension, UpdateSourceTrigger=PropertyChanged}"/>
@@ -23,5 +25,7 @@
         <Label Grid.Column="5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{StaticResource SecondaryAccentBrush}" Content="{Binding Azimuth, UpdateSourceTrigger=PropertyChanged}"/>
         <Label Grid.Column="6" VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbTopAlt}"/>
         <Label Grid.Column="7" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{StaticResource SecondaryAccentBrush}" Content="{Binding Altitude, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label Grid.Column="8" VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbTopLHA}" />
+        <Label Grid.Column="9" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{StaticResource SecondaryAccentBrush}" Content="{Binding Lha, UpdateSourceTrigger=PropertyChanged}" />
     </Grid>
 </UserControl>

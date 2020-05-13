@@ -281,5 +281,11 @@
     <Setting Name="UTCOffset" Type="System.TimeSpan" Scope="User">
       <Value Profile="(Default)">00:00:00</Value>
     </Setting>
+    <Setting Name="HcAntiRa" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="HcAntiDec" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -168,7 +168,7 @@ namespace GS.Server.SkyTelescope
                     lst = SkyServer.SiderealTime;
                     axes = Coordinate.AltAz2RaDec(axes[0], axes[1], SkySettings.Latitude, lst);
 
-                    axes[0] = Coordinate.Ra2Ha(axes[0], lst) * 15.0; // ha in degrees
+                    axes[0] = Coordinate.Ra2Ha12(axes[0], lst) * 15.0; // ha in degrees
 
                     if (SkyServer.SouthernHemisphere) axes[1] = -axes[1];
 
@@ -185,7 +185,7 @@ namespace GS.Server.SkyTelescope
                     lst = SkyServer.SiderealTime;
                     axes = Coordinate.AltAz2RaDec(axes[0], axes[1], SkySettings.Latitude, lst);
 
-                    axes[0] = Coordinate.Ra2Ha(axes[0], lst) * 15.0; // ha in degrees
+                    axes[0] = Coordinate.Ra2Ha12(axes[0], lst) * 15.0; // ha in degrees
 
                     if (SkyServer.SouthernHemisphere) axes[1] = -axes[1];
 
@@ -267,7 +267,7 @@ namespace GS.Server.SkyTelescope
             {
                 case AlignmentModes.algAltAz:
                     var radec = Coordinate.AltAz2RaDec(SkyServer.Altitude, SkyServer.Azimuth, SkySettings.Latitude, SkyServer.SiderealTime);
-                    raDec[0] = Coordinate.Ra2Ha(radec[0], SkyServer.SiderealTime) * 15.0; // ha in degrees
+                    raDec[0] = Coordinate.Ra2Ha12(radec[0], SkyServer.SiderealTime) * 15.0; // ha in degrees
                     raDec[1] = radec[1];
                     break;
                 case AlignmentModes.algGermanPolar:

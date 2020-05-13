@@ -39,7 +39,7 @@ namespace GS.Server.Test
     {
         public string TopName => "Test";
         public string BottomName => "Test";
-        public int Uid => 2;
+        public int Uid => 7;
 
         private readonly SkyTelescopeVM _skyTelescopeVM;
         private CancellationTokenSource _cts;
@@ -64,7 +64,7 @@ namespace GS.Server.Test
 
             IsRunning = false;
 
-            
+
         }
 
         #region Backlash Test

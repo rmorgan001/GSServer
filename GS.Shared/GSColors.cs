@@ -15,12 +15,13 @@
  */
 
 using System.Windows.Media;
+using Color = System.Drawing.Color;
 
 namespace GS.Shared
 {
     public class GSColors
     {
-        public Brush DrawingColorToBrush(System.Drawing.Color color)
+        public Brush DrawingColorToBrush(Color color)
         {
             Brush ret = null;
             var m = new BrushConverter();
@@ -31,5 +32,11 @@ namespace GS.Shared
             }
             return ret;
         }
+
+        public Brush ToBrush(Color color)
+        {
+            return new SolidColorBrush(System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B));
+        }
+
     }
 }

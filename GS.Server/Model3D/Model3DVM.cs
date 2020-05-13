@@ -40,7 +40,7 @@ namespace GS.Server.Model3D
     {
         public string TopName => "";
         public string BottomName => "3D";
-        public int Uid => 5;
+        public int Uid => 4;
         private bool _disposed;
 
         #region Model
@@ -105,6 +105,9 @@ namespace GS.Server.Model3D
                      case "DeclinationXform":
                          if (!DecVis) return;
                          Declination = _util.DegreesToDMS(SkyServer.DeclinationXform, "° ", ":", "", 2);
+                         break;
+                     case "Lha":
+                         Lha = _util.HoursToHMS(SkyServer.Lha, "h ", ":", "", 2);
                          break;
                      case "RightAscensionXform":
                          RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXform, "h ", ":", "", 2);
@@ -555,6 +558,7 @@ namespace GS.Server.Model3D
             Declination = "00° 00m 00s";
             Azimuth = "00° 00m 00s";
             Altitude = "00° 00m 00s";
+            Lha = "00h 00m 00s";
         }
 
         private string _altitude;
@@ -589,6 +593,18 @@ namespace GS.Server.Model3D
             {
                 if (value == _declination) return;
                 _declination = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _lha;
+        public string Lha
+        {
+            get => _lha;
+            set
+            {
+                if (value == _lha) return;
+                _lha = value;
                 OnPropertyChanged();
             }
         }

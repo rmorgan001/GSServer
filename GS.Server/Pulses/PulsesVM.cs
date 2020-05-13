@@ -48,7 +48,7 @@ namespace GS.Server.Pulses
         #region Fields
         public string TopName => "";
         public string BottomName => "Pulses";
-        public int Uid => 2;
+        public int Uid => 6;
 
         private DispatcherTimer _xAxisTimer;
         private CancellationTokenSource _cts;

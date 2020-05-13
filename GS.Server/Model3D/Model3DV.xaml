@@ -55,12 +55,12 @@
                     <RowDefinition Height="40" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <controls:TopCoordsBar Grid.Row="0" Grid.Column="0" IsEnabled="{Binding ScreenEnabled}" Visibility="{Binding TopVis, Converter={StaticResource BoolToVis}}" HorizontalAlignment="Center"/>
-                <StackPanel Grid.Row="0" Orientation="Horizontal">
-                    <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False" x:Name="MenuToggleButton" ToolTip="Open"
-                                  Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}"
+                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+                    <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False" x:Name="MenuToggleButton" ToolTip="{StaticResource tbtipOpen}" 
+                                  Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" IsHitTestVisible="True" 
                                   Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
                 </StackPanel>
+                <controls:TopCoordsBar Grid.Row="0" Grid.Column="0" IsEnabled="{Binding ScreenEnabled}" Visibility="{Binding TopVis, Converter={StaticResource BoolToVis}}" HorizontalAlignment="Center" />
                 <controls:HelixViewport3D Grid.Row="1" Grid.Column="0" IsEnabled="{Binding ScreenEnabled}" >
                     <controls:HelixViewport3D.Style>
                         <Style TargetType="controls:HelixViewport3D">

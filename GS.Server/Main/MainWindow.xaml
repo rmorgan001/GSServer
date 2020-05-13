@@ -13,6 +13,8 @@
         xmlns:pulses="clr-namespace:GS.Server.Pulses"
         xmlns:test="clr-namespace:GS.Server.Test"
         xmlns:controls="clr-namespace:GS.Server.Controls"
+        xmlns:pole="clr-namespace:GS.Server.PoleLocator"
+        xmlns:plot="clr-namespace:GS.Server.Plot"
         mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanResizeWithGrip"  WindowStyle="None"  TextOptions.TextFormattingMode="Display"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         ContentRendered="MainWindow_OnContentRendered" Closed="MainWindow_OnClosed"  Topmost="{Binding TopMost}"
@@ -50,6 +52,12 @@
         <DataTemplate DataType="{x:Type model3D:Model3DVM}">
             <model3D:Model3DV />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type plot:PlotVM}">
+            <plot:PlotV />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type pole:PoleLocatorVM}">
+            <pole:PoleLocatorV />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type pulses:PulsesVM}">
             <pulses:PulsesV />
         </DataTemplate>
@@ -72,6 +80,5 @@
                 <ContentControl Content="{Binding CurrentPageViewModel}"/>
             </Grid>
     </Grid>
-
 </Window>
 

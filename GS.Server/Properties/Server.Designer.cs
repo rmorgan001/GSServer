@@ -322,5 +322,29 @@ namespace GS.Server.Properties {
                 this["DisableHardwareAcceleration"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool PoleLocator {
+            get {
+                return ((bool)(this["PoleLocator"]));
+            }
+            set {
+                this["PoleLocator"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Plot {
+            get {
+                return ((bool)(this["Plot"]));
+            }
+            set {
+                this["Plot"] = value;
+            }
+        }
     }
 }

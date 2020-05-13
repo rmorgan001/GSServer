@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -44,7 +45,7 @@ namespace GS.Server.Settings
         public string TopName => "GS Server";
         public string BottomName => "Options";
         private static string GsUrl => $"http://www.greenswamp.org/autodownloads";
-        public int Uid => 3;
+        public int Uid => 2;
         private readonly MainWindowVM _mainWindowVm;
         public static SettingsVM _settingsVM;
         private readonly CancellationToken _cts;
@@ -194,7 +195,6 @@ namespace GS.Server.Settings
                 OpenDialog(ex.Message);
             }
         }
-
         private void PropertyChangedSkySettings(object sender, PropertyChangedEventArgs e)
         {
             try
@@ -321,6 +321,28 @@ namespace GS.Server.Settings
             {
                 Settings.Model3D = value;
                 _mainWindowVm.UpdateTabViewModel("Model3D");
+                OnPropertyChanged();
+            }
+        }
+
+        public bool Plot
+        {
+            get => Settings.Plot;
+            set
+            {
+                Settings.Plot = value;
+                _mainWindowVm.UpdateTabViewModel("Plot");
+                OnPropertyChanged();
+            }
+        }
+
+        public bool PoleLocator
+        {
+            get => Settings.PoleLocator;
+            set
+            {
+                Settings.PoleLocator = value;
+                _mainWindowVm.UpdateTabViewModel("PoleLocator");
                 OnPropertyChanged();
             }
         }
@@ -972,6 +994,30 @@ namespace GS.Server.Settings
             IsUpdateDialogOpen = false;
         }
 
+        private ICommand _clickDonateCmd;
+
+        public ICommand ClickDonateCmd
+        {
+            get
+            {
+                return _clickDonateCmd ?? (_clickDonateCmd = new RelayCommand(
+                    param => ClickDonate()
+                ));
+            }
+        }
+
+        private void ClickDonate()
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo("https://www.greenswamp.org/donate"));
+            }
+            catch (Exception ex)
+            {
+                OpenDialog(ex.Message);
+            }
+        }
+
         #endregion
 
         #region Monitor
@@ -1511,7 +1557,7 @@ namespace GS.Server.Settings
 
         #endregion
 
-        #region Doalog
+        #region Dialog
 
         private string _DialogMsg;
 
