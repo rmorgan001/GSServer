@@ -29,6 +29,7 @@ Download the GSServer installer program at
 * Multiple park positions
 * Full and half current tracking for battery power source
 * Theme support with primary and secondary colors
+* Anti-Backlash for hand controller
 
 ## Solution Projects
 
@@ -55,7 +56,7 @@ Download the GSServer installer program at
 * Inno Setup Compiler version 5.5.8 http://www.innosetup.com
 * Microsoft.Xaml.Behaviors.Wpf
 * Newtonsoft.Json
-* Reference strong named Dlls and other information can be downloaded [here](https://drive.google.com/open?id=13nAFTjvD_HTZVNBRV0BwxsHk0EmJ1ayi)
+
 
 ## Contributing
 
@@ -106,6 +107,7 @@ Can be found at [Groups.io](https://groups.io/g/GSS)
 
 ## Release Dates
 
+* 1.0.1.4 release 21 May 2020
 * 1.0.1.3 release 13 May 2020
 * 1.0.1.1 release 12 Apr 2020
 * 1.0.1.0 release 21 Mar 2020
