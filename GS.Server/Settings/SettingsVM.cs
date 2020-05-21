@@ -95,7 +95,12 @@ namespace GS.Server.Settings
                     AccentColors = primaryColors.Where(item => item.IsAccented).ToList();
                     PrimaryColor = primaryColors.First(item => item.Name.Equals(Settings.PrimaryColor));
                     AccentColor = primaryColors.First(item => item.Name.Equals(Settings.AccentColor));
-                    new PaletteHelper().SetLightDark(Settings.DarkTheme);
+
+                    var paletteHelper = new PaletteHelper();
+                    var theme = paletteHelper.GetTheme();
+                    theme.SetBaseTheme(Settings.DarkTheme ? Theme.Dark : Theme.Light);
+                    paletteHelper.SetTheme(theme);
+
 
                     //Performance
                     IntervalList = new List<int>(Numbers.InclusiveIntRange(100, 500, 10));
@@ -465,7 +470,10 @@ namespace GS.Server.Settings
             set
             {
                 _primaryColor = value;
-                new PaletteHelper().ReplacePrimaryColor(_primaryColor);
+                var paletteHelper = new PaletteHelper();
+                var theme = paletteHelper.GetTheme();
+                theme.SetPrimaryColor(_primaryColor.ExemplarHue.Color);
+                paletteHelper.SetTheme(theme);
                 Settings.PrimaryColor = _primaryColor.Name;
                 OnPropertyChanged();
             }
@@ -480,7 +488,10 @@ namespace GS.Server.Settings
             set
             {
                 _accentColor = value;
-                new PaletteHelper().ReplaceAccentColor(_accentColor);
+                var paletteHelper = new PaletteHelper();
+                var theme = paletteHelper.GetTheme();
+                theme.SetSecondaryColor(_accentColor.ExemplarHue.Color);
+                paletteHelper.SetTheme(theme);
                 Settings.AccentColor = _accentColor.Name;
                 OnPropertyChanged();
             }
@@ -1465,7 +1476,10 @@ namespace GS.Server.Settings
             {
                 using (new WaitCursor())
                 {
-                    new PaletteHelper().SetLightDark(isDark);
+                    var paletteHelper = new PaletteHelper();
+                    var theme = paletteHelper.GetTheme();
+                    theme.SetBaseTheme(isDark ? Theme.Dark : Theme.Light);
+                    paletteHelper.SetTheme(theme);
                 }
             }
             catch (Exception ex)
@@ -1501,7 +1515,10 @@ namespace GS.Server.Settings
             {
                 using (new WaitCursor())
                 {
-                    new PaletteHelper().ReplacePrimaryColor(swatch);
+                    var paletteHelper = new PaletteHelper();
+                    var theme = paletteHelper.GetTheme();
+                    theme.SetPrimaryColor(swatch.ExemplarHue.Color);
+                    paletteHelper.SetTheme(theme);
                 }
             }
             catch (Exception ex)
@@ -1537,7 +1554,10 @@ namespace GS.Server.Settings
             {
                 using (new WaitCursor())
                 {
-                    new PaletteHelper().ReplaceAccentColor(swatch);
+                    var paletteHelper = new PaletteHelper();
+                    var theme = paletteHelper.GetTheme();
+                    theme.SetSecondaryColor(swatch.ExemplarHue.Color);
+                    paletteHelper.SetTheme(theme);
                 }
             }
             catch (Exception ex)

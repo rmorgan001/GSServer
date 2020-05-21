@@ -150,6 +150,30 @@ namespace GS.Server.Test
 
         }
 
+        private ICommand _clickopencmd;
+        public ICommand ClickOpenCmd
+        {
+            get
+            {
+                return _clickopencmd ?? (_clickopencmd = new RelayCommand(
+                           param => ClickOpen()
+                       ));
+            }
+        }
+        private  void ClickOpen()
+        {
+            try
+            {
+                
+
+            }
+            catch (Exception ex)
+            {
+                IsRunning = false;
+                OpenDialog(ex.Message);
+            }
+        }
+
         private ICommand _clickstartcmd;
         public ICommand ClickStartCmd
         {

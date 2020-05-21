@@ -279,7 +279,7 @@
                                       LabelFormatter="{Binding FormatterX, Mode=TwoWay}" MaxValue="{Binding AxisXMax, Mode=TwoWay}" MinValue="{Binding AxisXMin, Mode=TwoWay}" Unit="{Binding AxisXUnit, Mode=TwoWay}"/>
                         </lvc:CartesianChart.AxisX>
                         <lvc:CartesianChart.AxisY>
-                            <lvc:Axis FontSize="15" Title="{Binding Path=Scale, StringFormat='\{0}  (y)'}" Position="LeftBottom"  Foreground="DarkGray" ShowLabels="True" DisableAnimations="True"
+                            <lvc:Axis FontSize="15" Title="{Binding Path=Scale, StringFormat='\{0}  (y)'}" Foreground="DarkGray" ShowLabels="True" DisableAnimations="True"
                                       LabelFormatter="{Binding FormatterY, Mode=TwoWay}" MaxValue="{Binding AxisYMax, Mode=TwoWay}" MinValue="{Binding AxisYMin, Mode=TwoWay}" Unit="{Binding AxisYUnit, Mode=TwoWay}">
                                 <lvc:Axis.Sections >
                                     <lvc:AxisSection Value="0" StrokeThickness=".5" Stroke="DarkGray" DisableAnimations="True"></lvc:AxisSection>

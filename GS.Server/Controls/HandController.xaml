@@ -8,7 +8,10 @@
              xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
              xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              mc:Ignorable="d" >
-    <Border Margin="0,5,10,0" BorderBrush="DimGray"  BorderThickness="3" CornerRadius="5" Background="{StaticResource MaterialDesignToolBarBackground}">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </UserControl.Resources>
+    <Border BorderBrush="DimGray"  BorderThickness="3" CornerRadius="5" Background="{DynamicResource MaterialDesignToolBarBackground}">
         <Grid Width="320" Height="175" Margin="4" >
             <Grid.RowDefinitions>
                 <RowDefinition />
@@ -22,6 +25,10 @@
                 <ColumnDefinition Width="80"/>
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
+            <Button Grid.Row="0" Grid.Column="0" Width="20" Height="20" ToolTip="{StaticResource btnOpenWin}" Command="{Binding OpenHCWindowCmd}" Style="{StaticResource MaterialDesignRaisedAccentButton}" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" 
+                    Visibility="{Binding HcWinVisability, Converter={StaticResource BoolToVis}}">
+                <md:PackIcon Kind="OpenInNew" Margin="-14,-2,0,0" />
+            </Button>
             <Button Grid.Row="1" Grid.Column="0" Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{StaticResource btntipW}"
                     helpers:MouseBehaviour.MouseLeftButtonDownCommand="{Binding HcMouseDownLeftCommand}"
                     helpers:MouseBehaviour.MouseLeftButtonUpCommand="{Binding HcMouseUpLeftCommand}">

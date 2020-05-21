@@ -41,6 +41,7 @@ namespace GS.Server.Plot
 {
     public class PlotVM : ObservableObject, IPageVM, IDisposable
     {
+        #region Fields
         public string TopName => "Plot";
         public string BottomName => "Plot";
         public int Uid => 8;
@@ -50,6 +51,8 @@ namespace GS.Server.Plot
         private CancellationToken _ct;
         private double raStepsPerSecond;
         private double decStepsPerSecond;
+        
+        #endregion
         
         public PlotVM()
         {

@@ -126,7 +126,7 @@
                         </wpf:Axis>
                     </wpf:CartesianChart.AxisX>
                     <wpf:CartesianChart.AxisY>
-                        <wpf:Axis Title="{Binding Scale, Mode=TwoWay}" FontSize="15" Position="LeftBottom" Foreground="DarkGray" ShowLabels="True" DisableAnimations="True" LabelFormatter="{Binding FormatterY, Mode=OneTime}" MaxValue="{Binding AxisYMax, Mode=TwoWay}" MinValue="{Binding AxisYMin, Mode=TwoWay}" Unit="{Binding AxisYUnit, Mode=TwoWay}">
+                        <wpf:Axis Title="{Binding Scale, Mode=TwoWay}" FontSize="15" Foreground="DarkGray" ShowLabels="True" DisableAnimations="True" LabelFormatter="{Binding FormatterY, Mode=OneTime}" MaxValue="{Binding AxisYMax, Mode=TwoWay}" MinValue="{Binding AxisYMin, Mode=TwoWay}" Unit="{Binding AxisYUnit, Mode=TwoWay}">
                             <wpf:Axis.Sections>
                                 <wpf:AxisSection Value="0" StrokeThickness="1" Stroke="DarkGray" DisableAnimations="True"/>
                             </wpf:Axis.Sections>

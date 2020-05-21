@@ -21,9 +21,9 @@
             <ColumnDefinition />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <TextBlock Grid.Column="0" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource tbtipHome}" Text="{StaticResource tbHome}">
+        <TextBlock Grid.Column="0" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource tbtipHome}" Text="{StaticResource tbHome}" FontSize="15">
             <TextBlock.Style>
-                    <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock }">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsHome}" Value="True">
                             <Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}"></Setter>
@@ -38,9 +38,10 @@
                     </Style>
                 </TextBlock.Style>
         </TextBlock>
-        <TextBlock Grid.Column="1" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource tbtipParked}" Text="{StaticResource tbParked}">
+        <TextBlock Grid.Column="1" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource tbtipParked}" Text="{StaticResource tbParked}" FontSize="15">
             <TextBlock.Style>
-                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
+                <!--<Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">-->
+                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
                     <Setter Property="Background" Value="Transparent"></Setter>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding AtPark}" Value="True">
@@ -66,9 +67,9 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <TextBlock Grid.Column="2" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource tbtipSlewing}" Text="{StaticResource tbSlewing}">
+        <TextBlock Grid.Column="2" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource tbtipSlewing}" Text="{StaticResource tbSlewing}" FontSize="15">
             <TextBlock.Style>
-                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
+                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsSlewing}" Value="True">
                         <Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}"></Setter>
@@ -83,9 +84,9 @@
                 </Style>
             </TextBlock.Style>
             </TextBlock>
-        <TextBlock Grid.Column="3" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource tbtipTracking}" Text="{StaticResource tbTracking}">
+        <TextBlock Grid.Column="3" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource tbtipTracking}" Text="{StaticResource tbTracking}" FontSize="15">
             <TextBlock.Style>
-                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
+                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsTracking}" Value="True">
                             <Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}"></Setter>
@@ -100,9 +101,9 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <TextBlock Grid.Column="4" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource tbtipSOP}" Text="{Binding IsSideOfPier}" Foreground="DimGray">
+        <TextBlock Grid.Column="4" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource tbtipSOP}" Text="{Binding IsSideOfPier}" Foreground="DimGray" FontSize="15">
             <TextBlock.Style>
-                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
+                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding SopBlinker}" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />

@@ -10,7 +10,6 @@
              xmlns:deviceInterface="clr-namespace:ASCOM.DeviceInterface;assembly=ASCOM.DeviceInterfaces"
              xmlns:controls="clr-namespace:GS.Server.Controls"
              xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
-
              Loaded="SkyTelescopeV_OnLoaded" 
              mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
     <UserControl.Resources>
@@ -620,27 +619,27 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0">
-                            <controls:RaDecGoTo IsEnabled="{Binding ScreenEnabled}"/>
-                            <controls:HandController IsEnabled="{Binding ScreenEnabled}" />
-                            <controls:Backlash IsEnabled="{Binding ScreenEnabled}"/>
-                            <controls:PpecBar IsEnabled="{Binding ScreenEnabled}"/>
+                            <controls:RaDecGoTo />
+                            <controls:HandController Margin="0,5,10,0"  />
+                            <controls:Backlash />
+                            <controls:PpecBar/>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1" >
-                            <controls:StandardButtonBar IsEnabled="{Binding ScreenEnabled}"/>
-                            <Border Margin="15,0,0,0" CornerRadius="5" BorderThickness="3" BorderBrush="DimGray" HorizontalAlignment="Stretch"  VerticalAlignment="Center" 
+                        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1">
+                            <controls:StandardButtonBar/>
+                            <Border Margin="15,0,0,0" CornerRadius="5" BorderThickness="3" BorderBrush="DimGray" 
                                     Background="{StaticResource MaterialDesignToolBarBackground}" >
                                 <Border.Effect>
                                     <DropShadowEffect BlurRadius="10"  Opacity=".5" ShadowDepth="10"/>
                                 </Border.Effect>
-                                <Grid Width="253" Height="335" IsEnabled="{Binding ScreenEnabled}">
+                                <Grid Width="253" Height="340">
                                     <Grid.Background>
-                                        <ImageBrush ImageSource="{Binding ImageFile}" Stretch="UniformToFill"/>
+                                        <ImageBrush ImageSource="{Binding ImageFile}" Stretch="UniformToFill" />
                                     </Grid.Background>
-                                    <controls:HelixViewport3D IsEnabled="{Binding ScreenEnabled}" Visibility="{Binding ModelOn, Converter={StaticResource BoolToVis}}"/>
+                                    <controls:HelixViewport3D Visibility="{Binding ModelOn, Converter={StaticResource BoolToVis}}"/>
                                     <StackPanel>
-                                        <controls:Debug IsEnabled="{Binding ScreenEnabled}" Visibility="{Binding DebugVisability, Converter={StaticResource BoolToVis}}"/>
+                                        <controls:Debug Visibility="{Binding DebugVisability, Converter={StaticResource BoolToVis}}"/>
                                     </StackPanel>
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Left" IsEnabled="{Binding ScreenEnabled}" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="5">
                                         <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="3DView" IsChecked="{Binding ModelOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                         <Label Content="3D" />
                                     </StackPanel>

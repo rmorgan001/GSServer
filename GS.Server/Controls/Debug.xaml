@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d">
-    <StackPanel Orientation="Vertical" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="5">
+    <StackPanel Orientation="Vertical" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="5,30,0,0">
         <StackPanel Orientation="Horizontal">
             <TextBlock Text="{StaticResource tbInternalX}" />
             <TextBlock Margin="5,0,0,0" Text="{Binding MountAxisX, StringFormat={}{0}°}" Foreground="{StaticResource SecondaryAccentBrush}"/>
@@ -23,7 +23,7 @@
             <TextBlock Margin="5,0,0,0" Text="{Binding ActualAxisY, StringFormat={}{0}°}" Foreground="{StaticResource SecondaryAccentBrush}"/>
         </StackPanel>
         <TextBlock/>
-        <StackPanel Orientation="Horizontal" Margin="60,219,0,0">
+        <StackPanel Orientation="Horizontal" Margin="60,199,0,0">
             <TextBlock Text="{StaticResource tbSiderealTime}" />
             <TextBlock Margin="5,0,0,0" Text="{Binding SiderealTime}" Foreground="{StaticResource SecondaryAccentBrush}"/>
         </StackPanel>

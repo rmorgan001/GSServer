@@ -50,8 +50,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>
-    </ApplicationIcon>
+    <ApplicationIcon>greenswamp1.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>GS.Utilities.App</StartupObject>
@@ -77,13 +76,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files (x86)\ASCOM\Platform 6 Developer Components\Components\Platform6\ASCOM.Utilities.dll</HintPath>
       <Private>False</Private>
-    </Reference>
-    <Reference Include="MaterialDesignColors">
-      <HintPath>..\Resources\MaterialDesign\Signed999\MaterialDesignColors.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="MaterialDesignThemes.Wpf">
-      <HintPath>..\Resources\MaterialDesign\Signed999\MaterialDesignThemes.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -209,6 +201,19 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <PackageReference Include="MaterialDesignColors">
+      <Version>1.2.5</Version>
+    </PackageReference>
+    <PackageReference Include="MaterialDesignThemes">
+      <Version>3.1.2</Version>
+    </PackageReference>
+    <PackageReference Include="StrongNamer">
+      <Version>0.2.5</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="greenswamp1.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

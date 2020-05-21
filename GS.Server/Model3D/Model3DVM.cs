@@ -25,6 +25,7 @@ using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
@@ -32,6 +33,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using GS.Server.Controls.Dialogs;
+using GS.Server.Windows;
 
 
 namespace GS.Server.Model3D
@@ -78,6 +80,7 @@ namespace GS.Server.Model3D
             AltVis = true;
             TopVis = true;
             ScreenEnabled = SkyServer.IsMountRunning;
+            ModelWinVisability = true;
         }
 
         /// <summary>
@@ -201,6 +204,52 @@ namespace GS.Server.Model3D
                 if (_screenEnabled == value) return;
                 _screenEnabled = value;
                 OnPropertyChanged();
+            }
+        }
+
+        private bool _modelWinVisability;
+        public bool ModelWinVisability
+        {
+            get => _modelWinVisability;
+            set
+            {
+                if (_modelWinVisability == value) return;
+                _modelWinVisability = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openModelWindowCmd;
+        public ICommand OpenModelWindowCmd
+        {
+            get
+            {
+                return _openModelWindowCmd ?? (_openModelWindowCmd = new RelayCommand(param => OpenModelWindow()));
+            }
+        }
+        private void OpenModelWindow()
+        {
+            try
+            {
+                var win = Application.Current.Windows.OfType<ModelV>().FirstOrDefault();
+                if (win != null) return;
+                var bWin = new ModelV();
+                bWin.Show();
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, "Error");
             }
         }
 

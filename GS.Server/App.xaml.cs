@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 using GS.Server.Main;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -23,6 +25,8 @@ namespace GS.Server
         private readonly bool createdNew;
         public App()
         {
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
+
             // overloaded mutex constructor which outs a boolean
             // telling if the mutex is new or not.
             // see http://msdn.microsoft.com/en-us/library/System.Threading.Mutex.aspx
@@ -31,6 +35,20 @@ namespace GS.Server
             // if the mutex already exists, notify and quit
             MessageBox.Show("GS Server is already running", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
             Current.Shutdown(0);
+        }
+
+        /// <summary>
+        /// Hack to get arround the strongnamer and material design not loading baml correctly
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        private Assembly CurrentDomainOnAssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            var assemblyName = new AssemblyName(args.Name);
+            var assembly = AppDomain.CurrentDomain.GetAssemblies()
+                .FirstOrDefault(a => a.GetName().Name == assemblyName.Name);
+            return assembly;
         }
 
         protected override void OnStartup(StartupEventArgs e)

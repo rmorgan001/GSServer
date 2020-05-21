@@ -24,6 +24,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="tbCloseApps">Application(s) still connected. Accept to close anyway?</system:String>
     <system:String x:Key="taskbarDescription">GreenSwamp Server</system:String>
     <system:String x:Key="msgClose">Close GS Server</system:String>
+
     <!--Tab bar-->
     <system:String x:Key="rbtnSkyWatcher">SkyWatcher</system:String>
     <system:String x:Key="rbtnFocuser">Focuser</system:String>
@@ -38,7 +39,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!--Top bar-->
     <system:String x:Key="lbTopRa">Right Ascension:</system:String>
+    <system:String x:Key="lbTopRaShort">RA:</system:String>
     <system:String x:Key="lbTopDec">Declination:</system:String>
+    <system:String x:Key="lbTopDecShort">Dec:</system:String>
     <system:String x:Key="lbTopAz">Az:</system:String>
     <system:String x:Key="lbTopAlt">Alt:</system:String>
     <system:String x:Key="lbTopLHA">LHA:</system:String>
@@ -112,7 +115,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="lbtipHcAntiBacklash">Anti-Backlash</system:String>
     <system:String x:Key="lbHcRa">E/W</system:String>
     <system:String x:Key="lbHcDec">N/S</system:String>
-
+    <system:String x:Key="lbHc">GSS Hand Control</system:String>
+    <system:String x:Key="btnOpenWin">Open Window</system:String>
 
     <!--PPEC bar-->
     <system:String x:Key="tbStartTraining">Accept to start training</system:String>
@@ -458,6 +462,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="cb3DRaAxis">RA Axis</system:String>
     <system:String x:Key="cb3DDecAxis">Dec Axis</system:String>
     <system:String x:Key="cb3DTopBar">Top coords bar</system:String>
+    <system:String x:Key="lbModel">GSS 3D Model</system:String>
 
     <!--Pulses -->
     <system:String x:Key="tbOPulses">Pulses</system:String>

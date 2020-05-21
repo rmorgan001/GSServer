@@ -39,6 +39,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using GS.Server.Controls.Dialogs;
+using GS.Server.Windows;
 
 namespace GS.Server.SkyTelescope
 {
@@ -126,6 +127,10 @@ namespace GS.Server.SkyTelescope
                     Lha = "00h 00m 00s";
                     ModelOn = SkySettings.ModelOn;
                     SetTrackingIcon(SkySettings.TrackingRate);
+
+                    HcWinVisability = true;
+                    ModelWinVisability = true;
+
 
                 }
 
@@ -1419,8 +1424,6 @@ namespace GS.Server.SkyTelescope
 
         #region Top Bar Control
 
-        public IList<int> Hours { get; }
-
         private string _altitude;
         public string Altitude
         {
@@ -2661,6 +2664,8 @@ namespace GS.Server.SkyTelescope
 
         #region RA Coord GoTo Control
 
+        public IList<int> Hours { get; }
+
         private double _rahours;
         public double RaHours
         {
@@ -3401,6 +3406,18 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private bool _hcWinVisability;
+        public bool HcWinVisability
+        {
+            get => _hcWinVisability;
+            set
+            {
+                if (_hcWinVisability == value) return;
+                _hcWinVisability = value;
+                OnPropertyChanged();
+            }
+        }
+
         private void SetHCFlipsVisability()
         {
             switch (HcMode)
@@ -3831,6 +3848,40 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 SkyServer.AlertState = true;
+                OpenDialog(ex.Message, "Error");
+            }
+        }
+
+        private ICommand _openHCWindowCmd;
+        public ICommand OpenHCWindowCmd
+        {
+            get
+            {
+                return _openHCWindowCmd ?? (_openHCWindowCmd = new RelayCommand(param => OpenHcWindow()));
+            }
+        }
+        private void OpenHcWindow()
+        {
+            try
+            {
+                var win = Application.Current.Windows.OfType<HandControlV>().FirstOrDefault();
+                if (win != null) return;
+                var bWin = new HandControlV();
+                bWin.Show();
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, "Error");
             }
         }
@@ -5346,6 +5397,18 @@ namespace GS.Server.SkyTelescope
 
         #region Viewport3D
 
+        private bool _modelWinVisability;
+        public bool ModelWinVisability
+        {
+            get => _modelWinVisability;
+            set
+            {
+                if (_modelWinVisability == value) return;
+                _modelWinVisability = value;
+                OnPropertyChanged();
+            }
+        }
+
         private bool _cameraVis;
         public bool CameraVis
         {
@@ -5575,6 +5638,40 @@ namespace GS.Server.SkyTelescope
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private ICommand _openModelWindowCmd;
+        public ICommand OpenModelWindowCmd
+        {
+            get
+            {
+                return _openModelWindowCmd ?? (_openModelWindowCmd = new RelayCommand(param => OpenModelWindow()));
+            }
+        }
+        private void OpenModelWindow()
+        {
+            try
+            {
+                var win = Application.Current.Windows.OfType<ModelV>().FirstOrDefault();
+                if (win != null) return;
+                var bWin = new ModelV();
+                bWin.Show();
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, "Error");
             }
         }
 

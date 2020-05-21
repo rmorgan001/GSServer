@@ -170,7 +170,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Orientation="Vertical" HorizontalAlignment="Left">
-                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center"  HorizontalAlignment="Left" Background="{StaticResource MaterialDesignTextFieldBoxBackground}"  Foreground="{StaticResource MaterialDesignColumnHeader}" Text="{StaticResource tbOTabs}"/>
+                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource tbOTabs}"/>
                             <StackPanel Orientation="Horizontal" Width="Auto">
                                 <CheckBox Height="25" Width="25" IsChecked="{Binding SkyWatcher}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource tbOSkyWatcher}"/>
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource tbOSkyWatcher}"/>
@@ -205,7 +205,7 @@
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" >
-                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" Background="{StaticResource MaterialDesignTextFieldBoxBackground}"  HorizontalAlignment="Left"  Foreground="{StaticResource MaterialDesignColumnHeader}" Text="{StaticResource tbOOptions}"/>
+                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" HorizontalAlignment="Left" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource tbOOptions}"/>
                             <StackPanel Orientation="Horizontal" >
                                 <CheckBox Height="25" Width="25" IsChecked="{Binding SleepMode}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource tbOSleepMode}"/>
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource tbOSleepMode}"/>
@@ -224,7 +224,7 @@
                         </StackPanel>
                     </StackPanel>
                         <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Left">
-                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center"  HorizontalAlignment="Left" Background="{StaticResource MaterialDesignTextFieldBoxBackground}"  Foreground="{StaticResource MaterialDesignColumnHeader}" Text="{StaticResource tbOVoice}"/>
+                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource tbOVoice}"/>
                             <StackPanel Orientation="Horizontal">
                                 <CheckBox Height="25" Width="25" IsChecked="{Binding VoiceActive}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource tbOVoiceSpeech}"/>
                                 <TextBlock Margin="10 10" VerticalAlignment="Center" Text="{StaticResource tbOVoiceSpeech}"/>
@@ -263,7 +263,7 @@
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Vertical" HorizontalAlignment="Left">
-                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center"  HorizontalAlignment="Left" Background="{StaticResource MaterialDesignTextFieldBoxBackground}"  Foreground="{StaticResource MaterialDesignColumnHeader}" Text="{StaticResource tbOColors}"/>
+                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource tbOColors}"/>
                             <StackPanel Orientation="Horizontal" Margin="5">
                                 <TextBlock VerticalAlignment="Center" Text="{StaticResource tbOLight}"/>
                                 <ToggleButton Margin="5,0,5,0" IsChecked="{Binding DarkTheme}" Command="{Binding ClickBaseCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=IsChecked}" ToolTip="{StaticResource tbOColors}" />
@@ -317,7 +317,7 @@
                             </ComboBox>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Left" Margin="0,20,0,0">
-                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{StaticResource MaterialDesignTextFieldBoxBackground}" Foreground="{StaticResource MaterialDesignColumnHeader}" Text="{StaticResource tbOPerf}" />
+                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource tbOPerf}" />
                             <ComboBox md:HintAssist.Hint="{StaticResource tbhintODisplayInterval}" Width="120" HorizontalAlignment="Left" ToolTip="{StaticResource tbhintODisplayInterval}" ItemsSource="{Binding IntervalList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                 <ComboBox.SelectedItem>
                                     <Binding Path="DisplayInterval" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -342,7 +342,7 @@
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" >
-                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center"  HorizontalAlignment="Left" Background="{StaticResource MaterialDesignTextFieldBoxBackground}"  Foreground="{StaticResource MaterialDesignColumnHeader}" Text="{StaticResource tbOSettings}"/>
+                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource tbOSettings}"/>
                             <StackPanel Orientation="Horizontal">
                                 <CheckBox Height="25" Width="25" IsChecked="{Binding ServerSettings}" ToolTip="{StaticResource cbServerSettings}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource cbServerSettings}"/>
@@ -367,7 +367,7 @@
                             </md:DialogHost>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Left" >
-                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center"  HorizontalAlignment="Left" Background="{StaticResource MaterialDesignTextFieldBoxBackground}"  Foreground="{StaticResource MaterialDesignColumnHeader}" Text="{StaticResource cbLanguage}"/>
+                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource cbLanguage}"/>
                             <ComboBox md:HintAssist.Hint="{StaticResource cbLanguage}" MinWidth="10" HorizontalAlignment="Left" ItemsSource="{Binding Langs}"
                                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource cbLanguage}">
                                 <ComboBox.Text>
@@ -385,7 +385,7 @@
                             </md:DialogHost>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Grid.Column="3" Orientation="Vertical" HorizontalAlignment="Left">
-                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Background="{StaticResource MaterialDesignTextFieldBoxBackground}" Foreground="{StaticResource MaterialDesignColumnHeader}" Text="{StaticResource tbOUTCOffset}" />
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource tbOUTCOffset}" />
                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                                 <md:PopupBox StaysOpen="False" Margin="-10,0,0,0" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{StaticResource pbtipReset}">
                                     <Grid Width="150">

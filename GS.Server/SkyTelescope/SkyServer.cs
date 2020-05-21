@@ -3144,6 +3144,10 @@ namespace GS.Server.SkyTelescope
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Get Positions:{x[0]},{x[1]}" };
             MonitorLog.LogToMonitor(monitorItem);
 
+            monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"StepsPerRevolution:{StepsPerRevolution[0]},{StepsPerRevolution[1]}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
             return true;
         }
 
@@ -3572,7 +3576,16 @@ namespace GS.Server.SkyTelescope
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "MainWindow Closing" };
             MonitorLog.LogToMonitor(monitorItem);
 
-            if (Application.Current.MainWindow != null) Application.Current.MainWindow.Close();
+            for (var intCounter = Application.Current.Windows.Count -1 ; intCounter >= 0; intCounter--)
+            {
+                if (Application.Current.Windows[intCounter] != null)
+                {
+                    Application.Current.Windows[intCounter].Close();
+                }
+            }
+
+            // if (Application.Current.MainWindow != null) Application.Current.MainWindow.Close();
+
         }
 
         /// <summary>

@@ -32,13 +32,13 @@
         <Grid >
             <Grid.RowDefinitions >
                 <!--<RowDefinition Height="40"/>-->
-                <RowDefinition Height="80"/>
+                <RowDefinition Height="70"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
                 <!--<ToggleButton Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top"
                 Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}"
                 Style="{StaticResource MaterialDesignHamburgerToggleButton}" IsChecked="False" x:Name="MenuToggleButton"/>-->
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10 10" HorizontalAlignment="Left">
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,0,0,0" HorizontalAlignment="Left">
                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource tbGPOn}"/>
                 <CheckBox ToolTip="{StaticResource cbtipGPOn}" IsChecked="{Binding IsGamepadRunning}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
                 <TextBlock Margin="20,0,10,0" VerticalAlignment="Center" Text="{StaticResource tbGPSen}"/>
@@ -54,7 +54,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="70"/>
+                    <RowDefinition Height="50"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />

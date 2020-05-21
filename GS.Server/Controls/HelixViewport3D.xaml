@@ -4,10 +4,18 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:h="http://helix-toolkit.org/wpf"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <h:HelixViewport3D ShowCameraInfo="{Binding CameraVis}" Background="Transparent"  ShowViewCube="False" 
-                       ViewCubeVerticalPosition="Top" ShowCameraTarget="False" >
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="{Binding ImageFile}" Stretch="UniformToFill" />
+        </Grid.Background>
+        <h:HelixViewport3D ShowCameraInfo="{Binding CameraVis}" Background="Transparent"  ShowViewCube="False" 
+                           ViewCubeVerticalPosition="Top" ShowCameraTarget="False" >
         <h:HelixViewport3D.Camera>
             <PerspectiveCamera  LookDirection="{Binding LookDirection, Mode=TwoWay}"
                                 UpDirection="{Binding UpDirection, Mode=TwoWay}"
@@ -43,4 +51,9 @@
             </h:HelixVisual3D.Transform>
         </h:HelixVisual3D>
     </h:HelixViewport3D>
+        <Button Width="20" Height="20" Margin="5" ToolTip="{StaticResource btnOpenWin}" Command="{Binding OpenModelWindowCmd}" Style="{StaticResource MaterialDesignRaisedAccentButton}" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Visibility="{Binding ModelWinVisability, Converter={StaticResource BoolToVis}}">
+            <materialDesign:PackIcon Kind="OpenInNew" Margin="-14,-2,0,0" />
+        </Button>
+    </Grid>
+
 </UserControl>

@@ -1,11 +1,11 @@
-﻿<UserControl x:Class="GS.Server.Controls.WindowTitleBar"
+﻿<UserControl x:Class="GS.Server.Controls.WindowTitleBarBasic"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d">
-    <StackPanel Background="{StaticResource MaterialDesignBackground}" >
+    <StackPanel Background="Black">
         <Grid MinWidth="200" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
@@ -13,7 +13,7 @@
             </Grid.ColumnDefinitions>
             <DockPanel Grid.Column="0" Dock="Left">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="5,0,0,0">
-                    <CheckBox WindowChrome.IsHitTestVisibleInChrome="True" IsChecked="{Binding TopMost}" >
+                    <CheckBox WindowChrome.IsHitTestVisibleInChrome="True" IsChecked="{Binding TopMost}">
                         <CheckBox.Resources>
                             <!-- ReSharper disable once Xaml.RedundantResource Unchecked state-->
                             <SolidColorBrush x:Key="MaterialDesignCheckBoxOff" Color="{StaticResource Primary900Foreground}" />
@@ -21,26 +21,20 @@
                             <SolidColorBrush x:Key="PrimaryHueMidBrush" Color="{StaticResource Primary900Foreground}" />
                         </CheckBox.Resources>
                     </CheckBox>
-                    <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Text="{StaticResource lbName}" Foreground="{StaticResource PrimaryHueLightBrush}"/>
-                    <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Text="{Binding Version}" Foreground="{StaticResource PrimaryHueLightBrush}"/>
-                    <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Text="{Binding MountType, StringFormat={}({0})}" Foreground="{StaticResource PrimaryHueLightBrush}" />
+                    <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Text="{Binding Title}" Foreground="{StaticResource PrimaryHueLightBrush}"/>
                 </StackPanel>
             </DockPanel>
             <DockPanel Grid.Column="1" Dock="Right">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Text="{StaticResource ResourceKey=lbApps}" Foreground="{StaticResource PrimaryHueLightBrush}"/>
-                    <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Text="{Binding AppCount}" Foreground="{StaticResource PrimaryHueLightBrush}"/>
-                <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding MinimizeWindowCommand}"  WindowChrome.IsHitTestVisibleInChrome="True">
+                    <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding MinimizeWindowCommand}"  WindowChrome.IsHitTestVisibleInChrome="True">
                         <md:PackIcon Kind="WindowMinimize" VerticalAlignment="Center" Width="25" Height="25" Foreground="{StaticResource PrimaryHueLightBrush}" />
                 </Button>
                 <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding MaximizeWindowCommand}"  WindowChrome.IsHitTestVisibleInChrome="True">
                         <md:PackIcon Kind="WindowMaximize" VerticalAlignment="Center" Width="25" Height="25" Foreground="{StaticResource PrimaryHueLightBrush}" />
                 </Button>
-                <md:DialogHost HorizontalAlignment="Left" VerticalAlignment="Bottom" CloseOnClickAway="True" IsOpen="{Binding IsCloseDialogOpen}" DialogContent="{Binding CloseContent}">
-                        <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{StaticResource PrimaryHueLightBrush}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding OpenCloseDialogCommand}" WindowChrome.IsHitTestVisibleInChrome="True">
+                    <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding OpenCloseWindowCmd}" WindowChrome.IsHitTestVisibleInChrome="True">
                             <md:PackIcon Kind="Power" VerticalAlignment="Center" Width="25" Height="25" Foreground="{StaticResource PrimaryHueLightBrush}" />
                     </Button>
-                </md:DialogHost>
                 </StackPanel>
             </DockPanel>
         </Grid>

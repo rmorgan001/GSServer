@@ -50,6 +50,7 @@
                                 <TextBlock Margin="10,0,0,0" Text="{Binding Lash, StringFormat={}Dec Backlash: {0}}" VerticalAlignment="Center" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" >
+                                <Button Margin="5,0,0,0" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickOpenCmd}" Content="Start" IsEnabled="{Binding IsEnabled}" />
                                 <Button Margin="5,0,0,0" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickStartCmd}" Content="Start" IsEnabled="{Binding IsEnabled}"/>
                                 <Button Margin="5,0,0,0" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickStopCmd}" Content="Stop" IsEnabled="{Binding IsRunning}"/>
                                 <Button Margin="5,0,0,0" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickCancelCmd}" Content="Cancel" IsEnabled="{Binding IsRunning}" />
