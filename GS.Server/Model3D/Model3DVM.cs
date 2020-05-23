@@ -13,7 +13,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 using ASCOM.Utilities;
 using GS.Principles;
 using GS.Server.Helpers;
@@ -35,20 +34,18 @@ using System.Windows.Media.Media3D;
 using GS.Server.Controls.Dialogs;
 using GS.Server.Windows;
 
-
 namespace GS.Server.Model3D
 {
     public class Model3DVM : ObservableObject, IPageVM, IDisposable
     {
+        #region fields
         public string TopName => "";
         public string BottomName => "3D";
         public int Uid => 4;
         private bool _disposed;
-
-        #region Model
-
         private readonly string _directoryPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase);
         private readonly Util _util = new Util();
+        #endregion
 
         public Model3DVM()
         {
@@ -59,10 +56,9 @@ namespace GS.Server.Model3D
             SkyServer.StaticPropertyChanged += PropertyChangedSkyServer;
             Settings.Settings.StaticPropertyChanged += PropertyChangedSettings;
 
-
-            LookDirection = new Vector3D(-1.2, -140, -133);
-            UpDirection = new Vector3D(-.006, -0.6, 0.7);
-            Position = new Point3D(.7, 139.7, 184.2);
+            LookDirection = Settings.Settings.ModelLookDirection1;
+            UpDirection = Settings.Settings.ModelUpDirection1;
+            Position = Settings.Settings.ModelPosition1;
 
             LoadTopBar();
             LoadCompass();
@@ -83,6 +79,7 @@ namespace GS.Server.Model3D
             ModelWinVisability = true;
         }
 
+        #region ViewModel
         /// <summary>
         /// Property changes from the server
         /// </summary>
@@ -234,6 +231,13 @@ namespace GS.Server.Model3D
                 var win = Application.Current.Windows.OfType<ModelV>().FirstOrDefault();
                 if (win != null) return;
                 var bWin = new ModelV();
+                var _modelVM = ModelVM._modelVM;
+                _modelVM.WinHeight = 220;
+                _modelVM.WinWidth = 250;
+                _modelVM.Position = Position;
+                _modelVM.LookDirection = LookDirection;
+                _modelVM.UpDirection = UpDirection;
+                _modelVM.ImageFile = ImageFile;
                 bWin.Show();
             }
             catch (Exception ex)
@@ -256,6 +260,17 @@ namespace GS.Server.Model3D
         #endregion
 
         #region Viewport3D
+        private string _imageFile;
+        public string ImageFile
+        {
+            get => _imageFile;
+            set
+            {
+                if (_imageFile == value) return;
+                _imageFile = value;
+                OnPropertyChanged();
+            }
+        }
 
         private Point3D _position;
         public Point3D Position
@@ -812,6 +827,7 @@ namespace GS.Server.Model3D
 
         #endregion
 
+        #region Dispose
         public void Dispose()
         {
             Dispose(disposing: true);
@@ -834,43 +850,13 @@ namespace GS.Server.Model3D
             _disposed = true;
         }
 
-    }
-
-    public class Overlay : DependencyObject
-    {
-        /// <summary>
-        /// The position 3 d property.
-        /// </summary>
-        public static readonly DependencyProperty Position3DProperty = DependencyProperty.RegisterAttached(
-            "Position3D", typeof(Point3D), typeof(Overlay));
-
-        /// <summary>
-        /// The get position 3 d.
-        /// </summary>
-        /// <param name="obj">
-        /// The obj.
-        /// </param>
-        /// <returns>
-        /// </returns>
-        public static Point3D GetPosition3D(DependencyObject obj)
+        ~Model3DVM()
         {
-            return (Point3D)obj.GetValue(Position3DProperty);
+            Settings.Settings.ModelLookDirection1 = LookDirection;
+            Settings.Settings.ModelUpDirection1 = UpDirection;
+            Settings.Settings.ModelPosition1 = Position;
+            Settings.Settings.Save();
         }
-
-        /// <summary>
-        /// The set position 3 d.
-        /// </summary>
-        /// <param name="obj">
-        /// The obj.
-        /// </param>
-        /// <param name="value">
-        /// The value.
-        /// </param>
-        public static void SetPosition3D(DependencyObject obj, Point3D value)
-        {
-            obj.SetValue(Position3DProperty, value);
-        }
-
-        // Using a DependencyProperty as the backing store for Position3D.  This enables animation, styling, binding, etc...
+        #endregion
     }
 }

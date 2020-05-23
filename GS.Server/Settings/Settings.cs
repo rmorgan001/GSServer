@@ -17,10 +17,12 @@
 using GS.Shared;
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows;
+using System.Windows.Media.Media3D;
 
 namespace GS.Server.Settings
 {
@@ -129,6 +131,78 @@ namespace GS.Server.Settings
                 Properties.Server.Default.Model3D = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
+            }
+        }
+
+        private static Vector3D _modelLookDirection1;
+        public static Vector3D ModelLookDirection1
+        {
+            get => _modelLookDirection1;
+            set
+            {
+                _modelLookDirection1 = value;
+                Properties.Server.Default.ModelLookDirection1 = value.ToString(CultureInfo.InvariantCulture);
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+            }
+        }
+
+        private static Point3D _modelPosition1;
+        public static Point3D ModelPosition1
+        {
+            get => _modelPosition1;
+            set
+            {
+                _modelPosition1 = value;
+                Properties.Server.Default.ModelPosition1 = value.ToString(CultureInfo.InvariantCulture);
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+            }
+        }
+
+        private static Vector3D _modelUpDirection1;
+        public static Vector3D ModelUpDirection1
+        {
+            get => _modelUpDirection1;
+            set
+            {
+                _modelUpDirection1 = value;
+                Properties.Server.Default.ModelUpDirection1 = value.ToString(CultureInfo.InvariantCulture);
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+            }
+        }
+
+        private static Vector3D _modelLookDirection2;
+        public static Vector3D ModelLookDirection2
+        {
+            get => _modelLookDirection2;
+            set
+            {
+                _modelLookDirection2 = value;
+                Properties.Server.Default.ModelLookDirection2 = value.ToString(CultureInfo.InvariantCulture);
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+            }
+        }
+
+        private static Point3D _modelPosition2;
+        public static Point3D ModelPosition2
+        {
+            get => _modelPosition2;
+            set
+            {
+                _modelPosition2 = value;
+                Properties.Server.Default.ModelPosition2 = value.ToString(CultureInfo.InvariantCulture);
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+            }
+        }
+
+        private static Vector3D _modelUpDirection2;
+        public static Vector3D ModelUpDirection2
+        {
+            get => _modelUpDirection2;
+            set
+            {
+                _modelUpDirection2 = value;
+                Properties.Server.Default.ModelUpDirection2 = value.ToString(CultureInfo.InvariantCulture);
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
             }
         }
 
@@ -401,6 +475,12 @@ namespace GS.Server.Settings
             Notes = Properties.Server.Default.Notes;
             SkyWatcher = Properties.Server.Default.SkyWatcher;
             Model3D = Properties.Server.Default.Model3D;
+            ModelLookDirection1 = Vector3D.Parse(Properties.Server.Default.ModelLookDirection1);
+            ModelPosition1 = Point3D.Parse(Properties.Server.Default.ModelPosition1);
+            ModelUpDirection1 = Vector3D.Parse(Properties.Server.Default.ModelPosition1);
+            ModelLookDirection2 = Vector3D.Parse(Properties.Server.Default.ModelLookDirection2);
+            ModelPosition2 = Point3D.Parse(Properties.Server.Default.ModelPosition2);
+            ModelUpDirection2 = Vector3D.Parse(Properties.Server.Default.ModelPosition2);
             Plot = Properties.Server.Default.Plot;
             PoleLocator = Properties.Server.Default.PoleLocator;
             Pulses = Properties.Server.Default.Pulses;

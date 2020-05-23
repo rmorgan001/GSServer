@@ -1,4 +1,19 @@
-﻿using System;
+﻿/* Copyright(C) 2020  Rob Morgan (robert.morgan.e@gmail.com)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -22,8 +37,11 @@ namespace GS.Server.Windows
 {
     public class ModelVM : ObservableObject, IDisposable
     {
+        #region Fields
         private readonly Util _util = new Util();
         private readonly string _directoryPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase);
+        public static ModelVM _modelVM;
+        #endregion
 
         public ModelVM()
         {
@@ -42,6 +60,7 @@ namespace GS.Server.Windows
                     ScreenEnabled = SkyServer.IsMountRunning;
                     ModelWinVisability = false;
                     TopMost = true;
+                    _modelVM = this;
 
                     LoadImages();
                     Rotate();
@@ -62,6 +81,8 @@ namespace GS.Server.Windows
                 throw;
             }
         }
+
+        #region ViewModel
 
         /// <summary>
         /// Enable or Disable screen items if connected
@@ -173,7 +194,7 @@ namespace GS.Server.Windows
 
         private void LoadImages()
         {
-            //image size Width="253" Height="340"
+            if (!string.IsNullOrEmpty(ImageFile)) return;
             var random = new Random();
             ImageFiles = new List<string> { "M33.png", "Horsehead.png", "NGC6992.png", "Orion.png" };
             ImageFile = "../Resources/" + ImageFiles[random.Next(ImageFiles.Count)];
@@ -211,6 +232,7 @@ namespace GS.Server.Windows
                 OnPropertyChanged();
             }
         }
+        #endregion
 
         #region Viewport3D
 
@@ -347,19 +369,9 @@ namespace GS.Server.Windows
             {
                 CameraVis = false;
 
-                LookDirection = new Vector3D(-1.2, -140, -133);
-                UpDirection = new Vector3D(-.006, -0.6, 0.7);
-                Position = new Point3D(.7, 139.7, 184.2);
-
-                //Camera = new PerspectiveCamera
-                //{
-                //    LookDirection = new Vector3D(-1.2, -140, -133),
-                //    UpDirection = new Vector3D(-.006, -0.6, 0.7),
-                //    Position = new Point3D(.7, 139.7, 184.2),
-                //    NearPlaneDistance = 0.001,
-                //    FarPlaneDistance = double.PositiveInfinity,
-                //    FieldOfView = 60
-                //};
+                //LookDirection = _skyTelescopeVm.LookDirection;
+                //UpDirection = _skyTelescopeVm.UpDirection;
+                //Position = _skyTelescopeVm.Position;
 
                 Xaxis = -90;
                 Yaxis = 90;
@@ -461,6 +473,30 @@ namespace GS.Server.Windows
         #endregion
 
         #region Window Info
+
+        private int _winHeight;
+        public int WinHeight
+        {
+            get => _winHeight;
+            set
+            {
+                if (_winHeight == value) return;
+                _winHeight = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _winWidth;
+        public int WinWidth
+        {
+            get => _winWidth;
+            set
+            {
+                if (_winWidth == value) return;
+                _winWidth = value;
+                OnPropertyChanged();
+            }
+        }
 
         private bool _topMost;
         public bool TopMost

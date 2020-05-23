@@ -24,22 +24,22 @@ using System.Windows.Media;
 
 namespace GS.Shared
 {
-    public static class PulsesLogging
+    public static class ChartLogging
     {
-        private static readonly BlockingCollection<PulsesLogItem> _chartBlockingCollection;
+        private static readonly BlockingCollection<ChartLogItem> _chartBlockingCollection;
         private static readonly string _instanceFileName;
         private static readonly string _logPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        private static readonly string _chartingFile = Path.Combine(_logPath, "GSServer\\GSPulsesLog");
+        private static readonly string _chartingFile = Path.Combine(_logPath, "GSServer\\GSChartLog");
         private static readonly SemaphoreSlim _lockFile = new SemaphoreSlim(1);
 
-        static PulsesLogging()
+        static ChartLogging()
         {
             try
             {
                 _instanceFileName = $"{DateTime.Now:yyyy-dd-MM}.txt";
-                DeleteFiles("GSPulsesLog", 7, _logPath);
+                DeleteFiles("GSChartLog", 7, _logPath);
 
-                _chartBlockingCollection = new BlockingCollection<PulsesLogItem>();
+                _chartBlockingCollection = new BlockingCollection<ChartLogItem>();
                 Task.Factory.StartNew(() =>
                 {
                     foreach (var logitem in _chartBlockingCollection.GetConsumingEnumerable())
@@ -73,7 +73,7 @@ namespace GS.Shared
         /// adds a item to a blocking queue
         /// </summary>
         /// <param name="logitem"></param>
-        private static void AddEntry(PulsesLogItem logitem)
+        private static void AddEntry(ChartLogItem logitem)
         {
             _chartBlockingCollection.TryAdd(logitem);
         }
@@ -82,7 +82,7 @@ namespace GS.Shared
         /// Process item from the blocking queue
         /// </summary>
         /// <param name="logitem"></param>
-        private static void ProcessChartQueueItem(PulsesLogItem logitem)
+        private static void ProcessChartQueueItem(ChartLogItem logitem)
         {
             try
             {
@@ -127,7 +127,7 @@ namespace GS.Shared
         /// <param name="filePath"></param>
         /// <param name="logitem"></param>
         /// <param name="append"></param>
-        private static async void FileWriteAsync(string filePath, PulsesLogItem logitem, bool append = true)
+        private static async void FileWriteAsync(string filePath, ChartLogItem logitem, bool append = true)
         {
             await _lockFile.WaitAsync();
             try
@@ -136,7 +136,7 @@ namespace GS.Shared
                 using (var stream = new FileStream(filePath, append ? FileMode.Append : FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
                 using (var sw = new StreamWriter(stream))
                 {
-                    var str = $"{(int)logitem.PulseLogCode},{logitem.Message}";
+                    var str = $"{(int)logitem.ChartType},{(int)logitem.LogCode},{logitem.Message}";
                     await sw.WriteLineAsync(str);
                 }
             }
@@ -150,40 +150,40 @@ namespace GS.Shared
         {
             if (!IsRunning) return;
             var str = $"{HiResDateTime.UtcNow.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{ChartLogCode.Start},{type}";
-            var pulsesLogItem = new PulsesLogItem { PulseLogCode = ChartLogCode.Start, Message = str };
-            AddEntry(pulsesLogItem);
+            var chartsLogItem = new ChartLogItem { ChartType = type , LogCode = ChartLogCode.Start, Message = str };
+            AddEntry(chartsLogItem);
         }
 
-        public static void LogInfo(string value)
+        public static void LogInfo(ChartType type, string value)
         {
             if (!IsRunning) return;
             var str = $"{HiResDateTime.UtcNow.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{value}";
-            var pulsesLogItem = new PulsesLogItem { PulseLogCode = ChartLogCode.Info, Message = str };
-            AddEntry(pulsesLogItem);
+            var chartsLogItem = new ChartLogItem { ChartType = type, LogCode = ChartLogCode.Info, Message = str };
+            AddEntry(chartsLogItem);
         }
 
-        public static void LogData(string key, string value)
+        public static void LogData(ChartType type, string key, string value)
         {
             if (!IsRunning) return;
             var str = $"{HiResDateTime.UtcNow.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{key},{value}";
-            var pulsesLogItem = new PulsesLogItem { PulseLogCode = ChartLogCode.Data, Message = str };
-            AddEntry(pulsesLogItem);
+            var chartsLogItem = new ChartLogItem { ChartType = type, LogCode = ChartLogCode.Data, Message = str };
+            AddEntry(chartsLogItem);
         }
 
-        public static void LogPoint(PointModel point)
+        public static void LogPoint(ChartType type, PointModel point)
         {
             if (!IsRunning) return;
             var str = $"{point.DateTime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{point.Value},{point.Set}";
-            var pulsesLogItem = new PulsesLogItem { PulseLogCode = ChartLogCode.Point, Message = str };
-            AddEntry(pulsesLogItem);
+            var chartsLogItem = new ChartLogItem { ChartType = type, LogCode = ChartLogCode.Point, Message = str };
+            AddEntry(chartsLogItem);
         }
 
-        public static void LogSeries(string series, string message)
+        public static void LogSeries(ChartType type, string series, string message)
         {
             if (!IsRunning) return;
             var str = $"{HiResDateTime.UtcNow.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{series},{message}";
-            var pulsesLogItem = new PulsesLogItem { PulseLogCode = ChartLogCode.Series, Message = str };
-            AddEntry(pulsesLogItem);
+            var chartsLogItem = new ChartLogItem { ChartType = type, LogCode = ChartLogCode.Series, Message = str };
+            AddEntry(chartsLogItem);
         }
     }
 
@@ -226,12 +226,14 @@ namespace GS.Shared
     }
     public enum ChartType
     {
-        Pulses = 1
+        Pulses = 1,
+        Plot = 2,
     }
 
-    public class PulsesLogItem
+    public class ChartLogItem
     {
-        public ChartLogCode PulseLogCode { get; set; }
+        public ChartType ChartType { get; set; }
+        public ChartLogCode LogCode { get; set; }
         public string Message { get; set; }
     }
 

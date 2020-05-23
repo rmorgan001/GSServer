@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Windows;
 using GS.Shared;
@@ -10,7 +12,7 @@ namespace GS.ChartViewer
     /// </summary>
     public partial class App : IDisposable
     {
-        // give the mutex a  unique name
+       // give the mutex a  unique name
         private const string MutexName = "Green Swamp ChartViewer";
         // declare the mutex
         private readonly Mutex _mutex;
@@ -19,6 +21,9 @@ namespace GS.ChartViewer
 
         public App()
         {
+
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
+
             // overloaded mutex constructor which outs a boolean
             // telling if the mutex is new or not.
             // see http://msdn.microsoft.com/en-us/library/System.Threading.Mutex.aspx
@@ -27,6 +32,20 @@ namespace GS.ChartViewer
             // if the mutex already exists, notify and quit
             MessageBox.Show("GS ChartViewer is already running", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
             Current.Shutdown(0);
+        }
+
+        /// <summary>
+        /// Hack to get arround the strongnamer and material design not loading baml correctly
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        private Assembly CurrentDomainOnAssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            var assemblyName = new AssemblyName(args.Name);
+            var assembly = AppDomain.CurrentDomain.GetAssemblies()
+                .FirstOrDefault(a => a.GetName().Name == assemblyName.Name);
+            return assembly;
         }
 
         protected override void OnStartup(StartupEventArgs e)

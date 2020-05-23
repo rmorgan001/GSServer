@@ -17,8 +17,8 @@
         <h:HelixViewport3D ShowCameraInfo="{Binding CameraVis}" Background="Transparent"  ShowViewCube="False" 
                            ViewCubeVerticalPosition="Top" ShowCameraTarget="False" >
         <h:HelixViewport3D.Camera>
-            <PerspectiveCamera  LookDirection="{Binding LookDirection, Mode=TwoWay}"
-                                UpDirection="{Binding UpDirection, Mode=TwoWay}"
+                <PerspectiveCamera LookDirection="{Binding LookDirection, Mode=TwoWay}" 
+                                UpDirection="{Binding UpDirection, Mode=TwoWay}" 
                                 Position="{Binding Position, Mode=TwoWay}"
                                 NearPlaneDistance="0.001"
                                 FarPlaneDistance ="Infinity"

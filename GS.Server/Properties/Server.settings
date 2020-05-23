@@ -83,5 +83,23 @@
     <Setting Name="Plot" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="ModelLookDirection1" Type="System.String" Scope="User">
+      <Value Profile="(Default)">-1.2, -140, -133</Value>
+    </Setting>
+    <Setting Name="ModelUpDirection1" Type="System.String" Scope="User">
+      <Value Profile="(Default)">-.006, -0.6, 0.7</Value>
+    </Setting>
+    <Setting Name="ModelPosition1" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.7, 139.7, 184.2</Value>
+    </Setting>
+    <Setting Name="ModelLookDirection2" Type="System.String" Scope="User">
+      <Value Profile="(Default)">-1.2, -140, -133</Value>
+    </Setting>
+    <Setting Name="ModelUpDirection2" Type="System.String" Scope="User">
+      <Value Profile="(Default)">-.006, -0.6, 0.7</Value>
+    </Setting>
+    <Setting Name="ModelPosition2" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.7, 139.7, 184.2</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

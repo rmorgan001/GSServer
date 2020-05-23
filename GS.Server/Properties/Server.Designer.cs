@@ -346,5 +346,77 @@ namespace GS.Server.Properties {
                 this["Plot"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1.2, -140, -133")]
+        public string ModelLookDirection1 {
+            get {
+                return ((string)(this["ModelLookDirection1"]));
+            }
+            set {
+                this["ModelLookDirection1"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-.006, -0.6, 0.7")]
+        public string ModelUpDirection1 {
+            get {
+                return ((string)(this["ModelUpDirection1"]));
+            }
+            set {
+                this["ModelUpDirection1"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(".7, 139.7, 184.2")]
+        public string ModelPosition1 {
+            get {
+                return ((string)(this["ModelPosition1"]));
+            }
+            set {
+                this["ModelPosition1"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1.2, -140, -133")]
+        public string ModelLookDirection2 {
+            get {
+                return ((string)(this["ModelLookDirection2"]));
+            }
+            set {
+                this["ModelLookDirection2"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-.006, -0.6, 0.7")]
+        public string ModelUpDirection2 {
+            get {
+                return ((string)(this["ModelUpDirection2"]));
+            }
+            set {
+                this["ModelUpDirection2"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(".7, 139.7, 184.2")]
+        public string ModelPosition2 {
+            get {
+                return ((string)(this["ModelPosition2"]));
+            }
+            set {
+                this["ModelPosition2"] = value;
+            }
+        }
     }
 }

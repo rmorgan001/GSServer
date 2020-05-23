@@ -88,6 +88,10 @@
                             </ItemsPanelTemplate>
                         </ComboBox.ItemsPanel>
                     </ComboBox>
+                        <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+                            <ToggleButton Width="25" Height="25" Style="{StaticResource MaterialDesignActionLightToggleButton}" IsChecked="{Binding IsLogging}" />
+                            <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="{StaticResource tbLogging}" />
+                    </StackPanel>
                     </StackPanel>
             </Grid>
         </md:DrawerHost.LeftDrawerContent>
@@ -114,19 +118,23 @@
                         <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Xy" Command="{Binding Path=ClickPlotZoomCmd}" CommandParameter="Xy" IsChecked="True" />
                     </StackPanel>
                 </StackPanel>
-                <wpf:CartesianChart Grid.Row="1" Foreground="DarkGray" Hoverable="True" Zoom="{Binding Zoom}" LegendLocation="Bottom" DisableAnimations="True"  Series="{Binding ValuesCollection, Mode=OneWay}" AnimationsSpeed="0" >
+                <wpf:CartesianChart Grid.Row="1" Foreground="DarkGray" Hoverable="True" Zoom="{Binding Zoom}" LegendLocation="Bottom" DisableAnimations="True"  
+                                    Series="{Binding ValuesCollection, Mode=OneWay}" AnimationsSpeed="0" >
                     <wpf:CartesianChart.DataTooltip>
                         <wpf:DefaultTooltip SelectionMode="OnlySender" Foreground="Black" />
                     </wpf:CartesianChart.DataTooltip>
                     <wpf:CartesianChart.AxisX>
-                        <wpf:Axis FontSize="18" LabelFormatter="{Binding FormatterX, Mode=TwoWay}" DisableAnimations="True" Foreground="DarkGray" MaxValue="{Binding AxisXMax, Mode=TwoWay}" MinValue="{Binding AxisXMin, Mode=TwoWay}" Unit="{Binding AxisXUnit, Mode=TwoWay}" >
+                        <wpf:Axis FontSize="18" DisableAnimations="True" Foreground="DarkGray" LabelFormatter="{Binding FormatterX, Mode=TwoWay}" MaxValue="{Binding AxisXMax, Mode=TwoWay}" 
+                                  MinValue="{Binding AxisXMin, Mode=TwoWay}" Unit="{Binding AxisXUnit, Mode=TwoWay}" >
                             <wpf:Axis.Separator>
-                                <wpf:Separator Stroke="DarkGray" StrokeThickness=".2" IsEnabled="True" />
+                                <wpf:Separator Stroke="DarkGray" StrokeThickness=".2" />
                             </wpf:Axis.Separator>
                         </wpf:Axis>
                     </wpf:CartesianChart.AxisX>
                     <wpf:CartesianChart.AxisY>
-                        <wpf:Axis Title="{Binding Scale, Mode=TwoWay}" FontSize="15" Foreground="DarkGray" ShowLabels="True" DisableAnimations="True" LabelFormatter="{Binding FormatterY, Mode=OneTime}" MaxValue="{Binding AxisYMax, Mode=TwoWay}" MinValue="{Binding AxisYMin, Mode=TwoWay}" Unit="{Binding AxisYUnit, Mode=TwoWay}">
+                        <wpf:Axis Title="{Binding Scale, Mode=TwoWay}" FontSize="15" Foreground="DarkGray" ShowLabels="True" DisableAnimations="True" 
+                                  LabelFormatter="{Binding FormatterY, Mode=OneTime}" MaxValue="{Binding AxisYMax, Mode=TwoWay}" MinValue="{Binding AxisYMin, Mode=TwoWay}"
+                                  Unit="{Binding AxisYUnit, Mode=TwoWay}">
                             <wpf:Axis.Sections>
                                 <wpf:AxisSection Value="0" StrokeThickness="1" Stroke="DarkGray" DisableAnimations="True"/>
                             </wpf:Axis.Sections>

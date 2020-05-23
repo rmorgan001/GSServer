@@ -174,42 +174,42 @@
                                 </StackPanel>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,15,0,0" HorizontalAlignment="Center">
-                                <Button Margin="0,0,0,0" Height="30" ToolTip="Fit Xy" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesSizeCmd}" Content="Xy"/>
-                                <Button Margin="5,0,0,0" Height="30" ToolTip="Fit X" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesSizeXCmd}" Content="X"/>
-                                <Button Margin="5,0,0,0" Height="30" ToolTip="Fit Y" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesSizeYCmd}" Content="Y"/>
+                                <Button Margin="0,0,0,0" Height="30" ToolTip="Fit Xy" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickChartSizeCmd}" Content="Reset"/>
+                                <!--<Button Margin="5,0,0,0" Height="30" ToolTip="Fit X" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickChartSizeXCmd}" Content="X"/>
+                                <Button Margin="5,0,0,0" Height="30" ToolTip="Fit Y" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickChartSizeYCmd}" Content="Y"/>-->
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"  Margin="0,5,0,0">
                                 <TextBlock VerticalAlignment="Center" Margin="0,0,0,0" Text="{DynamicResource tbChartZoom}"/>
-                                <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Xy" Command="{Binding Path=ClickPulsesZoomCmd}" CommandParameter="Xy" IsChecked="True" />
-                                <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="X" Command="{Binding Path=ClickPulsesZoomCmd}" CommandParameter="X"/>
-                                <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Y" Command="{Binding Path=ClickPulsesZoomCmd}" CommandParameter="Y"/>
+                                <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Xy" Command="{Binding Path=ClickChartZoomCmd}" CommandParameter="Xy" IsChecked="True" />
+                                <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="X" Command="{Binding Path=ClickChartZoomCmd}" CommandParameter="X"/>
+                                <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Y" Command="{Binding Path=ClickChartZoomCmd}" CommandParameter="Y"/>
                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"  Margin="0,5,0,0">
-                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="{DynamicResource btntipChartShrink}" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickPulsesXDownCmd}">
+                            <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Center"  Margin="0,5,0,0">
+                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="{DynamicResource btntipChartShrink}" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickChartXDownCmd}">
                                     <md:PackIcon
                                         Kind="ArrowLeft"
                                         Height="24"
                                         Width="24" />
                                 </Button>
-                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="{DynamicResource btntipChartExpand}" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickPulsesXUpCmd}">
+                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="{DynamicResource btntipChartExpand}" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickChartXUpCmd}">
                                     <md:PackIcon
                                         Kind="ArrowRight"
                                         Height="24"
                                         Width="24" />
                                     </Button>
-                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="{DynamicResource btntipChartUp}" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickPulsesYUpCmd}">
+                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="{DynamicResource btntipChartUp}" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickChartYUpCmd}">
                                     <md:PackIcon
                                         Kind="ArrowUp"
                                         Height="24"
                                         Width="24" />
                                 </Button>
-                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="{DynamicResource btntipChartDown}" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickPulsesYDownCmd}">
+                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="{DynamicResource btntipChartDown}" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickChartYDownCmd}">
                                     <md:PackIcon
                                         Kind="ArrowDown"
                                         Height="24"
                                         Width="24" />
                                 </Button>
-                            </StackPanel>
+                            </StackPanel>-->
                         </StackPanel>
                     <Grid Grid.Row="0" Grid.Column="2" Margin="0,0,10,0" >
                             <Grid.ColumnDefinitions>
@@ -257,30 +257,25 @@
                     </Grid>
                 </Grid>
                 <GridSplitter Margin="0,5,0,0" Grid.Row="2" Height="4" HorizontalAlignment="Stretch"  />
-                    <lvc:CartesianChart Grid.Row="3" Margin="5,0,0,0" Foreground="DarkGray" Hoverable="True" Zoom="{Binding Zoom, Mode=TwoWay}" LegendLocation="Top"  DataTooltip="{x:Null}"
-                                    DisableAnimations="{Binding DisableAnimations, Mode=OneWay}" Series="{Binding ChartCollection}" AnimationsSpeed="{Binding AnimationsSpeed, Mode=OneWay}">
-                        <lvc:CartesianChart.Resources>
-                            <Style TargetType="lvc:DefaultTooltip">
-                                <Setter Property="Background" Value="{DynamicResource PrimaryHueDarkBrush}"/>
-                                <Setter Property="Foreground" Value="{DynamicResource PrimaryHueLightBrush}"/>
-                                <Setter Property="ShowTitle" Value="True"/>
-                                <Setter Property="SelectionMode" Value="OnlySender"/>
-                                <Setter Property="ShowSeries" Value="True"/>
-                                <Setter Property="FontSize" Value="13"/>
-                                <Setter Property="FontWeight" Value="Normal"/>
-                                <Setter Property="CornerRadius" Value="5"/>
-                                <Setter Property="Width" Value="150"/>
-                                <Setter Property="Height" Value="35"/>
-                                <Setter Property="BorderThickness" Value="1"/>
-                            </Style>
-                        </lvc:CartesianChart.Resources>
+                    <lvc:CartesianChart Grid.Row="3" Margin="5,0,0,0" Foreground="DarkGray" Hoverable="True" LegendLocation="Top" Zoom="{Binding Zoom}" 
+                                        DisableAnimations="{Binding DisableAnimations, Mode=OneWay}" Series="{Binding ChartCollection, Mode=OneTime}" 
+                                        AnimationsSpeed="{Binding AnimationsSpeed, Mode=OneWay}">
+                        <lvc:CartesianChart.DataTooltip>
+                            <lvc:DefaultTooltip SelectionMode="OnlySender" Foreground="Black" />
+                        </lvc:CartesianChart.DataTooltip>
                         <lvc:CartesianChart.AxisX >
-                            <lvc:Axis FontSize="15" DisableAnimations="True" Foreground="DarkGray" ShowLabels="True" Title="{DynamicResource titChartTimeline}" RangeChanged="Axis_OnRangeChanged"
-                                      LabelFormatter="{Binding FormatterX, Mode=TwoWay}" MaxValue="{Binding AxisXMax, Mode=TwoWay}" MinValue="{Binding AxisXMin, Mode=TwoWay}" Unit="{Binding AxisXUnit, Mode=TwoWay}"/>
+                            <lvc:Axis FontSize="15" DisableAnimations="True" Foreground="DarkGray" ShowLabels="True" RangeChanged="Axis_OnRangeChanged" 
+                                      Title="{DynamicResource titChartTimeline}" LabelFormatter="{Binding FormatterX, Mode=TwoWay}" MaxValue="{Binding AxisXMax, Mode=TwoWay}" 
+                                      MinValue="{Binding AxisXMin, Mode=TwoWay}" Unit="{Binding AxisXUnit, Mode=TwoWay}">
+                                <lvc:Axis.Separator>
+                                    <lvc:Separator Stroke="DarkGray" StrokeThickness=".2" />
+                                </lvc:Axis.Separator>
+                                </lvc:Axis>
                         </lvc:CartesianChart.AxisX>
                         <lvc:CartesianChart.AxisY>
-                            <lvc:Axis FontSize="15" Title="{Binding Path=Scale, StringFormat='\{0}  (y)'}" Foreground="DarkGray" ShowLabels="True" DisableAnimations="True"
-                                      LabelFormatter="{Binding FormatterY, Mode=TwoWay}" MaxValue="{Binding AxisYMax, Mode=TwoWay}" MinValue="{Binding AxisYMin, Mode=TwoWay}" Unit="{Binding AxisYUnit, Mode=TwoWay}">
+                            <lvc:Axis FontSize="15" Foreground="DarkGray" ShowLabels="True" DisableAnimations="True" Title="{Binding Path=Scale, StringFormat='\{0} (y)'}" 
+                                      LabelFormatter="{Binding FormatterY, Mode=TwoWay}" MaxValue="{Binding AxisYMax, Mode=TwoWay}" MinValue="{Binding AxisYMin, Mode=TwoWay}" 
+                                      Unit="{Binding AxisYUnit, Mode=TwoWay}">
                                 <lvc:Axis.Sections >
                                     <lvc:AxisSection Value="0" StrokeThickness=".5" Stroke="DarkGray" DisableAnimations="True"></lvc:AxisSection>
                                 </lvc:Axis.Sections>
@@ -290,11 +285,11 @@
                             </lvc:Axis>
                         </lvc:CartesianChart.AxisY>
                     </lvc:CartesianChart>
-                <ListView Grid.Row="3" BorderThickness="0" Opacity=".6" HorizontalAlignment="Left"  Margin="80,10,0,0" Name="ListView1" 
+                    <ListView Grid.Row="3" BorderThickness="0" Opacity=".6" HorizontalAlignment="Left"  Margin="120,10,0,0" Name="ListView1" 
                           VerticalAlignment="Top" ItemsSource="{Binding TitleItems}" >
                     <Interactions:Interaction.Triggers>
                         <Interactions:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                            <Interactions:InvokeCommandAction Command="{Binding ClickPulsesSeriesCmd}" CommandParameter="{Binding ElementName=ListView1, Path=SelectedItem}"/>
+                            <Interactions:InvokeCommandAction Command="{Binding ClickChartSeriesCmd}" CommandParameter="{Binding ElementName=ListView1, Path=SelectedItem}"/>
                         </Interactions:EventTrigger>
                     </Interactions:Interaction.Triggers>
                         <ListView.ItemTemplate>
@@ -315,8 +310,8 @@
                         </Style>
                     </ListView.ItemContainerStyle>
                 </ListView>
-                    <lvc:CartesianChart Margin="10,0,10,0"  Grid.Row="4" DisableAnimations="True" Zoom="Y" ScrollMode="X" Hoverable="False" Background="Transparent" ScrollBarFill="#25FFFFFF" DataTooltip="{x:Null}" 
-                                        ScrollHorizontalFrom="{Binding AxisXMin, Mode=TwoWay}" ScrollHorizontalTo="{Binding AxisXMax, Mode=TwoWay}" >
+                    <lvc:CartesianChart Margin="10,0,10,0"  Grid.Row="4" DisableAnimations="True" Zoom="Y" ScrollMode="X" Hoverable="False" Background="Transparent" ScrollBarFill="#25FFFFFF" 
+                                        DataTooltip="{x:Null}" ScrollHorizontalFrom="{Binding AxisXMin, Mode=TwoWay}" ScrollHorizontalTo="{Binding AxisXMax, Mode=TwoWay}" AnimationsSpeed="0" >
                         <lvc:CartesianChart.Resources>
                             <Style TargetType="lvc:Separator">
                                 <Setter Property="IsEnabled" Value="False"></Setter>
@@ -331,7 +326,8 @@
                             <enums:GLineSeries Values="{Binding Chart6Values}" Visibility="{Binding Chart6Toggle, Converter={StaticResource BoolToVis}, Mode=TwoWay}" Stroke="{Binding Chart6Color, Mode=TwoWay}" StrokeThickness="1" Fill="Transparent" PointGeometry="{x:Null}" AreaLimit="0" LineSmoothness="0"/>
                         </lvc:CartesianChart.Series>
                         <lvc:CartesianChart.AxisX >
-                            <lvc:Axis ShowLabels="False" DisableAnimations="True" MaxValue="{Binding EndDateTicks, Mode=TwoWay}" MinValue="{Binding StartDateTicks, Mode=TwoWay}"/>
+                            <lvc:Axis ShowLabels="False" DisableAnimations="True" MaxValue="{Binding EndDateTicks, Mode=TwoWay}" MinValue="{Binding StartDateTicks, Mode=TwoWay}">
+                            </lvc:Axis>
                         </lvc:CartesianChart.AxisX>
                         <lvc:CartesianChart.AxisY>
                             <lvc:Axis ShowLabels="False" />

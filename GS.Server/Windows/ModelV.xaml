@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:GS.Server.Controls"
         xmlns:windows="clr-namespace:GS.Server.Windows" mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanResizeWithGrip" WindowStyle="None" 
-        TextOptions.TextFormattingMode="Display" Height="320" Width="255"
+        TextOptions.TextFormattingMode="Display" Height="{Binding WinHeight}" Width="{Binding WinWidth}"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Title="{StaticResource lbModel}" FontStretch="Normal" Topmost="{Binding TopMost}"
         d:DataContext="{d:DesignInstance windows:ModelVM, IsDesignTimeCreatable=True}" 
         TextElement.Foreground="{DynamicResource MaterialDesignBody}" 

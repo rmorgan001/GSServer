@@ -8,15 +8,18 @@
     <StackPanel Background="Black" >
         <Grid>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10,0,0,0">
-                <Label Content="GS ChartViewer" FontSize="15" VerticalAlignment="Center"/>
-                <Label Content="{Binding Version}" FontSize="10" VerticalAlignment="Center"/>
+                <Label Content="GS ChartViewer" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueLightBrush}"/>
+                <Label Content="{Binding Version}" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueLightBrush}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5 0">
-                <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}"   Foreground="{DynamicResource PrimaryHueMidBrush}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding MinimizeWindowCommand}"  WindowChrome.IsHitTestVisibleInChrome="True">
-                    <md:PackIcon Kind="WindowMinimize" VerticalAlignment="Center" Width="25" Height="25" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueMidBrush}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding MinimizeWindowCommand}"  WindowChrome.IsHitTestVisibleInChrome="True">
+                    <md:PackIcon Kind="WindowMinimize" VerticalAlignment="Center" Width="25" Height="25" Foreground="{DynamicResource PrimaryHueLightBrush}" />
+                </Button>
+                <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding MaximizeWindowCommand}" WindowChrome.IsHitTestVisibleInChrome="True">
+                    <md:PackIcon Kind="WindowMaximize" VerticalAlignment="Center" Width="25" Height="25" Foreground="{StaticResource PrimaryHueLightBrush}" />
                 </Button>
                 <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueMidBrush}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding ClickCloseAppCommand}" WindowChrome.IsHitTestVisibleInChrome="True">
-                        <md:PackIcon Kind="Power" VerticalAlignment="Center" Width="25" Height="25" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                    <md:PackIcon Kind="Power" VerticalAlignment="Center" Width="25" Height="25" Foreground="{DynamicResource PrimaryHueLightBrush}" />
                     </Button>
             </StackPanel>
         </Grid>

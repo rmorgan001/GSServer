@@ -46,7 +46,6 @@ namespace GS.Server.SkyTelescope
     public sealed class SkyTelescopeVM : ObservableObject, IPageVM, IDisposable
     {
         #region Fields
-
         private readonly Util _util = new Util();
         public string TopName => "SkyWatcher";
         public string BottomName => "Telescope";
@@ -55,7 +54,6 @@ namespace GS.Server.SkyTelescope
         private CancellationTokenSource _ctsPark;
         private CancellationToken _ctPark;
         private readonly string _directoryPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase);
-
         #endregion
 
         public SkyTelescopeVM()
@@ -130,8 +128,6 @@ namespace GS.Server.SkyTelescope
 
                     HcWinVisability = true;
                     ModelWinVisability = true;
-
-
                 }
 
                 // check to make sure window is visable then connect if requested.
@@ -585,7 +581,7 @@ namespace GS.Server.SkyTelescope
 
         private void LoadImages()
         {
-            //image size Width="253" Height="340"
+            if (!string.IsNullOrEmpty(ImageFile)) return;
             var random = new Random();
             ImageFiles = new List<string> { "M33.png", "Horsehead.png", "NGC6992.png", "Orion.png" };
             ImageFile = "../Resources/" + ImageFiles[random.Next(ImageFiles.Count)];
@@ -5530,19 +5526,13 @@ namespace GS.Server.SkyTelescope
             {
                 CameraVis = false;
 
-                LookDirection = new Vector3D(-1.2, -140, -133);
-                UpDirection = new Vector3D(-.006, -0.6, 0.7);
-                Position = new Point3D(.7, 139.7, 184.2);
+                LookDirection = Settings.Settings.ModelLookDirection2;
+                UpDirection = Settings.Settings.ModelUpDirection2;
+                Position = Settings.Settings.ModelPosition2;
 
-                //Camera = new PerspectiveCamera
-                //{
-                //    LookDirection = new Vector3D(-1.2, -140, -133),
-                //    UpDirection = new Vector3D(-.006, -0.6, 0.7),
-                //    Position = new Point3D(.7, 139.7, 184.2),
-                //    NearPlaneDistance = 0.001,
-                //    FarPlaneDistance = double.PositiveInfinity,
-                //    FieldOfView = 60
-                //};
+                //LookDirection = new Vector3D(-1.2, -140, -133);
+                //UpDirection = new Vector3D(-.006, -0.6, 0.7);
+                //Position = new Point3D(.7, 139.7, 184.2);
 
                 Xaxis = -90;
                 Yaxis = 90;
@@ -5656,6 +5646,13 @@ namespace GS.Server.SkyTelescope
                 var win = Application.Current.Windows.OfType<ModelV>().FirstOrDefault();
                 if (win != null) return;
                 var bWin = new ModelV();
+                var _modelVM = ModelVM._modelVM;
+                _modelVM.WinHeight = 320;
+                _modelVM.WinWidth = 225;
+                _modelVM.Position = Position;
+                _modelVM.LookDirection = LookDirection;
+                _modelVM.UpDirection = UpDirection;
+                _modelVM.ImageFile = ImageFile;
                 bWin.Show();
             }
             catch (Exception ex)
@@ -5958,6 +5955,11 @@ namespace GS.Server.SkyTelescope
         // exactly as they are.
         ~SkyTelescopeVM()
         {
+                Settings.Settings.ModelLookDirection2 = LookDirection;
+                Settings.Settings.ModelUpDirection2 = UpDirection;
+                Settings.Settings.ModelPosition2= Position;
+                Settings.Settings.Save();
+
             // Finalizer calls Dispose(false)
             Dispose(false);
         }

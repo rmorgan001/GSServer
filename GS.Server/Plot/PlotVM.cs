@@ -26,7 +26,6 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Threading;
 using GS.Server.Controls.Dialogs;
 using GS.Server.SkyTelescope;
@@ -118,9 +117,9 @@ namespace GS.Server.Plot
         private void ProcessValues1(MonitorEntry entry)
         {
             var date = entry.Datetime.ToLocalTime();
-            var point = new PointModel { DateTime = date, Value = 0 };
+            var point = new PointModel {DateTime = date, Value = 0, Set = ChartValueSet.Values1};
             var msg = entry.Message.Split(',');
-            double.TryParse(msg[2], out double steps);
+            double.TryParse(msg[2], out var steps);
 
             if (IsZeroBased)
             {
@@ -142,6 +141,7 @@ namespace GS.Server.Plot
                 default:
                     return;
             }
+            ChartLogging.LogPoint(ChartType.Plot, point);
 
             Values1.Add(point);
             if (Values1.Count > MaxPoints) Values1.RemoveAt(0);
@@ -158,7 +158,7 @@ namespace GS.Server.Plot
         private void ProcessValues2(MonitorEntry entry)
         {
             var date = entry.Datetime.ToLocalTime();
-            var point = new PointModel { DateTime = date, Value = 0 };
+            var point = new PointModel { DateTime = date, Value = 0, Set = ChartValueSet.Values2};
             var msg = entry.Message.Split(',');
             double.TryParse(msg[2], out var steps);
 
@@ -182,6 +182,8 @@ namespace GS.Server.Plot
                 default:
                     return;
             }
+
+            ChartLogging.LogPoint(ChartType.Plot, point);
 
             Values2.Add(point);
             if (Values2.Count > MaxPoints) Values2.RemoveAt(0);
@@ -252,6 +254,18 @@ namespace GS.Server.Plot
 
         #region Plot
 
+        private bool _isLogging;
+        public bool IsLogging
+        {
+            get => _isLogging;
+            set
+            {
+                if (_isLogging == value) return;
+                _isLogging = value;
+                OnPropertyChanged();
+            }
+        }
+
         private CartesianMapper<PointModel> _mapper;
         public CartesianMapper<PointModel> Mapper
         {
@@ -274,6 +288,7 @@ namespace GS.Server.Plot
                 _isRunning = value;
                 if (value)
                 {
+                    LogStart();
                     _xAxisTimer.Start();
                     _cts = new CancellationTokenSource();
                     _ct = _cts.Token;
@@ -528,13 +543,13 @@ namespace GS.Server.Plot
 
             if (Values1Toggle)
             {
-                var titleItem = CreateSeries(Values1Color, Values1Title, Values1Series, Values1, null, Values1PtSz, 0);
+                var titleItem = CreateSeries(Values1Color, Values1Title, Values1Series, Values1, ChartValueSet.Values1, Values1PtSz, 0);
                 if (titleItem != null) TitleItems.Add(titleItem);
             }
 
             if (!Values2Toggle) return;
             {
-                var titleItem = CreateSeries(Values2Color, Values2Title, Values2Series, Values2, null, Values2PtSz, 0);
+                var titleItem = CreateSeries(Values2Color, Values2Title, Values2Series, Values2, ChartValueSet.Values2, Values2PtSz, 0);
                 if (titleItem != null) TitleItems.Add(titleItem);
             }
         }
@@ -551,7 +566,7 @@ namespace GS.Server.Plot
             AxisXMin = now.Ticks - AxisXUnit * AxisXSeconds;
         }
 
-        private static GColumnSeries NewGColumnSeries(string title, IChartValues values, ChartValueSet? set, double pointsize, Brush color, int scaleat)
+        private GColumnSeries NewGColumnSeries(string title, IChartValues values, ChartValueSet set, double pointsize, Brush color, int scaleat)
         {
             var series = new GColumnSeries
             {
@@ -566,12 +581,10 @@ namespace GS.Server.Plot
                 Values = values
             };
 
-            // ReSharper disable once AssignmentIsFullyDiscarded
-            _ = set;
-            //LogGColumnSeries(series, set);
+            LogGColumnSeries(series, set);
             return series;
         }
-        private static GLineSeries NewGLineSeries(string title, IChartValues values, ChartValueSet? set, double pointsize, Brush color, int scaleat)
+        private GLineSeries NewGLineSeries(string title, IChartValues values, ChartValueSet set, double pointsize, Brush color, int scaleat)
         {
             var col = new GSColors();
             var series = new GLineSeries
@@ -589,12 +602,10 @@ namespace GS.Server.Plot
                 Values = values
             };
 
-            // ReSharper disable once AssignmentIsFullyDiscarded
-            _ = set;
-            // LogGLineSeries(series, set);
+            LogGLineSeries(series, set);
             return series;
         }
-        private static GScatterSeries NewGScatterSeries(string title, IChartValues values, ChartValueSet? set, double pointsize, Brush color, int scaleat)
+        private GScatterSeries NewGScatterSeries(string title, IChartValues values, ChartValueSet set, double pointsize, Brush color, int scaleat)
         {
             var series = new GScatterSeries
             {
@@ -606,13 +617,11 @@ namespace GS.Server.Plot
                 Title = title,
                 Values = values
             };
-
-            // ReSharper disable once AssignmentIsFullyDiscarded
-            _ = set;
-            // LogGScatterSeries(series, set);
+            
+            LogGScatterSeries(series, set);
             return series;
         }
-        private static GStepLineSeries NewGStepLineSeries(string title, IChartValues values, ChartValueSet? set, double pointsize, Brush color, int scaleat)
+        private GStepLineSeries NewGStepLineSeries(string title, IChartValues values, ChartValueSet set, double pointsize, Brush color, int scaleat)
         {
             var col = new GSColors();
             var series = new GStepLineSeries()
@@ -627,12 +636,10 @@ namespace GS.Server.Plot
                 Values = values
             };
 
-            // ReSharper disable once AssignmentIsFullyDiscarded
-            _ = set;
-           // LogGStepLineSeries(series, set);
+            LogGStepLineSeries(series, set);
             return series;
         }
-        private TitleItem CreateSeries(string serColor, string title, ChartSeriesType seriesType, IChartValues values, ChartValueSet? seriesSet, double pointsize, int scaleat)
+        private TitleItem CreateSeries(string serColor, string title, ChartSeriesType seriesType, IChartValues values, ChartValueSet seriesSet, double pointsize, int scaleat)
         {
             var col = new GSColors();
             var brush = col.ToBrush(Color.FromName(serColor));
@@ -853,7 +860,10 @@ namespace GS.Server.Plot
                 using (new WaitCursor())
                 {
                     IsRunning = !IsRunning;
-                    if (IsRunning) { StartChart(); }
+                    if (IsRunning)
+                    {
+                        StartChart();
+                    }
                 }
             }
             catch (Exception ex)
@@ -1028,7 +1038,57 @@ namespace GS.Server.Plot
                 OpenDialog(ex.Message);
             }
         }
-        
+
+        #endregion
+
+        #region Logging
+
+        private void LogStart()
+        {
+            if (!IsLogging) return;
+            ChartLogging.LogStart(ChartType.Plot);
+            ChartLogging.LogData(ChartType.Plot, "GSVersion", $"{Assembly.GetExecutingAssembly().GetName().Version}");
+            ChartLogging.LogData(ChartType.Plot, "MountName", $"{SkyServer.MountName}");
+            ChartLogging.LogData(ChartType.Plot, "MountVersion", $"{SkyServer.MountVersion}");
+            ChartLogging.LogData(ChartType.Plot, "RaStepsPerSecond", $"{SkyServer.StepsPerRevolution[0] / 360.0 / 3600}");
+            ChartLogging.LogData(ChartType.Plot, "DecStepsPerSecond", $"{SkyServer.StepsPerRevolution[1] / 360.0 / 3600}");
+            ChartLogging.LogData(ChartType.Plot, "Scale", $"{Scale}");
+            ChartLogging.LogData(ChartType.Plot, "GuideRateDec", $"{SkyServer.GuideRateDec}");
+            ChartLogging.LogData(ChartType.Plot, "GuideRateRa", $"{SkyServer.GuideRateRa}");
+            ChartLogging.LogData(ChartType.Plot, "IsZeroBased", $"{IsZeroBased}");
+            ChartLogging.LogData(ChartType.Plot, "Quality", $"{ChartQuality}");
+            ChartLogging.LogData(ChartType.Plot, "MaxPoints", $"{MaxPoints}");
+        }
+
+        private void LogGColumnSeries(GColumnSeries series, ChartValueSet set)
+        {
+            if (!IsLogging) return;
+            if (series == null) return;
+            var str = $"{set},{series.Title},{series.Stroke},{series.StrokeThickness},{series.Fill},{series.MinWidth},{series.ScalesYAt},{series.MaxColumnWidth},";
+            if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(ChartType.Plot, "GColumnSeries", str);
+        }
+        private void LogGLineSeries(LineSeries series, ChartValueSet set)
+        {
+            if (!IsLogging) return;
+            if (series == null) return;
+            var str = $"{set},{series.Title},{series.Stroke},{series.StrokeThickness},{series.Fill},{series.MinWidth},{series.ScalesYAt},{series.PointGeometrySize},{series.LineSmoothness}";
+            if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(ChartType.Plot, "GLineSeries", str);
+        }
+        private void LogGStepLineSeries(GStepLineSeries series, ChartValueSet set)
+        {
+            if (!IsLogging) return;
+            if (series == null) return;
+            var str = $"{set},{series.Title},{series.Stroke},{series.StrokeThickness},{series.Fill},{series.MinWidth},{series.ScalesYAt},{series.PointGeometrySize}";
+            if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(ChartType.Plot, "GStepLineSeries", str);
+        }
+        private void LogGScatterSeries(Series series, ChartValueSet set)
+        {
+            if (!IsLogging) return;
+            if (series == null) return;
+            var str = $"{set},{series.Title},{series.Stroke},{series.StrokeThickness},{series.Fill},{series.MinWidth},{series.ScalesYAt}";
+            if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(ChartType.Plot, "GScatterSeries", str);
+        }
+
         #endregion
 
         #region Dialog
@@ -1203,19 +1263,7 @@ namespace GS.Server.Plot
         }
         #endregion
     }
-    public class PointModel
-    {
-        public DateTime DateTime { get; set; }
-        public double Value { get; set; }
-        public SolidColorBrush Fill { get; set; }
-        public SolidColorBrush Stroke { get; set; }
-        public ChartValueSet Set { get; set; }
-    }
-    public enum ChartValueSet
-    {
-        Values1 = 1,
-        Values2 = 2
-    }
+
     public enum ChartScale
     {
         Arcsecs = 1,
