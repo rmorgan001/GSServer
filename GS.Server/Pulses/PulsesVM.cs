@@ -59,6 +59,8 @@ namespace GS.Server.Pulses
         private CancellationTokenSource _ctsPhd;
         private CancellationToken _ctPhd;
 
+        private const string BaseLogName = "Pulses";
+
         #endregion
 
         public PulsesVM()
@@ -1307,7 +1309,7 @@ namespace GS.Server.Pulses
                     break;
             }
 
-            ChartLogging.LogPoint(ChartType.Pulses, point);
+            ChartLogging.LogPoint(BaseLogName, ChartType.Pulses, point);
 
             if (RaDur.Count > MaxPoints) RaDur.RemoveAt(0);
             if (DecDur.Count > MaxPoints) DecDur.RemoveAt(0);
@@ -1753,7 +1755,7 @@ namespace GS.Server.Pulses
                     point.Fill = pointcolor;
                     point.Set = ChartValueSet.Values5;
                     RaPhd.Add(point);
-                    ChartLogging.LogPoint(ChartType.Pulses, point);
+                    ChartLogging.LogPoint(BaseLogName, ChartType.Pulses, point);
                     if (RaPhd.Count > MaxPoints) RaPhd.RemoveAt(0);
                 }
 
@@ -1784,7 +1786,7 @@ namespace GS.Server.Pulses
                     point.Fill = pointcolor;
                     point.Set = ChartValueSet.Values6;
                     DecPhd.Add(point);
-                    ChartLogging.LogPoint(ChartType.Pulses, point);
+                    ChartLogging.LogPoint(BaseLogName, ChartType.Pulses, point);
                     if (DecPhd.Count > MaxPoints) DecPhd.RemoveAt(0);
                 }
             }
@@ -1805,42 +1807,42 @@ namespace GS.Server.Pulses
 
         private void LogStart()
         {
-            ChartLogging.LogStart(ChartType.Pulses);
-            ChartLogging.LogData(ChartType.Pulses, "GSVersion", $"{Assembly.GetExecutingAssembly().GetName().Version}");
-            ChartLogging.LogData(ChartType.Pulses, "MountName", $"{SkyServer.MountName}");
-            ChartLogging.LogData(ChartType.Pulses, "MountVersion", $"{SkyServer.MountVersion}");
-            ChartLogging.LogData(ChartType.Pulses, "RaStepsPerSecond", $"{RaStepsPerSecond}");
-            ChartLogging.LogData(ChartType.Pulses, "DecStepsPerSecond", $"{DecStepsPerSecond}");
-            ChartLogging.LogData(ChartType.Pulses, "AnimationTime", $"{AnimationTime}");
-            ChartLogging.LogData(ChartType.Pulses, "LineSmoothness", $"{LineSmoothness}");
-            ChartLogging.LogData(ChartType.Pulses, "Scale", $"{Scale}");
-            ChartLogging.LogData(ChartType.Pulses, "GuideRateDec", $"{SkyServer.GuideRateDec}");
-            ChartLogging.LogData(ChartType.Pulses, "GuideRateRa", $"{SkyServer.GuideRateRa}");
+            ChartLogging.LogStart(BaseLogName, ChartType.Pulses);
+            ChartLogging.LogData(BaseLogName, ChartType.Pulses, "GSVersion", $"{Assembly.GetExecutingAssembly().GetName().Version}");
+            ChartLogging.LogData(BaseLogName, ChartType.Pulses, "MountName", $"{SkyServer.MountName}");
+            ChartLogging.LogData(BaseLogName, ChartType.Pulses, "MountVersion", $"{SkyServer.MountVersion}");
+            ChartLogging.LogData(BaseLogName, ChartType.Pulses, "RaStepsPerSecond", $"{RaStepsPerSecond}");
+            ChartLogging.LogData(BaseLogName, ChartType.Pulses, "DecStepsPerSecond", $"{DecStepsPerSecond}");
+            ChartLogging.LogData(BaseLogName, ChartType.Pulses, "AnimationTime", $"{AnimationTime}");
+            ChartLogging.LogData(BaseLogName, ChartType.Pulses, "LineSmoothness", $"{LineSmoothness}");
+            ChartLogging.LogData(BaseLogName, ChartType.Pulses, "Scale", $"{Scale}");
+            ChartLogging.LogData(BaseLogName, ChartType.Pulses, "GuideRateDec", $"{SkyServer.GuideRateDec}");
+            ChartLogging.LogData(BaseLogName, ChartType.Pulses, "GuideRateRa", $"{SkyServer.GuideRateRa}");
         }
 
         private static void LogGColumnSeries(GColumnSeries series, ChartValueSet set)
         {
             if (series == null) return;
             var str = $"{set},{series.Title},{series.Stroke},{series.StrokeThickness},{series.Fill},{series.MinWidth},{series.ScalesYAt},{series.MaxColumnWidth},";
-            if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(ChartType.Pulses, "GColumnSeries", str);
+            if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(BaseLogName, ChartType.Pulses, "GColumnSeries", str);
         }
         private static void LogGLineSeries(LineSeries series, ChartValueSet set)
         {
             if (series == null) return;
             var str = $"{set},{series.Title},{series.Stroke},{series.StrokeThickness},{series.Fill},{series.MinWidth},{series.ScalesYAt},{series.PointGeometrySize},{series.LineSmoothness}";
-            if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(ChartType.Pulses, "GLineSeries", str);
+            if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(BaseLogName, ChartType.Pulses, "GLineSeries", str);
         }
         private static void LogGStepLineSeries(GStepLineSeries series, ChartValueSet set)
         {
             if (series == null) return;
             var str = $"{set},{series.Title},{series.Stroke},{series.StrokeThickness},{series.Fill},{series.MinWidth},{series.ScalesYAt},{series.PointGeometrySize}";
-            if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(ChartType.Pulses, "GStepLineSeries", str);
+            if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(BaseLogName, ChartType.Pulses, "GStepLineSeries", str);
         }
         private static void LogGScatterSeries(Series series, ChartValueSet set)
         {
             if (series == null) return;
             var str = $"{set},{series.Title},{series.Stroke},{series.StrokeThickness},{series.Fill},{series.MinWidth},{series.ScalesYAt}";
-            if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(ChartType.Pulses, "GScatterSeries", str);
+            if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(BaseLogName, ChartType.Pulses, "GScatterSeries", str);
         }
 
         #endregion

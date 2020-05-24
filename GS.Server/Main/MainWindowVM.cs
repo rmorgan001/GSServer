@@ -14,14 +14,18 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using GS.Server.Controls.Dialogs;
 using GS.Server.Focuser;
 using GS.Server.Gamepad;
 using GS.Server.Helpers;
 using GS.Server.Model3D;
 using GS.Server.Notes;
+using GS.Server.Plot;
+using GS.Server.PoleLocator;
 using GS.Server.Pulses;
 using GS.Server.Settings;
 using GS.Server.SkyTelescope;
+using GS.Server.Test;
 using GS.Shared;
 using System;
 using System.Collections.Generic;
@@ -31,10 +35,6 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
-using GS.Server.Controls.Dialogs;
-using GS.Server.Plot;
-using GS.Server.PoleLocator;
-using GS.Server.Test;
 
 namespace GS.Server.Main
 {
@@ -888,7 +888,10 @@ namespace GS.Server.Main
             }
             else
             {
+                SkyServer.OpenSetupDialog = false;
+                SkyServer.OpenSetupDialogFinished = true;
                 CloseContent = new CloseDialog();
+                Tasks.DelayHandler(1000);
                 IsCloseDialogOpen = true;
             }
         }

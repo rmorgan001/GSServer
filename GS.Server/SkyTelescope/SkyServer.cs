@@ -1529,7 +1529,7 @@ namespace GS.Server.SkyTelescope
             Task decTask = Task.Run(() => SkyPrecisionGotoDec(target[1], skyTarget[1]));
             Task raTask = Task.Run(() => SkyPrecisionGoToRA(target, trackingState, stopwatch));
 
-            Task.WaitAll(new Task[] { decTask, raTask });
+            Task.WaitAll(decTask, raTask);
             #endregion
 
             SkyTasks(MountTaskName.StopAxes); //make sure all axes are stopped
@@ -1537,8 +1537,7 @@ namespace GS.Server.SkyTelescope
             stopwatch.Stop();
             return returncode;
         }
-
-
+        
         /// <summary>
         /// Performs a final precision slew of the Dec axis to target if necessary.
         /// </summary>
@@ -1565,7 +1564,7 @@ namespace GS.Server.SkyTelescope
                 if (deltaDegree < gotoPrecision) { break; }
                 if (SlewState == SlewType.SlewNone) { break; } //check for a stop
 
-                _ = new SkyAxisGoToTarget(0, AxisId.Axis2, skyTargetDec); //move to target DEC
+                object _ = new SkyAxisGoToTarget(0, AxisId.Axis2, skyTargetDec); //move to target DEC
 
                 // track movment until axis is stopped
                 var stopwatch1 = Stopwatch.StartNew();
@@ -1639,7 +1638,7 @@ namespace GS.Server.SkyTelescope
 
                     if (SlewState == SlewType.SlewNone) { break; } //check for a stop
 
-                    _ = new SkyAxisGoToTarget(0, AxisId.Axis1, deltaTarget[0]); //move to new target
+                    object _ = new SkyAxisGoToTarget(0, AxisId.Axis1, deltaTarget[0]); //move to new target
 
                     // track movment until axis is stopped
                     var stopwatch1 = Stopwatch.StartNew();

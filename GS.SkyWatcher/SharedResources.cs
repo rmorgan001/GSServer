@@ -85,7 +85,7 @@ namespace GS.SkyWatcher
 
         private static double UniformAngle(double source)
         {
-            source = source % (Math.PI * 2);
+            source %= (Math.PI * 2);
             if (source > Math.PI)
                 return source - 2 * Math.PI;
             if (source < -Math.PI)

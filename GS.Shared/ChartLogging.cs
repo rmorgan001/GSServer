@@ -29,7 +29,8 @@ namespace GS.Shared
         private static readonly BlockingCollection<ChartLogItem> _chartBlockingCollection;
         private static readonly string _instanceFileName;
         private static readonly string _logPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        private static readonly string _chartingFile = Path.Combine(_logPath, "GSServer\\GSChartLog");
+        private static readonly string _fileLocation = Path.Combine(_logPath, "GSServer\\");
+        private static readonly string _fileNameAddOn = "ChartLog";
         private static readonly SemaphoreSlim _lockFile = new SemaphoreSlim(1);
 
         static ChartLogging()
@@ -37,7 +38,7 @@ namespace GS.Shared
             try
             {
                 _instanceFileName = $"{DateTime.Now:yyyy-dd-MM}.txt";
-                DeleteFiles("GSChartLog", 7, _logPath);
+                DeleteFiles(_fileNameAddOn, 7, _logPath);
 
                 _chartBlockingCollection = new BlockingCollection<ChartLogItem>();
                 Task.Factory.StartNew(() =>
@@ -86,7 +87,7 @@ namespace GS.Shared
         {
             try
             {
-                if (logitem.Message != string.Empty) FileWriteAsync(_chartingFile + _instanceFileName, logitem);
+                if (logitem.Message != string.Empty) FileWriteAsync(_fileLocation + "GS" + logitem.LogBaseName + _fileNameAddOn + _instanceFileName, logitem);
             }
             catch (Exception ex)
             {
@@ -146,43 +147,43 @@ namespace GS.Shared
             }
         }
 
-        public static void LogStart(ChartType type)
+        public static void LogStart(string basename, ChartType type)
         {
             if (!IsRunning) return;
             var str = $"{HiResDateTime.UtcNow.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{ChartLogCode.Start},{type}";
-            var chartsLogItem = new ChartLogItem { ChartType = type , LogCode = ChartLogCode.Start, Message = str };
+            var chartsLogItem = new ChartLogItem { LogBaseName = basename, ChartType = type , LogCode = ChartLogCode.Start, Message = str };
             AddEntry(chartsLogItem);
         }
 
-        public static void LogInfo(ChartType type, string value)
+        public static void LogInfo(string basename, ChartType type, string value)
         {
             if (!IsRunning) return;
             var str = $"{HiResDateTime.UtcNow.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{value}";
-            var chartsLogItem = new ChartLogItem { ChartType = type, LogCode = ChartLogCode.Info, Message = str };
+            var chartsLogItem = new ChartLogItem { LogBaseName = basename, ChartType = type, LogCode = ChartLogCode.Info, Message = str };
             AddEntry(chartsLogItem);
         }
 
-        public static void LogData(ChartType type, string key, string value)
+        public static void LogData(string basename, ChartType type, string key, string value)
         {
             if (!IsRunning) return;
             var str = $"{HiResDateTime.UtcNow.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{key},{value}";
-            var chartsLogItem = new ChartLogItem { ChartType = type, LogCode = ChartLogCode.Data, Message = str };
+            var chartsLogItem = new ChartLogItem { LogBaseName = basename, ChartType = type, LogCode = ChartLogCode.Data, Message = str };
             AddEntry(chartsLogItem);
         }
 
-        public static void LogPoint(ChartType type, PointModel point)
+        public static void LogPoint(string basename, ChartType type, PointModel point)
         {
             if (!IsRunning) return;
             var str = $"{point.DateTime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{point.Value},{point.Set}";
-            var chartsLogItem = new ChartLogItem { ChartType = type, LogCode = ChartLogCode.Point, Message = str };
+            var chartsLogItem = new ChartLogItem { LogBaseName = basename, ChartType = type, LogCode = ChartLogCode.Point, Message = str };
             AddEntry(chartsLogItem);
         }
 
-        public static void LogSeries(ChartType type, string series, string message)
+        public static void LogSeries(string basename, ChartType type, string series, string message)
         {
             if (!IsRunning) return;
             var str = $"{HiResDateTime.UtcNow.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{series},{message}";
-            var chartsLogItem = new ChartLogItem { ChartType = type, LogCode = ChartLogCode.Series, Message = str };
+            var chartsLogItem = new ChartLogItem { LogBaseName = basename, ChartType = type, LogCode = ChartLogCode.Series, Message = str };
             AddEntry(chartsLogItem);
         }
     }
@@ -229,14 +230,13 @@ namespace GS.Shared
         Pulses = 1,
         Plot = 2,
     }
-
     public class ChartLogItem
     {
         public ChartType ChartType { get; set; }
         public ChartLogCode LogCode { get; set; }
         public string Message { get; set; }
+        public string LogBaseName { get; set; }
     }
-
     public enum ChartLogCode
     {
         Start = 1,
@@ -245,6 +245,4 @@ namespace GS.Shared
         Point = 4,
         Series = 5
     }
-
-
 }

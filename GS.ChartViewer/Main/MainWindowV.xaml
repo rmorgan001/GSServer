@@ -268,7 +268,7 @@
                                       Title="{DynamicResource titChartTimeline}" LabelFormatter="{Binding FormatterX, Mode=TwoWay}" MaxValue="{Binding AxisXMax, Mode=TwoWay}" 
                                       MinValue="{Binding AxisXMin, Mode=TwoWay}" Unit="{Binding AxisXUnit, Mode=TwoWay}">
                                 <lvc:Axis.Separator>
-                                    <lvc:Separator Stroke="DarkGray" StrokeThickness=".2" />
+                                    <lvc:Separator Stroke="DarkGray" StrokeThickness=".2" IsEnabled="True" />
                                 </lvc:Axis.Separator>
                                 </lvc:Axis>
                         </lvc:CartesianChart.AxisX>

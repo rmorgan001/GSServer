@@ -439,7 +439,7 @@ namespace GS.ChartViewer.Main
         {
             var openFileDialog = new OpenFileDialog
             {
-                FileName = "GSChartLog*",
+                FileName = "*ChartLog*",
                 Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
                 Multiselect = false,
             };
@@ -833,7 +833,6 @@ namespace GS.ChartViewer.Main
             Chart5Toggle = false;
             Chart6Toggle = false;
         }
-
         private void ChartColor(ChartValueSet valueset, Brush col)
         {
             switch (valueset)
@@ -893,7 +892,6 @@ namespace GS.ChartViewer.Main
 
 
         //}
-
         private void ResizeAxes(bool x, bool y)
         {
             if(y){ AxisYMax -= double.NaN;}
@@ -1942,7 +1940,6 @@ namespace GS.ChartViewer.Main
         public DateTime EndTime { get; set; }
         public TimeSpan TimeLength { get; set; }
     }
-
     internal class DataKey
     {
         public string Key { get; set; }
