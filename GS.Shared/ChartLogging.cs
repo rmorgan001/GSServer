@@ -141,6 +141,20 @@ namespace GS.Shared
                     await sw.WriteLineAsync(str);
                 }
             }
+            catch(IOException ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $" {ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
             finally
             {
                 _lockFile.Release();

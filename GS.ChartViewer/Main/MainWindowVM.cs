@@ -210,13 +210,17 @@ namespace GS.ChartViewer.Main
             try
             {
                 var cnt = ChartCollection.Count;
+                if (cnt == 0) return;
                 var title = (TitleItem)param;
+                if (title == null) return;
 
                 for (var i = 0; i < cnt; i++)
                 {
                     var a = ChartCollection[i];
+                    if (a == null) continue;
                     if (a.Title != title.TitleName) continue;
                     var type = a.GetType();
+                    if (type == null) continue;
                     if (type == typeof(GColumnSeries))
                     {
                         if (a is GColumnSeries series) series.Visibility = a.IsSeriesVisible ? Visibility.Collapsed : Visibility.Visible;
@@ -261,7 +265,7 @@ namespace GS.ChartViewer.Main
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message},  {ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);

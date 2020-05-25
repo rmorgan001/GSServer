@@ -23,6 +23,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GS.ChartViewer", "GS.ChartV
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GS.Utilities", "GS.Utilities\GS.Utilities.csproj", "{A0CF4007-724A-45EB-9609-C5FA97A3043E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CF04AB39-8531-4CF8-99C6-6259B2C13DDC}"
+	ProjectSection(SolutionItems) = preProject
+		GSResharper.DotSettings = GSResharper.DotSettings
+		GSSolution.sln.DotSettings = GSSolution.sln.DotSettings
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		AppVeyor|Any CPU = AppVeyor|Any CPU
