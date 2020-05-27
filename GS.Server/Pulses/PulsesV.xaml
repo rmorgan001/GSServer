@@ -536,6 +536,17 @@
                         <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Y" Command="{Binding Path=ClickPulsesZoomCmd}" CommandParameter="Y"/>
                         <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Xy" Command="{Binding Path=ClickPulsesZoomCmd}" CommandParameter="Xy" IsChecked="True" />
                     </StackPanel>
+                    <Label Margin="30,0,0,0" VerticalAlignment="Center" Content="{StaticResource cbtipDecBacklash}" />
+                    <ComboBox Margin="5,0,0,0" Width="45" HorizontalContentAlignment="Right" ToolTip="{StaticResource cbtipDecBacklash}" ItemsSource="{Binding DecBacklashList}">
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel HorizontalAlignment="Right" />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                        <ComboBox.Text>
+                            <Binding Path="DecBacklash" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
+                        </ComboBox.Text>
+                    </ComboBox>
                 </StackPanel>
                 <wpf:CartesianChart Grid.Row="1" Foreground="DarkGray" Hoverable="True" Zoom="{Binding Zoom}" DataTooltip="{x:Null}" LegendLocation="Bottom"
                                     DisableAnimations="{Binding AnimationsDisabled, Mode=OneWay}" Series="{Binding PulsesCollection, Mode=OneWay}" AnimationsSpeed="{Binding AnimationsSpeed, Mode=OneWay}"> 

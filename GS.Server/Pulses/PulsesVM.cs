@@ -85,6 +85,9 @@ namespace GS.Server.Pulses
                     MonitorQueue.StaticPropertyChanged += PropertyChangedMonitor;
                     // Phd events
                     GuiderImpl.PropertyChanged += PropertyChangedGuiding;
+                    SkySettings.StaticPropertyChanged += PropertyChangedSkySettings;
+
+                    DecBacklashList = new List<int>(Enumerable.Range(0, 500));
 
                     LoadDefaultSettings();
                     LoadPulsesDefaults();
@@ -720,9 +723,62 @@ namespace GS.Server.Pulses
                 OpenDialog(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Property changes from settings
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PropertyChangedSkySettings(object sender, PropertyChangedEventArgs e)
+        {
+            try
+            {
+                ThreadContext.BeginInvokeOnUiThread(
+             delegate
+             {
+                 switch (e.PropertyName)
+                 {
+                     case "DecBacklash":
+                         DecBacklash = SkySettings.DecBacklash;
+                         break;
+                 }
+             });
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, "Error");
+            }
+        }
         private void XAxisTimer_Tick(object sender, EventArgs e)
         {
             SetXaxisLimits(HiResDateTime.UtcNow.ToLocalTime());
+        }
+
+
+        public IList<int> DecBacklashList { get; }
+
+        public int DecBacklash
+        {
+            get => SkySettings.DecBacklash;
+            set
+            {
+                if (SkySettings.DecBacklash == value) return;
+                SkySettings.DecBacklash = value;
+                OnPropertyChanged();
+            }
         }
 
         #endregion
