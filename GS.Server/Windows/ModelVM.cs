@@ -581,7 +581,38 @@ namespace GS.Server.Windows
                 OnPropertyChanged();
             }
         }
-        
+
+        private ICommand _openModelWindowCmd;
+        public ICommand OpenModelWindowCmd
+        {
+            get
+            {
+                return _openModelWindowCmd ?? (_openModelWindowCmd = new RelayCommand(param => OpenModelWindow()));
+            }
+        }
+        private void OpenModelWindow()
+        {
+            try
+            {
+                //do nothing
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, "Error");
+            }
+        }
+
         #endregion
 
         #region Dialog

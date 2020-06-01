@@ -543,9 +543,13 @@
                                 <VirtualizingStackPanel HorizontalAlignment="Right" />
                             </ItemsPanelTemplate>
                         </ComboBox.ItemsPanel>
-                        <ComboBox.Text>
-                            <Binding Path="DecBacklash" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
-                        </ComboBox.Text>
+                        <ComboBox.SelectedItem>
+                            <Binding Path="DecBacklash" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </ComboBox.SelectedItem>
                     </ComboBox>
                 </StackPanel>
                 <wpf:CartesianChart Grid.Row="1" Foreground="DarkGray" Hoverable="True" Zoom="{Binding Zoom}" DataTooltip="{x:Null}" LegendLocation="Bottom"

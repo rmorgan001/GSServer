@@ -48,6 +48,8 @@ namespace GS.Server
         private static readonly object LockObject = new object();
         private static bool _removeProfile;
         private static BackgroundWorker _bgWorker;
+        private const string _drivername = "ASCOM.GS.Sky.Telescope.dll";
+        private const string _apiname = "GS.SkyApi.dll";
 
         #endregion
 
@@ -191,24 +193,27 @@ namespace GS.Server
 
             // put everything into one folder, the same as the server.
             var assyPath = Assembly.GetEntryAssembly()?.Location;
-            assyPath = Path.GetDirectoryName(assyPath) + @"\Drivers";
+            assyPath = Path.GetDirectoryName(assyPath);
             if (!Directory.Exists(assyPath))
             {
-                Directory.CreateDirectory(assyPath);
-                if (!Directory.Exists(assyPath))
-                {
-                    var msg = @"Unable to locate drivers directory - " + assyPath;
+                var msg = @"Unable to locate drivers directory - " + assyPath;
 
-                    var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
-                    MonitorLog.LogToMonitor(monitorItem);
+                var monitorItem = new MonitorEntry
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
+                MonitorLog.LogToMonitor(monitorItem);
 
-                    return false;
-                }
+                return false;
             }
 
             var dir = new DirectoryInfo(assyPath);
-            var dllfiles = dir.GetFiles("*.dll");
+            var files = new List<FileInfo>();
+            var driverpath = dir + "\\" + _drivername;
+            if (File.Exists(driverpath)) { files.Add(new FileInfo(driverpath)); }
+
+            var apipath = dir +  "\\" + _apiname;
+            if (File.Exists(apipath)) { files.Add(new FileInfo(apipath)); }
+
+            var dllfiles = files.ToArray();
             if (dllfiles.Length == 0)
             {
                 var msg = @"Unable to locate any drivers - " + assyPath;

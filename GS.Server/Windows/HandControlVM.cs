@@ -653,6 +653,37 @@ namespace GS.Server.Windows
             }
         }
 
+        private ICommand _openHCWindowCmd;
+        public ICommand OpenHCWindowCmd
+        {
+            get
+            {
+                return _openHCWindowCmd ?? (_openHCWindowCmd = new RelayCommand(param => OpenHcWindow()));
+            }
+        }
+        private void OpenHcWindow()
+        {
+            try
+            {
+                //do nothing
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, "Error");
+            }
+        }
+
         private static void StartSlew(SlewDirection direction)
         {
             if (SkyServer.AtPark)

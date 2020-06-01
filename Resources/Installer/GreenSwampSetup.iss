@@ -41,16 +41,14 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Dirs]
 Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\"
-Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\Drivers\"
-Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\Drivers\SkyScripts\"
-Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\NotesTemplates\"
+Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\SkyScripts\"
+Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\Notes\NotesTemplates\"
 Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\Models"
 ; TODO: Add subfolders below {app} as needed (e.g. Name: "{app}\MyFolder")
 
 [Files]
 Source: "C:\Users\Rob\source\repos\GSSolution\Builds\Release\*.*"; DestDir: "{app}"
-Source: "C:\Users\Rob\source\repos\GSSolution\Builds\Release\Drivers\*.*"; DestDir: "{app}\Drivers";
-Source: "C:\Users\Rob\source\repos\GSSolution\Builds\Release\Drivers\SkyScripts\*.*"; DestDir: "{app}\SkyScripts";
+Source: "C:\Users\Rob\source\repos\GSSolution\Builds\Release\SkyScripts\*.*"; DestDir: "{app}\SkyScripts";
 Source: "C:\Users\Rob\source\repos\GSSolution\Builds\Release\Notes\NotesTemplates\*.*"; DestDir: "{app}\NotesTemplates";
 Source: "C:\Users\Rob\source\repos\GSSolution\Builds\Release\Models\*.*"; DestDir: "{app}\Models";
 ; Require a read-me to appear after installation, maybe driver's Help doc

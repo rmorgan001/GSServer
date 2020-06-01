@@ -636,7 +636,7 @@ namespace GS.ChartViewer.Main
             SetXaxisLimits(HiResDateTime.UtcNow, HiResDateTime.UtcNow);
             Zoom = "Xy";
             DisableAnimations = true;
-            AnimationsSpeed = 0;
+            AnimationsSpeed = TimeSpan.Zero;
             LogTextVis = false;
         }
         private void LoadLogByIndex(IndexItem indexitem)
@@ -1073,8 +1073,8 @@ namespace GS.ChartViewer.Main
             }
         }
 
-        private int _animationsSpeed;
-        public int AnimationsSpeed
+        private TimeSpan _animationsSpeed;
+        public TimeSpan AnimationsSpeed
         {
             get => _animationsSpeed;
             set

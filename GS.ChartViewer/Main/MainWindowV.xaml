@@ -147,8 +147,8 @@
                             <Button Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickOpenFileCommand}" Content="{DynamicResource btnChartOpen}"/>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,0" >
-                                <ComboBox md:HintAssist.Hint="{DynamicResource cbChartQuality}" MinWidth="10" ToolTip="{DynamicResource cbChartQuality}" Width="65"
-                                      ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type enums:Quality}}}"
+                                <ComboBox md:HintAssist.Hint="{DynamicResource cbChartQuality}" MinWidth="10" ToolTip="{DynamicResource cbChartQuality}" Width="65" 
+                                          ItemsSource="{Binding Source={domain1:EnumBindingSourceExtension {x:Type enums:Quality}}}"
                                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" HorizontalAlignment="Left">
                                 <ComboBox.Text>
                                     <Binding Path="ChartQuality" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
@@ -259,7 +259,7 @@
                 <GridSplitter Margin="0,5,0,0" Grid.Row="2" Height="4" HorizontalAlignment="Stretch"  />
                     <lvc:CartesianChart Grid.Row="3" Margin="5,0,0,0" Foreground="DarkGray" Hoverable="True" LegendLocation="Top" Zoom="{Binding Zoom}" 
                                         DisableAnimations="{Binding DisableAnimations, Mode=OneWay}" Series="{Binding ChartCollection, Mode=OneTime}" 
-                                        AnimationsSpeed="{Binding AnimationsSpeed, Mode=OneWay}">
+                                        AnimationsSpeed="{Binding AnimationsSpeed}">
                         <lvc:CartesianChart.DataTooltip>
                             <lvc:DefaultTooltip SelectionMode="OnlySender" Foreground="Black" />
                         </lvc:CartesianChart.DataTooltip>
@@ -311,7 +311,7 @@
                     </ListView.ItemContainerStyle>
                 </ListView>
                     <lvc:CartesianChart Margin="10,0,10,0"  Grid.Row="4" DisableAnimations="True" Zoom="Y" ScrollMode="X" Hoverable="False" Background="Transparent" ScrollBarFill="#25FFFFFF" 
-                                        DataTooltip="{x:Null}" ScrollHorizontalFrom="{Binding AxisXMin, Mode=TwoWay}" ScrollHorizontalTo="{Binding AxisXMax, Mode=TwoWay}" AnimationsSpeed="0" >
+                                        DataTooltip="{x:Null}" ScrollHorizontalFrom="{Binding AxisXMin, Mode=TwoWay}" ScrollHorizontalTo="{Binding AxisXMax, Mode=TwoWay}" >
                         <lvc:CartesianChart.Resources>
                             <Style TargetType="lvc:Separator">
                                 <Setter Property="IsEnabled" Value="False"></Setter>

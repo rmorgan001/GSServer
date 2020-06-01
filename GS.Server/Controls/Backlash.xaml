@@ -2,7 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              mc:Ignorable="d">
     <StackPanel Orientation="Vertical" Margin="0,2,0,2" >
         <StackPanel Orientation="Horizontal" >
@@ -14,9 +15,13 @@
                         <VirtualizingStackPanel />
                     </ItemsPanelTemplate>
                 </ComboBox.ItemsPanel>
-                <ComboBox.Text>
-                    <Binding Path="RaBacklash" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
-                </ComboBox.Text>
+                <ComboBox.SelectedItem>
+                    <Binding Path="RaBacklash" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </ComboBox.SelectedItem>
             </ComboBox>
             <Label Margin="10,0,0,0" Content="{StaticResource lbDecBacklash}" />
             <ComboBox Margin="5,0,0,0" Width="45" HorizontalContentAlignment="Right" ToolTip="{StaticResource cbtipDecBacklash}" ItemsSource="{Binding DecBacklashList}" >
@@ -25,9 +30,13 @@
                         <VirtualizingStackPanel HorizontalAlignment="Right"/>
                     </ItemsPanelTemplate>
                 </ComboBox.ItemsPanel>
-                <ComboBox.Text>
-                    <Binding Path="DecBacklash" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
-                </ComboBox.Text>
+                <ComboBox.SelectedItem>
+                    <Binding Path="DecBacklash" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </ComboBox.SelectedItem>
             </ComboBox>
         </StackPanel>
         <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">

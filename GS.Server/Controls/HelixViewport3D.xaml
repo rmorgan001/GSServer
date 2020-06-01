@@ -5,14 +5,16 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:h="http://helix-toolkit.org/wpf"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <domain:NullImageConverter x:Key="NullImage" />
     </UserControl.Resources>
     <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="{Binding ImageFile}" Stretch="UniformToFill" />
+            <ImageBrush ImageSource="{Binding ImageFile, Converter={StaticResource NullImage}}" Stretch="UniformToFill" />
         </Grid.Background>
         <h:HelixViewport3D ShowCameraInfo="{Binding CameraVis}" Background="Transparent"  ShowViewCube="False" 
                            ViewCubeVerticalPosition="Top" ShowCameraTarget="False" >
