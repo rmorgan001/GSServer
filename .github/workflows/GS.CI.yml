@@ -105,11 +105,12 @@ jobs:
     #- name: Remove the pfx
     #  run: Remove-Item -path $env:Wap_Project_Directory\$env:Signing_Certificate
 
-    # Upload the MSIX package: https://github.com/marketplace/actions/upload-artifact
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v1
-      with:
-        name: GS_Build
-        command: mkdir /tmp/builds
-        path: tmp/builds/*
+
+
+    - run: |	
+        mkdir -p ${{ github.workspace }}/artifact
+    - uses: actions/upload-artifact@v2
+      with:	
+        name: ${{ $env:Solution_Name }}-name	
+        path: ${{ github.workspace }}/artifact/**/*
 
