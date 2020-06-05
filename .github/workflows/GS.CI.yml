@@ -110,4 +110,6 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: GS_Build
-        path: tests/builds/*
+        command: mkdir /tmp/builds
+        path: tmp/builds/*
+
