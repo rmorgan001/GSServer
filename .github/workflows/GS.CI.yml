@@ -79,8 +79,8 @@ jobs:
         Configuration: ${{ matrix.configuration }}
 
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@master
+      uses: actions/upload-artifact@v2
       with: 
         name: GSServer
         # A file, directory or wildcard pattern that describes what to upload
-        path: $Env:GITHUB_WORKSPACE\builds\release
+        path: $Env:GITHUB_WORKSPACE\builds\release\
