@@ -83,4 +83,4 @@ jobs:
       with: 
         name: GSServer
         # A file, directory or wildcard pattern that describes what to upload
-        path: $Env:GITHUB_WORKSPACE\builds\release\
+        path: ./bin/release/
