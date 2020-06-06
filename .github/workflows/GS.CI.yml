@@ -74,13 +74,13 @@ jobs:
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
+      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration 
       env:
         Configuration: ${{ matrix.configuration }}
 
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@master
       with: 
-        name: GSServer
+        name: GSServer.zip
         # A file, directory or wildcard pattern that describes what to upload
         path: bin\release
