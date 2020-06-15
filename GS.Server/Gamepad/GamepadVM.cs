@@ -1087,9 +1087,15 @@ namespace GS.Server.Gamepad
         {
             get
             {
-                return _clickTextboxGotFocusCommand ?? (_clickTextboxGotFocusCommand = new RelayCommand(
-                           param => ClickTextboxGotFocus(param)
-                       ));
+                var command = _clickTextboxGotFocusCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickTextboxGotFocusCommand = new RelayCommand(
+                    param => ClickTextboxGotFocus(param)
+                );
             }
         }
         private void ClickTextboxGotFocus(object parameter)
@@ -1120,9 +1126,15 @@ namespace GS.Server.Gamepad
         {
             get
             {
-                return _clickPreviewMouseDoubleClickCommand ?? (_clickPreviewMouseDoubleClickCommand = new RelayCommand(
-                           param => ClickPreviewMouseDoubleClick(param)
-                       ));
+                var command = _clickPreviewMouseDoubleClickCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickPreviewMouseDoubleClickCommand = new RelayCommand(
+                    param => ClickPreviewMouseDoubleClick(param)
+                );
             }
         }
         private void ClickPreviewMouseDoubleClick(object parameter)
@@ -1201,9 +1213,15 @@ namespace GS.Server.Gamepad
         {
             get
             {
-                return _clickTextboxLostFocusCommand ?? (_clickTextboxLostFocusCommand = new RelayCommand(
-                           param => ClickTextboxLostFocus()
-                       ));
+                var command = _clickTextboxLostFocusCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickTextboxLostFocusCommand = new RelayCommand(
+                    param => ClickTextboxLostFocus()
+                );
             }
         }
         private void ClickTextboxLostFocus()
@@ -1234,9 +1252,15 @@ namespace GS.Server.Gamepad
         {
             get
             {
-                return _clickSaveCommand ?? (_clickSaveCommand = new RelayCommand(
-                           param => ClickSave()
-                       ));
+                var command = _clickSaveCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickSaveCommand = new RelayCommand(
+                    param => ClickSave()
+                );
             }
         }
         private void ClickSave()
@@ -1317,9 +1341,15 @@ namespace GS.Server.Gamepad
         {
             get
             {
-                return _openDialogCommand ?? (_openDialogCommand = new RelayCommand(
-                           param => OpenDialog(null)
-                       ));
+                var command = _openDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openDialogCommand = new RelayCommand(
+                    param => OpenDialog(null)
+                );
             }
         }
         private void OpenDialog(string msg, string caption = null)
@@ -1348,9 +1378,15 @@ namespace GS.Server.Gamepad
         {
             get
             {
-                return _clickOkDialogCommand ?? (_clickOkDialogCommand = new RelayCommand(
-                           param => ClickOkDialog()
-                       ));
+                var command = _clickOkDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickOkDialogCommand = new RelayCommand(
+                    param => ClickOkDialog()
+                );
             }
         }
         private void ClickOkDialog()
@@ -1363,9 +1399,15 @@ namespace GS.Server.Gamepad
         {
             get
             {
-                return _clickCancelDialogCommand ?? (_clickCancelDialogCommand = new RelayCommand(
-                           param => ClickCancelDialog()
-                       ));
+                var command = _clickCancelDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickCancelDialogCommand = new RelayCommand(
+                    param => ClickCancelDialog()
+                );
             }
         }
         private void ClickCancelDialog()
@@ -1378,9 +1420,15 @@ namespace GS.Server.Gamepad
         {
             get
             {
-                return _runMessageDialog ?? (_runMessageDialog = new RelayCommand(
-                           param => ExecuteMessageDialog()
-                       ));
+                var dialog = _runMessageDialog;
+                if (dialog != null)
+                {
+                    return dialog;
+                }
+
+                return _runMessageDialog = new RelayCommand(
+                    param => ExecuteMessageDialog()
+                );
             }
         }
         private async void ExecuteMessageDialog()

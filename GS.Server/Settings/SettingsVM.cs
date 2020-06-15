@@ -537,9 +537,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _clickResetUtcffsetCmd ?? (_clickResetUtcffsetCmd = new RelayCommand(
+                var cmd = _clickResetUtcffsetCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _clickResetUtcffsetCmd = new RelayCommand(
                     param => ClickResetUtcOffset()
-                ));
+                );
             }
         }
 
@@ -641,9 +647,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _openSettingsResetDialogCommand ?? (_openSettingsResetDialogCommand = new RelayCommand(
+                var command = _openSettingsResetDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openSettingsResetDialogCommand = new RelayCommand(
                     param => OpenSettingsResetDialog()
-                ));
+                );
             }
         }
 
@@ -686,9 +698,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _acceptSettingsResetDialogCommand ?? (_acceptSettingsResetDialogCommand = new RelayCommand(
+                var command = _acceptSettingsResetDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptSettingsResetDialogCommand = new RelayCommand(
                     param => AcceptSettingsResetDialog()
-                ));
+                );
             }
         }
 
@@ -756,9 +774,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _cancelSettingsResetDialogCommand ?? (_cancelSettingsResetDialogCommand = new RelayCommand(
+                var command = _cancelSettingsResetDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelSettingsResetDialogCommand = new RelayCommand(
                     param => CancelSettingsResetDialog()
-                ));
+                );
             }
         }
 
@@ -872,9 +896,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _openUpdateDialogCmd ?? (_openUpdateDialogCmd = new RelayCommand(
+                var cmd = _openUpdateDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openUpdateDialogCmd = new RelayCommand(
                     param => OpenUpdateDialog()
-                ));
+                );
             }
         }
 
@@ -955,9 +985,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _clickDownloadUpdateCmd ?? (_clickDownloadUpdateCmd = new RelayCommand(
+                var cmd = _clickDownloadUpdateCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _clickDownloadUpdateCmd = new RelayCommand(
                     param => ClickDownloadUpdate()
-                ));
+                );
             }
         }
 
@@ -994,9 +1030,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _cancelUpdateDialogCmd ?? (_cancelUpdateDialogCmd = new RelayCommand(
+                var cmd = _cancelUpdateDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _cancelUpdateDialogCmd = new RelayCommand(
                     param => CancelUpdateDialog()
-                ));
+                );
             }
         }
 
@@ -1011,9 +1053,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _clickDonateCmd ?? (_clickDonateCmd = new RelayCommand(
+                var cmd = _clickDonateCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _clickDonateCmd = new RelayCommand(
                     param => ClickDonate()
-                ));
+                );
             }
         }
 
@@ -1181,9 +1229,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _volumeupCommand ?? (_volumeupCommand = new RelayCommand(
+                var command = _volumeupCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _volumeupCommand = new RelayCommand(
                     param => Volumeup()
-                ));
+                );
             }
         }
 
@@ -1220,9 +1274,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _volumedownCommand ?? (_volumedownCommand = new RelayCommand(
+                var command = _volumedownCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _volumedownCommand = new RelayCommand(
                     param => Volumedown()
-                ));
+                );
             }
         }
 
@@ -1272,9 +1332,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _clickStartStopCommand ?? (_clickStartStopCommand = new RelayCommand(
+                var command = _clickStartStopCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickStartStopCommand = new RelayCommand(
                     param => ClickStartStop()
-                ));
+                );
             }
         }
 
@@ -1309,9 +1375,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _clickClearCommand ?? (_clickClearCommand = new RelayCommand(
+                var command = _clickClearCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickClearCommand = new RelayCommand(
                     param => ClickClear()
-                ));
+                );
             }
         }
 
@@ -1346,9 +1418,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _clickExportCommand ?? (_clickExportCommand = new RelayCommand(
+                var command = _clickExportCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickExportCommand = new RelayCommand(
                     param => ClickExport()
-                ));
+                );
             }
         }
 
@@ -1409,9 +1487,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _clickCopyCommand ?? (_clickCopyCommand = new RelayCommand(
+                var command = _clickCopyCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickCopyCommand = new RelayCommand(
                     param => ClickCopy()
-                ));
+                );
             }
         }
 
@@ -1464,9 +1548,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _clickBaseCommand ?? (_clickBaseCommand = new RelayCommand(
+                var command = _clickBaseCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickBaseCommand = new RelayCommand(
                     param => ClickBase((bool) param)
-                ));
+                );
             }
         }
 
@@ -1503,9 +1593,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _clickPrimaryColorCommand ?? (_clickPrimaryColorCommand = new RelayCommand(
+                var command = _clickPrimaryColorCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickPrimaryColorCommand = new RelayCommand(
                     param => ClickPrimaryColor((Swatch) param)
-                ));
+                );
             }
         }
 
@@ -1542,9 +1638,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _clickAccentColorCommand ?? (_clickAccentColorCommand = new RelayCommand(
+                var command = _clickAccentColorCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickAccentColorCommand = new RelayCommand(
                     param => ClickAccentColor((Swatch) param)
-                ));
+                );
             }
         }
 
@@ -1636,9 +1738,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _openDialogCommand ?? (_openDialogCommand = new RelayCommand(
+                var command = _openDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openDialogCommand = new RelayCommand(
                     param => OpenDialog(null)
-                ));
+                );
             }
         }
 
@@ -1664,9 +1772,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _clickOkDialogCommand ?? (_clickOkDialogCommand = new RelayCommand(
+                var command = _clickOkDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickOkDialogCommand = new RelayCommand(
                     param => ClickOkDialog()
-                ));
+                );
             }
         }
 
@@ -1681,9 +1795,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _cancelDialogCommand ?? (_cancelDialogCommand = new RelayCommand(
+                var command = _cancelDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelDialogCommand = new RelayCommand(
                     param => CancelDialog()
-                ));
+                );
             }
         }
 
@@ -1698,9 +1818,15 @@ namespace GS.Server.Settings
         {
             get
             {
-                return _runMessageDialog ?? (_runMessageDialog = new RelayCommand(
+                var dialog = _runMessageDialog;
+                if (dialog != null)
+                {
+                    return dialog;
+                }
+
+                return _runMessageDialog = new RelayCommand(
                     param => ExecuteMessageDialog()
-                ));
+                );
             }
         }
 

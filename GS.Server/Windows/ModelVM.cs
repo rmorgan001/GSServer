@@ -39,7 +39,6 @@ namespace GS.Server.Windows
     {
         #region Fields
         private readonly Util _util = new Util();
-        private readonly string _directoryPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase);
         public static ModelVM _modelVM;
         #endregion
 
@@ -65,7 +64,6 @@ namespace GS.Server.Windows
                     LoadImages();
                     Rotate();
                     LoadGEM();
-                    LoadCompass();
 
                     RightAscension = "00h 00m 00s";
                     Declination = "00° 00m 00s";
@@ -155,6 +153,7 @@ namespace GS.Server.Windows
                         switch (e.PropertyName)
                         {
                             case "AccentColor":
+                            case "ModelType":
                                 LoadGEM();
                                 break;
                         }
@@ -235,6 +234,9 @@ namespace GS.Server.Windows
         #endregion
 
         #region Viewport3D
+        private double xaxisOffset;
+        private double yaxisOffset;
+        private double zaxisOffset;
 
         private bool _modelWinVisability;
         public bool ModelWinVisability
@@ -314,7 +316,6 @@ namespace GS.Server.Windows
                 {
                     Rotate();
                     LoadGEM();
-                    LoadCompass();
                 }
                 OnPropertyChanged();
             }
@@ -327,6 +328,7 @@ namespace GS.Server.Windows
             set
             {
                 _xaxis = value;
+                XaxisOffset = value + xaxisOffset;
                 OnPropertyChanged();
             }
         }
@@ -338,6 +340,7 @@ namespace GS.Server.Windows
             set
             {
                 _yaxis = value;
+                YaxisOffset = value + yaxisOffset;
                 OnPropertyChanged();
             }
         }
@@ -349,6 +352,40 @@ namespace GS.Server.Windows
             set
             {
                 _zaxis = value;
+                ZaxisOffset = zaxisOffset - value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _xaxisOffset;
+        public double XaxisOffset
+        {
+            get => _xaxisOffset;
+            set
+            {
+                _xaxisOffset = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _yaxisOffset;
+        public double YaxisOffset
+        {
+            get => _yaxisOffset;
+            set
+            {
+                _yaxisOffset = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _zaxisOffset;
+        public double ZaxisOffset
+        {
+            get => _zaxisOffset;
+            set
+            {
+                _zaxisOffset = value;
                 OnPropertyChanged();
             }
         }
@@ -369,27 +406,27 @@ namespace GS.Server.Windows
             {
                 CameraVis = false;
 
-                //LookDirection = _skyTelescopeVm.LookDirection;
-                //UpDirection = _skyTelescopeVm.UpDirection;
-                //Position = _skyTelescopeVm.Position;
+                //camera direction
+                LookDirection = Settings.Settings.ModelLookDirection2;
+                UpDirection = Settings.Settings.ModelUpDirection2;
+                Position = Settings.Settings.ModelPosition2;
 
+                //offset for model to match start position
+                xaxisOffset = 90;
+                yaxisOffset = -90;
+                zaxisOffset = 0;
+
+                //start position
                 Xaxis = -90;
                 Yaxis = 90;
-                Zaxis = -30;
+                Zaxis = Math.Round(Math.Abs(SkySettings.Latitude), 2);
 
-                const string gpModel = @"Models/GEM1.obj";
-                var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(), gpModel);
-                var file = new Uri(filePath).LocalPath;
+                //load model and compass
                 var import = new ModelImporter();
-                var color = Colors.Crimson;
-                Material material = new DiffuseMaterial(new SolidColorBrush(color));
-                import.DefaultMaterial = material;
+                var model = import.Load(Shared.Model3D.GetModelFile(Settings.Settings.ModelType));
+                Compass = MaterialHelper.CreateImageMaterial(Shared.Model3D.GetCompassFile(SkyServer.SouthernHemisphere), 100);
 
-                //color object
-                var a = import.Load(file);
-                Material materialweights = new DiffuseMaterial(new SolidColorBrush(Colors.Black));
-                if (a.Children[0] is GeometryModel3D weights) weights.Material = materialweights;
-
+                //color OTA
                 var accentColor = Settings.Settings.AccentColor;
                 if (!string.IsNullOrEmpty(accentColor))
                 {
@@ -398,42 +435,20 @@ namespace GS.Server.Windows
                     {
                         if (swatch.Name != Settings.Settings.AccentColor) continue;
                         var converter = new BrushConverter();
-                        var brush = (Brush)converter.ConvertFromString(swatch.ExemplarHue.Color.ToString());
+                        var accentbrush = (Brush)converter.ConvertFromString(swatch.ExemplarHue.Color.ToString());
 
-                        Material materialota = new DiffuseMaterial(brush);
-                        if (a.Children[1] is GeometryModel3D ota) ota.Material = materialota;
+                        var materialota = MaterialHelper.CreateMaterial(accentbrush);
+                        if (model.Children[0] is GeometryModel3D ota) ota.Material = materialota;
                     }
                 }
-                Material materialbar = new DiffuseMaterial(new SolidColorBrush(Colors.Silver));
-                if (a.Children[2] is GeometryModel3D bar) bar.Material = materialbar;
-                Model = a;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, "Error");
-            }
-        }
-        private void LoadCompass()
-        {
-            try
-            {
-                const string compassN = @"Models/compassN.png";
-                const string compassS = @"Models/compassS.png";
-                var compassFile = SkyServer.SouthernHemisphere ? compassS : compassN;
-                var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(), compassFile);
-                var file = new Uri(filePath).LocalPath;
-                Compass = MaterialHelper.CreateImageMaterial(file, 100);
+                //color weights
+                var materialweights = MaterialHelper.CreateMaterial(new SolidColorBrush(Color.FromRgb(64, 64, 64)));
+                if (model.Children[1] is GeometryModel3D weights) weights.Material = materialweights;
+                //color bar
+                var materialbar = MaterialHelper.CreateMaterial(Brushes.Gainsboro);
+                if (model.Children[2] is GeometryModel3D bar) bar.Material = materialbar;
+
+                Model = model;
             }
             catch (Exception ex)
             {
@@ -453,20 +468,87 @@ namespace GS.Server.Windows
         }
         private void Rotate()
         {
-            if (!ModelOn) return;
+            var axes = Shared.Model3D.RotateModel(SkySettings.Mount.ToString(), SkyServer.ActualAxisX,
+                SkyServer.ActualAxisY, SkyServer.SouthernHemisphere);
 
-            switch (SkySettings.Mount)
+            Yaxis = axes[0];
+            Xaxis = axes[1];
+        }
+
+        private ICommand _openModelWindowCmd;
+        public ICommand OpenModelWindowCmd
+        {
+            get
             {
-                case MountType.Simulator:
-                    Yaxis = Math.Round(SkyServer.ActualAxisX, 3);
-                    Xaxis = SkyServer.SouthernHemisphere ? Math.Round(SkyServer.ActualAxisY * -1.0, 3) : Math.Round(SkyServer.ActualAxisY - 180, 3);
-                    break;
-                case MountType.SkyWatcher:
-                    Yaxis = Math.Round(SkyServer.ActualAxisX, 3);
-                    Xaxis = Math.Round(SkyServer.ActualAxisY * -1.0, 3);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                var cmd = _openModelWindowCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openModelWindowCmd = new RelayCommand(param => OpenModelWindow());
+            }
+        }
+        private void OpenModelWindow()
+        {
+            try
+            {
+                //do nothing
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, "Error");
+            }
+        }
+
+        private ICommand _openResetViewCmd;
+        public ICommand OpenResetViewCmd
+        {
+            get
+            {
+                var cmd = _openResetViewCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openResetViewCmd = new RelayCommand(param => OpenResetView());
+            }
+        }
+        private void OpenResetView()
+        {
+            try
+            {
+                LoadGEM();
+                LookDirection = new Vector3D(-900, -1100, -400);
+                UpDirection = new Vector3D(.35, .43, .82);
+                Position = new Point3D(900, 1100, 800);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, "Error");
             }
         }
 
@@ -515,9 +597,15 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _minimizeWindowCommand ?? (_minimizeWindowCommand = new RelayCommand(
+                var command = _minimizeWindowCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _minimizeWindowCommand = new RelayCommand(
                     param => MinimizeWindow()
-                ));
+                );
             }
         }
         private void MinimizeWindow()
@@ -530,9 +618,15 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _maxmizeWindowCommand ?? (_maxmizeWindowCommand = new RelayCommand(
+                var command = _maxmizeWindowCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _maxmizeWindowCommand = new RelayCommand(
                     param => MaxmizeWindow()
-                ));
+                );
             }
         }
         private void MaxmizeWindow()
@@ -545,9 +639,15 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _normalWindowCommand ?? (_normalWindowCommand = new RelayCommand(
+                var command = _normalWindowCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _normalWindowCommand = new RelayCommand(
                     param => NormalWindow()
-                ));
+                );
             }
         }
         private void NormalWindow()
@@ -560,9 +660,15 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _openCloseWindowCmd ?? (_openCloseWindowCmd = new RelayCommand(
+                var cmd = _openCloseWindowCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openCloseWindowCmd = new RelayCommand(
                     param => CloseWindow()
-                ));
+                );
             }
         }
         private void CloseWindow()
@@ -579,37 +685,6 @@ namespace GS.Server.Windows
             {
                 _windowstate = value;
                 OnPropertyChanged();
-            }
-        }
-
-        private ICommand _openModelWindowCmd;
-        public ICommand OpenModelWindowCmd
-        {
-            get
-            {
-                return _openModelWindowCmd ?? (_openModelWindowCmd = new RelayCommand(param => OpenModelWindow()));
-            }
-        }
-        private void OpenModelWindow()
-        {
-            try
-            {
-                //do nothing
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, "Error");
             }
         }
 
@@ -670,9 +745,15 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _openDialogCommand ?? (_openDialogCommand = new RelayCommand(
-                           param => OpenDialog(null)
-                       ));
+                var command = _openDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openDialogCommand = new RelayCommand(
+                    param => OpenDialog(null)
+                );
             }
         }
         private void OpenDialog(string msg, string caption = null)
@@ -701,9 +782,15 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _clickOkDialogCommand ?? (_clickOkDialogCommand = new RelayCommand(
-                           param => ClickOkDialog()
-                       ));
+                var command = _clickOkDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickOkDialogCommand = new RelayCommand(
+                    param => ClickOkDialog()
+                );
             }
         }
         private void ClickOkDialog()
@@ -716,9 +803,15 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _clickCancelDialogCommand ?? (_clickCancelDialogCommand = new RelayCommand(
-                           param => ClickCancelDialog()
-                       ));
+                var command = _clickCancelDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickCancelDialogCommand = new RelayCommand(
+                    param => ClickCancelDialog()
+                );
             }
         }
         private void ClickCancelDialog()
@@ -731,9 +824,15 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _runMessageDialog ?? (_runMessageDialog = new RelayCommand(
-                           param => ExecuteMessageDialog()
-                       ));
+                var dialog = _runMessageDialog;
+                if (dialog != null)
+                {
+                    return dialog;
+                }
+
+                return _runMessageDialog = new RelayCommand(
+                    param => ExecuteMessageDialog()
+                );
             }
         }
         private async void ExecuteMessageDialog()

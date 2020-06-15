@@ -43,7 +43,6 @@ namespace GS.Server.Model3D
         public string BottomName => "3D";
         public int Uid => 4;
         private bool _disposed;
-        private readonly string _directoryPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase);
         private readonly Util _util = new Util();
         #endregion
 
@@ -61,7 +60,6 @@ namespace GS.Server.Model3D
             Position = Settings.Settings.ModelPosition1;
 
             LoadTopBar();
-            LoadCompass();
             LoadGEM();
             Rotate();
 
@@ -77,6 +75,7 @@ namespace GS.Server.Model3D
             TopVis = true;
             ScreenEnabled = SkyServer.IsMountRunning;
             ModelWinVisability = true;
+            ModelType = Settings.Settings.ModelType;
         }
 
         #region ViewModel
@@ -165,6 +164,8 @@ namespace GS.Server.Model3D
                         switch (e.PropertyName)
                         {
                             case "AccentColor":
+                            case "ModelType":
+                                ModelType = Settings.Settings.ModelType;
                                 LoadGEM();
                                 break;
                         }
@@ -221,7 +222,13 @@ namespace GS.Server.Model3D
         {
             get
             {
-                return _openModelWindowCmd ?? (_openModelWindowCmd = new RelayCommand(param => OpenModelWindow()));
+                var cmd = _openModelWindowCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openModelWindowCmd = new RelayCommand(param => OpenModelWindow());
             }
         }
         private void OpenModelWindow()
@@ -257,9 +264,52 @@ namespace GS.Server.Model3D
             }
         }
 
+        private ICommand _openResetViewCmd;
+        public ICommand OpenResetViewCmd
+        {
+            get
+            {
+                var cmd = _openResetViewCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openResetViewCmd = new RelayCommand(param => OpenResetView());
+            }
+        }
+        private void OpenResetView()
+        {
+            try
+            {
+                LoadGEM();
+                LookDirection = new Vector3D(-2616, -3167, -1170);
+                UpDirection = new Vector3D(.35, .43, .82);
+                Position = new Point3D(2523, 3000, 1379);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, "Error");
+            }
+        }
+
         #endregion
 
         #region Viewport3D
+        private double xaxisOffset;
+        private double yaxisOffset;
+        private double zaxisOffset;
         private string _imageFile;
         public string ImageFile
         {
@@ -468,6 +518,7 @@ namespace GS.Server.Model3D
             set
             {
                 _xaxis = value;
+                XaxisOffset = value + xaxisOffset;
                 OnPropertyChanged();
             }
         }
@@ -479,6 +530,7 @@ namespace GS.Server.Model3D
             set
             {
                 _yaxis = value;
+                YaxisOffset = value + yaxisOffset;
                 OnPropertyChanged();
             }
         }
@@ -490,6 +542,53 @@ namespace GS.Server.Model3D
             set
             {
                 _zaxis = value;
+                ZaxisOffset = zaxisOffset - value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _xaxisOffset;
+        public double XaxisOffset
+        {
+            get => _xaxisOffset;
+            set
+            {
+                _xaxisOffset = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _yaxisOffset;
+        public double YaxisOffset
+        {
+            get => _yaxisOffset;
+            set
+            {
+                _yaxisOffset = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _zaxisOffset;
+        public double ZaxisOffset
+        {
+            get => _zaxisOffset;
+            set
+            {
+                _zaxisOffset = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Model3DType _modeltype;
+        public Model3DType ModelType
+        {
+            get => _modeltype;
+            set
+            {
+                if (_modeltype == value) return;
+                _modeltype = value;
+                Settings.Settings.ModelType = value;
                 OnPropertyChanged();
             }
         }
@@ -509,18 +608,27 @@ namespace GS.Server.Model3D
         {
             try
             {
-                const string gpModel = @"Models/GEM1.obj";
-                var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(), gpModel);
-                var file = new Uri(filePath).LocalPath;
-                var import = new ModelImporter();
-                var color = Colors.Crimson;
-                Material material = new DiffuseMaterial(new SolidColorBrush(color));
-                import.DefaultMaterial = material;
+                CameraVis = false;
 
-                //color weights
-                var a = import.Load(file);
-                Material materialweights = new DiffuseMaterial(new SolidColorBrush(Colors.Black));
-                if (a.Children[0] is GeometryModel3D weights) weights.Material = materialweights;
+                //camera direction
+                LookDirection = Settings.Settings.ModelLookDirection1;
+                UpDirection = Settings.Settings.ModelUpDirection1;
+                Position = Settings.Settings.ModelPosition1;
+
+                //offset for model to match start position
+                xaxisOffset = 90;
+                yaxisOffset = -90;
+                zaxisOffset = 0;
+
+                //start position
+                Xaxis = -90;
+                Yaxis = 90;
+                Zaxis = Math.Round(Math.Abs(SkySettings.Latitude),2);
+
+                //load model and compass
+                var import = new ModelImporter();
+                var model = import.Load(Shared.Model3D.GetModelFile(Settings.Settings.ModelType));
+                Compass = MaterialHelper.CreateImageMaterial(Shared.Model3D.GetCompassFile(SkyServer.SouthernHemisphere), 100);
 
                 //color OTA
                 var accentColor = Settings.Settings.AccentColor;
@@ -531,26 +639,20 @@ namespace GS.Server.Model3D
                     {
                         if (swatch.Name != Settings.Settings.AccentColor) continue;
                         var converter = new BrushConverter();
-                        var brush = (Brush)converter.ConvertFromString(swatch.ExemplarHue.Color.ToString());
+                        var accentbrush = (Brush)converter.ConvertFromString(swatch.ExemplarHue.Color.ToString());
 
-                        Material materialota = new DiffuseMaterial(brush);
-                        if (a.Children[1] is GeometryModel3D ota) ota.Material = materialota;
+                        var materialota = MaterialHelper.CreateMaterial(accentbrush);
+                        if (model.Children[0] is GeometryModel3D ota) ota.Material = materialota;
                     }
                 }
+                //color weights
+                var materialweights = MaterialHelper.CreateMaterial(new SolidColorBrush(Color.FromRgb(64, 64, 64)));
+                if (model.Children[1] is GeometryModel3D weights) weights.Material = materialweights;
+                //color bar
+                var materialbar = MaterialHelper.CreateMaterial(Brushes.Gainsboro);
+                if (model.Children[2] is GeometryModel3D bar) bar.Material = materialbar;
 
-                //color weight bar
-                Material materialbar = new DiffuseMaterial(new SolidColorBrush(Colors.Silver));
-                if (a.Children[2] is GeometryModel3D bar) bar.Material = materialbar;
-                Model = a;
-
-                //var text = new TextBlock { Text = "Testing" };
-                //Overlay.SetPosition3D(text, new Point3D(0, 0, 10));
-                //a.Children.Add(text);
-
-                Xaxis = -90;
-                Yaxis = 90;
-                Zaxis = -30;
-
+                Model = model;
             }
             catch (Exception ex)
             {
@@ -562,54 +664,19 @@ namespace GS.Server.Model3D
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
+                    Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message);
-            }
-        }
-        private void LoadCompass()
-        {
-            try
-            {
-                const string compassN = @"Models/compassN.png";
-                const string compassS = @"Models/compassS.png";
-                var compassFile = SkyServer.SouthernHemisphere ? compassS : compassN;
-                var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(), compassFile);
-                var file = new Uri(filePath).LocalPath;
-                Compass = MaterialHelper.CreateImageMaterial(file, 80);
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message);
+                OpenDialog(ex.Message, "Error");
             }
         }
         private void Rotate()
         {
-            switch (SkySettings.Mount)
-            {
-                case MountType.Simulator:
-                    Yaxis = Math.Round(SkyServer.ActualAxisX, 3);
-                    Xaxis = SkyServer.SouthernHemisphere ? Math.Round(SkyServer.ActualAxisY * -1.0, 3) : Math.Round(SkyServer.ActualAxisY - 180, 3);
-                    break;
-                case MountType.SkyWatcher:
-                    Yaxis = Math.Round(SkyServer.ActualAxisX, 3);
-                    Xaxis = Math.Round(SkyServer.ActualAxisY * -1.0, 3);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            var axes = Shared.Model3D.RotateModel(SkySettings.Mount.ToString(), SkyServer.ActualAxisX,
+                SkyServer.ActualAxisY, SkyServer.SouthernHemisphere);
+
+            Yaxis = axes[0];
+            Xaxis = axes[1];
         }
 
         #endregion
@@ -742,9 +809,15 @@ namespace GS.Server.Model3D
         {
             get
             {
-                return _openDialogCommand ?? (_openDialogCommand = new RelayCommand(
-                           param => OpenDialog(null)
-                       ));
+                var command = _openDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openDialogCommand = new RelayCommand(
+                    param => OpenDialog(null)
+                );
             }
         }
         private void OpenDialog(string msg, string caption = null)
@@ -773,9 +846,15 @@ namespace GS.Server.Model3D
         {
             get
             {
-                return _clickOkDialogCommand ?? (_clickOkDialogCommand = new RelayCommand(
-                           param => ClickOkDialog()
-                       ));
+                var command = _clickOkDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickOkDialogCommand = new RelayCommand(
+                    param => ClickOkDialog()
+                );
             }
         }
         private void ClickOkDialog()
@@ -788,9 +867,15 @@ namespace GS.Server.Model3D
         {
             get
             {
-                return _clickCancelDialogCommand ?? (_clickCancelDialogCommand = new RelayCommand(
-                           param => ClickCancelDialog()
-                       ));
+                var command = _clickCancelDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickCancelDialogCommand = new RelayCommand(
+                    param => ClickCancelDialog()
+                );
             }
         }
         private void ClickCancelDialog()
@@ -804,9 +889,15 @@ namespace GS.Server.Model3D
         {
             get
             {
-                return _runMessageDialog ?? (_runMessageDialog = new RelayCommand(
-                           param => ExecuteMessageDialog()
-                       ));
+                var dialog = _runMessageDialog;
+                if (dialog != null)
+                {
+                    return dialog;
+                }
+
+                return _runMessageDialog = new RelayCommand(
+                    param => ExecuteMessageDialog()
+                );
             }
         }
         private async void ExecuteMessageDialog()

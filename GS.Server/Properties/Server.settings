@@ -84,22 +84,25 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="ModelLookDirection1" Type="System.String" Scope="User">
-      <Value Profile="(Default)">-1.2, -140, -133</Value>
+      <Value Profile="(Default)">-2616, -3167, -1170</Value>
     </Setting>
     <Setting Name="ModelUpDirection1" Type="System.String" Scope="User">
-      <Value Profile="(Default)">-.006, -0.6, 0.7</Value>
+      <Value Profile="(Default)">.35, .43, .82</Value>
     </Setting>
     <Setting Name="ModelPosition1" Type="System.String" Scope="User">
-      <Value Profile="(Default)">.7, 139.7, 184.2</Value>
+      <Value Profile="(Default)">2523, 3000, 1379</Value>
     </Setting>
     <Setting Name="ModelLookDirection2" Type="System.String" Scope="User">
-      <Value Profile="(Default)">-1.2, -140, -133</Value>
+      <Value Profile="(Default)">-900, -1100, -400</Value>
     </Setting>
     <Setting Name="ModelUpDirection2" Type="System.String" Scope="User">
-      <Value Profile="(Default)">-.006, -0.6, 0.7</Value>
+      <Value Profile="(Default)">.35, .43, .82</Value>
     </Setting>
     <Setting Name="ModelPosition2" Type="System.String" Scope="User">
-      <Value Profile="(Default)">.7, 139.7, 184.2</Value>
+      <Value Profile="(Default)">900, 1100, 800</Value>
+    </Setting>
+    <Setting Name="ModelType" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Default.obj</Value>
     </Setting>
   </Settings>
 </SettingsFile>

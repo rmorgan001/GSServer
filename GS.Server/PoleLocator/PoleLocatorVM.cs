@@ -43,7 +43,7 @@ namespace GS.Server.PoleLocator
         private MainWindowVM _mainWindowVM;
         private readonly Util _util = new Util();
         private readonly DispatcherTimer _timer;
-        private double _polaris = 2.53019444;
+        private readonly double _polaris = 2.53019444;
         private const double _octans = 21.4233333;
         private double _poleRa;
 
@@ -212,8 +212,8 @@ namespace GS.Server.PoleLocator
         /// </summary>
         private void SetDegrees()
         {
-            var ha = Coordinate.Ra2Ha24(_poleRa, lst);
-            Ha12 = Coordinate.Ra2Ha12(_poleRa, lst);
+            var ha = Coordinate.Ra2Ha24(_poleRa, Lst);
+            Ha12 = Coordinate.Ra2Ha12(_poleRa, Lst);
             var deg = Range.Range360(ha * 15);
 
             if (SkyServer.SouthernHemisphere)
@@ -250,8 +250,8 @@ namespace GS.Server.PoleLocator
         {
             UTCNow = HiResDateTime.UtcNow;
             var gsjd = JDate.Ole2Jd(UTCNow.Add(SkySettings.UTCDateOffset));
-            lst = Time.Lst(JDate.Epoch2000Days(), gsjd, false, SkySettings.Longitude);
-            LST = _util.HoursToHMS(lst);
+            Lst = Time.Lst(JDate.Epoch2000Days(), gsjd, false, SkySettings.Longitude);
+            LST = _util.HoursToHMS(Lst);
         }
 
         /// <summary>
@@ -320,7 +320,7 @@ namespace GS.Server.PoleLocator
         }
 
         private double _lst;
-        public double lst
+        public double Lst
         {
             get => _lst;
             set
@@ -535,9 +535,15 @@ namespace GS.Server.PoleLocator
         {
             get
             {
-                return _openDialogCommand ?? (_openDialogCommand = new RelayCommand(
-                           param => OpenDialog(null)
-                       ));
+                var command = _openDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openDialogCommand = new RelayCommand(
+                    param => OpenDialog(null)
+                );
             }
         }
         private void OpenDialog(string msg, string caption = null)
@@ -566,9 +572,15 @@ namespace GS.Server.PoleLocator
         {
             get
             {
-                return _clickOkDialogCommand ?? (_clickOkDialogCommand = new RelayCommand(
-                           param => ClickOkDialog()
-                       ));
+                var command = _clickOkDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickOkDialogCommand = new RelayCommand(
+                    param => ClickOkDialog()
+                );
             }
         }
         private void ClickOkDialog()
@@ -581,9 +593,15 @@ namespace GS.Server.PoleLocator
         {
             get
             {
-                return _clickCancelDialogCommand ?? (_clickCancelDialogCommand = new RelayCommand(
-                           param => ClickCancelDialog()
-                       ));
+                var command = _clickCancelDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickCancelDialogCommand = new RelayCommand(
+                    param => ClickCancelDialog()
+                );
             }
         }
         private void ClickCancelDialog()
@@ -596,9 +614,15 @@ namespace GS.Server.PoleLocator
         {
             get
             {
-                return _runMessageDialog ?? (_runMessageDialog = new RelayCommand(
-                           param => ExecuteMessageDialog()
-                       ));
+                var dialog = _runMessageDialog;
+                if (dialog != null)
+                {
+                    return dialog;
+                }
+
+                return _runMessageDialog = new RelayCommand(
+                    param => ExecuteMessageDialog()
+                );
             }
         }
         private async void ExecuteMessageDialog()

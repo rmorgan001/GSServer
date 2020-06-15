@@ -149,7 +149,19 @@ namespace GS.Server.Main
 
         //to add a page: add button to tabbar view, add the property below, add to properties server settings ,add property and checkbox to settingsVM and View
 
-        public List<IPageVM> PageViewModels => _pageViewModels ?? (_pageViewModels = new List<IPageVM>());
+        public List<IPageVM> PageViewModels
+        {
+            get
+            {
+                var vms = _pageViewModels;
+                if (vms != null)
+                {
+                    return vms;
+                }
+
+                return (_pageViewModels = new List<IPageVM>());
+            }
+        }
 
         public void UpdateTabViewModel(string name)
         {
@@ -713,9 +725,15 @@ namespace GS.Server.Main
         {
             get
             {
-                return _minimizeWindowCommand ?? (_minimizeWindowCommand = new RelayCommand(
+                var command = _minimizeWindowCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _minimizeWindowCommand = new RelayCommand(
                     param => MinimizeWindow()
-                ));
+                );
             }
         }
         private void MinimizeWindow()
@@ -729,9 +747,15 @@ namespace GS.Server.Main
         {
             get
             {
-                return _maxmizeWindowCommand ?? (_maxmizeWindowCommand = new RelayCommand(
+                var command = _maxmizeWindowCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _maxmizeWindowCommand = new RelayCommand(
                     param => MaxmizeWindow()
-                ));
+                );
             }
         }
         private void MaxmizeWindow()
@@ -744,9 +768,15 @@ namespace GS.Server.Main
         {
             get
             {
-                return _normalWindowCommand ?? (_normalWindowCommand = new RelayCommand(
+                var command = _normalWindowCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _normalWindowCommand = new RelayCommand(
                     param => NormalWindow()
-                ));
+                );
             }
         }
         private void NormalWindow()
@@ -809,9 +839,15 @@ namespace GS.Server.Main
         {
             get
             {
-                return _resetWindowCommand ?? (_resetWindowCommand = new RelayCommand(
-                           param => ResetWindow()
-                       ));
+                var command = _resetWindowCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _resetWindowCommand = new RelayCommand(
+                    param => ResetWindow()
+                );
             }
         }
         private void ResetWindow()
@@ -875,9 +911,15 @@ namespace GS.Server.Main
         {
             get
             {
-                return _openCloseDialogCommand ?? (_openCloseDialogCommand = new RelayCommand(
-                           param => OpenCloseDialog()
-                       ));
+                var command = _openCloseDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openCloseDialogCommand = new RelayCommand(
+                    param => OpenCloseDialog()
+                );
             }
         }
         private void OpenCloseDialog()
@@ -901,9 +943,15 @@ namespace GS.Server.Main
         {
             get
             {
-                return _acceptCloseDialogCommand ?? (_acceptCloseDialogCommand = new RelayCommand(
-                           param => AcceptCloseDialog()
-                       ));
+                var command = _acceptCloseDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptCloseDialogCommand = new RelayCommand(
+                    param => AcceptCloseDialog()
+                );
             }
         }
         private void AcceptCloseDialog()
@@ -917,9 +965,15 @@ namespace GS.Server.Main
         {
             get
             {
-                return _cancelCloseDialogCommand ?? (_cancelCloseDialogCommand = new RelayCommand(
-                           param => CancelCloseDialog()
-                       ));
+                var command = _cancelCloseDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelCloseDialogCommand = new RelayCommand(
+                    param => CancelCloseDialog()
+                );
             }
         }
 

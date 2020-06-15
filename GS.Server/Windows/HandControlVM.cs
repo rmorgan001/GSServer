@@ -256,9 +256,15 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _hcSpeedupCommand ?? (_hcSpeedupCommand = new RelayCommand(
-                           param => SpeedupCommand()
-                       ));
+                var command = _hcSpeedupCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcSpeedupCommand = new RelayCommand(
+                    param => SpeedupCommand()
+                );
             }
         }
         private void SpeedupCommand()
@@ -293,9 +299,15 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _hcSpeeddownCommand ?? (_hcSpeeddownCommand = new RelayCommand(
-                           param => SpeeddownCommand()
-                       ));
+                var command = _hcSpeeddownCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcSpeeddownCommand = new RelayCommand(
+                    param => SpeeddownCommand()
+                );
             }
         }
         private void SpeeddownCommand()
@@ -330,7 +342,13 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _hcMouseDownLeftCommand ?? (_hcMouseDownLeftCommand = new RelayCommand(param => HcMouseDownLeft()));
+                var command = _hcMouseDownLeftCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseDownLeftCommand = new RelayCommand(param => HcMouseDownLeft());
             }
             set => _hcMouseDownLeftCommand = value;
         }
@@ -370,7 +388,13 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _hcMouseUpLeftCommand ?? (_hcMouseUpLeftCommand = new RelayCommand(param => HcMouseUpLeft()));
+                var command = _hcMouseUpLeftCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseUpLeftCommand = new RelayCommand(param => HcMouseUpLeft());
             }
             set => _hcMouseUpLeftCommand = value;
         }
@@ -404,7 +428,13 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _hcMouseDownRightCommand ?? (_hcMouseDownRightCommand = new RelayCommand(param => HcMouseDownRight()));
+                var command = _hcMouseDownRightCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseDownRightCommand = new RelayCommand(param => HcMouseDownRight());
             }
             set => _hcMouseDownRightCommand = value;
         }
@@ -444,7 +474,13 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _hcMouseUpRightCommand ?? (_hcMouseUpRightCommand = new RelayCommand(param => HcMouseUpRight()));
+                var command = _hcMouseUpRightCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseUpRightCommand = new RelayCommand(param => HcMouseUpRight());
             }
             set => _hcMouseUpRightCommand = value;
         }
@@ -478,7 +514,13 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _hcMouseDownUpCommand ?? (_hcMouseDownUpCommand = new RelayCommand(param => HcMouseDownUp()));
+                var command = _hcMouseDownUpCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseDownUpCommand = new RelayCommand(param => HcMouseDownUp());
             }
             set => _hcMouseDownUpCommand = value;
         }
@@ -518,7 +560,13 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _hcMouseUpUpCommand ?? (_hcMouseUpUpCommand = new RelayCommand(param => HcMouseUpUp()));
+                var command = _hcMouseUpUpCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseUpUpCommand = new RelayCommand(param => HcMouseUpUp());
             }
             set => _hcMouseUpUpCommand = value;
         }
@@ -552,7 +600,13 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _hcMouseDownDownCommand ?? (_hcMouseDownDownCommand = new RelayCommand(param => HcMouseDownDown()));
+                var command = _hcMouseDownDownCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseDownDownCommand = new RelayCommand(param => HcMouseDownDown());
             }
             set => _hcMouseDownDownCommand = value;
         }
@@ -592,7 +646,13 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _hcMouseUpDownCommand ?? (_hcMouseUpDownCommand = new RelayCommand(param => HcMouseUpDown()));
+                var command = _hcMouseUpDownCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseUpDownCommand = new RelayCommand(param => HcMouseUpDown());
             }
             set => _hcMouseUpDownCommand = value;
         }
@@ -625,7 +685,13 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _hcMouseDownStopCommand ?? (_hcMouseDownStopCommand = new RelayCommand(param => HcMouseDownStop()));
+                var command = _hcMouseDownStopCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseDownStopCommand = new RelayCommand(param => HcMouseDownStop());
             }
             set => _hcMouseDownStopCommand = value;
         }
@@ -658,7 +724,13 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _openHCWindowCmd ?? (_openHCWindowCmd = new RelayCommand(param => OpenHcWindow()));
+                var cmd = _openHCWindowCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openHCWindowCmd = new RelayCommand(param => OpenHcWindow());
             }
         }
         private void OpenHcWindow()
@@ -742,9 +814,15 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _minimizeWindowCommand ?? (_minimizeWindowCommand = new RelayCommand(
+                var command = _minimizeWindowCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _minimizeWindowCommand = new RelayCommand(
                     param => MinimizeWindow()
-                ));
+                );
             }
         }
         private void MinimizeWindow()
@@ -757,9 +835,15 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _maxmizeWindowCommand ?? (_maxmizeWindowCommand = new RelayCommand(
+                var command = _maxmizeWindowCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _maxmizeWindowCommand = new RelayCommand(
                     param => MaxmizeWindow()
-                ));
+                );
             }
         }
         private void MaxmizeWindow()
@@ -772,9 +856,15 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _normalWindowCommand ?? (_normalWindowCommand = new RelayCommand(
+                var command = _normalWindowCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _normalWindowCommand = new RelayCommand(
                     param => NormalWindow()
-                ));
+                );
             }
         }
         private void NormalWindow()
@@ -787,9 +877,15 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _openCloseWindowCmd ?? (_openCloseWindowCmd = new RelayCommand(
+                var cmd = _openCloseWindowCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openCloseWindowCmd = new RelayCommand(
                     param => CloseWindow()
-                ));
+                );
             }
         }
         private void CloseWindow()
@@ -866,9 +962,15 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _openDialogCommand ?? (_openDialogCommand = new RelayCommand(
-                           param => OpenDialog(null)
-                       ));
+                var command = _openDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openDialogCommand = new RelayCommand(
+                    param => OpenDialog(null)
+                );
             }
         }
         private void OpenDialog(string msg, string caption = null)
@@ -897,9 +999,15 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _clickOkDialogCommand ?? (_clickOkDialogCommand = new RelayCommand(
-                           param => ClickOkDialog()
-                       ));
+                var command = _clickOkDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickOkDialogCommand = new RelayCommand(
+                    param => ClickOkDialog()
+                );
             }
         }
         private void ClickOkDialog()
@@ -912,9 +1020,15 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _clickCancelDialogCommand ?? (_clickCancelDialogCommand = new RelayCommand(
-                           param => ClickCancelDialog()
-                       ));
+                var command = _clickCancelDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickCancelDialogCommand = new RelayCommand(
+                    param => ClickCancelDialog()
+                );
             }
         }
         private void ClickCancelDialog()
@@ -927,9 +1041,15 @@ namespace GS.Server.Windows
         {
             get
             {
-                return _runMessageDialog ?? (_runMessageDialog = new RelayCommand(
-                           param => ExecuteMessageDialog()
-                       ));
+                var dialog = _runMessageDialog;
+                if (dialog != null)
+                {
+                    return dialog;
+                }
+
+                return _runMessageDialog = new RelayCommand(
+                    param => ExecuteMessageDialog()
+                );
             }
         }
         private async void ExecuteMessageDialog()

@@ -12,7 +12,7 @@ namespace GS.Server.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.4.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.6.0.0")]
     internal sealed partial class Server : global::System.Configuration.ApplicationSettingsBase {
         
         private static Server defaultInstance = ((Server)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Server())));
@@ -349,7 +349,7 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-1.2, -140, -133")]
+        [global::System.Configuration.DefaultSettingValueAttribute("-2616, -3167, -1170")]
         public string ModelLookDirection1 {
             get {
                 return ((string)(this["ModelLookDirection1"]));
@@ -361,7 +361,7 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-.006, -0.6, 0.7")]
+        [global::System.Configuration.DefaultSettingValueAttribute(".35, .43, .82")]
         public string ModelUpDirection1 {
             get {
                 return ((string)(this["ModelUpDirection1"]));
@@ -373,7 +373,7 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(".7, 139.7, 184.2")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2523, 3000, 1379")]
         public string ModelPosition1 {
             get {
                 return ((string)(this["ModelPosition1"]));
@@ -385,7 +385,7 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-1.2, -140, -133")]
+        [global::System.Configuration.DefaultSettingValueAttribute("-900, -1100, -400")]
         public string ModelLookDirection2 {
             get {
                 return ((string)(this["ModelLookDirection2"]));
@@ -397,7 +397,7 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-.006, -0.6, 0.7")]
+        [global::System.Configuration.DefaultSettingValueAttribute(".35, .43, .82")]
         public string ModelUpDirection2 {
             get {
                 return ((string)(this["ModelUpDirection2"]));
@@ -409,13 +409,25 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(".7, 139.7, 184.2")]
+        [global::System.Configuration.DefaultSettingValueAttribute("900, 1100, 800")]
         public string ModelPosition2 {
             get {
                 return ((string)(this["ModelPosition2"]));
             }
             set {
                 this["ModelPosition2"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Default.obj")]
+        public string ModelType {
+            get {
+                return ((string)(this["ModelType"]));
+            }
+            set {
+                this["ModelType"] = value;
             }
         }
     }

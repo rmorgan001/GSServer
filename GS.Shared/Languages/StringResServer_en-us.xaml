@@ -463,6 +463,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="cb3DDecAxis">Dec Axis</system:String>
     <system:String x:Key="cb3DTopBar">Top coords bar</system:String>
     <system:String x:Key="lbModel">GSS 3D Model</system:String>
+    <system:String x:Key="btntipResetView">Reset View</system:String>
+    <system:String x:Key="cbtipModelType">Model Type</system:String>
 
     <!--Pulses -->
     <system:String x:Key="tbOPulses">Pulses</system:String>

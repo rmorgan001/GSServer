@@ -53,7 +53,6 @@ namespace GS.Server.SkyTelescope
         public static SkyTelescopeVM _skyTelescopeVM;
         private CancellationTokenSource _ctsPark;
         private CancellationToken _ctPark;
-        private readonly string _directoryPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase);
         #endregion
 
         public SkyTelescopeVM()
@@ -96,7 +95,8 @@ namespace GS.Server.SkyTelescope
                     GuideRateOffsetList = new List<double>(Numbers.InclusiveRange(10, 100, 10));
                     MaxSlewRates = new List<double>(Numbers.InclusiveRange(2.0, 5));
                     HourAngleLimits = new List<double>(Numbers.InclusiveRange(0, 45, 1));
-                    Range179 = new List<int>(Enumerable.Range(0, 179));
+                    Range90 = new List<int>(Enumerable.Range(0, 90));
+                    Range179 = new List<int>(Enumerable.Range(0, 180));
                     LatitudeRangeNS = new List<string>() { "N", "S" };
                     LongitudeRangeEW = new List<string>() { "E", "W" };
                     DecRange = new List<int>(Enumerable.Range(-90, 181));
@@ -108,10 +108,10 @@ namespace GS.Server.SkyTelescope
                     DecOffsets = new List<int>() { 0, -90, 90 };
                     MinPulseList = new List<int>(Enumerable.Range(5, 46));
                     RaBacklashList = new List<int>(Enumerable.Range(0, 500));
-                    DecBacklashList = new List<int>(Enumerable.Range(0, 500));
+                    DecBacklashList = new List<int>(Enumerable.Range(0, 500)); 
 
                     // defaults
-                    AtPark = SkyServer.AtPark;
+                    AtPark = SkyServer.AtPark; 
                     ConnectButtonContent = Application.Current.Resources["btnConnect"].ToString();
                     VoiceState = Synthesizer.VoiceActive;
                     ParkSelection = ParkPositions.FirstOrDefault();
@@ -527,6 +527,7 @@ namespace GS.Server.SkyTelescope
                         switch (e.PropertyName)
                         {
                             case "AccentColor":
+                            case "ModelType":
                                 LoadGEM();
                                 break;
                         }
@@ -964,6 +965,7 @@ namespace GS.Server.SkyTelescope
             }
         }
         public IList<int> Range179 { get; }
+        public IList<int> Range90 { get; }
         public int Lat1
         {
             get
@@ -1111,9 +1113,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _clickSaveParkCommand ?? (_clickSaveParkCommand = new RelayCommand(
-                           param => ClickSavePark()
-                       ));
+                var command = _clickSaveParkCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickSaveParkCommand = new RelayCommand(
+                    param => ClickSavePark()
+                );
             }
         }
         private void ClickSavePark()
@@ -1164,9 +1172,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _clickSaveSettingcommand ?? (_clickSaveSettingcommand = new RelayCommand(
-                           param => ClickSaveSettings()
-                       ));
+                var command = _clickSaveSettingcommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickSaveSettingcommand = new RelayCommand(
+                    param => ClickSaveSettings()
+                );
             }
         }
         private void ClickSaveSettings()
@@ -1203,9 +1217,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _clickCloseSettingcommand ?? (_clickCloseSettingcommand = new RelayCommand(
-                           param => ClickCloseSettings()
-                       ));
+                var command = _clickCloseSettingcommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickCloseSettingcommand = new RelayCommand(
+                    param => ClickCloseSettings()
+                );
             }
         }
         private void ClickCloseSettings()
@@ -1243,9 +1263,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _clickResetSiderealRateCommand ?? (_clickResetSiderealRateCommand = new RelayCommand(
-                           param => ClickResetSiderealRate()
-                       ));
+                var command = _clickResetSiderealRateCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickResetSiderealRateCommand = new RelayCommand(
+                    param => ClickResetSiderealRate()
+                );
             }
         }
         private void ClickResetSiderealRate()
@@ -1258,9 +1284,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _clickResetSolarRateCommand ?? (_clickResetSolarRateCommand = new RelayCommand(
-                           param => ClickResetSolarRate()
-                       ));
+                var command = _clickResetSolarRateCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickResetSolarRateCommand = new RelayCommand(
+                    param => ClickResetSolarRate()
+                );
             }
         }
         private void ClickResetSolarRate()
@@ -1273,9 +1305,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _clickResetLunarRateCommand ?? (_clickResetLunarRateCommand = new RelayCommand(
-                           param => ClickResetLunarRate()
-                       ));
+                var command = _clickResetLunarRateCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickResetLunarRateCommand = new RelayCommand(
+                    param => ClickResetLunarRate()
+                );
             }
         }
         private void ClickResetLunarRate()
@@ -1288,9 +1326,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _clickResetKingRateCommand ?? (_clickResetKingRateCommand = new RelayCommand(
-                           param => ClickResetKingRate()
-                       ));
+                var command = _clickResetKingRateCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickResetKingRateCommand = new RelayCommand(
+                    param => ClickResetKingRate()
+                );
             }
         }
         private void ClickResetKingRate()
@@ -1379,7 +1423,13 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _testCommand ?? (_testCommand = new RelayCommand(param => Test()));
+                var command = _testCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _testCommand = new RelayCommand(param => Test());
             }
             set => _testCommand = value;
         }
@@ -1613,9 +1663,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _openParkAddDialogCommand ?? (_openParkAddDialogCommand = new RelayCommand(
-                           param => OpenParkAddDialog()
-                       ));
+                var command = _openParkAddDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openParkAddDialogCommand = new RelayCommand(
+                    param => OpenParkAddDialog()
+                );
             }
         }
         private void OpenParkAddDialog()
@@ -1651,9 +1707,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _acceptParkAddDialogCommand ?? (_acceptParkAddDialogCommand = new RelayCommand(
-                           param => AcceptParkAddDialog()
-                       ));
+                var command = _acceptParkAddDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptParkAddDialogCommand = new RelayCommand(
+                    param => AcceptParkAddDialog()
+                );
             }
         }
         private void AcceptParkAddDialog()
@@ -1693,9 +1755,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _cancelParkAddDialogCommand ?? (_cancelParkAddDialogCommand = new RelayCommand(
-                           param => CancelParkAddDialog()
-                       ));
+                var command = _cancelParkAddDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelParkAddDialogCommand = new RelayCommand(
+                    param => CancelParkAddDialog()
+                );
             }
         }
         private void CancelParkAddDialog()
@@ -1752,9 +1820,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _openParkDeleteDialogCommand ?? (_openParkDeleteDialogCommand = new RelayCommand(
-                           param => OpenParkDeleteDialog()
-                       ));
+                var command = _openParkDeleteDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openParkDeleteDialogCommand = new RelayCommand(
+                    param => OpenParkDeleteDialog()
+                );
             }
         }
         private void OpenParkDeleteDialog()
@@ -1789,9 +1863,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _acceptParkDeleteDialogCommand ?? (_acceptParkDeleteDialogCommand = new RelayCommand(
-                           param => AcceptParkDeleteDialog()
-                       ));
+                var command = _acceptParkDeleteDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptParkDeleteDialogCommand = new RelayCommand(
+                    param => AcceptParkDeleteDialog()
+                );
             }
         }
         private void AcceptParkDeleteDialog()
@@ -1831,9 +1911,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _cancelParkDeleteDialogCommand ?? (_cancelParkDeleteDialogCommand = new RelayCommand(
-                           param => CancelParkDeleteDialog()
-                       ));
+                var command = _cancelParkDeleteDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelParkDeleteDialogCommand = new RelayCommand(
+                    param => CancelParkDeleteDialog()
+                );
             }
         }
         private void CancelParkDeleteDialog()
@@ -1866,9 +1952,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _clickparkcommand ?? (_clickparkcommand = new RelayCommand(
-                           param => ClickPark()
-                       ));
+                var command = _clickparkcommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickparkcommand = new RelayCommand(
+                    param => ClickPark()
+                );
             }
         }
         private void ClickPark()
@@ -1963,9 +2055,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _clickhomecommand ?? (_clickhomecommand = new RelayCommand(
-                           param => ClickHome()
-                       ));
+                var command = _clickhomecommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickhomecommand = new RelayCommand(
+                    param => ClickHome()
+                );
             }
         }
         private void ClickHome()
@@ -2007,9 +2105,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _clickstopcommand ?? (_clickstopcommand = new RelayCommand(
-                           param => ClickStop()
-                       ));
+                var command = _clickstopcommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickstopcommand = new RelayCommand(
+                    param => ClickStop()
+                );
             }
         }
         private void ClickStop()
@@ -2046,9 +2150,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _clickTrackingcommand ?? (_clickTrackingcommand = new RelayCommand(
-                           param => ClickTracking()
-                       ));
+                var command = _clickTrackingcommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickTrackingcommand = new RelayCommand(
+                    param => ClickTracking()
+                );
             }
         }
         private void ClickTracking()
@@ -2114,9 +2224,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _openHomeResetDialogCommand ?? (_openHomeResetDialogCommand = new RelayCommand(
-                           param => OpenHomeResetDialog()
-                       ));
+                var command = _openHomeResetDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openHomeResetDialogCommand = new RelayCommand(
+                    param => OpenHomeResetDialog()
+                );
             }
         }
         private void OpenHomeResetDialog()
@@ -2156,9 +2272,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _acceptHomeResetDialogCommand ?? (_acceptHomeResetDialogCommand = new RelayCommand(
-                           param => AcceptHomeResetDialog()
-                       ));
+                var command = _acceptHomeResetDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptHomeResetDialogCommand = new RelayCommand(
+                    param => AcceptHomeResetDialog()
+                );
             }
         }
         private void AcceptHomeResetDialog()
@@ -2197,9 +2319,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _cancelHomeResetDialogCommand ?? (_cancelHomeResetDialogCommand = new RelayCommand(
-                           param => CancelHomeResetDialog()
-                       ));
+                var command = _cancelHomeResetDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelHomeResetDialogCommand = new RelayCommand(
+                    param => CancelHomeResetDialog()
+                );
             }
         }
         private void CancelHomeResetDialog()
@@ -2257,9 +2385,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _openFlipDialogCommand ?? (_openFlipDialogCommand = new RelayCommand(
-                           param => OpenFlipDialog()
-                       ));
+                var command = _openFlipDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openFlipDialogCommand = new RelayCommand(
+                    param => OpenFlipDialog()
+                );
             }
         }
         private void OpenFlipDialog()
@@ -2294,9 +2428,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _acceptFlipDialogCommand ?? (_acceptFlipDialogCommand = new RelayCommand(
-                           param => AcceptFlipDialog()
-                       ));
+                var command = _acceptFlipDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptFlipDialogCommand = new RelayCommand(
+                    param => AcceptFlipDialog()
+                );
             }
         }
         private void AcceptFlipDialog()
@@ -2333,9 +2473,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _cancelFlipDialogCommand ?? (_cancelFlipDialogCommand = new RelayCommand(
-                           param => CancelFlipDialog()
-                       ));
+                var command = _cancelFlipDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelFlipDialogCommand = new RelayCommand(
+                    param => CancelFlipDialog()
+                );
             }
         }
         private void CancelFlipDialog()
@@ -2405,9 +2551,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _openSchedulerDialogCmd ?? (_openSchedulerDialogCmd = new RelayCommand(
-                           param => OpenSchedulerDialog()
-                       ));
+                var cmd = _openSchedulerDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openSchedulerDialogCmd = new RelayCommand(
+                    param => OpenSchedulerDialog()
+                );
             }
         }
         private void OpenSchedulerDialog()
@@ -2445,9 +2597,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _acceptSchedulerDialogCmd ?? (_acceptSchedulerDialogCmd = new RelayCommand(
-                           param => AcceptSchedulerDialog()
-                       ));
+                var cmd = _acceptSchedulerDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _acceptSchedulerDialogCmd = new RelayCommand(
+                    param => AcceptSchedulerDialog()
+                );
             }
         }
         private void AcceptSchedulerDialog()
@@ -2469,9 +2627,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _cancelSchedulerDialogCmd ?? (_cancelSchedulerDialogCmd = new RelayCommand(
-                           param => CancelSchedulerDialog()
-                       ));
+                var cmd = _cancelSchedulerDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _cancelSchedulerDialogCmd = new RelayCommand(
+                    param => CancelSchedulerDialog()
+                );
             }
         }
         private void CancelSchedulerDialog()
@@ -2745,9 +2909,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _populateGoToRaDec ?? (_populateGoToRaDec = new RelayCommand(
-                           param => PopulateGoToRaDec()
-                       ));
+                var dec = _populateGoToRaDec;
+                if (dec != null)
+                {
+                    return dec;
+                }
+
+                return _populateGoToRaDec = new RelayCommand(
+                    param => PopulateGoToRaDec()
+                );
             }
         }
         private void PopulateGoToRaDec()
@@ -2819,9 +2989,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _openRaGoToDialogCommand ?? (_openRaGoToDialogCommand = new RelayCommand(
-                           param => OpenRaGoToDialog()
-                       ));
+                var command = _openRaGoToDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openRaGoToDialogCommand = new RelayCommand(
+                    param => OpenRaGoToDialog()
+                );
             }
         }
         private void OpenRaGoToDialog()
@@ -2866,9 +3042,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _acceptRaGoToDialogCommand ?? (_acceptRaGoToDialogCommand = new RelayCommand(
-                           param => AcceptRaGoToDialog()
-                       ));
+                var command = _acceptRaGoToDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptRaGoToDialogCommand = new RelayCommand(
+                    param => AcceptRaGoToDialog()
+                );
             }
         }
         private void AcceptRaGoToDialog()
@@ -2913,9 +3095,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _cancelRaGoToDialogCommand ?? (_cancelRaGoToDialogCommand = new RelayCommand(
-                           param => CancelRaGoToDialog()
-                       ));
+                var command = _cancelRaGoToDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelRaGoToDialogCommand = new RelayCommand(
+                    param => CancelRaGoToDialog()
+                );
             }
         }
         private void CancelRaGoToDialog()
@@ -2974,9 +3162,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _openRaGoToSyncDialogCmd ?? (_openRaGoToSyncDialogCmd = new RelayCommand(
-                           param => OpenRaGoToSyncDialog()
-                       ));
+                var cmd = _openRaGoToSyncDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openRaGoToSyncDialogCmd = new RelayCommand(
+                    param => OpenRaGoToSyncDialog()
+                );
             }
         }
         private void OpenRaGoToSyncDialog()
@@ -3021,9 +3215,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _acceptRaGoToSyncDialogCmd ?? (_acceptRaGoToSyncDialogCmd = new RelayCommand(
-                           param => AcceptRaGoToSyncDialog()
-                       ));
+                var cmd = _acceptRaGoToSyncDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _acceptRaGoToSyncDialogCmd = new RelayCommand(
+                    param => AcceptRaGoToSyncDialog()
+                );
             }
         }
         private void AcceptRaGoToSyncDialog()
@@ -3082,9 +3282,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _cancelRaGoToSyncDialogCmd ?? (_cancelRaGoToSyncDialogCmd = new RelayCommand(
-                           param => CancelRaGoToSyncDialog()
-                       ));
+                var cmd = _cancelRaGoToSyncDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _cancelRaGoToSyncDialogCmd = new RelayCommand(
+                    param => CancelRaGoToSyncDialog()
+                );
             }
         }
         private void CancelRaGoToSyncDialog()
@@ -3194,9 +3400,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _openPpecDialogCommand ?? (_openPpecDialogCommand = new RelayCommand(
-                           param => OpenPPecDialog()
-                       ));
+                var command = _openPpecDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openPpecDialogCommand = new RelayCommand(
+                    param => OpenPPecDialog()
+                );
             }
         }
         private void OpenPPecDialog()
@@ -3239,9 +3451,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _acceptPpecDialogCommand ?? (_acceptPpecDialogCommand = new RelayCommand(
-                           param => AcceptPpecDialog()
-                       ));
+                var command = _acceptPpecDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptPpecDialogCommand = new RelayCommand(
+                    param => AcceptPpecDialog()
+                );
             }
         }
         private void AcceptPpecDialog()
@@ -3278,9 +3496,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _cancelPpecDialogCommand ?? (_cancelPpecDialogCommand = new RelayCommand(
-                           param => CancelPpecDialog()
-                       ));
+                var command = _cancelPpecDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelPpecDialogCommand = new RelayCommand(
+                    param => CancelPpecDialog()
+                );
             }
         }
         private void CancelPpecDialog()
@@ -3451,9 +3675,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _hcSpeedupCommand ?? (_hcSpeedupCommand = new RelayCommand(
-                           param => SpeedupCommand()
-                       ));
+                var command = _hcSpeedupCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcSpeedupCommand = new RelayCommand(
+                    param => SpeedupCommand()
+                );
             }
         }
         private void SpeedupCommand()
@@ -3488,9 +3718,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _hcSpeeddownCommand ?? (_hcSpeeddownCommand = new RelayCommand(
-                           param => SpeeddownCommand()
-                       ));
+                var command = _hcSpeeddownCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcSpeeddownCommand = new RelayCommand(
+                    param => SpeeddownCommand()
+                );
             }
         }
         private void SpeeddownCommand()
@@ -3525,7 +3761,13 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _hcMouseDownLeftCommand ?? (_hcMouseDownLeftCommand = new RelayCommand(param => HcMouseDownLeft()));
+                var command = _hcMouseDownLeftCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseDownLeftCommand = new RelayCommand(param => HcMouseDownLeft());
             }
             set => _hcMouseDownLeftCommand = value;
         }
@@ -3565,7 +3807,13 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _hcMouseUpLeftCommand ?? (_hcMouseUpLeftCommand = new RelayCommand(param => HcMouseUpLeft()));
+                var command = _hcMouseUpLeftCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseUpLeftCommand = new RelayCommand(param => HcMouseUpLeft());
             }
             set => _hcMouseUpLeftCommand = value;
         }
@@ -3599,7 +3847,13 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _hcMouseDownRightCommand ?? (_hcMouseDownRightCommand = new RelayCommand(param => HcMouseDownRight()));
+                var command = _hcMouseDownRightCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseDownRightCommand = new RelayCommand(param => HcMouseDownRight());
             }
             set => _hcMouseDownRightCommand = value;
         }
@@ -3639,7 +3893,13 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _hcMouseUpRightCommand ?? (_hcMouseUpRightCommand = new RelayCommand(param => HcMouseUpRight()));
+                var command = _hcMouseUpRightCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseUpRightCommand = new RelayCommand(param => HcMouseUpRight());
             }
             set => _hcMouseUpRightCommand = value;
         }
@@ -3673,7 +3933,13 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _hcMouseDownUpCommand ?? (_hcMouseDownUpCommand = new RelayCommand(param => HcMouseDownUp()));
+                var command = _hcMouseDownUpCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseDownUpCommand = new RelayCommand(param => HcMouseDownUp());
             }
             set => _hcMouseDownUpCommand = value;
         }
@@ -3713,7 +3979,13 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _hcMouseUpUpCommand ?? (_hcMouseUpUpCommand = new RelayCommand(param => HcMouseUpUp()));
+                var command = _hcMouseUpUpCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseUpUpCommand = new RelayCommand(param => HcMouseUpUp());
             }
             set => _hcMouseUpUpCommand = value;
         }
@@ -3747,7 +4019,13 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _hcMouseDownDownCommand ?? (_hcMouseDownDownCommand = new RelayCommand(param => HcMouseDownDown()));
+                var command = _hcMouseDownDownCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseDownDownCommand = new RelayCommand(param => HcMouseDownDown());
             }
             set => _hcMouseDownDownCommand = value;
         }
@@ -3787,7 +4065,13 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _hcMouseUpDownCommand ?? (_hcMouseUpDownCommand = new RelayCommand(param => HcMouseUpDown()));
+                var command = _hcMouseUpDownCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseUpDownCommand = new RelayCommand(param => HcMouseUpDown());
             }
             set => _hcMouseUpDownCommand = value;
         }
@@ -3820,7 +4104,13 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _hcMouseDownStopCommand ?? (_hcMouseDownStopCommand = new RelayCommand(param => HcMouseDownStop()));
+                var command = _hcMouseDownStopCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseDownStopCommand = new RelayCommand(param => HcMouseDownStop());
             }
             set => _hcMouseDownStopCommand = value;
         }
@@ -3853,7 +4143,13 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _openHCWindowCmd ?? (_openHCWindowCmd = new RelayCommand(param => OpenHcWindow()));
+                var cmd = _openHCWindowCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openHCWindowCmd = new RelayCommand(param => OpenHcWindow());
             }
         }
         private void OpenHcWindow()
@@ -4231,9 +4527,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _openLimitDialogCommand ?? (_openLimitDialogCommand = new RelayCommand(
-                           param => OpenLimitDialog()
-                       ));
+                var command = _openLimitDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openLimitDialogCommand = new RelayCommand(
+                    param => OpenLimitDialog()
+                );
             }
         }
         private void OpenLimitDialog()
@@ -4271,9 +4573,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _okLimitDialogCommand ?? (_okLimitDialogCommand = new RelayCommand(
-                           param => OkLimitDialog()
-                       ));
+                var command = _okLimitDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _okLimitDialogCommand = new RelayCommand(
+                    param => OkLimitDialog()
+                );
             }
         }
         private void OkLimitDialog()
@@ -4308,9 +4616,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _clearWarningCommand ?? (_clearWarningCommand = new RelayCommand(
-                           param => ClearWarningState()
-                       ));
+                var command = _clearWarningCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clearWarningCommand = new RelayCommand(
+                    param => ClearWarningState()
+                );
             }
         }
         private void ClearWarningState()
@@ -4323,9 +4637,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _clearErrorsCommand ?? (_clearErrorsCommand = new RelayCommand(
-                           param => ClearErrorAlert()
-                       ));
+                var command = _clearErrorsCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clearErrorsCommand = new RelayCommand(
+                    param => ClearErrorAlert()
+                );
             }
         }
         private void ClearErrorAlert()
@@ -4338,9 +4658,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _clickconnectcommand ?? (_clickconnectcommand = new RelayCommand(
-                           param => ClickConnect()
-                       ));
+                var command = _clickconnectcommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickconnectcommand = new RelayCommand(
+                    param => ClickConnect()
+                );
             }
         }
         private void ClickConnect()
@@ -4411,9 +4737,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _clickMountInfoDialogCommand ?? (_clickMountInfoDialogCommand = new RelayCommand(
-                           param => ClickMountInfoDialog()
-                       ));
+                var command = _clickMountInfoDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickMountInfoDialogCommand = new RelayCommand(
+                    param => ClickMountInfoDialog()
+                );
             }
         }
         private void ClickMountInfoDialog()
@@ -4509,9 +4841,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _openDialogCommand ?? (_openDialogCommand = new RelayCommand(
-                           param => OpenDialog(null)
-                       ));
+                var command = _openDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openDialogCommand = new RelayCommand(
+                    param => OpenDialog(null)
+                );
             }
         }
         private void OpenDialog(string msg, string caption = null)
@@ -4540,9 +4878,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _clickOkDialogCommand ?? (_clickOkDialogCommand = new RelayCommand(
-                           param => ClickOkDialog()
-                       ));
+                var command = _clickOkDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickOkDialogCommand = new RelayCommand(
+                    param => ClickOkDialog()
+                );
             }
         }
         private void ClickOkDialog()
@@ -4555,9 +4899,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _clickCancelDialogCommand ?? (_clickCancelDialogCommand = new RelayCommand(
-                           param => ClickCancelDialog()
-                       ));
+                var command = _clickCancelDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickCancelDialogCommand = new RelayCommand(
+                    param => ClickCancelDialog()
+                );
             }
         }
         private void ClickCancelDialog()
@@ -4570,9 +4920,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _runMessageDialog ?? (_runMessageDialog = new RelayCommand(
-                           param => ExecuteMessageDialog()
-                       ));
+                var dialog = _runMessageDialog;
+                if (dialog != null)
+                {
+                    return dialog;
+                }
+
+                return _runMessageDialog = new RelayCommand(
+                    param => ExecuteMessageDialog()
+                );
             }
         }
         private async void ExecuteMessageDialog()
@@ -4763,9 +5119,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _populateGps ?? (_populateGps = new RelayCommand(
-                           param => PopulateGps()
-                       ));
+                var gps = _populateGps;
+                if (gps != null)
+                {
+                    return gps;
+                }
+
+                return _populateGps = new RelayCommand(
+                    param => PopulateGps()
+                );
             }
         }
         private void PopulateGps()
@@ -4833,9 +5195,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _openGpsDialogCommand ?? (_openGpsDialogCommand = new RelayCommand(
-                           param => OpenGpsDialog()
-                       ));
+                var command = _openGpsDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openGpsDialogCommand = new RelayCommand(
+                    param => OpenGpsDialog()
+                );
             }
         }
         private void OpenGpsDialog()
@@ -4887,9 +5255,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _acceptGpsDialogCommand ?? (_acceptGpsDialogCommand = new RelayCommand(
-                           param => AcceptGpsDialog()
-                       ));
+                var command = _acceptGpsDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptGpsDialogCommand = new RelayCommand(
+                    param => AcceptGpsDialog()
+                );
             }
         }
         private void AcceptGpsDialog()
@@ -4956,9 +5330,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _retrieveGpsDialogCommand ?? (_retrieveGpsDialogCommand = new RelayCommand(
-                           param => RetrieveGpsDialog()
-                       ));
+                var command = _retrieveGpsDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _retrieveGpsDialogCommand = new RelayCommand(
+                    param => RetrieveGpsDialog()
+                );
             }
         }
         private void RetrieveGpsDialog()
@@ -5030,9 +5410,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _cancelGpsDialogCommand ?? (_cancelGpsDialogCommand = new RelayCommand(
-                           param => CancelGpsDialog()
-                       ));
+                var command = _cancelGpsDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelGpsDialogCommand = new RelayCommand(
+                    param => CancelGpsDialog()
+                );
             }
         }
         private void CancelGpsDialog()
@@ -5132,9 +5518,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _populateCdc ?? (_populateCdc = new RelayCommand(
-                           param => PopulateCdc()
-                       ));
+                var cdc = _populateCdc;
+                if (cdc != null)
+                {
+                    return cdc;
+                }
+
+                return _populateCdc = new RelayCommand(
+                    param => PopulateCdc()
+                );
             }
         }
         private void PopulateCdc()
@@ -5197,9 +5589,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _openCdcDialogCommand ?? (_openCdcDialogCommand = new RelayCommand(
-                           param => OpenCdcDialog()
-                       ));
+                var command = _openCdcDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openCdcDialogCommand = new RelayCommand(
+                    param => OpenCdcDialog()
+                );
             }
         }
         private void OpenCdcDialog()
@@ -5237,9 +5635,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _acceptCdcDialogCommand ?? (_acceptCdcDialogCommand = new RelayCommand(
-                           param => AcceptCdcDialog()
-                       ));
+                var command = _acceptCdcDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptCdcDialogCommand = new RelayCommand(
+                    param => AcceptCdcDialog()
+                );
             }
         }
         private void AcceptCdcDialog()
@@ -5277,9 +5681,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _retrieveCdcDialogCommand ?? (_retrieveCdcDialogCommand = new RelayCommand(
-                           param => RetrieveCdcDialog()
-                       ));
+                var command = _retrieveCdcDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _retrieveCdcDialogCommand = new RelayCommand(
+                    param => RetrieveCdcDialog()
+                );
             }
         }
         private void RetrieveCdcDialog()
@@ -5320,9 +5730,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _sendObsCdcDialogCommand ?? (_sendObsCdcDialogCommand = new RelayCommand(
-                           param => SendObsCdcDialog()
-                       ));
+                var command = _sendObsCdcDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _sendObsCdcDialogCommand = new RelayCommand(
+                    param => SendObsCdcDialog()
+                );
             }
         }
         private void SendObsCdcDialog()
@@ -5360,9 +5776,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _cancelCdcDialogCommand ?? (_cancelCdcDialogCommand = new RelayCommand(
-                           param => CancelCdcDialog()
-                       ));
+                var command = _cancelCdcDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelCdcDialogCommand = new RelayCommand(
+                    param => CancelCdcDialog()
+                );
             }
         }
         private void CancelCdcDialog()
@@ -5392,6 +5814,10 @@ namespace GS.Server.SkyTelescope
         #endregion
 
         #region Viewport3D
+
+        private double xaxisOffset;
+        private double yaxisOffset;
+        private double zaxisOffset;
 
         private bool _modelWinVisability;
         public bool ModelWinVisability
@@ -5471,7 +5897,6 @@ namespace GS.Server.SkyTelescope
                 {
                     Rotate();
                     LoadGEM();
-                    LoadCompass();
                 }
                 OnPropertyChanged();
             }
@@ -5484,6 +5909,7 @@ namespace GS.Server.SkyTelescope
             set
             {
                 _xaxis = value;
+                XaxisOffset = value + xaxisOffset;
                 OnPropertyChanged();
             }
         }
@@ -5495,6 +5921,7 @@ namespace GS.Server.SkyTelescope
             set
             {
                 _yaxis = value;
+                YaxisOffset = value + yaxisOffset;
                 OnPropertyChanged();
             }
         }
@@ -5506,6 +5933,40 @@ namespace GS.Server.SkyTelescope
             set
             {
                 _zaxis = value;
+                ZaxisOffset = zaxisOffset - value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _xaxisOffset;
+        public double XaxisOffset
+        {
+            get => _xaxisOffset;
+            set
+            {
+                _xaxisOffset = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _yaxisOffset;
+        public double YaxisOffset
+        {
+            get => _yaxisOffset;
+            set
+            {
+                _yaxisOffset = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _zaxisOffset;
+        public double ZaxisOffset
+        {
+            get => _zaxisOffset;
+            set
+            {
+                _zaxisOffset = value;
                 OnPropertyChanged();
             }
         }
@@ -5525,32 +5986,28 @@ namespace GS.Server.SkyTelescope
             try
             {
                 CameraVis = false;
-
+                
+                //camera direction
                 LookDirection = Settings.Settings.ModelLookDirection2;
                 UpDirection = Settings.Settings.ModelUpDirection2;
                 Position = Settings.Settings.ModelPosition2;
 
-                //LookDirection = new Vector3D(-1.2, -140, -133);
-                //UpDirection = new Vector3D(-.006, -0.6, 0.7);
-                //Position = new Point3D(.7, 139.7, 184.2);
+                //offset for model to match start position
+                xaxisOffset = 90;
+                yaxisOffset = -90;
+                zaxisOffset = 0;
 
+                //start position
                 Xaxis = -90;
                 Yaxis = 90;
-                Zaxis = -30;
+                Zaxis = Math.Round(Math.Abs(SkySettings.Latitude), 2);
 
-                const string gpModel = @"Models/GEM1.obj";
-                var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(), gpModel);
-                var file = new Uri(filePath).LocalPath;
+                //load model and compass
                 var import = new ModelImporter();
-                var color = Colors.Crimson;
-                Material material = new DiffuseMaterial(new SolidColorBrush(color));
-                import.DefaultMaterial = material;
+                var model = import.Load(Shared.Model3D.GetModelFile(Settings.Settings.ModelType));
+                Compass = MaterialHelper.CreateImageMaterial(Shared.Model3D.GetCompassFile(SkyServer.SouthernHemisphere), 100);
 
-                //color object
-                var a = import.Load(file);
-                Material materialweights = new DiffuseMaterial(new SolidColorBrush(Colors.Black));
-                if (a.Children[0] is GeometryModel3D weights) weights.Material = materialweights;
-
+                //color OTA
                 var accentColor = Settings.Settings.AccentColor;
                 if (!string.IsNullOrEmpty(accentColor))
                 {
@@ -5559,42 +6016,20 @@ namespace GS.Server.SkyTelescope
                     {
                         if (swatch.Name != Settings.Settings.AccentColor) continue;
                         var converter = new BrushConverter();
-                        var brush = (Brush)converter.ConvertFromString(swatch.ExemplarHue.Color.ToString());
+                        var accentbrush = (Brush)converter.ConvertFromString(swatch.ExemplarHue.Color.ToString());
 
-                        Material materialota = new DiffuseMaterial(brush);
-                        if (a.Children[1] is GeometryModel3D ota) ota.Material = materialota;
+                        var materialota = MaterialHelper.CreateMaterial(accentbrush);
+                        if (model.Children[0] is GeometryModel3D ota) ota.Material = materialota;
                     }
                 }
-                Material materialbar = new DiffuseMaterial(new SolidColorBrush(Colors.Silver));
-                if (a.Children[2] is GeometryModel3D bar) bar.Material = materialbar;
-                Model = a;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, "Error");
-            }
-        }
-        private void LoadCompass()
-        {
-            try
-            {
-                const string compassN = @"Models/compassN.png";
-                const string compassS = @"Models/compassS.png";
-                var compassFile = SkyServer.SouthernHemisphere ? compassS : compassN;
-                var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(), compassFile);
-                var file = new Uri(filePath).LocalPath;
-                Compass = MaterialHelper.CreateImageMaterial(file, 100);
+                //color weights
+                var materialweights = MaterialHelper.CreateMaterial(new SolidColorBrush(Color.FromRgb(64, 64, 64)));
+                if (model.Children[1] is GeometryModel3D weights) weights.Material = materialweights;
+                //color bar
+                var materialbar = MaterialHelper.CreateMaterial(Brushes.Gainsboro);
+                if (model.Children[2] is GeometryModel3D bar) bar.Material = materialbar;
+
+                Model = model;
             }
             catch (Exception ex)
             {
@@ -5616,19 +6051,11 @@ namespace GS.Server.SkyTelescope
         {
             if (!ModelOn) return;
 
-            switch (SkySettings.Mount)
-            {
-                case MountType.Simulator:
-                    Yaxis = Math.Round(SkyServer.ActualAxisX, 3);
-                    Xaxis = SkyServer.SouthernHemisphere ? Math.Round(SkyServer.ActualAxisY * -1.0, 3) : Math.Round(SkyServer.ActualAxisY - 180, 3);
-                    break;
-                case MountType.SkyWatcher:
-                    Yaxis = Math.Round(SkyServer.ActualAxisX, 3);
-                    Xaxis = Math.Round(SkyServer.ActualAxisY * -1.0, 3);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            var axes = Shared.Model3D.RotateModel(SkySettings.Mount.ToString(), SkyServer.ActualAxisX,
+                SkyServer.ActualAxisY, SkyServer.SouthernHemisphere);
+
+            Yaxis = axes[0];
+            Xaxis = axes[1];
         }
 
         private ICommand _openModelWindowCmd;
@@ -5636,7 +6063,13 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _openModelWindowCmd ?? (_openModelWindowCmd = new RelayCommand(param => OpenModelWindow()));
+                var cmd = _openModelWindowCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openModelWindowCmd = new RelayCommand(param => OpenModelWindow());
             }
         }
         private void OpenModelWindow()
@@ -5648,12 +6081,52 @@ namespace GS.Server.SkyTelescope
                 var bWin = new ModelV();
                 var _modelVM = ModelVM._modelVM;
                 _modelVM.WinHeight = 320;
-                _modelVM.WinWidth = 225;
+                _modelVM.WinWidth = 250;
                 _modelVM.Position = Position;
                 _modelVM.LookDirection = LookDirection;
                 _modelVM.UpDirection = UpDirection;
                 _modelVM.ImageFile = ImageFile;
                 bWin.Show();
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, "Error");
+            }
+        }
+
+        private ICommand _openResetViewCmd;
+        public ICommand OpenResetViewCmd
+        {
+            get
+            {
+                var cmd = _openResetViewCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openResetViewCmd = new RelayCommand(param => OpenResetView());
+            }
+        }
+        private void OpenResetView()
+        {
+            try
+            {
+                LoadGEM();
+                LookDirection = new Vector3D(-900, -1100, -400);
+                UpDirection = new Vector3D(.35, .43, .82);
+                Position = new Point3D(900, 1100, 800);
             }
             catch (Exception ex)
             {
@@ -5774,9 +6247,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _openAutoHomeDialogCommand ?? (_openAutoHomeDialogCommand = new RelayCommand(
-                           param => OpenAutoHomeDialog()
-                       ));
+                var command = _openAutoHomeDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openAutoHomeDialogCommand = new RelayCommand(
+                    param => OpenAutoHomeDialog()
+                );
             }
         }
         private void OpenAutoHomeDialog()
@@ -5821,8 +6300,14 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _startAutoHomeDialogCommand ?? (_startAutoHomeDialogCommand = new RelayCommand(
-                           param => StartAutoHomeDialog()));
+                var command = _startAutoHomeDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _startAutoHomeDialogCommand = new RelayCommand(
+                    param => StartAutoHomeDialog());
             }
         }
         private void StartAutoHomeDialog()
@@ -5864,9 +6349,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _stopAutoHomeDialogCommand ?? (_stopAutoHomeDialogCommand = new RelayCommand(
-                           param => StopAutoHomeDialog()
-                       ));
+                var command = _stopAutoHomeDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _stopAutoHomeDialogCommand = new RelayCommand(
+                    param => StopAutoHomeDialog()
+                );
             }
         }
         private void StopAutoHomeDialog()
@@ -5904,9 +6395,15 @@ namespace GS.Server.SkyTelescope
         {
             get
             {
-                return _cancelAutoHomeDialogCommand ?? (_cancelAutoHomeDialogCommand = new RelayCommand(
-                           param => CancelAutoHomeDialog()
-                       ));
+                var command = _cancelAutoHomeDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelAutoHomeDialogCommand = new RelayCommand(
+                    param => CancelAutoHomeDialog()
+                );
             }
         }
         private void CancelAutoHomeDialog()

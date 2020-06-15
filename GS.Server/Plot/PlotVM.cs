@@ -850,7 +850,13 @@ namespace GS.Server.Plot
         {
             get
             {
-                return _clickPlotStartCmd ?? (_clickPlotStartCmd = new RelayCommand(param => PlotStartCmd()));
+                var cmd = _clickPlotStartCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _clickPlotStartCmd = new RelayCommand(param => PlotStartCmd());
             }
             set => _clickPlotStartCmd = value;
         }
@@ -883,7 +889,13 @@ namespace GS.Server.Plot
         {
             get
             {
-                return _clickPlotClearCmd ?? (_clickPlotClearCmd = new RelayCommand(param => PlotClearCmd()));
+                var cmd = _clickPlotClearCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _clickPlotClearCmd = new RelayCommand(param => PlotClearCmd());
             }
             set => _clickPlotClearCmd = value;
         }
@@ -911,7 +923,13 @@ namespace GS.Server.Plot
         {
             get
             {
-                return _clickPlotSizeCmd ?? (_clickPlotSizeCmd = new RelayCommand(param => PlotSizeCmd()));
+                var cmd = _clickPlotSizeCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _clickPlotSizeCmd = new RelayCommand(param => PlotSizeCmd());
             }
             set => _clickPlotSizeCmd = value;
         }
@@ -936,7 +954,13 @@ namespace GS.Server.Plot
         {
             get
             {
-                return _clickPlotPauseCmd ?? (_clickPlotPauseCmd = new RelayCommand(param => PlotPauseCmd()));
+                var cmd = _clickPlotPauseCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _clickPlotPauseCmd = new RelayCommand(param => PlotPauseCmd());
             }
             set => _clickPlotPauseCmd = value;
         }
@@ -971,7 +995,13 @@ namespace GS.Server.Plot
         {
             get
             {
-                return _clickPlotZoomCmd ?? (_clickPlotZoomCmd = new RelayCommand(param => PlotZoomCmd(param)));
+                var cmd = _clickPlotZoomCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _clickPlotZoomCmd = new RelayCommand(param => PlotZoomCmd(param));
             }
             set => _clickPlotZoomCmd = value;
         }
@@ -996,7 +1026,13 @@ namespace GS.Server.Plot
         {
             get
             {
-                return _clickPlotSeriesdCmd ?? (_clickPlotSeriesdCmd = new RelayCommand(param => PlotSeriesCmd(param)));
+                var cmd = _clickPlotSeriesdCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _clickPlotSeriesdCmd = new RelayCommand(param => PlotSeriesCmd(param));
             }
             set => _clickPlotSeriesdCmd = value;
         }
@@ -1147,9 +1183,15 @@ namespace GS.Server.Plot
         {
             get
             {
-                return _openDialogCommand ?? (_openDialogCommand = new RelayCommand(
-                           param => OpenDialog(null)
-                       ));
+                var command = _openDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openDialogCommand = new RelayCommand(
+                    param => OpenDialog(null)
+                );
             }
         }
         private void OpenDialog(string msg, string caption = null)
@@ -1178,9 +1220,15 @@ namespace GS.Server.Plot
         {
             get
             {
-                return _clickOkDialogCommand ?? (_clickOkDialogCommand = new RelayCommand(
-                           param => ClickOkDialog()
-                       ));
+                var command = _clickOkDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickOkDialogCommand = new RelayCommand(
+                    param => ClickOkDialog()
+                );
             }
         }
         private void ClickOkDialog()
@@ -1193,9 +1241,15 @@ namespace GS.Server.Plot
         {
             get
             {
-                return _clickCancelDialogCommand ?? (_clickCancelDialogCommand = new RelayCommand(
-                           param => ClickCancelDialog()
-                       ));
+                var command = _clickCancelDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickCancelDialogCommand = new RelayCommand(
+                    param => ClickCancelDialog()
+                );
             }
         }
         private void ClickCancelDialog()
@@ -1208,9 +1262,15 @@ namespace GS.Server.Plot
         {
             get
             {
-                return _runMessageDialog ?? (_runMessageDialog = new RelayCommand(
-                           param => ExecuteMessageDialog()
-                       ));
+                var dialog = _runMessageDialog;
+                if (dialog != null)
+                {
+                    return dialog;
+                }
+
+                return _runMessageDialog = new RelayCommand(
+                    param => ExecuteMessageDialog()
+                );
             }
         }
         private async void ExecuteMessageDialog()

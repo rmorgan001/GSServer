@@ -120,6 +120,20 @@ namespace GS.Server.Settings
             }
         }
 
+        private static Model3DType _modeltype;
+        public static Model3DType ModelType
+        {
+            get => _modeltype;
+            set
+            {
+                if (_modeltype == value) return;
+                _modeltype = value;
+                Properties.Server.Default.ModelType = value.ToString();
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static bool _model3d;
         public static bool Model3D
         {
@@ -477,7 +491,7 @@ namespace GS.Server.Settings
             Model3D = Properties.Server.Default.Model3D;
             ModelLookDirection1 = Vector3D.Parse(Properties.Server.Default.ModelLookDirection1);
             ModelPosition1 = Point3D.Parse(Properties.Server.Default.ModelPosition1);
-            ModelUpDirection1 = Vector3D.Parse(Properties.Server.Default.ModelPosition1);
+            ModelUpDirection1 = Vector3D.Parse(Properties.Server.Default.ModelUpDirection1);
             ModelLookDirection2 = Vector3D.Parse(Properties.Server.Default.ModelLookDirection2);
             ModelPosition2 = Point3D.Parse(Properties.Server.Default.ModelPosition2);
             ModelUpDirection2 = Vector3D.Parse(Properties.Server.Default.ModelPosition2);
@@ -499,6 +513,9 @@ namespace GS.Server.Settings
             Windowleft = Properties.Server.Default.WindowLeft;
             Windowtop = Properties.Server.Default.WindowTop;
             Windowstate = Properties.Server.Default.WindowState;
+
+            Enum.TryParse<Model3DType>(Properties.Server.Default.ModelType, true, out var aparse);
+            ModelType = aparse;
 
         }
 

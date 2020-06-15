@@ -426,7 +426,7 @@
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
                                 <ComboBox Grid.Row="1" Grid.Column="2" IsEnabled="True" md:HintAssist.Hint="{StaticResource cbhintDegrees}" Margin="10,0,0,0" ToolTip="{StaticResource cbhintDegrees}"
-                                ItemsSource="{Binding Range179}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                                ItemsSource="{Binding Range90}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                 <ComboBox.SelectedItem>
                                     <Binding Path="Lat1" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                         <Binding.ValidationRules>

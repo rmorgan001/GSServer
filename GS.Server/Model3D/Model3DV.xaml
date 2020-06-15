@@ -5,6 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:controls="clr-namespace:GS.Server.Controls"
+             xmlns:enums="clr-namespace:GS.Shared;assembly=GS.Shared"
+             xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              mc:Ignorable="d">
     <UserControl.Resources>
         <BooleanToVisibilityConverter  x:Key="BoolToVis"/>
@@ -28,23 +30,31 @@
                               Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
                               CommandParameter="{x:Static Dock.Left}"
                               IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"/>
-                    <StackPanel Grid.Row="1" Orientation="Vertical" Visibility="Visible" IsEnabled="False">
+                    <ComboBox Grid.Row="1" md:HintAssist.Hint="{StaticResource cbtipModelType}" MinWidth="10" Margin="20,0,5,20" Width="200" HorizontalAlignment="Left" VerticalAlignment="Top"
+                              ToolTip="{StaticResource cbtipModelType}" ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type enums:Model3DType}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                            <ComboBox.Text>
+                                <Binding Path="ModelType" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
+                            </ComboBox.Text>
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                        </ComboBox>
+                    <StackPanel Grid.Row="1" Orientation="Vertical" Visibility="Hidden"  Margin="10,0,0,0">
                         <StackPanel Orientation="Horizontal">
                             <Label Content="X"/>
-                            <Slider  Width="200" HorizontalAlignment="Left" Delay="1" Minimum="-360" Maximum="360" 
-                                     Value="{Binding Xaxis}" />
+                            <Slider Width="200" HorizontalAlignment="Left" Delay="1" Minimum="-360" Maximum="360" IsEnabled="False" Value="{Binding Xaxis}" />
                             <Label Content="{Binding Xaxis}"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Label Content="Y"/>
-                            <Slider  Width="200" HorizontalAlignment="Left" Delay="1" Minimum="-360" Maximum="360" 
-                                     Value="{Binding Yaxis}" />
+                            <Slider Width="200" HorizontalAlignment="Left" Delay="1" Minimum="-360" Maximum="360" IsEnabled="False" Value="{Binding Yaxis}" />
                             <Label Content="{Binding Yaxis}"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Label Content="Z"/>
-                            <Slider  Width="200" HorizontalAlignment="Left" Delay="1" Minimum="-360" Maximum="360" 
-                                     Value="{Binding Zaxis}" />
+                            <Slider Width="200" HorizontalAlignment="Left" Delay="1" Minimum="-360" Maximum="360" IsEnabled="False" Value="{Binding Zaxis}" />
                             <Label Content="{Binding Zaxis}"/>
                         </StackPanel>
                     </StackPanel>

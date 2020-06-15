@@ -421,7 +421,13 @@ namespace GS.Server.Pulses
         {
             get
             {
-                return _clickPulsesStartCmd ?? (_clickPulsesStartCmd = new RelayCommand(param => PulsesStartCmd()));
+                var cmd = _clickPulsesStartCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _clickPulsesStartCmd = new RelayCommand(param => PulsesStartCmd());
             }
             set => _clickPulsesStartCmd = value;
         }
@@ -459,7 +465,13 @@ namespace GS.Server.Pulses
         {
             get
             {
-                return _clickPulsesClearCmd ?? (_clickPulsesClearCmd = new RelayCommand(param => PulsesClearCmd()));
+                var cmd = _clickPulsesClearCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _clickPulsesClearCmd = new RelayCommand(param => PulsesClearCmd());
             }
             set => _clickPulsesClearCmd = value;
         }
@@ -487,7 +499,13 @@ namespace GS.Server.Pulses
         {
             get
             {
-                return _clickPulsesSizeCmd ?? (_clickPulsesSizeCmd = new RelayCommand(param => PulsesSizeCmd()));
+                var cmd = _clickPulsesSizeCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _clickPulsesSizeCmd = new RelayCommand(param => PulsesSizeCmd());
             }
             set => _clickPulsesSizeCmd = value;
         }
@@ -512,7 +530,13 @@ namespace GS.Server.Pulses
         {
             get
             {
-                return _clickPulsesPauseCmd ?? (_clickPulsesPauseCmd = new RelayCommand(param => PulsesPauseCmd()));
+                var cmd = _clickPulsesPauseCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _clickPulsesPauseCmd = new RelayCommand(param => PulsesPauseCmd());
             }
             set => _clickPulsesPauseCmd = value;
         }
@@ -547,7 +571,13 @@ namespace GS.Server.Pulses
         {
             get
             {
-                return _clickPulsesSeriesdCmd ?? (_clickPulsesSeriesdCmd = new RelayCommand(param => PulsesSeriesCmd(param)));
+                var cmd = _clickPulsesSeriesdCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _clickPulsesSeriesdCmd = new RelayCommand(param => PulsesSeriesCmd(param));
             }
             set => _clickPulsesSeriesdCmd = value;
         }
@@ -596,7 +626,13 @@ namespace GS.Server.Pulses
         {
             get
             {
-                return _clickPhdConnectCmd ?? (_clickPhdConnectCmd = new RelayCommand(async param => await PhdConnectCmd()));
+                var cmd = _clickPhdConnectCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _clickPhdConnectCmd = new RelayCommand(async param => await PhdConnectCmd());
             }
             set => _clickPhdConnectCmd = value;
         }
@@ -650,7 +686,13 @@ namespace GS.Server.Pulses
         {
             get
             {
-                return _clickPulsesZoomCmd ?? (_clickPulsesZoomCmd = new RelayCommand(param => PulsesZoomCmd(param)));
+                var cmd = _clickPulsesZoomCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _clickPulsesZoomCmd = new RelayCommand(param => PulsesZoomCmd(param));
             }
             set => _clickPulsesZoomCmd = value;
         }
@@ -1958,9 +2000,15 @@ namespace GS.Server.Pulses
         {
             get
             {
-                return _openDialogCommand ?? (_openDialogCommand = new RelayCommand(
-                           param => OpenDialog(null)
-                       ));
+                var command = _openDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openDialogCommand = new RelayCommand(
+                    param => OpenDialog(null)
+                );
             }
         }
         private void OpenDialog(string msg, string caption = null)
@@ -1989,9 +2037,15 @@ namespace GS.Server.Pulses
         {
             get
             {
-                return _clickOkDialogCommand ?? (_clickOkDialogCommand = new RelayCommand(
-                           param => ClickOkDialog()
-                       ));
+                var command = _clickOkDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickOkDialogCommand = new RelayCommand(
+                    param => ClickOkDialog()
+                );
             }
         }
         private void ClickOkDialog()
@@ -2004,9 +2058,15 @@ namespace GS.Server.Pulses
         {
             get
             {
-                return _clickCancelDialogCommand ?? (_clickCancelDialogCommand = new RelayCommand(
-                           param => ClickCancelDialog()
-                       ));
+                var command = _clickCancelDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickCancelDialogCommand = new RelayCommand(
+                    param => ClickCancelDialog()
+                );
             }
         }
         private void ClickCancelDialog()
@@ -2019,9 +2079,15 @@ namespace GS.Server.Pulses
         {
             get
             {
-                return _runMessageDialog ?? (_runMessageDialog = new RelayCommand(
-                           param => ExecuteMessageDialog()
-                       ));
+                var dialog = _runMessageDialog;
+                if (dialog != null)
+                {
+                    return dialog;
+                }
+
+                return _runMessageDialog = new RelayCommand(
+                    param => ExecuteMessageDialog()
+                );
             }
         }
         private async void ExecuteMessageDialog()

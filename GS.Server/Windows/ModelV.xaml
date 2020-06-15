@@ -23,7 +23,7 @@
         </Grid.RowDefinitions>
         <controls:WindowTitleBarBasic Grid.Row="0" />
         <Border Grid.Row="1" BorderBrush="DimGray" BorderThickness="3" CornerRadius="5" Background="{DynamicResource MaterialDesignToolBarBackground}" >
-            <Grid IsEnabled="{Binding ScreenEnabled}">
+            <Grid IsEnabled="{Binding ScreenEnabled, Mode=OneWay}">
                 <Grid.Style>
                     <Style TargetType="Grid">
                         <Style.Triggers>
@@ -36,8 +36,8 @@
                         </Style.Triggers>
                     </Style>
                 </Grid.Style>
-                <controls:HelixViewport3D Margin="3" IsEnabled="{Binding ScreenEnabled}" Background="{DynamicResource MaterialDesignPaper}"/>
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignPaper}">
+                <controls:HelixViewport3D Margin="3" IsEnabled="{Binding ScreenEnabled, Mode=OneWay}" Background="{DynamicResource MaterialDesignPaper}"/>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom"  HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignPaper}">
                 <Label Content="{StaticResource lbTopRaShort}" />
                 <Label Foreground="{StaticResource SecondaryAccentBrush}" Content="{Binding RightAscension}" />
                 <Label Content="{StaticResource lbTopDecShort}" />
