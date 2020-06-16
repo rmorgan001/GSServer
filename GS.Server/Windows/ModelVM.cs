@@ -268,6 +268,7 @@ namespace GS.Server.Windows
             get => _position;
             set
             {
+                if (_position == value) return;
                 _position = value;
                 OnPropertyChanged();
             }
@@ -279,6 +280,7 @@ namespace GS.Server.Windows
             get => _lookDirection;
             set
             {
+                if (_lookDirection == value) return;
                 _lookDirection = value;
                 OnPropertyChanged();
             }
@@ -290,6 +292,7 @@ namespace GS.Server.Windows
             get => _upDirection;
             set
             {
+                if (_upDirection == value) return;
                 _upDirection = value;
                 OnPropertyChanged();
             }

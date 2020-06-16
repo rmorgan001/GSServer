@@ -4,7 +4,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-             mc:Ignorable="d" >
+        xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
+        mc:Ignorable="d" >
     <GroupBox Header="{StaticResource btnAutoHome}" Margin="5" >
             <StackPanel Orientation="Vertical">
                 <ProgressBar Value="{Binding AutoHomeProgressBar}" md:TransitionAssist.DisableTransitions="True" Height="10" Width="200" Foreground="{StaticResource SecondaryAccentBrush}" />
@@ -12,9 +13,13 @@
                 <Label Content="{StaticResource msgAutoHomeLimit}" VerticalAlignment="Bottom"/>
                 <ComboBox md:HintAssist.Hint="{StaticResource cbhintAutoHomeLimit}" MinWidth="10" ToolTip="{StaticResource cbtipAutoHomeLimit}"  
                           ItemsSource="{Binding AutoHomeLimits}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
-                    <ComboBox.Text>
-                        <Binding Path="AutoHomeLimit" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
-                    </ComboBox.Text>
+                    <ComboBox.SelectedItem>
+                        <Binding Path="AutoHomeLimit" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </ComboBox.SelectedItem>
                     <ComboBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel />
@@ -26,9 +31,13 @@
                 <Label Content="{StaticResource msgDecOffset}" VerticalAlignment="Bottom"/>
                 <ComboBox md:HintAssist.Hint="{StaticResource cbhintDecOffset}" MinWidth="10" ToolTip="{StaticResource cbhintDecOffset}"  
                           ItemsSource="{Binding DecOffsets}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
-                    <ComboBox.Text>
-                        <Binding Path="DecOffset" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
-                    </ComboBox.Text>
+                    <ComboBox.SelectedItem>
+                        <Binding Path="DecOffset" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </ComboBox.SelectedItem>
                     <ComboBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel />

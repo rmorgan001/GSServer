@@ -16,44 +16,39 @@
         <Grid.Background>
             <ImageBrush ImageSource="{Binding ImageFile, Mode=OneWay, Converter={StaticResource NullImage}}" Stretch="UniformToFill" />
         </Grid.Background>
-        <h:HelixViewport3D ShowCameraInfo="{Binding CameraVis, Mode=OneWay}" Background="Transparent" ShowViewCube="False" 
+        <h:HelixViewport3D ShowCameraInfo="{Binding CameraVis}" Background="Transparent" ShowViewCube="False"
                            ViewCubeVerticalPosition="Top" ShowCameraTarget="False" >
-        <h:HelixViewport3D.Camera>
-                <PerspectiveCamera LookDirection="{Binding LookDirection}" 
-                                UpDirection="{Binding UpDirection}" 
-                                Position="{Binding Position}"
-                                NearPlaneDistance="0.001"
-                                FarPlaneDistance ="Infinity"
-                                FieldOfView="60"/>
-        </h:HelixViewport3D.Camera>
-        <h:SunLight />
-        <h:GridLinesVisual3D Fill="Black" Width="1600" Length="1600" MajorDistance="200" MinorDistance="200" Thickness="2" Visible="True" />
-        <h:BoxVisual3D Height="50" Width="100" Length="50" Center="0,-50,500" Fill="Black" />
-        <h:BoxVisual3D Height="520" Width="50" Length="50" Center="0,0,265" Fill="Black" />
-            <h:HelixVisual3D Content="{Binding Model}">
-            <h:HelixVisual3D.Transform>
-                <Transform3DGroup>
-                    <TranslateTransform3D OffsetX="1" OffsetY="0" OffsetZ="0" />
-                    <RotateTransform3D CenterX="0" CenterY="-104" CenterZ="525">
-                        <RotateTransform3D.Rotation>
-                            <AxisAngleRotation3D Axis="1 0 2000" Angle="{Binding XaxisOffset, Mode=OneWay}" />
-                        </RotateTransform3D.Rotation>
-                    </RotateTransform3D>
-                    <RotateTransform3D CenterX="0" CenterY="-102" CenterZ="525">
-                        <RotateTransform3D.Rotation>
-                                <AxisAngleRotation3D Axis="0 1 0" Angle="{Binding YaxisOffset, Mode=OneWay}" />
-                        </RotateTransform3D.Rotation>
-                    </RotateTransform3D>
-                    <RotateTransform3D CenterX="0" CenterY="-102" CenterZ="525">
-                        <RotateTransform3D.Rotation>
-                                <AxisAngleRotation3D Axis="2000 0 1" Angle="{Binding ZaxisOffset, Mode=OneWay}" />
-                        </RotateTransform3D.Rotation>
-                    </RotateTransform3D>
-                    <ScaleTransform3D ScaleX="1" ScaleY="1" ScaleZ="1" />
-                </Transform3DGroup>
-            </h:HelixVisual3D.Transform>
-        </h:HelixVisual3D>
-        <h:BoxVisual3D Height="0" Width="2000" Length="2000" Center="0,0,0" Fill="Transparent" BottomFace="False" BackMaterial="{Binding Compass, Mode=OneWay}" Material="{Binding Compass, Mode=OneWay}" />
+            <h:HelixViewport3D.Camera>
+                <PerspectiveCamera FieldOfView="60" LookDirection="{Binding LookDirection, Mode=TwoWay}" UpDirection="{Binding UpDirection, Mode=TwoWay}" Position="{Binding Position,Mode=TwoWay}"/>
+            </h:HelixViewport3D.Camera>
+            <h:SunLight />
+            <h:GridLinesVisual3D Fill="Black" Width="5000" Length="5000" MajorDistance="1000" MinorDistance="1000" Thickness="4" Visible="True" />
+            <h:BoxVisual3D Height="50" Width="100" Length="50" Center="0,-50,500" Fill="Black" />
+            <h:BoxVisual3D Height="520" Width="50" Length="50" Center="0,0,265" Fill="Black" />
+                <h:HelixVisual3D Content="{Binding Model}">
+                <h:HelixVisual3D.Transform>
+                    <Transform3DGroup>
+                        <TranslateTransform3D OffsetX="1" OffsetY="0" OffsetZ="0" />
+                        <RotateTransform3D CenterX="0" CenterY="-104" CenterZ="525">
+                            <RotateTransform3D.Rotation>
+                                <AxisAngleRotation3D Axis="1 0 2000" Angle="{Binding XaxisOffset}" />
+                            </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                        <RotateTransform3D CenterX="0" CenterY="-102" CenterZ="525">
+                            <RotateTransform3D.Rotation>
+                                    <AxisAngleRotation3D Axis="0 1 0" Angle="{Binding YaxisOffset}" />
+                            </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                        <RotateTransform3D CenterX="0" CenterY="-102" CenterZ="525">
+                            <RotateTransform3D.Rotation>
+                                    <AxisAngleRotation3D Axis="2000 0 1" Angle="{Binding ZaxisOffset}" />
+                            </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                        <ScaleTransform3D ScaleX="1" ScaleY="1" ScaleZ="1" />
+                    </Transform3DGroup>
+                </h:HelixVisual3D.Transform>
+            </h:HelixVisual3D>
+            <h:BoxVisual3D Height="0" Width="2000" Length="2000" Center="0,0,0" Fill="Transparent" BottomFace="False" BackMaterial="{Binding Compass, Mode=OneWay}" Material="{Binding Compass, Mode=OneWay}" />
         </h:HelixViewport3D>
         <Button Width="20" Height="20" Margin="5" ToolTip="{StaticResource btnOpenWin}" Command="{Binding OpenModelWindowCmd}" Style="{StaticResource MaterialDesignRaisedAccentButton}" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Visibility="{Binding ModelWinVisability, Converter={StaticResource BoolToVis}}">
             <materialDesign:PackIcon Kind="OpenInNew" Margin="-14,-2,0,0" />
