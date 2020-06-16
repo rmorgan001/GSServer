@@ -1,7 +1,8 @@
 # GSServer - ASCOM Synta/SkyWatcher Mount Driver
 GS Server is SkyWatcher ASCOM telescope driver for use with astronomy software and SkyWatcher and Orion mounts.  It is built using C#, WPF, and a variation of MVVM.
 
-![Builds](https://github.com/rmorgan001/GSServer/workflows/Builds/badge.svg) https://img.shields.io/github/v/release/rmorgan001/GSServer
+![Builds](https://github.com/rmorgan001/GSServer/workflows/Builds/badge.svg)
+[![Windows](https://img.shields.io/github/v/release/rmorgan001/GSServer)](https://github.com/rmorgan001/GSServer/releases/tag/v1.0.1.5)
 
 Download the GSServer installer program at ## http://www.greenswamp.org/
 
@@ -107,7 +108,7 @@ Can be found at [Groups.io](https://groups.io/g/GSS)
 * SkywatcherEQ8 members at [Groups.io](https://groups.io/g/SkywatcherEQ8)
 
 ## Release Dates
-
+* 1.0.1.5 release 16 Jun 2020
 * 1.0.1.4 release 21 May 2020
 * 1.0.1.3 release 13 May 2020
 * 1.0.1.1 release 12 Apr 2020
