@@ -131,7 +131,7 @@ namespace GS.Shared
                      }
                      else
                      {
-                         using (var fs = new FileStream(localpath, FileMode.Open))
+                         using (var fs = new FileStream(localpath, FileMode.Open, FileAccess.Read))
                          {
                              var dic = (ResourceDictionary) XamlReader.Load(fs);
                              //Resources.MergedDictionaries.Clear();
