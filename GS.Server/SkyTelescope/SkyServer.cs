@@ -1863,6 +1863,7 @@ namespace GS.Server.SkyTelescope
                         case SkyWatcher.ErrorCode.ErrUnimplement:
                         case SkyWatcher.ErrorCode.ErrWrongAlignmentData:
                         case SkyWatcher.ErrorCode.ErrQueueFailed:
+                        case SkyWatcher.ErrorCode.ErrTooManyRetries:
                             IsMountRunning = false;
                             MountError = mounterr;
                             break;

@@ -91,7 +91,7 @@ namespace GS.Server.PoleLocator
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -147,7 +147,7 @@ namespace GS.Server.PoleLocator
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -194,7 +194,7 @@ namespace GS.Server.PoleLocator
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
 
         }

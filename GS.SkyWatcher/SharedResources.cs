@@ -14,6 +14,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using System;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 using System.Security.Permissions;
 
@@ -65,13 +66,11 @@ namespace GS.SkyWatcher
             base.GetObjectData(info, context);
         }
     }
-
     internal static class Constant
     {
         //public const double Siderealrate in rad = 2 * Math.PI / 360;
         public const double Siderealrate = 2 * Math.PI / 86164.09065;
     }
-
     internal static class BasicMath
     {
         //public const double Rad1 = Math.PI / 180;
@@ -100,7 +99,6 @@ namespace GS.SkyWatcher
         internal static double SecToRad(double sec) { return (sec * Math.PI / 180.0 * 60.0 * 60.0); }
         internal static double MilToRad(int millisecond) { return SecToRad(Convert.ToDouble(millisecond / 1000)); }
     }
-
     public struct AxisStatus
     {
         /// <summary>
@@ -151,9 +149,7 @@ namespace GS.SkyWatcher
         //public const long AXIS_SLEWING_HIGHSPEED = 0x0010;	// 該軸處於高速運行狀態
         //public const long AXIS_NOT_INITIALIZED = 0x0020;    // MC控制器尚未初始化, axis is not initialized.
     }
-
     public enum AxisId { Axis1 = 0, Axis2 = 1 };
-
     public enum ErrorCode
     {
         ErrInvalidId = 1,			    // Invalid mount ID
@@ -174,7 +170,6 @@ namespace GS.SkyWatcher
         ErrQueueFailed = 500,             // Queue timeout or not running
         ErrTooManyRetries = 501         // retries hit max limit
     };
-
     public enum Mountid
     {
         // Telescope ID, they must be started from 0 and coded continuously.
@@ -190,5 +185,58 @@ namespace GS.SkyWatcher
         IdNexstargt114 = 9,             // NexStarGT-114 mount
         IdStarseeker80 = 10,                // NexStarGT-80 mount
         IdStarseeker114 = 11,			// NexStarGT-114 mount
+    }
+
+    public enum McModel
+    {
+        [Description("EQ6(EQ6 MC)")] EQ6 = 0,
+        [Description("HEQ5(HEQ5 MC)")] HEQ5 = 1,
+        [Description("EQ5 Goto mount(MC002)")] EQ5 = 2,
+        [Description("EQ3 Goto mount(MC002)")] EQ3 = 3,
+        [Description("EQ8(MC009)")] EQ8 = 4,
+        [Description("AZ-EQ6 and EQ6-R(MC007)")] AZEQ6EQ6R = 5,
+        [Description("Star Adventurer(MC012)")] StarAdventurer = 7,
+        [Description("Star Adventurer Mini(MC013)")] StarAdventurerMini = 8,
+        [Description("Avant(MC018)")] Avant = 11,
+        [Description("EQM35(MC002)")] EQM35 = 26,
+        [Description("EQ8-R(MC015)")] EQ8R = 32,
+        [Description("EQ8(MC015)")] EQ8a = 33,
+        [Description("AZ-EQ6(MC015)")] AZEQ6 = 34,
+        [Description("EQ6-R(MC015)")] EQ6R = 35,
+        [Description("NEQ6 PRO(MC015)")] NEQ6PRO = 36,
+        [Description("EQ7(MC015)")] EQ7 = 37,
+        [Description("DOB 18(MC015)")] DOB18 = 183,
+        [Description("Prototyping(MC019)")] Prototyping = 55,
+        [Description("HEQ5(MC020)")] HEQ5a = 56,
+        [Description("SynTrek hand control")] SynTrekHC = 127,
+        [Description("80GT(MC001)")] a80GT = 128,
+        [Description("Multi-Function mount Bushnell(MC001)")] MultiFunctionBushnell = 129,
+        [Description("114GT(MC001)")] a114GT = 130,
+        [Description("80GT(MC001)")] b80GT = 131,
+        [Description("Multi-Function mount Merlin(MC001)")] MultiFunctionMerlin = 132,
+        [Description("114GT(MC001)")] b114GT = 133,
+        [Description("80GTSLT (MC001)")] c80GTSLT = 134,
+        [Description("114GT SynScan AZ 360(MC001)")] c114GTSlt = 135,
+        [Description("Dob Tracking 8 to 12(MC003)")] DobTracking8to12 = 144,
+        [Description("Dob Goto 8 to 12(MC003)")] DobGoto8to12 = 145,
+        [Description("Dob Goto 8 to 12 Clutchless)(MC004)")] DobGoto8to12cl = 152,
+        [Description("Dob Goto 14 to 16(MC004)")] DobGoto14to16 = 153,
+        [Description("Dob Goto 8 to 12 Clutch(MC003)")] DobGoto8to12c = 154,
+        [Description("AllView(MC005)")] AllView = 160,
+        [Description("DobMini Tracking(MC006)")] DobMini = 161,
+        [Description("Star Discovery(MC006)")] StarDiscovery = 162,
+        [Description("Dob 18 StarGate(MC009)")] Dob18StarGate = 164,
+        [Description("AZ-GTi(MC014)")] AZGTi = 165,
+        [Description("Discovery(MC014)")] DiscoverySolar = 166,
+        [Description("Merlin(MC014)")] Merlin = 167,
+        [Description("SynScan AZ 130GT(MC014)")] SynScanAZ130GT = 168,
+        [Description("DOB 18/20(MC014)")] DOB18_20 = 169,
+        [Description("DOB 8/10/12 Clutch(MC014)")] DOB8_10_12c = 170,
+        [Description("DOB 8/10/12 Clutchless(MC014)")] DOB8_10_12cl = 171,
+        [Description("DOB 14/16 Clutch(MC014)")] DOB14_16 = 172,
+        [Description("SynScan 80GT(MC014)")] SynScan80GT = 173,
+        [Description("Dob14 StarGate(MC007)")] Dob14StarGate = 182,
+        [Description("Undefined")] Undefined = 999,
+
     }
 }

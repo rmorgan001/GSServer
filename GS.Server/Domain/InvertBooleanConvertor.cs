@@ -14,6 +14,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using System;
+using System.Windows;
 using System.Windows.Data;
 
 namespace GS.Server.Domain
@@ -27,7 +28,7 @@ namespace GS.Server.Domain
             System.Globalization.CultureInfo culture)
         {
             if (targetType != typeof(bool))
-                throw new InvalidOperationException("Must be boolean");
+                throw new InvalidOperationException($"{Application.Current.Resources["cvtMustBool"]}");
 
             return value != null && !(bool)value;
         }

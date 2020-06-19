@@ -1019,15 +1019,22 @@ namespace GS.SkyWatcher
                     break;
                 case "!":  // Abnormal response.
                     string errormsg;
+                    var subdata = string.Empty;
                     switch (receivedData)
                     {
                         case "!":
                             errormsg = "Invalid Reason Code";
-                            if (command == 'q') return "=000000";
+                            if (command == 'q') subdata = "=000000";
                             break;
                         case "!0":
                             errormsg = "Invalid Command: Command doesnt apply to the model";
-                            if (command == 'q') return "=000000";
+                            switch (command)
+                            {
+                                case 'q':
+                                case 'W':
+                                    subdata = "=000000"; // EQ6R W1060100,!0 workaround
+                                    break;
+                            }
                             break;
                         case "!1":
                             errormsg = "Invalid Paramcount: Valid command was passed with invalid param count";
@@ -1060,6 +1067,7 @@ namespace GS.SkyWatcher
                     monitorItem = new MonitorEntry
                     { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" Abnormal Response: Axis:{axis}, Command:{command}, Received:{receivedData}, CommandStr:{cmdDataStr}, Message: {errormsg}" };
                     MonitorLog.LogToMonitor(monitorItem);
+                    if(!string.IsNullOrEmpty(subdata)) return subdata;
                     receivedData = null;
                     break;
                 default:

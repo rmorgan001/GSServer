@@ -149,7 +149,7 @@ namespace GS.Server.SkyTelescope
 
                 SkyServer.AlertState = true;
                 SkyServer.IsMountRunning = false;
-                OpenDialog(ex.Message,"Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -244,7 +244,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -360,7 +360,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -395,7 +395,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -430,7 +430,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -469,7 +469,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -508,7 +508,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -548,7 +548,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -563,7 +563,7 @@ namespace GS.Server.SkyTelescope
             {
                 _mountError = value;
                 if (value == null) return;
-                OpenDialog(value.Message);
+                OpenDialog(value.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -596,7 +596,7 @@ namespace GS.Server.SkyTelescope
                 return;
             }
 
-            IsDialogOpen = false;
+            //IsDialogOpen = false;
             IsAutoHomeDialogOpen = false;
             IsFlipDialogOpen = false;
             IsHomeResetDialogOpen = false;
@@ -1132,7 +1132,7 @@ namespace GS.Server.SkyTelescope
                 {
                     if (ParkSelectionSetting == null)
                     {
-                        OpenDialog("Nothing selected");
+                        OpenDialog($"{Application.Current.Resources["cmdNoSelected"]}");
                         return;
                     }
                     var parkcoords = Axes.MountAxis2Mount();
@@ -1145,7 +1145,7 @@ namespace GS.Server.SkyTelescope
                     parkToUpdate.X = parkcoords[0];
                     parkToUpdate.Y = parkcoords[1];
                     SkySettings.ParkPositions = ParkPositions;
-                    OpenDialog($"Position saved to {parkToUpdate.Name}");
+                    OpenDialog($"{Application.Current.Resources["cmdParkSaved"]} {parkToUpdate.Name}");
                     Synthesizer.Speak(Application.Current.Resources["vceParkSet"].ToString());
                 }
             }
@@ -1163,7 +1163,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -1208,7 +1208,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -1254,7 +1254,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -1462,7 +1462,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -1697,7 +1697,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
 
         }
@@ -1746,7 +1746,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -1787,7 +1787,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -1853,7 +1853,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
 
         }
@@ -1902,7 +1902,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -1943,7 +1943,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -2009,7 +2009,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
 
         }
@@ -2096,7 +2096,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -2141,7 +2141,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -2190,7 +2190,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -2262,7 +2262,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
 
         }
@@ -2310,7 +2310,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -2351,7 +2351,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -2418,7 +2418,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
 
         }
@@ -2464,7 +2464,7 @@ namespace GS.Server.SkyTelescope
             catch (Exception ex)
             {
                 IsFlipDialogOpen = false;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -2505,7 +2505,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -2587,7 +2587,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
 
         }
@@ -2618,7 +2618,7 @@ namespace GS.Server.SkyTelescope
             catch (Exception ex)
             {
                 IsSchedulerDialogOpen = false;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -2659,7 +2659,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -2743,19 +2743,19 @@ namespace GS.Server.SkyTelescope
             var oktime = TimeSpan.TryParse(FutureParkTime, out var ftime);
             if (!oktime)
             {
-                OpenDialog("Invalid time", "Error");
+                OpenDialog($"{Application.Current.Resources["msgParkEvent1"]}", $"{Application.Current.Resources["Error"]}");
                 return false;
             }
             var okdate = DateTime.TryParse(FutureParkDate.ToString(), out var fdate);
             if (!okdate)
             {
-                OpenDialog("Invalid Date", "Error");
+                OpenDialog($"{Application.Current.Resources["msgParkEvent2"]}", $"{Application.Current.Resources["Error"]}");
                 return false;
             }
             var fdatetime = fdate.Date + ftime;
             if (fdatetime < DateTime.Now)
             {
-                OpenDialog("Invalid Date and time", "Error");
+                OpenDialog($"{Application.Current.Resources["msgParkEvent3"]}", $"{Application.Current.Resources["Error"]}");
                 return false;
             }
 
@@ -2815,7 +2815,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
 
             }
 
@@ -2954,7 +2954,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -3033,7 +3033,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -3086,7 +3086,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -3127,7 +3127,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -3206,7 +3206,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -3235,7 +3235,7 @@ namespace GS.Server.SkyTelescope
                     if (!SkySettings.CanSlewAsync) return;
                     if (SkyServer.IsSlewing)
                     {
-                        OpenDialog("Mount is slewing", "Error");
+                        OpenDialog($"{Application.Current.Resources["msgSlewing"]}", $"{Application.Current.Resources["Error"]}");
                         return;
                     }
                     if (AtPark)
@@ -3249,7 +3249,7 @@ namespace GS.Server.SkyTelescope
 
                     if (!result)
                     {
-                        OpenDialog("Outside of Sync limits", "Error");
+                        OpenDialog($"{Application.Current.Resources["msgOutLimits"]}", $"{Application.Current.Resources["Error"]}");
                         return;
                     }
                     SkyServer.TargetDec = radec.Y;
@@ -3273,7 +3273,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -3314,7 +3314,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -3441,7 +3441,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
 
         }
@@ -3487,7 +3487,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -3529,7 +3529,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -3709,7 +3709,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -3752,7 +3752,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -3798,7 +3798,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -3838,7 +3838,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -3884,7 +3884,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -3924,7 +3924,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -3970,7 +3970,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -4010,7 +4010,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -4056,7 +4056,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -4095,7 +4095,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -4134,7 +4134,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -4174,7 +4174,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -4564,7 +4564,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -4607,7 +4607,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -4681,7 +4681,6 @@ namespace GS.Server.SkyTelescope
                         return;
                     }
                     SkyServer.IsMountRunning = !SkyServer.IsMountRunning;
-                    // ModelOn = SkySettings.ModelOn;
                 }
 
                 if (SkyServer.IsMountRunning)
@@ -4752,18 +4751,18 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
-                var canppec = SkyServer.CanPec ? "Supported" : "Not Supported";
-                var canhome = SkyServer.CanHomeSensor ? "Supported" : "Not Supported";
-                var msg = $"Mount: {SkyServer.MountName}" + Environment.NewLine;
-                msg += $"Version: {SkyServer.MountVersion}" + Environment.NewLine;
-                msg += $"StepsRa: {SkyServer.StepsPerRevolution[0]}" + Environment.NewLine;
-                msg += $"StepsDec: {SkyServer.StepsPerRevolution[1]}" + Environment.NewLine;
-                msg += $"PPEC: {canppec}" + Environment.NewLine;
-                msg += $"Home Sensor: {canhome}" + Environment.NewLine;
-                msg += $"Ra Steps/Arcsec: {Math.Round(SkyServer.StepsPerRevolution[0] / 360.0 / 3600, 2)}" + Environment.NewLine;
-                msg += $"Dec Steps/Arcsec: {Math.Round(SkyServer.StepsPerRevolution[1] / 360.0 / 3600, 2)}" + Environment.NewLine;
+                var canppec = SkyServer.CanPec ? $"{Application.Current.Resources["msgSupported"]}" : $"{Application.Current.Resources["msgNotSupported"]}";
+                var canhome = SkyServer.CanHomeSensor ? $"{Application.Current.Resources["msgSupported"]}" : $"{Application.Current.Resources["msgNotSupported"]}";
+                var msg = $"{Application.Current.Resources["msgMount"]} {SkyServer.MountName}" + Environment.NewLine;
+                msg += $"{Application.Current.Resources["msgVersion"]} {SkyServer.MountVersion}" + Environment.NewLine;
+                msg += $"{Application.Current.Resources["msgStepsRa"]} {SkyServer.StepsPerRevolution[0]}" + Environment.NewLine;
+                msg += $"{Application.Current.Resources["msgStepsDec"]} {SkyServer.StepsPerRevolution[1]}" + Environment.NewLine;
+                msg += $"{Application.Current.Resources["msgPPEC"]} {canppec}" + Environment.NewLine;
+                msg += $"{Application.Current.Resources["msgHomeSensor"]} {canhome}" + Environment.NewLine;
+                msg += $"{Application.Current.Resources["msgRaSteps"]} {Math.Round(SkyServer.StepsPerRevolution[0] / 360.0 / 3600, 2)}" + Environment.NewLine;
+                msg += $"{Application.Current.Resources["msgDecSteps"]} {Math.Round(SkyServer.StepsPerRevolution[1] / 360.0 / 3600, 2)}" + Environment.NewLine;
 
-                OpenDialog(msg, "Mount Info");
+                OpenDialog(msg, $"{Application.Current.Resources["msgInfo"]}");
             }
             catch (Exception ex)
             {
@@ -4780,7 +4779,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -5163,7 +5162,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
         private bool _isGpsDialogOpen;
@@ -5246,7 +5245,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -5321,7 +5320,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -5397,7 +5396,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 IsGpsDialogOpen = false;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
             finally
             {
@@ -5441,7 +5440,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -5556,7 +5555,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -5626,7 +5625,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -5672,7 +5671,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -5721,7 +5720,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -5767,7 +5766,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -5807,7 +5806,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -6047,7 +6046,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
         private void Rotate()
@@ -6089,6 +6088,7 @@ namespace GS.Server.SkyTelescope
                 _modelVM.LookDirection = LookDirection;
                 _modelVM.UpDirection = UpDirection;
                 _modelVM.ImageFile = ImageFile;
+                _modelVM.CameraIndex = 2;
                 bWin.Show();
             }
             catch (Exception ex)
@@ -6104,7 +6104,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -6126,10 +6126,10 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
+                Settings.Settings.ModelLookDirection2 = new Vector3D(-900, -1100, -400);
+                Settings.Settings.ModelUpDirection2 = new Vector3D(.35, .43, .82);
+                Settings.Settings.ModelPosition2 = new Point3D(900, 1100, 800);
                 LoadGEM();
-                LookDirection = new Vector3D(-900, -1100, -400);
-                UpDirection = new Vector3D(.35, .43, .82);
-                Position = new Point3D(900, 1100, 800);
             }
             catch (Exception ex)
             {
@@ -6144,7 +6144,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -6294,7 +6294,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -6342,7 +6342,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
 
         }
@@ -6389,7 +6389,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -6436,7 +6436,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 

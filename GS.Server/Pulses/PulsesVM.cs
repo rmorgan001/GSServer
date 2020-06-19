@@ -801,7 +801,7 @@ namespace GS.Server.Pulses
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
         private void XAxisTimer_Tick(object sender, EventArgs e)

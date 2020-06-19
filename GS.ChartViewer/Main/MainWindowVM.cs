@@ -51,9 +51,6 @@ namespace GS.ChartViewer.Main
 
         public MainWindowVM()
         {
-            //Load language resource file
-            Languages.SetLanguageDictionary(false, LanguageApp.GSChartViewer);
-
             Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             LoadDefaults();
         }
@@ -539,7 +536,7 @@ namespace GS.ChartViewer.Main
 
             if (LineCount <= 0)
             {
-                OpenDialog($"No valid records found");
+                OpenDialog($"{Application.Current.Resources["msgNoValidRecords"]}");
                 loaded = false;
             }
             else

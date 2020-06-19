@@ -245,6 +245,7 @@ namespace GS.Server.Model3D
                 _modelVM.LookDirection = LookDirection;
                 _modelVM.UpDirection = UpDirection;
                 _modelVM.ImageFile = ImageFile;
+                _modelVM.CameraIndex = 1;
                 bWin.Show();
             }
             catch (Exception ex)
@@ -260,7 +261,7 @@ namespace GS.Server.Model3D
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -282,10 +283,10 @@ namespace GS.Server.Model3D
         {
             try
             {
+                Settings.Settings.ModelLookDirection1 = new Vector3D(-2616, -3167, -1170);
+                Settings.Settings.ModelUpDirection1 = new Vector3D(.35, .43, .82);
+                Settings.Settings.ModelPosition1 = new Point3D(2523, 3000, 1379);
                 LoadGEM();
-                LookDirection = new Vector3D(-2616, -3167, -1170);
-                UpDirection = new Vector3D(.35, .43, .82);
-                Position = new Point3D(2523, 3000, 1379);
             }
             catch (Exception ex)
             {
@@ -300,7 +301,7 @@ namespace GS.Server.Model3D
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -670,7 +671,7 @@ namespace GS.Server.Model3D
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
         private void Rotate()

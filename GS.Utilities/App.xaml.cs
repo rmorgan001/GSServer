@@ -52,10 +52,8 @@ namespace GS.Utilities
         {
             if (!createdNew) return;
             base.OnStartup(e);
-            Languages.SetLanguageDictionary(false, LanguageApp.GSChartViewer);
-
+            Languages.SetLanguageDictionary(false, LanguageApp.GSUtilities);
         }
-
 
         #region Dispose
         public void Dispose()

@@ -155,17 +155,22 @@ namespace GS.Server.Test
         {
             get
             {
-                return _clickopencmd ?? (_clickopencmd = new RelayCommand(
-                           param => ClickOpen()
-                       ));
+                var cmd = _clickopencmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return (_clickopencmd = new RelayCommand(
+                    param => ClickOpen()
+                ));
             }
         }
         private  void ClickOpen()
         {
             try
             {
-                
-
+               
             }
             catch (Exception ex)
             {
@@ -179,9 +184,15 @@ namespace GS.Server.Test
         {
             get
             {
-                return _clickstartcmd ?? (_clickstartcmd = new RelayCommand(
-                           param => ClickStart()
-                       ));
+                var cmd = _clickstartcmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return (_clickstartcmd = new RelayCommand(
+                    param => ClickStart()
+                ));
             }
         }
         private async void ClickStart()
@@ -274,9 +285,15 @@ namespace GS.Server.Test
         {
             get
             {
-                return _clickstopcmd ?? (_clickstopcmd = new RelayCommand(
-                           param => ClickStop()
-                       ));
+                var cmd = _clickstopcmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return (_clickstopcmd = new RelayCommand(
+                    param => ClickStop()
+                ));
             }
         }
         private void ClickStop()
@@ -296,9 +313,15 @@ namespace GS.Server.Test
         {
             get
             {
-                return _clickcancelcmd ?? (_clickcancelcmd = new RelayCommand(
-                           param => ClickCancel()
-                       ));
+                var cmd = _clickcancelcmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return (_clickcancelcmd = new RelayCommand(
+                    param => ClickCancel()
+                ));
             }
         }
         private void ClickCancel()
@@ -425,9 +448,15 @@ namespace GS.Server.Test
         {
             get
             {
-                return _openDialogCommand ?? (_openDialogCommand = new RelayCommand(
-                           param => OpenDialog(null)
-                       ));
+                var command = _openDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return (_openDialogCommand = new RelayCommand(
+                    param => OpenDialog(null)
+                ));
             }
         }
         private void OpenDialog(string msg, string caption = null)
@@ -456,9 +485,15 @@ namespace GS.Server.Test
         {
             get
             {
-                return _clickOkDialogCommand ?? (_clickOkDialogCommand = new RelayCommand(
-                           param => ClickOkDialog()
-                       ));
+                var command = _clickOkDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return (_clickOkDialogCommand = new RelayCommand(
+                    param => ClickOkDialog()
+                ));
             }
         }
         private void ClickOkDialog()
@@ -471,9 +506,15 @@ namespace GS.Server.Test
         {
             get
             {
-                return _clickCancelDialogCommand ?? (_clickCancelDialogCommand = new RelayCommand(
-                           param => ClickCancelDialog()
-                       ));
+                var command = _clickCancelDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return (_clickCancelDialogCommand = new RelayCommand(
+                    param => ClickCancelDialog()
+                ));
             }
         }
         private void ClickCancelDialog()
@@ -486,9 +527,15 @@ namespace GS.Server.Test
         {
             get
             {
-                return _runMessageDialog ?? (_runMessageDialog = new RelayCommand(
-                           param => ExecuteMessageDialog()
-                       ));
+                var dialog = _runMessageDialog;
+                if (dialog != null)
+                {
+                    return dialog;
+                }
+
+                return (_runMessageDialog = new RelayCommand(
+                    param => ExecuteMessageDialog()
+                ));
             }
         }
         private async void ExecuteMessageDialog()
@@ -540,5 +587,15 @@ namespace GS.Server.Test
         }
         #endregion
 
+    }
+
+    [Flags]
+    public enum StatusBit
+    {
+        None = 0,
+        A = 1,
+        B = 1 << 1,
+        C = 1 << 2,
+        D = 1 << 3
     }
 }

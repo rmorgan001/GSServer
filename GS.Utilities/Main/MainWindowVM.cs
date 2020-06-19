@@ -49,8 +49,6 @@ namespace GS.Utilities.Main
             {
                 using (new WaitCursor())
                 {
-                    Languages.SetLanguageDictionary(false, LanguageApp.GSUtilities);
-
                     Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
                     LoadDefaults();
                 }
@@ -127,9 +125,15 @@ namespace GS.Utilities.Main
         {
             get
             {
-                return _clickCloseAppCommand ?? (_clickCloseAppCommand = new RelayCommand(
-                           param => CloseApp()
-                       ));
+                var command = _clickCloseAppCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return (_clickCloseAppCommand = new RelayCommand(
+                    param => CloseApp()
+                ));
             }
         }
         private void CloseApp()
@@ -142,9 +146,15 @@ namespace GS.Utilities.Main
         {
             get
             {
-                return _minimizeWindowCommand ?? (_minimizeWindowCommand = new RelayCommand(
-                           param => MinimizeWindow()
-                       ));
+                var command = _minimizeWindowCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return (_minimizeWindowCommand = new RelayCommand(
+                    param => MinimizeWindow()
+                ));
             }
         }
         private void MinimizeWindow()
@@ -173,9 +183,15 @@ namespace GS.Utilities.Main
         {
             get
             {
-                return _clickConnectCmd ?? (_clickConnectCmd = new RelayCommand(
-                           param => ConnectCheck()
-                       ));
+                var cmd = _clickConnectCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return (_clickConnectCmd = new RelayCommand(
+                    param => ConnectCheck()
+                ));
             }
         }
         private void ConnectCheck()
@@ -183,7 +199,7 @@ namespace GS.Utilities.Main
             try
             {
                 Connect = null;
-                var msg = "Not found";
+                var msg = $"{Application.Current.Resources["msgNotfound"]}";
                 var util = new ASCOM.Utilities.Chooser();
                 var progID = util.Choose("ASCOM.GS.Sky.Telescope");
                 if (progID != null)
@@ -342,7 +358,7 @@ namespace GS.Utilities.Main
             }
         }
 
-        private static void InvokeOnUiThread(Action action, CancellationToken token = default(CancellationToken))
+        private static void InvokeOnUiThread(Action action, CancellationToken token = default)
         {
             if (Application.Current == null) return;
             if (Application.Current.Dispatcher != null && Application.Current.Dispatcher.CheckAccess())
@@ -395,9 +411,15 @@ namespace GS.Utilities.Main
         {
             get
             {
-                return _clickSerialStartCmd ?? (_clickSerialStartCmd = new RelayCommand(
-                           param => SerialStart()
-                       ));
+                var cmd = _clickSerialStartCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return (_clickSerialStartCmd = new RelayCommand(
+                    param => SerialStart()
+                ));
             }
         }
         private void SerialStart()
@@ -456,9 +478,15 @@ namespace GS.Utilities.Main
         {
             get
             {
-                return _clickSerialStopCmd ?? (_clickSerialStopCmd = new RelayCommand(
-                           param => SerialStop()
-                       ));
+                var cmd = _clickSerialStopCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return (_clickSerialStopCmd = new RelayCommand(
+                    param => SerialStop()
+                ));
             }
         }
         private void SerialStop()
@@ -497,9 +525,15 @@ namespace GS.Utilities.Main
         {
             get
             {
-                return _clickFileCheckCmd ?? (_clickFileCheckCmd = new RelayCommand(
-                           param => FileCheck()
-                       ));
+                var cmd = _clickFileCheckCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return (_clickFileCheckCmd = new RelayCommand(
+                    param => FileCheck()
+                ));
             }
         }
         private void FileCheck()
@@ -618,9 +652,15 @@ namespace GS.Utilities.Main
         {
             get
             {
-                return _openDelDialogCommand ?? (_openDelDialogCommand = new RelayCommand(
-                           param => OpenDelDialog(null)
-                       ));
+                var command = _openDelDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return (_openDelDialogCommand = new RelayCommand(
+                    param => OpenDelDialog(null)
+                ));
             }
         }
         private void OpenDelDialog(string msg)
@@ -650,9 +690,15 @@ namespace GS.Utilities.Main
         {
             get
             {
-                return _clickDelAcceptDialogCommand ?? (_clickDelAcceptDialogCommand = new RelayCommand(
-                           param => ClickDelDialog()
-                       ));
+                var command = _clickDelAcceptDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return (_clickDelAcceptDialogCommand = new RelayCommand(
+                    param => ClickDelDialog()
+                ));
             }
         }
         private void ClickDelDialog()
@@ -770,8 +816,14 @@ namespace GS.Utilities.Main
         {
             get
             {
-                return _cancelDelDialogCommand ?? (_cancelDelDialogCommand = new RelayCommand(
-                           param => CancelDelDialog()));
+                var command = _cancelDelDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return (_cancelDelDialogCommand = new RelayCommand(
+                    param => CancelDelDialog()));
             }
         }
         private void CancelDelDialog()
@@ -825,9 +877,15 @@ namespace GS.Utilities.Main
         {
             get
             {
-                return _openDialogCommand ?? (_openDialogCommand = new RelayCommand(
-                           param => OpenDialog(null)
-                       ));
+                var command = _openDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return (_openDialogCommand = new RelayCommand(
+                    param => OpenDialog(null)
+                ));
             }
         }
         private void OpenDialog(string msg)
@@ -842,9 +900,15 @@ namespace GS.Utilities.Main
         {
             get
             {
-                return _clickOkDialogCommand ?? (_clickOkDialogCommand = new RelayCommand(
-                           param => ClickOkDialog()
-                       ));
+                var command = _clickOkDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return (_clickOkDialogCommand = new RelayCommand(
+                    param => ClickOkDialog()
+                ));
             }
         }
         private void ClickOkDialog()
@@ -857,9 +921,15 @@ namespace GS.Utilities.Main
         {
             get
             {
-                return _cancelDialogCommand ?? (_cancelDialogCommand = new RelayCommand(
-                           param => CancelDialog()
-                       ));
+                var command = _cancelDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return (_cancelDialogCommand = new RelayCommand(
+                    param => CancelDialog()
+                ));
             }
         }
         private void CancelDialog()
@@ -872,9 +942,15 @@ namespace GS.Utilities.Main
         {
             get
             {
-                return _runMessageDialog ?? (_runMessageDialog = new RelayCommand(
-                           param => ExecuteMessageDialog()
-                       ));
+                var dialog = _runMessageDialog;
+                if (dialog != null)
+                {
+                    return dialog;
+                }
+
+                return (_runMessageDialog = new RelayCommand(
+                    param => ExecuteMessageDialog()
+                ));
             }
         }
         private async void ExecuteMessageDialog()

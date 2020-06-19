@@ -15,6 +15,7 @@
 //  */
 using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace GS.Server.Domain
@@ -26,10 +27,10 @@ namespace GS.Server.Domain
             if (!DateTime.TryParse((value ?? "").ToString(),
                 CultureInfo.CurrentCulture,
                 DateTimeStyles.AssumeLocal | DateTimeStyles.AllowWhiteSpaces,
-                out var time)) return new ValidationResult(false, "Invalid date");
+                out var time)) return new ValidationResult(false, $"{Application.Current.Resources["cvtInvaliddate"]}");
 
             return time.Date < DateTime.Now.Date
-                ? new ValidationResult(false, "Future date required")
+                ? new ValidationResult(false, $"{Application.Current.Resources["cvtFutureDate"]}")
                 : ValidationResult.ValidResult;
         }
     }

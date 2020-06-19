@@ -139,7 +139,7 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -174,7 +174,7 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -260,6 +260,14 @@ namespace GS.Server.Windows
                 _cameraVis = value;
                 OnPropertyChanged();
             }
+        }
+
+        private int _cameraIndex;
+
+        public int CameraIndex
+        {
+            get => _cameraIndex;
+            set => _cameraIndex = value;
         }
 
         private Point3D _position;
@@ -410,9 +418,19 @@ namespace GS.Server.Windows
                 CameraVis = false;
 
                 //camera direction
-                LookDirection = Settings.Settings.ModelLookDirection2;
-                UpDirection = Settings.Settings.ModelUpDirection2;
-                Position = Settings.Settings.ModelPosition2;
+                if (CameraIndex == 1)
+                {
+                    LookDirection = Settings.Settings.ModelLookDirection1;
+                    UpDirection = Settings.Settings.ModelUpDirection1;
+                    Position = Settings.Settings.ModelPosition1;
+                }
+                else
+                {
+                    LookDirection = Settings.Settings.ModelLookDirection2;
+                    UpDirection = Settings.Settings.ModelUpDirection2;
+                    Position = Settings.Settings.ModelPosition2;
+                }
+
 
                 //offset for model to match start position
                 xaxisOffset = 90;
@@ -466,7 +484,7 @@ namespace GS.Server.Windows
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
         private void Rotate()
@@ -511,7 +529,7 @@ namespace GS.Server.Windows
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 
@@ -533,10 +551,23 @@ namespace GS.Server.Windows
         {
             try
             {
-                LoadGEM();
+                if (CameraIndex == 1)
+                {
+                    Settings.Settings.ModelLookDirection1 = new Vector3D(-2616, -3167, -1170);
+                    Settings.Settings.ModelUpDirection1 = new Vector3D(.35, .43, .82);
+                    Settings.Settings.ModelPosition1 = new Point3D(2523, 3000, 1379);
+                }
+                else
+                {
+                    Settings.Settings.ModelLookDirection2 = new Vector3D(-900, -1100, -400);
+                    Settings.Settings.ModelUpDirection2 = new Vector3D(.35, .43, .82);
+                    Settings.Settings.ModelPosition2 = new Point3D(900, 1100, 800);
+                }
                 LookDirection = new Vector3D(-900, -1100, -400);
                 UpDirection = new Vector3D(.35, .43, .82);
                 Position = new Point3D(900, 1100, 800);
+                
+                LoadGEM();
             }
             catch (Exception ex)
             {
@@ -551,7 +582,7 @@ namespace GS.Server.Windows
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, "Error");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
 

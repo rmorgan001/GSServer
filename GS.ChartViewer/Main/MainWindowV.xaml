@@ -148,7 +148,7 @@
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,0" >
                                 <ComboBox md:HintAssist.Hint="{DynamicResource cbChartQuality}" MinWidth="10" ToolTip="{DynamicResource cbChartQuality}" Width="65" 
-                                          ItemsSource="{Binding Source={domain1:EnumBindingSourceExtension {x:Type enums:Quality}}}"
+                                          ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type enums:Quality}}}"
                                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" HorizontalAlignment="Left">
                                 <ComboBox.Text>
                                     <Binding Path="ChartQuality" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>

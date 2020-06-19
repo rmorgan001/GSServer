@@ -13,10 +13,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see<https://www.gnu.org/licenses/> .
 */-->
-<ResourceDictionary 
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-    xmlns:system="clr-namespace:System;assembly=mscorlib">
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <!--Window Title bar-->
     <system:String x:Key="lbName">GS Server</system:String>
@@ -28,7 +25,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--Tab bar-->
     <system:String x:Key="rbtnSkyWatcher">SkyWatcher</system:String>
     <system:String x:Key="rbtnFocuser">Focuser</system:String>
-    <system:String x:Key="rbtnNotes">Notes</system:String> 
+    <system:String x:Key="rbtnNotes">Notes</system:String>
     <system:String x:Key="rbtnOptions">Options</system:String>
     <system:String x:Key="rbtnGamepad">Gamepad</system:String>
     <system:String x:Key="rbtnModel3D">3D</system:String>
@@ -218,9 +215,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnCdcRetrieve">Retrieve</system:String>
     <system:String x:Key="btnCdcSend">Send</system:String>
     <system:String x:Key="btnCdcNMEA">NMEA:</system:String>
-    <system:String x:Key="btnCdcLat">Latitude: </system:String>
-    <system:String x:Key="btnCdcLong">Longitude: </system:String>
-    <system:String x:Key="btnCdcEle">Elevation: </system:String>
+    <system:String x:Key="btnCdcLat">Latitude:</system:String>
+    <system:String x:Key="btnCdcLong">Longitude:</system:String>
+    <system:String x:Key="btnCdcEle">Elevation:</system:String>
     <system:String x:Key="tbCdcAccept">Accept Coordinates?</system:String>
     <system:String x:Key="msgOBNotFound">Observatory information not found.</system:String>
     <system:String x:Key="msgCdcNotFound">Server not found.</system:String>
@@ -230,7 +227,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="cbhintMinutes">Minutes</system:String>
     <system:String x:Key="cbhintSeconds">Seconds</system:String>
     <system:String x:Key="cbhintDegrees">Degrees</system:String>
-    
+
     <!--Dialog -->
     <system:String x:Key="btnAccept">Accept</system:String>
     <system:String x:Key="btnCancel">Cancel</system:String>
@@ -487,8 +484,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="tbOLSTAdjusted">UTC Adjusted Date:</system:String>
     <system:String x:Key="tbOLocalAdjusted">Local Adjusted Date:</system:String>
     <system:String x:Key="btnODownload">Download</system:String>
-    <system:String x:Key="tbOUpdateVer">Available Version: </system:String>
-    <system:String x:Key="tbOCurrentVer">Installed Version: </system:String>
+    <system:String x:Key="tbOUpdateVer">Available Version:</system:String>
+    <system:String x:Key="tbOCurrentVer">Installed Version:</system:String>
     <system:String x:Key="btnOCheckUpdates">Check for Updates</system:String>
     <system:String x:Key="msgONotAvail">Updates not Available</system:String>
     <system:String x:Key="msgONotFound">Updates not Found</system:String>

@@ -189,11 +189,11 @@ namespace GS.Server.Notes
                             rtbEditor.CaretPosition?.InsertTextInRun(str);
                             return;
                         }
-                        OpenDialog1("No Data Found");
+                        OpenDialog1($"{Application.Current.Resources["msgNoData"]}");
                     }
                     else
                     {
-                        OpenDialog1("The operation has timed out.");
+                        OpenDialog1($"{Application.Current.Resources["msgTimeout"]}");
                     }
                 }
 
@@ -656,7 +656,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $" Date: {DateTime.Now:D}";
+                var str = $" { Application.Current.Resources["btntipNDate"]}: {DateTime.Now:D}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -683,7 +683,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $" Time: {DateTime.Now:T}";
+                var str = $" { Application.Current.Resources["btntipNTime"]}: {DateTime.Now:T}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -710,7 +710,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $" RA: {_util.HoursToHMS(SkyServer.RightAscensionXform, "h ", ":", "", 2)}";
+                var str = $" { Application.Current.Resources["btntipNRa"]}: {_util.HoursToHMS(SkyServer.RightAscensionXform, "h ", ":", "", 2)}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -737,7 +737,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $" Dec: {_util.DegreesToDMS(SkyServer.DeclinationXform, "° ", ":", "", 2)}";
+                var str = $" { Application.Current.Resources["btntipNDec"]}: {_util.DegreesToDMS(SkyServer.DeclinationXform, "° ", ":", "", 2)}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -764,7 +764,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $" Alt: {_util.DegreesToDMS(SkyServer.Altitude, "° ", ":", "", 2)}";
+                var str = $" { Application.Current.Resources["btntipNAlt"]}: {_util.DegreesToDMS(SkyServer.Altitude, "° ", ":", "", 2)}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -783,7 +783,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $" Az: {_util.DegreesToDMS(SkyServer.Azimuth, "° ", ":", "", 2)}";
+                var str = $" { Application.Current.Resources["btntipNAz"]}: {_util.DegreesToDMS(SkyServer.Azimuth, "° ", ":", "", 2)}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -807,32 +807,32 @@ namespace GS.Server.Notes
                 switch (angle)
                 {
                     case var n when (n >= -180.0 && n <= -135.0):
-                        phase = "Full Moon";
+                        phase = $"{Application.Current.Resources["msgFullMoon"]}";
                         break;
                     case var n when (n >= -135.0 && n <= -90.0):
-                        phase = "Waning Gibbous";
+                        phase = $"{Application.Current.Resources["msgWaningGibbous"]}";
                         break;
                     case var n when (n >= -90.0 && n <= -45.0):
-                        phase = "Last Quarter";
+                        phase = $"{Application.Current.Resources["msgLastQuarter"]}";
                         break;
                     case var n when (n >= -45.0 && n <= 0.0):
-                        phase = "Waning Crescent";
+                        phase = $"{Application.Current.Resources["msgWaningCrescent"]}";
                         break;
                     case var n when (n >= 0.0 && n <= 45.0):
-                        phase = "New Moon";
+                        phase = $"{Application.Current.Resources["msgNewMoon"]}";
                         break;
                     case var n when (n >= 45.0 && n <= 90.0):
-                        phase = "Waxing Crescent";
+                        phase = $"{Application.Current.Resources["msgWaxingCrescent"]}";
                         break;
                     case var n when (n >= 90.0 && n <= 135.0):
-                        phase = "First Quarter";
+                        phase = $"{Application.Current.Resources["msgFirstQuarter"]}";
                         break;
                     case var n when (n >= 135.0 && n <= 180.0):
-                        phase = "Waxing Gibbous";
+                        phase = $"{Application.Current.Resources["msgWaxingGibbous"]}";
                         break;
                 }
 
-                var str = $" Moon Phase: {phase} ";
+                var str = $" {Application.Current.Resources["btntipNMoon"]}: {phase} ";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -858,7 +858,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $"Log Entry: Date {DateTime.Now:D} Time {DateTime.Now:T}";
+                var str = $"{Application.Current.Resources["msgLogEntry"]}: {Application.Current.Resources["btntipNDate"]} {DateTime.Now:D} {Application.Current.Resources["btntipNTime"]} {DateTime.Now:T}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -884,7 +884,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $"Alignment Mode: {SkySettings.AlignmentMode}";
+                var str = $"{ Application.Current.Resources["msgAlignmentMode"]}: { SkySettings.AlignmentMode}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -911,7 +911,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $"Alignment Mode: {SkySettings.EquatorialCoordinateType}";
+                var str = $"{ Application.Current.Resources["msgCoordinateType"]}: {SkySettings.EquatorialCoordinateType}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -938,7 +938,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $"Observatory Lat: {_util.DegreesToDMS(SkySettings.Latitude, "° ", ":", "", 2)} Long: {_util.DegreesToDMS(SkySettings.Longitude, "° ", ":", "", 2)}";
+                var str = $"{ Application.Current.Resources["Observatory"]} { Application.Current.Resources["msgLat"]}: {_util.DegreesToDMS(SkySettings.Latitude, "° ", ":", "", 2)} { Application.Current.Resources["msgLong"]}: {_util.DegreesToDMS(SkySettings.Longitude, "° ", ":", "", 2)}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -991,7 +991,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $" Sidereal Time: {_util.HoursToHMS(SkyServer.SiderealTime)}";
+                var str = $" { Application.Current.Resources["msgSiderealTime"]}: {_util.HoursToHMS(SkyServer.SiderealTime)}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -1018,7 +1018,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $" Ha: {_util.HoursToHMS(Coordinate.Ra2Ha12(SkyServer.RightAscensionXform,SkyServer.SiderealTime))}";
+                var str = $" { Application.Current.Resources["msgHa"]}: {_util.HoursToHMS(Coordinate.Ra2Ha12(SkyServer.RightAscensionXform,SkyServer.SiderealTime))}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);

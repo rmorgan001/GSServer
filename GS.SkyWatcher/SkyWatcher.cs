@@ -15,9 +15,11 @@
  */
 using GS.Shared;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO.Ports;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 
@@ -88,6 +90,7 @@ namespace GS.SkyWatcher
         internal bool CanPolarLed { get; private set; }
         internal bool MonitorPulse { private get; set; }
         internal string MountType { get; private set; }
+        private int MountNum { get; set; }
         internal string MountVersion { get; private set; }
         internal bool SouthernHemisphere { private get; set; }
         internal bool PulseRaRunning { get; private set; }
@@ -799,62 +802,17 @@ namespace GS.SkyWatcher
         internal string GetMotorCardVersion(AxisId axis)
         {
             var result = _commands.GetMotorCardVersion(axis);
+            if (result.Length < 7) { return string.Empty; }
 
-            //int value = Convert.ToInt32(result.Substring(5, 2), 16); convert hex to int for possible enum list
-            
-            switch (result.Substring(5, 2))
-            {
-                case "00":
-                    MountType = "EQ6Pro";
-                    break;
-                case "01":
-                    MountType = "HEQ5";
-                    break;
-                case "02":
-                    MountType = "EQ5";
-                    break;
-                case "03":
-                    MountType = "EQ3";
-                    break;
-                case "04":
-                    MountType = "EQ8";
-                    break;
-                case "05":
-                    MountType = "AZEQ6/EQ6-R";
-                    break;
-                case "06":
-                    MountType = "AZEQ5";
-                    break;
-                case "A5":
-                    MountType = "AZGTi";
-                    break;
-                case "20":
-                    MountType = "EQ8-R";
-                    break;
-                case "21":
-                    MountType = "EQ8";
-                    break;
-                case "22":
-                    MountType = "AZ-EQ6";
-                    break;
-                case "23":
-                    MountType = "EQ6-R";
-                    break;
-                case "24":
-                    MountType = "NEQ6 PRO";
-                    break;
-                case "25":
-                    MountType = "EQ7";
-                    break;
-                default:
-                    MountType = "Unknown";
-                    break;
-            }
+            var a = Convert.ToInt32(result.Substring(5, 2), 16);
+            if (!Enum.IsDefined(typeof(McModel), a)){ a = 999;}
 
+            MountType = GetEnumDescription((McModel) a);
+            MountNum = a;
             MountVersion = result.Substring(1, 2) + "." + result.Substring(3, 2);
 
             var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{MountType},{MountVersion}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{MountType},{MountVersion},{MountNum}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             return result.Substring(1, 6);
@@ -1358,6 +1316,18 @@ namespace GS.SkyWatcher
         }
 
         #endregion
+
+        private static string GetEnumDescription(Enum value)
+        {
+            var fi = value.GetType().GetField(value.ToString());
+
+            if (fi.GetCustomAttributes(typeof(DescriptionAttribute), false) is DescriptionAttribute[] attributes && attributes.Any())
+            {
+                return attributes.First().Description;
+            }
+
+            return value.ToString();
+        }
     }
 
     [Flags]

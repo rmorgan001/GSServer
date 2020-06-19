@@ -13,10 +13,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see<https://www.gnu.org/licenses/> .
 */-->
-<ResourceDictionary 
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-    xmlns:system="clr-namespace:System;assembly=mscorlib">
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <!--Window Title bar-->
     <system:String x:Key="lbName">GS Server</system:String>
@@ -39,7 +36,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="cvtInvIP">Invalid IP</system:String>
     <system:String x:Key="cvtRequired">Required</system:String>
 
-   <!--Exceptions -->
+    <!--Exceptions -->
     <system:String x:Key="exParked">Unpark first</system:String>
 
     <!--ChartViewer -->

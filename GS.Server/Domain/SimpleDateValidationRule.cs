@@ -16,6 +16,7 @@
 
 using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace GS.Server.Domain
@@ -27,7 +28,7 @@ namespace GS.Server.Domain
             return DateTime.TryParse((value ?? "").ToString(),
                 CultureInfo.CurrentCulture, DateTimeStyles.AssumeLocal | DateTimeStyles.AllowWhiteSpaces, out _)
                 ? ValidationResult.ValidResult
-                : new ValidationResult(false, "Invalid date");
+                : new ValidationResult(false, $"{Application.Current.Resources["cvtInvaliddate"]}");
         }
     }
 }

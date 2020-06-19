@@ -305,6 +305,7 @@ namespace GS.Server.Settings
             {
                 Languages.Language = value;
                 OnPropertyChanged();
+                OpenDialog("Restart GS Server");
             }
         }
 
@@ -1523,7 +1524,7 @@ namespace GS.Server.Settings
                         }
 
                         //stream.Close();
-                        OpenDialog("Copied to Clipboard");
+                        OpenDialog($"{Application.Current.Resources["msgCopiedClip"]}");
                     }
                 }
             }
