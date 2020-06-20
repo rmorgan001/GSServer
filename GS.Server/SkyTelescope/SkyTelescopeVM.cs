@@ -107,8 +107,8 @@ namespace GS.Server.SkyTelescope
                     AutoHomeLimits = new List<int>(Enumerable.Range(20, 160));
                     DecOffsets = new List<int>() { 0, -90, 90 };
                     MinPulseList = new List<int>(Enumerable.Range(5, 46));
-                    RaBacklashList = new List<int>(Enumerable.Range(0, 500));
-                    DecBacklashList = new List<int>(Enumerable.Range(0, 500)); 
+                    RaBacklashList = new List<int>(Enumerable.Range(0, 1001));
+                    DecBacklashList = new List<int>(Enumerable.Range(0, 1001)); 
 
                     // defaults
                     AtPark = SkyServer.AtPark; 

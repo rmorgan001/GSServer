@@ -87,7 +87,7 @@ namespace GS.Server.Pulses
                     GuiderImpl.PropertyChanged += PropertyChangedGuiding;
                     SkySettings.StaticPropertyChanged += PropertyChangedSkySettings;
 
-                    DecBacklashList = new List<int>(Enumerable.Range(0, 500));
+                    DecBacklashList = new List<int>(Enumerable.Range(0, 1001));
 
                     LoadDefaultSettings();
                     LoadPulsesDefaults();
