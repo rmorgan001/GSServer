@@ -763,30 +763,36 @@ namespace GS.Server.Windows
                 return;
             }
 
+            var HcMode = SkySettings.HcMode;
+            var HcAntiDec = SkySettings.HcAntiDec;
+            var HcAntiRa = SkySettings.HcAntiRa;
+            var DecBacklash = SkySettings.DecBacklash;
+            var RaBacklash = SkySettings.DecBacklash;
+
             var speed = SkySettings.HcSpeed;
             switch (direction)
             {
                 case SlewDirection.SlewEast:
                 case SlewDirection.SlewRight:
-                    SkyServer.HcMoves(speed, SlewDirection.SlewEast);
+                    SkyServer.HcMoves(speed, SlewDirection.SlewEast, HcMode, HcAntiRa, HcAntiDec, RaBacklash, DecBacklash);
                     break;
                 case SlewDirection.SlewWest:
                 case SlewDirection.SlewLeft:
-                    SkyServer.HcMoves(speed, SlewDirection.SlewWest);
+                    SkyServer.HcMoves(speed, SlewDirection.SlewWest, HcMode, HcAntiRa, HcAntiDec, RaBacklash, DecBacklash);
                     break;
                 case SlewDirection.SlewNorth:
                 case SlewDirection.SlewUp:
-                    SkyServer.HcMoves(speed, SlewDirection.SlewNorth);
+                    SkyServer.HcMoves(speed, SlewDirection.SlewNorth, HcMode, HcAntiRa, HcAntiDec, RaBacklash, DecBacklash);
                     break;
                 case SlewDirection.SlewSouth:
                 case SlewDirection.SlewDown:
-                    SkyServer.HcMoves(speed, SlewDirection.SlewSouth);
+                    SkyServer.HcMoves(speed, SlewDirection.SlewSouth, HcMode, HcAntiRa, HcAntiDec, RaBacklash, DecBacklash);
                     break;
                 case SlewDirection.SlewNoneRa:
-                    SkyServer.HcMoves(speed, SlewDirection.SlewNoneRa);
+                    SkyServer.HcMoves(speed, SlewDirection.SlewNoneRa, HcMode, HcAntiRa, HcAntiDec, RaBacklash, DecBacklash);
                     break;
                 case SlewDirection.SlewNoneDec:
-                    SkyServer.HcMoves(speed, SlewDirection.SlewNoneDec);
+                    SkyServer.HcMoves(speed, SlewDirection.SlewNoneDec, HcMode, HcAntiRa, HcAntiDec, RaBacklash, DecBacklash);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

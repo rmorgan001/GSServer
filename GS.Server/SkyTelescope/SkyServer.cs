@@ -2681,7 +2681,7 @@ namespace GS.Server.SkyTelescope
         /// return the change in axis values as a result of any HC button presses
         /// </summary>
         /// <returns></returns>
-        public static void HcMoves(SlewSpeed speed, SlewDirection direction)
+        public static void HcMoves(SlewSpeed speed, SlewDirection direction, HCMode HcMode, bool HcAntiRa, bool HcAntiDec, int RaBacklash, int DecBacklash)
         {
             if (!IsMountRunning) { return; }
 
@@ -2719,7 +2719,7 @@ namespace GS.Server.SkyTelescope
             }
 
             // Check hand control mode and direction
-            switch (SkySettings.HcMode)
+            switch (HcMode)
             {
                 case HCMode.Axes:
                     switch (direction)
@@ -2860,7 +2860,7 @@ namespace GS.Server.SkyTelescope
 
             // Anti-backlash compensate
             long stepsNeededDec = 0;
-            if (SkySettings.HcAntiDec && SkySettings.DecBacklash > 0 && HcPrevMoveDec != null)
+            if (HcAntiDec && DecBacklash > 0 && HcPrevMoveDec != null)
             {
                 switch (direction)
                 {
@@ -2872,9 +2872,9 @@ namespace GS.Server.SkyTelescope
                             Math.Sign(HcPrevMoveDec.Delta) != Math.Sign(change[1]))
                         {
                             stepsNeededDec = Convert.ToInt64(HcPrevMovesDec.Sum());
-                            if (stepsNeededDec >= SkySettings.DecBacklash)
+                            if (stepsNeededDec >= DecBacklash)
                             {
-                                stepsNeededDec = SkySettings.DecBacklash;
+                                stepsNeededDec = DecBacklash;
                             }
 
                             if (change[1] < 0) stepsNeededDec = -stepsNeededDec;
@@ -2883,7 +2883,7 @@ namespace GS.Server.SkyTelescope
                 }
             }
             long stepsNeededRa = 0;
-            if (SkySettings.HcAntiRa && Tracking && SkySettings.RaBacklash > 0 && HcPrevMoveRa != null)
+            if (HcAntiRa && Tracking && RaBacklash > 0 && HcPrevMoveRa != null)
             {
                 if (direction == SlewDirection.SlewNoneRa)
                 {
@@ -2894,7 +2894,7 @@ namespace GS.Server.SkyTelescope
                             if (HcPrevMoveRa.StepEnd.Value > HcPrevMoveRa.StepStart.Value)
                             {
                                 stepsNeededRa = Convert.ToInt64(HcPrevMoveRa.StepDiff);
-                                if (stepsNeededRa >= SkySettings.RaBacklash) { stepsNeededRa = SkySettings.RaBacklash; }
+                                if (stepsNeededRa >= RaBacklash) { stepsNeededRa = RaBacklash; }
                                 stepsNeededRa = -Math.Abs(stepsNeededRa);
                             }
                         }
@@ -2903,7 +2903,7 @@ namespace GS.Server.SkyTelescope
                             if (HcPrevMoveRa.StepEnd.Value < HcPrevMoveRa.StepStart.Value)
                             {
                                 stepsNeededRa = Convert.ToInt64(HcPrevMoveRa.StepDiff);
-                                if (stepsNeededRa >= SkySettings.RaBacklash) { stepsNeededRa = SkySettings.RaBacklash; }
+                                if (stepsNeededRa >= RaBacklash) { stepsNeededRa = RaBacklash; }
                             }
                         }
                     }
@@ -2921,7 +2921,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{HcPrevMoveDec.Delta},{HcPrevMovesDec.Sum()},Anti-Lash,{stepsNeededDec} of {SkySettings.DecBacklash}"
+                    Message = $"{HcPrevMoveDec.Delta},{HcPrevMovesDec.Sum()},Anti-Lash,{stepsNeededDec} of {DecBacklash}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -2935,7 +2935,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{HcPrevMoveRa.Direction},{HcPrevMoveRa.StepDiff},Anti-Lash,{stepsNeededRa} of {SkySettings.RaBacklash}"
+                    Message = $"{HcPrevMoveRa.Direction},{HcPrevMoveRa.StepDiff},Anti-Lash,{stepsNeededRa} of {RaBacklash}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -3000,7 +3000,7 @@ namespace GS.Server.SkyTelescope
                         }
                     }
 
-                    // Collect position after lash correction
+                    // Correct position after lash correction
                     if (HcPrevMoveDec != null) HcPrevMoveDec.StepStart = GetRawSteps(1);
 
                     if (Math.Abs(stepsNeededRa) > 0)
@@ -3046,7 +3046,7 @@ namespace GS.Server.SkyTelescope
                         }
                     }
 
-                    // Collect position after lash correction
+                    // Correct position after lash correction
                     if (HcPrevMoveDec != null) HcPrevMoveDec.StepStart = GetRawSteps(1);
 
                     if (Math.Abs(stepsNeededRa) > 0)
