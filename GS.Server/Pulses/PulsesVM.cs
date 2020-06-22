@@ -88,6 +88,8 @@ namespace GS.Server.Pulses
                     SkySettings.StaticPropertyChanged += PropertyChangedSkySettings;
 
                     DecBacklashList = new List<int>(Enumerable.Range(0, 1001));
+                    var extendedlist = new List<int>(Numbers.InclusiveIntRange(1000, 3000, 100));
+                    DecBacklashList = DecBacklashList.Concat(extendedlist);
 
                     LoadDefaultSettings();
                     LoadPulsesDefaults();
@@ -810,7 +812,7 @@ namespace GS.Server.Pulses
         }
 
 
-        public IList<int> DecBacklashList { get; }
+        public IEnumerable<int> DecBacklashList { get; }
 
         public int DecBacklash
         {

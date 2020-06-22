@@ -108,7 +108,10 @@ namespace GS.Server.SkyTelescope
                     DecOffsets = new List<int>() { 0, -90, 90 };
                     MinPulseList = new List<int>(Enumerable.Range(5, 46));
                     RaBacklashList = new List<int>(Enumerable.Range(0, 1001));
-                    DecBacklashList = new List<int>(Enumerable.Range(0, 1001)); 
+                    DecBacklashList = new List<int>(Enumerable.Range(0, 1001));
+                    var extendedlist = new List<int>(Numbers.InclusiveIntRange(1000, 3000, 100));
+                    RaBacklashList = RaBacklashList.Concat(extendedlist);
+                    DecBacklashList = DecBacklashList.Concat(extendedlist);
 
                     // defaults
                     AtPark = SkyServer.AtPark; 
@@ -4225,9 +4228,9 @@ namespace GS.Server.SkyTelescope
 
         #region Backlash
 
-        public IList<int> RaBacklashList { get; }
+        public IEnumerable<int> RaBacklashList { get; }
 
-        public IList<int> DecBacklashList { get; }
+        public IEnumerable<int> DecBacklashList { get; }
 
         public int DecBacklash
         {

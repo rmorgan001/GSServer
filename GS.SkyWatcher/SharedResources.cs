@@ -186,7 +186,6 @@ namespace GS.SkyWatcher
         IdStarseeker80 = 10,                // NexStarGT-80 mount
         IdStarseeker114 = 11,			// NexStarGT-114 mount
     }
-
     public enum McModel
     {
         [Description("EQ6(EQ6 MC)")] EQ6 = 0,
