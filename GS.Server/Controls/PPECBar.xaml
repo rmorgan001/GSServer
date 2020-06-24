@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d">
-    <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  IsEnabled="{Binding PecEnabled}">
+    <StackPanel Margin="0,5,0,0" Orientation="Horizontal" VerticalAlignment="Center"  IsEnabled="{Binding PecEnabled}">
         <StackPanel.Style>
             <Style TargetType="StackPanel">
                 <Style.Triggers>
@@ -21,13 +21,13 @@
         <ToggleButton Width="20" Height="20" ToolTip="{StaticResource tbOnOff}" Style="{StaticResource MaterialDesignActionLightToggleButton}"
                           IsChecked="{Binding PpecOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Label Content="{StaticResource lbPpec}"/>
-        <md:DialogHost Margin="5,0,0,0" CloseOnClickAway="True" IsOpen="{Binding IsPpecDialogOpen}" DialogContent="{Binding PpecContent}">
+        <md:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsPpecDialogOpen}" DialogContent="{Binding PpecContent}">
             <ToggleButton  HorizontalAlignment="Center" Width="20" Height="20" ToolTip="{StaticResource tbStartTrainingMode}"
                           IsChecked="{Binding PecTrainOn}" Style="{StaticResource MaterialDesignActionLightToggleButton}"
                           Command="{Binding OpenPpecDialogCommand}"/>
         </md:DialogHost>
         <Label Content="{StaticResource lbPpecTraining}"/>
-        <md:PackIcon Margin="5,0,0,0" Kind="Timer" Width="25" Height="25" ToolTip="{StaticResource ictipPpecTimer}">
+        <md:PackIcon Kind="Timer" Width="20" Height="20" ToolTip="{StaticResource ictipPpecTimer}" VerticalAlignment="Center">
             <md:PackIcon.Style>
                 <Style TargetType="md:PackIcon">
                     <Style.Triggers>

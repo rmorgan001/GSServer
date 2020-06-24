@@ -36,7 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\Monitor.settings">
-      <Generator>PublicSettingsSingleFileGenerator</Generator>
+      <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Monitor.Designer.cs</LastGenOutput>
     </None>
     <None Include="Resources\ASCOM.snk" />
@@ -62,7 +62,17 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <None Update="LanguageFiles\GSChart_en-US.xaml">
+      <SubType>Designer</SubType>
+      <Generator></Generator>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="LanguageFiles\GSChart_fr-FR.xaml">
+      <SubType>Designer</SubType>
+      <Generator></Generator>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="LanguageFiles\GSServer_en-US.xaml">
       <SubType>Designer</SubType>
       <Generator></Generator>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -70,6 +80,11 @@
     <None Update="LanguageFiles\GSServer_fr-FR.xaml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
+    </None>
+    <None Update="LanguageFiles\GSUtil_en-US.xaml">
+      <SubType>Designer</SubType>
+      <Generator></Generator>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="LanguageFiles\GSUtil_fr-FR.xaml">
       <SubType>Designer</SubType>

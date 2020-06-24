@@ -616,7 +616,6 @@ namespace GS.Server
                     case "-embedding":
                         StartedByCom = true; // Indicate COM started us
                         break;
-
                     case "-register":
                     case @"/register":
                     case "-regserver": // Emulate VB6
@@ -624,7 +623,6 @@ namespace GS.Server
                         RegisterObjects(); // Register each served object
                         bRet = false;
                         break;
-
                     case "-unregister":
                     case @"/unregister":
                     case "-unregserver": // Emulate VB6
@@ -634,6 +632,12 @@ namespace GS.Server
                         break;
                     case @"/test":
                         SkyServer.TestTab = true;
+                        break;
+                    case @"/en":
+                        Shared.Settings.Language = "en-US";
+                        break;
+                    case @"/fr":
+                        Shared.Settings.Language = "fr-FR";
                         break;
                     default:
                         MessageBox.Show(

@@ -11,8 +11,8 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>
-    <Border BorderBrush="DimGray"  BorderThickness="3" CornerRadius="5" Background="{DynamicResource MaterialDesignToolBarBackground}">
-        <Grid Width="320" Height="175" Margin="4" >
+    <Border BorderBrush="DimGray"  BorderThickness="2" CornerRadius="5" Background="{DynamicResource MaterialDesignToolBarBackground}">
+        <Grid Width="320" Height="175" Margin="4"  HorizontalAlignment="Left">
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition />
@@ -22,7 +22,7 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition />
-                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <Button Grid.Row="0" Grid.Column="0" Width="20" Height="20" ToolTip="{StaticResource btnOpenWin}" Command="{Binding OpenHCWindowCmd}" Style="{StaticResource MaterialDesignRaisedAccentButton}" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" 

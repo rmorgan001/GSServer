@@ -17,55 +17,55 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!--Window Title bar-->
     <system:String x:Key="lbName">GS Server</system:String>
-    <system:String x:Key="lbApps">Connected Applications:</system:String>
-    <system:String x:Key="tbCloseApps">Application(s) still connected. Accept to close anyway?</system:String>
+    <system:String x:Key="lbApps">Applications connectées:</system:String>
+    <system:String x:Key="tbCloseApps">Applications connectées. Fermer quand même?</system:String>
     <system:String x:Key="taskbarDescription">GreenSwamp Server</system:String>
 
     <!--Dialog -->
-    <system:String x:Key="btnAccept">Accept</system:String>
-    <system:String x:Key="btnCancel">Cancel</system:String>
+    <system:String x:Key="btnAccept">Accepter</system:String>
+    <system:String x:Key="btnCancel">Annuler</system:String>
     <system:String x:Key="btnOk">Ok</system:String>
-    <system:String x:Key="btnStart">Start</system:String>
-    <system:String x:Key="btnDiaStop">Stop</system:String>
+    <system:String x:Key="btnStart">Démarrer</system:String>
+    <system:String x:Key="btnDiaStop">Arréter</system:String>
 
     <!--Converters -->
-    <system:String x:Key="cvtInvNumber">Invalid Number</system:String>
-    <system:String x:Key="cvtColorToBrush">ColorToBurshConverter only supports converting from Color and String</system:String>
-    <system:String x:Key="cvtEnumErr1">Type must be for an Enum</system:String>
-    <system:String x:Key="cvtEnumErr2">The EnumType must be specified</system:String>
-    <system:String x:Key="cvtInvIP">Invalid IP</system:String>
-    <system:String x:Key="cvtRequired">Required</system:String>
+    <system:String x:Key="cvtInvNumber">Nombre invalide</system:String>
+    <system:String x:Key="cvtColorToBrush">colorToBurshConverter ne supporte que la conversion à partir de couleur et chaine</system:String>
+    <system:String x:Key="cvtEnumErr1">Le type doit être pour un Enum</system:String>
+    <system:String x:Key="cvtEnumErr2">Le type de Enum doit être spécifié</system:String>
+    <system:String x:Key="cvtInvIP">IP invalide</system:String>
+    <system:String x:Key="cvtRequired">Requis</system:String>
 
-    <!--Utilities-->
-    <system:String x:Key="cbDelLogFiles">Log Files</system:String>
-    <system:String x:Key="cbDelSettings">Settings</system:String>
-    <system:String x:Key="btnDelFiles">Delete</system:String>
-    <system:String x:Key="msgDelFiles">Delete GS files and settings</system:String>
-    <system:String x:Key="btnExit">Exit</system:String>
-    <system:String x:Key="btnDelAccept">Accept</system:String>
-    <system:String x:Key="btnDelCancel">Cancel</system:String>
-    <system:String x:Key="msgDelFilesOk">Accept to delete?</system:String>
-    <system:String x:Key="msgDelLogFiles">Log files deleted</system:String>
-    <system:String x:Key="msgDelSettings">Setting files deleted</system:String>
-    <system:String x:Key="msgDelSettingsVer">Setting versions deleted</system:String>
-    <system:String x:Key="msgDelCloseApps">Close any open GS applications</system:String>
-    <system:String x:Key="msgUtilLockTitle">Running test: is GS Server running or locked</system:String>
-    <system:String x:Key="btnUtilCheck">Check</system:String>
-    <system:String x:Key="btnUtilChooser">Chooser</system:String>
-    <system:String x:Key="btnUtilChooserTitle">Connection test: to the telescope driver</system:String>
-    <system:String x:Key="btnUtilStart">Start</system:String>
-    <system:String x:Key="btnUtilStop">Stop</system:String>
-    <system:String x:Key="tbUtilSerial">Serial Test:</system:String>
-    <system:String x:Key="tbUtilComPort">ComPort</system:String>
-    <system:String x:Key="tbUtilTimeout">Timeout Occured Event #</system:String>
-    <system:String x:Key="tbUtilProcessName">Process Name:</system:String>
+<!--Utilities-->
+    <system:String x:Key="cbDelLogFiles">Fichiers journal</system:String>
+    <system:String x:Key="cbDelSettings">Paramètres</system:String>
+    <system:String x:Key="btnDelFiles">Supprimer</system:String>
+    <system:String x:Key="msgDelFiles">Supprimer les fichiers GS et les préférences</system:String>
+    <system:String x:Key="btnExit">Sortir</system:String>
+    <system:String x:Key="btnDelAccept">Accepter</system:String>
+    <system:String x:Key="btnDelCancel">Annuler</system:String>
+    <system:String x:Key="msgDelFilesOk">Accepter de supprimer?</system:String>
+    <system:String x:Key="msgDelLogFiles">Fichiers journaux supprimés</system:String>
+    <system:String x:Key="msgDelSettings">Fichiers préférences supprimés</system:String>
+    <system:String x:Key="msgDelSettingsVer">Préférences de version supprimées</system:String>
+    <system:String x:Key="msgDelCloseApps">Fermer toutes les applications GS ouvertes</system:String>
+    <system:String x:Key="msgUtilLockTitle">Test de démarrage : GS Server est démarré ou vérouillé</system:String>
+    <system:String x:Key="btnUtilCheck">Vérification</system:String>
+    <system:String x:Key="btnUtilChooser">Sélection</system:String>
+    <system:String x:Key="btnUtilChooserTitle">Test de connexion : vers le driver de la monture</system:String>
+    <system:String x:Key="btnUtilStart">Démarrer</system:String>
+    <system:String x:Key="btnUtilStop">Arréter</system:String>
+    <system:String x:Key="tbUtilSerial">Test série :</system:String>
+    <system:String x:Key="tbUtilComPort">Port Com</system:String>
+    <system:String x:Key="tbUtilTimeout">Délais dépassé pour l'action #</system:String>
+    <system:String x:Key="tbUtilProcessName">Nom du process:</system:String>
     <system:String x:Key="tbUtilId">Id:</system:String>
-    <system:String x:Key="tbUtilLocks">Locks:</system:String>
-    <system:String x:Key="tbUtilCounter">Counter:</system:String>
-    <system:String x:Key="tbUtilTimer">Timer:</system:String>
-    <system:String x:Key="tbUtilNothing">Nothing found</system:String>
+    <system:String x:Key="tbUtilLocks">Verrouillage:</system:String>
+    <system:String x:Key="tbUtilCounter">Compteur:</system:String>
+    <system:String x:Key="tbUtilTimer">Compte à rebours:</system:String>
+    <system:String x:Key="tbUtilNothing">Aucun élément trouvé</system:String>
     <system:String x:Key="tbUtilBaudRate">BaudRate</system:String>
-    <system:String x:Key="tbUtilInterval">Interval</system:String>
-    <system:String x:Key="msgNotfound">Not found</system:String>
+    <system:String x:Key="tbUtilInterval">Intervalle</system:String>
+    <system:String x:Key="msgNotfound">Non trouvé</system:String>
 </ResourceDictionary>
  

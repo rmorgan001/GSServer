@@ -104,13 +104,13 @@
                               Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
                 <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Center">
                     <md:Badged Badge="{Binding StartBadgeContent}" VerticalAlignment="Center">
-                        <Button Margin="10,0,0,0" Height="30" Width="80" ToolTip="{StaticResource btnPlotStart}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPlotStartCmd}" Content="{StaticResource btnPlotStart}" />
+                        <Button Margin="10,0,0,0" Height="30" ToolTip="{StaticResource btnPlotStart}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPlotStartCmd}" Content="{StaticResource btnPlotStart}" />
                     </md:Badged>
-                    <Button Margin="15,0,0,0" Height="30" Width="80" ToolTip="{StaticResource btnPlotClear}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPlotClearCmd}" Content="{StaticResource btnPlotClear}" />
+                    <Button Margin="15,0,0,0" Height="30" ToolTip="{StaticResource btnPlotClear}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPlotClearCmd}" Content="{StaticResource btnPlotClear}" />
                     <md:Badged Badge="{Binding PauseBadgeContent}" VerticalAlignment="Center">
-                        <Button Margin="10,0,0,0" Height="30" Width="80" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPlotPauseCmd}" Content="{StaticResource btnPlotPause}" />
+                        <Button Margin="10,0,0,0" Height="30" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPlotPauseCmd}" Content="{StaticResource btnPlotPause}" />
                     </md:Badged>
-                    <Button Margin="10,0,0,0" Height="30" Width="80" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPlotSizeCmd}" Content="{StaticResource btnPlotSize}" />
+                    <Button Margin="10,0,0,0" Height="30" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPlotSizeCmd}" Content="{StaticResource btnPlotSize}" />
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock VerticalAlignment="Center" Margin="10,0,0,0" Text="Zoom:" />
                         <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="X" Command="{Binding Path=ClickPlotZoomCmd}" CommandParameter="X" />

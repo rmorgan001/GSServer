@@ -128,7 +128,7 @@
             </TextBlock.Style>
             </TextBlock>
         <md:DialogHost Grid.Column="5" IsOpen="{Binding IsLimitDialogOpen}"  DialogContent="{Binding LimitContent}">
-            <Button Command="{Binding OpenLimitDialogCommand}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource btntipAxisLimit}">
+            <Button Command="{Binding OpenLimitDialogCommand}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource btntipAxisLimit}" Padding="10">
                 <md:PackIcon Kind="WarningCircle" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-5">
                     <md:PackIcon.Style>
                         <Style TargetType="md:PackIcon">
@@ -148,7 +148,7 @@
                 </md:PackIcon>
             </Button>
         </md:DialogHost>
-        <Button Grid.Column="6" Command="{Binding ClearWarningCommand}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource btntipWarnings}">
+        <Button Grid.Column="6" Command="{Binding ClearWarningCommand}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource btntipWarnings}" Padding="10">
             <md:PackIcon Kind="WarningBox" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-5">
                 <md:PackIcon.Style>
                     <Style TargetType="md:PackIcon">
@@ -167,7 +167,7 @@
                 </md:PackIcon.Style>
             </md:PackIcon>
         </Button>
-        <Button Grid.Column="7" Command="{Binding ClearErrorsCommand}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource btntipErrors}">
+        <Button Grid.Column="7" Command="{Binding ClearErrorsCommand}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource btntipErrors}" Padding="10">
             <md:PackIcon Kind="AlarmLight" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-5">
                 <md:PackIcon.Style>
                     <Style TargetType="md:PackIcon">
@@ -186,7 +186,7 @@
                 </md:PackIcon.Style>
             </md:PackIcon>
         </Button>
-        <Button Grid.Column="8" Command="{Binding ClickMountInfoDialogCommand}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource btntipConnected}">
+        <Button Grid.Column="8" Command="{Binding ClickMountInfoDialogCommand}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource btntipConnected}" Padding="10">
             <md:PackIcon Kind="Usb" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-5" ToolTip="{StaticResource btntipConnected}">
                 <md:PackIcon.Style>
                     <Style TargetType="md:PackIcon">

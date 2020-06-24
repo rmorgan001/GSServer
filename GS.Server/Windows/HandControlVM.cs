@@ -767,7 +767,7 @@ namespace GS.Server.Windows
             var HcAntiDec = SkySettings.HcAntiDec;
             var HcAntiRa = SkySettings.HcAntiRa;
             var DecBacklash = SkySettings.DecBacklash;
-            var RaBacklash = SkySettings.DecBacklash;
+            var RaBacklash = SkySettings.RaBacklash;
 
             var speed = SkySettings.HcSpeed;
             switch (direction)

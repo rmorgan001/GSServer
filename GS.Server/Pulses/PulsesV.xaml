@@ -519,16 +519,16 @@
                 Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
                 <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Center" >
                     <md:Badged Badge="{Binding StartBadgeContent}" VerticalAlignment="Center">
-                        <Button Margin="10,0,0,0" Height="30" Width="80" ToolTip="{StaticResource btnPulsesStart}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesStartCmd}"
+                        <Button Margin="10,0,0,0" Height="30" ToolTip="{StaticResource btnPulsesStart}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesStartCmd}"
                                 Content="{StaticResource btnPulsesStart}"/>
                     </md:Badged>
-                    <Button Margin="15,0,0,0" Height="30" Width="80" ToolTip="{StaticResource btnPulsesClear}"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesClearCmd}"
+                    <Button Margin="15,0,0,0" Height="30" ToolTip="{StaticResource btnPulsesClear}"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesClearCmd}"
                             Content="{StaticResource btnPulsesClear}"/>
                     <md:Badged Badge="{Binding PauseBadgeContent}" VerticalAlignment="Center">
-                        <Button Margin="10,0,0,0" Height="30" Width="80" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesPauseCmd}"
+                        <Button Margin="10,0,0,0" Height="30" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesPauseCmd}"
                                 Content="{StaticResource btnPulsesPause}"/>
                     </md:Badged>
-                    <Button Margin="10,0,0,0" Height="30" Width="80" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesSizeCmd}"
+                    <Button Margin="10,0,0,0" Height="30" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesSizeCmd}"
                             Content="{StaticResource btnPulsesSize}"/>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock VerticalAlignment="Center" Margin="10,0,0,0" Text="Zoom:"/>
@@ -536,8 +536,8 @@
                         <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Y" Command="{Binding Path=ClickPulsesZoomCmd}" CommandParameter="Y"/>
                         <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Xy" Command="{Binding Path=ClickPulsesZoomCmd}" CommandParameter="Xy" IsChecked="True" />
                     </StackPanel>
-                    <Label Margin="30,0,0,0" VerticalAlignment="Center" Content="{StaticResource cbtipDecBacklash}" />
-                    <ComboBox Margin="5,0,0,0" Width="45" HorizontalContentAlignment="Right" ToolTip="{StaticResource cbtipDecBacklash}" ItemsSource="{Binding DecBacklashList}">
+                    <Label Margin="10,0,0,0" VerticalAlignment="Center" Content="{StaticResource cbtipDecBacklash}" />
+                    <ComboBox Width="45" HorizontalContentAlignment="Right" ToolTip="{StaticResource cbtipDecBacklash}" ItemsSource="{Binding DecBacklashList}">
                         <ComboBox.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <VirtualizingStackPanel HorizontalAlignment="Right" />
