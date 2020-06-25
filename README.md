@@ -2,7 +2,7 @@
 GS Server is SkyWatcher ASCOM telescope driver for use with astronomy software and SkyWatcher and Orion mounts.  It is built using C#, WPF, and a variation of MVVM.
 
 ![Builds](https://github.com/rmorgan001/GSServer/workflows/Builds/badge.svg)
-[![Windows](https://img.shields.io/github/v/release/rmorgan001/GSServer)](https://github.com/rmorgan001/GSServer/releases/tag/v1.0.1.6)
+[![Windows](https://img.shields.io/github/v/release/rmorgan001/GSServer)](https://github.com/rmorgan001/GSServer/releases)
 
 Download the GSServer installer program at ## http://www.greenswamp.org/
 
