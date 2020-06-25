@@ -67,7 +67,7 @@
                     </ComboBox.Text>
                 </ComboBox>
                 <!--Flip-->
-                <Label VerticalAlignment="Bottom" Margin="0,5,0,0"  Content="{StaticResource lbFlip}" FontSize="12" />
+                <Label VerticalAlignment="Bottom" Margin="-3,5,0,0"  Content="{StaticResource lbFlip}" FontSize="12" />
                 <StackPanel Orientation="Horizontal" Margin="0,-5,0,0" >
                     <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource tbtntipFlipEW}" IsChecked="{Binding FlipEW, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding EWEnabled}" />
                     <Label VerticalAlignment="Bottom" Content="{StaticResource lbFlipEW}" FontSize="12" />
@@ -77,7 +77,7 @@
                     <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbFlipNS}" FontSize="12" />
                 </StackPanel>
                 <!--backlash-->
-                <Label VerticalAlignment="Bottom" Margin="0,0,0,0" Content="{StaticResource lbHcBacklash}" FontSize="12" />
+                <Label VerticalAlignment="Bottom" Margin="-3,0,0,0" Content="{StaticResource lbHcBacklash}" FontSize="12" />
                 <StackPanel Orientation="Horizontal" Margin="0,-5,0,0">
                     <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource lbtipHcAntiBacklash}" IsChecked="{Binding HcAntiRa, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbHcRa}" FontSize="12" />
