@@ -1127,67 +1127,149 @@ namespace GS.Server.SkyTelescope
 
             #endregion
 
-            #region Repeat Slews for Ra
+            #region Final precision slew
 
-            if (trackingState)
-            {
-                //attempt precision moves to target
-                var gotoPrecision = SkySettings.GotoPrecision;
-                var rate = CurrentTrackingRate();
-                var deltaTime = stopwatch.Elapsed.TotalSeconds;
-                var maxtries = 0;
+            Task decTask = Task.Run(() => SimPrecisionGotoDec(target[1], simTarget[1]));
+            Task raTask = Task.Run(() => SimPrecisionGoToRA(target, trackingState, stopwatch));
 
-                while (true)
-                {
-                    if (maxtries > 3) break;
-                    maxtries++;
-                    stopwatch.Reset();
-                    stopwatch.Start();
-
-                    //calculate new target position
-                    var deltaDegree = rate * deltaTime;
-                    if (deltaDegree < gotoPrecision) break;
-
-                    target[0] += deltaDegree;
-                    var deltaTarget = Axes.AxesAppToMount(target);
-
-                    if (SlewState == SlewType.SlewNone) break;//check for a stop
-
-                    _ = new CmdAxisGoToTarget(0, Axis.Axis1, deltaTarget[0]);//move to new target
-
-                    // check for axis stopped
-                    var stopwatch1 = Stopwatch.StartNew();
-                    while (stopwatch1.Elapsed.TotalMilliseconds < 2000)
-                    {
-                        if (SlewState == SlewType.SlewNone) break;
-                        var deltax = new CmdAxisStatus(MountQueue.NewId, Axis.Axis1);
-                        var axis1Status = (AxisStatus)MountQueue.GetCommandResult(deltax).Result;
-                        if (!axis1Status.Slewing) break; // stopped doesn't report quick enough
-                    }
-
-                    monitorItem = new MonitorEntry
-                    {
-                        Datetime = HiResDateTime.UtcNow,
-                        Device = MonitorDevice.Telescope,
-                        Category = MonitorCategory.Server,
-                        Type = MonitorType.Information,
-                        Method = MethodBase.GetCurrentMethod().Name,
-                        Thread = Thread.CurrentThread.ManagedThreadId,
-                        Message = $"Percision:{target[0]},{deltaTime},{deltaDegree}"
-                    };
-                    MonitorLog.LogToMonitor(monitorItem);
-
-                    deltaTime = stopwatch.Elapsed.TotalSeconds;//take the time and move again
-                }
-
-                SimTasks(MountTaskName.StopAxes);//make sure all axes are stopped
-            }
-
-            stopwatch.Stop();
+            Task.WaitAll(decTask, raTask);
 
             #endregion
 
+            SimTasks(MountTaskName.StopAxes);//make sure all axes are stopped
+
+            stopwatch.Stop();
             return returncode;
+        }
+
+        /// <summary>
+        /// Performs a final precision slew of the Dec axis to target if necessary.
+        /// </summary>
+        /// <param name="targetDec"></param>
+        /// <param name="skyTargetDec"></param>
+        /// <returns></returns>
+        private static int SimPrecisionGotoDec(double targetDec, double skyTargetDec)
+        {
+            const int returncode = 0;
+            var gotoPrecision = SkySettings.GotoPrecision;
+            var maxtries = 0;
+
+            while (true)
+            {
+                if (maxtries > 3) { break; }
+                maxtries++;
+
+                // Calculate error
+                var rawPositions = GetRawDegrees();
+                if (rawPositions == null || double.IsNaN(rawPositions[1])) { break; }
+                var deltaDegree = Math.Abs(skyTargetDec - rawPositions[1]);
+
+                if (deltaDegree < gotoPrecision) { break; }
+                if (SlewState == SlewType.SlewNone) { break; } //check for a stop
+
+                object _ = new CmdAxisGoToTarget(0, Axis.Axis2, skyTargetDec); //move to target DEC
+
+                // track movment until axis is stopped
+                var stopwatch1 = Stopwatch.StartNew();
+                while (stopwatch1.Elapsed.TotalMilliseconds < 2000)
+                {
+                    if (SlewState == SlewType.SlewNone) { break; }
+                    var deltay = new CmdAxisStatus(MountQueue.NewId, Axis.Axis2);
+                    var axis2Status = Convert.ToBoolean(MountQueue.GetCommandResult(deltay).Result);
+                    if (!axis2Status.Slewing) { break; }
+                }
+
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"Dec Precision:{targetDec},{deltaDegree}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+            return returncode;
+        }
+
+        /// <summary>
+        /// Perform a final precision slew of the RA axis to target.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="trackingState"></param>
+        /// <param name="stopwatch"></param>
+        /// <returns></returns>
+        private static int SimPrecisionGoToRA(double[] target, bool trackingState, Stopwatch stopwatch)
+        {
+            const int returnCode = 0;
+            if (!trackingState) return returnCode;
+            //attempt precision moves to target
+            var gotoPrecision = SkySettings.GotoPrecision;
+            var rate = CurrentTrackingRate();
+            var deltaTime = stopwatch.Elapsed.TotalSeconds;
+            var maxtries = 0;
+
+            while (true)
+            {
+                if (maxtries > 3) { break; }
+                maxtries++;
+                stopwatch.Reset();
+                stopwatch.Start();
+
+                //calculate new target position
+                var deltaDegree = rate * deltaTime;
+                if (deltaDegree < gotoPrecision) { break; }
+
+
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"RA Delta:{rate},{deltaTime},{deltaDegree}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                
+
+                target[0] += deltaDegree;
+                var deltaTarget = Axes.AxesAppToMount(target);
+
+                if (SlewState == SlewType.SlewNone) { break; } //check for a stop
+
+                object _ = new CmdAxisGoToTarget(0, Axis.Axis1, deltaTarget[0]);//move to new target
+
+                // check for axis stopped
+                var stopwatch1 = Stopwatch.StartNew();
+                while (stopwatch1.Elapsed.TotalMilliseconds < 2000)
+                {
+                    if (SlewState == SlewType.SlewNone) { break; }
+                    var deltax = new CmdAxisStatus(MountQueue.NewId, Axis.Axis1);
+                    var axis1Status = (AxisStatus)MountQueue.GetCommandResult(deltax).Result;
+                    if (!axis1Status.Slewing) { break; }
+                }
+
+                monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"RA Precision:{target[0]},{deltaTime},{deltaDegree}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                deltaTime = stopwatch.Elapsed.TotalSeconds; //take the time and move again
+            }
+
+            return returnCode;
         }
 
         /// <summary>
