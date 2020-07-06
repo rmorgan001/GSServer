@@ -134,6 +134,18 @@ namespace GS.SkyWatcher
             if (internalSpeed <= Constant.Siderealrate / 1000.0)
             {
                 AxisStop(axis);
+
+                // Wait until the axis stops or counter runs out
+                var stopwatch = Stopwatch.StartNew();
+                while (stopwatch.Elapsed.TotalMilliseconds < 2000)
+                {
+                    var axesstop = _commands.GetAxisStatus(axis);
+                    // Return if the axis has stopped.
+                    if (axesstop.FullStop)
+                    {
+                        break;
+                    }
+                }
                 return;
             }
 
@@ -1090,100 +1102,6 @@ namespace GS.SkyWatcher
             var r = (rateInRad * _factorRadRateToInt[(int)axis]);
             return (long)Math.Round(r, 0, MidpointRounding.AwayFromZero);
         }
-
-        //private void ParseCapabilities1()
-        //{
-        //    var result = GetCapabilities();
-
-        //    switch (result.Substring(1, 1))
-        //    {
-        //        case "0":
-        //            IsPpecOn = false;
-        //            IsPpecInTrainingOn = false;
-        //            break;
-        //        case "1":
-        //            IsPpecOn = false;
-        //            IsPpecInTrainingOn = true;
-        //            break;
-        //        case "2":
-        //            IsPpecOn = true;
-        //            IsPpecInTrainingOn = false;
-        //            break;
-        //        case "3":
-        //            IsPpecOn = true;
-        //            IsPpecInTrainingOn = true;
-        //            break;
-        //        default:
-        //            IsPpecOn = false;
-        //            IsPpecInTrainingOn = false;
-        //            break;
-        //    }
-
-        //    switch (result.Substring(2, 5))
-        //    {
-        //        case "60001": //EQ8-R
-        //            CanAzEq = false;
-        //            CanHomeSensors = true;
-        //            CanPpec = true;
-        //            CanDualEncoders = false;
-        //            CanWifi = false;
-        //            CanHalfTrack = false;
-        //            CanAxisSlewsIndependent = true;
-        //            CanPolarLed = false;
-        //            break;
-        //        case "76000": //EQ8
-        //            CanAzEq = false;
-        //            CanHomeSensors = true;
-        //            CanPpec = true;
-        //            CanDualEncoders = true;
-        //            CanWifi = false;
-        //            CanHalfTrack = true;
-        //            CanAxisSlewsIndependent = true;
-        //            CanPolarLed = false;
-        //            break;
-        //        case "B3000": //AZEQ6          
-        //            CanAzEq = true;
-        //            CanHomeSensors = false;
-        //            CanPpec = true;
-        //            CanDualEncoders = true;
-        //            CanWifi = false;
-        //            CanHalfTrack = false;
-        //            CanAxisSlewsIndependent = true;
-        //            CanPolarLed = true;
-        //            break;
-        //        case "B6000": //AZEQ5
-        //            CanAzEq = true;
-        //            CanHomeSensors = false;
-        //            CanPpec = true;
-        //            CanDualEncoders = true;
-        //            CanWifi = false;
-        //            CanHalfTrack = true;
-        //            CanAxisSlewsIndependent = true;
-        //            CanPolarLed = false;
-        //            break;
-        //        case "98000":
-        //            CanAzEq = true;
-        //            CanHomeSensors = false;
-        //            CanPpec = false;
-        //            CanDualEncoders = true;
-        //            CanWifi = true;
-        //            CanHalfTrack = true;
-        //            CanAxisSlewsIndependent = true;
-        //            CanPolarLed = false;
-        //            break;
-        //        default:
-        //            CanAzEq = false;
-        //            CanHomeSensors = false;
-        //            CanPpec = false;
-        //            CanDualEncoders = false;
-        //            CanWifi = false;
-        //            CanHalfTrack = false;
-        //            CanPolarLed = false;
-        //            CanAxisSlewsIndependent = false;
-        //            break;
-
-        //    }
-        //}
 
         /// <summary>
         /// parses status from the q command using =010000

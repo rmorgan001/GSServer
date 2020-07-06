@@ -19,19 +19,13 @@ using GS.Server.Main;
 using GS.Shared;
 using MaterialDesignThemes.Wpf;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using ASCOM.DeviceInterface;
 using GS.Server.Controls.Dialogs;
 using GS.Server.SkyTelescope;
+
 
 namespace GS.Server.Test
 {
@@ -42,9 +36,6 @@ namespace GS.Server.Test
         public int Uid => 7;
 
         private readonly SkyTelescopeVM _skyTelescopeVM;
-        private CancellationTokenSource _cts;
-        private CancellationToken _ct;
-        private Oscillation _oscillation;
 
         public TestVM()
         {
@@ -54,130 +45,9 @@ namespace GS.Server.Test
 
             if (_skyTelescopeVM == null) _skyTelescopeVM = SkyTelescopeVM._skyTelescopeVM;
 
-            Intervals = new List<double>(Numbers.InclusiveRange(0, 300, 15));
-            Interval = 15;
-
-            StepLashs = new List<int>(Enumerable.Range(0, 21));
-            StepLash = 0;
-
-            LashList = new List<int>(Enumerable.Range(0, 200));
-
-            IsRunning = false;
-
-
         }
 
-        #region Backlash Test
-
-        private ObservableCollection<OscillationResult> _oscillationList;
-
-        public ObservableCollection<OscillationResult> OscillationList
-        {
-            get => _oscillationList;
-            set
-            {
-                _oscillationList = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _isrunning;
-        public bool IsRunning
-        {
-            get => _isrunning;
-            set
-            {
-                _isrunning = value;
-                IsEnabled = !value;
-                OnPropertyChanged();
-            }
-        }
-        private bool _isenabled;
-        public bool IsEnabled
-        {
-            get => _isenabled;
-            set
-            {
-                _isenabled = value;
-                OnPropertyChanged();
-            }
-        }
-        private int _prevLash;
-        public int PrevLash
-        {
-            get => _prevLash;
-            set
-            {
-                _prevLash = value;
-                OnPropertyChanged();
-            }
-
-        }
-        public List<int> StepLashs { get; set; }
-        private int _stepLash;
-        public int StepLash
-        {
-            get => _stepLash;
-            set
-            {
-                _stepLash = value;
-                OnPropertyChanged();
-            }
-
-        }
-
-        public List<int> LashList { get; set; }
-
-        public List<double> Intervals { get; set; }
-        private double _interval;
-        public double Interval
-        {
-            get => _interval;
-            set
-            {
-                _interval = value;
-                OnPropertyChanged();
-            }
-        }
-        public int Lash
-        {
-            get => _skyTelescopeVM.DecBacklash;
-            set
-            {
-                _skyTelescopeVM.DecBacklash = value;
-                OnPropertyChanged();
-            }
-
-        }
-
-        private ICommand _clickopencmd;
-        public ICommand ClickOpenCmd
-        {
-            get
-            {
-                var cmd = _clickopencmd;
-                if (cmd != null)
-                {
-                    return cmd;
-                }
-
-                return (_clickopencmd = new RelayCommand(
-                    param => ClickOpen()
-                ));
-            }
-        }
-        private  void ClickOpen()
-        {
-            try
-            {
-               
-            }
-            catch (Exception ex)
-            {
-                IsRunning = false;
-                OpenDialog(ex.Message);
-            }
-        }
+        #region Test
 
         private ICommand _clickstartcmd;
         public ICommand ClickStartCmd
@@ -195,87 +65,17 @@ namespace GS.Server.Test
                 ));
             }
         }
-        private async void ClickStart()
+        private void ClickStart()
         {
             try
             {
-                if ((int) Interval == 0) return;
-                _cts = new CancellationTokenSource();
-                _ct = _cts.Token;
-                IsRunning = true;
-                var KeepRunning = true;
-                OscillationList = new ObservableCollection<OscillationResult>();
-                var task = Task.Run(() =>
-                {
-                    while (KeepRunning)
-                    {
-                        if (_ct.IsCancellationRequested)
-                        {
-                            // Clean up here, then...
-                            // ct.ThrowIfCancellationRequested();
-                            KeepRunning = false;
-                        }
-                        else
-                        {
-                            //run for interval
-                            _oscillation = new Oscillation();
-                            var starttime = HiResDateTime.UtcNow;
-                            MonitorLog.GetPulses = true;
-                            SkyServer.MonitorPulse = true;
-                            MonitorQueue.StaticPropertyChanged += PropertyChangedMonitor;
 
-                            var stopwatch = Stopwatch.StartNew();
-                            while (stopwatch.Elapsed < TimeSpan.FromSeconds(Interval))
-                            {
-                                //
-                                if (_ct.IsCancellationRequested)
-                                {
-                                    KeepRunning = false;
-                                    break;
-                                }
-                                Thread.Sleep(100);
-
-                            }
-                            stopwatch.Stop();
-
-                            //stop interval
-                            SkyServer.MonitorPulse = false;
-                            MonitorLog.GetPulses = false;
-                            MonitorQueue.StaticPropertyChanged -= PropertyChangedMonitor;
-                            var endtime = HiResDateTime.UtcNow;
-
-                            //process oscillations
-                           var result = _oscillation.GetResult(GuideDirections.guideNorth, starttime, endtime);
-                           if (result != null)
-                            {
-                                ThreadContext.InvokeOnUiThread(
-                                    delegate { OscillationList.Add(result); }, _ct);
-
-                                var monitorItem = new MonitorEntry
-                                {
-                                    Datetime = HiResDateTime.UtcNow,
-                                    Device = MonitorDevice.Server,
-                                    Category = MonitorCategory.Interface,
-                                    Type = MonitorType.Information,
-                                    Method = MethodBase.GetCurrentMethod().Name,
-                                    Thread = Thread.CurrentThread.ManagedThreadId,
-                                    Message =
-                                        $"result:{Lash},{result.StartTime},{result.EndTime},{result.AvgStrength},{result.AvgStrength1},{result.Direction1},{result.Percent1},{result.AvgStrength2},{result.Direction2},{result.Percent2}"
-                                };
-                                MonitorLog.LogToMonitor(monitorItem);
-                            }
-
-                            _oscillation = null;
-                        }
-                    }
-                }, _ct);
-                await task;
-                task.Wait(_ct);
-                IsRunning = false;
             }
             catch (Exception ex)
             {
-                IsRunning = false;
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message);
             }
         }
@@ -300,10 +100,13 @@ namespace GS.Server.Test
         {
             try
             {
-                _cts?.Cancel();
+
             }
             catch (Exception ex)
             {
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message);
             }
         }
@@ -329,64 +132,13 @@ namespace GS.Server.Test
             try
             {
                ClickStop();
-               Lash = PrevLash;
-            }
-            catch (Exception ex)
-            {
-                OpenDialog(ex.Message);
-            }
-        }
 
-        private void PropertyChangedMonitor(object sender, PropertyChangedEventArgs e)
-        {
-            try
-            {
-                ThreadContext.InvokeOnUiThread(
-                    delegate
-                    {
-                        switch (e.PropertyName)
-                        {
-                            case "PulseEntry":
-                                if (_oscillation != null)
-                                {
-                                    var pulse = MonitorQueue.PulseEntry;
-                                    var pair = new OscillationPair
-                                    {
-                                        Data = Math.Abs(pulse.Duration),
-                                        TimeStamp = pulse.StartTime
-                                    };
-                                    switch (pulse.Axis)
-                                    {
-                                        case 0:
-                                            pair.Direction = pulse.Rate < 0 ? GuideDirections.guideEast : GuideDirections.guideWest;
-                                            break;
-                                        case 1:
-                                            pair.Direction = pulse.Rate < 0 ? GuideDirections.guideNorth : GuideDirections.guideSouth;
-                                            break;
-                                    }
-                                    _oscillation.AddOscillation(pair);
-                                    var monitorItem = new MonitorEntry
-                                    {
-                                        Datetime = HiResDateTime.UtcNow,
-                                        Device = MonitorDevice.Server,
-                                        Category = MonitorCategory.Interface,
-                                        Type = MonitorType.Information,
-                                        Method = MethodBase.GetCurrentMethod().Name,
-                                        Thread = Thread.CurrentThread.ManagedThreadId,
-                                        Message = $"Pair: {pair.Data},{pair.Direction},{pair.TimeStamp}"
-                                    };
-                                    MonitorLog.LogToMonitor(monitorItem);
-                                }
-                                break;
-                        }
-                    }, _ct);
             }
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
                     { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
-
                 OpenDialog(ex.Message);
             }
         }
@@ -575,7 +327,6 @@ namespace GS.Server.Test
         {
             if (disposing)
             {
-                _cts?.Dispose();
                 _skyTelescopeVM?.Dispose();
             }
             // free native resources if there are any.
@@ -587,15 +338,5 @@ namespace GS.Server.Test
         }
         #endregion
 
-    }
-
-    [Flags]
-    public enum StatusBit
-    {
-        None = 0,
-        A = 1,
-        B = 1 << 1,
-        C = 1 << 2,
-        D = 1 << 3
     }
 }

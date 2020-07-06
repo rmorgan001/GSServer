@@ -4,8 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
-             mc:Ignorable="d">
+             FontSize="15" mc:Ignorable="d">
     <Grid>
         <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Center"  CloseOnClickAway="True"
                        IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
@@ -37,84 +36,22 @@
                               Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
                 <Grid Grid.Row="1">
                     <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
+                        <RowDefinition/>
+                        <RowDefinition/>
                     </Grid.RowDefinitions>
                     <Border Grid.Row="0" Margin="10,0,10,0" BorderBrush="DimGray" BorderThickness="1" CornerRadius="5">
-                        <StackPanel Orientation="Vertical">
-                            <StackPanel Orientation="Horizontal">
-                                <Label>Backlash Adjuster Test</Label>
-                                <TextBlock Margin="10,0,0,0" Text="{Binding Lash, StringFormat={}Dec Backlash: {0}}" VerticalAlignment="Center" />
-                            </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="5">
                             <StackPanel Orientation="Horizontal" >
-                                <Button Margin="5,0,0,0" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickOpenCmd}" Content="Start" IsEnabled="{Binding IsEnabled}" />
                                 <Button Margin="5,0,0,0" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickStartCmd}" Content="Start" IsEnabled="{Binding IsEnabled}"/>
                                 <Button Margin="5,0,0,0" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickStopCmd}" Content="Stop" IsEnabled="{Binding IsRunning}"/>
                                 <Button Margin="5,0,0,0" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickCancelCmd}" Content="Cancel" IsEnabled="{Binding IsRunning}" />
-                                <ComboBox md:HintAssist.Hint="Interval seconds" Margin="10,0,0,0" ItemsSource="{Binding Intervals}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEnabled="{Binding IsEnabled}">
-                                    <ComboBox.SelectedItem>
-                                        <Binding Path="Interval" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
-                                            <Binding.ValidationRules>
-                                                <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
-                                            </Binding.ValidationRules>
-                                        </Binding>
-                                    </ComboBox.SelectedItem>
-                                    <ComboBox.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <VirtualizingStackPanel />
-                                        </ItemsPanelTemplate>
-                                    </ComboBox.ItemsPanel>
-                                </ComboBox>
-                                <ComboBox md:HintAssist.Hint="Step Lash" Margin="10,0,0,0" ItemsSource="{Binding StepLashs}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEnabled="{Binding IsEnabled}">
-                                    <ComboBox.SelectedItem>
-                                        <Binding Path="StepLash" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
-                                            <Binding.ValidationRules>
-                                                <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
-                                            </Binding.ValidationRules>
-                                        </Binding>
-                                    </ComboBox.SelectedItem>
-                                    <ComboBox.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <VirtualizingStackPanel />
-                                        </ItemsPanelTemplate>
-                                    </ComboBox.ItemsPanel>
-                                </ComboBox>
-                                <ComboBox md:HintAssist.Hint="Lash" Margin="10,0,0,0" ItemsSource="{Binding LashList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
-                                    <ComboBox.SelectedItem>
-                                        <Binding Path="Lash" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
-                                            <Binding.ValidationRules>
-                                                <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
-                                            </Binding.ValidationRules>
-                                        </Binding>
-                                    </ComboBox.SelectedItem>
-                                    <ComboBox.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <VirtualizingStackPanel />
-                                        </ItemsPanelTemplate>
-                                    </ComboBox.ItemsPanel>
-                                </ComboBox>
                             </StackPanel>
                         </StackPanel>
                     </Border>
                     <Border Grid.Row="1" Margin="10,5,10,5" BorderBrush="DimGray" BorderThickness="1" CornerRadius="5">
-                        <ListView BorderThickness="0" Width="800" Height="300" HorizontalAlignment="Left" Margin="5,0,5,0" ItemsSource="{Binding OscillationList, Mode=TwoWay}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn DisplayMemberBinding="{Binding AvgStrength}" Header="Strength" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding StartTime, StringFormat=T}" Header="Start" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding EndTime, StringFormat=T}" Header="End" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding Direction1}" Header="Dir1" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding AvgStrength1}" Header="Str1" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding Percent1}" Header="%1" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding Direction2}" Header="Dir2" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding AvgStrength2}" Header="Str2" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding Percent2}" Header="%2" />
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
+                        <Grid Height="300">
+
+                        </Grid>
                     </Border>
                 </Grid>
             </Grid>

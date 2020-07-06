@@ -545,5 +545,12 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="cbMirrorFlip">Flip View</system:String>
     <system:String x:Key="tbPolaris">Polaris</system:String>
     <system:String x:Key="tbOctans">Sigma Octantis</system:String>
+
+    <!--1.0.1.8 -->
+    <system:String x:Key="msgMouseLock0">Press a key to stop. Left/Right click for Ra or Dec moves.</system:String>
+    <system:String x:Key="msgMouseLock1">Wheel click to switch Ra or Dec. Wheel up/down for speed</system:String>
+    <system:String x:Key="msgMouseLock2">X1 click for tracking. X2 click to stop</system:String>
+    <system:String x:Key="capMouseLock">Mouse Locked</system:String>
+    <system:String x:Key="tipMouseLock">Lock Mouse</system:String>
 </ResourceDictionary>
  

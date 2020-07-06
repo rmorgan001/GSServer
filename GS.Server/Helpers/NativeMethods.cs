@@ -15,6 +15,7 @@
  */
 using System;
 using System.Runtime.InteropServices;
+using System.Windows;
 
 namespace GS.Server.Helpers
 {
@@ -103,6 +104,35 @@ namespace GS.Server.Helpers
         /// <returns></returns>
         [DllImport("user32.dll", SetLastError = true)]
         internal static extern uint SendInput(uint nInputs, ref INPUT pInputs, int cbSize);
+        
+        /// <summary>
+        /// Limits mouse movements to a rectangle
+        /// </summary>
+        /// <param name="rect"></param>
+        [DllImport("user32.dll")]
+        internal static extern void ClipCursor(ref System.Drawing.Rectangle rect);
+
+        /// <summary>
+        /// Resets mouse movements by passing null pointer
+        /// </summary>
+        /// <param name="rect"></param>
+        [DllImport("user32.dll")]
+        internal static extern void ClipCursor(IntPtr rect);
+
+        /// <summary>
+        /// Retrieves the cursor's position, in screen coordinates.
+        /// </summary>
+        /// <see>See MSDN documentation for further information.</see>
+        [DllImport("user32.dll")]
+        public static extern bool GetCursorPos(out POINT lpPoint);
+        public static Point GetCursorPosition()
+        {
+            GetCursorPos(out var lpPoint);
+            // NOTE: If you need error handling
+            // bool success = GetCursorPos(out lpPoint);
+            // if (!success)
+            return lpPoint;
+        }
     }
 
     /// <summary>
@@ -120,4 +150,21 @@ namespace GS.Server.Helpers
         public IntPtr dwExtraInfo;
 #pragma warning restore 0649
     }
+
+    /// <summary>
+    /// Struct representing a point.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct POINT
+    {
+        private readonly int X;
+        private readonly int Y;
+
+        public static implicit operator Point(POINT point)
+        {
+            return new Point(point.X, point.Y);
+        }
+    }
+
+
 }

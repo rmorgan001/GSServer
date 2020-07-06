@@ -3105,6 +3105,7 @@ namespace GS.Server.SkyTelescope
 
                         GetRawDegrees();
                     }
+
                     _ = new CmdHcSlew(0, Axis.Axis1, change[0]);
                     _ = new CmdHcSlew(0, Axis.Axis2, change[1]);
 
@@ -3144,6 +3145,7 @@ namespace GS.Server.SkyTelescope
                             break;
                         }
                     }
+
                     SkyHCRate.X = change[0];
                     SkyHCRate.Y = change[1];
                     var rate = GetSlewRate();
@@ -3939,6 +3941,146 @@ namespace GS.Server.SkyTelescope
 
             Tracking = false;
             Synthesizer.Speak(Application.Current.Resources["vceStop"].ToString());
+        }
+
+        public static void StopAxesTask(int axis, bool validate, bool speak, bool stoptracking, bool trackingspeak, SlewType? slewstate)
+        {
+            if (!IsMountRunning) { return; }
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod().Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{axis},{validate},{slewstate} "
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            Task raTask = null;
+            Task decTask = null;
+            switch (axis)
+            {
+                case 1:
+                    decTask = Task.Run(() => StopAxis(axis, validate, speak, stoptracking, trackingspeak, slewstate));
+                    Task.WaitAll(decTask);
+                    break;
+                case 2:
+                    raTask = Task.Run(() => StopAxis(axis, validate, speak, stoptracking, trackingspeak, slewstate));
+                    Task.WaitAll(raTask);
+                    break;
+                case 3:
+                    decTask = Task.Run(() => StopAxis(axis, validate, speak, stoptracking, trackingspeak, slewstate));
+                    raTask = Task.Run(() => StopAxis(axis, validate, speak, stoptracking, trackingspeak, slewstate));
+                    Task.WaitAll(decTask, raTask);
+                    break;
+            }
+        }
+
+        private static void StopAxis(int axis, bool validate, bool speak, bool stoptracking, bool trackingspeak, SlewType? slewstate)
+        {
+            object _;
+            bool istracking;
+            var axis1stopped = false;
+            var axis2stopped = false;
+            Stopwatch stopwatch;
+
+            if (!IsMountRunning) { return; }
+
+            switch (SkySettings.Mount)
+            {
+                case MountType.Simulator:
+                    istracking = Tracking;
+                    TrackingSpeak = trackingspeak;
+                    Tracking = false;
+
+                    switch (axis)
+                    {
+                        case 1:
+                            stopwatch = Stopwatch.StartNew();
+                            while (stopwatch.Elapsed.TotalMilliseconds < 3000)
+                            {
+                                _ = new CmdAxisStop(0, Axis.Axis1);
+                                if (!validate) { break;}
+                                
+                                var statusx = new CmdAxisStatus(MountQueue.NewId, Axis.Axis1);
+                                var axis1Status = (AxisStatus)MountQueue.GetCommandResult(statusx).Result;
+                                axis1stopped = axis1Status.Stopped;
+                                if (axis1stopped) { break; }
+                            }
+
+                            if (!axis1stopped) { return; }
+                            Tracking = !stoptracking || istracking;
+                            TrackingSpeak = true;
+                            break;
+                        case 2:
+                            stopwatch = Stopwatch.StartNew();
+                            while (stopwatch.Elapsed.TotalMilliseconds < 3000)
+                            {
+                                _ = new CmdAxisStop(0, Axis.Axis2);
+                                if (!validate) { break; }
+
+                                var statusy = new CmdAxisStatus(MountQueue.NewId, Axis.Axis2);
+                                var axis2Status = (AxisStatus)MountQueue.GetCommandResult(statusy).Result;
+                                axis2stopped = axis2Status.Stopped;
+                                if (axis2stopped) { break; }
+                            }
+                            if (!axis2stopped) { return; }
+                            break;
+                        case 3:
+                            break;
+
+                    }
+                    break;
+                case MountType.SkyWatcher:
+                    istracking = Tracking;
+                    TrackingSpeak = trackingspeak;
+                    Tracking = false;
+
+                    switch (axis)
+                    {
+                        case 1:
+                            stopwatch = Stopwatch.StartNew();
+                            while (stopwatch.Elapsed.TotalMilliseconds < 3000)
+                            {
+                                _ = new SkyAxisStop(0, AxisId.Axis1);
+                                if (!validate) { break; }
+
+                                var statusx = new SkyIsAxisFullStop(SkyQueue.NewId, AxisId.Axis1);
+                                axis1stopped = Convert.ToBoolean(SkyQueue.GetCommandResult(statusx).Result);
+                                if (axis1stopped) { break; }
+                            }
+                            if (!axis1stopped) { return; }
+                            Tracking = !stoptracking || istracking;
+                            TrackingSpeak = true;
+                            break;
+                        case 2:
+                            stopwatch = Stopwatch.StartNew();
+                            while (stopwatch.Elapsed.TotalMilliseconds < 3000)
+                            {
+                                _ = new SkyAxisStop(0, AxisId.Axis2);
+                                if (!validate) { break; }
+
+                                var statusy = new SkyIsAxisFullStop(SkyQueue.NewId, AxisId.Axis2);
+                                axis2stopped = Convert.ToBoolean(SkyQueue.GetCommandResult(statusy).Result);
+
+                                if (!axis2stopped) { break; }
+                            }
+                            if (!axis2stopped) { return; }
+                            break;
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            _rateAxes = new Vector();
+            _rateRaDec = new Vector();
+            if (slewstate != null) { SlewState = (SlewType)slewstate; }
+            if (speak) { Synthesizer.Speak(Application.Current.Resources["vceStop"].ToString()); }
+
         }
 
         /// <summary>

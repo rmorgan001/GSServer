@@ -584,7 +584,7 @@ namespace GS.Server.Phd
             if (response != null)
             {
                 if (!Failed(response)) return response;
-                throw new GuiderException(ErrorCode.NoResponse, (string)response["error"]["message"]);
+                throw new GuiderException(ErrorCode.NoResponse, (string)response["error"]?["message"]);
             }
 
             return response;
@@ -877,9 +877,10 @@ namespace GS.Server.Phd
             var profiles = new List<string>();
 
             var ary = (JArray)res["result"];
+            if (ary == null) return profiles;
             foreach (var p in ary)
             {
-                var name = (string)p["name"];
+                var name = (string) p["name"];
                 profiles.Add(name);
             }
 
@@ -902,22 +903,24 @@ namespace GS.Server.Phd
 
             var profname = profileName;
 
-            if ((string)prof["name"] != profname)
+            if (prof != null && (string)prof["name"] != profname)
             {
                 res = Call("get_profiles");
                 var profiles = (JArray)res["result"];
                 var profid = -1;
-                foreach (var p in profiles)
-                {
-                    var name = (string)p["name"];
-                    Debug.WriteLine($"found profile {name}");
-                    if (name == profname)
+                if (profiles != null)
+                    foreach (var p in profiles)
                     {
-                        profid = (int)GetDefault(p, "id", new JValue(-1));
-                        Debug.WriteLine($"found profid {profid}");
-                        break;
+                        var name = (string) p["name"];
+                        Debug.WriteLine($"found profile {name}");
+                        if (name == profname)
+                        {
+                            profid = (int) GetDefault(p, "id", new JValue(-1));
+                            Debug.WriteLine($"found profid {profid}");
+                            break;
+                        }
                     }
-                }
+
                 if (profid == -1)
                     throw new GuiderException(ErrorCode.GuidingError, "invalid phd2 profile name: " + profname);
 
@@ -974,7 +977,7 @@ namespace GS.Server.Phd
         public override string SaveImage()
         {
             var res = Call("save_image");
-            return (string)res["result"]["filename"];
+            return (string)res["result"]?["filename"];
         }
 
         /// <summary>

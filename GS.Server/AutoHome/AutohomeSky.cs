@@ -283,7 +283,7 @@ namespace GS.Server.AutoHome
             SkyServer.AutoHomeProgressBar += 5;
 
             #region slew back over home to validate home position
-            SlewAxis(5, axis, clockwise); // slew over home
+            slew = SlewAxis(5, axis, clockwise); // slew over home
             if (slew != 0) return slew;
             status = GetHomeSensorStatus(axis); // check sensor
             switch (status)

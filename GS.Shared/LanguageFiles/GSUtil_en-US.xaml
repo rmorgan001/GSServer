@@ -70,5 +70,6 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="tbUtilBaudRate">BaudRate</system:String>
     <system:String x:Key="tbUtilInterval">Interval</system:String>
     <system:String x:Key="msgNotfound">Not found</system:String>
+
 </ResourceDictionary>
  

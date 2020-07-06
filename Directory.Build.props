@@ -5,9 +5,9 @@
 	<Trademark>GS Server</Trademark>
 	<NeutralLanguage>en</NeutralLanguage>
 	<Copyright>Copyright © GreenSwamp Software 2019-2020</Copyright>
-    	<AssemblyVersion>1.0.1.7</AssemblyVersion>
-    	<FileVersion>1.0.1.7</FileVersion>
-	<ProductVersion>1.0.1.7</ProductVersion>
-	<Version>1.0.1.7</Version>
+    	<AssemblyVersion>1.0.1.71</AssemblyVersion>
+    	<FileVersion>1.0.1.71</FileVersion>
+	<ProductVersion>1.0.1.71</ProductVersion>
+	<Version>1.0.1.71</Version>
  </PropertyGroup>
 </Project>

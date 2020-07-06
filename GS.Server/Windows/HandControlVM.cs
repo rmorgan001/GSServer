@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -11,13 +12,17 @@ using GS.Server.Helpers;
 using GS.Server.SkyTelescope;
 using GS.Shared;
 using MaterialDesignThemes.Wpf;
+using NativeMethods = GS.Server.Helpers.NativeMethods;
 
 namespace GS.Server.Windows
 {
     public class HandControlVM : ObservableObject, IDisposable
     {
+        #region Fields
 
         private readonly SkyTelescopeVM _skyTelescopeVM;
+
+        #endregion
 
         public HandControlVM()
         {
@@ -50,6 +55,8 @@ namespace GS.Server.Windows
                 throw;
             }
         }
+
+        #region ViewModel
 
         private string _title;
         public string Title
@@ -127,6 +134,8 @@ namespace GS.Server.Windows
                 OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
             }
         }
+
+        #endregion
 
         #region Hand Controller
 
@@ -910,7 +919,278 @@ namespace GS.Server.Windows
                 OnPropertyChanged();
             }
         }
-        
+
+        #endregion
+
+        #region Locked Mouse
+
+        private bool _lockOn;
+        public bool LockOn
+        {
+            get => _lockOn;
+            set
+            {
+                _lockOn = value;
+                if (value)
+                {
+                    HideMouse();
+                    var msg = $"{Application.Current.Resources["msgMouseLock0"]}{Environment.NewLine}";
+                    msg += $"{Application.Current.Resources["msgMouseLock1"]}{Environment.NewLine}";
+                    msg += $"{Application.Current.Resources["msgMouseLock2"]}";
+                    OpenDialog($"{msg}", $"{ Application.Current.Resources["capMouseLock"]}");
+                }
+                else
+                {
+                    NativeMethods.ClipCursor(IntPtr.Zero);
+                    IsDialogOpen = false;
+                }
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _radecLockedMouse;
+        public bool RaDecLockedMouse
+        {
+            get => _radecLockedMouse;
+            set
+            {
+                if (_radecLockedMouse == value) return;
+                _radecLockedMouse = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private static void HideMouse()
+        {
+            var point = NativeMethods.GetCursorPosition();
+            var r = new Rectangle((int)point.X, (int)point.Y, (int)point.X + 2, (int)point.Y + 2);
+            NativeMethods.ClipCursor(ref r);
+        }
+
+        private ICommand _pressKeyDownCmd;
+        public ICommand PressAnyKeyDownCmd
+        {
+            get
+            {
+                var cmd = _pressKeyDownCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return (_pressKeyDownCmd = new RelayCommand(
+                    param => PressAnyKeyDown()
+                ));
+            }
+        }
+        private void PressAnyKeyDown()
+        {
+            try
+            {
+                LockOn = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+            }
+        }
+
+        private ICommand _clickLockedMouseDownCmd;
+        public ICommand ClickLockedMouseDownCmd
+        {
+            get
+            {
+                var cmd = _clickLockedMouseDownCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return (_clickLockedMouseDownCmd = new RelayCommand(
+                    param => ClickLockedMouseDown((MouseEventArgs)param)
+                ));
+            }
+        }
+        private void ClickLockedMouseDown(MouseEventArgs e)
+        {
+            try
+            {
+                if (e.LeftButton == MouseButtonState.Pressed)
+                {
+                    if (!LockOn)
+                    {
+                        LockOn = true;
+                        return;
+                    }
+
+                    if (RaDecLockedMouse)
+                    {
+                        HcMouseDownLeft();
+                    }
+                    else
+                    {
+                        HcMouseDownUp();
+                    }
+                }
+
+                if (e.RightButton == MouseButtonState.Pressed)
+                {
+                    if (RaDecLockedMouse)
+                    {
+                        HcMouseDownRight();
+                    }
+                    else
+                    {
+                        HcMouseDownDown();
+                    }
+                }
+
+                if (e.XButton1 == MouseButtonState.Pressed)
+                {
+                    SkyServer.Tracking = !SkyServer.Tracking;
+                }
+
+                if (e.XButton2 == MouseButtonState.Pressed)
+                {
+                    SkyServer.AbortSlew();
+                }
+
+                if (e.MiddleButton != MouseButtonState.Pressed) return;
+                RaDecLockedMouse = !RaDecLockedMouse;
+                var axis = RaDecLockedMouse ? $"{Application.Current.Resources["lbTopRa"]}" : $"{Application.Current.Resources["lbTopDec"]}";
+                if (!string.IsNullOrEmpty(axis)) Synthesizer.Speak(axis);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+            }
+        }
+
+        private ICommand _clickLockedMouseUpCmd;
+        public ICommand ClickLockedMouseUpCmd
+        {
+            get
+            {
+                var cmd = _clickLockedMouseUpCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return (_clickLockedMouseUpCmd = new RelayCommand(
+                    param => ClickLockedMouseUp((MouseEventArgs)param)
+                ));
+            }
+        }
+        private void ClickLockedMouseUp(MouseEventArgs e)
+        {
+            try
+            {
+                if (e.LeftButton == MouseButtonState.Released)
+                {
+                    if (RaDecLockedMouse)
+                    {
+                        HcMouseUpLeft();
+                    }
+                    else
+                    {
+                        HcMouseUpUp();
+                    }
+                }
+
+                if (e.RightButton != MouseButtonState.Released) return;
+                if (RaDecLockedMouse)
+                {
+                    HcMouseUpRight();
+                }
+                else
+                {
+                    HcMouseUpDown();
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+            }
+        }
+
+        private ICommand _scrollMouseWheelCmd;
+        public ICommand ScrollMouseWheelCmd
+        {
+            get
+            {
+                var cmd = _scrollMouseWheelCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _scrollMouseWheelCmd = new RelayCommand(
+                    param => ScrollMouseWheel((MouseWheelEventArgs)param));
+            }
+        }
+        private void ScrollMouseWheel(MouseWheelEventArgs e)
+        {
+            try
+            {
+                if(e == null) { return; }
+                if (e.Delta > 0)
+                {
+                    HcSpeed += 1; 
+                }
+                if (e.Delta >= 0) return;
+                HcSpeed -= 1; 
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+            }
+        }
+
         #endregion
 
         #region Dialog
@@ -1019,6 +1299,7 @@ namespace GS.Server.Windows
         private void ClickOkDialog()
         {
             IsDialogOpen = false;
+            LockOn = false;
         }
 
         private ICommand _clickCancelDialogCommand;
@@ -1097,12 +1378,7 @@ namespace GS.Server.Windows
             {
                 SkyServer.StaticPropertyChanged -= PropertyChangedSkyServer;
             }
-            // free native resources if there are any.
-            //if (nativeResource != IntPtr.Zero)
-            //{
-            //    Marshal.FreeHGlobal(nativeResource);
-            //    nativeResource = IntPtr.Zero;
-            //}
+            NativeMethods.ClipCursor(IntPtr.Zero);
         }
         #endregion
     }
