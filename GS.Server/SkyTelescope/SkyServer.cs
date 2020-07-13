@@ -1175,8 +1175,8 @@ namespace GS.Server.SkyTelescope
                 {
                     if (SlewState == SlewType.SlewNone) { break; }
                     var deltay = new CmdAxisStatus(MountQueue.NewId, Axis.Axis2);
-                    var axis2Status = Convert.ToBoolean(MountQueue.GetCommandResult(deltay).Result);
-                    if (!axis2Status.Slewing) { break; }
+                    var axis2Status = (AxisStatus)(MountQueue.GetCommandResult(deltay).Result);
+                    if (axis2Status.Stopped) { break; }
                 }
 
                 var monitorItem = new MonitorEntry
@@ -1998,7 +1998,7 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Abort Slew in a normal motion
         /// </summary>
-        public static void AbortSlew()
+        public static void AbortSlew(bool speak)
         {
             if (!IsMountRunning) { return; }
 
@@ -2037,7 +2037,7 @@ namespace GS.Server.SkyTelescope
             Tracking = tracking;
             TrackingSpeak = true;
 
-            Synthesizer.Speak(Application.Current.Resources["vceAbortSlew"].ToString());
+            if(speak) {Synthesizer.Speak(Application.Current.Resources["vceAbortSlew"].ToString());}
         }
 
         /// <summary>
@@ -2585,6 +2585,36 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
+        /// gets HC speed in degrees
+        /// </summary>
+        /// <param name="speed"></param>
+        /// <returns></returns>
+        public static double GetSlewSpeed(SlewSpeed speed)
+        {
+            switch (speed)
+            {
+                case SlewSpeed.One:
+                    return SlewSpeedOne;
+                case SlewSpeed.Two:
+                    return SlewSpeedTwo;
+                case SlewSpeed.Three:
+                    return SlewSpeedThree;
+                case SlewSpeed.Four:
+                    return SlewSpeedFour;
+                case SlewSpeed.Five:
+                    return SlewSpeedFive;
+                case SlewSpeed.Six:
+                    return SlewSpeedSix;
+                case SlewSpeed.Seven:
+                    return SlewSpeedSeven;
+                case SlewSpeed.Eight:
+                    return SlewSpeedEight;
+                default:
+                    return 0.0;
+            }
+        }
+
+        /// <summary>
         /// Runs the Goto in async so not to block the driver or UI threads.
         /// </summary>
         /// <param name="target"></param>
@@ -2598,7 +2628,7 @@ namespace GS.Server.SkyTelescope
                 var stopped = AxesStopValidate();
                 if (!stopped)
                 {
-                    AbortSlew();
+                    AbortSlew(true);
                     var monitorItem = new MonitorEntry
                     {
                         Datetime = HiResDateTime.UtcNow,
@@ -2689,7 +2719,7 @@ namespace GS.Server.SkyTelescope
                 return;
             }
             Tracking = trackingState;
-            AbortSlew();
+            AbortSlew(true);
             MountError = new Exception($"GoTo Async Error: {returncode}");
         }
 

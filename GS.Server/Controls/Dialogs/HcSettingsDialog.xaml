@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="GS.Server.Controls.Dialogs.HcSettingsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d" >
+    <GroupBox Header="{StaticResource tipSpiralSettings}" Margin="5">
+        <StackPanel Orientation="Vertical">
+            <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel Orientation="Vertical">
+                   <StackPanel Orientation="Horizontal">
+                        <TextBox Margin="5" Width="100" PreviewTextInput="NumberValidationTextBox" md:HintAssist.Hint="{StaticResource hntSpiralFov}" ToolTip="{StaticResource hntSpiralFov}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpiralFov}" />
+                        <ComboBox Margin="5" Width="80" md:HintAssist.Hint="{StaticResource hntSpiralSpeed}" ToolTip="{StaticResource hntSpiralSpeed}" ItemsSource="{Binding SpiralHcSpeeds}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                            <ComboBox.SelectedValue>
+                                <Binding Path="SpiralSpeed" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                            </ComboBox.SelectedValue>
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                        </ComboBox>
+                        <ComboBox Margin="5" Width="90" md:HintAssist.Hint="{StaticResource hntSpiralPause}" ToolTip="{StaticResource hntSpiralPause}" ItemsSource="{Binding SpiralPauses}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                            <ComboBox.SelectedValue>
+                                <Binding Path="SpiralPause" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                            </ComboBox.SelectedValue>
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                        </ComboBox>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+         <Button Margin="0,5,0,0" Width="50"  IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptHcSettingsDialogCmd}" Content="{StaticResource btnOk}"/>
+        </StackPanel>
+    </GroupBox>
+    </UserControl>

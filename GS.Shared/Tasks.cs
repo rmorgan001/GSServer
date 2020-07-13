@@ -52,5 +52,25 @@ namespace GS.Shared
             await Task.Delay(ms);
             // whatever you need to do after delay.
         }
+
+        /// <summary>
+        /// Delay with cancel token and no error
+        /// </summary>
+        /// <param name="ms"></param>
+        /// <param name="ct"></param>
+        public static async Task DelayHandler(int ms, CancellationToken ct)
+        {
+            try
+            {
+                if (ct.IsCancellationRequested) return;
+                // whatever you need to do before delay goes here         
+                await Task.Delay(ms, ct);
+                // whatever you need to do after delay.
+            }
+            catch (OperationCanceledException ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
     }
 }

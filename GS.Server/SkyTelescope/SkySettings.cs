@@ -1182,6 +1182,48 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static int _spiralFov;
+        public static int SpiralFov
+        {
+            get => _spiralFov;
+            set
+            {
+                if (_spiralFov == value) return;
+                _spiralFov = value;
+                Properties.SkyTelescope.Default.SpiralFov = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static int _spiralPause;
+        public static int SpiralPause
+        {
+            get => _spiralPause;
+            set
+            {
+                if (_spiralPause  ==  value) return;
+                _spiralPause = value;
+                Properties.SkyTelescope.Default.SpiralPause = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static int _spiralSpeed;
+        public static int SpiralSpeed
+        {
+            get => _spiralSpeed;
+            set
+            {
+                if (_spiralSpeed == value) return;
+                _spiralSpeed = value;
+                Properties.SkyTelescope.Default.SpiralSpeed = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static int _displayInterval;
         public static int DisplayInterval
         {
@@ -1403,6 +1445,9 @@ namespace GS.Server.SkyTelescope
             RaTrackingOffset = Properties.SkyTelescope.Default.RATrackingOffset;
             RtsEnable = Properties.SkyTelescope.Default.RTSEnable;
             SiderealRate = Properties.SkyTelescope.Default.SiderealRate;
+            SpiralFov = Properties.SkyTelescope.Default.SpiralFov;
+            SpiralPause = Properties.SkyTelescope.Default.SpiralPause;
+            SpiralSpeed = Properties.SkyTelescope.Default.SpiralSpeed;
             DisplayInterval = Properties.SkyTelescope.Default.DisplayInterval;
             SolarRate = Properties.SkyTelescope.Default.SolarRate;
             St4Guiderate = Properties.SkyTelescope.Default.St4Guiderate;

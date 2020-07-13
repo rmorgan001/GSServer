@@ -117,6 +117,8 @@ namespace GS.Server.SkyTelescope
                     var extendedlist = new List<int>(Numbers.InclusiveIntRange(1000, 3000, 100));
                     RaBacklashList = RaBacklashList.Concat(extendedlist);
                     DecBacklashList = DecBacklashList.Concat(extendedlist);
+                    SpiralHcSpeeds = new List<int>(Enumerable.Range(1, 8));
+                    SpiralPauses = new List<int>(Enumerable.Range(0, 61));
 
                     // defaults
                     AtPark = SkyServer.AtPark; 
@@ -230,6 +232,15 @@ namespace GS.Server.SkyTelescope
                          break;
                      case "ModelOn":
                          ModelOn = SkySettings.ModelOn;
+                         break;
+                     case "SpiralFov":
+                         SpiralFov = SkySettings.SpiralFov;
+                         break;
+                     case "SpiralPause":
+                         SpiralPause = SkySettings.SpiralPause;
+                         break;
+                     case "SpiralSpeed":
+                         SpiralSpeed = SkySettings.SpiralSpeed;
                          break;
                      case "TrackingRate":
                          TrackingRate = SkySettings.TrackingRate;
@@ -617,6 +628,7 @@ namespace GS.Server.SkyTelescope
             IsParkDeleteDialogOpen = false;
             IsGpsDialogOpen = false;
             IsCdcDialogOpen = false;
+            IsHcSettingsDialogOpen = false;
 
             ScreenEnabled = SkyServer.IsMountRunning;
         }
@@ -4126,7 +4138,8 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
-                SkyServer.AbortSlew();
+                _ctsSpiral?.Cancel();
+                SkyServer.AbortSlew(true);
             }
             catch (Exception ex)
             {
@@ -4247,6 +4260,7 @@ namespace GS.Server.SkyTelescope
                     msg += $"{Application.Current.Resources["msgMouseLock1"]}{Environment.NewLine}";
                     msg += $"{Application.Current.Resources["msgMouseLock2"]}";
                     OpenDialog($"{msg}", $"{ Application.Current.Resources["capMouseLock"]}");
+                    Synthesizer.Speak(Application.Current.Resources["capMouseLock"].ToString());
                 }
                 else
                 {
@@ -4367,12 +4381,12 @@ namespace GS.Server.SkyTelescope
 
                 if (e.XButton1 == MouseButtonState.Pressed)
                 {
-                    SkyServer.Tracking = !SkyServer.Tracking;
+                    _ = SpiralDownCmd();
                 }
 
                 if (e.XButton2 == MouseButtonState.Pressed)
                 {
-                    SkyServer.AbortSlew();
+                    SkyServer.AbortSlew(true);
                 }
 
                 if (e.MiddleButton != MouseButtonState.Pressed) return;
@@ -4429,14 +4443,26 @@ namespace GS.Server.SkyTelescope
                     }
                 }
 
-                if (e.RightButton != MouseButtonState.Released) return;
-                if (RaDecLockedMouse)
+                if (e.RightButton == MouseButtonState.Released)
                 {
-                    HcMouseUpRight();
+                    if (RaDecLockedMouse)
+                    {
+                        HcMouseUpRight();
+                    }
+                    else
+                    {
+                        HcMouseUpDown();
+                    }
                 }
-                else
+
+                if (e.XButton1 == MouseButtonState.Released)
                 {
-                    HcMouseUpDown();
+                    SpiralUpCmd();
+                }
+
+                if (e.XButton2 == MouseButtonState.Released)
+                {
+
                 }
             }
             catch (Exception ex)
@@ -4500,6 +4526,380 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        #endregion
+
+        #region Spiral Search
+
+        private CancellationTokenSource _ctsSpiral;
+        private CancellationToken _ctSpiral;
+
+        public List<int> SpiralHcSpeeds { get; }
+        public List<int> SpiralPauses { get; }
+        
+        private int _spiralFov;
+        public int SpiralFov
+        {
+            get
+            {
+                _spiralFov = SkySettings.SpiralFov;
+                return _spiralFov;
+            }
+            set
+            {
+                if (_spiralFov ==  value) return;
+                _spiralFov = value;
+                SkySettings.SpiralFov = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _spiralSpeed;
+        public int SpiralSpeed
+        {
+            get
+            {
+                _spiralSpeed = SkySettings.SpiralSpeed;
+                return _spiralSpeed;
+            }
+            set
+            {
+                if (_spiralSpeed == value) return;
+                _spiralSpeed = value;
+                SkySettings.SpiralSpeed = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _spiralPause;
+        public int SpiralPause
+        {
+            get
+            {
+                _spiralPause = SkySettings.SpiralPause;
+                return _spiralPause;
+            }
+            set
+            {
+                if (_spiralPause == value) return;
+                _spiralPause = value;
+                SkySettings.SpiralPause = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isSpiralSearching;
+        public bool IsSpiralSearching
+        {
+            get => _isSpiralSearching;
+            set
+            {
+                if (_isSpiralSearching == value) return;
+                _isSpiralSearching = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _hcMouseDownSpiralCmd;
+        public ICommand HcMouseDownSpiralCmd
+        {
+            get
+            {
+                var command = _hcMouseDownSpiralCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseDownSpiralCmd = new RelayCommand(
+                    async param => await SpiralDownCmd()
+                );
+            }
+        }
+        private async Task SpiralDownCmd()
+        {
+            try
+            {
+                _ctsSpiral?.Cancel();
+                _ctsSpiral = new CancellationTokenSource();
+                _ctSpiral = _ctsSpiral.Token;
+                await Task.Run(() => SpiralSearch(_ctSpiral), _ctSpiral);
+            }
+            catch (OperationCanceledException) { }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+            }
+        }
+
+        private ICommand _hcMouseUpSpiralCmd;
+        public ICommand HcMouseUpSpiralCmd
+        {
+            get
+            {
+                var command = _hcMouseUpSpiralCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseUpSpiralCmd = new RelayCommand(
+                    param => SpiralUpCmd()
+                );
+            }
+        }
+        private void SpiralUpCmd()
+        {
+            try
+            {
+                _ctsSpiral?.Cancel();
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+            }
+        }
+        
+        private bool _isHcSettingsDialogOpen;
+        public bool IsHcSettingsDialogOpen
+        {
+            get => _isHcSettingsDialogOpen;
+            set
+            {
+                if (_isHcSettingsDialogOpen == value) return;
+                _isHcSettingsDialogOpen = value;
+                CloseDialogs(value);
+                OnPropertyChanged();
+            }
+        }
+
+        private object _hcSettingsContent;
+        public object HcSettingsContent
+        {
+            get => _hcSettingsContent;
+            set
+            {
+                if (_hcSettingsContent == value) return;
+                _hcSettingsContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openHcSettingsDialogCmd;
+        public ICommand OpenHcSettingsDialogCmd
+        {
+            get
+            {
+                var cmd = _openHcSettingsDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openHcSettingsDialogCmd = new RelayCommand(
+                    param => OpenHcSettings()
+                );
+            }
+        }
+        private void OpenHcSettings()
+        {
+            try
+            {
+                HcSettingsContent = new HcSettingsDialog();
+                IsHcSettingsDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+            }
+
+        }
+
+        private ICommand _acceptHcSettingsDialogCmd;
+        public ICommand AcceptHcSettingsDialogCmd
+        {
+            get
+            {
+                var cmd = _acceptHcSettingsDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _acceptHcSettingsDialogCmd = new RelayCommand(
+                    param => AcceptHcSettings()
+                );
+            }
+        }
+        private void AcceptHcSettings()
+        {
+            try
+            {
+                IsHcSettingsDialogOpen = false;
+
+            }
+            catch (Exception ex)
+            {
+                IsHcSettingsDialogOpen = false;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+            }
+        }
+
+        private async Task SpiralSearch(CancellationToken _ctSpiral)
+        {
+            var isTracking = SkyServer.Tracking;
+            SkyServer.TrackingSpeak = false;
+            IsSpiralSearching = true;
+            var speed = SkyServer.GetSlewSpeed(SkySettings.HcSpeed);
+            var fov = SkySettings.SpiralFov;
+            var pause = SkySettings.SpiralPause;
+
+            try
+            {
+                SkyServer.AbortSlew(false);
+                var count = 0;
+
+                while (!_ctSpiral.IsCancellationRequested)
+                {
+                    count++;
+                    Synthesizer.Speak(Application.Current.Resources["msgSearching"].ToString());
+
+                    // move up
+                    for (var i = 0; i < count; i++)
+                    {
+                        if (_ctSpiral.IsCancellationRequested) return;
+                        HcMouseDownUp();
+                        var decdist = fov / (speed * 3600);
+                        var stepms = (int)(decdist * 1000);
+                        Debug.WriteLine($"Up: {decdist}, {stepms}, {count}");
+                        await Tasks.DelayHandler(stepms, _ctSpiral);
+                        HcMouseUpUp();
+                        if (_ctSpiral.IsCancellationRequested) return;
+                        if (pause <= 0) continue;
+                        SkyServer.TrackingSpeak = false;
+                        SkyServer.Tracking = false;
+                        SkyServer.Tracking = isTracking;
+                        await Tasks.DelayHandler(pause * 1000, _ctSpiral);
+                    }
+
+                    // move right
+                    for (var i = 0; i < count; i++)
+                    {
+                        if (_ctSpiral.IsCancellationRequested) return;
+                        HcMouseDownRight();
+                        var rastep = fov * (1 / Math.Cos(Principles.Units.Deg2Rad1(SkyServer.Declination)));
+                        var radist = rastep / (speed * 3600);
+                        var stepms = (int)(radist * 1000);
+                        Debug.WriteLine($"Right: {rastep}, {radist}, {stepms}, {count}");
+                        await Tasks.DelayHandler(stepms, _ctSpiral);
+                        HcMouseUpRight();
+                        if (_ctSpiral.IsCancellationRequested) return;
+                        if (pause <= 0) continue;
+                        SkyServer.TrackingSpeak = false;
+                        SkyServer.Tracking = false;
+                        SkyServer.Tracking = isTracking;
+                        await Tasks.DelayHandler(pause * 1000, _ctSpiral);
+                    }
+
+                    count++;
+
+                    // move down
+                    for (var i = 0; i < count; i++)
+                    {
+                        if (_ctSpiral.IsCancellationRequested) return;
+                        HcMouseDownDown();
+                        var decdist = fov / (speed * 3600);
+                        var stepms = (int)(decdist * 1000);
+                        Debug.WriteLine($"Down: {decdist}, {stepms}, {count}");
+                        await Tasks.DelayHandler(stepms, _ctSpiral);
+                        HcMouseUpDown();
+                        if (_ctSpiral.IsCancellationRequested) return;
+                        if (pause <= 0) continue;
+                        SkyServer.TrackingSpeak = false;
+                        SkyServer.Tracking = false;
+                        SkyServer.Tracking = isTracking;
+                        await Tasks.DelayHandler(pause * 1000, _ctSpiral);
+                    }
+
+                    // move left
+                    for (var i = 0; i < count; i++)
+                    {
+                        if (_ctSpiral.IsCancellationRequested) return;
+                        HcMouseDownLeft();
+                        var rastep = fov * (1 / Math.Cos(Principles.Units.Deg2Rad1(SkyServer.Declination)));
+                        var radist = rastep / (speed * 3600);
+                        var stepms = (int)(radist * 1000);
+                        Debug.WriteLine($"Left: {rastep}, {radist}, {stepms}, {count}");
+                        await Tasks.DelayHandler(stepms, _ctSpiral);
+                        HcMouseUpLeft();
+                        if (_ctSpiral.IsCancellationRequested) return;
+                        if (pause <= 0) continue;
+                        SkyServer.TrackingSpeak = false;
+                        SkyServer.Tracking = false;
+                        SkyServer.Tracking = isTracking;
+                        await Tasks.DelayHandler(pause * 1000, _ctSpiral);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+            }
+            finally
+            {
+                SkyServer.TrackingSpeak = false;
+                SkyServer.Tracking = false;
+                SkyServer.Tracking = isTracking;
+                SkyServer.TrackingSpeak = true;
+                IsSpiralSearching = false;
+            }
+
+        }
         #endregion
 
         #region Backlash
@@ -6734,6 +7134,8 @@ namespace GS.Server.SkyTelescope
             Dispose(true);
             _ctsPark?.Cancel();
             _ctsPark?.Dispose();
+            _ctsSpiral?.Cancel();
+            _ctsSpiral?.Dispose();
             // GC.SuppressFinalize(this);
         }
         // NOTE: Leave out the finalizer altogether if this class doesn't
