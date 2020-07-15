@@ -544,14 +544,16 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="tbOctans">Sigma Octantis</system:String>
 
     <!--1.0.1.8 -->
-    <system:String x:Key="msgMouseLock0">Press a key to stop. Left/Right click for Ra or Dec moves.</system:String>
-    <system:String x:Key="msgMouseLock1">Wheel click to switch Ra or Dec. Wheel up/down for speed</system:String>
-    <system:String x:Key="msgMouseLock2">X1 click for spiral search. X2 click to stop</system:String>
+    <system:String x:Key="msgMouseLock0">Press a key to unlock the mouse.</system:String>
     <system:String x:Key="capMouseLock">Mouse Locked</system:String>
     <system:String x:Key="tipMouseLock">Lock Mouse</system:String>
-    <system:String x:Key="btnSpiralSearch">Spiral Search</system:String>
+    <system:String x:Key="btnSpiralSearch">Spiral Search, right click for settings</system:String>
     <system:String x:Key="hintSpiral">Spiral</system:String>
-    <system:String x:Key="tipSpiralStep">Spiral Step Seconds</system:String>
     <system:String x:Key="msgSearching">Searching</system:String>
+    <system:String x:Key="tipSettings">Settings</system:String>
+    <system:String x:Key="tipSpiralSettings">Spiral Search Settings</system:String>
+    <system:String x:Key="hntSpiralSpeed">Speed</system:String>
+    <system:String x:Key="hntSpiralPause">Pause (seconds)</system:String>
+    <system:String x:Key="hntSpiralFov">FOV (arc seconds)</system:String>
 
 </ResourceDictionary>

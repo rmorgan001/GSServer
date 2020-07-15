@@ -940,9 +940,9 @@ namespace GS.Server.Windows
                 if (value)
                 {
                     HideMouse();
-                    var msg = $"{Application.Current.Resources["msgMouseLock0"]}{Environment.NewLine}";
-                    msg += $"{Application.Current.Resources["msgMouseLock1"]}{Environment.NewLine}";
-                    msg += $"{Application.Current.Resources["msgMouseLock2"]}";
+                    var msg = $"{Application.Current.Resources["msgMouseLock0"]}";
+                    //msg += $"{Application.Current.Resources["msgMouseLock1"]}{Environment.NewLine}";
+                    //msg += $"{Application.Current.Resources["msgMouseLock2"]}";
                     OpenDialog($"{msg}", $"{ Application.Current.Resources["capMouseLock"]}");
                 }
                 else

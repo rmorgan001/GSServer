@@ -4256,9 +4256,9 @@ namespace GS.Server.SkyTelescope
                 if (value)
                 {
                     HideMouse();
-                    var msg = $"{Application.Current.Resources["msgMouseLock0"]}{Environment.NewLine}";
-                    msg += $"{Application.Current.Resources["msgMouseLock1"]}{Environment.NewLine}";
-                    msg += $"{Application.Current.Resources["msgMouseLock2"]}";
+                    var msg = $"{Application.Current.Resources["msgMouseLock0"]}";
+                    //msg += $"{Application.Current.Resources["msgMouseLock1"]}{Environment.NewLine}";
+                    //msg += $"{Application.Current.Resources["msgMouseLock2"]}";
                     OpenDialog($"{msg}", $"{ Application.Current.Resources["capMouseLock"]}");
                     Synthesizer.Speak(Application.Current.Resources["capMouseLock"].ToString());
                 }
