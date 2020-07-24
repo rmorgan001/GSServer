@@ -56,7 +56,7 @@ namespace GS.Server.Notes
                 }
                 var text = new FormattedText("GS Server Notes - Page " + (pageNumber + 1),
                     System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
-                    m_Typeface, 14, Brushes.Black);
+                    m_Typeface, 14, Brushes.Black, VisualTreeHelper.GetDpi(newpage).PixelsPerDip); 
                 ctx.DrawText(text, new Point(0, -96 / 4.0)); // 1/4 inch above page content
             }
             var background = new DrawingVisual();

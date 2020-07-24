@@ -94,6 +94,8 @@ namespace GS.Server.Helpers
             }
             catch (Exception ex)
             {
+                Sleep = false;
+                Settings.Settings.SleepMode = false;
                 var monitorItem = new MonitorEntry
                 { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message},{ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);

@@ -213,6 +213,9 @@ namespace GS.Server.Settings
                                 OnPropertyChanged($"UTCDateOffset");
                                 OnPropertyChanged($"UTCTime");
                                 break;
+                            case "SleepMode":
+                                SleepMode = Settings.SleepMode;
+                                break;
                         }
                     }, _cts);
             }
@@ -365,12 +368,14 @@ namespace GS.Server.Settings
         }
 
         private SleepMode _sleepMode;
+        private bool sleepmode;
 
         public bool SleepMode
         {
             get => Settings.SleepMode;
             set
             {
+                if(sleepmode == value) {return;}
                 if (value)
                 {
                     if (_sleepMode == null)
@@ -388,6 +393,7 @@ namespace GS.Server.Settings
                     }
                 }
 
+                sleepmode = value;
                 Settings.SleepMode = value;
                 OnPropertyChanged();
             }

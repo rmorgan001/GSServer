@@ -4,7 +4,7 @@
     <Title>GS.Simulator</Title>
     <Description>GS.Simulator</Description>
     <ProjectGuid>{E463EC96-56DA-447B-8719-F68C33771185}</ProjectGuid>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <OutputPath>..\Builds\$(Configuration)\</OutputPath>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
@@ -35,7 +35,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ASCOM.Platform" Version="6.4.2">
+    <PackageReference Include="ASCOM.Platform" Version="6.5.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

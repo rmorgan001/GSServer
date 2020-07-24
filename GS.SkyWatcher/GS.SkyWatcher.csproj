@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <ProjectGuid>{194A85E4-994C-432B-A25D-48DA75553349}</ProjectGuid>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <OutputPath>..\Builds\$(Configuration)\</OutputPath>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
@@ -44,7 +44,7 @@
     <None Include="Resources\ASCOM.snk" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ASCOM.Platform" Version="6.4.2">
+    <PackageReference Include="ASCOM.Platform" Version="6.5.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
   </ItemGroup>

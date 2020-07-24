@@ -4,7 +4,7 @@
     <Title>GS.Shared</Title>
     <Description>GS.Shared</Description>
     <ProjectGuid>{63E824C8-585D-45FC-88E4-7E119F0C7773}</ProjectGuid>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <OutputPath>..\Builds\$(Configuration)\</OutputPath>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>

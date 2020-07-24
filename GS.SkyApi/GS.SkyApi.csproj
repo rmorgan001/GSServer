@@ -4,7 +4,7 @@
     <Title>GS.SkyApi</Title>
     <Description>GS.SkyApi</Description>
     <ProjectGuid>{3FF43445-E8E2-43FB-AC67-1733748AFFDD}</ProjectGuid>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <OutputPath>..\Builds\$(Configuration)\</OutputPath>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>

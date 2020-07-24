@@ -4,7 +4,7 @@
     <Title>GS.Principles</Title>
     <Description>GS.Principles</Description>
     <ProjectGuid>{C2BC2641-3B32-4940-B124-61ADEC0DAC28}</ProjectGuid>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <OutputPath>..\Builds\$(Configuration)\</OutputPath>
     <PostBuildEvent />
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -29,7 +29,7 @@
     <None Include="Resources\ASCOM.snk" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ASCOM.Platform" Version="6.4.2">
+    <PackageReference Include="ASCOM.Platform" Version="6.5.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

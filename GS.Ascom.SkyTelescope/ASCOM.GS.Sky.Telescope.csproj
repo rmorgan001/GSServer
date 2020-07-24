@@ -7,7 +7,7 @@
     <ProjectGuid>{20CD9164-D5BF-4DA5-A248-EC6B81830610}</ProjectGuid>
     <AssemblyOriginatorKeyFile>Resources\ASCOM.snk</AssemblyOriginatorKeyFile>
     <FileUpgradeFlags />
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <UpgradeBackupLocation />
     <IsWebBootstrapper>true</IsWebBootstrapper>
     <PublishUrl>http://localhost/ASCOM.%24safeprojectname%24.Telescope/</PublishUrl>
@@ -88,7 +88,7 @@
     <None Include="Resources\ASCOM.snk" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ASCOM.Platform" Version="6.4.2">
+    <PackageReference Include="ASCOM.Platform" Version="6.5.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="StrongNamer" Version="0.2.5" />
