@@ -74,11 +74,11 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <controls:WindowTitleBar Grid.Row="0"/>
+        <controls:WindowTitleBar Grid.Row="0"/>
             <controls:TabBar Grid.Row="1"/>
-            <Grid Grid.Row="2" Margin="1" Background="{DynamicResource MaterialDesignPaper}">
-                <ContentControl Content="{Binding CurrentPageViewModel}"/>
-            </Grid>
+        <Grid Grid.Row="2" Background="{DynamicResource MaterialDesignPaper}">
+            <ContentControl Content="{Binding CurrentPageViewModel}"/>
+        </Grid>
     </Grid>
 </Window>
 
