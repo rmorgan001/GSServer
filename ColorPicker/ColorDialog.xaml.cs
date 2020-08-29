@@ -40,7 +40,7 @@ namespace ColorPicker
         /// <summary>
         /// User is happy with choice
         /// </summary>
-        private void btnOk_Click(object sender, RoutedEventArgs e)
+        private void BtnOk_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
         }
@@ -48,7 +48,7 @@ namespace ColorPicker
         /// <summary>
         /// User is not happy with choice
         /// </summary>
-        private void btnCancel_Click(object sender, RoutedEventArgs e)
+        private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
         }

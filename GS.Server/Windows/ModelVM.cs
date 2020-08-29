@@ -65,8 +65,8 @@ namespace GS.Server.Windows
                     Rotate();
                     LoadGEM();
 
-                    RightAscension = "00h 00m 00s";
-                    Declination = "00° 00m 00s";
+                    RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXform, "h ", ":", "", 2);
+                    Declination = _util.DegreesToDMS(SkyServer.DeclinationXform, "° ", ":", "", 2);
                 }
 
             }

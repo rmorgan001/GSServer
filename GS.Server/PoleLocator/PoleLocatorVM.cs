@@ -26,7 +26,6 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
-//using ASCOM.Astrometry.Transform;
 using ASCOM.Utilities;
 using GS.Server.Controls.Dialogs;
 
@@ -213,19 +212,19 @@ namespace GS.Server.PoleLocator
         private void SetDegrees()
         {
             var ha = Coordinate.Ra2Ha24(_poleRa, Lst);
-            Ha12 = Coordinate.Ra2Ha12(_poleRa, Lst);
-            var deg = Range.Range360(ha * 15);
+            Ha12 = ha; // Coordinate.Ra2Ha12(_poleRa, Lst);
+            var deg = Range.Range360(ha * 15.0);
 
             if (SkyServer.SouthernHemisphere)
             {
                 HaDeg = Range.Range360(deg);
-                HaFlipDeg = Range.Range360(deg - 180);
+                HaFlipDeg = Range.Range360(deg - 180.0);
                 GridAngle = MirrorFlip ? (int)Range.Range360(HaFlipDeg + 100) : (int)Range.Range360(HaDeg + 100);
             }
             else
             {
                 HaDeg = 360 - deg;
-                HaFlipDeg = Range.Range360(180 - deg);
+                HaFlipDeg = Range.Range360(180.0 - deg);
                 PolePosition = MirrorFlip ? HaFlipDeg : HaDeg;
             }
 
@@ -241,6 +240,7 @@ namespace GS.Server.PoleLocator
             SouthernHemisphere = shemi;
 
             _poleRa = shemi ? _octans : _polaris;
+            Ra = _util.HoursToHMS(_poleRa,"h ", ":","",2);
         }
 
         /// <summary>
@@ -302,6 +302,18 @@ namespace GS.Server.PoleLocator
             {
                 if (value == _long) return;
                 _long = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _ra;
+        public string Ra
+        {
+            get => _ra;
+            set
+            {
+                if (value == _ra) return;
+                _ra = value;
                 OnPropertyChanged();
             }
         }

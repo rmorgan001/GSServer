@@ -49,8 +49,11 @@
                         </StackPanel>
                     </Border>
                     <Border Grid.Row="1" Margin="10,5,10,5" BorderBrush="DimGray" BorderThickness="1" CornerRadius="5">
-                        <Grid Height="300">
-
+                        <Grid Height="100">
+                            <StackPanel Orientation="Vertical" >
+                                <TextBox Text="{Binding Message}" />
+                                <TextBox Text="{Binding Message1}" />
+                            </StackPanel>
                         </Grid>
                     </Border>
                 </Grid>

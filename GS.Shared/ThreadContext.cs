@@ -26,7 +26,7 @@ namespace GS.Shared
         /// </summary>
         /// <param name="action"></param>
         /// <param name="token"></param>
-        public static void InvokeOnUiThread(Action action, CancellationToken token = default(CancellationToken))
+        public static void InvokeOnUiThread(Action action, CancellationToken token = default)
         {
             if (Application.Current.Dispatcher != null && Application.Current.Dispatcher.CheckAccess())
             {

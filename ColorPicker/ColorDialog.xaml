@@ -16,8 +16,8 @@
 
         <local:ColorPickerControl x:Name="colorPicker"/>
         <StackPanel Grid.Row="1" HorizontalAlignment="Right" Orientation="Horizontal" Margin="5" >
-            <Button x:Name="btnOk" Content="Ok" Click="btnOk_Click" Width="60" Height="25" Margin="10,0,0,0" />
-            <Button x:Name="btnCancel" Content="Cancel" Click="btnCancel_Click" Height="25" Width="80" Margin="10,0,10,0" />
+            <Button x:Name="btnOk" Content="Ok" Click="BtnOk_Click" Width="60" Height="25" Margin="10,0,0,0" />
+            <Button x:Name="btnCancel" Content="Cancel" Click="BtnCancel_Click" Height="25" Width="80" Margin="10,0,10,0" />
         </StackPanel>
     </Grid>
 </Window>

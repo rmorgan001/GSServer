@@ -93,7 +93,7 @@ namespace GS.Server.SkyTelescope
                     SkySystem.StaticPropertyChanged += PropertyChangedSkySystem;
                     SkySettings.StaticPropertyChanged += PropertyChangedSkySettings;
                     Shared.Settings.StaticPropertyChanged += PropertyChangedMonitorLog;
-                    Synthesizer._staticPropertyChanged += PropertyChangedSynthesizer;
+                    Synthesizer.StaticPropertyChanged += PropertyChangedSynthesizer;
                     Settings.Settings.StaticPropertyChanged += PropertyChangedSettings;
 
                     // dropdown lists

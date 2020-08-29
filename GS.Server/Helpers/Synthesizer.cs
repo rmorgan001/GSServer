@@ -28,7 +28,7 @@ namespace GS.Server.Helpers
     internal static class Synthesizer
     {
         private static readonly SpeechSynthesizer _synthesizer;
-        public static event PropertyChangedEventHandler _staticPropertyChanged;
+        public static event PropertyChangedEventHandler StaticPropertyChanged;
 
         private static IList<string> VoiceNames;
         private static string VoiceName => Settings.Settings.VoiceName;
@@ -162,7 +162,7 @@ namespace GS.Server.Helpers
         /// <param name="propertyName"></param>
         private static void OnStaticPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            _staticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));
+            StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

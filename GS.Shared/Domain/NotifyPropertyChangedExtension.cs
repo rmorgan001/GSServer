@@ -25,7 +25,9 @@ namespace GS.Shared.Domain
     [ComVisible(false)]
     public static class NotifyPropertyChangedExtension
     {
+#pragma warning disable IDE0060 // Remove unused parameter
         public static void MutateVerbose<TField>(this INotifyPropertyChanged instance, ref TField field, TField newValue,
+#pragma warning restore IDE0060 // Remove unused parameter
             Action<PropertyChangedEventArgs> raise, [CallerMemberName] string propertyName = null)
         {
             if (EqualityComparer<TField>.Default.Equals(field, newValue)) return;

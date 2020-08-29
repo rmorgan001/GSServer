@@ -63,7 +63,7 @@ namespace GS.Server.SkyTelescope
             }
             else
             {
-                var successfullyRemoved = ConnectStates.TryRemove(id, out value);
+                var successfullyRemoved = ConnectStates.TryRemove(id, out _);
 
                 var monitorItem = new MonitorEntry
                 {

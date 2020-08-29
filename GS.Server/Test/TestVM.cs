@@ -49,6 +49,29 @@ namespace GS.Server.Test
 
         #region Test
 
+        private string _message;
+        public string Message
+        {
+            get => _message;
+            set
+            {
+                if (_message == value) return;
+                _message = value;
+                OnPropertyChanged();
+            }
+        }
+        private string _message1;
+        public string Message1
+        {
+            get => _message1;
+            set
+            {
+                if (_message1 == value) return;
+                _message1 = value;
+                OnPropertyChanged();
+            }
+        }
+
         private ICommand _clickstartcmd;
         public ICommand ClickStartCmd
         {
@@ -69,7 +92,12 @@ namespace GS.Server.Test
         {
             try
             {
-
+                var ra = 11.8847222;
+                var dec = 53.6844444;
+                var radec = Transforms.CoordTypeToInternal(ra,dec);
+                Message = $"{radec.X}, {radec.Y}";
+                radec = Transforms.CoordTypeToInternal(SkyServer.RightAscension, SkyServer.Declination);
+                Message1 = $"{SkyServer.RightAscension}:{radec.X}, {SkyServer.Declination}:{radec.Y}";
             }
             catch (Exception ex)
             {

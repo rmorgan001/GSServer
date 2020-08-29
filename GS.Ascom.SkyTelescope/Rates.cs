@@ -72,6 +72,10 @@ namespace ASCOM.GS.Sky.Telescope
         private void Dispose(bool disposing)
         {
             // nothing to do?
+            if (disposing)
+            {
+
+            }
         }
 
         #endregion

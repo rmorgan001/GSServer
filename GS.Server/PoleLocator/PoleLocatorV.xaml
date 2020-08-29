@@ -32,7 +32,10 @@
                         <TextBlock Text="{StaticResource tbPolaris}" Margin="5,0,0,0" Visibility="{Binding NorthernHemisphere, Converter={StaticResource BoolToVis}}"/>
                         <TextBlock Text="{StaticResource tbOctans}" Margin="5,0,0,0"  Visibility="{Binding SouthernHemisphere, Converter={StaticResource BoolToVis}}" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="10">
+                    <StackPanel Orientation="Horizontal" >
+                        <TextBlock Text="{Binding Ra}" Margin="5,5,0,0"/>
+                    </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="10">
                         <CheckBox Height="25" Width="25" IsChecked="{Binding MirrorFlip}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource cbMirrorFlip}" />
                         <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource cbMirrorFlip}" />
                     </StackPanel>
