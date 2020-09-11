@@ -73,4 +73,9 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="StrongNamer" Version="0.2.5" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="SkyScripts\Park.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

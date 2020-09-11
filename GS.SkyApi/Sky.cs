@@ -607,6 +607,16 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
+        public bool IsParked
+        {
+            get
+            {
+                CheckRunning();
+                return SkyServer.AtPark;
+            }
+        }
+
+        /// <inheritdoc />
         public bool IsPpecInTrainingOn
         {
             get
@@ -714,6 +724,54 @@ namespace GS.SkyApi
                 var command = new SkyMountVersion(SkyQueue.NewId);
                 var results = GetResult(command);
                 return results.Result;
+            }
+        }
+
+        /// <inheritdoc />
+        public void Park()
+        {
+            var monitorItem = new MonitorEntry
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Started" };
+            MonitorLog.LogToMonitor(monitorItem);
+            CheckRunning();
+
+            if (SkyServer.AtPark)
+            {
+                throw new Exception("Parked");
+            }
+
+            var found = SkySettings.ParkPositions.Find(x => x.Name == SkyServer.ParkSelected.Name);
+            if (found != null)
+            {
+                SkyServer.GoToPark();
+            }
+            else
+            {
+                throw new Exception("Not Found");
+            }
+        }
+
+        /// <inheritdoc />
+        public string ParkPosition
+        {
+            get => SkyServer.ParkSelected.Name;
+            set
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
+                MonitorLog.LogToMonitor(monitorItem);
+                if (IsMountRunning == false) { return; }
+
+                if (string.IsNullOrEmpty(value)) return;
+                var found = SkySettings.ParkPositions.Find(x => x.Name == value);
+                if (found != null)
+                {
+                    SkyServer.ParkSelected = found;
+                }
+                else
+                {
+                    throw new Exception("Not Found");
+                }
             }
         }
 
@@ -906,6 +964,18 @@ namespace GS.SkyApi
 
             SkyServer.ShutdownServer();
         }
+
+        /// <inheritdoc />
+        public void UnPark()
+        {
+            var monitorItem = new MonitorEntry
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Started" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            CheckRunning();
+            SkyServer.AtPark = false;
+            SkyServer.Tracking = true;
+        }
         
         /// <summary>
         /// Validate axis number as 1 or 2
@@ -914,6 +984,11 @@ namespace GS.SkyApi
         {
             if (!IsServerSkyWatcher) { throw new Exception("Server not set to correct mount type"); }
             if (!IsConnected) throw new Exception("Mount not connected");
+        }
+
+        private void CheckRunning()
+        {
+            if (!IsMountRunning) {throw new Exception("Mount not connected");}
         }
 
         /// <summary>
@@ -1219,6 +1294,10 @@ namespace GS.SkyApi
         /// </summary>
         bool IsMountRunning { get; set; }
         /// <summary>
+        /// Is mount parked
+        /// </summary>
+        bool IsParked { get; }
+        /// <summary>
         /// q Is the mount collecting PPEC data
         /// </summary>
         bool IsPpecInTrainingOn { get; }
@@ -1272,6 +1351,14 @@ namespace GS.SkyApi
         /// e Identify board version
         /// </summary>
         bool MountVersion { get; }
+        /// <summary>
+        /// Park mount to the current selected park position
+        /// </summary>
+        void Park();
+        /// <summary>
+        /// Get parked selected or Set to an existing park position name
+        /// </summary>
+        string ParkPosition { get; set; }
         /// <summary>
         /// Turns PPEC off during movements and then back on for error correction moves
         /// </summary>
@@ -1357,5 +1444,9 @@ namespace GS.SkyApi
         /// shutdown and close the server
         /// </summary>
         void ShutdownServer();
+        /// <summary>
+        /// UnPark mount
+        /// </summary>
+        void UnPark();
     }
 }

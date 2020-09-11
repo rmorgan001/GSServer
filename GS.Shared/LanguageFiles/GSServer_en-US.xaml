@@ -492,7 +492,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnOCheckUpdates">Check for Updates</system:String>
     <system:String x:Key="msgONotAvail">Updates not Available</system:String>
     <system:String x:Key="msgONotFound">Updates not Found</system:String>
-    <system:String x:Key="msgODisconnects">Diconnect mount and connected applications before running</system:String>
+    <system:String x:Key="msgODisconnects">Disconnect mount and connected applications before running</system:String>
     <system:String x:Key="tbOPole">Pole Locator</system:String>
     <system:String x:Key="msgCopiedClip">Copied to Clipboard</system:String>
 

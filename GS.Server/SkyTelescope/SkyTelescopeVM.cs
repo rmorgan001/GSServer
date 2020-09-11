@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019  Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2020  Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -1011,7 +1011,7 @@ namespace GS.Server.SkyTelescope
                 var sec = (int)Math.Round(SkySettings.Latitude * 3600);
                 sec = Math.Abs(sec % 3600);
                 var min = sec / 60;
-                return Math.Abs(min);
+                return min;
             }
             set
             {
@@ -1075,7 +1075,7 @@ namespace GS.Server.SkyTelescope
                 var sec = (int)Math.Round(SkySettings.Longitude * 3600);
                 sec = Math.Abs(sec % 3600);
                 var min = sec / 60;
-                return Math.Abs(min);
+                return min;
             }
             set
             {
