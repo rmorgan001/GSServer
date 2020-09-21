@@ -1,4 +1,4 @@
-﻿<!--/* Copyright(C) 2019  Rob Morgan (robert.morgan.e@gmail.com)
+﻿<!--/* Copyright(C) 2019-2020  Rob Morgan (robert.morgan.e@gmail.com)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published
@@ -48,7 +48,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="badgeHome">Home</system:String>
     <system:String x:Key="btntipHome">Déplacement vers position Home</system:String>
     <system:String x:Key="btnPark">Parker</system:String>
-    <system:String x:Key="btnUnPark">déparker</system:String>
+    <system:String x:Key="btnUnPark">Déparker</system:String>
     <system:String x:Key="btnhintPark">Parker</system:String>
     <system:String x:Key="btntipPark">Parker la monture</system:String>
     <system:String x:Key="btnStop">Stop</system:String>
@@ -72,7 +72,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="msgDecOffset">Offset d'alignement de la platine:</system:String>
     <system:String x:Key="cbhintDecOffset">Degrés</system:String>
     <system:String x:Key="btntipScheduler">Fonctions de planifications</system:String>
-    <system:String x:Key="btnScheduler">Fonctions</system:String>
+    <system:String x:Key="btnScheduler">Planification</system:String>
 
     <!--Bottom Status bar-->
     <system:String x:Key="tbHome">Home</system:String>
@@ -524,11 +524,11 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="bdgPlotStart">On</system:String>
     <system:String x:Key="btnPlotPause">Pause</system:String>
     <system:String x:Key="bdgPlotPause">On</system:String>
-    <system:String x:Key="tbPlotZero">Zero Base Axes</system:String>
-    <system:String x:Key="cbPlotYscale">Y - échelle</system:String>
+    <system:String x:Key="tbPlotZero">Zero des axes</system:String>
+    <system:String x:Key="cbPlotYscale">Y-échelle</system:String>
     <system:String x:Key="cbPlotQuality">Qualité du Zoom</system:String>
-    <system:String x:Key="cbPlotMaxPoints">Maxium Plot Points</system:String>
-    <system:String x:Key="cbtipPlotMaxPoints">Max Points</system:String>
+    <system:String x:Key="cbPlotMaxPoints">Nombre maximum de points</system:String>
+    <system:String x:Key="cbtipPlotMaxPoints">Points max</system:String>
     <system:String x:Key="tbLogging">Enregistrer dans GSChartLog</system:String>
 
     <!--Pole Locator -->
@@ -544,16 +544,16 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="tbOctans">Sigma Octantis</system:String>
 
     <!--1.0.1.8 -->
-    <system:String x:Key="msgMouseLock0">Press a key to unlock the mouse.</system:String>
-    <system:String x:Key="capMouseLock">Mouse Locked</system:String>
-    <system:String x:Key="tipMouseLock">Lock Mouse</system:String>
-    <system:String x:Key="btnSpiralSearch">Spiral Search, right click for settings</system:String>
-    <system:String x:Key="hintSpiral">Spiral</system:String>
-    <system:String x:Key="msgSearching">Searching</system:String>
-    <system:String x:Key="tipSettings">Settings</system:String>
-    <system:String x:Key="tipSpiralSettings">Spiral Search Settings</system:String>
-    <system:String x:Key="hntSpiralSpeed">Speed</system:String>
-    <system:String x:Key="hntSpiralPause">Pause (seconds)</system:String>
-    <system:String x:Key="hntSpiralFov">FOV (arc seconds)</system:String>
+    <system:String x:Key="msgMouseLock0">Appuyer sur une touche pour déverouiller la souris.</system:String>
+    <system:String x:Key="capMouseLock">Souris vérouillée</system:String>
+    <system:String x:Key="tipMouseLock">Vérouiller la souris</system:String>
+    <system:String x:Key="btnSpiralSearch">Recherche en spirale, clique droit pour accéder aux paramètres</system:String>
+    <system:String x:Key="hintSpiral">Spirale</system:String>
+    <system:String x:Key="msgSearching">Recherche</system:String>
+    <system:String x:Key="tipSettings">Paramètres</system:String>
+    <system:String x:Key="tipSpiralSettings">Paramètres du mode spirale</system:String>
+    <system:String x:Key="hntSpiralSpeed">Vitesse</system:String>
+    <system:String x:Key="hntSpiralPause">Pause (secondes)</system:String>
+    <system:String x:Key="hntSpiralFov">Champ (arc seconds)</system:String>
 
 </ResourceDictionary>
