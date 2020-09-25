@@ -137,14 +137,16 @@ namespace GS.SkyWatcher
 
                 // Wait until the axis stops or counter runs out
                 var stopwatch = Stopwatch.StartNew();
-                while (stopwatch.Elapsed.TotalMilliseconds < 2000)
+                var counter = 1;
+                while (stopwatch.Elapsed.TotalMilliseconds <= 3500)
                 {
                     var axesstop = _commands.GetAxisStatus(axis);
                     // Return if the axis has stopped.
-                    if (axesstop.FullStop)
-                    {
-                        break;
-                    }
+                    if (axesstop.FullStop) { break; }
+                    // issue new stop
+                    if (counter % 5 == 0) { AxisStop(axis); }
+                    counter++;
+                    Thread.Sleep(50);
                 }
                 return;
             }
@@ -173,14 +175,16 @@ namespace GS.SkyWatcher
 
                     // Wait until the axis stops or counter runs out
                     var stopwatch = Stopwatch.StartNew();
-                    while (stopwatch.Elapsed.TotalMilliseconds < 2000)
+                    var counter = 1; 
+                    while (stopwatch.Elapsed.TotalMilliseconds <= 3500)
                     {
                         axesstatus = _commands.GetAxisStatus(axis);
                         // Return if the axis has stopped.
-                        if (axesstatus.FullStop)
-                        {
-                            break;
-                        }
+                        if (axesstatus.FullStop) { break; }
+                        // issue new stop
+                        if (counter % 5 == 0) { AxisStop(axis); }
+                        counter++;
+                        Thread.Sleep(50);
                     }
                 }
 
@@ -352,15 +356,14 @@ namespace GS.SkyWatcher
                             {
                                 // Wait until the axis stops or counter runs out
                                 var sw2 = Stopwatch.StartNew();
-                                while (sw2.Elapsed.TotalMilliseconds < 2000)
+                                while (sw2.Elapsed.TotalMilliseconds <= 3500)
                                 {
                                     axesstatus = _commands.GetAxisStatus(axis);
                                     // Return if the axis has stopped.
-                                    if (axesstatus.FullStop)
-                                    {
-                                        break;
-                                    }
+                                    if (axesstatus.FullStop) { break; }
+                                    Thread.Sleep(10);
                                 }
+                                if (!axesstatus.FullStop) { AxisStop(axis); }
                             }
                         }
                     }
@@ -376,11 +379,12 @@ namespace GS.SkyWatcher
                     {
                         // Wait until the axis stops or counter runs out
                         var stopwatch = Stopwatch.StartNew();
-                        while (stopwatch.Elapsed.TotalMilliseconds < 2000)
+                        while (stopwatch.Elapsed.TotalMilliseconds <= 3500)
                         {
                             axesstatus = _commands.GetAxisStatus(AxisId.Axis2);
                             // Return if the axis has stopped.
                             if (axesstatus.FullStop) { break; }
+                            Thread.Sleep(10);
                         }
                     }
 
@@ -514,11 +518,16 @@ namespace GS.SkyWatcher
 
                 // Wait until the axis stops or counter runs out
                 var stopwatch = Stopwatch.StartNew();
-                while (stopwatch.Elapsed.TotalMilliseconds < 2000)
+                var counter = 1;
+                while (stopwatch.Elapsed.TotalMilliseconds <= 3500)
                 {
                     axesstatus = _commands.GetAxisStatus(axis);
                     // Return if the axis has stopped.
                     if (axesstatus.FullStop) { break; }
+                    // issue new stop
+                    if (counter % 5 == 0) { AxisStop(axis); }
+                    counter++;
+                    Thread.Sleep(50);
                 }
             }
 
@@ -581,11 +590,15 @@ namespace GS.SkyWatcher
 
                 // Wait until the axis stops or counter runs out
                 var sw = Stopwatch.StartNew();
-                while (sw.Elapsed.TotalMilliseconds < 2000)
+                var counter = 1;
+                while (sw.Elapsed.TotalMilliseconds <= 3500)
                 {
                     axesstatus = _commands.GetAxisStatus(axis);
                     // Return if the axis has stopped.
                     if (axesstatus.FullStop) { break; }
+                    if (counter % 5 == 0) { AxisStop(axis); }
+                    counter++;
+                    Thread.Sleep(50);
                 }
             }
 
@@ -1005,12 +1018,12 @@ namespace GS.SkyWatcher
             {
                 // Wait until the axis stops or counter runs out
                 stopwatch.Start();
-                while (stopwatch.Elapsed.TotalMilliseconds < 2000)
+                while (stopwatch.Elapsed.TotalMilliseconds <= 2000)
                 {
                     axesstatus1 = _commands.GetAxisStatus(AxisId.Axis1);
                     // Break loop if the axis has stopped.
                     if (axesstatus1.FullStop) { break; }
-                    Thread.Sleep(1); // no need to hurry
+                    Thread.Sleep(10); // no need to hurry
                     AxisStop(AxisId.Axis1); // force another stop
                 }
                 stopwatch.Reset(); //stop any interval measurement in progress and clear the elapsed time value
@@ -1044,12 +1057,12 @@ namespace GS.SkyWatcher
             {
                 // Wait until the axis stops or counter runs out
                 stopwatch.Start();
-                while (stopwatch.Elapsed.TotalMilliseconds < 2000)
+                while (stopwatch.Elapsed.TotalMilliseconds <= 2000)
                 {
                     axesstatus2 = _commands.GetAxisStatus(AxisId.Axis2);
                     // Break loop if the axis has stopped.
                     if (axesstatus2.FullStop) { break; }
-                    Thread.Sleep(1);
+                    Thread.Sleep(10);
                     AxisStop(AxisId.Axis2); // force another stop
                 }
                 stopwatch.Reset();

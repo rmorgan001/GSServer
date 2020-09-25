@@ -15,7 +15,6 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </UserControl.Resources>
     <Grid MinWidth="800">
-        <md:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" HorizontalAlignment="Center" VerticalAlignment="Center" CloseOnClickAway="True"/>
         <md:DrawerHost IsLeftDrawerOpen="{Binding OpenSetupDialog}" BorderBrush="{StaticResource MaterialDesignDivider}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0">
             <!-- switched lines for opendialog so COM can open the settings IsLeftDrawerOpen="{Binding OpenSetupDialog}"-->
             <!--IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}"-->
@@ -588,6 +587,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
+                <md:DialogHost Grid.RowSpan="2" IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" HorizontalAlignment="Center" VerticalAlignment="Center" CloseOnClickAway="True" />
                 <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
                     <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding OpenSetupDialog}" x:Name="MenuToggleButton" ToolTip="{StaticResource tbtipOpen}"
                                   Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}"  IsHitTestVisible="True"
