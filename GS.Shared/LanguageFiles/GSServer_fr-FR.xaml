@@ -161,10 +161,6 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="cbtipRaBacklash">Ra Backlash</system:String>
 
     <!--Debug bar-->
-    <system:String x:Key="tbInternalX">MontureX:</system:String>
-    <system:String x:Key="tbInternalY">MontureY:</system:String>
-    <system:String x:Key="tbActualX">ActuelX:</system:String>
-    <system:String x:Key="tbActualY">ActuelY:</system:String>
     <system:String x:Key="tbSiderealTime">Heure Sidérale:</system:String>
 
     <!--Gamepad-->
@@ -547,13 +543,29 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="msgMouseLock0">Appuyer sur une touche pour déverouiller la souris.</system:String>
     <system:String x:Key="capMouseLock">Souris vérouillée</system:String>
     <system:String x:Key="tipMouseLock">Vérouiller la souris</system:String>
-    <system:String x:Key="btnSpiralSearch">Recherche en spirale, clique droit pour accéder aux paramètres</system:String>
-    <system:String x:Key="hintSpiral">Spirale</system:String>
-    <system:String x:Key="msgSearching">Recherche</system:String>
-    <system:String x:Key="tipSettings">Paramètres</system:String>
-    <system:String x:Key="tipSpiralSettings">Paramètres du mode spirale</system:String>
-    <system:String x:Key="hntSpiralSpeed">Vitesse</system:String>
-    <system:String x:Key="hntSpiralPause">Pause (secondes)</system:String>
-    <system:String x:Key="hntSpiralFov">Champ (arc seconds)</system:String>
 
+    <!--1.0.2.1 -->
+    <system:String x:Key="winSpiralSearch">Spiral Search</system:String>
+    <system:String x:Key="btnSpiralIn">In</system:String>
+    <system:String x:Key="btnSpiralOut">Out</system:String>
+    <system:String x:Key="btnSpiralAbort">Abort</system:String>
+    <system:String x:Key="btnSpiralNew">New</system:String>
+    <system:String x:Key="btnSpiralClear">Clear</system:String>
+    <system:String x:Key="btnSpiralCalculate">Calculate</system:String>
+    <system:String x:Key="tbSpiralWidth">Width (arcsec)</system:String>
+    <system:String x:Key="tbSpiralHeight">Height (arcsec)</system:String>
+    <system:String x:Key="tbSpiralLimitsOn">Limits On</system:String>
+    <system:String x:Key="tbSpiralDistance">Distance:</system:String>
+    <system:String x:Key="ttMM">(mm)</system:String>
+    <system:String x:Key="gbFovHeader">Calculate (FOV)</system:String>
+    <system:String x:Key="tbCameraWidth">Camera Width</system:String>
+    <system:String x:Key="tbCameraHeight">Camera Height</system:String>
+    <system:String x:Key="tbEyepieceFS">Eyepiece Field Stop</system:String>
+    <system:String x:Key="tbOtaFL">OTA Focal Length</system:String>
+    <system:String x:Key="btnEyepiece">Eyepiece</system:String>
+    <system:String x:Key="btnCamera">Camera</system:String>
+    <system:String x:Key="tbWidth">Width</system:String>
+    <system:String x:Key="tbHeight">Height</system:String>
+    <system:String x:Key="msgFlipLimit">Flip Limit</system:String>
+    <system:String x:Key="msgNoHomeSensor">Mount doesn't support a home sensor</system:String>
 </ResourceDictionary>

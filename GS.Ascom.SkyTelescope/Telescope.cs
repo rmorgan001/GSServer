@@ -627,6 +627,7 @@ namespace ASCOM.GS.Sky.Telescope
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
+                CheckRate(value);
                 SkyServer.RateDec = value;
             }
         }
@@ -1003,6 +1004,7 @@ namespace ASCOM.GS.Sky.Telescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 CheckCapability(SkySettings.CanSetEquRates, "RightAscensionRate", true);
+                CheckRate(value);
                 SkyServer.RateRa = value;
             }
         }
@@ -1774,6 +1776,8 @@ namespace ASCOM.GS.Sky.Telescope
             throw new PropertyNotImplementedException(property, setNotGet);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object,System.Object)")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "GS.Shared.MonitorEntry.set_Message(System.String)")]
         private static void CheckParked(string property)
         {
             if (!SkyServer.AtPark) return;
@@ -1783,6 +1787,24 @@ namespace ASCOM.GS.Sky.Telescope
             MonitorLog.LogToMonitor(monitorItem);
 
             throw new ParkedException(property + @": Telescope parked");
+        }
+
+        /// <summary>
+        /// Check slew rate for amount limit
+        /// </summary>
+        /// <param name="rate"></param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object,System.Object)")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "GS.Shared.MonitorEntry.set_Message(System.String)")]
+        private static void CheckRate(double rate)
+        {
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{rate}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            if (rate > SkyServer.SlewSpeedEight || rate < -SkyServer.SlewSpeedEight)
+            {
+                throw new InvalidOperationException($"{rate} is out of limits");
+            }
         }
 
         /// <summary>

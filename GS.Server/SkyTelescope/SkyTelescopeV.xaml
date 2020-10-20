@@ -15,6 +15,7 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </UserControl.Resources>
     <Grid MinWidth="800">
+        <md:DialogHost Grid.Row="0" Grid.Column="0" IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" CloseOnClickAway="True" />
         <md:DrawerHost IsLeftDrawerOpen="{Binding OpenSetupDialog}" BorderBrush="{StaticResource MaterialDesignDivider}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0">
             <!-- switched lines for opendialog so COM can open the settings IsLeftDrawerOpen="{Binding OpenSetupDialog}"-->
             <!--IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}"-->
@@ -214,9 +215,9 @@
                     </ComboBox.ItemsPanel>
                 </ComboBox>
                     <ComboBox Grid.Row="2" Grid.Column="2" md:HintAssist.Hint="{StaticResource cbhintST4}" MinWidth="10" Margin="10,0,0,0" ToolTip="{StaticResource cbhintST4}" 
-                              ItemsSource="{Binding St4Guiderates}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                              ItemsSource="{Binding St4GuideRates}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         <ComboBox.SelectedItem>
-                            <Binding Path="St4Guiderate" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                            <Binding Path="St4GuideRate" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                 <Binding.ValidationRules>
                                     <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                 </Binding.ValidationRules>
@@ -351,7 +352,7 @@
                     </StackPanel>
                     <StackPanel Grid.Row="8" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,0,0,0">
                         <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource lbDiagnostics}"
-                                      IsChecked="{Binding DebugVisability, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                      IsChecked="{Binding DebugVisibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbDiagnostics}"/>
                     </StackPanel>
                     <Border Margin="0,0,4,0" Grid.Row="8" Grid.Column="3" Grid.ColumnSpan="2" BorderThickness="3" BorderBrush="DimGray" CornerRadius="5"
@@ -585,17 +586,16 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <md:DialogHost Grid.RowSpan="2" IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" HorizontalAlignment="Center" VerticalAlignment="Center" CloseOnClickAway="True" />
                 <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
                     <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding OpenSetupDialog}" x:Name="MenuToggleButton" ToolTip="{StaticResource tbtipOpen}"
                                   Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}"  IsHitTestVisible="True"
                                   Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
                 </StackPanel>
                 <controls:TopCoordsBar Grid.Row="0" Grid.Column="0" IsEnabled="{Binding ScreenEnabled}" HorizontalAlignment="Center"/>
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <Grid HorizontalAlignment="Center" VerticalAlignment="Top" IsEnabled="{Binding ScreenEnabled}">
+
+                <Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" IsEnabled="{Binding ScreenEnabled}">
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
@@ -635,7 +635,7 @@
                                     </Grid.Background>
                                     <controls:HelixViewport3D Visibility="{Binding ModelOn, Converter={StaticResource BoolToVis}}"/>
                                     <StackPanel>
-                                        <controls:Debug Visibility="{Binding DebugVisability, Converter={StaticResource BoolToVis}}"/>
+                                        <controls:Debug Visibility="{Binding DebugVisibility, Converter={StaticResource BoolToVis}}"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="5">
                                         <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="3DView" IsChecked="{Binding ModelOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -645,7 +645,7 @@
                             </Border>
                     </StackPanel>
                     </Grid>
-                </ScrollViewer>
+
                 <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center">
                     <controls:BottomStatusBar IsEnabled="{Binding ScreenEnabled}"/>
                     <Button Margin="5,0,0,0" Width="120" Height="30" ToolTip="{StaticResource btntipConnect}"

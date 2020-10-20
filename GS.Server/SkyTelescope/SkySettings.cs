@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019  Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2020  Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -544,6 +544,7 @@ namespace GS.Server.SkyTelescope
                 _hcSpeed = value;
                 Properties.SkyTelescope.Default.HcSpeed = value.ToString();
                 LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
+                OnStaticPropertyChanged();
             }
         }
 
@@ -659,6 +660,34 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static double _cameraHeight;
+        public static double CameraHeight
+        {
+            get => _cameraHeight;
+            set
+            {
+                if (Math.Abs(_cameraHeight - value) < 0.0) return;
+                _cameraHeight = value;
+                Properties.SkyTelescope.Default.CameraHeight = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static double _cameraWidth;
+        public static double CameraWidth
+        {
+            get => _cameraWidth;
+            set
+            {
+                if (Math.Abs(_cameraWidth - value) < 0.0) return;
+                _cameraWidth = value;
+                Properties.SkyTelescope.Default.CameraWidth = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static int _comPort;
         public static int ComPort
         {
@@ -716,6 +745,20 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static bool _diagnostics;
+        public static bool Diagnostics
+        {
+            get => _diagnostics;
+            set
+            {
+                if (_diagnostics == value) return;
+                _diagnostics = value;
+                Properties.SkyTelescope.Default.Diagnostics = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static bool _dtrEnable;
         public static bool DtrEnable
         {
@@ -758,6 +801,20 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static double _eyepieceFS;
+        public static double EyepieceFS
+        {
+            get => _eyepieceFS;
+            set
+            {
+                if (Math.Abs(_eyepieceFS - value) < 0.0) return;
+                _eyepieceFS = value;
+                Properties.SkyTelescope.Default.EyepieceFS = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static bool _fullCurrent;
         public static bool FullCurrent
         {
@@ -776,7 +833,7 @@ namespace GS.Server.SkyTelescope
         public static double FocalLength
         {
             get => _focalLength;
-            private set
+            set
             {
                 if (Math.Abs(_focalLength - value) <= 0) return;
                 _focalLength = value;
@@ -1099,6 +1156,20 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static bool _pPecOn;
+        public static bool PPecOn
+        {
+            get => _pPecOn;
+            set
+            {
+                if (_pPecOn == value) return;
+                _pPecOn = value;
+                Properties.SkyTelescope.Default.PpecOn = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static int _raBacklash;
         public static int RaBacklash
         {
@@ -1182,48 +1253,105 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static int _spiralFov;
-        public static int SpiralFov
+        //private static int _spiralFov;
+        //public static int SpiralFov
+        //{
+        //    get => _spiralFov;
+        //    set
+        //    {
+        //        if (_spiralFov == value) return;
+        //        _spiralFov = value;
+        //        Properties.SkyTelescope.Default.SpiralFov = value;
+        //        LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+        //        OnStaticPropertyChanged();
+        //    }
+        //}
+
+        //private static int _spiralPause;
+        //public static int SpiralPause
+        //{
+        //    get => _spiralPause;
+        //    set
+        //    {
+        //        if (_spiralPause  ==  value) return;
+        //        _spiralPause = value;
+        //        Properties.SkyTelescope.Default.SpiralPause = value;
+        //        LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+        //        OnStaticPropertyChanged();
+        //    }
+        //}
+
+        //private static int _spiralSpeed;
+        //public static int SpiralSpeed
+        //{
+        //    get => _spiralSpeed;
+        //    set
+        //    {
+        //        if (_spiralSpeed == value) return;
+        //        _spiralSpeed = value;
+        //        Properties.SkyTelescope.Default.SpiralSpeed = value;
+        //        LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+        //        OnStaticPropertyChanged();
+        //    }
+        //}
+
+        private static bool _spiralLimits;
+        public static bool SpiralLimits
         {
-            get => _spiralFov;
+            get => _spiralLimits;
             set
             {
-                if (_spiralFov == value) return;
-                _spiralFov = value;
-                Properties.SkyTelescope.Default.SpiralFov = value;
+                if (_spiralLimits == value) return;
+                _spiralLimits = value;
+                Properties.SkyTelescope.Default.SpiralLimits = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
 
-        private static int _spiralPause;
-        public static int SpiralPause
+        private static int _spiralHeight;
+        public static int SpiralHeight
         {
-            get => _spiralPause;
+            get => _spiralHeight;
             set
             {
-                if (_spiralPause  ==  value) return;
-                _spiralPause = value;
-                Properties.SkyTelescope.Default.SpiralPause = value;
+                if (_spiralHeight == value) return;
+                _spiralHeight = value;
+                Properties.SkyTelescope.Default.SpiralHeight = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
 
-        private static int _spiralSpeed;
-        public static int SpiralSpeed
+        private static double _spiralDistance;
+        public static double SpiralDistance
         {
-            get => _spiralSpeed;
+            get => _spiralDistance;
             set
             {
-                if (_spiralSpeed == value) return;
-                _spiralSpeed = value;
-                Properties.SkyTelescope.Default.SpiralSpeed = value;
+                if (Math.Abs(_spiralDistance - value) < 0.0) return;
+                _spiralDistance = value;
+                Properties.SkyTelescope.Default.SpiralDistance = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
 
+        private static int _spiralWidth;
+        public static int SpiralWidth
+        {
+            get => _spiralWidth;
+            set
+            {
+                if (_spiralWidth == value) return;
+                _spiralWidth = value;
+                Properties.SkyTelescope.Default.SpiralWidth = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        
         private static int _displayInterval;
         public static int DisplayInterval
         {
@@ -1406,13 +1534,17 @@ namespace GS.Server.SkyTelescope
             ApertureDiameter = Properties.SkyTelescope.Default.ApertureDiameter;
             AtPark = Properties.SkyTelescope.Default.AtPark;
             AutoTrack = Properties.SkyTelescope.Default.AutoTrack;
+            CameraHeight = Properties.SkyTelescope.Default.CameraHeight;
+            CameraWidth = Properties.SkyTelescope.Default.CameraWidth;
             ComPort = Properties.SkyTelescope.Default.ComPort;
             DataBits = Properties.SkyTelescope.Default.DataBits;
             DecBacklash = Properties.SkyTelescope.Default.DecBacklash;
             DecPulseToGoTo = Properties.SkyTelescope.Default.DecPulseToGoTo;
+            Diagnostics = Properties.SkyTelescope.Default.Diagnostics;
             DtrEnable = Properties.SkyTelescope.Default.DTREnable;
             Elevation = Properties.SkyTelescope.Default.Elevation;
             Encoders = Properties.SkyTelescope.Default.EncodersOn;
+            EyepieceFS = Properties.SkyTelescope.Default.EyepieceFS;
             FocalLength = Properties.SkyTelescope.Default.FocalLength;
             FullCurrent = Properties.SkyTelescope.Default.FullCurrent;
             HcAntiDec = Properties.SkyTelescope.Default.HcAntiDec;
@@ -1439,15 +1571,20 @@ namespace GS.Server.SkyTelescope
             ParkAxisX = Properties.SkyTelescope.Default.ParkAxisX;
             ParkAxisY = Properties.SkyTelescope.Default.ParkAxisY;
             ParkName = Properties.SkyTelescope.Default.ParkName;
+            PPecOn = Properties.SkyTelescope.Default.PpecOn;
             RaBacklash = Properties.SkyTelescope.Default.RaBacklash;
             ReadTimeout = Properties.SkyTelescope.Default.ReadTimeout;
             Refraction = Properties.SkyTelescope.Default.Refraction;
             RaTrackingOffset = Properties.SkyTelescope.Default.RATrackingOffset;
             RtsEnable = Properties.SkyTelescope.Default.RTSEnable;
             SiderealRate = Properties.SkyTelescope.Default.SiderealRate;
-            SpiralFov = Properties.SkyTelescope.Default.SpiralFov;
-            SpiralPause = Properties.SkyTelescope.Default.SpiralPause;
-            SpiralSpeed = Properties.SkyTelescope.Default.SpiralSpeed;
+            //SpiralFov = Properties.SkyTelescope.Default.SpiralFov;
+            //SpiralPause = Properties.SkyTelescope.Default.SpiralPause;
+            SpiralDistance = Properties.SkyTelescope.Default.SpiralDistance;
+            //SpiralSpeed = Properties.SkyTelescope.Default.SpiralSpeed;
+            SpiralLimits = Properties.SkyTelescope.Default.SpiralLimits;
+            SpiralHeight = Properties.SkyTelescope.Default.SpiralHeight;
+            SpiralWidth = Properties.SkyTelescope.Default.SpiralWidth;
             DisplayInterval = Properties.SkyTelescope.Default.DisplayInterval;
             SolarRate = Properties.SkyTelescope.Default.SolarRate;
             St4Guiderate = Properties.SkyTelescope.Default.St4Guiderate;

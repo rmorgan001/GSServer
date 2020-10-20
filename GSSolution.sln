@@ -3,25 +3,25 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GS.Shared", "GS.Shared\GS.Shared.csproj", "{63E824C8-585D-45FC-88E4-7E119F0C7773}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GS.Shared", "GS.Shared\GS.Shared.csproj", "{63E824C8-585D-45FC-88E4-7E119F0C7773}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GS.SkyWatcher", "GS.SkyWatcher\GS.SkyWatcher.csproj", "{194A85E4-994C-432B-A25D-48DA75553349}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GS.SkyWatcher", "GS.SkyWatcher\GS.SkyWatcher.csproj", "{194A85E4-994C-432B-A25D-48DA75553349}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GS.Server", "GS.Server\GS.Server.csproj", "{6806353A-9C8C-49AA-BEAA-27094AC5BDDA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GS.Server", "GS.Server\GS.Server.csproj", "{6806353A-9C8C-49AA-BEAA-27094AC5BDDA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASCOM.GS.Sky.Telescope", "GS.Ascom.SkyTelescope\ASCOM.GS.Sky.Telescope.csproj", "{20CD9164-D5BF-4DA5-A248-EC6B81830610}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASCOM.GS.Sky.Telescope", "GS.Ascom.SkyTelescope\ASCOM.GS.Sky.Telescope.csproj", "{20CD9164-D5BF-4DA5-A248-EC6B81830610}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GS.SkyApi", "GS.SkyApi\GS.SkyApi.csproj", "{3FF43445-E8E2-43FB-AC67-1733748AFFDD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GS.SkyApi", "GS.SkyApi\GS.SkyApi.csproj", "{3FF43445-E8E2-43FB-AC67-1733748AFFDD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GS.Principles", "GS.Principle\GS.Principles.csproj", "{C2BC2641-3B32-4940-B124-61ADEC0DAC28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GS.Principles", "GS.Principle\GS.Principles.csproj", "{C2BC2641-3B32-4940-B124-61ADEC0DAC28}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GS.Simulator", "GS.Simulator\GS.Simulator.csproj", "{E463EC96-56DA-447B-8719-F68C33771185}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GS.Simulator", "GS.Simulator\GS.Simulator.csproj", "{E463EC96-56DA-447B-8719-F68C33771185}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColorPicker", "ColorPicker\ColorPicker.csproj", "{6813ECB1-B6B3-49F4-9070-9E4DFEF34FAE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ColorPicker", "ColorPicker\ColorPicker.csproj", "{6813ECB1-B6B3-49F4-9070-9E4DFEF34FAE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GS.ChartViewer", "GS.ChartViewer\GS.ChartViewer.csproj", "{EAF5DB3A-99A5-451C-B626-7B3BF7423F7D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GS.ChartViewer", "GS.ChartViewer\GS.ChartViewer.csproj", "{EAF5DB3A-99A5-451C-B626-7B3BF7423F7D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GS.Utilities", "GS.Utilities\GS.Utilities.csproj", "{A0CF4007-724A-45EB-9609-C5FA97A3043E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GS.Utilities", "GS.Utilities\GS.Utilities.csproj", "{A0CF4007-724A-45EB-9609-C5FA97A3043E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CF04AB39-8531-4CF8-99C6-6259B2C13DDC}"
 	ProjectSection(SolutionItems) = preProject

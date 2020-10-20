@@ -117,7 +117,7 @@ namespace GS.SkyWatcher
         /// Start tracking based degree rate.  Use for tracking and guiding, not gotos
         /// </summary>
         /// <param name="axis">>AxisId.Axis1 or AxisId.Axis2</param>
-        /// <param name="rate">Rate in degrees per sec</param>
+        /// <param name="rate">Rate in degrees per arcsec</param>
         internal void AxisSlew(AxisId axis, double rate)
         {
             rate = Principles.Units.Deg2Rad1(rate);

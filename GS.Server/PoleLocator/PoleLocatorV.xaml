@@ -13,7 +13,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid MinWidth="600">
-        <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Center"  CloseOnClickAway="True" IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
+        <md:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" CloseOnClickAway="True" />
         <Grid Margin="5,5" ClipToBounds="True">
             <Grid.RowDefinitions>
                 <RowDefinition Height="10" />

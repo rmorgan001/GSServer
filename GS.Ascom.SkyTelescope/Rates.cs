@@ -120,13 +120,13 @@ namespace ASCOM.GS.Sky.Telescope
             {
                 case TelescopeAxes.axisPrimary:
                     // Example: m_Rates = new Rate[] { new Rate(10.5, 30.2), new Rate(54.0, 43.6) }
-                    _mRates = new[] { new Rate(0.0, SkyServer.SlewSpeedEight) };
+                    _mRates = new[] { new Rate(0.0, SkyServer.SlewSpeedEight)};
                     break;
                 case TelescopeAxes.axisSecondary:
-                    _mRates = new[] { new Rate(0.0, SkyServer.SlewSpeedEight) };
+                    _mRates = new[] { new Rate(0.0, SkyServer.SlewSpeedEight)};
                     break;
                 case TelescopeAxes.axisTertiary:
-                    _mRates = new[] { new Rate(0.0, SkyServer.SlewSpeedEight) };
+                    _mRates = new[] { new Rate(0.0, SkyServer.SlewSpeedEight)}; //Conversions.Sec2ArcSec(SkyServer.SlewSpeedEight)) };
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);

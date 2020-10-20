@@ -333,5 +333,41 @@ namespace GS.Server.SkyTelescope
             axes = Range.RangeAxesXY(axes);
             return axes;
         }
+
+        internal static bool IsFlipRequired(double[] raDec)
+        {
+            var axes = new[] { raDec[0], raDec[1] };
+            switch (SkySettings.AlignmentMode)
+            {
+                case AlignmentModes.algAltAz:
+                    return false;
+                case AlignmentModes.algGermanPolar:
+                    axes[0] = (SkyServer.SiderealTime - axes[0]) * 15.0;
+                    if (SkyServer.SouthernHemisphere) axes[1] = -axes[1];
+                    axes[0] = Range.Range360(axes[0]);
+
+                    if (axes[0] > 180.0 || axes[0] < 0)
+                    {
+                        // adjust the targets to be through the pole
+                        axes[0] += 180;
+                        axes[1] = 180 - axes[1];
+                    }
+                    axes = Range.RangeAxesXY(axes);
+
+                    //check within meridian limits
+                    var b = AxesAppToMount(axes);
+                    if (SkyServer.IsWithinMeridianLimits(b)) return false;
+
+                    //check if farthest position is needed
+                    var alt = Axes.GetAltAxisPosition(b);
+                    var c = SkyServer.ChooseClosestPosition(SkyServer.ActualAxisX, b, alt);
+                    return c == "b";
+
+                case AlignmentModes.algPolar:
+                    return false;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
     }
 }

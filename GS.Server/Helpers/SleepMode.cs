@@ -96,6 +96,7 @@ namespace GS.Server.Helpers
             {
                 Sleep = false;
                 Settings.Settings.SleepMode = false;
+                _ctsSleepMode?.Cancel();
                 var monitorItem = new MonitorEntry
                 { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message},{ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);

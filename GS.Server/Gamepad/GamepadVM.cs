@@ -40,22 +40,26 @@ namespace GS.Server.Gamepad
 
         private SkyTelescopeVM _skyTelescopeVM;
         private SettingsVM _settingsVM;
-        private CancellationTokenSource ctsGamepad;
-        private string _focusTextbox;
-        private Gamepad _gamepad;
+        private CancellationTokenSource ctsGamePad;
+        private string _focusTextBox;
+        private Gamepad _gamePad;
 
         private int _trackingCount;
         private int _homeCount;
         private int _parkCount;
         private int _stopCount;
         private int _speedupCount;
-        private int _speeddownCount;
-        private int _volumeupCount;
-        private int _volumedownCount;
-        private int _ratesiderealCount;
-        private int _ratelunarCount;
-        private int _ratesolarCount;
-        private int _ratekingCount;
+        private int _speedDownCount;
+        private int _volumeUpCount;
+        private int _volumeDownCount;
+        private int _rateSiderealCount;
+        private int _rateLunarCount;
+        private int _rateSolarCount;
+        private int _rateKingCount;
+        private int _abortCount;
+        private int _spiralInCount;
+        private int _spiralOutCount;
+        private int _newSpiralCount;
 
 
         public GamepadVM()
@@ -69,7 +73,7 @@ namespace GS.Server.Gamepad
                 GamepadSettings.Load();
                 SkyTelescope();
                 Settings();
-                IsGamepadRunning = GamepadSettings.Startup;
+                IsGamePadRunning = GamepadSettings.Startup;
             }
             catch (Exception ex)
             {
@@ -90,27 +94,27 @@ namespace GS.Server.Gamepad
 
         }
 
-        private bool _isGamepadRunning;
-        public bool IsGamepadRunning
+        private bool _isGamePadRunning;
+        public bool IsGamePadRunning
         {
             get => GamepadSettings.Startup;
             set
             {
-                if (_isGamepadRunning == value) return;
+                if (_isGamePadRunning == value) return;
                 if (value)
                 {
-                    GamepadLoopAsync();
+                    GamePadLoopAsync();
 
                 }
                 else
                 {
                     EnableTextBoxes = false;
-                    ctsGamepad?.Cancel();
-                    ctsGamepad?.Dispose();
-                    ctsGamepad = null;
+                    ctsGamePad?.Cancel();
+                    ctsGamePad?.Dispose();
+                    ctsGamePad = null;
                 }
-                _isGamepadRunning = value;
-                GamepadSettings.Startup = _isGamepadRunning;
+                _isGamePadRunning = value;
+                GamepadSettings.Startup = _isGamePadRunning;
                 OnPropertyChanged();
             }
         }
@@ -215,46 +219,46 @@ namespace GS.Server.Gamepad
             }
         }
 
-        private string _speedup;
-        public string Speedup
+        private string _speedUp;
+        public string SpeedUp
         {
-            get => _speedup;
+            get => _speedUp;
             set
             {
-                _speedup = value;
+                _speedUp = value;
                 OnPropertyChanged();
             }
         }
 
-        private string _speeddown;
-        public string Speeddown
+        private string _speedDown;
+        public string SpeedDown
         {
-            get => _speeddown;
+            get => _speedDown;
             set
             {
-                _speeddown = value;
+                _speedDown = value;
                 OnPropertyChanged();
             }
         }
 
-        private string _volumeup;
-        public string Volumeup
+        private string _volumeUp;
+        public string VolumeUp
         {
-            get => _volumeup;
+            get => _volumeUp;
             set
             {
-                _volumeup = value;
+                _volumeUp = value;
                 OnPropertyChanged();
             }
         }
 
-        private string _volumedown;
-        public string Volumedown
+        private string _volumeDown;
+        public string VolumeDown
         {
-            get => _volumedown;
+            get => _volumeDown;
             set
             {
-                _volumedown = value;
+                _volumeDown = value;
                 OnPropertyChanged();
             }
         }
@@ -303,6 +307,50 @@ namespace GS.Server.Gamepad
             }
         }
 
+        private string _abort;
+        public string Abort
+        {
+            get => _abort;
+            set
+            {
+                _abort = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _spiralIn;
+        public string SpiralIn
+        {
+            get => _spiralIn;
+            set
+            {
+                _spiralIn = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _spiralOut;
+        public string SpiralOut
+        {
+            get => _spiralOut;
+            set
+            {
+                _spiralOut = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _newSpiral;
+        public string NewSpiral
+        {
+            get => _newSpiral;
+            set
+            {
+                _newSpiral = value;
+                OnPropertyChanged();
+            }
+        }
+
         private int _delay;
         public int Delay
         {
@@ -338,17 +386,17 @@ namespace GS.Server.Gamepad
         /// <summary>
         /// Async to find or poll gamepads
         /// </summary>
-        private async void GamepadLoopAsync()
+        private async void GamePadLoopAsync()
         {
             try
             {
-                if (ctsGamepad == null) ctsGamepad = new CancellationTokenSource();
-                var ct = ctsGamepad.Token;
+                if (ctsGamePad == null) ctsGamePad = new CancellationTokenSource();
+                var ct = ctsGamePad.Token;
                 var task = Task.Run(() =>
                 {
                     var windowHandle = new IntPtr();
                     ThreadContext.InvokeOnUiThread(delegate { windowHandle = Process.GetCurrentProcess().MainWindowHandle; }, ct);
-                    _gamepad = new Gamepad(windowHandle);
+                    _gamePad = new Gamepad(windowHandle);
                     LoadTextboxes();
                     ResetCounts();
                     EnableTextBoxes = true;
@@ -366,26 +414,26 @@ namespace GS.Server.Gamepad
                             continue;
                         }
 
-                        if (!_gamepad.IsAvailable)
+                        if (!_gamePad.IsAvailable)
                         {
                             Thread.Sleep(2000);
-                            _gamepad.Find();
+                            _gamePad.Find();
                             continue;
                         }
 
-                        _gamepad.Poll();
-                        var key = _focusTextbox;
+                        _gamePad.Poll();
+                        var key = _focusTextBox;
 
                         // Check buttons
-                        var gamepadButtons = _gamepad.Buttons;
+                        var gamepadButtons = _gamePad.Buttons;
                         if (gamepadButtons != null && gamepadButtons.Length > 0)
                         {
                             if (buttontocheck > -1)
                             {
                                 if (string.IsNullOrEmpty(key))
                                 {
-                                    buttontocheck = DoGamepadCommand(buttontocheck, gamepadButtons[buttontocheck],
-                                        _gamepad.Get_KeyByValue("button" + " " + buttontocheck));
+                                    buttontocheck = DoGamePadCommand(buttontocheck, gamepadButtons[buttontocheck],
+                                        _gamePad.Get_KeyByValue("button" + " " + buttontocheck));
                                 }
                             }
                             else
@@ -396,18 +444,18 @@ namespace GS.Server.Gamepad
                                     var cmd = "button" + " " + i;
                                     if (key != null)
                                     {
-                                        DoGamepadSetKey(key, cmd);
+                                        DoGamePadSetKey(key, cmd);
                                         break;
                                     }
-                                    buttontocheck = DoGamepadCommand(i, gamepadButtons[i],
-                                        _gamepad.Get_KeyByValue(cmd));
+                                    buttontocheck = DoGamePadCommand(i, gamepadButtons[i],
+                                        _gamePad.Get_KeyByValue(cmd));
                                     break;
                                 }
                             }
                         }
 
                         // Check PoVs
-                        var gamepadPovs = _gamepad.Povs;
+                        var gamepadPovs = _gamePad.Povs;
                         if (gamepadPovs != null && gamepadPovs.Length > 0)
                         {
                             if (povtocheck.Key > -1)
@@ -416,8 +464,8 @@ namespace GS.Server.Gamepad
                                 {
                                     var pushed = povtocheck.Value == gamepadPovs[povtocheck.Key];
                                     var dir = Gamepad.PovDirection(povtocheck.Value);
-                                    var cmd = _gamepad.Get_KeyByValue("pov" + " " + dir + " " + povtocheck.Key);
-                                    var id = DoGamepadCommand(povtocheck.Key, pushed, cmd);
+                                    var cmd = _gamePad.Get_KeyByValue("pov" + " " + dir + " " + povtocheck.Key);
+                                    var id = DoGamePadCommand(povtocheck.Key, pushed, cmd);
                                     if (id == -1) povtocheck = new PovPair(-1, 0);
                                 }
                             }
@@ -429,15 +477,15 @@ namespace GS.Server.Gamepad
                                     var newhit = new PovPair(i, gamepadPovs[i]);
                                     var dir = Gamepad.PovDirection(newhit.Value);
                                     var val = "pov" + " " + dir + " " + newhit.Key;
-                                    var cmd = _gamepad.Get_KeyByValue(val);
+                                    var cmd = _gamePad.Get_KeyByValue(val);
 
                                     if (key != null)
                                     {
-                                        DoGamepadSetKey(key, val);
+                                        DoGamePadSetKey(key, val);
                                         break;
                                     }
 
-                                    var id = DoGamepadCommand(newhit.Key, true, cmd);
+                                    var id = DoGamePadCommand(newhit.Key, true, cmd);
                                     povtocheck = id == -1 ? new PovPair(-1, 0) : newhit;
                                     break;
                                 }
@@ -447,34 +495,34 @@ namespace GS.Server.Gamepad
                         // Check X Axis
                         if (xaxistocheck.Key > -1)
                         {
-                            var xDirection = Gamepad.AxisDirection(_gamepad.Xaxis);
+                            var xDirection = Gamepad.AxisDirection(_gamePad.Xaxis);
                             var pushed = xaxistocheck.Value == xDirection;
                             if (!pushed)
                             {
                                 if (string.IsNullOrEmpty(key))
                                 {
-                                    var cmd = _gamepad.Get_KeyByValue("xaxis" + " " + xaxistocheck.Value);
-                                    var id = DoGamepadCommand(xaxistocheck.Key, false, cmd);
+                                    var cmd = _gamePad.Get_KeyByValue("xaxis" + " " + xaxistocheck.Value);
+                                    var id = DoGamePadCommand(xaxistocheck.Key, false, cmd);
                                     if (id == -1) xaxistocheck = new AxisPair(-1, string.Empty);
                                 }
                             }
                         }
                         else
                         {
-                            var xDirection = Gamepad.AxisDirection(_gamepad.Xaxis);
+                            var xDirection = Gamepad.AxisDirection(_gamePad.Xaxis);
                             if (xDirection != "normal")
                             {
                                 var newaxis = new AxisPair(1, xDirection);
                                 var val = "xaxis" + " " + xDirection;
-                                var cmd = _gamepad.Get_KeyByValue(val);
+                                var cmd = _gamePad.Get_KeyByValue(val);
 
                                 if (key != null)
                                 {
-                                    DoGamepadSetKey(key, val);
+                                    DoGamePadSetKey(key, val);
                                 }
                                 else
                                 {
-                                    var id = DoGamepadCommand(1, true, cmd);
+                                    var id = DoGamePadCommand(1, true, cmd);
                                     xaxistocheck = id == -1 ? new AxisPair(-1, string.Empty) : newaxis;
                                 }
                             }
@@ -483,34 +531,34 @@ namespace GS.Server.Gamepad
                         // Check Y Axis
                         if (yaxistocheck.Key > -1)
                         {
-                            var yDirection = Gamepad.AxisDirection(_gamepad.Yaxis);
+                            var yDirection = Gamepad.AxisDirection(_gamePad.Yaxis);
                             var pushed = yaxistocheck.Value == yDirection;
                             if (!pushed)
                             {
                                 if (string.IsNullOrEmpty(key))
                                 {
-                                    var cmd = _gamepad.Get_KeyByValue("yaxis" + " " + yaxistocheck.Value);
-                                    var id = DoGamepadCommand(yaxistocheck.Key, false, cmd);
+                                    var cmd = _gamePad.Get_KeyByValue("yaxis" + " " + yaxistocheck.Value);
+                                    var id = DoGamePadCommand(yaxistocheck.Key, false, cmd);
                                     if (id == -1) yaxistocheck = new AxisPair(-1, string.Empty);
                                 }
                             }
                         }
                         else
                         {
-                            var yDirection = Gamepad.AxisDirection(_gamepad.Yaxis);
+                            var yDirection = Gamepad.AxisDirection(_gamePad.Yaxis);
                             if (yDirection != "normal")
                             {
                                 var newaxis = new AxisPair(1, yDirection);
                                 var val = "yaxis" + " " + yDirection;
-                                var cmd = _gamepad.Get_KeyByValue(val);
+                                var cmd = _gamePad.Get_KeyByValue(val);
 
                                 if (key != null)
                                 {
-                                    DoGamepadSetKey(key, val);
+                                    DoGamePadSetKey(key, val);
                                 }
                                 else
                                 {
-                                    var id = DoGamepadCommand(1, true, cmd);
+                                    var id = DoGamePadCommand(1, true, cmd);
                                     yaxistocheck = id == -1 ? new AxisPair(-1, string.Empty) : newaxis;
                                 }
                             }
@@ -519,34 +567,34 @@ namespace GS.Server.Gamepad
                         // Check Z Axis
                         if (zaxistocheck.Key > -1)
                         {
-                            var zDirection = Gamepad.AxisDirection(_gamepad.Zaxis);
+                            var zDirection = Gamepad.AxisDirection(_gamePad.Zaxis);
                             var pushed = zaxistocheck.Value == zDirection;
                             if (!pushed)
                             {
                                 if (string.IsNullOrEmpty(key))
                                 {
-                                    var cmd = _gamepad.Get_KeyByValue("zaxis" + " " + zaxistocheck.Value);
-                                    var id = DoGamepadCommand(zaxistocheck.Key, false, cmd);
+                                    var cmd = _gamePad.Get_KeyByValue("zaxis" + " " + zaxistocheck.Value);
+                                    var id = DoGamePadCommand(zaxistocheck.Key, false, cmd);
                                     if (id == -1) zaxistocheck = new AxisPair(-1, string.Empty);
                                 }
                             }
                         }
                         else
                         {
-                            var zDirection = Gamepad.AxisDirection(_gamepad.Zaxis);
+                            var zDirection = Gamepad.AxisDirection(_gamePad.Zaxis);
                             if (zDirection != "normal")
                             {
                                 var newaxis = new AxisPair(1, zDirection);
                                 var val = "zaxis" + " " + zDirection;
-                                var cmd = _gamepad.Get_KeyByValue(val);
+                                var cmd = _gamePad.Get_KeyByValue(val);
 
                                 if (key != null)
                                 {
-                                    DoGamepadSetKey(key, val);
+                                    DoGamePadSetKey(key, val);
                                 }
                                 else
                                 {
-                                    var id = DoGamepadCommand(1, true, cmd);
+                                    var id = DoGamePadCommand(1, true, cmd);
                                     zaxistocheck = id == -1 ? new AxisPair(-1, string.Empty) : newaxis;
                                 }
                             }
@@ -557,7 +605,7 @@ namespace GS.Server.Gamepad
                 }, ct);
                 await task;
                 task.Wait(ct);
-                IsGamepadRunning = false;
+                IsGamePadRunning = false;
             }
             catch (Exception ex)
             {
@@ -572,7 +620,7 @@ namespace GS.Server.Gamepad
                     Message = $"{ex.Message}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                IsGamepadRunning = false;
+                IsGamePadRunning = false;
                 OpenDialog(ex.Message);
 
             }
@@ -585,7 +633,7 @@ namespace GS.Server.Gamepad
         /// <param name="value"></param>
         /// <param name="command"></param>
         /// <returns></returns>
-        private int DoGamepadCommand(int id, bool value, string command)
+        private int DoGamePadCommand(int id, bool value, string command)
         {
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{id},{value},{command}" };
@@ -594,7 +642,7 @@ namespace GS.Server.Gamepad
             var returnId = -1;
             if (!SkyServer.IsMountRunning) return returnId;
             if (command == null) return returnId;
-            if (ctsGamepad.IsCancellationRequested) return returnId;
+            if (ctsGamePad.IsCancellationRequested) return returnId;
             ThreadContext.InvokeOnUiThread(delegate
             {
                 switch (command)
@@ -739,12 +787,12 @@ namespace GS.Server.Gamepad
                         if (value)
                         {
                             if (!SkyTelescope()) return;
-                            if (_speeddownCount == 0)
+                            if (_speedDownCount == 0)
                             {
                                 if (_skyTelescopeVM.HcSpeeddownCommand.CanExecute(null))
                                     _skyTelescopeVM.HcSpeeddownCommand.Execute(null);
                             }
-                            _speeddownCount++;
+                            _speedDownCount++;
                             returnId = id;
                             break;
                         }
@@ -757,12 +805,12 @@ namespace GS.Server.Gamepad
                         if (value)
                         {
                             if (!Settings()) return;
-                            if (_volumeupCount == 0)
+                            if (_volumeUpCount == 0)
                             {
                                 if (_settingsVM.VolumeupCommand.CanExecute(null))
                                     _settingsVM.VolumeupCommand.Execute(null);
                             }
-                            _volumeupCount++;
+                            _volumeUpCount++;
                             returnId = id;
                             break;
                         }
@@ -776,12 +824,12 @@ namespace GS.Server.Gamepad
                         if (value)
                         {
                             if (!Settings()) return;
-                            if (_volumedownCount == 0)
+                            if (_volumeDownCount == 0)
                             {
                                 if (_settingsVM.VolumedownCommand.CanExecute(null))
                                     _settingsVM.VolumedownCommand.Execute(null);
                             }
-                            _volumedownCount++;
+                            _volumeDownCount++;
                             returnId = id;
                             break;
                         }
@@ -812,19 +860,12 @@ namespace GS.Server.Gamepad
                     case "ratesidereal":
                         if (value)
                         {
-                            if (_ratesiderealCount == 0)
+                            if (_rateSiderealCount == 0)
                             {
-                                SkySettings.TrackingRate = DriveRates.driveSidereal;
-                                if (SkyServer.Tracking)
-                                {
-                                    SkyServer.TrackingSpeak = false;
-                                    SkyServer.Tracking = false;
-                                    SkyServer.Tracking = true;
-                                    SkyServer.TrackingSpeak = true;
-                                }
+                                _skyTelescopeVM.TrackingRate = DriveRates.driveSidereal;
                                 Synthesizer.Speak(Application.Current.Resources["vceSidereal"].ToString());
                             }
-                            _ratesiderealCount++;
+                            _rateSiderealCount++;
                             returnId = id;
                             break;
                         }
@@ -836,20 +877,12 @@ namespace GS.Server.Gamepad
                     case "ratelunar":
                         if (value)
                         {
-                            if (_ratelunarCount == 0)
+                            if (_rateLunarCount == 0)
                             {
-                                SkySettings.TrackingRate = DriveRates.driveLunar;
-                                if (SkyServer.Tracking)
-                                {
-                                    SkyServer.TrackingSpeak = false;
-                                    SkyServer.Tracking = false;
-                                    SkyServer.Tracking = true;
-                                    SkyServer.TrackingSpeak = true;
-                                }
-
+                                _skyTelescopeVM.TrackingRate = DriveRates.driveLunar;
                                 Synthesizer.Speak(Application.Current.Resources["vceLunar"].ToString());
                             }
-                            _ratelunarCount++;
+                            _rateLunarCount++;
                             returnId = id;
                             break;
                         }
@@ -861,20 +894,12 @@ namespace GS.Server.Gamepad
                     case "ratesolar":
                         if (value)
                         {
-                            if (_ratesolarCount == 0)
+                            if (_rateSolarCount == 0)
                             {
-                                SkySettings.TrackingRate = DriveRates.driveSolar;
-                                if (SkyServer.Tracking)
-                                {
-                                    SkyServer.TrackingSpeak = false;
-                                    SkyServer.Tracking = false;
-                                    SkyServer.Tracking = true;
-                                    SkyServer.TrackingSpeak = true;
-                                }
-
+                                _skyTelescopeVM.TrackingRate = DriveRates.driveSolar;
                                 Synthesizer.Speak(Application.Current.Resources["vceSolar"].ToString());
                             }
-                            _ratesolarCount++;
+                            _rateSolarCount++;
                             returnId = id;
                             break;
                         }
@@ -886,20 +911,84 @@ namespace GS.Server.Gamepad
                     case "rateking":
                         if (value)
                         {
-                            if (_ratekingCount == 0)
+                            if (_rateKingCount == 0)
                             {
-                                SkySettings.TrackingRate = DriveRates.driveKing;
-                                if (SkyServer.Tracking)
-                                {
-                                    SkyServer.TrackingSpeak = false;
-                                    SkyServer.Tracking = false;
-                                    SkyServer.Tracking = true;
-                                    SkyServer.TrackingSpeak = true;
-                                }
-
+                                _skyTelescopeVM.TrackingRate = DriveRates.driveKing;
                                 Synthesizer.Speak(Application.Current.Resources["vceKing"].ToString());
                             }
-                            _ratekingCount++;
+                            _rateKingCount++;
+                            returnId = id;
+                            break;
+                        }
+                        else
+                        {
+                            ResetCounts();
+                            break;
+                        }
+                    case "abort":
+                        if (value)
+                        {
+                            if (!SkyTelescope()) return;
+                            if (_abortCount == 0)
+                            {
+                                if (_skyTelescopeVM.AbortCmd.CanExecute(null))
+                                    _skyTelescopeVM.AbortCmd.Execute(null);
+                            }
+                            _abortCount++;
+                            returnId = id;
+                            break;
+                        }
+                        else
+                        {
+                            ResetCounts();
+                            break;
+                        }
+                    case "spiralin":
+                        if (value)
+                        {
+                            if (!SkyTelescope()) return;
+                            if (_spiralInCount == 0)
+                            {
+                                if (_skyTelescopeVM.SpiralInCmd.CanExecute(null))
+                                    _skyTelescopeVM.SpiralInCmd.Execute(null);
+                            }
+                            _spiralInCount++;
+                            returnId = id;
+                            break;
+                        }
+                        else
+                        {
+                            ResetCounts();
+                            break;
+                        }
+                    case "spiralout":
+                        if (value)
+                        {
+                            if (!SkyTelescope()) return;
+                            if (_spiralOutCount == 0)
+                            {
+                                if (_skyTelescopeVM.SpiralOutCmd.CanExecute(null))
+                                    _skyTelescopeVM.SpiralOutCmd.Execute(null);
+                            }
+                            _spiralOutCount++;
+                            returnId = id;
+                            break;
+                        }
+                        else
+                        {
+                            ResetCounts();
+                            break;
+                        }
+                    case "newspiral":
+                        if (value)
+                        {
+                            if (!SkyTelescope()) return;
+                            if (_newSpiralCount == 0)
+                            {
+                                if (_skyTelescopeVM.SpiralGenerateCmd.CanExecute(null))
+                                    _skyTelescopeVM.SpiralGenerateCmd.Execute(null);
+                            }
+                            _newSpiralCount++;
                             returnId = id;
                             break;
                         }
@@ -913,7 +1002,7 @@ namespace GS.Server.Gamepad
                         returnId = -1;
                         break;
                 }
-            }, ctsGamepad.Token);
+            }, ctsGamePad.Token);
             return returnId;
         }
 
@@ -922,7 +1011,7 @@ namespace GS.Server.Gamepad
         /// </summary>
         /// <param name="key"></param>
         /// <param name="val"></param>
-        private void DoGamepadSetKey(string key, string val)
+        private void DoGamePadSetKey(string key, string val)
         {
             if (!(val != null || key != null)) return;
 
@@ -941,10 +1030,10 @@ namespace GS.Server.Gamepad
                     Home = val;
                     break;
                 case "speeddown":
-                    Speeddown = val;
+                    SpeedDown = val;
                     break;
                 case "speedup":
-                    Speedup = val;
+                    SpeedUp = val;
                     break;
                 case "up":
                     Up = val;
@@ -959,10 +1048,10 @@ namespace GS.Server.Gamepad
                     Right = val;
                     break;
                 case "volumedown":
-                    Volumedown = val;
+                    VolumeDown = val;
                     break;
                 case "volumeup":
-                    Volumeup = val;
+                    VolumeUp = val;
                     break;
                 case "ratesidereal":
                     RateSidereal = val;
@@ -976,10 +1065,22 @@ namespace GS.Server.Gamepad
                 case "rateking":
                     RateKing = val;
                     break;
+                case "abort":
+                    Abort = val;
+                    break;
+                case "spiralin":
+                    SpiralIn = val;
+                    break;
+                case "spiralout":
+                    SpiralOut = val;
+                    break;
+                case "newspiral":
+                    NewSpiral = val;
+                    break;
             }
 
-            _gamepad?.Update_Setting(key, val);
-            _gamepad?.SaveSettings();
+            _gamePad?.Update_Setting(key, val);
+            _gamePad?.SaveSettings();
             LoadTextboxes();
         }
 
@@ -990,7 +1091,7 @@ namespace GS.Server.Gamepad
         {
             try
             {
-                var dict = _gamepad?.GetSettings();
+                var dict = _gamePad?.GetSettings();
                 if (dict == null) return;
                 foreach (var setting in dict)
                 {
@@ -1011,10 +1112,10 @@ namespace GS.Server.Gamepad
                             Home = val;
                             break;
                         case "speeddown":
-                            Speeddown = val;
+                            SpeedDown = val;
                             break;
                         case "speedup":
-                            Speedup = val;
+                            SpeedUp = val;
                             break;
                         case "up":
                             Up = val;
@@ -1029,10 +1130,10 @@ namespace GS.Server.Gamepad
                             Right = val;
                             break;
                         case "volumedown":
-                            Volumedown = val;
+                            VolumeDown = val;
                             break;
                         case "volumeup":
-                            Volumeup = val;
+                            VolumeUp = val;
                             break;
                         case "ratesidereal":
                             RateSidereal = val;
@@ -1045,6 +1146,18 @@ namespace GS.Server.Gamepad
                             break;
                         case "rateking":
                             RateKing = val;
+                            break;
+                        case "abort":
+                            Abort = val;
+                            break;
+                        case "spiralin":
+                            SpiralIn = val;
+                            break;
+                        case "spiralout":
+                            SpiralOut = val;
+                            break;
+                        case "newspiral":
+                            NewSpiral = val;
                             break;
                     }
                 }
@@ -1073,36 +1186,40 @@ namespace GS.Server.Gamepad
             _parkCount = 0;
             _stopCount = 0;
             _speedupCount = 0;
-            _speeddownCount = 0;
-            _volumeupCount = 0;
-            _volumedownCount = 0;
-            _ratesiderealCount = 0;
-            _ratelunarCount = 0;
-            _ratesolarCount = 0;
-            _ratekingCount = 0;
+            _speedDownCount = 0;
+            _volumeUpCount = 0;
+            _volumeDownCount = 0;
+            _rateSiderealCount = 0;
+            _rateLunarCount = 0;
+            _rateSolarCount = 0;
+            _rateKingCount = 0;
+            _abortCount = 0;
+            _spiralInCount = 0;
+            _spiralOutCount = 0;
+            _newSpiralCount = 0;
         }
 
-        private ICommand _clickTextboxGotFocusCommand;
-        public ICommand ClickTextboxGotFocusCommand
+        private ICommand _clickTextBoxGotFocusCommand;
+        public ICommand ClickTextBoxGotFocusCommand
         {
             get
             {
-                var command = _clickTextboxGotFocusCommand;
+                var command = _clickTextBoxGotFocusCommand;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _clickTextboxGotFocusCommand = new RelayCommand(
-                    param => ClickTextboxGotFocus(param)
+                return _clickTextBoxGotFocusCommand = new RelayCommand(
+                    param => ClickTextBoxGotFocus(param)
                 );
             }
         }
-        private void ClickTextboxGotFocus(object parameter)
+        private void ClickTextBoxGotFocus(object parameter)
         {
             try
             {
-                _focusTextbox = parameter.ToString().Trim().ToLower();
+                _focusTextBox = parameter.ToString().Trim().ToLower();
             }
             catch (Exception ex)
             {
@@ -1141,7 +1258,7 @@ namespace GS.Server.Gamepad
         {
             try
             {
-                if (_gamepad == null) return;
+                if (_gamePad == null) return;
                 var key = parameter.ToString().Trim().ToLower();
                 var update = true;
                 switch (key)
@@ -1159,10 +1276,10 @@ namespace GS.Server.Gamepad
                         Home = null;
                         break;
                     case "speeddown":
-                        Speeddown = null;
+                        SpeedDown = null;
                         break;
                     case "speedup":
-                        Speedup = null;
+                        SpeedUp = null;
                         break;
                     case "up":
                         Up = null;
@@ -1177,10 +1294,22 @@ namespace GS.Server.Gamepad
                         Right = null;
                         break;
                     case "volumedown":
-                        Volumedown = null;
+                        VolumeDown = null;
                         break;
                     case "volumeup":
-                        Volumeup = null;
+                        VolumeUp = null;
+                        break;
+                    case "abort":
+                        Abort = null;
+                        break;
+                    case "spiralin":
+                        SpiralIn = null;
+                        break;
+                    case "spiralout":
+                        SpiralOut = null;
+                        break;
+                    case "newspiral":
+                        NewSpiral = null;
                         break;
                     default:
                         update = false;
@@ -1188,8 +1317,8 @@ namespace GS.Server.Gamepad
                 }
 
                 if (!update) return;
-                _gamepad?.Update_Setting(key, null);
-                _gamepad?.SaveSettings();
+                _gamePad?.Update_Setting(key, null);
+                _gamePad?.SaveSettings();
             }
             catch (Exception ex)
             {
@@ -1208,27 +1337,27 @@ namespace GS.Server.Gamepad
             }
         }
 
-        private ICommand _clickTextboxLostFocusCommand;
-        public ICommand ClickTextboxLostFocusCommand
+        private ICommand _clickTextBoxLostFocusCommand;
+        public ICommand ClickTextBoxLostFocusCommand
         {
             get
             {
-                var command = _clickTextboxLostFocusCommand;
+                var command = _clickTextBoxLostFocusCommand;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _clickTextboxLostFocusCommand = new RelayCommand(
-                    param => ClickTextboxLostFocus()
+                return _clickTextBoxLostFocusCommand = new RelayCommand(
+                    param => ClickTextBoxLostFocus()
                 );
             }
         }
-        private void ClickTextboxLostFocus()
+        private void ClickTextBoxLostFocus()
         {
             try
             {
-                _focusTextbox = null;
+                _focusTextBox = null;
             }
             catch (Exception ex)
             {
@@ -1267,7 +1396,7 @@ namespace GS.Server.Gamepad
         {
             try
             {
-                _gamepad?.SaveSettings();
+                _gamePad?.SaveSettings();
             }
             catch (Exception ex)
             {
@@ -1469,9 +1598,9 @@ namespace GS.Server.Gamepad
             if (disposing)
             {
                 _skyTelescopeVM?.Dispose();
-                ctsGamepad?.Dispose();
+                ctsGamePad?.Dispose();
                 _settingsVM?.Dispose();
-                _gamepad?.Dispose();
+                _gamePad?.Dispose();
             }
             // free native resources if there are any.
             //if (nativeResource != IntPtr.Zero)

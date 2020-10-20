@@ -29,7 +29,7 @@ namespace GS.Simulator
     {
         #region Fields
 
-        private readonly IOSerial _ioserial;
+        private readonly IOSerial _ioSerial;
         private readonly double[] _stepsPerSec = { 0.0, 0.0 };
         private readonly int[] _revSteps = { 0, 0 };
 
@@ -46,7 +46,7 @@ namespace GS.Simulator
 
         internal Actions()
         {
-            _ioserial = new IOSerial();
+            _ioSerial = new IOSerial();
         }
 
         #region Action Commands
@@ -76,18 +76,18 @@ namespace GS.Simulator
         /// <returns></returns>
         internal double[] AxesDegrees()
         {
-            var x = Convert.ToDouble(_ioserial.Send($"degrees,{Axis.Axis1}"));
+            var x = Convert.ToDouble(_ioSerial.Send($"degrees,{Axis.Axis1}"));
 
             //put in for capture tracking in charts
-            var stepsx = _ioserial.Send($"steps,{Axis.Axis1}");
+            var stepsx = _ioSerial.Send($"steps,{Axis.Axis1}");
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps1,{null},{stepsx}" };
             MonitorLog.LogToMonitor(monitorItem);
 
-            var y = Convert.ToDouble(_ioserial.Send($"degrees,{Axis.Axis2}"));
+            var y = Convert.ToDouble(_ioSerial.Send($"degrees,{Axis.Axis2}"));
 
             //put in for capture tracking in charts
-            var stepsy = _ioserial.Send($"steps,{Axis.Axis2}");
+            var stepsy = _ioSerial.Send($"steps,{Axis.Axis2}");
             monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps2,{null},{stepsy}" };
             MonitorLog.LogToMonitor(monitorItem);
@@ -104,7 +104,7 @@ namespace GS.Simulator
         /// <param name="target"></param>
         internal void AxisGoToTarget(Axis axis, double target)
         {
-            _ioserial.Send($"gototarget,{axis},{target}");
+            _ioSerial.Send($"gototarget,{axis},{target}");
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace GS.Simulator
         /// <param name="degrees"></param>
         internal void AxisToDegrees(Axis axis, double degrees)
         {
-            _ioserial.Send($"setdegrees,{axis},{degrees}");
+            _ioSerial.Send($"setdegrees,{axis},{degrees}");
         }
 
         /// <summary>
@@ -178,14 +178,14 @@ namespace GS.Simulator
             }
 
             // execute pulse
-            _ioserial.Send($"pulse,{axis},{guiderate}");
+            _ioSerial.Send($"pulse,{axis},{guiderate}");
             var sw = Stopwatch.StartNew();
             while (sw.Elapsed.TotalMilliseconds < duration)
             {
                 //do something while waiting
             }
             sw.Reset();
-            _ioserial.Send($"pulse,{axis},{0}");
+            _ioSerial.Send($"pulse,{axis},{0}");
             if (axis == Axis.Axis1)
             {
                 PulseRaRunning = false;
@@ -216,7 +216,7 @@ namespace GS.Simulator
         /// <param name="degrees"></param>
         internal void AxisTracking(Axis axis, double degrees)
         {
-            _ioserial.Send($"tracking,{axis},{degrees}");
+            _ioSerial.Send($"tracking,{axis},{degrees}");
         }
 
         /// <summary>
@@ -226,7 +226,7 @@ namespace GS.Simulator
         /// <param name="degrees"></param>
         internal void AxisSlew(Axis axis, double degrees)
         {
-            _ioserial.Send($"slew,{axis},{degrees}");
+            _ioSerial.Send($"slew,{axis},{degrees}");
         }
 
         /// <summary>
@@ -236,7 +236,7 @@ namespace GS.Simulator
         /// <returns></returns>
         internal AxisStatus AxisStatus(Axis axis)
         {
-            var a = _ioserial.Send($"axisstatus,{axis}");
+            var a = _ioSerial.Send($"axisstatus,{axis}");
             var strings = a.Split(',');
             var b = new AxisStatus()
             {
@@ -255,7 +255,7 @@ namespace GS.Simulator
         /// <param name="axis"></param>
         internal void AxisStop(Axis axis)
         {
-            _ioserial.Send($"stop,{axis}");
+            _ioSerial.Send($"stop,{axis}");
         }
 
         /// <summary>
@@ -264,8 +264,8 @@ namespace GS.Simulator
         /// <returns></returns>
         internal int[] AxisSteps()
         {
-            var x = Convert.ToInt32(_ioserial.Send($"steps,{Axis.Axis1}"));
-            var y = Convert.ToInt32(_ioserial.Send($"steps,{Axis.Axis2}"));
+            var x = Convert.ToInt32(_ioSerial.Send($"steps,{Axis.Axis1}"));
+            var y = Convert.ToInt32(_ioSerial.Send($"steps,{Axis.Axis2}"));
             var i = new[] { x, y };
             return i;
         }
@@ -277,7 +277,7 @@ namespace GS.Simulator
         /// <param name="degrees"></param>
         internal void HcSlew(Axis axis, double degrees)
         {
-            _ioserial.Send($"hc,{axis},{degrees}");
+            _ioSerial.Send($"hc,{axis},{degrees}");
             AxesDegrees();
         }
 
@@ -286,7 +286,7 @@ namespace GS.Simulator
         /// </summary>
         internal void InitializeAxes()
         {
-            _ioserial.Send("initialize");
+            _ioSerial.Send("initialize");
             LoadDefaults();
         }
 
@@ -296,7 +296,7 @@ namespace GS.Simulator
         private void LoadDefaults()
         {
             //steps per revolution
-            var a = Convert.ToInt32(_ioserial.Send("getrevsteps"));
+            var a = Convert.ToInt32(_ioSerial.Send("getrevsteps"));
             _revSteps[0] = a;
             _revSteps[1] = a;
             //steps per second
@@ -304,7 +304,7 @@ namespace GS.Simulator
             _stepsPerSec[0] = b;
             _stepsPerSec[1] = b;
 
-            var c = _ioserial.Send("capabilities");
+            var c = _ioSerial.Send("capabilities");
             var d = c.Split(',');
             var mountInfo = new MountInfo
             {
@@ -329,7 +329,7 @@ namespace GS.Simulator
         /// <returns></returns>
         internal int HomeSensor(Axis axis)
         {
-            return Convert.ToInt32(_ioserial.Send($"homesensor,{axis}"));
+            return Convert.ToInt32(_ioSerial.Send($"homesensor,{axis}"));
         }
 
         /// <summary>
@@ -338,7 +338,7 @@ namespace GS.Simulator
         /// <param name="axis"></param>
         internal void HomeSensorReset(Axis axis)
         {
-            _ioserial.Send($"homesensorreset,{axis}");
+            _ioSerial.Send($"homesensorreset,{axis}");
         }
 
         /// <summary>
@@ -347,7 +347,7 @@ namespace GS.Simulator
         /// <returns></returns>
         internal string MountName()
         {
-            return _ioserial.Send("mountname");
+            return _ioSerial.Send("mountname");
         }
 
         /// <summary>
@@ -356,7 +356,7 @@ namespace GS.Simulator
         /// <returns></returns>
         internal string MountVersion()
         {
-            return _ioserial.Send("mountversion");
+            return _ioSerial.Send("mountversion");
         }
 
         /// <summary>
@@ -365,7 +365,7 @@ namespace GS.Simulator
         /// <returns></returns>
         internal long Spr()
         {
-            return Convert.ToInt32(_ioserial.Send("spr"));
+            return Convert.ToInt32(_ioSerial.Send("spr"));
         }
 
         /// <summary>
@@ -375,7 +375,7 @@ namespace GS.Simulator
         /// <param name="degrees"></param>
         internal void Rate(Axis axis, double degrees)
         {
-            _ioserial.Send($"rate,{axis},{degrees}");
+            _ioSerial.Send($"rate,{axis},{degrees}");
         }
 
         /// <summary>
@@ -385,7 +385,7 @@ namespace GS.Simulator
         /// <param name="degrees"></param>
         internal void RateAxis(Axis axis, double degrees)
         {
-            _ioserial.Send($"rateaxis,{axis},{degrees}");
+            _ioSerial.Send($"rateaxis,{axis},{degrees}");
         }
 
         /// <summary>
@@ -393,7 +393,7 @@ namespace GS.Simulator
         /// </summary>
         internal void Shutdown()
         {
-            _ioserial.Send("shutdown");
+            _ioSerial.Send("shutdown");
         }
 
         #endregion

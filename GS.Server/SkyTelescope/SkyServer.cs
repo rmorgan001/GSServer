@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019  Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2020  Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -32,6 +32,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using GS.Server.Windows;
 using AxisStatus = GS.Simulator.AxisStatus;
 
 namespace GS.Server.SkyTelescope
@@ -48,7 +49,7 @@ namespace GS.Server.SkyTelescope
 
         private static readonly Util _util = new Util();
         private static readonly object _timerLock = new object();
-        private static MediaTimer _mediatimer;
+        private static MediaTimer _mediaTimer;
 
         // Slew and HC speeds
         private static double SlewSpeedOne;
@@ -69,6 +70,8 @@ namespace GS.Server.SkyTelescope
         private static Vector _mountAxes;
         private static Vector _targetAxes;
         private static Vector _altAzSync;
+
+        public static readonly List<SpiralPoint> SpiralCollection;
 
         #endregion Fields 
 
@@ -94,7 +97,9 @@ namespace GS.Server.SkyTelescope
                 // load some things
                 Defaults();
 
-                // set local to NaN for contructor
+                SpiralCollection = new List<SpiralPoint>();
+
+                // set local to NaN for constructor
                 _mountAxes = new Vector(double.NaN, double.NaN);
             }
             catch (Exception ex)
@@ -152,6 +157,7 @@ namespace GS.Server.SkyTelescope
         private static double _rightAscensionXform;
         private static double _slewSettleTime;
         private static double _siderealTime;
+        private static bool _spiralChanged;
         private static Vector _targetRaDec;
         private static bool _testTab;
         private static TrackingMode _trackingMode;
@@ -369,10 +375,10 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         public static double RateRa
         {
-            get => Conversions.Deg2ArcSec(_rateRaDec.X);
+            get => _rateRaDec.X;
             set
             {
-                _rateRaDec.X = Conversions.ArcSec2Deg(value);
+                _rateRaDec.X = value;
                 object _;
                 switch (SkySettings.Mount)
                 {
@@ -736,7 +742,7 @@ namespace GS.Server.SkyTelescope
             private get => _rateAxes.Y;
             set
             {
-                _rateAxes.Y = Conversions.ArcSec2Deg(value);
+                _rateAxes.Y = value;
                 if (Math.Abs(value) > 0)
                 {
                     IsSlewing = true;
@@ -784,7 +790,7 @@ namespace GS.Server.SkyTelescope
             private get => _rateAxes.X;
             set
             {
-                _rateAxes.X = Conversions.ArcSec2Deg(value);
+                _rateAxes.X = value;
                 if (Math.Abs(value) > 0)
                 {
                     IsSlewing = true;
@@ -829,10 +835,10 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         public static double RateDec
         {
-            get => Conversions.Deg2ArcSec(_rateRaDec.Y);
+            get => _rateRaDec.Y;
             set
             {
-                _rateRaDec.Y = Conversions.ArcSec2Deg(value);
+                _rateRaDec.Y = value;
                 object _;
                 switch (SkySettings.Mount)
                 {
@@ -974,6 +980,19 @@ namespace GS.Server.SkyTelescope
         /// Southern alignment status
         /// </summary>
         public static bool SouthernHemisphere => SkySettings.Latitude < 0;
+
+        /// <summary>
+        /// Used to notify spiral search list was modified
+        /// </summary>
+        public static bool SpiralChanged
+        {
+            get => _spiralChanged;
+            set
+            {
+                _spiralChanged = value;
+                OnStaticPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Dec target for slewing
@@ -1169,7 +1188,7 @@ namespace GS.Server.SkyTelescope
 
                 object _ = new CmdAxisGoToTarget(0, Axis.Axis2, skyTargetDec); //move to target DEC
 
-                // track movment until axis is stopped
+                // track movement until axis is stopped
                 var stopwatch1 = Stopwatch.StartNew();
                 while (stopwatch1.Elapsed.TotalMilliseconds < 2000)
                 {
@@ -1402,27 +1421,25 @@ namespace GS.Server.SkyTelescope
         private static Vector SkyTrackingRate;
 
         // PPEC info
-        private static bool _canpec;
+        private static bool _canPec;
         public static bool CanPec
         {
-            get => _canpec;
+            get => _canPec;
             private set
             {
-                if (_canpec == value) return;
-                _canpec = value;
+                if (_canPec == value) return;
+                _canPec = value;
                 OnStaticPropertyChanged();
             }
         }
 
-        private static bool _pec;
         public static bool Pec
         {
-            get => _pec;
+            get => SkySettings.PPecOn;
             set
             {
-                if (Pec == value) return;
-                _pec = value;
-                Synthesizer.Speak(value ? Application.Current.Resources["vcePeckOn"].ToString() : Application.Current.Resources["vcePeckOff"].ToString());
+                if (SkySettings.PPecOn == value) return;
+                SkySettings.PPecOn = value;
 
                 var monitorItem = new MonitorEntry
                 {
@@ -1437,7 +1454,6 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyTasks(MountTaskName.Pec);
-                //SkyTasks(MountTaskName.Capabilities);
                 OnStaticPropertyChanged();
             }
         }
@@ -1720,7 +1736,7 @@ namespace GS.Server.SkyTelescope
 
                 object _ = new SkyAxisGoToTarget(0, AxisId.Axis1, deltaTarget[0]); //move to new target
 
-                // track movment until axis is stopped
+                // track movement until axis is stopped
                 var stopwatch1 = Stopwatch.StartNew();
                 while (stopwatch1.Elapsed.TotalMilliseconds < 2000)
                 {
@@ -2373,6 +2389,23 @@ namespace GS.Server.SkyTelescope
 
             if (Math.Abs(RateAxisRa + RateAxisDec) > 0) { slewing = true; }
             IsSlewing = slewing;
+        }
+
+        /// <summary>
+        /// Resets the spiral list if slew is out of limit
+        /// </summary>
+        private static void CheckSpiralLimit()
+        {
+            if (!SkySettings.SpiralLimits) return;
+            if (SpiralCollection.Count == 0) return;
+            var point = SpiralCollection[0];
+            if (point == null) return;
+            // calc distance between two coordinates
+            var distance = Calculations.AngularDistance(RightAscensionXform, DeclinationXform, point.RaDec.X, point.RaDec.Y);
+            if (distance <= SkySettings.SpiralDistance) return;
+            SpiralCollection.Clear();
+            SkySettings.SpiralDistance = 0;
+            SpiralChanged = true;
         }
 
         /// <summary>
@@ -3279,6 +3312,7 @@ namespace GS.Server.SkyTelescope
                     SkyTasks(MountTaskName.AlternatingPpec);
                     SkyTasks(MountTaskName.MinPulseDec);
                     SkyTasks(MountTaskName.MinPulseRa);
+                    if(CanPec) SkyTasks(MountTaskName.Pec);
 
                     // checks if the mount is close enough to home position to set default position. If not use the positions from the mount
                     while (rawPositions == null)
@@ -3288,7 +3322,7 @@ namespace GS.Server.SkyTelescope
                             _ = new SkySetAxisPosition(0, AxisId.Axis1, positions[0]);
                             _ = new SkySetAxisPosition(0, AxisId.Axis2, positions[1]);
                             monitorItem = new MonitorEntry
-                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Counter exceded:{positions[0]},{positions[1]}" };
+                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Counter exceeded:{positions[0]},{positions[1]}" };
                             MonitorLog.LogToMonitor(monitorItem);
                             break;
                         }
@@ -3374,9 +3408,9 @@ namespace GS.Server.SkyTelescope
                 AxesStopValidate();
 
                 // Event to get mount positions and update UI
-                _mediatimer = new MediaTimer { Period = SkySettings.DisplayInterval, Resolution = 5 };
-                _mediatimer.Tick += UpdateServerEvent;
-                _mediatimer.Start();
+                _mediaTimer = new MediaTimer { Period = SkySettings.DisplayInterval, Resolution = 5 };
+                _mediaTimer.Tick += UpdateServerEvent;
+                _mediaTimer.Start();
             }
             else
             {
@@ -3396,17 +3430,17 @@ namespace GS.Server.SkyTelescope
             if (MountQueue.IsRunning)
             {
                 AxesStopValidate();
-                if (_mediatimer != null) { _mediatimer.Tick -= UpdateServerEvent; }
-                _mediatimer?.Stop();
-                _mediatimer?.Dispose();
+                if (_mediaTimer != null) { _mediaTimer.Tick -= UpdateServerEvent; }
+                _mediaTimer?.Stop();
+                _mediaTimer?.Dispose();
                 MountQueue.Stop();
             }
 
             if (!SkyQueue.IsRunning) return;
             AxesStopValidate();
-            if (_mediatimer != null) { _mediatimer.Tick -= UpdateServerEvent; }
-            _mediatimer?.Stop();
-            _mediatimer?.Dispose();
+            if (_mediaTimer != null) { _mediaTimer.Tick -= UpdateServerEvent; }
+            _mediaTimer?.Stop();
+            _mediaTimer?.Dispose();
             var sw = Stopwatch.StartNew();
             while (sw.Elapsed.TotalMilliseconds < 1000)
             {
@@ -3664,17 +3698,17 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Sets speeds for hand controller and slews in simulator
         /// </summary>
-        internal static void SetSlewRates(double maxrate)
+        internal static void SetSlewRates(double maxRate)
         {
             // Sky Speeds
-            SlewSpeedOne = Math.Round(maxrate * 0.0034, 3);
-            SlewSpeedTwo = Math.Round(maxrate * 0.0068, 3);
-            SlewSpeedThree = Math.Round(maxrate * 0.047, 3);
-            SlewSpeedFour = Math.Round(maxrate * 0.068, 3);
-            SlewSpeedFive = Math.Round(maxrate * 0.2, 3);
-            SlewSpeedSix = Math.Round(maxrate * 0.4, 3);
-            SlewSpeedSeven = Math.Round(maxrate * 0.8, 3);
-            SlewSpeedEight = Math.Round(maxrate * 1.0, 3);
+            SlewSpeedOne = Math.Round(maxRate * 0.0034, 3);
+            SlewSpeedTwo = Math.Round(maxRate * 0.0068, 3);
+            SlewSpeedThree = Math.Round(maxRate * 0.047, 3);
+            SlewSpeedFour = Math.Round(maxRate * 0.068, 3);
+            SlewSpeedFive = Math.Round(maxRate * 0.2, 3);
+            SlewSpeedSix = Math.Round(maxRate * 0.4, 3);
+            SlewSpeedSeven = Math.Round(maxRate * 0.8, 3);
+            SlewSpeedEight = Math.Round(maxRate * 1.0, 3);
 
             var monitorItem = new MonitorEntry
             {
@@ -3804,7 +3838,7 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Wihin the meridian limits will check for closest slew
+        /// Within the meridian limits will check for closest slew
         /// </summary>
         /// <param name="position"></param>
         /// <returns>axis position that is closest</returns>
@@ -3844,7 +3878,7 @@ namespace GS.Server.SkyTelescope
         /// <param name="a">First pair of positions</param>
         /// <param name="b">Seconds pair of positions</param>
         /// <returns>a or b as string</returns>
-        private static string ChooseClosestPosition(double position, IReadOnlyList<double> a, IReadOnlyList<double> b)
+        public static string ChooseClosestPosition(double position, IReadOnlyList<double> a, IReadOnlyList<double> b)
         {
             var val1 = Math.Abs(a[0] - position);
             var val2 = Math.Abs(b[0] - position);
@@ -3855,9 +3889,9 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Calculates if axis position is within the defined meridian limits
         /// </summary>
-        /// <param name="position">X axis poistion of mount</param>
-        /// <returns>True if within limits otherwize false</returns>
-        private static bool IsWithinMeridianLimits(IReadOnlyList<double> position)
+        /// <param name="position">X axis position of mount</param>
+        /// <returns>True if within limits otherwise false</returns>
+        public static bool IsWithinMeridianLimits(IReadOnlyList<double> position)
         {
             return position[0] > -SkySettings.HourAngleLimit && position[0] < SkySettings.HourAngleLimit ||
                    position[0] > 180 - SkySettings.HourAngleLimit && position[0] < 180 + SkySettings.HourAngleLimit;
@@ -4474,13 +4508,16 @@ namespace GS.Server.SkyTelescope
                 //used for warning light
                 CheckAxisLimits();
 
+                // reset spiral if moved too far
+                CheckSpiralLimit();
+
                 // Update UI 
                 CheckPecTraining();
                 IsHome = AtHome;
                 IsSideOfPier = SideOfPier;
 
                 // Event interval time set for UI performance
-                _mediatimer.Period = SkySettings.DisplayInterval;
+                _mediaTimer.Period = SkySettings.DisplayInterval;
             }
             finally
             {

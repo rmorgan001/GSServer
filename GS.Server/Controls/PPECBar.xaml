@@ -18,8 +18,7 @@
                 </Style.Triggers>
             </Style>
         </StackPanel.Style>
-        <ToggleButton Width="20" Height="20" ToolTip="{StaticResource tbOnOff}" Style="{StaticResource MaterialDesignActionLightToggleButton}"
-                          IsChecked="{Binding PpecOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <ToggleButton Width="20" Height="20" ToolTip="{StaticResource tbOnOff}" Style="{StaticResource MaterialDesignActionLightToggleButton}" IsChecked="{Binding PPecOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Label Content="{StaticResource lbPpec}"/>
         <md:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsPpecDialogOpen}" DialogContent="{Binding PpecContent}">
             <ToggleButton  HorizontalAlignment="Center" Width="20" Height="20" ToolTip="{StaticResource tbStartTrainingMode}"

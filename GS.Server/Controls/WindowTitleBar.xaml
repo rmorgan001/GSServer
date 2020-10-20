@@ -11,7 +11,7 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <DockPanel Grid.Column="0" Dock="Left">
+            <DockPanel Grid.Column="0" Dock="Left" Background="{Binding MountTypeColor}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="5,0,0,0">
                     <CheckBox WindowChrome.IsHitTestVisibleInChrome="True" IsChecked="{Binding TopMost}" >
                         <CheckBox.Resources>
@@ -22,7 +22,7 @@
                         </CheckBox.Resources>
                     </CheckBox>
                     <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Text="{StaticResource lbName}" Foreground="{StaticResource PrimaryHueLightBrush}"/>
-                    <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Text="{Binding Version}" Foreground="{StaticResource PrimaryHueLightBrush}"/>
+                    <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Text="{Binding Version}" Foreground="{StaticResource PrimaryHueLightBrush}" />
                     <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Text="{Binding MountType, StringFormat={}({0})}" Foreground="{StaticResource PrimaryHueLightBrush}" />
                 </StackPanel>
             </DockPanel>

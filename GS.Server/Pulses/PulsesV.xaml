@@ -16,8 +16,7 @@
         <domain:InverseBooleanConverter x:Key="InvBol"/>
     </UserControl.Resources>
     <Grid MinWidth="600">
-        <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Center"  CloseOnClickAway="True" 
-                       IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
+        <md:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" CloseOnClickAway="True" />
         <md:DrawerHost BorderThickness="0" IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" BorderBrush="{StaticResource MaterialDesignDivider}" >
         <md:DrawerHost.LeftDrawerContent>
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MinWidth="510">

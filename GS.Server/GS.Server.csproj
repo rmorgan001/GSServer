@@ -186,4 +186,9 @@
       <LastGenOutput>SkyTelescope.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Page Update="Controls\Dialogs\SpiralFovDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
 </Project>

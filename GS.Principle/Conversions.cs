@@ -21,26 +21,26 @@ namespace GS.Principles
     public static class Conversions
     {
         /// <summary>
-        /// Milliseconds to seconds per arcseconds
+        /// Milliseconds to seconds per arcSeconds
         /// </summary>
-        /// <param name="millseconds"></param>
+        /// <param name="millSeconds"></param>
         /// <param name="rate">Degrees per second</param>
-        /// <param name="prate">Perentage of rate</param>
+        /// <param name="prate">Percentage of rate</param>
         /// <returns></returns>
-        public static double Ms2Arcsec(double millseconds, double rate, double prate)
+        public static double Ms2Arcsec(double millSeconds, double rate, double prate)
         {
             if (Math.Abs(prate) < 0.01) prate = 1;
-             var a = millseconds / 1000.0;
+             var a = millSeconds / 1000.0;
             var b = GuideRate(rate, prate);
             var c = a * b * 3600;
             return c;
         }
 
         /// <summary>
-        /// Calculate guiderate from rate in arcseconds per second
+        /// Calculate guideRate from rate in arcSeconds per second
         /// </summary>
         /// <param name="rate">Degrees per second</param>
-        /// <param name="prate">Perentage of rate 0-1.0</param>
+        /// <param name="prate">Percentage of rate 0-1.0</param>
         /// <returns></returns>
         public static double GuideRate(double rate, double prate)
         {
@@ -51,49 +51,79 @@ namespace GS.Principles
         }
 
         /// <summary>
-        /// Steps in arcseconds per second
+        /// Steps in arcSeconds per second
         /// </summary>
-        /// <param name="prate">Perentage of rate 0-1.0</param>
-        /// <param name="totalsteps"></param>
+        /// <param name="prate">Percentage of rate 0-1.0</param>
+        /// <param name="totalSteps"></param>
         /// <param name="milliseconds"></param>
-        /// <param name="rate">in arcseconds</param>
+        /// <param name="rate">in arcSeconds</param>
         /// <returns></returns>
-        public static double Rate2Steps(double milliseconds, double rate, double prate, double totalsteps)
+        public static double Rate2Steps(double milliseconds, double rate, double prate, double totalSteps)
         {
-            var a = StepPerArcsec(totalsteps);
+            var a = StepPerArcsec(totalSteps);
             var b = a * Ms2Arcsec(milliseconds, rate, prate);
             return b;
         }
 
         /// <summary>
-        /// Calculates steps per arcsecond
+        /// Calculates steps per arcSecond
         /// </summary>
-        /// <param name="totalsteps"></param>
+        /// <param name="totalSteps"></param>
         /// <returns></returns>
-        public static double StepPerArcsec(double totalsteps)
+        public static double StepPerArcsec(double totalSteps)
         {
-            var a = totalsteps / 360 / 3600.0;
+            var a = totalSteps / 360 / 3600.0;
             return a;
         }
 
         /// <summary>
-        /// Arcseconds to degrees
+        /// ArcSeconds to degrees
         /// </summary>
-        /// <param name="arcsec">ArcSecond per second</param>
+        /// <param name="arcSec">ArcSecond per second</param>
         /// <returns></returns>
-        public static double ArcSec2Deg(double arcsec)
+        public static double ArcSec2Deg(double arcSec)
         {
-            return arcsec / 3600.0;
+            return arcSec / 3600.0;
         }
 
         /// <summary>
-        /// Degrees to Arcseconds
+        /// Degrees to ArcSeconds
         /// </summary>
         /// <param name="degrees">Degrees per second</param>
-        /// <returns></returns>
+        /// <returns>ArcSeconds</returns>
         public static double Deg2ArcSec(double degrees)
         {
             return degrees * 3600.0;
+        }
+
+        /// <summary>
+        /// Seconds to Degrees
+        /// </summary>
+        /// <param name="degrees">Degrees per second</param>
+        /// <returns></returns>
+        public static double Sec2Deg(double degrees)
+        {
+            return degrees / 360.0;
+        }
+
+        /// <summary>
+        /// Seconds to ArcSeconds
+        /// </summary>
+        /// <param name="seconds">seconds in time</param>
+        /// <returns>ArcSeconds</returns>
+        public static double Sec2ArcSec(double seconds)
+        {
+            return seconds * 15;
+        }
+
+        /// <summary>
+        /// ArcSeconds to Seconds
+        /// </summary>
+        /// <param name="arcSecs">seconds in arc</param>
+        /// <returns>seconds</returns>
+        public static double ArcSec2Sec(double arcSecs)
+        {
+            return arcSecs / 15;
         }
     }
 }

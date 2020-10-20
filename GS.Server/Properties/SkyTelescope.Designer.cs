@@ -12,7 +12,7 @@ namespace GS.Server.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.6.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.7.0.0")]
     internal sealed partial class SkyTelescope : global::System.Configuration.ApplicationSettingsBase {
         
         private static SkyTelescope defaultInstance = ((SkyTelescope)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new SkyTelescope())));
@@ -1196,6 +1196,114 @@ namespace GS.Server.Properties {
             }
             set {
                 this["SpiralFov"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4800")]
+        public int SpiralWidth {
+            get {
+                return ((int)(this["SpiralWidth"]));
+            }
+            set {
+                this["SpiralWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4800")]
+        public int SpiralHeight {
+            get {
+                return ((int)(this["SpiralHeight"]));
+            }
+            set {
+                this["SpiralHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
+        public double SpiralDistance {
+            get {
+                return ((double)(this["SpiralDistance"]));
+            }
+            set {
+                this["SpiralDistance"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SpiralLimits {
+            get {
+                return ((bool)(this["SpiralLimits"]));
+            }
+            set {
+                this["SpiralLimits"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double CameraWidth {
+            get {
+                return ((double)(this["CameraWidth"]));
+            }
+            set {
+                this["CameraWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double CameraHeight {
+            get {
+                return ((double)(this["CameraHeight"]));
+            }
+            set {
+                this["CameraHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double EyepieceFS {
+            get {
+                return ((double)(this["EyepieceFS"]));
+            }
+            set {
+                this["EyepieceFS"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool PpecOn {
+            get {
+                return ((bool)(this["PpecOn"]));
+            }
+            set {
+                this["PpecOn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Diagnostics {
+            get {
+                return ((bool)(this["Diagnostics"]));
+            }
+            set {
+                this["Diagnostics"] = value;
             }
         }
     }

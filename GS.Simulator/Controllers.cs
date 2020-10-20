@@ -425,17 +425,18 @@ namespace GS.Simulator
         /// Rate tracking Movement
         /// </summary>
         /// <param name="axis"></param>
+        /// <param name="interval"></param>
         /// <returns></returns>
-        private double Rate(Axis axis)
+        private double Rate(Axis axis, double interval)
         {
             switch (axis)
             {
                 case Axis.Axis1:
                     _isRateTrackingX = Math.Abs(_rateX) > 0;
-                    return _isRateTrackingX ? _rateX : 0;
+                    return _isRateTrackingX ? _rateX * interval : 0;
                 case Axis.Axis2:
                     _isRateTrackingY = Math.Abs(_rateY) > 0;
-                    return _isRateTrackingY ? _rateY : 0;
+                    return _isRateTrackingY ? _rateY * interval : 0;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
             }
@@ -463,17 +464,18 @@ namespace GS.Simulator
         /// RateAxis Movement
         /// </summary>
         /// <param name="axis"></param>
+        /// <param name="interval"></param>
         /// <returns></returns>
-        private double RateAxis(Axis axis)
+        private double RateAxis(Axis axis, double interval)
         {
             switch (axis)
             {
                 case Axis.Axis1:
                     _isRateAxisSlewingX = Math.Abs(_rateAxisX) > 0;
-                    return _isRateAxisSlewingX ? _rateAxisX : 0;
+                    return _isRateAxisSlewingX ? _rateAxisX * interval : 0;
                 case Axis.Axis2:
                     _isRateAxisSlewingY = Math.Abs(_rateAxisY) > 0;
-                    return _isRateAxisSlewingY ? _rateAxisY : 0;
+                    return _isRateAxisSlewingY ? _rateAxisY * interval : 0;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
             }
@@ -592,12 +594,12 @@ namespace GS.Simulator
             changeY += Pulse(Axis.Axis2);
 
             // RateAxis
-            changeX += RateAxis(Axis.Axis1);
-            changeY += RateAxis(Axis.Axis2);
+            changeX += RateAxis(Axis.Axis1, seconds);
+            changeY += RateAxis(Axis.Axis2, seconds);
 
             // Rate
-            changeX += Rate(Axis.Axis1);
-            changeY += Rate(Axis.Axis2);
+            changeX += Rate(Axis.Axis1, seconds);
+            changeY += Rate(Axis.Axis2, seconds);
 
             // Slew
             changeX += Slew(Axis.Axis1, seconds);

@@ -35,6 +35,8 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using MaterialDesignColors;
 
 namespace GS.Server.Main
 {
@@ -71,6 +73,7 @@ namespace GS.Server.Main
                     //setup property info from the GSServer
                     GSServer.StaticPropertyChanged += PropertyChangedServer;
                     SkySettings.StaticPropertyChanged += PropertyChangedSettings;
+                    Settings.Settings.StaticPropertyChanged += PropertyChangedSettingsSettings;
                     Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
                     var monitorItem = new MonitorEntry
@@ -82,10 +85,10 @@ namespace GS.Server.Main
                     MonitorLog.LogToMonitor(monitorItem);
 
                     AppCount = GSServer.AppCount;
-                    MountType = SkySettings.Mount;
                     Settings.Settings.Load();
                     if (Settings.Settings.StartMinimized)
                         Settings.Settings.Windowstate = WindowState.Minimized;
+                    MountType = SkySettings.Mount;
 
                     _mainWindowVm = this;
 
@@ -138,6 +141,16 @@ namespace GS.Server.Main
             switch (e.PropertyName)
             {
                 case "Mount":
+                    MountType = SkySettings.Mount;
+                    break;
+            }
+        }
+
+        private void PropertyChangedSettingsSettings(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "AccentColor":
                     MountType = SkySettings.Mount;
                     break;
             }
@@ -704,6 +717,33 @@ namespace GS.Server.Main
             set
             {
                 _mounttype = value;
+                var accentbrush = new SolidColorBrush(Colors.Transparent);
+                if (value == MountType.Simulator)
+                {
+                    if (!string.IsNullOrEmpty(Settings.Settings.AccentColor))
+                    {
+                        var swatches = new SwatchesProvider().Swatches;
+                        foreach (var swatch in swatches)
+                        {
+                            if (swatch.Name != Settings.Settings.AccentColor) continue;
+                            var converter = new BrushConverter();
+                            accentbrush = (SolidColorBrush)converter.ConvertFromString(swatch.ExemplarHue.Color.ToString());
+                        }
+                    }
+
+                }
+                MountTypeColor = accentbrush;
+                OnPropertyChanged();
+            }
+        }
+
+        private Brush _mountTypeColor;
+        public Brush MountTypeColor
+        {
+            get => _mountTypeColor;
+            set
+            {
+                _mountTypeColor = value;
                 OnPropertyChanged();
             }
         }
