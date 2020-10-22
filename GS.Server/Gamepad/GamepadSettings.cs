@@ -212,6 +212,22 @@ namespace GS.Server.Gamepad
                         Properties.Gamepad.Default.rateking = setting.Value;
                         LogSetting(MethodBase.GetCurrentMethod().Name, $"rateking {setting.Value}");
                         break;
+                    case "abort":
+                        Properties.Gamepad.Default.abort = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"abort {setting.Value}");
+                        break;
+                    case "spiralin":
+                        Properties.Gamepad.Default.spiralin = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"spiralin {setting.Value}");
+                        break;
+                    case "spiralout":
+                        Properties.Gamepad.Default.spiralout = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"spiralout {setting.Value}");
+                        break;
+                    case "newspiral":
+                        Properties.Gamepad.Default.newspiral = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"newspiral {setting.Value}");
+                        break;
                 }
             }
             Save();

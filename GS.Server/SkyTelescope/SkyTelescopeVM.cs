@@ -51,7 +51,7 @@ namespace GS.Server.SkyTelescope
     public sealed class SkyTelescopeVM : ObservableObject, IPageVM, IDisposable
     {
         #region Fields
-        private readonly Util _util = new Util();
+        private static readonly Util _util = new Util();
         public string TopName => "SkyWatcher";
         public string BottomName => "Telescope";
         public int Uid => 0;
@@ -4928,7 +4928,12 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
-                if (AtPark) return;
+                if (AtPark)
+                {
+                    LogSpiral($"SpiralIn: Parked", MonitorType.Warning);
+                    return;
+                }
+
                 if (!SkyServer.Tracking) SkyServer.Tracking = true;
                 SpiralMove(-1);
             }
@@ -4971,7 +4976,11 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
-                if (AtPark) return;
+                if (AtPark)
+                {
+                    LogSpiral($"SpiralOut: Parked", MonitorType.Warning);
+                    return;
+                }
                 if (!SkyServer.Tracking) SkyServer.Tracking = true;
                 SpiralMove(1);
             }
@@ -5169,18 +5178,47 @@ namespace GS.Server.SkyTelescope
             }
 
             SkySettings.SpiralDistance = Math.Round(farthest, 1);
+
+            LogSpiral($"GenerateSpiral: {SkyServer.SpiralCollection.Count}", MonitorType.Information);
+            Synthesizer.Speak(Application.Current.Resources["btnSpiralNew"].ToString());
         }
+
         private static void SpiralMove(int amt)
         {
             if (SkyServer.SpiralCollection.Count == 0) GenerateSpiral();
-            if (!SkyServer.SpiralCollection.Exists(x => x.Status == SpiralPointStatus.Current)) return;
+            if (!SkyServer.SpiralCollection.Exists(x => x.Status == SpiralPointStatus.Current))
+            {
+                LogSpiral($"{amt}, Can't find Current", MonitorType.Warning);
+                return;
+            }
 
             var currentpoint = SkyServer.SpiralCollection.Find(x => x.Status == SpiralPointStatus.Current);
             var index = currentpoint.Index + amt;
-            if (index < 0 || index > 48) return;
-            if (!SkyServer.SpiralCollection.Exists(x => x.Index == index)) return;
+            if (index < 0 )
+            {
+                Synthesizer.Speak(Application.Current.Resources["strCenter"].ToString());
+                return;
+            }
+            if (index > 48)
+            {
+                Synthesizer.Speak(Application.Current.Resources["strEnd"].ToString());
+                return;
+            }
+
+            if (!SkyServer.SpiralCollection.Exists(x => x.Index == index))
+            {
+                LogSpiral($"{amt}, Index not Exists", MonitorType.Warning);
+                return;
+            }
             var newpoint = SkyServer.SpiralCollection.Find(x => x.Index == index);
-            if (newpoint?.RaDec == null) return;
+            if (newpoint?.RaDec == null)
+            {
+                LogSpiral($"{amt}, Index not Found", MonitorType.Warning);
+                return;
+            }
+
+            LogSpiral($"Spiral Move: {_util.HoursToHMS(newpoint.RaDec.X, "h ", "m ", "s", 2)}, {_util.DegreesToDMS(newpoint.RaDec.Y, "° ", "m ", "s", 2)}, {amt}", MonitorType.Information);
+
             var radec = Transforms.CoordTypeToInternal(newpoint.RaDec.X, newpoint.RaDec.Y);
 
             // check for possible flip
@@ -5189,16 +5227,31 @@ namespace GS.Server.SkyTelescope
                 var flipRequired = Axes.IsFlipRequired(new[] { radec.X, radec.Y });
                 if (flipRequired)
                 {
+                    LogSpiral(Application.Current.Resources["msgFlipLimit"].ToString(), MonitorType.Warning);
                     Synthesizer.Speak(Application.Current.Resources["msgFlipLimit"].ToString()); 
                     return;
                 }
             }
 
-
             SkyServer.SlewRaDec(radec.X, radec.Y);
             currentpoint.Status = SpiralPointStatus.Visited;
             newpoint.Status = SpiralPointStatus.Current;
             SkyServer.SpiralChanged = true;
+        }
+
+        private static void LogSpiral(string msg, MonitorType typ)
+        {
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Interface,
+                Type = typ,
+                Method = MethodBase.GetCurrentMethod().Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{msg}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
         }
 
         #endregion

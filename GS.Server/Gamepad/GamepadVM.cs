@@ -860,6 +860,7 @@ namespace GS.Server.Gamepad
                     case "ratesidereal":
                         if (value)
                         {
+                            if (!SkyTelescope()) return;
                             if (_rateSiderealCount == 0)
                             {
                                 _skyTelescopeVM.TrackingRate = DriveRates.driveSidereal;
@@ -877,6 +878,7 @@ namespace GS.Server.Gamepad
                     case "ratelunar":
                         if (value)
                         {
+                            if (!SkyTelescope()) return;
                             if (_rateLunarCount == 0)
                             {
                                 _skyTelescopeVM.TrackingRate = DriveRates.driveLunar;
@@ -894,6 +896,7 @@ namespace GS.Server.Gamepad
                     case "ratesolar":
                         if (value)
                         {
+                            if (!SkyTelescope()) return;
                             if (_rateSolarCount == 0)
                             {
                                 _skyTelescopeVM.TrackingRate = DriveRates.driveSolar;
@@ -911,6 +914,7 @@ namespace GS.Server.Gamepad
                     case "rateking":
                         if (value)
                         {
+                            if (!SkyTelescope()) return;
                             if (_rateKingCount == 0)
                             {
                                 _skyTelescopeVM.TrackingRate = DriveRates.driveKing;
@@ -1298,6 +1302,18 @@ namespace GS.Server.Gamepad
                         break;
                     case "volumeup":
                         VolumeUp = null;
+                        break;
+                    case "ratesidereal":
+                        RateSidereal = null;
+                        break;
+                    case "ratelunar":
+                        RateLunar = null;
+                        break;
+                    case "ratesolar":
+                        RateSolar = null;
+                        break;
+                    case "rateking":
+                        RateKing = null;
                         break;
                     case "abort":
                         Abort = null;

@@ -568,4 +568,6 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="tbHeight">Height</system:String>
     <system:String x:Key="msgFlipLimit">Flip Limit</system:String>
     <system:String x:Key="msgNoHomeSensor">Mount doesn't support a home sensor</system:String>
+    <system:String x:Key="strCenter">Center</system:String>
+    <system:String x:Key="strEnd">End</system:String>
 </ResourceDictionary>

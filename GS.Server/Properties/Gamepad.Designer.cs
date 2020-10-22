@@ -12,7 +12,7 @@ namespace GS.Server.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.4.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.7.0.0")]
     internal sealed partial class Gamepad : global::System.Configuration.ApplicationSettingsBase {
         
         private static Gamepad defaultInstance = ((Gamepad)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Gamepad())));
@@ -248,6 +248,54 @@ namespace GS.Server.Properties {
             }
             set {
                 this["rateking"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string abort {
+            get {
+                return ((string)(this["abort"]));
+            }
+            set {
+                this["abort"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string spiralin {
+            get {
+                return ((string)(this["spiralin"]));
+            }
+            set {
+                this["spiralin"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string spiralout {
+            get {
+                return ((string)(this["spiralout"]));
+            }
+            set {
+                this["spiralout"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string newspiral {
+            get {
+                return ((string)(this["newspiral"]));
+            }
+            set {
+                this["newspiral"] = value;
             }
         }
     }

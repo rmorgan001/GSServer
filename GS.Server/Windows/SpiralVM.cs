@@ -1760,11 +1760,11 @@ namespace GS.Server.Windows
             switch (status)
             {
                 case SpiralPointStatus.Clear:
-                    return Brushes.White;
+                    return Application.Current.TryFindResource("SecondaryHueMidForegroundBrush") as SolidColorBrush;
                 case SpiralPointStatus.Visited:
-                    return Brushes.DimGray;
+                    return Application.Current.TryFindResource("SecondaryHueDarkBrush") as SolidColorBrush;
                 case SpiralPointStatus.Current:
-                    return Brushes.Chartreuse;
+                    return Application.Current.TryFindResource("SecondaryHueLightBrush") as SolidColorBrush;
                 default:
                     return Brushes.DarkRed;
             }
