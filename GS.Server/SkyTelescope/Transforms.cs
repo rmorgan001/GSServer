@@ -23,7 +23,7 @@ namespace GS.Server.SkyTelescope
     {
         #region Transform
 
-        private static readonly Transform xform = new Transform();
+        private static readonly Transform xForm = new Transform();
 
         ///// <summary>
         ///// Convert RA and DEC to Azimuth and Altitude using Transform
@@ -36,42 +36,42 @@ namespace GS.Server.SkyTelescope
         ///// <returns></returns>
         //private static Vector CalculateAltAz(double rightAscension, double declination, double latitude, double longitude, double elevation)
         //{
-        //    xform.SiteElevation = elevation;
-        //    xform.SiteLatitude = latitude;
-        //    xform.SiteLongitude = longitude;
-        //    xform.Refraction = SkyServer.Refraction;
+        //    xForm.SiteElevation = elevation;
+        //    xForm.SiteLatitude = latitude;
+        //    xForm.SiteLongitude = longitude;
+        //    xForm.Refraction = SkyServer.Refraction;
         //    switch (SkyServer.EquatorialCoordinateType)
         //    {
         //        case EquatorialCoordinateType.equJ2000:
-        //            xform.SetJ2000(rightAscension, declination);
+        //            xForm.SetJ2000(rightAscension, declination);
         //            break;
         //        case EquatorialCoordinateType.equLocalTopocentric:
-        //            xform.SetTopocentric(rightAscension, declination);
+        //            xForm.SetTopocentric(rightAscension, declination);
         //            break;
         //        case EquatorialCoordinateType.equOther:
-        //            xform.SetApparent(rightAscension, declination);
+        //            xForm.SetApparent(rightAscension, declination);
         //            break;
         //        case EquatorialCoordinateType.equJ2050:
-        //            xform.SetJ2000(rightAscension, declination);
+        //            xForm.SetJ2000(rightAscension, declination);
         //            break;
         //        case EquatorialCoordinateType.equB1950:
-        //            xform.SetJ2000(rightAscension, declination);
+        //            xForm.SetJ2000(rightAscension, declination);
         //            break;
         //        default:
-        //            xform.SetApparent(rightAscension, declination);
+        //            xForm.SetApparent(rightAscension, declination);
         //            break;
         //    }
         //    var r = new Vector
         //    {
-        //        X = xform.AzimuthTopocentric,
-        //        Y = xform.ElevationTopocentric
+        //        X = xForm.AzimuthTopocentric,
+        //        Y = xForm.ElevationTopocentric
         //    };
         //    return r;
         //}
 
         /// <summary>
         /// Converts RA and DEC to the required EquatorialCoordinateType
-        /// Used for all RA and DEC corrdinates comming into the system 
+        /// Used for all RA and DEC coordinates coming into the system 
         /// </summary>
         /// <param name="rightAscension"></param>
         /// <param name="declination"></param>
@@ -81,37 +81,37 @@ namespace GS.Server.SkyTelescope
             //internal is already topo so return it
             if (SkySettings.EquatorialCoordinateType == EquatorialCoordinateType.equTopocentric) return new Vector(rightAscension, declination);
 
-            xform.SiteElevation = SkySettings.Elevation;
-            xform.SiteLatitude = SkySettings.Latitude;
-            xform.SiteLongitude = SkySettings.Longitude;
-            xform.Refraction = SkySettings.Refraction;
-            xform.SiteTemperature = SkySettings.Temperature;
+            xForm.SiteElevation = SkySettings.Elevation;
+            xForm.SiteLatitude = SkySettings.Latitude;
+            xForm.SiteLongitude = SkySettings.Longitude;
+            xForm.Refraction = SkySettings.Refraction;
+            xForm.SiteTemperature = SkySettings.Temperature;
             switch (SkySettings.EquatorialCoordinateType)
             {
                 case EquatorialCoordinateType.equJ2000:
-                    xform.SetJ2000(rightAscension, declination);
+                    xForm.SetJ2000(rightAscension, declination);
                     break;
                 case EquatorialCoordinateType.equTopocentric:
                     return new Vector(rightAscension, declination);
                 case EquatorialCoordinateType.equOther:
-                    xform.SetApparent(rightAscension, declination);
+                    xForm.SetApparent(rightAscension, declination);
                     break;
                 case EquatorialCoordinateType.equJ2050:
-                    xform.SetJ2000(rightAscension, declination);
+                    xForm.SetJ2000(rightAscension, declination);
                     break;
                 case EquatorialCoordinateType.equB1950:
-                    xform.SetJ2000(rightAscension, declination);
+                    xForm.SetJ2000(rightAscension, declination);
                     break;
                 default:
-                    xform.SetTopocentric(rightAscension, declination);
+                    xForm.SetTopocentric(rightAscension, declination);
                     break;
             }
-            return new Vector(xform.RATopocentric, xform.DECTopocentric);
+            return new Vector(xForm.RATopocentric, xForm.DECTopocentric);
         }
 
         /// <summary>
         /// Converts internal stored coords to the stored EquatorialCoordinateType
-        /// Used for all RA and DEC corrdinates going out of the system  
+        /// Used for all RA and DEC coordinates going out of the system  
         /// </summary>
         /// <param name="rightAscension"></param>
         /// <param name="declination"></param>
@@ -122,33 +122,33 @@ namespace GS.Server.SkyTelescope
             //internal is already topo so return it
             if (SkySettings.EquatorialCoordinateType == EquatorialCoordinateType.equTopocentric) return new Vector(rightAscension, declination);
 
-            xform.SiteElevation = SkySettings.Elevation;
-            xform.SiteLatitude = SkySettings.Latitude;
-            xform.SiteLongitude = SkySettings.Longitude;
-            xform.Refraction = SkySettings.Refraction;
-            xform.SiteTemperature = SkySettings.Temperature;
-            xform.SetTopocentric(rightAscension, declination);
+            xForm.SiteElevation = SkySettings.Elevation;
+            xForm.SiteLatitude = SkySettings.Latitude;
+            xForm.SiteLongitude = SkySettings.Longitude;
+            xForm.Refraction = SkySettings.Refraction;
+            xForm.SiteTemperature = SkySettings.Temperature;
+            xForm.SetTopocentric(rightAscension, declination);
             switch (SkySettings.EquatorialCoordinateType)
             {
                 case EquatorialCoordinateType.equJ2000:
-                    radec.X = xform.RAJ2000;
-                    radec.Y = xform.DecJ2000;
+                    radec.X = xForm.RAJ2000;
+                    radec.Y = xForm.DecJ2000;
                     break;
                 case EquatorialCoordinateType.equTopocentric:
                     radec.X = rightAscension;
                     radec.Y = declination;
                     break;
                 case EquatorialCoordinateType.equOther:
-                    radec.X = xform.RAApparent;
-                    radec.Y = xform.DECApparent;
+                    radec.X = xForm.RAApparent;
+                    radec.Y = xForm.DECApparent;
                     break;
                 case EquatorialCoordinateType.equJ2050:
-                    radec.X = xform.RAJ2000;
-                    radec.Y = xform.DecJ2000;
+                    radec.X = xForm.RAJ2000;
+                    radec.Y = xForm.DecJ2000;
                     break;
                 case EquatorialCoordinateType.equB1950:
-                    radec.X = xform.RAJ2000;
-                    radec.Y = xform.DecJ2000;
+                    radec.X = xForm.RAJ2000;
+                    radec.Y = xForm.DecJ2000;
                     break;
                 default:
                     radec.X = rightAscension;
@@ -160,7 +160,7 @@ namespace GS.Server.SkyTelescope
 
         /// <summary>
         /// Converts internal stored coords to the stored EquatorialCoordinateType
-        /// Used for all RA corrdinates going out of the system  
+        /// Used for all RA coordinates going out of the system  
         /// </summary>
         /// <param name="rightAscension"></param>
         /// <param name="declination"></param>
@@ -170,16 +170,16 @@ namespace GS.Server.SkyTelescope
             double ra;
             //internal is already topo so return it
             if (SkySettings.EquatorialCoordinateType == EquatorialCoordinateType.equTopocentric) return rightAscension;
-            xform.SiteElevation = SkySettings.Elevation;
-            xform.SiteLatitude = SkySettings.Latitude;
-            xform.SiteLongitude = SkySettings.Longitude;
-            xform.Refraction = SkySettings.Refraction;
-            xform.SiteTemperature = SkySettings.Temperature;
-            xform.SetTopocentric(rightAscension, declination);
+            xForm.SiteElevation = SkySettings.Elevation;
+            xForm.SiteLatitude = SkySettings.Latitude;
+            xForm.SiteLongitude = SkySettings.Longitude;
+            xForm.Refraction = SkySettings.Refraction;
+            xForm.SiteTemperature = SkySettings.Temperature;
+            xForm.SetTopocentric(rightAscension, declination);
             switch (SkySettings.EquatorialCoordinateType)
             {
                 case EquatorialCoordinateType.equJ2000:
-                    ra = xform.RAJ2000;
+                    ra = xForm.RAJ2000;
                     //radec.Y = declination;
                     break;
                 case EquatorialCoordinateType.equTopocentric:
@@ -187,20 +187,20 @@ namespace GS.Server.SkyTelescope
                     //radec.Y = xform.DECTopocentric;
                     break;
                 case EquatorialCoordinateType.equOther:
-                    ra = xform.RAApparent;
+                    ra = xForm.RAApparent;
                     //radec.Y = xform.DECApparent;
                     break;
                 case EquatorialCoordinateType.equJ2050:
-                    ra = xform.RAJ2000;
+                    ra = xForm.RAJ2000;
                     //radec.Y = xform.DecJ2000;
                     break;
                 case EquatorialCoordinateType.equB1950:
-                    ra = xform.RAJ2000;
-                    //radec.Y = xform.DecJ2000;
+                    ra = xForm.RAJ2000;
+                    //radec.Y = xForm.DecJ2000;
                     break;
                 default:
                     ra = rightAscension;
-                    //radec.Y = xform.DECTopocentric;
+                    //xForm.Y = xForm.DECTopocentric;
                     break;
             }
             return ra;
@@ -208,7 +208,7 @@ namespace GS.Server.SkyTelescope
 
         /// <summary>
         /// Converts internal stored coords to the stored EquatorialCoordinateType
-        /// Used for all DEC corrdinates going out of the system  
+        /// Used for all DEC coordinates going out of the system  
         /// </summary>
         /// <param name="rightAscension"></param>
         /// <param name="declination"></param>
@@ -218,37 +218,37 @@ namespace GS.Server.SkyTelescope
             double dec;
             //internal is already topo so return it
             if (SkySettings.EquatorialCoordinateType == EquatorialCoordinateType.equTopocentric) return declination;
-            xform.SiteElevation = SkySettings.Elevation;
-            xform.SiteLatitude = SkySettings.Latitude;
-            xform.SiteLongitude = SkySettings.Longitude;
-            xform.Refraction = SkySettings.Refraction;
-            xform.SiteTemperature = SkySettings.Temperature;
-            xform.SetTopocentric(rightAscension, declination);
+            xForm.SiteElevation = SkySettings.Elevation;
+            xForm.SiteLatitude = SkySettings.Latitude;
+            xForm.SiteLongitude = SkySettings.Longitude;
+            xForm.Refraction = SkySettings.Refraction;
+            xForm.SiteTemperature = SkySettings.Temperature;
+            xForm.SetTopocentric(rightAscension, declination);
             switch (SkySettings.EquatorialCoordinateType)
             {
                 case EquatorialCoordinateType.equJ2000:
                     //ra = rightAscension;
-                    dec = xform.DecJ2000;
+                    dec = xForm.DecJ2000;
                     break;
                 case EquatorialCoordinateType.equTopocentric:
-                    //ra = xform.RATopocentric;
+                    //ra = xForm.RATopocentric;
                     dec = declination;
                     break;
                 case EquatorialCoordinateType.equOther:
                     //ra = xform.RAApparent;
-                    dec = xform.DECApparent;
+                    dec = xForm.DECApparent;
                     break;
                 case EquatorialCoordinateType.equJ2050:
-                    //ra = xform.RAJ2000;
-                    dec = xform.DecJ2000;
+                    //ra = xForm.RAJ2000;
+                    dec = xForm.DecJ2000;
                     break;
                 case EquatorialCoordinateType.equB1950:
-                    //ra = xform.RAJ2000;
-                    dec = xform.DecJ2000;
+                    //ra = xForm.RAJ2000;
+                    dec = xForm.DecJ2000;
                     break;
                 default:
-                    //ra = xform.RATopocentric;
-                    dec = xform.DECTopocentric;
+                    //ra = xForm.RATopocentric;
+                    dec = xForm.DECTopocentric;
                     break;
             }
             return dec;

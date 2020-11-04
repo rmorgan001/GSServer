@@ -14,45 +14,31 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <!--Window Title bar-->
-    <system:String x:Key="lbName">GS Server</system:String>
-    <system:String x:Key="lbApps">Applications connectées :</system:String>
-    <system:String x:Key="tbCloseApps">Applications connectées. Fermer quand même?</system:String>
-    <system:String x:Key="taskbarDescription">GreenSwamp Server</system:String>
-
     <!--Dialog -->
-    <system:String x:Key="btnAccept">Accepter</system:String>
-    <system:String x:Key="btnCancel">Annuler</system:String>
-    <system:String x:Key="btnOk">Ok</system:String>
-    <system:String x:Key="btnStart">Démarrer</system:String>
-    <system:String x:Key="btnDiaStop">Arréter</system:String>
+    <system:String x:Key="diaAccept">Accepter</system:String>
+    <system:String x:Key="diaCancel">Annuler</system:String>
+    <system:String x:Key="diaOk">Ok</system:String>
+    <system:String x:Key="diaStart">Démarrer</system:String>
+    <system:String x:Key="diaStop">Arréter</system:String>
 
     <!--Converters -->
     <system:String x:Key="cvtInvNumber">Nombre invalide</system:String>
-    <system:String x:Key="cvtColorToBrush">colorToBurshConverter ne supporte que la conversion à partir de couleur et chaine</system:String>
+    <system:String x:Key="cvtColorToBrush">ColorToBrushConverter ne supporte que la conversion à partir de couleur et chaine</system:String>
     <system:String x:Key="cvtEnumErr1">Le type doit être pour un Enum</system:String>
     <system:String x:Key="cvtEnumErr2">Le type de Enum doit être spécifié</system:String>
     <system:String x:Key="cvtInvIP">IP invalide</system:String>
     <system:String x:Key="cvtRequired">Requis</system:String>
 
-    <!--Exceptions -->
-    <system:String x:Key="exParked">Déparké en premier</system:String>
-
     <!--ChartViewer -->
-    <system:String x:Key="lbChartNumber">#</system:String>
-    <system:String x:Key="lbChartStart">Démarrer</system:String>
-    <system:String x:Key="lbChartEnd">Fin</system:String>
-    <system:String x:Key="lbChartLength">Longueur</system:String>
-    <system:String x:Key="lbChartType">Type</system:String>
-    <system:String x:Key="btnChartOpen">Ouvrir fichier</system:String>
-    <system:String x:Key="cbChartQuality">Qualité</system:String>
-    <system:String x:Key="tbChartViewLog">Voir journal</system:String>
-    <system:String x:Key="tbChartZoom">Zoom:</system:String>
-    <system:String x:Key="btntipChartShrink">Réduire X</system:String>
-    <system:String x:Key="btntipChartExpand">Agrandir X</system:String>
-    <system:String x:Key="btntipChartUp">Monter Y</system:String>
-    <system:String x:Key="btntipChartDown">Descendre Y</system:String>
-    <system:String x:Key="titChartTimeline">Ligne de temps (X)</system:String>
-    <system:String x:Key="msgNoValidRecords">Pas d'enregistrement valide</system:String>
+    <system:String x:Key="chtNumber">#</system:String>
+    <system:String x:Key="chtStart">Démarrer</system:String>
+    <system:String x:Key="chtEnd">Fin</system:String>
+    <system:String x:Key="chtLength">Longueur</system:String>
+    <system:String x:Key="chtType">Type</system:String>
+    <system:String x:Key="chtOpen">Ouvrir fichier</system:String>
+    <system:String x:Key="chtQuality">Qualité</system:String>
+    <system:String x:Key="chtViewLog">Voir journal</system:String>
+    <system:String x:Key="chtZoom">Zoom:</system:String>
+    <system:String x:Key="chtNoValidRecords">Pas d'enregistrement valide</system:String>
 </ResourceDictionary>
  

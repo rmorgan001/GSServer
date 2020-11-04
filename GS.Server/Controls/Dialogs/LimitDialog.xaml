@@ -4,14 +4,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         mc:Ignorable="d" >
-    <GroupBox Header="{StaticResource lbLimitOptions}" Margin="5">
+    <GroupBox Header="{StaticResource botLimitOptions}" Margin="5">
         <StackPanel Orientation="Vertical">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
-                <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource lbLimitOptions}"
+                <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource botLimitOptions}"
                               IsChecked="{Binding LimitTracking, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <Label Content="{StaticResource lbLimitTracking}" VerticalAlignment="Bottom"/>
+                <Label Content="{StaticResource botLimitTracking}" VerticalAlignment="Bottom"/>
             </StackPanel>
-            <Button Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding OkLimitDialogCommand}" Content="{StaticResource btnOk}"/>
+            <Button Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding OkLimitDialogCommand}" Content="{StaticResource diaOk}"/>
         </StackPanel>
     </GroupBox>
     </UserControl>

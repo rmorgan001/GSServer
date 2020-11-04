@@ -115,35 +115,35 @@ namespace GS.Principles
         /// Force range for Altitude and Azimuth
         /// </summary>
         ///  <remarks>Attention to the order given and received</remarks>
-        /// <param name="altaz"></param>
+        /// <param name="altAz"></param>
         /// <returns></returns>
-        public static double[] RangeAltAz(double[] altaz)
+        public static double[] RangeAltAz(double[] altAz)
         {
-            double[] altAz = { Range90(altaz[0]), Range360(altaz[1]) };
-            return altAz;
+            double[] a = { Range90(altAz[0]), Range360(altAz[1]) };
+            return a;
         }
 
         /// <summary>
         /// Force range for Azimuth an Altitude
         /// </summary>
         /// <remarks>Attention to the order given and received</remarks>
-        /// <param name="azalt"></param>
+        /// <param name="azAlt"></param>
         /// <returns></returns>
-        public static double[] RangeAzAlt(double[] azalt)
+        public static double[] RangeAzAlt(double[] azAlt)
         {
-            double[] azAlt = { Range360(azalt[0]), Range90(azalt[1]) };
-            return azAlt;
+            double[] a = { Range360(azAlt[0]), Range90(azAlt[1]) };
+            return a;
         }
 
         /// <summary>
         /// Force range for Right Ascension and Declination
         /// </summary>
-        /// <param name="radec"></param>
+        /// <param name="raDec"></param>
         /// <returns></returns>
-        public static double[] RangeRaDec(double[] radec)
+        public static double[] RangeRaDec(double[] raDec)
         {
-            double[] raDec = { Range24(radec[0]), Range90(radec[1]) };
-            return raDec;
+            double[] a = { Range24(raDec[0]), Range90(raDec[1]) };
+            return a;
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace GS.Principles
         }
 
         /// <summary>
-        /// Force range for secondar and primary axes
+        /// Force range for secondary and primary axes
         /// </summary>
         /// <param name="axes"></param>
         /// <returns></returns>

@@ -16,7 +16,7 @@
 
 using GS.Server.Controls.Dialogs;
 using GS.Server.Focuser;
-using GS.Server.Gamepad;
+using GS.Server.GamePad;
 using GS.Server.Helpers;
 using GS.Server.Model3D;
 using GS.Server.Notes;
@@ -50,7 +50,7 @@ namespace GS.Server.Main
         private FocuserVM _focuserVM;
         private NotesVM _notesVM;
         private SettingsVM _settingsVM;
-        private GamepadVM _gamepadVM;
+        private GamePadVM _gamePadVM;
         private Model3DVM _model3dVM;
         private PlotVM _plotVM;
         private PoleLocatorVM _poleLocatorVM;
@@ -98,7 +98,7 @@ namespace GS.Server.Main
                     UpdateTabViewModel("Charts");
                     UpdateTabViewModel("Notes");
                     UpdateTabViewModel("Settings");
-                    UpdateTabViewModel("Gamepad");
+                    UpdateTabViewModel("GamePad");
                     UpdateTabViewModel("Model3D");
                     UpdateTabViewModel("Plot");
                     UpdateTabViewModel("PoleLocator");
@@ -160,7 +160,7 @@ namespace GS.Server.Main
 
         #region Tab Control
 
-        //to add a page: add button to tabbar view, add the property below, add to properties server settings ,add property and checkbox to settingsVM and View
+        //to add a page: add button to tab bar view, add the property below, add to properties server settings ,add property and checkbox to settingsVM and View
 
         public List<IPageVM> PageViewModels
         {
@@ -188,7 +188,7 @@ namespace GS.Server.Main
                             _focuserVM = new FocuserVM();
                             PageViewModels.Add(_focuserVM);
                         }
-                        FocuserRadioVisable = true;
+                        FocuserRadioVisible = true;
                     }
                     else
                     {
@@ -196,7 +196,7 @@ namespace GS.Server.Main
                         {
                             PageViewModels.Remove(_focuserVM);
                         }
-                        FocuserRadioVisable = false;
+                        FocuserRadioVisible = false;
                     }
                     break;
                 case "Notes":
@@ -207,7 +207,7 @@ namespace GS.Server.Main
                             _notesVM = new NotesVM();
                             PageViewModels.Add(_notesVM);
                         }
-                        NotesRadioVisable = true;
+                        NotesRadioVisible = true;
                     }
                     else
                     {
@@ -215,7 +215,7 @@ namespace GS.Server.Main
                         {
                             PageViewModels.Remove(_notesVM);
                         }
-                        NotesRadioVisable = false;
+                        NotesRadioVisible = false;
                     }
                     break;
                 case "SkyWatcher":
@@ -226,7 +226,7 @@ namespace GS.Server.Main
                             _skyTelescopeVM = new SkyTelescopeVM();
                             PageViewModels.Add(_skyTelescopeVM);
                         }
-                        SkyWatcherRadioVisable = true;
+                        SkyWatcherRadioVisible = true;
                     }
                     else
                     {
@@ -234,32 +234,32 @@ namespace GS.Server.Main
                         {
                             PageViewModels.Remove(_skyTelescopeVM);
                         }
-                        SkyWatcherRadioVisable = false;
+                        SkyWatcherRadioVisible = false;
                     }
                     break;
-                case "Gamepad":
-                    if (Settings.Settings.Gamepad)
+                case "GamePad":
+                    if (Settings.Settings.GamePad)
                     {
-                        if (!PageViewModels.Contains(_gamepadVM))
+                        if (!PageViewModels.Contains(_gamePadVM))
                         {
-                            _gamepadVM = new GamepadVM();
-                            PageViewModels.Add(_gamepadVM);
+                            _gamePadVM = new GamePadVM();
+                            PageViewModels.Add(_gamePadVM);
                         }
-                        GamepadRadioVisable = true;
+                        GamePadRadioVisible = true;
                     }
                     else
                     {
-                        if (PageViewModels.Contains(_gamepadVM))
+                        if (PageViewModels.Contains(_gamePadVM))
                         {
-                            PageViewModels.Remove(_gamepadVM);
+                            PageViewModels.Remove(_gamePadVM);
                         }
-                        GamepadRadioVisable = false;
+                        GamePadRadioVisible = false;
                     }
                     break;
                 case "Settings":
                     _settingsVM = new SettingsVM();
                     PageViewModels.Add(_settingsVM);
-                    SettingsRadioVisable = true;
+                    SettingsRadioVisible = true;
                     break;
                 case "Model3D":
                     if (Settings.Settings.Model3D)
@@ -269,7 +269,7 @@ namespace GS.Server.Main
                             _model3dVM = new Model3DVM();
                             PageViewModels.Add(_model3dVM);
                         }
-                        Model3DRadioVisable = true;
+                        Model3DRadioVisible = true;
                     }
                     else
                     {
@@ -277,7 +277,7 @@ namespace GS.Server.Main
                         {
                             PageViewModels.Remove(_model3dVM);
                         }
-                        Model3DRadioVisable = false;
+                        Model3DRadioVisible = false;
                     }
                     break;
                 case "Plot":
@@ -288,7 +288,7 @@ namespace GS.Server.Main
                             _plotVM = new PlotVM();
                             PageViewModels.Add(_plotVM);
                         }
-                        PlotRadioVisable = true;
+                        PlotRadioVisible = true;
                     }
                     else
                     {
@@ -296,7 +296,7 @@ namespace GS.Server.Main
                         {
                             PageViewModels.Remove(_plotVM);
                         }
-                        PlotRadioVisable = false;
+                        PlotRadioVisible = false;
                     }
                     break;
                 case "PoleLocator":
@@ -307,7 +307,7 @@ namespace GS.Server.Main
                             _poleLocatorVM = new PoleLocatorVM();
                             PageViewModels.Add(_poleLocatorVM);
                         }
-                        PoleLocatorRadioVisable = true;
+                        PoleLocatorRadioVisible = true;
                     }
                     else
                     {
@@ -315,7 +315,7 @@ namespace GS.Server.Main
                         {
                             PageViewModels.Remove(_poleLocatorVM);
                         }
-                        PoleLocatorRadioVisable = false;
+                        PoleLocatorRadioVisible = false;
                     }
                     break;
                 case "Pulses":
@@ -326,7 +326,7 @@ namespace GS.Server.Main
                             _pulsesVM = new PulsesVM();
                             PageViewModels.Add(_pulsesVM);
                         }
-                        PulsesRadioVisable = true;
+                        PulsesRadioVisible = true;
                     }
                     else
                     {
@@ -334,7 +334,7 @@ namespace GS.Server.Main
                         {
                             PageViewModels.Remove(_pulsesVM);
                         }
-                        PulsesRadioVisable = false;
+                        PulsesRadioVisible = false;
                     }
                     break;
                 case "Test":
@@ -345,7 +345,7 @@ namespace GS.Server.Main
                             _testVM = new TestVM();
                             PageViewModels.Add(_testVM);
                         }
-                        TestRadioVisable = true;
+                        TestRadioVisible = true;
                     }
                     else
                     {
@@ -353,7 +353,7 @@ namespace GS.Server.Main
                         {
                             PageViewModels.Remove(_testVM);
                         }
-                        TestRadioVisable = false;
+                        TestRadioVisible = false;
                     }
                     break;
             }
@@ -407,14 +407,14 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _settingsRadioVisable;
-        public bool SettingsRadioVisable
+        private bool _settingsRadioVisible;
+        public bool SettingsRadioVisible
         {
-            get => _settingsRadioVisable;
+            get => _settingsRadioVisible;
             set
             {
-                if (_settingsRadioVisable == value) return;
-                _settingsRadioVisable = value;
+                if (_settingsRadioVisible == value) return;
+                _settingsRadioVisible = value;
                 OnPropertyChanged();
             }
         }
@@ -435,26 +435,14 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _skyWatcherRadioVisable;
-        public bool SkyWatcherRadioVisable
+        private bool _skyWatcherRadioVisible;
+        public bool SkyWatcherRadioVisible
         {
-            get => _skyWatcherRadioVisable;
+            get => _skyWatcherRadioVisible;
             set
             {
-                if (_skyWatcherRadioVisable == value) return;
-                _skyWatcherRadioVisable = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool __chartingRadioVisable;
-        public bool ChartingRadioVisable
-        {
-            get => __chartingRadioVisable;
-            set
-            {
-                if (__chartingRadioVisable == value) return;
-                __chartingRadioVisable = value;
+                if (_skyWatcherRadioVisible == value) return;
+                _skyWatcherRadioVisible = value;
                 OnPropertyChanged();
             }
         }
@@ -475,14 +463,14 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _notesRadioVisable;
-        public bool NotesRadioVisable
+        private bool _notesRadioVisible;
+        public bool NotesRadioVisible
         {
-            get => _notesRadioVisable;
+            get => _notesRadioVisible;
             set
             {
-                if (_notesRadioVisable == value) return;
-                _notesRadioVisable = value;
+                if (_notesRadioVisible == value) return;
+                _notesRadioVisible = value;
                 OnPropertyChanged();
             }
         }
@@ -503,42 +491,42 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _focuserRadioVisable;
-        public bool FocuserRadioVisable
+        private bool _focuserRadioVisible;
+        public bool FocuserRadioVisible
         {
-            get => _focuserRadioVisable;
+            get => _focuserRadioVisible;
             set
             {
-                if (_focuserRadioVisable == value) return;
-                _focuserRadioVisable = value;
+                if (_focuserRadioVisible == value) return;
+                _focuserRadioVisible = value;
                 OnPropertyChanged();
             }
         }
 
-        private bool _gamepadVMRadio;
-        public bool GamepadVMRadioRadio
+        private bool _gamePadVMRadio;
+        public bool GamePadVMRadioRadio
         {
-            get => _gamepadVMRadio;
+            get => _gamePadVMRadio;
             set
             {
                 using (new WaitCursor())
                 {
-                    if (_gamepadVMRadio == value) return;
-                    _gamepadVMRadio = value;
-                    if (value) ChangeViewModel(_gamepadVM);
+                    if (_gamePadVMRadio == value) return;
+                    _gamePadVMRadio = value;
+                    if (value) ChangeViewModel(_gamePadVM);
                     OnPropertyChanged();
                 }
             }
         }
 
-        private bool _gamepadRadioVisable;
-        public bool GamepadRadioVisable
+        private bool _gamePadRadioVisible;
+        public bool GamePadRadioVisible
         {
-            get => _gamepadRadioVisable;
+            get => _gamePadRadioVisible;
             set
             {
-                if (_gamepadRadioVisable == value) return;
-                _gamepadRadioVisable = value;
+                if (_gamePadRadioVisible == value) return;
+                _gamePadRadioVisible = value;
                 OnPropertyChanged();
             }
         }
@@ -559,14 +547,14 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _model3dRadioVisable;
-        public bool Model3DRadioVisable
+        private bool _model3dRadioVisible;
+        public bool Model3DRadioVisible
         {
-            get => _model3dRadioVisable;
+            get => _model3dRadioVisible;
             set
             {
-                if (_model3dRadioVisable == value) return;
-                _model3dRadioVisable = value;
+                if (_model3dRadioVisible == value) return;
+                _model3dRadioVisible = value;
                 OnPropertyChanged();
             }
         }
@@ -587,14 +575,14 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _plotRadioVisable;
-        public bool PlotRadioVisable
+        private bool _plotRadioVisible;
+        public bool PlotRadioVisible
         {
-            get => _plotRadioVisable;
+            get => _plotRadioVisible;
             set
             {
-                if (_plotRadioVisable == value) return;
-                _plotRadioVisable = value;
+                if (_plotRadioVisible == value) return;
+                _plotRadioVisible = value;
                 OnPropertyChanged();
             }
         }
@@ -616,14 +604,14 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _poleLocatorRadioVisable;
-        public bool PoleLocatorRadioVisable
+        private bool _poleLocatorRadioVisible;
+        public bool PoleLocatorRadioVisible
         {
-            get => _poleLocatorRadioVisable;
+            get => _poleLocatorRadioVisible;
             set
             {
-                if (_poleLocatorRadioVisable == value) return;
-                _poleLocatorRadioVisable = value;
+                if (_poleLocatorRadioVisible == value) return;
+                _poleLocatorRadioVisible = value;
                 OnPropertyChanged();
             }
         }
@@ -644,14 +632,14 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _pulsesRadioVisable;
-        public bool PulsesRadioVisable
+        private bool _pulsesRadioVisible;
+        public bool PulsesRadioVisible
         {
-            get => _pulsesRadioVisable;
+            get => _pulsesRadioVisible;
             set
             {
-                if (_pulsesRadioVisable == value) return;
-                _pulsesRadioVisable = value;
+                if (_pulsesRadioVisible == value) return;
+                _pulsesRadioVisible = value;
                 OnPropertyChanged();
             }
         }
@@ -672,14 +660,14 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _testRadioVisable;
-        public bool TestRadioVisable
+        private bool _testRadioVisible;
+        public bool TestRadioVisible
         {
-            get => _testRadioVisable;
+            get => _testRadioVisible;
             set
             {
-                if (_testRadioVisable == value) return;
-                _testRadioVisable = value;
+                if (_testRadioVisible == value) return;
+                _testRadioVisible = value;
                 OnPropertyChanged();
             }
         }
@@ -699,24 +687,24 @@ namespace GS.Server.Main
             }
         }
 
-        private int _appcount;
+        private int _appCount;
         public int AppCount
         {
-            get => _appcount;
+            get => _appCount;
             set
             {
-                _appcount = value;
+                _appCount = value;
                 OnPropertyChanged();
             }
         }
 
-        private MountType _mounttype;
+        private MountType _mountType;
         public MountType MountType
         {
-            get => _mounttype;
+            get => _mountType;
             set
             {
-                _mounttype = value;
+                _mountType = value;
                 var accentbrush = new SolidColorBrush(Colors.Transparent);
                 if (value == MountType.Simulator)
                 {
@@ -778,29 +766,29 @@ namespace GS.Server.Main
         }
         private void MinimizeWindow()
         {
-            Windowstate = WindowState.Minimized;
+            WindowStates = WindowState.Minimized;
             Memory.FlushMemory();
         }
 
-        private ICommand _maxmizeWindowCommand;
+        private ICommand _maximizeWindowCommand;
         public ICommand MaximizeWindowCommand
         {
             get
             {
-                var command = _maxmizeWindowCommand;
+                var command = _maximizeWindowCommand;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _maxmizeWindowCommand = new RelayCommand(
-                    param => MaxmizeWindow()
+                return _maximizeWindowCommand = new RelayCommand(
+                    param => MaximizeWindow()
                 );
             }
         }
-        private void MaxmizeWindow()
+        private void MaximizeWindow()
         {
-            Windowstate = Windowstate != WindowState.Maximized ? WindowState.Maximized : WindowState.Normal;
+            WindowStates = WindowStates != WindowState.Maximized ? WindowState.Maximized : WindowState.Normal;
         }
 
         private ICommand _normalWindowCommand;
@@ -821,10 +809,10 @@ namespace GS.Server.Main
         }
         private void NormalWindow()
         {
-            Windowstate = WindowState.Normal;
+            WindowStates = WindowState.Normal;
         }
 
-        public WindowState Windowstate
+        public WindowState WindowStates
         {
             get => Settings.Settings.Windowstate;
             set
@@ -834,7 +822,7 @@ namespace GS.Server.Main
             }
         }
 
-        public double Windowheight
+        public double WindowHeight
         {
             get => Settings.Settings.Windowheight;
             set
@@ -844,7 +832,7 @@ namespace GS.Server.Main
             }
         }
 
-        public double Windowwidth
+        public double WindowWidth
         {
             get => Settings.Settings.Windowwidth;
             set
@@ -854,7 +842,7 @@ namespace GS.Server.Main
             }
         }
 
-        public double Windowleft
+        public double WindowLeft
         {
             get => Settings.Settings.Windowleft;
             set
@@ -864,7 +852,7 @@ namespace GS.Server.Main
             }
         }
 
-        public double Windowtop
+        public double WindowTop
         {
             get => Settings.Settings.Windowtop;
             set
@@ -892,24 +880,24 @@ namespace GS.Server.Main
         }
         private void ResetWindow()
         {
-            var h = Windowheight;
-            var w = Windowwidth;
+            var h = WindowHeight;
+            var w = WindowWidth;
 
             if (Math.Abs(h - 510) > 1 || Math.Abs(w - 850) > 1)
             {
-                _tempHeight = Windowheight;
-                _tempWidth = Windowwidth;
-                _tempWindowState = Windowstate;
+                _tempHeight = WindowHeight;
+                _tempWidth = WindowWidth;
+                _tempWindowState = WindowStates;
 
-                Windowstate = WindowState.Normal;
-                Windowheight = 510;
-                Windowwidth = 850;
+                WindowStates = WindowState.Normal;
+                WindowHeight = 510;
+                WindowWidth = 850;
             }
             else
             {
-                Windowstate = _tempWindowState;
-                Windowheight = _tempHeight;
-                Windowwidth = _tempWidth;
+                WindowStates = _tempWindowState;
+                WindowHeight = _tempHeight;
+                WindowWidth = _tempWidth;
             }
 
         }
@@ -1047,7 +1035,7 @@ namespace GS.Server.Main
                 _focuserVM?.Dispose();
                 _notesVM?.Dispose();
                 _settingsVM?.Dispose();
-                _gamepadVM?.Dispose();
+                _gamePadVM?.Dispose();
                 _model3dVM?.Dispose();
                 _pulsesVM?.Dispose();
                 _mainWindowVm?.Dispose();

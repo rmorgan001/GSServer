@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019  Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2020  Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -24,10 +24,10 @@ namespace GS.Principles
     /// </summary>
     public static class HiResDateTime
     {
-        private static readonly long maxidle = TimeSpan.FromSeconds(10).Ticks;
+        private static readonly long maxIdle = TimeSpan.FromSeconds(10).Ticks;
         private const long TicksMultiplier = 1000 * TimeSpan.TicksPerMillisecond;
-        private static readonly ThreadLocal<DateTime> starttime = new ThreadLocal<DateTime>(() => DateTime.UtcNow, false);
-        private static readonly ThreadLocal<double> starttimestamp = new ThreadLocal<double>(() => Stopwatch.GetTimestamp(), false);
+        private static readonly ThreadLocal<DateTime> startTime = new ThreadLocal<DateTime>(() => DateTime.UtcNow, false);
+        private static readonly ThreadLocal<double> startTimestamp = new ThreadLocal<double>(() => Stopwatch.GetTimestamp(), false);
 
         /// <summary>
         /// High resolution supported
@@ -48,11 +48,11 @@ namespace GS.Principles
                     return DateTime.FromFileTimeUtc(preciseTime);
                 }
                 double endTimestamp = Stopwatch.GetTimestamp();
-                var durationInTicks = (endTimestamp - starttimestamp.Value) / Stopwatch.Frequency * TicksMultiplier;
-                if (!(durationInTicks >= maxidle)) return starttime.Value.AddTicks((long)durationInTicks);
-                starttimestamp.Value = Stopwatch.GetTimestamp();
-                starttime.Value = DateTime.UtcNow;
-                return starttime.Value;
+                var durationInTicks = (endTimestamp - startTimestamp.Value) / Stopwatch.Frequency * TicksMultiplier;
+                if (!(durationInTicks >= maxIdle)) return startTime.Value.AddTicks((long)durationInTicks);
+                startTimestamp.Value = Stopwatch.GetTimestamp();
+                startTime.Value = DateTime.UtcNow;
+                return startTime.Value;
             }
         }
 

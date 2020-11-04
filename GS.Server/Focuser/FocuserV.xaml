@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-             mc:Ignorable="d">
+             xmlns:focuser="clr-namespace:GS.Server.Focuser"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance focuser:FocuserVM}">
     <Grid Width="800">
         <md:DialogHost HorizontalAlignment="Center" CloseOnClickAway="True"
                        IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>

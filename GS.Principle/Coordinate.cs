@@ -25,14 +25,14 @@ namespace GS.Principles
         /// <remarks>
         /// The hour angle (HA) of an object is equal to the difference between
         /// the current local sidereal time (LST) and the right ascension of that object.
-        /// Adoped from ASCOM
+        /// Adopted from AsCom
         /// </remarks>
         /// <param name="rightAscension">In decimal hours</param>
-        /// <param name="localsiderealtime">In decimal hours</param>
+        /// <param name="localSiderealTime">In decimal hours</param>
         /// <returns>Local Hour Angles in decimal hours</returns>
-        public static double Ra2Ha12(double rightAscension, double localsiderealtime)
+        public static double Ra2Ha12(double rightAscension, double localSiderealTime)
         {
-            var a = localsiderealtime - rightAscension;
+            var a = localSiderealTime - rightAscension;
             var Ra2Ha = Range.Range12(a);
             return Ra2Ha;
         }
@@ -43,45 +43,45 @@ namespace GS.Principles
         /// <remarks>
         /// The hour angle (HA) of an object is equal to the difference between
         /// the current local sidereal time (LST) and the right ascension of that object.
-        /// Adoped from ASCOM
+        /// Adopted from AsCom
         /// </remarks>
         /// <param name="rightAscension">In decimal hours</param>
-        /// <param name="localsiderealtime">In decimal hours</param>
+        /// <param name="localSiderealTime">In decimal hours</param>
         /// <returns>Local Hour Angles in decimal hours</returns>
-        public static double Ra2Ha24(double rightAscension, double localsiderealtime)
+        public static double Ra2Ha24(double rightAscension, double localSiderealTime)
         {
-            var a = localsiderealtime - rightAscension;
+            var a = localSiderealTime - rightAscension;
             var Ra2Ha = Range.Range24(a);
             return Ra2Ha;
         }
 
         /// <summary>
         /// Right Ascension and Declination to Altitude and Azimuth
-        /// Adoped from ASCOM
+        /// Adopted from AsCom
         /// </summary>
         /// <param name="rightAscension">In decimal hours</param>
         /// <param name="declination">In decimal degrees</param>
-        /// <param name="localsiderealtime">In decimal hours</param>
+        /// <param name="localSiderealTime">In decimal hours</param>
         /// <param name="latitude">In decimal degrees</param>
-        /// <returns>Array of Azmith, Altitude in decimal degrees</returns>
-        public static double[] RaDec2AltAz(double rightAscension, double declination, double localsiderealtime, double latitude)
+        /// <returns>Array of Azimuth, Altitude in decimal degrees</returns>
+        public static double[] RaDec2AltAz(double rightAscension, double declination, double localSiderealTime, double latitude)
         {
-            var a = Ra2Ha12(rightAscension, localsiderealtime);
+            var a = Ra2Ha12(rightAscension, localSiderealTime);
             var RaDec2AltAz = HaDec2AltAz(a, declination, latitude);
             return RaDec2AltAz;
         }
 
         /// <summary>
         /// Hour Angles and Declination to Altitude and Azimuth
-        /// Adoped from ASCOM
+        /// Adopted from AsCom
         /// </summary>
-        /// <param name="hourangle">Local Hour angle</param>
+        /// <param name="hourAngle">Local Hour angle</param>
         /// <param name="declination">In decimal degrees</param>
         /// <param name="latitude">In decimal degrees</param>
-        /// <returns>Array of Azmith, Altitude in decimal degrees</returns>
-        public static double[] HaDec2AltAz(double hourangle, double declination, double latitude)
+        /// <returns>Array of Azimuth, Altitude in decimal degrees</returns>
+        public static double[] HaDec2AltAz(double hourAngle, double declination, double latitude)
         {
-            var a = Units.Hrs2Rad(hourangle);
+            var a = Units.Hrs2Rad(hourAngle);
             var b = Units.Deg2Rad(declination);
             var c = Units.Deg2Rad(latitude);
             var d = Math.Sin(a);
@@ -104,15 +104,15 @@ namespace GS.Principles
 
         /// <summary>
         /// Hour Angles and Declination to Azimuth
-        /// Adoped from ASCOM
+        /// Adopted from AsCom
         /// </summary>
-        /// <param name="hourangle">In Decimal Hours</param>
+        /// <param name="hourAngle">In Decimal Hours</param>
         /// <param name="declination">In decimal degrees</param>
         /// <param name="latitude">In decimal degrees</param>
-        /// <returns>Azmith in decimal degrees</returns>
-        public static double HaDec2Azm(double hourangle, double declination, double latitude)
+        /// <returns>Azimuth in decimal degrees</returns>
+        public static double HaDec2Azm(double hourAngle, double declination, double latitude)
         {
-            var a = Units.Hrs2Rad(hourangle);
+            var a = Units.Hrs2Rad(hourAngle);
             var b = Units.Deg2Rad(declination);
             var c = Units.Deg2Rad(latitude);
             var d = Math.Sin(a);
@@ -130,15 +130,15 @@ namespace GS.Principles
 
         /// <summary>
         /// Hour Angles and Declination to Altitude
-        /// Adoped from ASCOM
+        /// Adopted from AsCom
         /// </summary>
-        /// <param name="hourangle">In Decimal Hours</param>
+        /// <param name="hourAngle">In Decimal Hours</param>
         /// <param name="declination">In decimal degrees</param>
         /// <param name="latitude">In decimal degrees</param>
         /// <returns>Altitude in decimal degrees</returns>
-        public static double HaDec2Alt(double hourangle, double declination, double latitude)
+        public static double HaDec2Alt(double hourAngle, double declination, double latitude)
         {
-            var a = Units.Hrs2Rad(hourangle);
+            var a = Units.Hrs2Rad(hourAngle);
             var b = Units.Deg2Rad(declination);
             var c = Units.Deg2Rad(latitude);
             //var d = Math.Sin(a);
@@ -170,7 +170,7 @@ namespace GS.Principles
 
         /// <summary>
         /// Azimuth and Altitude to Declination
-        /// Adoped from ASCOM
+        /// Adopted from AsCom
         /// </summary>
         /// <param name="altitude">In decimal degrees</param>
         /// <param name="azimuth">In decimal degrees</param>
@@ -195,7 +195,7 @@ namespace GS.Principles
 
         /// <summary>
         /// Azimuth and Altitude to Right Ascension
-        /// Adoped from ASCOM
+        /// Adopted from AsCom
         /// </summary>
         /// <param name="altitude">In decimal degrees</param>
         /// <param name="azimuth">In decimal degrees</param>

@@ -56,7 +56,7 @@ namespace GS.Server.Cdc
             _tcpClient?.Connect(Ip, Port);
             if (!_tcpClient.Connected)
             {
-                throw new Exception(Application.Current.Resources["msgCdcNotFound"].ToString());
+                throw new Exception(Application.Current.Resources["cdcNotFound"].ToString());
             }
 
         }
@@ -158,7 +158,7 @@ namespace GS.Server.Cdc
             }
             else
             {
-                throw new Exception(Application.Current.Resources["msgOBNotFound"].ToString());
+                throw new Exception(Application.Current.Resources["cdcOBNotFound"].ToString());
             }
             return darray;
         }

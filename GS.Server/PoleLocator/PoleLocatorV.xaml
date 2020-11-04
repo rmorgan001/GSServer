@@ -5,16 +5,17 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:GS.Server.Domain"
-             mc:Ignorable="d">
+             xmlns:poleLocator="clr-namespace:GS.Server.PoleLocator"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance poleLocator:PoleLocatorVM}">
     <UserControl.Resources>
         <ResourceDictionary>
             <domain:UtcToLocalDateTimeConverter x:Key="UTCtoLocal" />
             <BooleanToVisibilityConverter x:Key="BoolToVis" />
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid MinWidth="600">
-        <md:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" CloseOnClickAway="True" />
-        <Grid Margin="5,5" ClipToBounds="True">
+    <md:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" CloseOnClickAway="True" >
+        <Grid MinWidth="600">
+       <Grid Margin="5,5" ClipToBounds="True">
             <Grid.RowDefinitions>
                 <RowDefinition Height="10" />
                 <RowDefinition />
@@ -29,43 +30,43 @@
                 <StackPanel Orientation="Vertical" Grid.Column="0" HorizontalAlignment="Left" Margin="0,35,0,0">
                     <StackPanel Orientation="Horizontal">
                     <TextBlock HorizontalAlignment="Center" Text="Pole Locator:"/>
-                        <TextBlock Text="{StaticResource tbPolaris}" Margin="5,0,0,0" Visibility="{Binding NorthernHemisphere, Converter={StaticResource BoolToVis}}"/>
-                        <TextBlock Text="{StaticResource tbOctans}" Margin="5,0,0,0"  Visibility="{Binding SouthernHemisphere, Converter={StaticResource BoolToVis}}" />
+                        <TextBlock Text="{StaticResource polPolaris}" Margin="5,0,0,0" Visibility="{Binding NorthernHemisphere, Converter={StaticResource BoolToVis}}"/>
+                        <TextBlock Text="{StaticResource polOct}" Margin="5,0,0,0"  Visibility="{Binding SouthernHemisphere, Converter={StaticResource BoolToVis}}" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" >
                         <TextBlock Text="{Binding Ra}" Margin="5,5,0,0"/>
                     </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="10">
-                        <CheckBox Height="25" Width="25" IsChecked="{Binding MirrorFlip}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource cbMirrorFlip}" />
-                        <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource cbMirrorFlip}" />
+                        <CheckBox Height="25" Width="25" IsChecked="{Binding MirrorFlip}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource polMirrorFlip}" />
+                        <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource polMirrorFlip}" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" >
-                            <TextBlock Text="{StaticResource tbLatitude}" Margin="5"/>
+                            <TextBlock Text="{StaticResource polLat}" Margin="5"/>
                             <TextBlock Text="{Binding Lat}" Margin="5" Foreground="{StaticResource SecondaryAccentBrush}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{StaticResource tbLongitude}" Margin="5"/>
+                        <TextBlock Text="{StaticResource polLong}" Margin="5"/>
                             <TextBlock Text="{Binding Long}" Margin="5" Foreground="{StaticResource SecondaryAccentBrush}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{StaticResource tbLDate}" Margin="5"/>
+                            <TextBlock Text="{StaticResource polLDate}" Margin="5"/>
                             <TextBlock Text="{Binding UTCNow, Converter={StaticResource UTCtoLocal}, StringFormat={}{0:d}}" Margin="5" Foreground="{StaticResource SecondaryAccentBrush}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{StaticResource tbLTime}" Margin="5"/>
+                            <TextBlock Text="{StaticResource polLTime}" Margin="5"/>
                             <TextBlock Text="{Binding UTCNow, Converter={StaticResource UTCtoLocal}, StringFormat={}{0:t}}" Margin="5" Foreground="{StaticResource SecondaryAccentBrush}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{StaticResource tbLST}" Margin="5"/>
+                            <TextBlock Text="{StaticResource polLST}" Margin="5"/>
                         <TextBlock Text="{Binding LST}" Margin="5" Foreground="{StaticResource SecondaryAccentBrush}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{StaticResource tbHADeg}" Margin="5"/>
+                            <TextBlock Text="{StaticResource polHADeg}" Margin="5"/>
                             <TextBlock Text="{Binding Ha12Str, StringFormat={}{0:0}}" Margin="5" Foreground="{StaticResource SecondaryAccentBrush}"/>
                             <TextBlock Text="{Binding HaDeg, StringFormat={}{0:(0.#°)}}" Margin="5" Foreground="{StaticResource SecondaryAccentBrush}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{StaticResource tbHAFlipDeg}" Margin="5"/>
+                            <TextBlock Text="{StaticResource polHAFlipDeg}" Margin="5"/>
                         <TextBlock Text="{Binding HaFlipDeg, StringFormat={}{0:0.#°}}" Margin="5" Foreground="{StaticResource SecondaryAccentBrush}"/>
                     </StackPanel>
                 </StackPanel>
@@ -290,4 +291,5 @@
             </Grid>
         </Grid>
     </Grid>
+     </md:DialogHost>
 </UserControl>

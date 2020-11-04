@@ -35,7 +35,7 @@ namespace GS.Utilities
         }
 
         /// <summary>
-        /// Hack to get arround the strongnamer and material design not loading baml correctly
+        /// Hack to get around the strongName and material design not loading BAML correctly
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>

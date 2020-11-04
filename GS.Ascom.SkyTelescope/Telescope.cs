@@ -597,7 +597,7 @@ namespace ASCOM.GS.Sky.Telescope
             get
             {
                 CheckCapability(SkySettings.CanEquatorial, "Declination", false);
-                var dec = SkyServer.DeclinationXform;
+                var dec = SkyServer.DeclinationXForm;
 
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(dec, "° ", ":", "", 2)}" };
@@ -736,7 +736,7 @@ namespace ASCOM.GS.Sky.Telescope
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "GS.Shared.MonitorEntry.set_Message(System.String)")]
         public void FindHome()
         {
-            if (!SkyServer.AscomOn) return;
+            if (!SkyServer.AsComOn) return;
             CheckCapability(SkySettings.CanFindHome, "FindHome");
             CheckParked("FindHome");
             SkyServer.GoToHome();
@@ -855,7 +855,7 @@ namespace ASCOM.GS.Sky.Telescope
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "GS.Shared.MonitorEntry.set_Message(System.String)")]
         public void MoveAxis(TelescopeAxes Axis, double Rate)
         {
-            if (!SkyServer.AscomOn) return;
+            if (!SkyServer.AsComOn) return;
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
@@ -907,7 +907,7 @@ namespace ASCOM.GS.Sky.Telescope
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "GS.Shared.MonitorEntry.set_Message(System.String)")]
         public void Park()
         {
-            if (!SkyServer.AscomOn) return;
+            if (!SkyServer.AsComOn) return;
             MonitorEntry monitorItem;
             CheckCapability(SkySettings.CanPark, "Park");
             if (SkyServer.AtPark)
@@ -934,7 +934,7 @@ namespace ASCOM.GS.Sky.Telescope
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object)")]
         public void PulseGuide(GuideDirections Direction, int Duration)
         {
-            if (!SkyServer.AscomOn) return;
+            if (!SkyServer.AsComOn) return;
 
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{Direction},{Duration}") };
@@ -946,7 +946,7 @@ namespace ASCOM.GS.Sky.Telescope
             CheckCapability(SkySettings.CanPulseGuide, "PulseGuide");
             CheckRange(Duration, 0, 30000, "PulseGuide", "Duration");
             SkyServer.PulseGuide(Direction, Duration);
-            if (!SkySettings.CanDualAxisPulseGuide) Thread.Sleep(Duration); // Must be synchronous so wait out the pulseguide duration here
+            if (!SkySettings.CanDualAxisPulseGuide) Thread.Sleep(Duration); // Must be synchronous so wait out the pulse guide duration here
         }
 
         /// <inheritdoc />
@@ -960,7 +960,7 @@ namespace ASCOM.GS.Sky.Telescope
             get
             {
                 CheckCapability(SkySettings.CanEquatorial, "RightAscension", false);
-                var ra = SkyServer.RightAscensionXform;
+                var ra = SkyServer.RightAscensionXForm;
 
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.HoursToHMS(ra, "h ", ":", "", 2)}" };
@@ -1035,6 +1035,10 @@ namespace ASCOM.GS.Sky.Telescope
                 Thread.Sleep(100);
                 if (SkyServer.OpenSetupDialogFinished) break;
             }
+
+            monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Open:{SkyServer.OpenSetupDialog}, Finished:{SkyServer.OpenSetupDialogFinished}" };
+            MonitorLog.LogToMonitor(monitorItem);
 
         }
 
@@ -1199,7 +1203,7 @@ namespace ASCOM.GS.Sky.Telescope
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "GS.Shared.MonitorEntry.set_Message(System.String)")]
         public void SlewToAltAz(double Azimuth, double Altitude)
         {
-            if (!SkyServer.AscomOn) return;
+            if (!SkyServer.AsComOn) return;
 
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(Azimuth, "° ", ":", "", 2)},{_util.DegreesToDMS(Altitude, "° ", ":", "", 2)}" };
@@ -1208,7 +1212,7 @@ namespace ASCOM.GS.Sky.Telescope
             CheckCapability(SkySettings.CanSlewAltAz, "SlewToAltAz");
             CheckParked("SlewToAltAz");
             CheckTracking(false, "SlewToAltAz");
-            CheckRange(Azimuth, 0, 360, "SlewToltAz", "azimuth");
+            CheckRange(Azimuth, 0, 360, "SlewToAltAz", "azimuth");
             CheckRange(Altitude, -90, 90, "SlewToAltAz", "Altitude");
             SkyServer.SlewAltAz(Altitude, Azimuth);
             while (SkyServer.SlewState == SlewType.SlewAltAz || SkyServer.SlewState == SlewType.SlewSettle)
@@ -1222,7 +1226,7 @@ namespace ASCOM.GS.Sky.Telescope
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "GS.Shared.MonitorEntry.set_Message(System.String)")]
         public void SlewToAltAzAsync(double Azimuth, double Altitude)
         {
-            if (!SkyServer.AscomOn) return;
+            if (!SkyServer.AsComOn) return;
 
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(Azimuth, "° ", ":", "", 2)},{_util.DegreesToDMS(Altitude, "° ", ":", "", 2)}" };
@@ -1239,7 +1243,7 @@ namespace ASCOM.GS.Sky.Telescope
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "GS.Shared.MonitorEntry.set_Message(System.String)")]
         public void SlewToCoordinates(double RightAscension, double Declination)
         {
-            if (!SkyServer.AscomOn) return;
+            if (!SkyServer.AsComOn) return;
 
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.HoursToHMS(RightAscension, "h ", ":", "", 2)},{_util.DegreesToDMS(Declination, "° ", ":", "", 2)}" };
@@ -1266,7 +1270,7 @@ namespace ASCOM.GS.Sky.Telescope
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "GS.Shared.MonitorEntry.set_Message(System.String)")]
         public void SlewToCoordinatesAsync(double RightAscension, double Declination)
         {
-            if (!SkyServer.AscomOn) return;
+            if (!SkyServer.AsComOn) return;
 
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.HoursToHMS(RightAscension, "h ", ":", "", 2)},{_util.DegreesToDMS(Declination, "° ", ":", "", 2)}" };
@@ -1288,7 +1292,7 @@ namespace ASCOM.GS.Sky.Telescope
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "GS.Shared.MonitorEntry.set_Message(System.String)")]
         public void SlewToTarget()
         {
-            if (!SkyServer.AscomOn) return;
+            if (!SkyServer.AsComOn) return;
 
             var ra = SkyServer.TargetRa;
             var dec = SkyServer.TargetDec;
@@ -1323,7 +1327,7 @@ namespace ASCOM.GS.Sky.Telescope
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "GS.Shared.MonitorEntry.set_Message(System.String)")]
         public void SlewToTargetAsync()
         {
-            if (!SkyServer.AscomOn) return;
+            if (!SkyServer.AsComOn) return;
 
             var ra = SkyServer.TargetRa;
             var dec = SkyServer.TargetDec;
@@ -1449,7 +1453,7 @@ namespace ASCOM.GS.Sky.Telescope
             }
             set
             {
-                if (!SkyServer.AscomOn) return;
+                if (!SkyServer.AsComOn) return;
 
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(value, "° ", ":", "", 2)}" };
@@ -1482,7 +1486,7 @@ namespace ASCOM.GS.Sky.Telescope
             }
             set
             {
-                if (!SkyServer.AscomOn) return;
+                if (!SkyServer.AsComOn) return;
 
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.HoursToHMS(value, "h ", ":", "", 2)}" };
@@ -1513,7 +1517,7 @@ namespace ASCOM.GS.Sky.Telescope
             }
             set
             {
-                if (!SkyServer.AscomOn) return;
+                if (!SkyServer.AsComOn) return;
 
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
@@ -1866,7 +1870,7 @@ namespace ASCOM.GS.Sky.Telescope
         }
 
         /// <summary>
-        /// Allow application events to occur while witing for something
+        /// Allow application events to occur while waiting for something
         /// </summary>
         private static void DoEvents()
         {
@@ -1896,7 +1900,7 @@ namespace ASCOM.GS.Sky.Telescope
                     delay += SkySettings.DisplayInterval;
                     break;
                 case MountType.SkyWatcher:
-                    delay += 20;  // some gotos have been off .10 to .70 seconds, not sure exactly why
+                    delay += 20;  // some go tos have been off .10 to .70 seconds, not sure exactly why
                     delay += SkySettings.DisplayInterval;
                     break;
             }
@@ -1912,7 +1916,7 @@ namespace ASCOM.GS.Sky.Telescope
 
         public void Dispose()
         {
-            // tried destructor from objectbase and doesn't work
+            // tried destructor from object base and doesn't work
             // disposed seems to not run, not sure why
             Dispose(true);
             //GC.SuppressFinalize(this);

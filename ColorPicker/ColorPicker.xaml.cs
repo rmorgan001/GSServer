@@ -17,16 +17,19 @@ namespace ColorPicker
     /// This class borrows an idea or two from the following source(s)
     /// 
     /// AlphaSlider, and Preview box
+    /// ReSharper disable once CommentTypo
     /// Based on an article by ShawnVN's Blog
     /// http://weblogs.asp.net/savanness/archive/2006/12/05/colorcomb-yet-another-color-picker-dialog-for-wpf.aspx
     /// 
     /// 1*1 pixel copy
+    /// ReSharper disable once CommentTypo
     /// Based on an article by Lee Brimelow 
     /// http://thewpfblog.com/?p=62
     /// </summary>
     /// 
 	/// <summary>
-	/// Interaktionslogik für "MainControl.xaml"
+    /// ReSharper disable once CommentTypo
+    /// Interaktionslogik für "MainControl.xaml"
 	/// </summary>
     public partial class ColorPickerControl
     {
@@ -114,7 +117,7 @@ namespace ColorPicker
         /// use that and copy the new 1*1 image pixels to a byte array and
         /// then construct a Color from that.
         /// </summary>
-        private void CanvImage_MouseMove(object sender, MouseEventArgs e)
+        private void CanvasImage_MouseMove(object sender, MouseEventArgs e)
         {
             if (!IsMouseDown)
                 return;
@@ -122,24 +125,19 @@ namespace ColorPicker
             try
             {
                 var cb = new CroppedBitmap(ColorImage.Source as BitmapSource ?? throw new InvalidOperationException(),
-                    new Int32Rect((int)Mouse.GetPosition(CanvImage).X,
-                        (int)Mouse.GetPosition(CanvImage).Y, 1, 1));
+                    new Int32Rect((int)Mouse.GetPosition(CanvasImage).X,
+                        (int)Mouse.GetPosition(CanvasImage).Y, 1, 1));
 
                 var pixels = new byte[4];
 
-                try
-                {
+
                     cb.CopyPixels(pixels, 4, 0);
-                }
-                catch (Exception)
-                {
-                    //Ooops
-                }
+
 
                 //Ok now, so update the mouse cursor position and the SelectedColor
-                ellipsePixel.SetValue(Canvas.LeftProperty, Mouse.GetPosition(CanvImage).X - 5);
-                ellipsePixel.SetValue(Canvas.TopProperty, Mouse.GetPosition(CanvImage).Y - 5);
-                CanvImage.InvalidateVisual();
+                ellipsePixel.SetValue(Canvas.LeftProperty, Mouse.GetPosition(CanvasImage).X - 5);
+                ellipsePixel.SetValue(Canvas.TopProperty, Mouse.GetPosition(CanvasImage).Y - 5);
+                CanvasImage.InvalidateVisual();
                 SelectedColor = Color.FromArgb((byte)AlphaSlider.Value, pixels[2], pixels[1], pixels[0]);
             }
             catch (Exception)
@@ -181,7 +179,7 @@ namespace ColorPicker
         }
 
         /// <summary>
-        /// Update SelectedColor Aplha based on Slider value
+        /// Update SelectedColor Alpha based on Slider value
         /// </summary>
         private void AlphaSlider_ValueChanged(object sender,
             RoutedPropertyChangedEventArgs<double> e)
@@ -197,7 +195,7 @@ namespace ColorPicker
         /// <summary>
         /// Change IsMouseDown state
         /// </summary>
-        private void CanvImage_MouseDown(object sender, MouseButtonEventArgs e)
+        private void CanvasImage_MouseDown(object sender, MouseButtonEventArgs e)
         {
             IsMouseDown = true;
         }
@@ -205,7 +203,7 @@ namespace ColorPicker
         /// <summary>
         /// Change IsMouseDown state
         /// </summary>
-        private void CanvImage_MouseUp(object sender, MouseButtonEventArgs e)
+        private void CanvasImage_MouseUp(object sender, MouseButtonEventArgs e)
         {
             IsMouseDown = false;
         }

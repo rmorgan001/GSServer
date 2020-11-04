@@ -63,8 +63,8 @@ namespace GS.Server.Model3D
             LoadGEM();
             Rotate();
 
-            ActualAxisX = $"--.--";
-            ActualAxisY = $"--.--";
+            ActualAxisX = "--.--";
+            ActualAxisY = "--.--";
             CameraVis = false;
             RaAxisVis = false;
             DecAxisVis = false;
@@ -74,7 +74,7 @@ namespace GS.Server.Model3D
             AltVis = true;
             TopVis = true;
             ScreenEnabled = SkyServer.IsMountRunning;
-            ModelWinVisability = true;
+            ModelWinVisibility = true;
             ModelType = Settings.Settings.ModelType;
         }
 
@@ -101,15 +101,15 @@ namespace GS.Server.Model3D
                          if (!AzVis) return;
                          Azimuth = _util.DegreesToDMS(SkyServer.Azimuth, "° ", ":", "", 2);
                          break;
-                     case "DeclinationXform":
+                     case "DeclinationXForm":
                          if (!DecVis) return;
-                         Declination = _util.DegreesToDMS(SkyServer.DeclinationXform, "° ", ":", "", 2);
+                         Declination = _util.DegreesToDMS(SkyServer.DeclinationXForm, "° ", ":", "", 2);
                          break;
                      case "Lha":
                          Lha = _util.HoursToHMS(SkyServer.Lha, "h ", ":", "", 2);
                          break;
-                     case "RightAscensionXform":
-                         RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXform, "h ", ":", "", 2);
+                     case "RightAscensionXForm":
+                         RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
                          Rotate();
                          break;
                      case "IsMountRunning":
@@ -205,14 +205,14 @@ namespace GS.Server.Model3D
             }
         }
 
-        private bool _modelWinVisability;
-        public bool ModelWinVisability
+        private bool _modelWinVisibility;
+        public bool ModelWinVisibility
         {
-            get => _modelWinVisability;
+            get => _modelWinVisibility;
             set
             {
-                if (_modelWinVisability == value) return;
-                _modelWinVisability = value;
+                if (_modelWinVisibility == value) return;
+                _modelWinVisibility = value;
                 OnPropertyChanged();
             }
         }
@@ -261,7 +261,7 @@ namespace GS.Server.Model3D
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -301,16 +301,16 @@ namespace GS.Server.Model3D
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
         #endregion
 
         #region Viewport3D
-        private double xaxisOffset;
-        private double yaxisOffset;
-        private double zaxisOffset;
+        private double xAxisOffset;
+        private double yAxisOffset;
+        private double zAxisOffset;
         private string _imageFile;
         public string ImageFile
         {
@@ -515,83 +515,83 @@ namespace GS.Server.Model3D
             }
         }
 
-        private double _xaxis;
-        public double Xaxis
+        private double _xAxis;
+        public double XAxis
         {
-            get => _xaxis;
+            get => _xAxis;
             set
             {
-                _xaxis = value;
-                XaxisOffset = value + xaxisOffset;
+                _xAxis = value;
+                XAxisOffset = value + xAxisOffset;
                 OnPropertyChanged();
             }
         }
 
-        private double _yaxis;
-        public double Yaxis
+        private double _yAxis;
+        public double YAxis
         {
-            get => _yaxis;
+            get => _yAxis;
             set
             {
-                _yaxis = value;
-                YaxisOffset = value + yaxisOffset;
+                _yAxis = value;
+                YAxisOffset = value + yAxisOffset;
                 OnPropertyChanged();
             }
         }
 
-        private double _zaxis;
-        public double Zaxis
+        private double _zAxis;
+        public double ZAxis
         {
-            get => _zaxis;
+            get => _zAxis;
             set
             {
-                _zaxis = value;
-                ZaxisOffset = zaxisOffset - value;
+                _zAxis = value;
+                ZAxisOffset = zAxisOffset - value;
                 OnPropertyChanged();
             }
         }
 
-        private double _xaxisOffset;
-        public double XaxisOffset
+        private double _xAxisOffset;
+        public double XAxisOffset
         {
-            get => _xaxisOffset;
+            get => _xAxisOffset;
             set
             {
-                _xaxisOffset = value;
+                _xAxisOffset = value;
                 OnPropertyChanged();
             }
         }
 
-        private double _yaxisOffset;
-        public double YaxisOffset
+        private double _yAxisOffset;
+        public double YAxisOffset
         {
-            get => _yaxisOffset;
+            get => _yAxisOffset;
             set
             {
-                _yaxisOffset = value;
+                _yAxisOffset = value;
                 OnPropertyChanged();
             }
         }
 
-        private double _zaxisOffset;
-        public double ZaxisOffset
+        private double _zAxisOffset;
+        public double ZAxisOffset
         {
-            get => _zaxisOffset;
+            get => _zAxisOffset;
             set
             {
-                _zaxisOffset = value;
+                _zAxisOffset = value;
                 OnPropertyChanged();
             }
         }
 
-        private Model3DType _modeltype;
+        private Model3DType _modelType;
         public Model3DType ModelType
         {
-            get => _modeltype;
+            get => _modelType;
             set
             {
-                if (_modeltype == value) return;
-                _modeltype = value;
+                if (_modelType == value) return;
+                _modelType = value;
                 Settings.Settings.ModelType = value;
                 OnPropertyChanged();
             }
@@ -620,14 +620,14 @@ namespace GS.Server.Model3D
                 Position = Settings.Settings.ModelPosition1;
 
                 //offset for model to match start position
-                xaxisOffset = 90;
-                yaxisOffset = -90;
-                zaxisOffset = 0;
+                xAxisOffset = 90;
+                yAxisOffset = -90;
+                zAxisOffset = 0;
 
                 //start position
-                Xaxis = -90;
-                Yaxis = 90;
-                Zaxis = Math.Round(Math.Abs(SkySettings.Latitude),2);
+                XAxis = -90;
+                YAxis = 90;
+                ZAxis = Math.Round(Math.Abs(SkySettings.Latitude),2);
 
                 //load model and compass
                 var import = new ModelImporter();
@@ -671,7 +671,7 @@ namespace GS.Server.Model3D
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
         private void Rotate()
@@ -679,8 +679,8 @@ namespace GS.Server.Model3D
             var axes = Shared.Model3D.RotateModel(SkySettings.Mount.ToString(), SkyServer.ActualAxisX,
                 SkyServer.ActualAxisY, SkyServer.SouthernHemisphere);
 
-            Yaxis = axes[0];
-            Xaxis = axes[1];
+            YAxis = axes[0];
+            XAxis = axes[1];
         }
 
         #endregion
@@ -827,7 +827,7 @@ namespace GS.Server.Model3D
         private void OpenDialog(string msg, string caption = null)
         {
             if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["msgDialog"].ToString();
+            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
             DialogContent = new DialogOK();
             IsDialogOpen = true;
 

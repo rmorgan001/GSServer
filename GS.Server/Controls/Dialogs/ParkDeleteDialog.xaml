@@ -3,13 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        mc:Ignorable="d" >
-    <GroupBox Header="{StaticResource msgParkDelete}" Margin="5">
+        xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+    <GroupBox Header="{StaticResource skyParkDelete}" Margin="5">
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
             <TextBlock HorizontalAlignment="Center" Text="{Binding Path=ParkSelectionSetting.Name, StringFormat='&quot; {0} &quot;'}" />
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5">
-            <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource btnAccept}" Command="{Binding AcceptParkDeleteDialogCommand}"/>
-            <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource btnCancel}" Command="{Binding CancelParkDeleteDialogCommand}"/>
+            <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaAccept}" Command="{Binding AcceptParkDeleteDialogCommand}"/>
+            <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaCancel}" Command="{Binding CancelParkDeleteDialogCommand}"/>
             </StackPanel>
         </StackPanel>
     </GroupBox>

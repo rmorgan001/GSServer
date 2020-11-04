@@ -162,7 +162,7 @@ namespace GS.Principles
 
         /// <summary>
         /// Local Sidereal Time
-        /// Adoped from the ASCOM .net telescope simulator
+        /// Adopted from the ASCOM .net telescope simulator
         /// </summary>
         /// <param name="ejd">2000, 1, 1, 12, 0, 0</param>
         /// <param name="jd">2009, 6, 19, 4, 40, 5, 230</param>

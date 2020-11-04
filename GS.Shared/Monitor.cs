@@ -125,9 +125,9 @@ namespace GS.Shared
         }
 
         /// <summary>
-        /// Turns on charting for CmdjSentEntry
+        /// Turns on charting for CmdJSentEntry
         /// </summary>
-        public static bool GetjEntries { get; set; }
+        public static bool GetJEntries { get; set; }
 
         /// <summary>
         /// Turns on charting for pulses
@@ -218,20 +218,20 @@ namespace GS.Shared
         /// <summary>
         /// Turn on/off entry types that trigger the OnPropertyChanged event
         /// </summary>
-        /// <param name="entrytype"></param>
+        /// <param name="entryType"></param>
         /// <param name="add"></param>
-        public static void TypesToMonitor(MonitorType entrytype, bool add)
+        public static void TypesToMonitor(MonitorType entryType, bool add)
         {
             if (add)
             {
-                _typesCheckList.Add(entrytype);
+                _typesCheckList.Add(entryType);
             }
             else
             {
-                _typesCheckList.Remove(entrytype);
+                _typesCheckList.Remove(entryType);
             }
 
-            Save_MonitorType(entrytype, add);
+            Save_MonitorType(entryType, add);
         }
 
         /// <summary>
@@ -277,7 +277,7 @@ namespace GS.Shared
         {
             entry.Message = entry.Message.Trim();
             entry.Method = entry.Method.Trim();
-            // dont add to queue if not needed
+            // don't add to queue if not needed
             switch (entry.Type)
             {
                 case MonitorType.Warning:
@@ -286,7 +286,7 @@ namespace GS.Shared
                     MonitorQueue.AddEntry(entry);
                     break;
                 case MonitorType.Data:
-                    if (GetjEntries || Settings.StartMonitor) MonitorQueue.AddEntry(entry);
+                    if (GetJEntries || Settings.StartMonitor) MonitorQueue.AddEntry(entry);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -362,15 +362,15 @@ namespace GS.Shared
     {
         public int Axis { get; set; }
         public DateTime StartTime { get; set; }
-        public long PositionStart { get; set; }
-        public long PositionEnd { get; set; }
-        public DateTime EndTime { get; set; }
+    //    public long PositionStart { get; set; }
+    //    public long PositionEnd { get; set; }
+    //    public DateTime EndTime { get; set; }
         public double Duration { get; set; }
         public double Rate { get; set; }
-        public int BacklashSteps { get; set; }
-        public bool PPECon { get; set; }
-        public bool AltPPECon { get; set; }
-        public double Declination { get; set; }
+     //   public int BacklashSteps { get; set; }
+     //   public bool PPECon { get; set; }
+     //   public bool AltPPECon { get; set; }
+    //    public double Declination { get; set; }
         public bool Rejected { get; set; }
     }
 

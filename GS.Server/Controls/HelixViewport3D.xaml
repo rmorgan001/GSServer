@@ -6,8 +6,8 @@
              xmlns:h="http://helix-toolkit.org/wpf"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}" d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <domain:NullImageConverter x:Key="NullImage" />
@@ -31,17 +31,17 @@
                         <TranslateTransform3D OffsetX="1" OffsetY="0" OffsetZ="0" />
                         <RotateTransform3D CenterX="0" CenterY="-104" CenterZ="525">
                             <RotateTransform3D.Rotation>
-                                <AxisAngleRotation3D Axis="1 0 2000" Angle="{Binding XaxisOffset}" />
+                                <AxisAngleRotation3D Axis="1 0 2000" Angle="{Binding XAxisOffset}" />
                             </RotateTransform3D.Rotation>
                         </RotateTransform3D>
                         <RotateTransform3D CenterX="0" CenterY="-102" CenterZ="525">
                             <RotateTransform3D.Rotation>
-                                    <AxisAngleRotation3D Axis="0 1 0" Angle="{Binding YaxisOffset}" />
+                                    <AxisAngleRotation3D Axis="0 1 0" Angle="{Binding YAxisOffset}" />
                             </RotateTransform3D.Rotation>
                         </RotateTransform3D>
                         <RotateTransform3D CenterX="0" CenterY="-102" CenterZ="525">
                             <RotateTransform3D.Rotation>
-                                    <AxisAngleRotation3D Axis="2000 0 1" Angle="{Binding ZaxisOffset}" />
+                                    <AxisAngleRotation3D Axis="2000 0 1" Angle="{Binding ZAxisOffset}" />
                             </RotateTransform3D.Rotation>
                         </RotateTransform3D>
                         <ScaleTransform3D ScaleX="1" ScaleY="1" ScaleZ="1" />
@@ -50,10 +50,10 @@
             </h:HelixVisual3D>
             <h:BoxVisual3D Height="0" Width="2000" Length="2000" Center="0,0,0" Fill="Transparent" BottomFace="False" BackMaterial="{Binding Compass, Mode=OneWay}" Material="{Binding Compass, Mode=OneWay}" />
         </h:HelixViewport3D>
-        <Button Width="20" Height="20" Margin="5" ToolTip="{StaticResource btnOpenWin}" Command="{Binding OpenModelWindowCmd}" Style="{StaticResource MaterialDesignRaisedAccentButton}" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Visibility="{Binding ModelWinVisability, Converter={StaticResource BoolToVis}}">
+        <Button Width="20" Height="20" Margin="5" ToolTip="{StaticResource hcOpenWin}" Command="{Binding OpenModelWindowCmd}" Style="{StaticResource MaterialDesignRaisedAccentButton}" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Visibility="{Binding ModelWinVisibility, Converter={StaticResource BoolToVis}}">
             <materialDesign:PackIcon Kind="OpenInNew" Margin="-14,-2,0,0" />
         </Button>
-        <Button Width="20" Height="20" Margin="5" ToolTip="{StaticResource btntipResetView}" Command="{Binding OpenResetViewCmd}" Style="{StaticResource MaterialDesignRaisedAccentButton}" VerticalAlignment="Top" HorizontalAlignment="Right"  HorizontalContentAlignment="Left" VerticalContentAlignment="Top">
+        <Button Width="20" Height="20" Margin="5" ToolTip="{StaticResource 3dResetView}" Command="{Binding OpenResetViewCmd}" Style="{StaticResource MaterialDesignRaisedAccentButton}" VerticalAlignment="Top" HorizontalAlignment="Right"  HorizontalContentAlignment="Left" VerticalContentAlignment="Top">
             <materialDesign:PackIcon Kind="RelativeScale" Margin="-14,-2,0,0" />
         </Button>
     </Grid>

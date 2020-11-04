@@ -122,11 +122,11 @@ namespace GS.Server.SkyTelescope
 
                     // defaults
                     AtPark = SkyServer.AtPark; 
-                    ConnectButtonContent = Application.Current.Resources["btnConnect"].ToString();
+                    ConnectButtonContent = Application.Current.Resources["skyConnect"].ToString();
                     VoiceState = Synthesizer.VoiceActive;
                     ParkSelection = ParkPositions.FirstOrDefault();
                     ParkSelectionSetting = ParkPositions.FirstOrDefault();
-                    SetHCFlipsVisability();
+                    SetHCFlipsVisibility();
                     RightAscension = "00h 00m 00s";
                     Declination = "00° 00m 00s";
                     Azimuth = "00° 00m 00s";
@@ -135,8 +135,8 @@ namespace GS.Server.SkyTelescope
                     ModelOn = SkySettings.ModelOn;
                     SetTrackingIcon(SkySettings.TrackingRate);
 
-                    HcWinVisability = true;
-                    ModelWinVisability = true;
+                    HcWinVisibility = true;
+                    ModelWinVisibility = true;
                     DebugVisibility = SkySettings.Diagnostics;
                 }
 
@@ -159,7 +159,7 @@ namespace GS.Server.SkyTelescope
 
                 SkyServer.AlertState = true;
                 SkyServer.IsMountRunning = false;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -239,15 +239,6 @@ namespace GS.Server.SkyTelescope
                      case "ModelOn":
                          ModelOn = SkySettings.ModelOn;
                          break;
-                     //case "SpiralFov":
-                     //    SpiralFov = SkySettings.SpiralFov;
-                     //    break;
-                     //case "SpiralPause":
-                     //    SpiralPause = SkySettings.SpiralPause;
-                     //    break;
-                     //case "SpiralSpeed":
-                     //    SpiralSpeed = SkySettings.SpiralSpeed;
-                     //    break;
                      case "TrackingRate":
                          TrackingRate = SkySettings.TrackingRate;
                          break;
@@ -269,7 +260,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -296,8 +287,8 @@ namespace GS.Server.SkyTelescope
                                 case "CanPec":
                                     PecEnabled = SkyServer.CanPec;
                                     break;
-                                case "DeclinationXform":
-                                    Declination = _util.DegreesToDMS(SkyServer.DeclinationXform, "° ", ":", "", 2);
+                                case "DeclinationXForm":
+                                    Declination = _util.DegreesToDMS(SkyServer.DeclinationXForm, "° ", ":", "", 2);
                                     break;
                                 case "CanHomeSensor":
                                     AutoHomeEnabled = SkyServer.CanHomeSensor;
@@ -308,8 +299,8 @@ namespace GS.Server.SkyTelescope
                                 case "Lha":
                                     Lha = _util.HoursToHMS(SkyServer.Lha, "h ", ":", "", 2);
                                     break;
-                                case "RightAscensionXform":
-                                    RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXform, "h ", ":", "", 2);
+                                case "RightAscensionXForm":
+                                    RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
                                     Rotate();
                                     GetDebugProperties();
                                     break;
@@ -385,7 +376,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -420,7 +411,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -455,7 +446,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -494,7 +485,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -533,7 +524,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -573,7 +564,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -588,7 +579,7 @@ namespace GS.Server.SkyTelescope
             {
                 _mountError = value;
                 if (value == null) return;
-                OpenDialog(value.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(value.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -629,7 +620,7 @@ namespace GS.Server.SkyTelescope
             IsRaGoToSyncDialogOpen = false;
             IsSchedulerDialogOpen = false;
             IsLimitDialogOpen = false;
-            IsPpecDialogOpen = false;
+            IsPPecDialogOpen = false;
             IsParkAddDialogOpen = false;
             IsParkDeleteDialogOpen = false;
             IsGpsDialogOpen = false;
@@ -931,7 +922,7 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-        public bool AlternatingPpec
+        public bool AlternatingPPec
         {
             get => SkySettings.AlternatingPpec;
             set
@@ -1139,7 +1130,7 @@ namespace GS.Server.SkyTelescope
                 {
                     if (ParkSelectionSetting == null)
                     {
-                        OpenDialog($"{Application.Current.Resources["cmdNoSelected"]}");
+                        OpenDialog($"{Application.Current.Resources["skyNoSelected"]}");
                         return;
                     }
                     var parkcoords = Axes.MountAxis2Mount();
@@ -1152,7 +1143,7 @@ namespace GS.Server.SkyTelescope
                     parkToUpdate.X = parkcoords[0];
                     parkToUpdate.Y = parkcoords[1];
                     SkySettings.ParkPositions = ParkPositions;
-                    OpenDialog($"{Application.Current.Resources["cmdParkSaved"]} {parkToUpdate.Name}");
+                    OpenDialog($"{Application.Current.Resources["skyParkSaved"]} {parkToUpdate.Name}");
                     Synthesizer.Speak(Application.Current.Resources["vceParkSet"].ToString());
                 }
             }
@@ -1170,7 +1161,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -1215,7 +1206,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -1261,7 +1252,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -1443,7 +1434,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -1678,7 +1669,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
 
         }
@@ -1727,7 +1718,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -1768,7 +1759,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -1834,7 +1825,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
 
         }
@@ -1883,7 +1874,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -1924,22 +1915,22 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
-        private ICommand _clickparkcommand;
+        private ICommand _clickParkCmd;
         public ICommand ClickParkCommand
         {
             get
             {
-                var command = _clickparkcommand;
+                var command = _clickParkCmd;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _clickparkcommand = new RelayCommand(
+                return _clickParkCmd = new RelayCommand(
                     param => ClickPark()
                 );
             }
@@ -1990,7 +1981,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
 
         }
@@ -2031,18 +2022,18 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private ICommand _clickhomecommand;
+        private ICommand _clickHomeCmd;
         public ICommand ClickHomeCommand
         {
             get
             {
-                var command = _clickhomecommand;
+                var command = _clickHomeCmd;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _clickhomecommand = new RelayCommand(
+                return _clickHomeCmd = new RelayCommand(
                     param => ClickHome()
                 );
             }
@@ -2077,22 +2068,22 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
-        private ICommand _clickstopcommand;
+        private ICommand _clickStopCmd;
         public ICommand ClickStopCommand
         {
             get
             {
-                var command = _clickstopcommand;
+                var command = _clickStopCmd;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _clickstopcommand = new RelayCommand(
+                return _clickStopCmd = new RelayCommand(
                     param => ClickStop()
                 );
             }
@@ -2122,22 +2113,22 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
-        private ICommand _clickTrackingcommand;
+        private ICommand _clickTrackingCmd;
         public ICommand ClickTrackingCommand
         {
             get
             {
-                var command = _clickTrackingcommand;
+                var command = _clickTrackingCmd;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _clickTrackingcommand = new RelayCommand(
+                return _clickTrackingCmd = new RelayCommand(
                     param => ClickTracking()
                 );
             }
@@ -2171,7 +2162,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -2222,7 +2213,7 @@ namespace GS.Server.SkyTelescope
             {
                 if (SkyServer.Tracking)
                 {
-                    OpenDialog(Application.Current.Resources["msgStopMount"].ToString());
+                    OpenDialog(Application.Current.Resources["skyStopMount"].ToString());
                     return;
                 }
                 HomeResetContent = new HomeResetDialog();
@@ -2243,7 +2234,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
 
         }
@@ -2291,7 +2282,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -2332,7 +2323,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -2399,7 +2390,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
 
         }
@@ -2445,7 +2436,7 @@ namespace GS.Server.SkyTelescope
             catch (Exception ex)
             {
                 IsFlipDialogOpen = false;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -2486,7 +2477,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -2568,7 +2559,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
 
         }
@@ -2599,7 +2590,7 @@ namespace GS.Server.SkyTelescope
             catch (Exception ex)
             {
                 IsSchedulerDialogOpen = false;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -2640,7 +2631,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -2724,19 +2715,19 @@ namespace GS.Server.SkyTelescope
             var oktime = TimeSpan.TryParse(FutureParkTime, out var ftime);
             if (!oktime)
             {
-                OpenDialog($"{Application.Current.Resources["msgParkEvent1"]}", $"{Application.Current.Resources["Error"]}");
+                OpenDialog($"{Application.Current.Resources["skyParkEvent1"]}", $"{Application.Current.Resources["exError"]}");
                 return false;
             }
             var okdate = DateTime.TryParse(FutureParkDate.ToString(), out var fdate);
             if (!okdate)
             {
-                OpenDialog($"{Application.Current.Resources["msgParkEvent2"]}", $"{Application.Current.Resources["Error"]}");
+                OpenDialog($"{Application.Current.Resources["skyParkEvent2"]}", $"{Application.Current.Resources["exError"]}");
                 return false;
             }
             var fdatetime = fdate.Date + ftime;
             if (fdatetime < DateTime.Now)
             {
-                OpenDialog($"{Application.Current.Resources["msgParkEvent3"]}", $"{Application.Current.Resources["Error"]}");
+                OpenDialog($"{Application.Current.Resources["skyParkEvent3"]}", $"{Application.Current.Resources["exError"]}");
                 return false;
             }
 
@@ -2796,7 +2787,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
 
             }
 
@@ -2907,13 +2898,13 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    var ra = _util.HoursToHMS(SkyServer.RightAscensionXform, ":", ":", ":", 3);
+                    var ra = _util.HoursToHMS(SkyServer.RightAscensionXForm, ":", ":", ":", 3);
                     var ras = ra.Split(':');
                     RaHours = Convert.ToDouble(ras[0]);
                     RaMinutes = Convert.ToDouble(ras[1]);
                     RaSeconds = Convert.ToDouble(ras[2]);
 
-                    var dec = _util.HoursToHMS(SkyServer.DeclinationXform, ":", ":", ":", 3);
+                    var dec = _util.HoursToHMS(SkyServer.DeclinationXForm, ":", ":", ":", 3);
                     var decs = dec.Split(':');
                     DecDegrees = Convert.ToDouble(decs[0]);
                     DecMinutes = Convert.ToDouble(decs[1]);
@@ -2935,7 +2926,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -2991,7 +2982,7 @@ namespace GS.Server.SkyTelescope
                         SkySettings.Latitude);
                     if (AltAz[0] < 0)
                     {
-                        OpenDialog($"{Application.Current.Resources["msgTargetBelow"]}: {AltAz[1]} Alt: {AltAz[0]}");
+                        OpenDialog($"{Application.Current.Resources["goTargetBelow"]}: {AltAz[1]} Alt: {AltAz[0]}");
                         return;
                     }
 
@@ -3014,7 +3005,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -3067,7 +3058,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -3108,7 +3099,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -3164,7 +3155,7 @@ namespace GS.Server.SkyTelescope
                         SkySettings.Latitude);
                     if (AltAz[0] < 0)
                     {
-                        OpenDialog($"{Application.Current.Resources["msgTargetBelow"]}: {AltAz[1]} Alt: {AltAz[0]}");
+                        OpenDialog($"{Application.Current.Resources["goTargetBelow"]}: {AltAz[1]} Alt: {AltAz[0]}");
                         return;
                     }
 
@@ -3187,7 +3178,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -3216,7 +3207,7 @@ namespace GS.Server.SkyTelescope
                     if (!SkySettings.CanSlewAsync) return;
                     if (SkyServer.IsSlewing)
                     {
-                        OpenDialog($"{Application.Current.Resources["msgSlewing"]}", $"{Application.Current.Resources["Error"]}");
+                        OpenDialog($"{Application.Current.Resources["goSlewing"]}", $"{Application.Current.Resources["exError"]}");
                         return;
                     }
                     if (AtPark)
@@ -3230,7 +3221,7 @@ namespace GS.Server.SkyTelescope
 
                     if (!result)
                     {
-                        OpenDialog($"{Application.Current.Resources["msgOutLimits"]}", $"{Application.Current.Resources["Error"]}");
+                        OpenDialog($"{Application.Current.Resources["goOutLimits"]}", $"{Application.Current.Resources["exError"]}");
                         return;
                     }
                     SkyServer.TargetDec = radec.Y;
@@ -3254,7 +3245,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -3295,7 +3286,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -3352,43 +3343,43 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private bool _isPpecDialogOpen;
-        public bool IsPpecDialogOpen
+        private bool _isPPecDialogOpen;
+        public bool IsPPecDialogOpen
         {
-            get => _isPpecDialogOpen;
+            get => _isPPecDialogOpen;
             set
             {
-                if (_isPpecDialogOpen == value) return;
-                _isPpecDialogOpen = value;
+                if (_isPPecDialogOpen == value) return;
+                _isPPecDialogOpen = value;
                 CloseDialogs(value);
                 OnPropertyChanged();
             }
         }
 
-        private object _ppecContent;
-        public object PpecContent
+        private object _pPecContent;
+        public object PPecContent
         {
-            get => _ppecContent;
+            get => _pPecContent;
             set
             {
-                if (_ppecContent == value) return;
-                _ppecContent = value;
+                if (_pPecContent == value) return;
+                _pPecContent = value;
                 OnPropertyChanged();
             }
         }
 
-        private ICommand _openPpecDialogCommand;
-        public ICommand OpenPpecDialogCommand
+        private ICommand _openPPecDialogCommand;
+        public ICommand OpenPPecDialogCommand
         {
             get
             {
-                var command = _openPpecDialogCommand;
+                var command = _openPPecDialogCommand;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _openPpecDialogCommand = new RelayCommand(
+                return _openPPecDialogCommand = new RelayCommand(
                     param => OpenPPecDialog()
                 );
             }
@@ -3399,13 +3390,13 @@ namespace GS.Server.SkyTelescope
             {
                 if (SkyServer.Tracking || SkyServer.PecTrainInProgress)
                 {
-                    PpecContent = new PpecDialog();
-                    IsPpecDialogOpen = true;
+                    PPecContent = new PpecDialog();
+                    IsPPecDialogOpen = true;
                 }
                 else
                 {
                     PecTrainOn = false;
-                    OpenDialog(Application.Current.Resources["msgTrackingOn"].ToString());
+                    OpenDialog(Application.Current.Resources["ppTrackingOn"].ToString());
                 }
             }
             catch (Exception ex)
@@ -3423,35 +3414,35 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
 
         }
 
-        private ICommand _acceptPpecDialogCommand;
-        public ICommand AcceptPpecDialogCommand
+        private ICommand _acceptPPecDialogCommand;
+        public ICommand AcceptPPecDialogCommand
         {
             get
             {
-                var command = _acceptPpecDialogCommand;
+                var command = _acceptPPecDialogCommand;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _acceptPpecDialogCommand = new RelayCommand(
-                    param => AcceptPpecDialog()
+                return _acceptPPecDialogCommand = new RelayCommand(
+                    param => AcceptPPecDialog()
                 );
             }
         }
-        private void AcceptPpecDialog()
+        private void AcceptPPecDialog()
         {
             try
             {
                 using (new WaitCursor())
                 {
                     SkyServer.PecTraining = !SkyServer.PecTraining;
-                    IsPpecDialogOpen = false;
+                    IsPPecDialogOpen = false;
                 }
             }
             catch (Exception ex)
@@ -3469,32 +3460,32 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
-        private ICommand _cancelPpecDialogCommand;
-        public ICommand CancelPpecDialogCommand
+        private ICommand _cancelPPecDialogCommand;
+        public ICommand CancelPPecDialogCommand
         {
             get
             {
-                var command = _cancelPpecDialogCommand;
+                var command = _cancelPPecDialogCommand;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _cancelPpecDialogCommand = new RelayCommand(
-                    param => CancelPpecDialog()
+                return _cancelPPecDialogCommand = new RelayCommand(
+                    param => CancelPPecDialog()
                 );
             }
         }
-        private void CancelPpecDialog()
+        private void CancelPPecDialog()
         {
             try
             {
                 PecTrainOn = !PecTrainOn;
-                IsPpecDialogOpen = false;
+                IsPPecDialogOpen = false;
             }
             catch (Exception ex)
             {
@@ -3511,7 +3502,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -3519,45 +3510,45 @@ namespace GS.Server.SkyTelescope
 
         #region Hand Controller
 
-        private double _hcspeed;
+        private double _hcSpeed;
         public double HcSpeed
         {
             get
             {
-                _hcspeed = Convert.ToInt32(SkySettings.HcSpeed);
-                return _hcspeed;
+                _hcSpeed = Convert.ToInt32(SkySettings.HcSpeed);
+                return _hcSpeed;
             }
             set
             {
                 var tmp = Convert.ToInt32(value);
-                if (Math.Abs(_hcspeed - tmp) < 0.0) return;
-                _hcspeed = tmp;
+                if (Math.Abs(_hcSpeed - tmp) < 0.0) return;
+                _hcSpeed = tmp;
                 SkySettings.HcSpeed = (SlewSpeed)tmp;
                 Synthesizer.Speak(SkySettings.HcSpeed.ToString());
                 OnPropertyChanged();
             }
         }
 
-        private bool _flipns;
+        private bool _flipNS;
         public bool FlipNS
         {
-            get => _flipns;
+            get => _flipNS;
             set
             {
-                if (_flipns == value) return;
-                _flipns = value;
+                if (_flipNS == value) return;
+                _flipNS = value;
                 OnPropertyChanged();
             }
         }
 
-        private bool _flipew;
+        private bool _flipEW;
         public bool FlipEW
         {
-            get => _flipew;
+            get => _flipEW;
             set
             {
-                if (_flipew == value) return;
-                _flipew = value;
+                if (_flipEW == value) return;
+                _flipEW = value;
                 OnPropertyChanged();
             }
         }
@@ -3608,19 +3599,19 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private bool _hcWinVisability;
-        public bool HcWinVisability
+        private bool _hcWinVisibility;
+        public bool HcWinVisibility
         {
-            get => _hcWinVisability;
+            get => _hcWinVisibility;
             set
             {
-                if (_hcWinVisability == value) return;
-                _hcWinVisability = value;
+                if (_hcWinVisibility == value) return;
+                _hcWinVisibility = value;
                 OnPropertyChanged();
             }
         }
 
-        private void SetHCFlipsVisability()
+        private void SetHCFlipsVisibility()
         {
             switch (HcMode)
             {
@@ -3629,8 +3620,8 @@ namespace GS.Server.SkyTelescope
                     NSEnabled = true;
                     break;
                 //case HCMode.Compass:
-                //    EWVisability = false;
-                //    NSVisability = false;
+                //    EWVisibility = false;
+                //    NSVisibility = false;
                 //    break;
                 case HCMode.Guiding:
                     EWEnabled = false;
@@ -3647,7 +3638,7 @@ namespace GS.Server.SkyTelescope
             set
             {
                 SkySettings.HcMode = value;
-                SetHCFlipsVisability();
+                SetHCFlipsVisibility();
                 OnPropertyChanged();
             }
         }
@@ -3691,27 +3682,27 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
-        private ICommand _hcSpeeddownCommand;
-        public ICommand HcSpeeddownCommand
+        private ICommand _hcSpeedDownCommand;
+        public ICommand HcSpeedDownCommand
         {
             get
             {
-                var command = _hcSpeeddownCommand;
+                var command = _hcSpeedDownCommand;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _hcSpeeddownCommand = new RelayCommand(
-                    param => SpeeddownCommand()
+                return _hcSpeedDownCommand = new RelayCommand(
+                    param => SpeedDownCommand()
                 );
             }
         }
-        private void SpeeddownCommand()
+        private void SpeedDownCommand()
         {
             try
             {
@@ -3734,7 +3725,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -3780,7 +3771,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -3820,7 +3811,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -3866,7 +3857,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -3906,7 +3897,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -3952,7 +3943,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -3992,7 +3983,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -4038,7 +4029,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -4077,7 +4068,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -4117,7 +4108,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -4157,23 +4148,16 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
-        private static void StartSlew(SlewDirection direction)
+        private void StartSlew(SlewDirection direction)
         {
             if (SkyServer.AtPark)
             {
                 return;
             }
-
-            var HcMode = SkySettings.HcMode;
-            var HcAntiDec = SkySettings.HcAntiDec;
-            var HcAntiRa = SkySettings.HcAntiRa;
-            var DecBacklash = SkySettings.DecBacklash;
-            var RaBacklash = SkySettings.RaBacklash;
-
             var speed = SkySettings.HcSpeed;
             switch (direction)
             {
@@ -4218,11 +4202,7 @@ namespace GS.Server.SkyTelescope
                 if (value)
                 {
                     HideMouse();
-                    var msg = $"{Application.Current.Resources["msgMouseLock0"]}";
-                    //msg += $"{Application.Current.Resources["msgMouseLock1"]}{Environment.NewLine}";
-                    //msg += $"{Application.Current.Resources["msgMouseLock2"]}";
-                    OpenDialog($"{msg}", $"{ Application.Current.Resources["capMouseLock"]}");
-                    Synthesizer.Speak(Application.Current.Resources["capMouseLock"].ToString());
+                    Synthesizer.Speak(Application.Current.Resources["1018MouseLock"].ToString());
                 }
                 else
                 {
@@ -4233,14 +4213,14 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private bool _radecLockedMouse;
+        private bool _raDecLockedMouse;
         public bool RaDecLockedMouse
         {
-            get => _radecLockedMouse;
+            get => _raDecLockedMouse;
             set
             {
-                if (_radecLockedMouse == value) return;
-                _radecLockedMouse = value;
+                if (_raDecLockedMouse == value) return;
+                _raDecLockedMouse = value;
                 OnPropertyChanged();
             }
         }
@@ -4287,7 +4267,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -4355,7 +4335,7 @@ namespace GS.Server.SkyTelescope
 
                 if (e.MiddleButton != MouseButtonState.Pressed) return;
                 RaDecLockedMouse = !RaDecLockedMouse;
-                var axis = RaDecLockedMouse ? $"{Application.Current.Resources["lbTopRa"]}" : $"{Application.Current.Resources["lbTopDec"]}";
+                var axis = RaDecLockedMouse ? $"{Application.Current.Resources["topRa"]}" : $"{Application.Current.Resources["topDec"]}";
                 if (!string.IsNullOrEmpty(axis)) Synthesizer.Speak(axis);
             }
             catch (Exception ex)
@@ -4371,7 +4351,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -4442,7 +4422,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -4468,9 +4448,19 @@ namespace GS.Server.SkyTelescope
                 if (e == null) { return; }
                 if (e.Delta > 0)
                 {
+                    if (HcSpeed >= 8)
+                    {
+                        HcSpeed = 8;
+                        return;
+                    }
                     HcSpeed += 1;
                 }
                 if (e.Delta >= 0) return;
+                if (HcSpeed <= 1)
+                {
+                    HcSpeed = 1;
+                    return;
+                }
                 HcSpeed -= 1;
             }
             catch (Exception ex)
@@ -4486,384 +4476,10 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
-        #endregion
-
-        #region Spiral Search
-
-        //private CancellationTokenSource _ctsSpiral;
-        //private CancellationToken _ctSpiral;
-
-        //public List<int> SpiralHcSpeeds { get; }
-        //public List<int> SpiralPauses { get; }
-        
-        //private int _spiralFov;
-        //public int SpiralFov
-        //{
-        //    get
-        //    {
-        //        _spiralFov = SkySettings.SpiralFov;
-        //        return _spiralFov;
-        //    }
-        //    set
-        //    {
-        //        if (_spiralFov ==  value) return;
-        //        _spiralFov = value;
-        //        SkySettings.SpiralFov = value;
-        //        OnPropertyChanged();
-        //    }
-        //}
-
-        //private int _spiralSpeed;
-        //public int SpiralSpeed
-        //{
-        //    get
-        //    {
-        //        _spiralSpeed = SkySettings.SpiralSpeed;
-        //        return _spiralSpeed;
-        //    }
-        //    set
-        //    {
-        //        if (_spiralSpeed == value) return;
-        //        _spiralSpeed = value;
-        //        SkySettings.SpiralSpeed = value;
-        //        OnPropertyChanged();
-        //    }
-        //}
-
-        //private int _spiralPause;
-        //public int SpiralPause
-        //{
-        //    get
-        //    {
-        //        _spiralPause = SkySettings.SpiralPause;
-        //        return _spiralPause;
-        //    }
-        //    set
-        //    {
-        //        if (_spiralPause == value) return;
-        //        _spiralPause = value;
-        //        SkySettings.SpiralPause = value;
-        //        OnPropertyChanged();
-        //    }
-        //}
-
-        //private bool _isSpiralSearching;
-        //public bool IsSpiralSearching
-        //{
-        //    get => _isSpiralSearching;
-        //    set
-        //    {
-        //        if (_isSpiralSearching == value) return;
-        //        _isSpiralSearching = value;
-        //        OnPropertyChanged();
-        //    }
-        //}
-
-        //private ICommand _hcMouseDownSpiralCmd;
-        //public ICommand HcMouseDownSpiralCmd
-        //{
-        //    get
-        //    {
-        //        var command = _hcMouseDownSpiralCmd;
-        //        if (command != null)
-        //        {
-        //            return command;
-        //        }
-
-        //        return _hcMouseDownSpiralCmd = new RelayCommand(
-        //            async param => await SpiralDownCmd()
-        //        );
-        //    }
-        //}
-        //private async Task SpiralDownCmd()
-        //{
-        //    try
-        //    {
-        //        _ctsSpiral?.Cancel();
-        //        _ctsSpiral = new CancellationTokenSource();
-        //        _ctSpiral = _ctsSpiral.Token;
-        //        await Task.Run(() => SpiralSearch(_ctSpiral), _ctSpiral);
-        //    }
-        //    catch (OperationCanceledException) { }
-        //    catch (Exception ex)
-        //    {
-        //        var monitorItem = new MonitorEntry
-        //        {
-        //            Datetime = HiResDateTime.UtcNow,
-        //            Device = MonitorDevice.Telescope,
-        //            Category = MonitorCategory.Interface,
-        //            Type = MonitorType.Error,
-        //            Method = MethodBase.GetCurrentMethod().Name,
-        //            Thread = Thread.CurrentThread.ManagedThreadId,
-        //            Message = $"{ex.Message},{ex.StackTrace}"
-        //        };
-        //        MonitorLog.LogToMonitor(monitorItem);
-        //        OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
-        //    }
-        //}
-
-        //private ICommand _hcMouseUpSpiralCmd;
-        //public ICommand HcMouseUpSpiralCmd
-        //{
-        //    get
-        //    {
-        //        var command = _hcMouseUpSpiralCmd;
-        //        if (command != null)
-        //        {
-        //            return command;
-        //        }
-
-        //        return _hcMouseUpSpiralCmd = new RelayCommand(
-        //            param => SpiralUpCmd()
-        //        );
-        //    }
-        //}
-        //private void SpiralUpCmd()
-        //{
-        //    try
-        //    {
-        //        _ctsSpiral?.Cancel();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var monitorItem = new MonitorEntry
-        //        {
-        //            Datetime = HiResDateTime.UtcNow,
-        //            Device = MonitorDevice.Telescope,
-        //            Category = MonitorCategory.Interface,
-        //            Type = MonitorType.Error,
-        //            Method = MethodBase.GetCurrentMethod().Name,
-        //            Thread = Thread.CurrentThread.ManagedThreadId,
-        //            Message = $"{ex.Message},{ex.StackTrace}"
-        //        };
-        //        MonitorLog.LogToMonitor(monitorItem);
-        //        OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
-        //    }
-        //}
-        
-        //private bool _isHcSettingsDialogOpen;
-        //public bool IsHcSettingsDialogOpen
-        //{
-        //    get => _isHcSettingsDialogOpen;
-        //    set
-        //    {
-        //        if (_isHcSettingsDialogOpen == value) return;
-        //        _isHcSettingsDialogOpen = value;
-        //        CloseDialogs(value);
-        //        OnPropertyChanged();
-        //    }
-        //}
-
-        //private object _hcSettingsContent;
-        //public object HcSettingsContent
-        //{
-        //    get => _hcSettingsContent;
-        //    set
-        //    {
-        //        if (_hcSettingsContent == value) return;
-        //        _hcSettingsContent = value;
-        //        OnPropertyChanged();
-        //    }
-        //}
-
-        //private ICommand _openHcSettingsDialogCmd;
-        //public ICommand OpenHcSettingsDialogCmd
-        //{
-        //    get
-        //    {
-        //        var cmd = _openHcSettingsDialogCmd;
-        //        if (cmd != null)
-        //        {
-        //            return cmd;
-        //        }
-
-        //        return _openHcSettingsDialogCmd = new RelayCommand(
-        //            param => OpenHcSettings()
-        //        );
-        //    }
-        //}
-        //private void OpenHcSettings()
-        //{
-        //    try
-        //    {
-        //        HcSettingsContent = new HcSettingsDialog();
-        //        IsHcSettingsDialogOpen = true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var monitorItem = new MonitorEntry
-        //        {
-        //            Datetime = HiResDateTime.UtcNow,
-        //            Device = MonitorDevice.Telescope,
-        //            Category = MonitorCategory.Interface,
-        //            Type = MonitorType.Error,
-        //            Method = MethodBase.GetCurrentMethod().Name,
-        //            Thread = Thread.CurrentThread.ManagedThreadId,
-        //            Message = $"{ex.Message},{ex.StackTrace}"
-        //        };
-        //        MonitorLog.LogToMonitor(monitorItem);
-
-        //        SkyServer.AlertState = true;
-        //        OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
-        //    }
-
-        //}
-
-        //private ICommand _acceptHcSettingsDialogCmd;
-        //public ICommand AcceptHcSettingsDialogCmd
-        //{
-        //    get
-        //    {
-        //        var cmd = _acceptHcSettingsDialogCmd;
-        //        if (cmd != null)
-        //        {
-        //            return cmd;
-        //        }
-
-        //        return _acceptHcSettingsDialogCmd = new RelayCommand(
-        //            param => AcceptHcSettings()
-        //        );
-        //    }
-        //}
-        //private void AcceptHcSettings()
-        //{
-        //    try
-        //    {
-        //        IsHcSettingsDialogOpen = false;
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        IsHcSettingsDialogOpen = false;
-        //        OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
-        //    }
-        //}
-
-        //private async Task SpiralSearch(CancellationToken _ctSpiral)
-        //{
-        //    var isTracking = SkyServer.Tracking;
-        //    SkyServer.TrackingSpeak = false;
-        //    IsSpiralSearching = true;
-        //    var speed = SkyServer.GetSlewSpeed(SkySettings.HcSpeed);
-        //    var fov = SkySettings.SpiralFov;
-        //    var pause = SkySettings.SpiralPause;
-
-        //    try
-        //    {
-        //        SkyServer.AbortSlew(false);
-        //        var count = 0;
-
-        //        while (!_ctSpiral.IsCancellationRequested)
-        //        {
-        //            count++;
-        //            Synthesizer.Speak(Application.Current.Resources["msgSearching"].ToString());
-
-        //            // move up
-        //            for (var i = 0; i < count; i++)
-        //            {
-        //                if (_ctSpiral.IsCancellationRequested) return;
-        //                HcMouseDownUp();
-        //                var decdist = fov / (speed * 3600);
-        //                var stepms = (int)(decdist * 1000);
-        //                Debug.WriteLine($"Up: {decdist}, {stepms}, {count}");
-        //                await Tasks.DelayHandler(stepms, _ctSpiral);
-        //                HcMouseUpUp();
-        //                if (_ctSpiral.IsCancellationRequested) return;
-        //                if (pause <= 0) continue;
-        //                SkyServer.TrackingSpeak = false;
-        //                SkyServer.Tracking = false;
-        //                SkyServer.Tracking = isTracking;
-        //                await Tasks.DelayHandler(pause * 1000, _ctSpiral);
-        //            }
-
-        //            // move right
-        //            for (var i = 0; i < count; i++)
-        //            {
-        //                if (_ctSpiral.IsCancellationRequested) return;
-        //                HcMouseDownRight();
-        //                var rastep = fov * (1 / Math.Cos(Principles.Units.Deg2Rad1(SkyServer.Declination)));
-        //                var radist = rastep / (speed * 3600);
-        //                var stepms = (int)(radist * 1000);
-        //                Debug.WriteLine($"Right: {rastep}, {radist}, {stepms}, {count}");
-        //                await Tasks.DelayHandler(stepms, _ctSpiral);
-        //                HcMouseUpRight();
-        //                if (_ctSpiral.IsCancellationRequested) return;
-        //                if (pause <= 0) continue;
-        //                SkyServer.TrackingSpeak = false;
-        //                SkyServer.Tracking = false;
-        //                SkyServer.Tracking = isTracking;
-        //                await Tasks.DelayHandler(pause * 1000, _ctSpiral);
-        //            }
-
-        //            count++;
-
-        //            // move down
-        //            for (var i = 0; i < count; i++)
-        //            {
-        //                if (_ctSpiral.IsCancellationRequested) return;
-        //                HcMouseDownDown();
-        //                var decdist = fov / (speed * 3600);
-        //                var stepms = (int)(decdist * 1000);
-        //                Debug.WriteLine($"Down: {decdist}, {stepms}, {count}");
-        //                await Tasks.DelayHandler(stepms, _ctSpiral);
-        //                HcMouseUpDown();
-        //                if (_ctSpiral.IsCancellationRequested) return;
-        //                if (pause <= 0) continue;
-        //                SkyServer.TrackingSpeak = false;
-        //                SkyServer.Tracking = false;
-        //                SkyServer.Tracking = isTracking;
-        //                await Tasks.DelayHandler(pause * 1000, _ctSpiral);
-        //            }
-
-        //            // move left
-        //            for (var i = 0; i < count; i++)
-        //            {
-        //                if (_ctSpiral.IsCancellationRequested) return;
-        //                HcMouseDownLeft();
-        //                var rastep = fov * (1 / Math.Cos(Principles.Units.Deg2Rad1(SkyServer.Declination)));
-        //                var radist = rastep / (speed * 3600);
-        //                var stepms = (int)(radist * 1000);
-        //                Debug.WriteLine($"Left: {rastep}, {radist}, {stepms}, {count}");
-        //                await Tasks.DelayHandler(stepms, _ctSpiral);
-        //                HcMouseUpLeft();
-        //                if (_ctSpiral.IsCancellationRequested) return;
-        //                if (pause <= 0) continue;
-        //                SkyServer.TrackingSpeak = false;
-        //                SkyServer.Tracking = false;
-        //                SkyServer.Tracking = isTracking;
-        //                await Tasks.DelayHandler(pause * 1000, _ctSpiral);
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var monitorItem = new MonitorEntry
-        //        {
-        //            Datetime = HiResDateTime.UtcNow,
-        //            Device = MonitorDevice.Telescope,
-        //            Category = MonitorCategory.Interface,
-        //            Type = MonitorType.Error,
-        //            Method = MethodBase.GetCurrentMethod().Name,
-        //            Thread = Thread.CurrentThread.ManagedThreadId,
-        //            Message = $"{ex.Message},{ex.StackTrace}"
-        //        };
-        //        MonitorLog.LogToMonitor(monitorItem);
-        //        OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
-        //    }
-        //    finally
-        //    {
-        //        SkyServer.TrackingSpeak = false;
-        //        SkyServer.Tracking = false;
-        //        SkyServer.Tracking = isTracking;
-        //        SkyServer.TrackingSpeak = true;
-        //        IsSpiralSearching = false;
-        //    }
-
-        //}
         #endregion
 
         #region Spiral Window
@@ -4904,7 +4520,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -4952,7 +4568,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -4999,7 +4615,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -5043,7 +4659,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -5073,7 +4689,7 @@ namespace GS.Server.SkyTelescope
             }
             catch (Exception ex)
             {
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
@@ -5097,8 +4713,8 @@ namespace GS.Server.SkyTelescope
 
             var count = 0;
             var index = 0;
-            var ra = SkyServer.RightAscensionXform;
-            var dec = SkyServer.DeclinationXform;
+            var ra = SkyServer.RightAscensionXForm;
+            var dec = SkyServer.DeclinationXForm;
 
             SkyServer.SpiralCollection.Clear();
             SkySettings.SpiralDistance = 0;
@@ -5180,7 +4796,7 @@ namespace GS.Server.SkyTelescope
             SkySettings.SpiralDistance = Math.Round(farthest, 1);
 
             LogSpiral($"GenerateSpiral: {SkyServer.SpiralCollection.Count}", MonitorType.Information);
-            Synthesizer.Speak(Application.Current.Resources["btnSpiralNew"].ToString());
+            Synthesizer.Speak(Application.Current.Resources["1021New"].ToString());
         }
 
         private static void SpiralMove(int amt)
@@ -5196,12 +4812,12 @@ namespace GS.Server.SkyTelescope
             var index = currentpoint.Index + amt;
             if (index < 0 )
             {
-                Synthesizer.Speak(Application.Current.Resources["strCenter"].ToString());
+                Synthesizer.Speak(Application.Current.Resources["1021Center"].ToString());
                 return;
             }
             if (index > 48)
             {
-                Synthesizer.Speak(Application.Current.Resources["strEnd"].ToString());
+                Synthesizer.Speak(Application.Current.Resources["1021End"].ToString());
                 return;
             }
 
@@ -5227,8 +4843,8 @@ namespace GS.Server.SkyTelescope
                 var flipRequired = Axes.IsFlipRequired(new[] { radec.X, radec.Y });
                 if (flipRequired)
                 {
-                    LogSpiral(Application.Current.Resources["msgFlipLimit"].ToString(), MonitorType.Warning);
-                    Synthesizer.Speak(Application.Current.Resources["msgFlipLimit"].ToString()); 
+                    LogSpiral(Application.Current.Resources["1021FlipLimit"].ToString(), MonitorType.Warning);
+                    Synthesizer.Speak(Application.Current.Resources["1021FlipLimit"].ToString()); 
                     return;
                 }
             }
@@ -5296,7 +4912,7 @@ namespace GS.Server.SkyTelescope
             {
                 if (IsHome == value) return;
                 _isHome = value;
-                HomeBadgeContent = value ? Application.Current.Resources["badgeHome"].ToString() : "";
+                HomeBadgeContent = value ? Application.Current.Resources["btnBadgeHome"].ToString() : "";
                 OnPropertyChanged();
             }
         }
@@ -5309,7 +4925,7 @@ namespace GS.Server.SkyTelescope
             {
                 _atPark = value;
                 ParkButtonContent = value ? Application.Current.Resources["btnUnPark"].ToString() : Application.Current.Resources["btnPark"].ToString();
-                ParkBadgeContent = value ? SkySettings.ParkName : ""; //Application.Current.Resources["btnhintPark"].ToString()
+                ParkBadgeContent = value ? SkySettings.ParkName : ""; 
                 OnPropertyChanged();
             }
         }
@@ -5346,7 +4962,7 @@ namespace GS.Server.SkyTelescope
             {
                 if (IsTracking == value) return;
                 _isTracking = value;
-                TrackingBadgeContent = value ? Application.Current.Resources["btnhintTracking"].ToString() : "";
+                TrackingBadgeContent = value ? Application.Current.Resources["btnHintTracking"].ToString() : "";
                 OnPropertyChanged();
             }
         }
@@ -5485,7 +5101,7 @@ namespace GS.Server.SkyTelescope
             set
             {
                 ScreenEnabled = value;
-                ConnectButtonContent = value ? Application.Current.Resources["btnDisConnect"].ToString() : Application.Current.Resources["btnConnect"].ToString();
+                ConnectButtonContent = value ? Application.Current.Resources["skyDisconnect"].ToString() : Application.Current.Resources["skyConnect"].ToString();
             }
         }
 
@@ -5603,7 +5219,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -5646,7 +5262,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -5756,9 +5372,9 @@ namespace GS.Server.SkyTelescope
                         case AlignmentModes.algPolar:
                             break;
                         case AlignmentModes.algGermanPolar:
-                            var msg = Application.Current.Resources["msgHome1"].ToString();
-                            msg += Environment.NewLine + Application.Current.Resources["msgHome2"];
-                            msg += Environment.NewLine + Application.Current.Resources["msgHome3"];
+                            var msg = Application.Current.Resources["skyHome1"].ToString();
+                            msg += Environment.NewLine + Application.Current.Resources["skyHome2"];
+                            msg += Environment.NewLine + Application.Current.Resources["skyHome3"];
                             OpenDialog(msg);
                             break;
                         default:
@@ -5790,18 +5406,18 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
-                var canppec = SkyServer.CanPec ? $"{Application.Current.Resources["msgSupported"]}" : $"{Application.Current.Resources["msgNotSupported"]}";
-                var canhome = SkyServer.CanHomeSensor ? $"{Application.Current.Resources["msgSupported"]}" : $"{Application.Current.Resources["msgNotSupported"]}";
-                var msg = $"{Application.Current.Resources["msgMount"]} {SkyServer.MountName}" + Environment.NewLine;
-                msg += $"{Application.Current.Resources["msgVersion"]} {SkyServer.MountVersion}" + Environment.NewLine;
-                msg += $"{Application.Current.Resources["msgStepsRa"]} {SkyServer.StepsPerRevolution[0]}" + Environment.NewLine;
-                msg += $"{Application.Current.Resources["msgStepsDec"]} {SkyServer.StepsPerRevolution[1]}" + Environment.NewLine;
-                msg += $"{Application.Current.Resources["msgPPEC"]} {canppec}" + Environment.NewLine;
-                msg += $"{Application.Current.Resources["msgHomeSensor"]} {canhome}" + Environment.NewLine;
-                msg += $"{Application.Current.Resources["msgRaSteps"]} {Math.Round(SkyServer.StepsPerRevolution[0] / 360.0 / 3600, 2)}" + Environment.NewLine;
-                msg += $"{Application.Current.Resources["msgDecSteps"]} {Math.Round(SkyServer.StepsPerRevolution[1] / 360.0 / 3600, 2)}" + Environment.NewLine;
+                var canppec = SkyServer.CanPec ? $"{Application.Current.Resources["mntSupported"]}" : $"{Application.Current.Resources["mntNotSupported"]}";
+                var canhome = SkyServer.CanHomeSensor ? $"{Application.Current.Resources["mntSupported"]}" : $"{Application.Current.Resources["mntNotSupported"]}";
+                var msg = $"{Application.Current.Resources["mntMount"]} {SkyServer.MountName}" + Environment.NewLine;
+                msg += $"{Application.Current.Resources["mntVersion"]} {SkyServer.MountVersion}" + Environment.NewLine;
+                msg += $"{Application.Current.Resources["mntStepsRa"]} {SkyServer.StepsPerRevolution[0]}" + Environment.NewLine;
+                msg += $"{Application.Current.Resources["mntStepsDec"]} {SkyServer.StepsPerRevolution[1]}" + Environment.NewLine;
+                msg += $"{Application.Current.Resources["mntPEC"]} {canppec}" + Environment.NewLine;
+                msg += $"{Application.Current.Resources["mntHomeSensor"]} {canhome}" + Environment.NewLine;
+                msg += $"{Application.Current.Resources["mntRaSteps"]} {Math.Round(SkyServer.StepsPerRevolution[0] / 360.0 / 3600, 2)}" + Environment.NewLine;
+                msg += $"{Application.Current.Resources["mntDecSteps"]} {Math.Round(SkyServer.StepsPerRevolution[1] / 360.0 / 3600, 2)}" + Environment.NewLine;
 
-                OpenDialog(msg, $"{Application.Current.Resources["msgInfo"]}");
+                OpenDialog(msg, $"{Application.Current.Resources["mntInfo"]}");
             }
             catch (Exception ex)
             {
@@ -5818,7 +5434,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -5893,7 +5509,7 @@ namespace GS.Server.SkyTelescope
         private void OpenDialog(string msg, string caption = null)
         {
             if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["msgDialog"].ToString();
+            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
             DialogContent = new DialogOK();
             IsDialogOpen = true;
 
@@ -6201,7 +5817,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
         private bool _isGpsDialogOpen;
@@ -6284,7 +5900,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -6321,12 +5937,12 @@ namespace GS.Server.SkyTelescope
                     {
                         if (Math.Abs(GpsSpan.TotalSeconds) > 300)
                         {
-                            OpenDialog(Application.Current.Resources["msgGPSTimeLimit"].ToString());
+                            OpenDialog(Application.Current.Resources["gpsTimeLimit"].ToString());
                         }
                         else
                         {
                             var msg = Time.SetSystemUTCTime(HiResDateTime.UtcNow.ToLocalTime().Add(GpsSpan));
-                            if (msg != string.Empty) OpenDialog($"{Application.Current.Resources["msgGPSTimeError"]}: {msg}");
+                            if (msg != string.Empty) OpenDialog($"{Application.Current.Resources["gpsTimeError"]}: {msg}");
                         }
                     }
 
@@ -6359,7 +5975,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -6405,18 +6021,18 @@ namespace GS.Server.SkyTelescope
                         GpsLat = gpsHardware.Latitude;
                         GpsLatString = _util.DegreesToDMS(GpsLat, "° ", ":", "", 2);
                         GpsElevation = gpsHardware.Altitude;
-                        NmeaTag = gpsHardware.NmeaTag;
+                        NmeaTag = gpsHardware.NmEaTag;
                         GpsPcTime = gpsHardware.PcUtcNow.ToLocalTime();
                         GpsTime = gpsHardware.TimeStamp.ToLocalTime();
                         GpsSpan = gpsHardware.TimeSpan;
-                        NmeaSentence = gpsHardware.NmeaSentence;
+                        NmeaSentence = gpsHardware.NmEaSentence;
                         HasGSPData = true;
                         gpsHardware.GpsOff();
                     }
                     else
                     {
                         gpsHardware.GpsOff();
-                        OpenDialog($"{Application.Current.Resources["msgGPSNoDataFound"]}{GpsComPort}{Environment.NewLine}{gpsHardware.NmeaSentence}");
+                        OpenDialog($"{Application.Current.Resources["gpsNoData"]}{GpsComPort}{Environment.NewLine}{gpsHardware.NmEaSentence}");
                     }
 
                 }
@@ -6435,7 +6051,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 IsGpsDialogOpen = false;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
             finally
             {
@@ -6479,14 +6095,13 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
         #endregion
 
         #region CdC Dialog
-
         public double CdcLat { get; set; }
         private string _cdcLatString;
         public string CdcLatString
@@ -6594,7 +6209,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -6664,7 +6279,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -6710,7 +6325,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -6759,7 +6374,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -6805,7 +6420,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -6845,7 +6460,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -6853,18 +6468,18 @@ namespace GS.Server.SkyTelescope
 
         #region Viewport3D
 
-        private double xaxisOffset;
-        private double yaxisOffset;
-        private double zaxisOffset;
+        private double xAxisOffset;
+        private double yAxisOffset;
+        private double zAxisOffset;
 
-        private bool _modelWinVisability;
-        public bool ModelWinVisability
+        private bool _modelWinVisibility;
+        public bool ModelWinVisibility
         {
-            get => _modelWinVisability;
+            get => _modelWinVisibility;
             set
             {
-                if (_modelWinVisability == value) return;
-                _modelWinVisability = value;
+                if (_modelWinVisibility == value) return;
+                _modelWinVisibility = value;
                 OnPropertyChanged();
             }
         }
@@ -6943,71 +6558,71 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private double _xaxis;
-        public double Xaxis
+        private double _xAxis;
+        public double XAxis
         {
-            get => _xaxis;
+            get => _xAxis;
             set
             {
-                _xaxis = value;
-                XaxisOffset = value + xaxisOffset;
+                _xAxis = value;
+                XAxisOffset = value + xAxisOffset;
                 OnPropertyChanged();
             }
         }
 
-        private double _yaxis;
-        public double Yaxis
+        private double _yAxis;
+        public double YAxis
         {
-            get => _yaxis;
+            get => _yAxis;
             set
             {
-                _yaxis = value;
-                YaxisOffset = value + yaxisOffset;
+                _yAxis = value;
+                YAxisOffset = value + yAxisOffset;
                 OnPropertyChanged();
             }
         }
 
-        private double _zaxis;
-        public double Zaxis
+        private double _zAxis;
+        public double ZAxis
         {
-            get => _zaxis;
+            get => _zAxis;
             set
             {
-                _zaxis = value;
-                ZaxisOffset = zaxisOffset - value;
+                _zAxis = value;
+                ZAxisOffset = zAxisOffset - value;
                 OnPropertyChanged();
             }
         }
 
-        private double _xaxisOffset;
-        public double XaxisOffset
+        private double _xAxisOffset;
+        public double XAxisOffset
         {
-            get => _xaxisOffset;
+            get => _xAxisOffset;
             set
             {
-                _xaxisOffset = value;
+                _xAxisOffset = value;
                 OnPropertyChanged();
             }
         }
 
-        private double _yaxisOffset;
-        public double YaxisOffset
+        private double _yAxisOffset;
+        public double YAxisOffset
         {
-            get => _yaxisOffset;
+            get => _yAxisOffset;
             set
             {
-                _yaxisOffset = value;
+                _yAxisOffset = value;
                 OnPropertyChanged();
             }
         }
 
-        private double _zaxisOffset;
-        public double ZaxisOffset
+        private double _zAxisOffset;
+        public double ZAxisOffset
         {
-            get => _zaxisOffset;
+            get => _zAxisOffset;
             set
             {
-                _zaxisOffset = value;
+                _zAxisOffset = value;
                 OnPropertyChanged();
             }
         }
@@ -7034,14 +6649,14 @@ namespace GS.Server.SkyTelescope
                 Position = Settings.Settings.ModelPosition2;
 
                 //offset for model to match start position
-                xaxisOffset = 90;
-                yaxisOffset = -90;
-                zaxisOffset = 0;
+                xAxisOffset = 90;
+                yAxisOffset = -90;
+                zAxisOffset = 0;
 
                 //start position
-                Xaxis = -90;
-                Yaxis = 90;
-                Zaxis = Math.Round(Math.Abs(SkySettings.Latitude), 2);
+                XAxis = -90;
+                YAxis = 90;
+                ZAxis = Math.Round(Math.Abs(SkySettings.Latitude), 2);
 
                 //load model and compass
                 var import = new ModelImporter();
@@ -7085,7 +6700,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
         private void Rotate()
@@ -7095,8 +6710,8 @@ namespace GS.Server.SkyTelescope
             var axes = Shared.Model3D.RotateModel(SkySettings.Mount.ToString(), SkyServer.ActualAxisX,
                 SkyServer.ActualAxisY, SkyServer.SouthernHemisphere);
 
-            Yaxis = axes[0];
-            Xaxis = axes[1];
+            YAxis = axes[0];
+            XAxis = axes[1];
         }
 
         private ICommand _openModelWindowCmd;
@@ -7143,7 +6758,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -7183,7 +6798,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -7191,14 +6806,14 @@ namespace GS.Server.SkyTelescope
 
         #region AutoHome Dialog
 
-        private bool _autohomeEnabled;
+        private bool _autoHomeEnabled;
         public bool AutoHomeEnabled
         {
-            get => _autohomeEnabled;
+            get => _autoHomeEnabled;
             set
             {
-                if (_autohomeEnabled == value) return;
-                _autohomeEnabled = value;
+                if (_autoHomeEnabled == value) return;
+                _autoHomeEnabled = value;
                 OnPropertyChanged();
             }
         }
@@ -7233,15 +6848,15 @@ namespace GS.Server.SkyTelescope
         }
 
         public IList<int> DecOffsets { get; }
-        private int _decoffset;
+        private int _decOffset;
 
         public int DecOffset
         {
-            get => _decoffset;
+            get => _decOffset;
             set
             {
-                if (_decoffset == value) return;
-                _decoffset = value;
+                if (_decOffset == value) return;
+                _decOffset = value;
                 OnPropertyChanged();
             }
         }
@@ -7308,7 +6923,7 @@ namespace GS.Server.SkyTelescope
                 {
                     if (!SkyServer.CanHomeSensor)
                     {
-                        OpenDialog($"{Application.Current.Resources["msgNoHomeSensor"]}");
+                        OpenDialog($"{Application.Current.Resources["1021NoHomeSensor"]}");
                         return;
                     }
                     AutoHomeContent = new AutoHomeDialog();
@@ -7333,7 +6948,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -7359,7 +6974,7 @@ namespace GS.Server.SkyTelescope
                 using (new WaitCursor())
                 {
                     if (!SkyServer.IsMountRunning) return;
-                    //start autohome
+                    //start auto home
                     StartEnabled = false;
                     SkyServer.AutoHomeProgressBar = 0;
                     SkyServer.AutoHomeStop = false;
@@ -7381,7 +6996,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
 
         }
@@ -7408,7 +7023,7 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    // stop autohome
+                    // stop auto home
                     SkyServer.AutoHomeStop = true;
                     StartEnabled = true;
                 }
@@ -7428,7 +7043,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -7454,7 +7069,7 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    // cancel autohome
+                    // cancel auto home
                     SkyServer.AutoHomeStop = true;
                     IsAutoHomeDialogOpen = false;
 
@@ -7475,7 +7090,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 

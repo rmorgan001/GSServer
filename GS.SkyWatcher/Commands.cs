@@ -25,15 +25,15 @@ using System.Threading;
 namespace GS.SkyWatcher
 {
     /// <summary>
-    /// Skywatcher Commands class
-    /// Based on information from Andrew Johansen and the original skywatcher-pacific project 5/31/2011: release C# basic API 1.0
-    /// Contructor takes a connected serial object. 
+    /// SkyWatcher Commands class
+    /// Based on information from Andrew Johansen and the original skyWatcher-pacific project 5/31/2011: release C# basic API 1.0
+    /// Constructor takes a connected serial object. 
     /// </summary>
     public class Commands
     {
         #region Fields
 
-        private const char _endChar = (char)13;                          // Tailing charactor of command and response.
+        private const char _endChar = (char)13;                          // Tailing character of command and response.
         private readonly AxisStatus[] _axesStatus = new AxisStatus[2];  // Status and state information for each axis
         private readonly double[] _positions = { 0, 0 };
         private readonly double[] _factorStepToRad = { 0, 0 };          // radians per step based on gear ratio
@@ -46,7 +46,7 @@ namespace GS.SkyWatcher
         private readonly double[] _factorRadRateToInt = { 0, 0 };
         private readonly long[] _lowSpeedGotoMargin = new long[2];
         private readonly long[] _axisVersion = new long[2];             // Axes versions
-        private readonly long[] _highSpeedRatio = new long[2];          // HiSpeed multiplier  EQ6Pro, AZEQ5, EQ8 = 16   AZEQ6 = 32
+        private readonly long[] _highSpeedRatio = new long[2];          // HiSpeed multiplier  EQ6Pro, AZEeQ5, EQ8 = 16   AZeQ6 = 32
         private const int _threadLockTimeout = 50; // milliseconds
         private readonly object _syncObject = new object();
 
@@ -113,8 +113,8 @@ namespace GS.SkyWatcher
             _positions[(int)AxisId.Axis1] = GetAxisPosition(AxisId.Axis1);
             _positions[(int)AxisId.Axis2] = GetAxisPosition(AxisId.Axis2);
             // These two LowSpeedGotoMargin are calculate from slewing for 5 seconds in 128x sidereal rate
-            _lowSpeedGotoMargin[(int)AxisId.Axis1] = (long)(640 * Constant.Siderealrate * _factorRadToStep[(int)AxisId.Axis1]);
-            _lowSpeedGotoMargin[(int)AxisId.Axis2] = (long)(640 * Constant.Siderealrate * _factorRadToStep[(int)AxisId.Axis2]);
+            _lowSpeedGotoMargin[(int)AxisId.Axis1] = (long)(640 * Constant.SiderealRate * _factorRadToStep[(int)AxisId.Axis1]);
+            _lowSpeedGotoMargin[(int)AxisId.Axis2] = (long)(640 * Constant.SiderealRate * _factorRadToStep[(int)AxisId.Axis2]);
             // Default break steps
             _breakSteps[(int)AxisId.Axis1] = 3500;
             _breakSteps[(int)AxisId.Axis2] = 3500;
@@ -148,7 +148,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// Time Fequency per step
+        /// Time Frequency per step
         /// </summary>
         /// <returns></returns>
         internal long[] GetStepTimeFreq()
@@ -197,10 +197,10 @@ namespace GS.SkyWatcher
         /// </summary>
         /// <param name="axis"></param>
         /// <param name="forward"></param>
-        /// <param name="highspeed"></param>
-        internal void SetSlewing(int axis, bool forward, bool highspeed)
+        /// <param name="highSpeed"></param>
+        internal void SetSlewing(int axis, bool forward, bool highSpeed)
         {
-            _axesStatus[axis].SetSlewing(forward, highspeed);
+            _axesStatus[axis].SetSlewing(forward, highSpeed);
         }
 
         /// <summary>
@@ -208,10 +208,10 @@ namespace GS.SkyWatcher
         /// </summary>
         /// <param name="axis"></param>
         /// <param name="forward"></param>
-        /// <param name="highspeed"></param>
-        internal void SetSlewingTo(int axis, bool forward, bool highspeed)
+        /// <param name="highSpeed"></param>
+        internal void SetSlewingTo(int axis, bool forward, bool highSpeed)
         {
-            _axesStatus[axis].SetSlewingTo(forward, highspeed);
+            _axesStatus[axis].SetSlewingTo(forward, highSpeed);
         }
 
         /// <summary>
@@ -281,7 +281,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// c microsteps from target where the rampdown process begins
+        /// c micro steps from target where the ramp down process begins
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         internal double GetRampDownRange(AxisId axis)
@@ -364,7 +364,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// g Inquire High Speed Ratio, EQ6Pro, AZEQ5, EQ8 = 16   AZEQ6 = 32
+        /// g Inquire High Speed Ratio, EQ6Pro, AZeQ5, EQ8 = 16   AZeQ6 = 32
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         private void GetHighSpeedRatio(AxisId axis)
@@ -414,7 +414,7 @@ namespace GS.SkyWatcher
         /// j Gets radians position of an axis
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
-        /// <returns>Radians of the axis or NaN if no respose is received</returns>
+        /// <returns>Radians of the axis or NaN if no response is received</returns>
         internal double GetAxisPositionNaN(AxisId axis)
         {
             var response = CmdToAxis(axis, 'j', null, true);
@@ -426,7 +426,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// j Gets axis poistion counter
+        /// j Gets axis position counter
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <returns>Cardinal encoder count</returns>
@@ -457,14 +457,14 @@ namespace GS.SkyWatcher
 
         /// <summary>
         /// qx01 Capabilities
-        ///    :qx010000[0D]=ABCDEF[0D]  ie the bitmapped nybbles for current status
+        ///    :qx010000[0D]=ABCDEF[0D]  ie the bit mapped nybbles for current status
         /// A    8  not defined
         ///      4  not defined
-        ///      2  PPEC ON
-        ///      1  PPEC training in progress,
+        ///      2  pPEC ON
+        ///      1  pPEC training in progress,
         /// B    8  supports AZ/EQ
         ///      4  has Home Sensors
-        ///      2  supports PPEC
+        ///      2  supports pPEC
         ///      1  supports dual encoders
         /// C    8  has WIFI
         ///      4  supports half current tracking          // ref :Wx06....
@@ -493,7 +493,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// D Sidereal rate in stepcounts
+        /// D Sidereal rate in step counts
         /// </summary>
         /// <returns></returns>
         internal long GetSiderealRate(AxisId axis)
@@ -506,7 +506,7 @@ namespace GS.SkyWatcher
         /// E Set the target axis position to the specify value
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
-        /// <param name="radians">raidian value</param>
+        /// <param name="radians">radian value</param>
         internal void SetAxisPosition(AxisId axis, double radians)
         {
             var newStepIndex = AngleToStep(axis, radians);
@@ -532,7 +532,7 @@ namespace GS.SkyWatcher
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="func">'0' high speed GOTO slewing,'1' low speed slewing mode,'2' low speed GOTO mode,'3' High slewing mode</param>
-        /// <param name="direction">0=forward/right, 1=backaward/left</param>
+        /// <param name="direction">0=forward/right, 1=backward/left</param>
         /// <param name="southernHemisphere">is mount in the south</param>
         internal void SetMotionMode(AxisId axis, int func, int direction, bool southernHemisphere)
         {
@@ -625,10 +625,10 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// set ST4 guiderate
+        /// set ST4 guide rate
         /// </summary>
         /// <param name="rate"> 0..4 (1.0, 0.75, 0.50, 0.25, 0.125)</param>
-        internal void SetSt4Guiderate(int rate)
+        internal void SetSt4GuideRate(int rate)
         {
             CmdToAxis(AxisId.Axis1, 'P', $"{rate}");
         }
@@ -656,11 +656,11 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// Wx01 on/off PPEC train
+        /// Wx01 on/off pPEC train
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="on"></param>
-        internal void SetPpecTrain(AxisId axis, bool on)
+        internal void SetPPecTrain(AxisId axis, bool on)
         {
             var szCmd = LongToHex(1);
             if (on)
@@ -671,11 +671,11 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// Wx03 on/off PPEC
+        /// Wx03 on/off pPEC
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="on"></param>
-        internal void SetPpec(AxisId axis, bool on)
+        internal void SetPPec(AxisId axis, bool on)
         {
             var szCmd = LongToHex(3);
             if (on)
@@ -743,7 +743,7 @@ namespace GS.SkyWatcher
         /// One communication between mount and client
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
-        /// <param name="command">The comamnd char set</param>
+        /// <param name="command">The command char set</param>
         /// <param name="cmdDataStr">The data need to send</param>
         /// <param name="ignoreWarnings">to ignore serial response issues</param>
         /// <returns>The response string from mount</returns>
@@ -807,8 +807,8 @@ namespace GS.SkyWatcher
 
                             MountConnected = false;
                             throw axis == AxisId.Axis1
-                                ? new MountControlException(ErrorCode.ErrNoresponseAxis1, "Timeout", ex)
-                                : new MountControlException(ErrorCode.ErrNoresponseAxis2, "Timeout", ex);
+                                ? new MountControlException(ErrorCode.ErrNoResponseAxis1, "Timeout", ex)
+                                : new MountControlException(ErrorCode.ErrNoResponseAxis2, "Timeout", ex);
                         }
                         catch (IOException ex)
                         {
@@ -862,7 +862,7 @@ namespace GS.SkyWatcher
             const int bufferSize = 20;
             var commandStr = new StringBuilder(bufferSize);
             commandStr.Append(startCharOut);                    // 0: Leading char
-            commandStr.Append(command);                         // 1: Length of command( Source, distination, command char, data )
+            commandStr.Append(command);                         // 1: Length of command( Source, destination, command char, data )
             // Target Device
             commandStr.Append(axis == AxisId.Axis1 ? '1' : '2');// 2: Target Axis
             // Copy command data to buffer
@@ -891,17 +891,17 @@ namespace GS.SkyWatcher
         }
 
         ///// <summary>
-        ///// Work for seialport event - meium cpu usage
+        ///// Work for serial port event - medium cpu usage
         ///// </summary>
         ///// <param name="sender"></param>
         ///// <param name="e"></param>
         //private void DataReceived(object sender, SerialDataReceivedEventArgs e)
         //{
-        //    IncomingData = RecieveResponse();
+        //    IncomingData = ReceiveResponse();
         //}
 
         ///// <summary>
-        ///// Errors for seialport event
+        ///// Errors for serial port event
         ///// </summary>
         ///// <param name="sender"></param>
         ///// <param name="e"></param>
@@ -948,7 +948,7 @@ namespace GS.SkyWatcher
         //}
 
         /// <summary>
-        /// Read serial port buffer - skywatcher original source
+        /// Read serial port buffer - skyWatcher original source
         /// </summary>
         /// <returns></returns>
         private string ReceiveResponse()
@@ -976,7 +976,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// Constructs a string from the responce
+        /// Constructs a string from the response
         /// </summary>
         /// <returns></returns>
         private string ReceiveResponse(AxisId axis, char command, string cmdDataStr)
@@ -987,7 +987,7 @@ namespace GS.SkyWatcher
             //    // alternative method
             //    //receivedData = DataReceived(cmdDataStr);
 
-            //    receivedData = RecieveResponse();
+            //    receivedData = ReceiveResponse();
             //    if (!string.IsNullOrEmpty(receivedData)) break;
 
             //    // alternative using events
@@ -1027,7 +1027,7 @@ namespace GS.SkyWatcher
                             if (command == 'q') subdata = "=000000";
                             break;
                         case "!0":
-                            errormsg = "Invalid Command: Command doesnt apply to the model";
+                            errormsg = "Invalid Command: Command doesn't apply to the model";
                             switch (command)
                             {
                                 case 'q':
@@ -1037,7 +1037,7 @@ namespace GS.SkyWatcher
                             }
                             break;
                         case "!1":
-                            errormsg = "Invalid Paramcount: Valid command was passed with invalid param count";
+                            errormsg = "Invalid Param count: Valid command was passed with invalid param count";
                             break;
                         case "!2":
                             errormsg = "Motor not Stopped: Valid command failed to run ( ie sending :G whilst motor is running )";
@@ -1046,7 +1046,7 @@ namespace GS.SkyWatcher
                             errormsg = "NonHex Param: Parameter contains a non uppercase Hex Char ";
                             break;
                         case "!4":
-                            errormsg = "Not energised: Motor is not energised";
+                            errormsg = "Not energized: Motor is not energized";
                             break;
                         case "!5":
                             errormsg = "Driver Asleep: card is in sleep mode";
@@ -1058,7 +1058,7 @@ namespace GS.SkyWatcher
                             errormsg = "Unknown";
                             break;
                         case "!8":
-                            errormsg = "Invalid PPEC model";
+                            errormsg = "Invalid pPEC model";
                             break;
                         default:
                             errormsg = "Code Not Found";
@@ -1078,11 +1078,11 @@ namespace GS.SkyWatcher
         }
 
         ///// <summary>
-        ///// Sends :e1 to the mounts and evaluates responce to see its an appropriate response.
+        ///// Sends :e1 to the mounts and evaluates response to see its an appropriate response.
         ///// </summary>
         //internal void TestSerial()
         //{
-        //    var iserror = true;
+        //    var isError = true;
         //    //Serial.ClearBuffers();
         //    // send the request
         //    SendRequest(AxisId.Axis1, 'e', null);
@@ -1097,23 +1097,23 @@ namespace GS.SkyWatcher
         //        switch (responseString[0].ToString())
         //        {
         //            case "=":
-        //                iserror = false;
+        //                isError = false;
         //                break;
         //            case "!":
-        //                iserror = false;
+        //                isError = false;
         //                break;
         //        }
         //        // check to see if the number for the mount type is valid
-        //        if (!iserror)
+        //        if (!isError)
         //        {
-        //            var parsed = int.TryParse(responseString.Substring(6, 1), out var mountnumber);
+        //            var parsed = int.TryParse(responseString.Substring(6, 1), out var mountNumber);
         //            if (parsed)
         //            {
-        //                if (mountnumber < 0 || mountnumber > 6)iserror = true;
+        //                if (mountNumber < 0 || mountNumber > 6)isError = true;
         //            }
         //            else
         //            {
-        //                iserror = true;
+        //                isError = true;
         //            }
         //        }
 
@@ -1123,7 +1123,7 @@ namespace GS.SkyWatcher
         //        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" Response:{responseString}"};
         //    MonitorLog.LogToMonitor(monitorItem);
 
-        //    if (!iserror) return;
+        //    if (!isError) return;
         //    throw new MountControlException(ErrorCode.ErrMountNotFound);
         //}
 

@@ -5,13 +5,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
-        mc:Ignorable="d" >
+        xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
     <GroupBox Header="{StaticResource btnAutoHome}" Margin="5" >
             <StackPanel Orientation="Vertical">
                 <ProgressBar Value="{Binding AutoHomeProgressBar}" md:TransitionAssist.DisableTransitions="True" Height="10" Width="200" Foreground="{StaticResource SecondaryAccentBrush}" />
                 <StackPanel Orientation="Horizontal" Margin="0,5,0,0" IsEnabled="{Binding StartEnabled}">
-                <Label Content="{StaticResource msgAutoHomeLimit}" VerticalAlignment="Bottom"/>
-                <ComboBox md:HintAssist.Hint="{StaticResource cbhintAutoHomeLimit}" MinWidth="10" ToolTip="{StaticResource cbtipAutoHomeLimit}"  
+                <Label Content="{StaticResource btnAutoHomeLimit}" VerticalAlignment="Bottom"/>
+                <ComboBox md:HintAssist.Hint="{StaticResource btnHintAutoHomeLimit}" MinWidth="10" ToolTip="{StaticResource btnTipAutoHomeLimit}"  
                           ItemsSource="{Binding AutoHomeLimits}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                     <ComboBox.SelectedItem>
                         <Binding Path="AutoHomeLimit" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -28,8 +29,8 @@
                 </ComboBox>
             </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0" IsEnabled="{Binding StartEnabled}">
-                <Label Content="{StaticResource msgDecOffset}" VerticalAlignment="Bottom"/>
-                <ComboBox md:HintAssist.Hint="{StaticResource cbhintDecOffset}" MinWidth="10" ToolTip="{StaticResource cbhintDecOffset}"  
+                <Label Content="{StaticResource btnDecOffset}" VerticalAlignment="Bottom"/>
+                <ComboBox md:HintAssist.Hint="{StaticResource btnHintDecOffset}" MinWidth="10" ToolTip="{StaticResource btnHintDecOffset}"  
                           ItemsSource="{Binding DecOffsets}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                     <ComboBox.SelectedItem>
                         <Binding Path="DecOffset" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -46,8 +47,8 @@
                 </ComboBox>
             </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0 10 0 0" HorizontalAlignment="Center">
-                    <Button IsEnabled="{Binding StartEnabled}" IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding StartAutoHomeDialogCommand}" Content="{StaticResource btnStart}"/>
-                    <Button IsCancel="True"  Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelAutoHomeDialogCommand}" Content="{StaticResource btnCancel}"/>
+                    <Button IsEnabled="{Binding StartEnabled}" IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding StartAutoHomeDialogCommand}" Content="{StaticResource diaStart}"/>
+                    <Button IsCancel="True"  Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelAutoHomeDialogCommand}" Content="{StaticResource diaCancel}"/>
                 </StackPanel>
             </StackPanel>
     </GroupBox>

@@ -6,11 +6,11 @@
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <GroupBox Header="{StaticResource msgError}" Margin="5">
+    <GroupBox Header="{StaticResource exError}" Margin="5">
         <StackPanel Orientation="Vertical">
             <TextBlock x:Name="Message" Margin="0 6 0 0" FontSize="18"/>
             <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" HorizontalAlignment="Center"  Margin="10"
-                    Command="{x:Static md:DialogHost.CloseDialogCommand}" Content="{StaticResource btnOk}"/>
+                    Command="{x:Static md:DialogHost.CloseDialogCommand}" Content="{StaticResource diaOk}"/>
         </StackPanel>
     </GroupBox>
 </UserControl>

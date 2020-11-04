@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019  Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2020  Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -28,7 +28,7 @@ namespace GS.Principles
         /// </summary>
         /// <param name="jd">2456474.4423611108</param>
         /// <returns>30.942361110821366</returns>
-        public static double Jd2Cday(double jd)
+        public static double Jd2CDay(double jd)
         {
             var a = Math.Floor(jd + 0.5);
             var b = jd + 0.5 - a;
@@ -48,7 +48,7 @@ namespace GS.Principles
         /// </summary>
         /// <param name="jd">2456474.4423611108</param>
         /// <returns>6</returns>
-        public static int Jd2Cmonth(double jd)
+        public static int Jd2CMonth(double jd)
         {
             var i = Math.Floor(jd + 0.5);
             var a = Math.Floor((i - 1867216.25) / 36524.25);
@@ -67,7 +67,7 @@ namespace GS.Principles
         /// </summary>
         /// <param name="jd">2456474.4423611108</param>
         /// <returns>2013</returns>
-        public static int Jd2Cyear(double jd)
+        public static int Jd2CYear(double jd)
         {
             var a = Math.Floor(jd + 0.5);
             var b = Math.Floor((a - 1867216.25) / 36524.25);
@@ -173,7 +173,7 @@ namespace GS.Principles
         }
 
         /// <summary>
-        /// Julian Date conversion with ASCOM Utilities
+        /// Julian Date conversion with AsCom Utilities
         /// </summary>
         /// <param name="date">2009, 6, 19, 18, 0, 0</param>
         /// <returns>2455002.25</returns>
@@ -231,12 +231,12 @@ namespace GS.Principles
         /// Days since the epoch (UTC)
         /// Adapted from Peter Duffett-Smith, Practical Astronomy with your Calculator
         /// </summary>
-        /// <param name="edate">2010, 6, 19, 18, 0, 0</param>
+        /// <param name="eDate">2010, 6, 19, 18, 0, 0</param>
         /// <param name="date">1999, 6, 19, 18, 0, 0</param>
         /// <returns>-4018</returns>
-        public static double EpochDays(DateTime edate, DateTime date)
+        public static double EpochDays(DateTime eDate, DateTime date)
         {
-            var a = Utc2Jd2(edate);
+            var a = Utc2Jd2(eDate);
             var b = Utc2Jd2(date);
             var EpochDays = b - a;
             return EpochDays;

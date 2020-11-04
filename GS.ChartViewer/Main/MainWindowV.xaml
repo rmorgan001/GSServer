@@ -20,8 +20,7 @@
         Left="{Binding WindowLeft, Source={x:Static properties:ChartViewer.Default}, Mode=TwoWay}"
         Top="{Binding WindowTop, Source={x:Static properties:ChartViewer.Default}, Mode=TwoWay}"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        Background="{DynamicResource MaterialDesignPaper}" 
-        Title="GS LogView" FontSize="13">
+        Background="{DynamicResource MaterialDesignPaper}" Title="GS LogView" FontSize="13" d:DataContext="{d:DesignInstance main:MainWindowVM}">
     <WindowChrome.WindowChrome>
         <WindowChrome
             ResizeBorderThickness="6"
@@ -62,8 +61,8 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <controls:WindowTitleBar Grid.Row="0" />
-        <Grid Grid.Row="1" >
-            <md:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" />
+        <md:DialogHost Grid.Row="1"  CloseOnClickAway="True" IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" >
+            <Grid >
             <md:DrawerHost BorderThickness="2" IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" BorderBrush="{DynamicResource MaterialDesignDivider}">
                 <md:DrawerHost.LeftDrawerContent>
                     <Grid Width="400">
@@ -113,11 +112,11 @@
                                 <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="35"/>
                                 </Grid.ColumnDefinitions>
-                                <Label Grid.Row="0" Grid.Column="0" Content="{DynamicResource lbChartNumber}"/>
-                                <Label Grid.Row="0" Grid.Column="1" Content="{DynamicResource lbChartStart}"/>
-                                <Label Grid.Row="0" Grid.Column="2" Content="{DynamicResource lbChartEnd}"/>
-                                <Label Grid.Row="0" Grid.Column="3" Content="{DynamicResource lbChartLength}"/>
-                                <Label Grid.Row="0" Grid.Column="4" Content="{DynamicResource lbChartType}"/>
+                                    <Label Grid.Row="0" Grid.Column="0" Content="{DynamicResource chtNumber}"/>
+                                    <Label Grid.Row="0" Grid.Column="1" Content="{DynamicResource chtStart}"/>
+                                    <Label Grid.Row="0" Grid.Column="2" Content="{DynamicResource chtEnd}"/>
+                                    <Label Grid.Row="0" Grid.Column="3" Content="{DynamicResource chtLength}"/>
+                                    <Label Grid.Row="0" Grid.Column="4" Content="{DynamicResource chtType}"/>
                             <ListView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="6" ItemsSource="{Binding Path=IndexItems}" SelectedItem="{Binding SelectedIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                                 <ListView.ItemTemplate>
                                     <DataTemplate DataType="{x:Type main:IndexItem}">
@@ -144,10 +143,10 @@
                         </Grid>
                     </Border>
                     <StackPanel Margin="15,0,15,0" Grid.Row="0" Grid.Column="1" Orientation="Vertical">
-                            <Button Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickOpenFileCommand}" Content="{DynamicResource btnChartOpen}"/>
+                                <Button Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickOpenFileCommand}" Content="{DynamicResource chtOpen}"/>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,0" >
-                                <ComboBox md:HintAssist.Hint="{DynamicResource cbChartQuality}" MinWidth="10" ToolTip="{DynamicResource cbChartQuality}" Width="65" 
+                                    <ComboBox md:HintAssist.Hint="{DynamicResource chtQuality}" MinWidth="10" ToolTip="{DynamicResource chtQuality}" Width="65" 
                                           ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type enums:Quality}}}"
                                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" HorizontalAlignment="Left">
                                 <ComboBox.Text>
@@ -160,8 +159,8 @@
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
                                 <StackPanel Orientation="Vertical" Margin="15,0,0,0">
-                                    <TextBlock Margin="0,0,10,10" Text="{DynamicResource tbChartViewLog}"/>
-                                    <ToggleButton IsChecked="{Binding LogTextVis, Mode=TwoWay}" Style="{StaticResource MaterialDesignSwitchAccentToggleButton}" ToolTip="{DynamicResource btnChartViewLog}">
+                                        <TextBlock Margin="0,0,10,10" Text="{DynamicResource chtViewLog}"/>
+                                        <ToggleButton IsChecked="{Binding LogTextVis, Mode=TwoWay}" Style="{StaticResource MaterialDesignSwitchAccentToggleButton}" ToolTip="{DynamicResource chtViewLog}">
                                         <md:PackIcon Kind="Pin" RenderTransformOrigin=".5,.5">
                                             <md:PackIcon.RenderTransform>
                                                 <RotateTransform Angle="45" />
@@ -175,42 +174,14 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,15,0,0" HorizontalAlignment="Center">
                                 <Button Margin="0,0,0,0" Height="30" ToolTip="Fit Xy" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickChartSizeCmd}" Content="Reset"/>
-                                <!--<Button Margin="5,0,0,0" Height="30" ToolTip="Fit X" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickChartSizeXCmd}" Content="X"/>
-                                <Button Margin="5,0,0,0" Height="30" ToolTip="Fit Y" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickChartSizeYCmd}" Content="Y"/>-->
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"  Margin="0,5,0,0">
-                                <TextBlock VerticalAlignment="Center" Margin="0,0,0,0" Text="{DynamicResource tbChartZoom}"/>
+                                    <TextBlock VerticalAlignment="Center" Margin="0,0,0,0" Text="{DynamicResource chtZoom}"/>
                                 <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Xy" Command="{Binding Path=ClickChartZoomCmd}" CommandParameter="Xy" IsChecked="True" />
                                 <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="X" Command="{Binding Path=ClickChartZoomCmd}" CommandParameter="X"/>
                                 <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Y" Command="{Binding Path=ClickChartZoomCmd}" CommandParameter="Y"/>
                            </StackPanel>
-                            <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Center"  Margin="0,5,0,0">
-                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="{DynamicResource btntipChartShrink}" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickChartXDownCmd}">
-                                    <md:PackIcon
-                                        Kind="ArrowLeft"
-                                        Height="24"
-                                        Width="24" />
-                                </Button>
-                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="{DynamicResource btntipChartExpand}" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickChartXUpCmd}">
-                                    <md:PackIcon
-                                        Kind="ArrowRight"
-                                        Height="24"
-                                        Width="24" />
-                                    </Button>
-                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="{DynamicResource btntipChartUp}" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickChartYUpCmd}">
-                                    <md:PackIcon
-                                        Kind="ArrowUp"
-                                        Height="24"
-                                        Width="24" />
-                                </Button>
-                                <Button Margin="5,0,0,0" Height="30" Width="30" ToolTip="{DynamicResource btntipChartDown}" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Command="{Binding ClickChartYDownCmd}">
-                                    <md:PackIcon
-                                        Kind="ArrowDown"
-                                        Height="24"
-                                        Width="24" />
-                                </Button>
-                            </StackPanel>-->
-                        </StackPanel>
+                    </StackPanel>
                     <Grid Grid.Row="0" Grid.Column="2" Margin="0,0,10,0" >
                             <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
@@ -336,5 +307,6 @@
                 </Grid>
             </md:DrawerHost>
         </Grid>
+        </md:DialogHost>
     </Grid>
 </Window>

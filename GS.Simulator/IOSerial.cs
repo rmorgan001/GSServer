@@ -55,7 +55,7 @@ namespace GS.Simulator
         /// One communication between mount and client
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
-        /// <param name="command">The comamnd char set</param>
+        /// <param name="command">The command char set</param>
         /// <param name="cmdDataStr">The data need to send</param>
         /// <returns>The response string from mount</returns>
         private string CmdToAxis(AxisId axis, char command, string cmdDataStr)
@@ -75,14 +75,14 @@ namespace GS.Simulator
                             // send the request
                             cmdDataStr = SendRequest(axis, command, cmdDataStr);
                             // receive the response
-                            var responseString = RecieveResponse(axis, command, cmdDataStr);
+                            var responseString = Receive Response(axis, command, cmdDataStr);
                             return responseString;
                         }
                         catch (TimeoutException ex)
                         {
                             throw axis == AxisId.Axis1
-                                ? new MountException(ErrorCode.ErrNoresponseAxis1, "Timeout", ex)
-                                : new MountException(ErrorCode.ErrNoresponseAxis2, "Timeout", ex);
+                                ? new MountException(ErrorCode.ErrNoResponseAxis1, "Timeout", ex)
+                                : new MountException(ErrorCode.ErrNoResponseAxis2, "Timeout", ex);
                         }
                         catch (IOException ex)
                         {
@@ -124,7 +124,7 @@ namespace GS.Simulator
             const int bufferSize = 20;
             var commandStr = new StringBuilder(bufferSize);
             commandStr.Append(startCharOut);                    // 0: Leading char
-            commandStr.Append(command);                         // 1: Length of command( Source, distination, command char, data )
+            commandStr.Append(command);                         // 1: Length of command( Source, destination, command char, data )
             // Target Device
             commandStr.Append(axis == AxisId.Axis1 ? '1' : '2');// 2: Target Axis
             // Copy command data to buffer
@@ -136,10 +136,10 @@ namespace GS.Simulator
         }
 
         /// <summary>
-        /// Constructs a string from the responce
+        /// Constructs a string from the response
         /// </summary>
         /// <returns></returns>
-        private string RecieveResponse(AxisId axis, char command, string cmdDataStr)
+        private string ReceiveResponse(AxisId axis, char command, string cmdDataStr)
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -157,11 +157,11 @@ namespace GS.Simulator
                         sw.Stop();
                         return receivedData;
                     case "!":  // Abnormal response.
-                        string errormsg;
+                        string errorMsg;
                         switch (receivedData.Trim())
                         {
                             case "!0":
-                                errormsg = "Invalid Command: Command doesnt apply to the model";
+                                errorMsg = "Invalid Command: Command doesn't apply to the model";
                                 break;
                         }
                         //log and do something about errors
@@ -175,11 +175,11 @@ namespace GS.Simulator
         }
 
         /// <summary>
-        /// Sends :e1 to the mounts and evaluates responce to see its an appropriate response.
+        /// Sends :e1 to the mounts and evaluates response to see its an appropriate response.
         /// </summary>
         internal void TestSerial()
         {
-            var iserror = true;
+            var isError = true;
             MountQueue.Serial.ClearBuffers();
             // send the request
             SendRequest(AxisId.Axis1, 'e', null);
@@ -193,29 +193,29 @@ namespace GS.Simulator
                 switch (responseString[0].ToString())
                 {
                     case "=":
-                        iserror = false;
+                        isError = false;
                         break;
                     case "!":
-                        iserror = false;
+                        isError = false;
                         break;
                 }
                 // check to see if the number for the mount type is valid
-                if (!iserror)
+                if (!isError)
                 {
-                    var parsed = int.TryParse(responseString.Substring(6, 1), out var mountnumber);
+                    var parsed = int.TryParse(responseString.Substring(6, 1), out var mountNumber);
                     if (parsed)
                     {
-                        if (mountnumber < 0 || mountnumber > 6) iserror = true;
+                        if (mountNumber < 0 || mountNumber > 6) isError = true;
                     }
                     else
                     {
-                        iserror = true;
+                        isError = true;
                     }
                 }
 
             }
 
-            if (!iserror) return;
+            if (!isError) return;
             throw new MountException(ErrorCode.ErrMountNotFound);
         }
 

@@ -4,8 +4,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
-        mc:Ignorable="d" >
-    <GroupBox Header="{StaticResource msgParkNewName}" Margin="5">
+        xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+    <GroupBox Header="{StaticResource skyParkNewName}" Margin="5">
         <StackPanel Orientation="Vertical">
             <StackPanel Orientation="Horizontal" Margin="10">
                 <TextBlock Text="Name:" VerticalAlignment="Center"/>
@@ -20,8 +21,8 @@
                 </TextBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="5" >
-                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource btnAccept}" Command="{Binding AcceptParkAddDialogCommand}"/>
-                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource btnCancel}" Command="{Binding CancelParkAddDialogCommand}"/>
+                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaAccept}" Command="{Binding AcceptParkAddDialogCommand}"/>
+                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaCancel}" Command="{Binding CancelParkAddDialogCommand}"/>
             </StackPanel>
         </StackPanel>
 </GroupBox>

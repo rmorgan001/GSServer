@@ -3,13 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" >
-    <GroupBox Header="{StaticResource msgResetSettings}" Margin="5">
+        xmlns:settings="clr-namespace:GS.Server.Settings"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance settings:SettingsVM}">
+    <GroupBox Header="{StaticResource optResetSettings}" Margin="5">
         <StackPanel Orientation="Vertical">
-            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10" Text="{StaticResource tbAcceptResetSettings}"/>
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10" Text="{StaticResource optAcceptResetSettings}"/>
             <StackPanel Orientation="Horizontal"  HorizontalAlignment="Center">
-                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptResetDialogCommand}" Content="{StaticResource btnAccept}"/>
-                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelResetDialogCommand}" Content="{StaticResource btnCancel}"/>
+                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptResetDialogCommand}" Content="{StaticResource diaAccept}"/>
+                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelResetDialogCommand}" Content="{StaticResource diaCancel}"/>
             </StackPanel>
         </StackPanel>
     </GroupBox>

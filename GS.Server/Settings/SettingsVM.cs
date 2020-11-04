@@ -41,10 +41,9 @@ namespace GS.Server.Settings
     public sealed class SettingsVM : ObservableObject, IPageVM, IDisposable
     {
         #region fields
-
         public string TopName => "GS Server";
         public string BottomName => "Options";
-        private static string GsUrl => $"http://www.greenswamp.org/autodownloads";
+        private static string GsUrl => $"https://github.com/rmorgan001/GSServer/wiki/autodownloads";
         public int Uid => 2;
         private readonly MainWindowVM _mainWindowVm;
         public static SettingsVM _settingsVM;
@@ -157,7 +156,7 @@ namespace GS.Server.Settings
                                 //AccentColor = Settings.AccentColor;
                                 break;
                             case "Gamepad":
-                                Gamepad = Settings.Gamepad;
+                                GamePad = Settings.GamePad;
                                 break;
                             case "SkyWatcher":
                                 SkyWatcher = Settings.SkyWatcher;
@@ -288,25 +287,25 @@ namespace GS.Server.Settings
             }
         }
 
-        public bool Gamepad
+        public bool GamePad
         {
-            get => Settings.Gamepad;
+            get => Settings.GamePad;
             set
             {
-                Settings.Gamepad = value;
-                _mainWindowVm.UpdateTabViewModel("Gamepad");
+                Settings.GamePad = value;
+                _mainWindowVm.UpdateTabViewModel("GamePad");
                 OnPropertyChanged();
             }
         }
 
-        public List<string> Langs => Languages.SupportedLanguages;
+        public List<string> Languages => Shared.Languages.SupportedLanguages;
 
         public string Lang
         {
-            get => Languages.Language;
+            get => Shared.Languages.Language;
             set
             {
-                Languages.Language = value;
+                Shared.Languages.Language = value;
                 OnPropertyChanged();
                 OpenDialog("Restart GS Server");
             }
@@ -368,14 +367,14 @@ namespace GS.Server.Settings
         }
 
         private SleepMode _sleepMode;
-        private bool sleepmode;
+        private bool sleepMode;
 
         public bool SleepMode
         {
             get => Settings.SleepMode;
             set
             {
-                if(sleepmode == value) {return;}
+                if(sleepMode == value) {return;}
                 if (value)
                 {
                     if (_sleepMode == null)
@@ -393,7 +392,7 @@ namespace GS.Server.Settings
                     }
                 }
 
-                sleepmode = value;
+                sleepMode = value;
                 Settings.SleepMode = value;
                 OnPropertyChanged();
             }
@@ -538,19 +537,19 @@ namespace GS.Server.Settings
 
         public DateTime UTCTime => HiResDateTime.UtcNow.Add(SkySettings.UTCDateOffset);
 
-        private ICommand _clickResetUtcffsetCmd;
+        private ICommand _clickResetUtcOffsetCmd;
 
         public ICommand ClickResetUtcOffsetCmd
         {
             get
             {
-                var cmd = _clickResetUtcffsetCmd;
+                var cmd = _clickResetUtcOffsetCmd;
                 if (cmd != null)
                 {
                     return cmd;
                 }
 
-                return _clickResetUtcffsetCmd = new RelayCommand(
+                return _clickResetUtcOffsetCmd = new RelayCommand(
                     param => ClickResetUtcOffset()
                 );
             }
@@ -589,14 +588,14 @@ namespace GS.Server.Settings
             }
         }
 
-        private bool _gamepadSettings;
+        private bool _gamePadSettings;
 
-        public bool GamepadSettings
+        public bool GamePadSettings
         {
-            get => _gamepadSettings;
+            get => _gamePadSettings;
             set
             {
-                _gamepadSettings = value;
+                _gamePadSettings = value;
                 OnPropertyChanged();
             }
         }
@@ -618,7 +617,7 @@ namespace GS.Server.Settings
         {
             SkyTelescopeSettings = false;
             ServerSettings = false;
-            GamepadSettings = false;
+            GamePadSettings = false;
             MonitorSettings = false;
         }
 
@@ -670,9 +669,9 @@ namespace GS.Server.Settings
         {
             try
             {
-                if (!SkyTelescopeSettings && !ServerSettings && !GamepadSettings && !MonitorSettings)
+                if (!SkyTelescopeSettings && !ServerSettings && !GamePadSettings && !MonitorSettings)
                 {
-                    OpenDialog(Application.Current.Resources["tbNoResetSettings"].ToString());
+                    OpenDialog(Application.Current.Resources["optNoResetSettings"].ToString());
                     return;
                 }
 
@@ -737,7 +736,7 @@ namespace GS.Server.Settings
                         Properties.Server.Default.Reload();
                     }
 
-                    if (GamepadSettings)
+                    if (GamePadSettings)
                     {
                         Properties.Gamepad.Default.Reset();
                         Properties.Gamepad.Default.Save();
@@ -752,7 +751,7 @@ namespace GS.Server.Settings
                     }
 
                     IsSettingsResetDialogOpen = false;
-                    OpenDialog(Application.Current.Resources["msgRestart"].ToString());
+                    OpenDialog(Application.Current.Resources["optRestart"].ToString());
                     ClearSettings();
                 }
             }
@@ -835,17 +834,7 @@ namespace GS.Server.Settings
             }
         }
 
-        private string _updateLink;
-
-        public string UpdateLink
-        {
-            get => _updateLink;
-            set
-            {
-                _updateLink = value;
-                OnPropertyChanged();
-            }
-        }
+        private string UpdateLink { get; set; }
 
         private string _currentVersion;
 
@@ -861,7 +850,7 @@ namespace GS.Server.Settings
 
         private string _updateVersion;
 
-        public string UpdatetVersion
+        public string UpdateVersion
         {
             get => _updateVersion;
             set
@@ -921,7 +910,7 @@ namespace GS.Server.Settings
             {
                 if (SkySettings.Mount == MountType.SkyWatcher && SkyServer.IsMountRunning || GSServer.AppCount > 0)
                 {
-                    OpenDialog(Application.Current.Resources["msgODisconnects"].ToString());
+                    OpenDialog(Application.Current.Resources["optDisconnects"].ToString());
                     return;
                 }
                 using (new WaitCursor())
@@ -941,42 +930,25 @@ namespace GS.Server.Settings
                         // valid array
                         if (ver.Length < 3)
                         {
-                            OpenDialog(Application.Current.Resources["msgONotFound"].ToString());
+                            OpenDialog(Application.Current.Resources["optNotFound"].ToString());
                             return;
                         }
                         // valid URL?
                         if (!html.IsValidUri(i.Href))
                         {
-                            OpenDialog(Application.Current.Resources["msgONotFound"].ToString());
+                            OpenDialog(Application.Current.Resources["optNotFound"].ToString());
                             return;
                         }
-                        UpdatetVersion = ver[3];
+                        UpdateVersion = ver[3];
                         UpdateLink = i.Href;
 
                         //check version numbers
                         UpdateEnabled = true;
                         IsUpdateDialogOpen = true;
-                        //var currentVer = new Version(CurrentVersion);
-                        //var updateVer = new Version(UpdatetVersion);
-                        //switch (currentVer.CompareTo(updateVer))
-                        //{
-                        //    case 0:
-                        //        UpdateEnabled = true;
-                        //        IsUpdateDialogOpen = true;
-                        //        OpenDialog(Application.Current.Resources["msgOOnLatest"].ToString());
-                        //        break;
-                        //    case 1:
-                        //        OpenDialog(Application.Current.Resources["msgOOnNewer"].ToString());
-                        //        break;
-                        //    default:
-                        //        UpdateEnabled = true;
-                        //        IsUpdateDialogOpen = true;
-                        //        break;
-                        //}
 
                         return;
                     }
-                    OpenDialog(Application.Current.Resources["msgONotAvail"].ToString());
+                    OpenDialog(Application.Current.Resources["optNotAvail"].ToString());
                 }
             }
             catch (Exception ex)
@@ -1011,7 +983,7 @@ namespace GS.Server.Settings
                 var html = new HTML();
                 if (!html.IsValidUri(UpdateLink))
                 {
-                    OpenDialog(Application.Current.Resources["msgONotFound"].ToString());
+                    OpenDialog(Application.Current.Resources["optNotFound"].ToString());
                     return;
                 }
                 html.OpenUri(UpdateLink);
@@ -1230,25 +1202,25 @@ namespace GS.Server.Settings
             }
         }
 
-        private ICommand _volumeupCommand;
+        private ICommand _volumeUpCommand;
 
-        public ICommand VolumeupCommand
+        public ICommand VolumeUpCommand
         {
             get
             {
-                var command = _volumeupCommand;
+                var command = _volumeUpCommand;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _volumeupCommand = new RelayCommand(
-                    param => Volumeup()
+                return _volumeUpCommand = new RelayCommand(
+                    param => VolumeUp()
                 );
             }
         }
 
-        private void Volumeup()
+        private void VolumeUp()
         {
             try
             {
@@ -1275,25 +1247,25 @@ namespace GS.Server.Settings
             }
         }
 
-        private ICommand _volumedownCommand;
+        private ICommand _volumeDownCommand;
 
-        public ICommand VolumedownCommand
+        public ICommand VolumeDownCommand
         {
             get
             {
-                var command = _volumedownCommand;
+                var command = _volumeDownCommand;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _volumedownCommand = new RelayCommand(
-                    param => Volumedown()
+                return _volumeDownCommand = new RelayCommand(
+                    param => VolumeDown()
                 );
             }
         }
 
-        private void Volumedown()
+        private void VolumeDown()
         {
             try
             {
@@ -1530,7 +1502,7 @@ namespace GS.Server.Settings
                         }
 
                         //stream.Close();
-                        OpenDialog($"{Application.Current.Resources["msgCopiedClip"]}");
+                        OpenDialog($"{Application.Current.Resources["optCopiedClip"]}");
                     }
                 }
             }
@@ -1594,102 +1566,11 @@ namespace GS.Server.Settings
             }
         }
 
-        private ICommand _clickPrimaryColorCommand;
-
-        public ICommand ClickPrimaryColorCommand
-        {
-            get
-            {
-                var command = _clickPrimaryColorCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _clickPrimaryColorCommand = new RelayCommand(
-                    param => ClickPrimaryColor((Swatch) param)
-                );
-            }
-        }
-
-        private void ClickPrimaryColor(Swatch swatch)
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    var paletteHelper = new PaletteHelper();
-                    var theme = paletteHelper.GetTheme();
-                    theme.SetPrimaryColor(swatch.ExemplarHue.Color);
-                    paletteHelper.SetTheme(theme);
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server,
-                    Category = MonitorCategory.Interface, Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                OpenDialog(ex.Message);
-            }
-        }
-
-        private ICommand _clickAccentColorCommand;
-
-        public ICommand ClickAccentColorCommand
-        {
-            get
-            {
-                var command = _clickAccentColorCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _clickAccentColorCommand = new RelayCommand(
-                    param => ClickAccentColor((Swatch) param)
-                );
-            }
-        }
-
-        private void ClickAccentColor(Swatch swatch)
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    var paletteHelper = new PaletteHelper();
-                    var theme = paletteHelper.GetTheme();
-                    theme.SetSecondaryColor(swatch.ExemplarHue.Color);
-                    paletteHelper.SetTheme(theme);
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server,
-                    Category = MonitorCategory.Interface, Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                OpenDialog(ex.Message);
-            }
-        }
-
         #endregion
 
         #region Dialog
 
         private string _DialogMsg;
-
         public string DialogMsg
         {
             get => _DialogMsg;
@@ -1714,7 +1595,6 @@ namespace GS.Server.Settings
         }
 
         private bool _isDialogOpen;
-
         public bool IsDialogOpen
         {
             get => _isDialogOpen;
@@ -1727,7 +1607,6 @@ namespace GS.Server.Settings
         }
 
         private object _dialogContent;
-
         public object DialogContent
         {
             get => _dialogContent;
@@ -1760,7 +1639,7 @@ namespace GS.Server.Settings
         private void OpenDialog(string msg, string caption = null)
         {
             if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["msgDialog"].ToString();
+            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
             DialogContent = new DialogOK();
             IsDialogOpen = true;
 
@@ -1774,7 +1653,6 @@ namespace GS.Server.Settings
         }
 
         private ICommand _clickOkDialogCommand;
-
         public ICommand ClickOkDialogCommand
         {
             get
@@ -1790,14 +1668,12 @@ namespace GS.Server.Settings
                 );
             }
         }
-
         private void ClickOkDialog()
         {
             IsDialogOpen = false;
         }
 
         private ICommand _cancelDialogCommand;
-
         public ICommand CancelDialogCommand
         {
             get
@@ -1813,14 +1689,12 @@ namespace GS.Server.Settings
                 );
             }
         }
-
         private void CancelDialog()
         {
             IsDialogOpen = false;
         }
 
         private ICommand _runMessageDialog;
-
         public ICommand RunMessageDialogCommand
         {
             get
@@ -1836,10 +1710,8 @@ namespace GS.Server.Settings
                 );
             }
         }
-
         private async void ExecuteMessageDialog()
         {
-            //let's set up a little MVVM, cos that's what the cool kids are doing:
             var view = new ErrorMessageDialog
             {
                 DataContext = new ErrorMessageDialogVM()
@@ -1848,7 +1720,6 @@ namespace GS.Server.Settings
             //show the dialog
             await DialogHost.Show(view, "RootDialog", ClosingMessageEventHandler);
         }
-
         private void ClosingMessageEventHandler(object sender, DialogClosingEventArgs eventArgs)
         {
             Console.WriteLine(@"You can intercept the closing event, and cancel here.");

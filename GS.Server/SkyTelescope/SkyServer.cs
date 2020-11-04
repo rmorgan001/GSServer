@@ -131,9 +131,9 @@ namespace GS.Server.SkyTelescope
         private static Vector _altAzm;
         private static int _autoHomeProgressBar;
         private static bool _autoHomeStop;
-        private static bool _ascomOn;
-        private static bool _canhomesensor;
-        private static double _declinationXform;
+        private static bool _asComOn;
+        private static bool _canHomeSensor;
+        private static double _declinationXForm;
         private static Vector _guideRate;
         private static bool _isAutoHomeRunning;
         private static bool _isHome;
@@ -144,7 +144,7 @@ namespace GS.Server.SkyTelescope
         private static Exception _lastAutoHomeError;
         private static double _lha;
         private static bool _limitAlarm;
-        private static bool _mountrunning;
+        private static bool _mountRunning;
         private static bool _monitorPulse;
         private static double _mountAxisX;
         private static double _mountAxisY;
@@ -154,7 +154,7 @@ namespace GS.Server.SkyTelescope
         private static Vector _raDec;
         private static Vector _rateAxes;
         private static Vector _rateRaDec;
-        private static double _rightAscensionXform;
+        private static double _rightAscensionXForm;
         private static double _slewSettleTime;
         private static double _siderealTime;
         private static bool _spiralChanged;
@@ -165,7 +165,7 @@ namespace GS.Server.SkyTelescope
         #endregion
 
         /// <summary>
-        /// UI display for actual poistions in degrees
+        /// UI display for actual positions in degrees
         /// </summary>
         public static double ActualAxisX
         {
@@ -179,7 +179,7 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// UI display for actual poistions in degrees
+        /// UI display for actual positions in degrees
         /// </summary>
         public static double ActualAxisY
         {
@@ -243,7 +243,7 @@ namespace GS.Server.SkyTelescope
             get
             {
                 var h = new Vector(_homeAxes.X, _homeAxes.Y);
-                var m = new Vector(Math.Abs(_mountAxes.X), _mountAxes.Y); // Abs is for S Hemi, hack for homepoistion
+                var m = new Vector(Math.Abs(_mountAxes.X), _mountAxes.Y); // Abs is for S Hemisphere, hack for home position
                 var x = (m - h);
                 var r = x.LengthSquared < 0.01;
                 return r;
@@ -277,7 +277,7 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// UI progress bar for autohome 
+        /// UI progress bar for autoHome 
         /// </summary>
         public static int AutoHomeProgressBar
         {
@@ -290,7 +290,7 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Cancel button status for autohome
+        /// Cancel button status for auto home
         /// </summary>
         public static bool AutoHomeStop
         {
@@ -303,14 +303,14 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Allow ascom driver to process calls
+        /// Allow asCom driver to process calls
         /// </summary>
-        public static bool AscomOn
+        public static bool AsComOn
         {
-            get => _ascomOn;
+            get => _asComOn;
             set
             {
-                _ascomOn = value;
+                _asComOn = value;
 
                 var monitorItem = new MonitorEntry
                 {
@@ -333,11 +333,11 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         public static bool CanHomeSensor
         {
-            get => _canhomesensor;
+            get => _canHomeSensor;
             private set
             {
-                if (_canhomesensor == value) { return; }
-                _canhomesensor = value;
+                if (_canHomeSensor == value) { return; }
+                _canHomeSensor = value;
                 OnStaticPropertyChanged();
             }
         }
@@ -352,26 +352,26 @@ namespace GS.Server.SkyTelescope
             {
                 if (Math.Abs(value - _raDec.Y) < 0.000000000000001) { return; }
                 _raDec.Y = value;
-                DeclinationXform = value;
+                DeclinationXForm = value;
             }
         }
 
         /// <summary>
         /// UI display for converted dec
         /// </summary>
-        public static double DeclinationXform
+        public static double DeclinationXForm
         {
-            get => _declinationXform;
+            get => _declinationXForm;
             private set
             {
                 var dec = Transforms.DecToCoordType(RightAscension, value);
-                _declinationXform = dec;
+                _declinationXForm = dec;
                 OnStaticPropertyChanged();
             }
         }
 
         /// <summary>
-        /// The right ascension tracking rate tracking rate (arcseconds per second, default = 0.0) 
+        /// The right ascension tracking rate tracking rate (arc seconds per second, default = 0.0) 
         /// </summary>
         public static double RateRa
         {
@@ -426,7 +426,7 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Checks if the autohome async process is running
+        /// Checks if the auto home async process is running
         /// </summary>
         public static bool IsAutoHomeRunning
         {
@@ -503,19 +503,19 @@ namespace GS.Server.SkyTelescope
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
-                        _mountrunning = MountQueue.IsRunning;
+                        _mountRunning = MountQueue.IsRunning;
                         break;
                     case MountType.SkyWatcher:
-                        _mountrunning = SkyQueue.IsRunning;
+                        _mountRunning = SkyQueue.IsRunning;
                         break;
                 }
 
-                return _mountrunning;
+                return _mountRunning;
             }
             set
             {
-                if (value == _mountrunning) return;
-                _mountrunning = value;
+                if (value == _mountRunning) return;
+                _mountRunning = value;
                 if (value)
                 {
                     MountStart();
@@ -542,7 +542,7 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Checks if the autohome async process is running
+        /// Checks if the auto home async process is running
         /// </summary>
         public static Exception LastAutoHomeError
         {
@@ -600,7 +600,7 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// ulse monitoring for charts
+        /// use monitoring for charts
         /// </summary>
         public static bool MonitorPulse
         {
@@ -679,7 +679,7 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Persistance of the rtf document while switching tabs
+        /// Persistence of the rtf document while switching tabs
         /// </summary>
         public static string Notes { get; set; }
 
@@ -703,7 +703,7 @@ namespace GS.Server.SkyTelescope
         public static bool OpenSetupDialogFinished { get; set; }
 
         /// <summary>
-        /// Park position selected set from UI or ascom
+        /// Park position selected set from UI or asCom
         /// </summary>
         public static ParkPosition ParkSelected
         {
@@ -730,7 +730,7 @@ namespace GS.Server.SkyTelescope
             {
                 if (Math.Abs(value - _raDec.X) < 0.000000000000001) return;
                 _raDec.X = value;
-                RightAscensionXform = value;
+                RightAscensionXForm = value;
             }
         }
 
@@ -831,7 +831,7 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// The declination tracking rate (arcseconds per second, default = 0.0) 
+        /// The declination tracking rate (arc seconds per second, default = 0.0) 
         /// </summary>
         public static double RateDec
         {
@@ -870,13 +870,13 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// UI display for converted ra
         /// </summary>
-        public static double RightAscensionXform
+        public static double RightAscensionXForm
         {
-            get => _rightAscensionXform;
+            get => _rightAscensionXForm;
             private set
             {
                 var ra = Transforms.RaToCoordType(value, Declination);
-                _rightAscensionXform = ra;
+                _rightAscensionXForm = ra;
                 OnStaticPropertyChanged();
             }
         }
@@ -967,7 +967,7 @@ namespace GS.Server.SkyTelescope
         public static long[] StepsPerRevolution { get; private set; }
 
         /// <summary>
-        /// Set for all types of gotos
+        /// Set for all types of go tos
         /// </summary>
         public static SlewType SlewState { get; private set; }
 
@@ -1109,7 +1109,7 @@ namespace GS.Server.SkyTelescope
 
             #region First Slew
 
-            // time could be off a bit may need to deal with each axis seperate
+            // time could be off a bit may need to deal with each axis separate
             object _ = new CmdAxisGoToTarget(0, Axis.Axis1, simTarget[0]);
             _ = new CmdAxisGoToTarget(0, Axis.Axis2, simTarget[1]);
 
@@ -1294,8 +1294,8 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Creates tasks that are put in the MountQueue
         /// </summary>
-        /// <param name="taskname"></param>
-        private static void SimTasks(MountTaskName taskname)
+        /// <param name="taskName"></param>
+        private static void SimTasks(MountTaskName taskName)
         {
             if (!IsMountRunning) return;
 
@@ -1307,7 +1307,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Data,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{taskname}"
+                Message = $"{taskName}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -1318,7 +1318,7 @@ namespace GS.Server.SkyTelescope
                 case MountType.SkyWatcher:
                     break;
                 case MountType.Simulator:
-                    switch (taskname)
+                    switch (taskName)
                     {
                         case MountTaskName.AlternatingPpec:
                             break;
@@ -1402,7 +1402,7 @@ namespace GS.Server.SkyTelescope
                             _ = new CmdAxisToDegrees(0, Axis.Axis2, _homeAxes.Y);
                             break;
                         default:
-                            throw new ArgumentOutOfRangeException(nameof(taskname), taskname, null);
+                            throw new ArgumentOutOfRangeException(nameof(taskName), taskName, null);
                     }
 
                     break;
@@ -1420,7 +1420,7 @@ namespace GS.Server.SkyTelescope
         private static Vector SkyHCRate;
         private static Vector SkyTrackingRate;
 
-        // PPEC info
+        // pPEC info
         private static bool _canPec;
         public static bool CanPec
         {
@@ -1511,7 +1511,7 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Monitors the mount doing PPEC training
+        /// Monitors the mount doing pPEC training
         /// </summary>
         private static void CheckPecTraining()
         {
@@ -1526,7 +1526,7 @@ namespace GS.Server.SkyTelescope
                         return;
                     }
 
-                    var ppectrain = new SkyIsPpecInTrainingOn(SkyQueue.NewId);
+                    var ppectrain = new SkyIsPPecInTrainingOn(SkyQueue.NewId);
                     PecTraining = (bool)SkyQueue.GetCommandResult(ppectrain).Result;
                     PecTrainInProgress = PecTraining;
                     break;
@@ -1570,7 +1570,7 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Skywatcher GOTO slew
+        /// SkyWatcher GOTO slew
         /// </summary>
         /// <returns></returns>
         private static int SkyGoTo(double[] target, bool trackingState)
@@ -1584,7 +1584,7 @@ namespace GS.Server.SkyTelescope
             var skyTarget = Axes.AxesAppToMount(target);
 
             #region First Slew
-            // time could be off a bit may need to deal with each axis seperate
+            // time could be off a bit may need to deal with each axis separate
             object _ = new SkyAxisGoToTarget(0, AxisId.Axis1, skyTarget[0]);
             _ = new SkyAxisGoToTarget(0, AxisId.Axis2, skyTarget[1]);
 
@@ -1663,7 +1663,7 @@ namespace GS.Server.SkyTelescope
 
                 object _ = new SkyAxisGoToTarget(0, AxisId.Axis2, skyTargetDec); //move to target DEC
 
-                // track movment until axis is stopped
+                // track movement until axis is stopped
                 var stopwatch1 = Stopwatch.StartNew();
                 while (stopwatch1.Elapsed.TotalMilliseconds < 2000)
                 {
@@ -1767,8 +1767,8 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Creates tasks that are put in the SkyQueue
         /// </summary>
-        /// <param name="taskname"></param>
-        internal static void SkyTasks(MountTaskName taskname)
+        /// <param name="taskName"></param>
+        internal static void SkyTasks(MountTaskName taskName)
         {
             if (!IsMountRunning) { return; }
 
@@ -1780,7 +1780,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{taskname}"
+                Message = $"{taskName}"
             };
 
             object _;
@@ -1790,16 +1790,16 @@ namespace GS.Server.SkyTelescope
                 case MountType.Simulator:
                     break;
                 case MountType.SkyWatcher:
-                    switch (taskname)
+                    switch (taskName)
                     {
                         case MountTaskName.AlternatingPpec:
-                            _ = new SkySetAlternatingPpec(0, SkySettings.AlternatingPpec);
+                            _ = new SkySetAlternatingPPec(0, SkySettings.AlternatingPpec);
                             break;
                         case MountTaskName.DecPulseToGoTo:
                             _ = new SkySetDecPulseToGoTo(0, SkySettings.DecPulseToGoTo);
                             break;
                         case MountTaskName.CanPpec:
-                            var SkyMountCanPpec = new SkyCanPpec(SkyQueue.NewId);
+                            var SkyMountCanPpec = new SkyCanPPec(SkyQueue.NewId);
                             CanPec = (bool)SkyQueue.GetCommandResult(SkyMountCanPpec).Result;
                             break;
                         case MountTaskName.CanHomeSensor:
@@ -1842,17 +1842,17 @@ namespace GS.Server.SkyTelescope
                             _ = new SkySetMonitorPulse(0, MonitorPulse);
                             break;
                         case MountTaskName.PecTraining:
-                            _ = new SkySetPpecTrain(0, AxisId.Axis1, PecTraining);
+                            _ = new SkySetPPecTrain(0, AxisId.Axis1, PecTraining);
                             break;
                         case MountTaskName.Pec:
-                            _ = new SkySetPpec(0, AxisId.Axis1, Pec);
+                            _ = new SkySetPPec(0, AxisId.Axis1, Pec);
                             break;
                         case MountTaskName.StopAxes:
                             _ = new SkyAxisStop(0, AxisId.Axis1);
                             _ = new SkyAxisStop(0, AxisId.Axis2);
                             break;
                         case MountTaskName.SetSt4Guiderate:
-                            _ = new SkySetSt4Guiderate(0, SkySettings.St4Guiderate);
+                            _ = new SkySetSt4GuideRate(0, SkySettings.St4Guiderate);
                             break;
                         case MountTaskName.SetSouthernHemisphere:
                             _ = new SkySetSouthernHemisphere(0, SouthernHemisphere);
@@ -1951,14 +1951,14 @@ namespace GS.Server.SkyTelescope
                         case SkyWatcher.ErrorCode.ErrInvalidData:
                         case SkyWatcher.ErrorCode.ErrSerialPortBusy:
                         case SkyWatcher.ErrorCode.ErrMountNotFound:
-                        case SkyWatcher.ErrorCode.ErrNoresponseAxis1:
-                        case SkyWatcher.ErrorCode.ErrNoresponseAxis2:
+                        case SkyWatcher.ErrorCode.ErrNoResponseAxis1:
+                        case SkyWatcher.ErrorCode.ErrNoResponseAxis2:
                         case SkyWatcher.ErrorCode.ErrAxisBusy:
                         case SkyWatcher.ErrorCode.ErrMaxPitch:
                         case SkyWatcher.ErrorCode.ErrMinPitch:
                         case SkyWatcher.ErrorCode.ErrUserInterrupt:
                         case SkyWatcher.ErrorCode.ErrAlignFailed:
-                        case SkyWatcher.ErrorCode.ErrUnimplement:
+                        case SkyWatcher.ErrorCode.ErrUnimplemented:
                         case SkyWatcher.ErrorCode.ErrWrongAlignmentData:
                         case SkyWatcher.ErrorCode.ErrQueueFailed:
                         case SkyWatcher.ErrorCode.ErrTooManyRetries:
@@ -1998,10 +1998,10 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Checks command object for errors and unsucessful execution
+        /// Checks command object for errors and unsuccessful execution
         /// </summary>
         /// <param name="command"></param>
-        /// <returns>true for errors found and not sucessful</returns>
+        /// <returns>true for errors found and not successful</returns>
         private static bool CheckSkyErrors(ISkyCommand command)
         {
             return !command.Successful && command.Exception != null;
@@ -2057,9 +2057,9 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Autohome, Slew home based on mount's home sensor
+        /// Auto home, Slew home based on mount's home sensor
         /// </summary>
-        public static async void AutoHomeAsync(int degreelimit = 100, int offsetdec = 0)
+        public static async void AutoHomeAsync(int degreeLimit = 100, int offSetDec = 0)
         {
             try
             {
@@ -2080,26 +2080,26 @@ namespace GS.Server.SkyTelescope
 
                 var returncode1 = 0;
                 var returncode2 = 0;
-                if (degreelimit < 20) { degreelimit = 100; }
+                if (degreeLimit < 20) { degreeLimit = 100; }
                 AutoHomeProgressBar = 0;
                 var EncoderTemp = SkySettings.Encoders;
                 if (Tracking) { Tracking = false; }
-                Synthesizer.Speak(Application.Current.Resources["msgAutoHomeStart"].ToString());
+                Synthesizer.Speak(Application.Current.Resources["btnAutoHomeStart"].ToString());
                 Synthesizer.VoicePause = true;
 
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
-                        var autosim = new AutohomeSim();
-                        returncode1 = await Task.Run(() => autosim.StartAutoHome(Axis.Axis1, degreelimit));
+                        var autosim = new AutoHomeSim();
+                        returncode1 = await Task.Run(() => autosim.StartAutoHome(Axis.Axis1, degreeLimit));
                         AutoHomeProgressBar = 50;
-                        returncode2 = await Task.Run(() => autosim.StartAutoHome(Axis.Axis2, degreelimit, offsetdec));
+                        returncode2 = await Task.Run(() => autosim.StartAutoHome(Axis.Axis2, degreeLimit, offSetDec));
                         break;
                     case MountType.SkyWatcher:
-                        var autossky = new AutohomeSky();
-                        returncode1 = await Task.Run(() => autossky.StartAutoHome(AxisId.Axis1, degreelimit));
+                        var autossky = new AutoHomeSky();
+                        returncode1 = await Task.Run(() => autossky.StartAutoHome(AxisId.Axis1, degreeLimit));
                         AutoHomeProgressBar = 50;
-                        returncode2 = await Task.Run(() => autossky.StartAutoHome(AxisId.Axis2, degreelimit, offsetdec));
+                        returncode2 = await Task.Run(() => autossky.StartAutoHome(AxisId.Axis2, degreeLimit, offSetDec));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -2173,7 +2173,7 @@ namespace GS.Server.SkyTelescope
                     ResetHomePositions();
                     Synthesizer.VoicePause = false;
                     Thread.Sleep(1500);
-                    Synthesizer.Speak(Application.Current.Resources["msgAutoHomeComplete"].ToString());
+                    Synthesizer.Speak(Application.Current.Resources["btnAutoHomeComplete"].ToString());
 
                 }
                 else
@@ -2401,7 +2401,7 @@ namespace GS.Server.SkyTelescope
             var point = SpiralCollection[0];
             if (point == null) return;
             // calc distance between two coordinates
-            var distance = Calculations.AngularDistance(RightAscensionXform, DeclinationXform, point.RaDec.X, point.RaDec.Y);
+            var distance = Calculations.AngularDistance(RightAscensionXForm, DeclinationXForm, point.RaDec.X, point.RaDec.Y);
             if (distance <= SkySettings.SpiralDistance) return;
             SpiralCollection.Clear();
             SkySettings.SpiralDistance = 0;
@@ -2459,7 +2459,7 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Calculates the current tracking rate used in arcseconds per degree
+        /// Calculates the current tracking rate used in arc seconds per degree
         /// </summary>
         /// <returns></returns>
         private static double CurrentTrackingRate()
@@ -2794,14 +2794,14 @@ namespace GS.Server.SkyTelescope
                 return;
             }
 
-            // get position selected could be set from UI or ASCOM
+            // get position selected could be set from UI or AsCom
             var ps = ParkSelected;
             if (ps == null) { return; }
             if (double.IsNaN(ps.X)) { return; }
             if (double.IsNaN(ps.Y)) { return; }
             SetParkAxis(ps.Name, ps.X, ps.Y);
 
-            // Store for startup default poistion
+            // Store for startup default position
             SkySettings.ParkAxisX = ps.X;
             SkySettings.ParkAxisY = ps.Y;
             SkySettings.ParkName = ps.Name;
@@ -3130,7 +3130,7 @@ namespace GS.Server.SkyTelescope
 
                         var a = new CmdAxesDegrees(MountQueue.NewId);
                         var b = (double[])MountQueue.GetCommandResult(a).Result;
-                        var arcsecs = Conversions.StepPerArcsec(StepsPerRevolution[1]);
+                        var arcsecs = Conversions.StepPerArcSec(StepsPerRevolution[1]);
                         var c = stepsNeededDec / arcsecs;
                         var d = Conversions.ArcSec2Deg(c);
                         _ = new CmdAxisGoToTarget(0, Axis.Axis2, b[1] + d);
@@ -3152,7 +3152,7 @@ namespace GS.Server.SkyTelescope
                     {
                         var a = new CmdAxesDegrees(MountQueue.NewId);
                         var b = (double[])MountQueue.GetCommandResult(a).Result;
-                        var arcsecs = Conversions.StepPerArcsec(StepsPerRevolution[0]);
+                        var arcsecs = Conversions.StepPerArcSec(StepsPerRevolution[0]);
                         var c = (stepsNeededRa) / arcsecs;
                         var d = Conversions.ArcSec2Deg(c);
                         _ = new CmdAxisGoToTarget(0, Axis.Axis1, b[0] + d);
@@ -3243,7 +3243,7 @@ namespace GS.Server.SkyTelescope
         private static bool MountConnect()
         {
             object _;
-            if (!AscomOn) { AscomOn = true; }
+            if (!AsComOn) { AsComOn = true; }
             _targetRaDec = new Vector(double.NaN, double.NaN); // invalid target position
             var positions = GetDefaultPositions();
             double[] rawPositions = null;
@@ -3529,12 +3529,12 @@ namespace GS.Server.SkyTelescope
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
-                        _ = new CmdAxisPulse(0, Axis.Axis1, raGuideRate, duration, 0, Declination);
+                        _ = new CmdAxisPulse(0, Axis.Axis1, raGuideRate, duration);
                         pulseStatusEntry = new PulseStatusEntry { Axis = (int)Axis.Axis1, Duration = duration, CreateDateTime = createDateTime };
                         PulseStatusQueue.AddPulseStatusEntry(pulseStatusEntry);
                         break;
                     case MountType.SkyWatcher:
-                        _ = new SkyAxisPulse(0, AxisId.Axis1, raGuideRate, duration, 0, Declination);
+                        _ = new SkyAxisPulse(0, AxisId.Axis1, raGuideRate, duration);
                         pulseStatusEntry = new PulseStatusEntry { Axis = (int)AxisId.Axis1, Duration = duration, CreateDateTime = createDateTime };
                         PulseStatusQueue.AddPulseStatusEntry(pulseStatusEntry);
                         break;
@@ -3566,12 +3566,12 @@ namespace GS.Server.SkyTelescope
                 {
                     case MountType.Simulator:
                         decGuideRate = decGuideRate > 0 ? -Math.Abs(decGuideRate) : Math.Abs(decGuideRate);
-                        _ = new CmdAxisPulse(0, Axis.Axis2, decGuideRate, duration, decbacklashamount, Declination);
+                        _ = new CmdAxisPulse(0, Axis.Axis2, decGuideRate, duration);
                         pulseStatusEntry = new PulseStatusEntry { Axis = (int)Axis.Axis2, Duration = duration, CreateDateTime = createDateTime };
                         PulseStatusQueue.AddPulseStatusEntry(pulseStatusEntry);
                         break;
                     case MountType.SkyWatcher:
-                        _ = new SkyAxisPulse(0, AxisId.Axis2, decGuideRate, duration, decbacklashamount, Declination);
+                        _ = new SkyAxisPulse(0, AxisId.Axis2, decGuideRate, duration, decbacklashamount);
                         pulseStatusEntry = new PulseStatusEntry { Axis = (int)Axis.Axis2, Duration = duration, CreateDateTime = createDateTime };
                         PulseStatusQueue.AddPulseStatusEntry(pulseStatusEntry);
                         break;
@@ -4007,7 +4007,7 @@ namespace GS.Server.SkyTelescope
             Synthesizer.Speak(Application.Current.Resources["vceStop"].ToString());
         }
 
-        public static void StopAxesTask(int axis, bool validate, bool speak, bool stoptracking, bool trackingspeak, SlewType? slewstate)
+        public static void StopAxesTask(int axis, bool validate, bool speak, bool stopTracking, bool trackingSpeak, SlewType? slewState)
         {
             if (!IsMountRunning) { return; }
 
@@ -4019,7 +4019,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{axis},{validate},{slewstate} "
+                Message = $"{axis},{validate},{slewState} "
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -4028,22 +4028,22 @@ namespace GS.Server.SkyTelescope
             switch (axis)
             {
                 case 1:
-                    decTask = Task.Run(() => StopAxis(axis, validate, speak, stoptracking, trackingspeak, slewstate));
+                    decTask = Task.Run(() => StopAxis(axis, validate, speak, stopTracking, trackingSpeak, slewState));
                     Task.WaitAll(decTask);
                     break;
                 case 2:
-                    raTask = Task.Run(() => StopAxis(axis, validate, speak, stoptracking, trackingspeak, slewstate));
+                    raTask = Task.Run(() => StopAxis(axis, validate, speak, stopTracking, trackingSpeak, slewState));
                     Task.WaitAll(raTask);
                     break;
                 case 3:
-                    decTask = Task.Run(() => StopAxis(axis, validate, speak, stoptracking, trackingspeak, slewstate));
-                    raTask = Task.Run(() => StopAxis(axis, validate, speak, stoptracking, trackingspeak, slewstate));
+                    decTask = Task.Run(() => StopAxis(axis, validate, speak, stopTracking, trackingSpeak, slewState));
+                    raTask = Task.Run(() => StopAxis(axis, validate, speak, stopTracking, trackingSpeak, slewState));
                     Task.WaitAll(decTask, raTask);
                     break;
             }
         }
 
-        private static void StopAxis(int axis, bool validate, bool speak, bool stoptracking, bool trackingspeak, SlewType? slewstate)
+        private static void StopAxis(int axis, bool validate, bool speak, bool stopTracking, bool trackingSpeak, SlewType? slewState)
         {
             object _;
             bool istracking;
@@ -4057,7 +4057,7 @@ namespace GS.Server.SkyTelescope
             {
                 case MountType.Simulator:
                     istracking = Tracking;
-                    TrackingSpeak = trackingspeak;
+                    TrackingSpeak = trackingSpeak;
                     Tracking = false;
 
                     switch (axis)
@@ -4076,7 +4076,7 @@ namespace GS.Server.SkyTelescope
                             }
 
                             if (!axis1stopped) { return; }
-                            Tracking = !stoptracking || istracking;
+                            Tracking = !stopTracking || istracking;
                             TrackingSpeak = true;
                             break;
                         case 2:
@@ -4100,7 +4100,7 @@ namespace GS.Server.SkyTelescope
                     break;
                 case MountType.SkyWatcher:
                     istracking = Tracking;
-                    TrackingSpeak = trackingspeak;
+                    TrackingSpeak = trackingSpeak;
                     Tracking = false;
 
                     switch (axis)
@@ -4117,7 +4117,7 @@ namespace GS.Server.SkyTelescope
                                 if (axis1stopped) { break; }
                             }
                             if (!axis1stopped) { return; }
-                            Tracking = !stoptracking || istracking;
+                            Tracking = !stopTracking || istracking;
                             TrackingSpeak = true;
                             break;
                         case 2:
@@ -4142,7 +4142,7 @@ namespace GS.Server.SkyTelescope
 
             _rateAxes = new Vector();
             _rateRaDec = new Vector();
-            if (slewstate != null) { SlewState = (SlewType)slewstate; }
+            if (slewState != null) { SlewState = (SlewType)slewState; }
             if (speak) { Synthesizer.Speak(Application.Current.Resources["vceStop"].ToString()); }
 
         }
@@ -4251,14 +4251,14 @@ namespace GS.Server.SkyTelescope
                 return false;
             } // add check later if needed
 
-            //convert radec to mount positions
+            //convert ra dec to mount positions
             var xy = Axes.RaDecToAxesXY(new[] { ra, dec });
             var target = Axes.AxesAppToMount(xy);
 
             //convert current position to mount position
             var current = Axes.AxesMountToApp(new[] { _mountAxisX, _mountAxisY });
 
-            //compare radec to current postion
+            //compare ra dec to current position
             var a = Math.Abs(target[0]) - Math.Abs(current[0]);
             var b = Math.Abs(target[1]) - Math.Abs(current[1]);
             var ret = !(Math.Abs(a) > SkySettings.SyncLimit || Math.Abs(b) > SkySettings.SyncLimit);
@@ -4293,14 +4293,14 @@ namespace GS.Server.SkyTelescope
                 return false;
             } // add check later if needed
 
-            //convert radec to mount positions
+            //convert ra dec to mount positions
             var yx = Axes.AltAzToAxesYX(new[] { alt, az });
             var target = Axes.AxesAppToMount(new[] { yx[1], yx[0] });
 
             //convert current position to mount position
             var current = Axes.AxesMountToApp(new[] { _mountAxisX, _mountAxisY });
 
-            //compare radec to current postion
+            //compare ra dec to current position
             var a = Math.Abs(target[0]) - Math.Abs(current[0]);
             var b = Math.Abs(target[1]) - Math.Abs(current[1]);
 
@@ -4328,7 +4328,7 @@ namespace GS.Server.SkyTelescope
         #region Server Items
 
         /// <summary>
-        /// inital defaults
+        /// initial defaults
         /// </summary>
         private static void Defaults()
         {
@@ -4349,11 +4349,11 @@ namespace GS.Server.SkyTelescope
             // invalid any target positions
             _targetRaDec = new Vector(double.NaN, double.NaN);
 
-            //default handcontrol and slew rates
+            //default hand control and slew rates
             SetSlewRates(SkySettings.MaxSlewRate);
 
             // Allows driver movements commands to process
-            AscomOn = true;
+            AsComOn = true;
 
             // default guide rates
             SetGuideRates();
@@ -4365,7 +4365,7 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// called from the setter property.  Used to update UI elements.  propertyname is not required
+        /// called from the setter property.  Used to update UI elements.  property name is not required
         /// </summary>
         /// <param name="propertyName"></param>
         private static void OnStaticPropertyChanged([CallerMemberName] string propertyName = null)
@@ -4376,10 +4376,10 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Time to open my mouth
         /// </summary>
-        /// <param name="slewtype"></param>
-        private static void SpeakSlewStart(SlewType slewtype)
+        /// <param name="slewType"></param>
+        private static void SpeakSlewStart(SlewType slewType)
         {
-            switch (slewtype)
+            switch (slewType)
             {
                 case SlewType.SlewNone:
                     break;
@@ -4406,17 +4406,17 @@ namespace GS.Server.SkyTelescope
                     Synthesizer.Speak(Application.Current.Resources["vceSlewComplete"].ToString());
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(slewtype), slewtype, null);
+                    throw new ArgumentOutOfRangeException(nameof(slewType), slewType, null);
             }
         }
 
         /// <summary>
         /// Time to open my mouth
         /// </summary>
-        /// <param name="slewtype"></param>
-        private static void SpeakSlewEnd(SlewType slewtype)
+        /// <param name="slewType"></param>
+        private static void SpeakSlewEnd(SlewType slewType)
         {
-            switch (slewtype)
+            switch (slewType)
             {
                 case SlewType.SlewNone:
                     break;
@@ -4443,7 +4443,7 @@ namespace GS.Server.SkyTelescope
                     Synthesizer.Speak(Application.Current.Resources["vceSlewComplete"].ToString());
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(slewtype), slewtype, null);
+                    throw new ArgumentOutOfRangeException(nameof(slewType), slewType, null);
             }
         }
 
@@ -4465,9 +4465,6 @@ namespace GS.Server.SkyTelescope
 
                 // the time is?
                 var gsjd = JDate.Ole2Jd(HiResDateTime.UtcNow.Add(SkySettings.UTCDateOffset));
-                //var ascomjd = _util.JulianDate;
-                //var altjd = JDate.Utc2Jd2(HiResDateTime.UtcNow.Add(SkySettings.UTCDateOffset));
-                //var dtsdiff = ascomjd - altjd;
                 SiderealTime = Time.Lst(JDate.Epoch2000Days(), gsjd, false, SkySettings.Longitude);
 
                 // Get raw positions, some are non-responses from mount and are returned as NaN
@@ -4500,7 +4497,7 @@ namespace GS.Server.SkyTelescope
                 RightAscension = radec[0];
                 Declination = radec[1];
 
-                Lha = Coordinate.Ra2Ha12(RightAscensionXform, SiderealTime);
+                Lha = Coordinate.Ra2Ha12(RightAscensionXForm, SiderealTime);
 
                 // Track slewing state
                 CheckSlewState();

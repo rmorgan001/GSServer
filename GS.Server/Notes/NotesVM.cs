@@ -103,7 +103,7 @@ namespace GS.Server.Notes
         private void OpenDialog(string msg, string caption = null)
         {
             if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["msgDialog"].ToString();
+            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
             DialogContent = new DialogOK();
             IsDialogOpen = true;
 

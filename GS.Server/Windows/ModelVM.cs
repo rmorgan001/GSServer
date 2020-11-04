@@ -55,9 +55,9 @@ namespace GS.Server.Windows
                     SkyServer.StaticPropertyChanged += PropertyChangedSkyServer;
                     Settings.Settings.StaticPropertyChanged += PropertyChangedSettings;
 
-                    Title = Application.Current.Resources["lbModel"].ToString();
+                    Title = Application.Current.Resources["3dModel"].ToString();
                     ScreenEnabled = SkyServer.IsMountRunning;
-                    ModelWinVisability = false;
+                    ModelWinVisibility = false;
                     TopMost = true;
                     _modelVM = this;
 
@@ -65,8 +65,8 @@ namespace GS.Server.Windows
                     Rotate();
                     LoadGEM();
 
-                    RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXform, "h ", ":", "", 2);
-                    Declination = _util.DegreesToDMS(SkyServer.DeclinationXform, "° ", ":", "", 2);
+                    RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
+                    Declination = _util.DegreesToDMS(SkyServer.DeclinationXForm, "° ", ":", "", 2);
                 }
 
             }
@@ -114,12 +114,12 @@ namespace GS.Server.Windows
                      case "IsMountRunning":
                          ScreenEnabled = SkyServer.IsMountRunning;
                          break;
-                     case "RightAscensionXform":
-                         RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXform, "h ", ":", "", 2);
+                     case "RightAscensionXForm":
+                         RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
                          Rotate();
                          break;
-                     case "DeclinationXform":
-                         Declination = _util.DegreesToDMS(SkyServer.DeclinationXform, "° ", ":", "", 2);
+                     case "DeclinationXForm":
+                         Declination = _util.DegreesToDMS(SkyServer.DeclinationXForm, "° ", ":", "", 2);
                          break;
                  }
              });
@@ -139,7 +139,7 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -174,7 +174,7 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -234,18 +234,18 @@ namespace GS.Server.Windows
         #endregion
 
         #region Viewport3D
-        private double xaxisOffset;
-        private double yaxisOffset;
-        private double zaxisOffset;
+        private double xAxisOffset;
+        private double yAxisOffset;
+        private double zAxisOffset;
 
-        private bool _modelWinVisability;
-        public bool ModelWinVisability
+        private bool _modelWinVisibility;
+        public bool ModelWinVisibility
         {
-            get => _modelWinVisability;
+            get => _modelWinVisibility;
             set
             {
-                if (_modelWinVisability == value) return;
-                _modelWinVisability = value;
+                if (_modelWinVisibility == value) return;
+                _modelWinVisibility = value;
                 OnPropertyChanged();
             }
         }
@@ -262,13 +262,7 @@ namespace GS.Server.Windows
             }
         }
 
-        private int _cameraIndex;
-
-        public int CameraIndex
-        {
-            get => _cameraIndex;
-            set => _cameraIndex = value;
-        }
+        public int CameraIndex { get; set; }
 
         private Point3D _position;
         public Point3D Position
@@ -332,71 +326,71 @@ namespace GS.Server.Windows
             }
         }
 
-        private double _xaxis;
-        public double Xaxis
+        private double _xAxis;
+        public double XAxis
         {
-            get => _xaxis;
+            get => _xAxis;
             set
             {
-                _xaxis = value;
-                XaxisOffset = value + xaxisOffset;
+                _xAxis = value;
+                XAxisOffset = value + xAxisOffset;
                 OnPropertyChanged();
             }
         }
 
-        private double _yaxis;
-        public double Yaxis
+        private double _yAxis;
+        public double YAxis
         {
-            get => _yaxis;
+            get => _yAxis;
             set
             {
-                _yaxis = value;
-                YaxisOffset = value + yaxisOffset;
+                _yAxis = value;
+                YAxisOffset = value + yAxisOffset;
                 OnPropertyChanged();
             }
         }
 
-        private double _zaxis;
-        public double Zaxis
+        private double _zAxis;
+        public double ZAxis
         {
-            get => _zaxis;
+            get => _zAxis;
             set
             {
-                _zaxis = value;
-                ZaxisOffset = zaxisOffset - value;
+                _zAxis = value;
+                ZAxisOffset = zAxisOffset - value;
                 OnPropertyChanged();
             }
         }
 
-        private double _xaxisOffset;
-        public double XaxisOffset
+        private double _xAxisOffset;
+        public double XAxisOffset
         {
-            get => _xaxisOffset;
+            get => _xAxisOffset;
             set
             {
-                _xaxisOffset = value;
+                _xAxisOffset = value;
                 OnPropertyChanged();
             }
         }
 
-        private double _yaxisOffset;
-        public double YaxisOffset
+        private double _yAxisOffset;
+        public double YAxisOffset
         {
-            get => _yaxisOffset;
+            get => _yAxisOffset;
             set
             {
-                _yaxisOffset = value;
+                _yAxisOffset = value;
                 OnPropertyChanged();
             }
         }
 
-        private double _zaxisOffset;
-        public double ZaxisOffset
+        private double _zAxisOffset;
+        public double ZAxisOffset
         {
-            get => _zaxisOffset;
+            get => _zAxisOffset;
             set
             {
-                _zaxisOffset = value;
+                _zAxisOffset = value;
                 OnPropertyChanged();
             }
         }
@@ -433,14 +427,14 @@ namespace GS.Server.Windows
 
 
                 //offset for model to match start position
-                xaxisOffset = 90;
-                yaxisOffset = -90;
-                zaxisOffset = 0;
+                xAxisOffset = 90;
+                yAxisOffset = -90;
+                zAxisOffset = 0;
 
                 //start position
-                Xaxis = -90;
-                Yaxis = 90;
-                Zaxis = Math.Round(Math.Abs(SkySettings.Latitude), 2);
+                XAxis = -90;
+                YAxis = 90;
+                ZAxis = Math.Round(Math.Abs(SkySettings.Latitude), 2);
 
                 //load model and compass
                 var import = new ModelImporter();
@@ -484,7 +478,7 @@ namespace GS.Server.Windows
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
         private void Rotate()
@@ -492,8 +486,8 @@ namespace GS.Server.Windows
             var axes = Shared.Model3D.RotateModel(SkySettings.Mount.ToString(), SkyServer.ActualAxisX,
                 SkyServer.ActualAxisY, SkyServer.SouthernHemisphere);
 
-            Yaxis = axes[0];
-            Xaxis = axes[1];
+            YAxis = axes[0];
+            XAxis = axes[1];
         }
 
         private ICommand _openModelWindowCmd;
@@ -529,7 +523,7 @@ namespace GS.Server.Windows
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -582,7 +576,7 @@ namespace GS.Server.Windows
                     Message = $"{ex.Message},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -644,28 +638,28 @@ namespace GS.Server.Windows
         }
         private void MinimizeWindow()
         {
-            Windowstate = WindowState.Minimized;
+            WindowStates = WindowState.Minimized;
         }
 
-        private ICommand _maxmizeWindowCommand;
+        private ICommand _maximizeWindowCommand;
         public ICommand MaximizeWindowCommand
         {
             get
             {
-                var command = _maxmizeWindowCommand;
+                var command = _maximizeWindowCommand;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _maxmizeWindowCommand = new RelayCommand(
-                    param => MaxmizeWindow()
+                return _maximizeWindowCommand = new RelayCommand(
+                    param => MaximizeWindow()
                 );
             }
         }
-        private void MaxmizeWindow()
+        private void MaximizeWindow()
         {
-            Windowstate = Windowstate != WindowState.Maximized ? WindowState.Maximized : WindowState.Normal;
+            WindowStates = WindowStates != WindowState.Maximized ? WindowState.Maximized : WindowState.Normal;
         }
 
         private ICommand _normalWindowCommand;
@@ -686,7 +680,7 @@ namespace GS.Server.Windows
         }
         private void NormalWindow()
         {
-            Windowstate = WindowState.Normal;
+            WindowStates = WindowState.Normal;
         }
 
         private ICommand _openCloseWindowCmd;
@@ -711,13 +705,13 @@ namespace GS.Server.Windows
             win?.Close();
         }
 
-        private WindowState _windowstate;
-        public WindowState Windowstate
+        private WindowState _windowState;
+        public WindowState WindowStates
         {
-            get => _windowstate;
+            get => _windowState;
             set
             {
-                _windowstate = value;
+                _windowState = value;
                 OnPropertyChanged();
             }
         }
@@ -793,7 +787,7 @@ namespace GS.Server.Windows
         private void OpenDialog(string msg, string caption = null)
         {
             if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["msgDialog"].ToString();
+            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
             DialogContent = new DialogOK();
             IsDialogOpen = true;
 

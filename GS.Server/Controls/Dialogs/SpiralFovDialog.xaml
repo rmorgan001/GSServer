@@ -11,12 +11,12 @@
     <UserControl.Resources>
         <domain:InverseBooleanConverter x:Key="InvBol" />
     </UserControl.Resources>
-    <GroupBox Header="{StaticResource gbFovHeader}" Margin="5">
+    <GroupBox Header="{StaticResource 1021FovHeader}" Margin="5">
         <StackPanel Orientation="Vertical" >
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{StaticResource tbCameraWidth}" VerticalAlignment="Center"/>
-                    <TextBox materialDesign:HintAssist.Hint="{StaticResource ttMM}" ToolTip="{StaticResource ttMM}" Margin="13,0,0,0" MinWidth="80">
+                    <TextBlock Text="{StaticResource 1021CameraWidth}" VerticalAlignment="Center"/>
+                    <TextBox materialDesign:HintAssist.Hint="{StaticResource 1021MM}" ToolTip="{StaticResource 1021MM}" Margin="13,0,0,0" MinWidth="80">
                         <TextBox.Text>
                             <Binding Path="CameraWidth" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
                                 <Binding.ValidationRules>
@@ -28,8 +28,8 @@
                     </TextBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                    <TextBlock Text="{StaticResource tbCameraHeight}" VerticalAlignment="Center" />
-                    <TextBox materialDesign:HintAssist.Hint="{StaticResource ttMM}" ToolTip="{StaticResource ttMM}" Margin="10,0,0,0" MinWidth="80">
+                    <TextBlock Text="{StaticResource 1021CameraHeight}" VerticalAlignment="Center" />
+                    <TextBox materialDesign:HintAssist.Hint="{StaticResource 1021MM}" ToolTip="{StaticResource 1021MM}" Margin="10,0,0,0" MinWidth="80">
                         <TextBox.Text>
                             <Binding Path="CameraHeight" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
                                 <Binding.ValidationRules>
@@ -43,8 +43,8 @@
 
                 <Label Content="--OR--" HorizontalAlignment="Center" Margin="0,10,0,0"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                    <TextBlock Text="{StaticResource tbEyepieceFS}" VerticalAlignment="Center" />
-                    <TextBox materialDesign:HintAssist.Hint="{StaticResource ttMM}" ToolTip="{StaticResource ttMM}" Margin="5,0,0,0" MinWidth="50">
+                    <TextBlock Text="{StaticResource 1021EyepieceFS}" VerticalAlignment="Center" />
+                    <TextBox materialDesign:HintAssist.Hint="{StaticResource 1021MM}" ToolTip="{StaticResource 1021MM}" Margin="5,0,0,0" MinWidth="50">
                         <TextBox.Text>
                             <Binding Path="EyepieceFS" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
                                 <Binding.ValidationRules>
@@ -59,8 +59,8 @@
                 <Separator Margin="0,10,0,0"></Separator>
 
                 <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                    <TextBlock Text="{StaticResource tbOtaFL}" VerticalAlignment="Center" />
-                    <TextBox materialDesign:HintAssist.Hint="{StaticResource ttMM}" ToolTip="{StaticResource ttMM}"  Margin="10,0,0,0" MinWidth="50">
+                    <TextBlock Text="{StaticResource 1021OtaFL}" VerticalAlignment="Center" />
+                    <TextBox materialDesign:HintAssist.Hint="{StaticResource 1021MM}" ToolTip="{StaticResource 1021MM}"  Margin="10,0,0,0" MinWidth="50">
                     <TextBox.Text>
                             <Binding Path="FocalLength" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
                                 <Binding.ValidationRules>
@@ -74,18 +74,18 @@
             </StackPanel>
             <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,20,0,0" Text="Calculate Which Applies" />
             <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                <Button IsCancel="True" Margin="8 0 0 0" Command="{Binding EyepieceFovDialogCmd}" Content="{StaticResource btnEyepiece}" />
-                <Button IsCancel="True" Margin="8 0 0 0" Command="{Binding CameraFovDialogCmd}" Content="{StaticResource btnCamera}" />
+                <Button IsCancel="True" Margin="8 0 0 0" Command="{Binding EyepieceFovDialogCmd}" Content="{StaticResource 1021Eyepiece}" />
+                <Button IsCancel="True" Margin="8 0 0 0" Command="{Binding CameraFovDialogCmd}" Content="{StaticResource 1021Camera}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
-                <TextBlock Margin="5" Text="{StaticResource tbWidth}" />
+                <TextBlock Margin="5" Text="{StaticResource 1021Width}" />
                 <TextBlock Margin="5" Text="{Binding CalcWidth}"/>
-                <TextBlock Margin="5" Text="{StaticResource tbHeight}" />
+                <TextBlock Margin="5" Text="{StaticResource 1021Height}" />
                 <TextBlock Margin="5" Text="{Binding CalcHeight}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptSpiralFovDialogCmd}" Content="{StaticResource btnAccept}" IsEnabled="{Binding IsSlewing, Converter={StaticResource InvBol}}"/>
-                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelSpiralFovDialogCmd}" Content="{StaticResource btnCancel}"/>
+                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptSpiralFovDialogCmd}" Content="{StaticResource diaAccept}" IsEnabled="{Binding IsSlewing, Converter={StaticResource InvBol}}"/>
+                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelSpiralFovDialogCmd}" Content="{StaticResource diaCancel}"/>
             </StackPanel>
         </StackPanel>
     </GroupBox>

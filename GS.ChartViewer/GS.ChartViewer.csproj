@@ -88,4 +88,17 @@
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\ChartViewer.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ChartViewer.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\ChartViewer.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>ChartViewer.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
 </Project>

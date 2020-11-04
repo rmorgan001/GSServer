@@ -1,18 +1,18 @@
-﻿// /* Copyright(C) 2019  Rob Morgan (robert.morgan.e@gmail.com)
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU Affero General Public License as published
-//     by the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU Affero General Public License for more details.
-// 
-//     You should have received a copy of the GNU Affero General Public License
-//     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-//  */
+﻿/* Copyright(C) 2019-2020  Rob Morgan (robert.morgan.e@gmail.com)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 using System;
 using System.Collections.Generic;
@@ -29,9 +29,9 @@ namespace GS.Shared
     public static class Languages
     {
         private static readonly string _directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase) + "\\LanguageFiles\\";
-        private const string gsserver = "GSServer_";
-        private const string gschart = "GSChart_";
-        private const string gsutil = "GSUtil_";
+        private const string gsServer = "GSServer_";
+        private const string gsChart = "GSChart_";
+        private const string gsUtil = "GSUtil_";
 
         static Languages()
         {
@@ -69,7 +69,7 @@ namespace GS.Shared
                             uri = new Uri("GS.Shared;component/Languages/StringResServer_en-us.xaml", UriKind.Relative);
                             break;
                         default:
-                            localpath = new Uri(Path.Combine(_directoryPath, $"{gsserver}{cultureInfo}.xaml")).LocalPath;
+                            localpath = new Uri(Path.Combine(_directoryPath, $"{gsServer}{cultureInfo}.xaml")).LocalPath;
                             if (!File.Exists(localpath))
                             {
                                 filenotfound = true;
@@ -85,7 +85,7 @@ namespace GS.Shared
                             uri = new Uri("GS.Shared;component/Languages/StringResChart_en-us.xaml", UriKind.Relative);
                             break;
                         default:
-                            localpath = new Uri(Path.Combine(_directoryPath, $"{gschart}{cultureInfo}.xaml")).LocalPath;
+                            localpath = new Uri(Path.Combine(_directoryPath, $"{gsChart}{cultureInfo}.xaml")).LocalPath;
                             if (!File.Exists(localpath))
                             {
                                 filenotfound = true;
@@ -101,7 +101,7 @@ namespace GS.Shared
                             uri = new Uri("GS.Shared;component/Languages/StringResUtil_en-us.xaml", UriKind.Relative);
                             break;
                         default:
-                            localpath = new Uri(Path.Combine(_directoryPath, $"{gsutil}{cultureInfo}.xaml")).LocalPath;
+                            localpath = new Uri(Path.Combine(_directoryPath, $"{gsUtil}{cultureInfo}.xaml")).LocalPath;
                             if (!File.Exists(localpath))
                             {
                                 filenotfound = true;

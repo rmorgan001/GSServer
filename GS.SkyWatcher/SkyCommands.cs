@@ -71,19 +71,19 @@ namespace GS.SkyWatcher
         public Exception Exception { get; set; }
         public dynamic Result { get; }
         private readonly AxisId _axis;
-        private readonly double _guiderate;
+        private readonly double _guideRate;
         private readonly int _duration;
-        private readonly int _backlashsteps;
-        private readonly double _declination;
+        private readonly int _backlashSteps;
+        //private readonly double _declination;
 
-        public SkyAxisPulse(long id, AxisId axis, double guiderate, int duration, int backlashsteps = 0, double declination = 0)
+        public SkyAxisPulse(long id, AxisId axis, double guideRate, int duration, int backlashSteps = 0)
         {
             Id = id;
             _axis = axis;
-            _guiderate = guiderate;
+            _guideRate = guideRate;
             _duration = duration;
-            _backlashsteps = backlashsteps;
-            _declination = declination;
+            _backlashSteps = backlashSteps;
+            //_declination = declination;
             CreatedUtc = Principles.HiResDateTime.UtcNow;
             Successful = false;
             Result = null;
@@ -94,7 +94,7 @@ namespace GS.SkyWatcher
         {
             try
             {
-                skyWatcher.AxisPulse(_axis, _guiderate, _duration, _backlashsteps, _declination);
+                skyWatcher.AxisPulse(_axis, _guideRate, _duration, _backlashSteps);
                 Successful = true;
             }
             catch (Exception e)
@@ -462,7 +462,7 @@ namespace GS.SkyWatcher
         }
     }
 
-    public class SkyCanPpec : ISkyCommand
+    public class SkyCanPPec : ISkyCommand
     {
         public long Id { get; }
         public DateTime CreatedUtc { get; }
@@ -470,7 +470,7 @@ namespace GS.SkyWatcher
         public Exception Exception { get; set; }
         public dynamic Result { get; private set; }
 
-        public SkyCanPpec(long id)
+        public SkyCanPPec(long id)
         {
             Id = id;
             CreatedUtc = Principles.HiResDateTime.UtcNow;
@@ -482,7 +482,7 @@ namespace GS.SkyWatcher
         {
             try
             {
-                Result = skyWatcher.CanPpec;
+                Result = skyWatcher.CanPPec;
                 Successful = true;
             }
             catch (Exception e)
@@ -524,7 +524,7 @@ namespace GS.SkyWatcher
         }
     }
 
-    public class SkyGetAlternatingPpec : ISkyCommand
+    public class SkyGetAlternatingPPec : ISkyCommand
     {
         public long Id { get; }
         public DateTime CreatedUtc { get; }
@@ -532,7 +532,7 @@ namespace GS.SkyWatcher
         public Exception Exception { get; set; }
         public dynamic Result { get; private set; }
 
-        public SkyGetAlternatingPpec(long id)
+        public SkyGetAlternatingPPec(long id)
         {
             Id = id;
             CreatedUtc = Principles.HiResDateTime.UtcNow;
@@ -544,7 +544,7 @@ namespace GS.SkyWatcher
         {
             try
             {
-                Result = skyWatcher.AlternatingPpec;
+                Result = skyWatcher.AlternatingPPec;
                 Successful = true;
             }
             catch (Exception e)
@@ -1350,7 +1350,7 @@ namespace GS.SkyWatcher
         }
     }
 
-    public class SkySetAlternatingPpec : ISkyCommand
+    public class SkySetAlternatingPPec : ISkyCommand
     {
         public long Id { get; }
         public DateTime CreatedUtc { get; }
@@ -1359,7 +1359,7 @@ namespace GS.SkyWatcher
         public dynamic Result { get; }
         private readonly bool _on;
 
-        public SkySetAlternatingPpec(long id, bool on)
+        public SkySetAlternatingPPec(long id, bool on)
         {
             Id = id;
             _on = on;
@@ -1373,7 +1373,7 @@ namespace GS.SkyWatcher
         {
             try
             {
-                skyWatcher.AlternatingPpec = _on;
+                skyWatcher.AlternatingPPec = _on;
                 Successful = true;
             }
             catch (Exception e)
@@ -1548,7 +1548,7 @@ namespace GS.SkyWatcher
         }
     }
 
-    public class SkyIsPpecOn : ISkyCommand
+    public class SkyIsPPecOn : ISkyCommand
     {
         public long Id { get; }
         public DateTime CreatedUtc { get; }
@@ -1556,7 +1556,7 @@ namespace GS.SkyWatcher
         public Exception Exception { get; set; }
         public dynamic Result { get; private set; }
 
-        public SkyIsPpecOn(long id)
+        public SkyIsPPecOn(long id)
         {
             Id = id;
             CreatedUtc = Principles.HiResDateTime.UtcNow;
@@ -1568,7 +1568,7 @@ namespace GS.SkyWatcher
         {
             try
             {
-                Result = skyWatcher.IsPpecOn;
+                Result = skyWatcher.IsPPecOn;
                 Successful = true;
             }
             catch (Exception e)
@@ -1579,7 +1579,7 @@ namespace GS.SkyWatcher
         }
     }
 
-    public class SkyIsPpecInTrainingOn : ISkyCommand
+    public class SkyIsPPecInTrainingOn : ISkyCommand
     {
         public long Id { get; }
         public DateTime CreatedUtc { get; }
@@ -1587,7 +1587,7 @@ namespace GS.SkyWatcher
         public Exception Exception { get; set; }
         public dynamic Result { get; private set; }
 
-        public SkyIsPpecInTrainingOn(long id)
+        public SkyIsPPecInTrainingOn(long id)
         {
             Id = id;
             CreatedUtc = Principles.HiResDateTime.UtcNow;
@@ -1599,7 +1599,7 @@ namespace GS.SkyWatcher
         {
             try
             {
-                Result = skyWatcher.IsPpecInTrainingOn;
+                Result = skyWatcher.IsPPecInTrainingOn;
                 Successful = true;
             }
             catch (Exception e)
@@ -1643,7 +1643,7 @@ namespace GS.SkyWatcher
         }
     }
 
-    public class SkyIsSlewingFoward : ISkyCommand
+    public class SkyIsSlewingForward : ISkyCommand
     {
         public long Id { get; }
         public DateTime CreatedUtc { get; }
@@ -1652,7 +1652,7 @@ namespace GS.SkyWatcher
         public dynamic Result { get; private set; }
         private readonly AxisId _axis;
 
-        public SkyIsSlewingFoward(long id, AxisId axis)
+        public SkyIsSlewingForward(long id, AxisId axis)
         {
             Id = id;
             _axis = axis;
@@ -1944,7 +1944,7 @@ namespace GS.SkyWatcher
         }
     }
 
-    public class SkySetPpec : ISkyCommand
+    public class SkySetPPec : ISkyCommand
     {
         public long Id { get; }
         public DateTime CreatedUtc { get; }
@@ -1954,7 +1954,7 @@ namespace GS.SkyWatcher
         private readonly AxisId _axis;
         private readonly bool _on;
 
-        public SkySetPpec(long id, AxisId axis, bool on)
+        public SkySetPPec(long id, AxisId axis, bool on)
         {
             Id = id;
             _axis = axis;
@@ -1969,7 +1969,7 @@ namespace GS.SkyWatcher
         {
             try
             {
-                skyWatcher.SetPpec(_axis, _on);
+                skyWatcher.SetPPec(_axis, _on);
                 Successful = true;
             }
             catch (Exception e)
@@ -1980,7 +1980,7 @@ namespace GS.SkyWatcher
         }
     }
 
-    public class SkySetPpecTrain : ISkyCommand
+    public class SkySetPPecTrain : ISkyCommand
     {
         public long Id { get; }
         public DateTime CreatedUtc { get; }
@@ -1990,7 +1990,7 @@ namespace GS.SkyWatcher
         private readonly AxisId _axis;
         private readonly bool _on;
 
-        public SkySetPpecTrain(long id, AxisId axis, bool on)
+        public SkySetPPecTrain(long id, AxisId axis, bool on)
         {
             Id = id;
             _axis = axis;
@@ -2005,7 +2005,7 @@ namespace GS.SkyWatcher
         {
             try
             {
-                skyWatcher.SetPpecTrain(_axis, _on);
+                skyWatcher.SetPPecTrain(_axis, _on);
                 Successful = true;
             }
             catch (Exception e)
@@ -2160,7 +2160,7 @@ namespace GS.SkyWatcher
         }
     }
 
-    public class SkySetSt4Guiderate : ISkyCommand
+    public class SkySetSt4GuideRate : ISkyCommand
     {
         public long Id { get; }
         public DateTime CreatedUtc { get; }
@@ -2169,7 +2169,7 @@ namespace GS.SkyWatcher
         public dynamic Result { get; }
         private readonly int _rate;
 
-        public SkySetSt4Guiderate(long id, int rate)
+        public SkySetSt4GuideRate(long id, int rate)
         {
             Id = id;
             _rate = rate;
@@ -2183,7 +2183,7 @@ namespace GS.SkyWatcher
         {
             try
             {
-                skyWatcher.SetSt4Guiderate(_rate);
+                skyWatcher.SetSt4GuideRate(_rate);
                 Successful = true;
             }
             catch (Exception e)

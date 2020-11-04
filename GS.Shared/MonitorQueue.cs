@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 namespace GS.Shared
 {
     /// <summary>
-    /// Handles output to logging files usign a blocking queue
+    /// Handles output to logging files using a blocking queue
     /// </summary>
     public static class MonitorQueue
     {
@@ -34,14 +34,14 @@ namespace GS.Shared
         private static readonly BlockingCollection<PulseEntry> _pulseBlockingCollection;
         private static int _errIndex;
         private static int _sessionIndex;
-        private static int _monitorindex;
+        private static int _monitorIndex;
         private static readonly string _instanceFileName;
         private static readonly string _logPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         private static readonly string _monitorFile = Path.Combine(_logPath, "GSServer\\GSMonitorLog");
         private static readonly string _errorFile = Path.Combine(_logPath, "GSServer\\GSErrorLog");
         private static readonly string _sessionFile = Path.Combine(_logPath, "GSServer\\GSSessionLog");
         private static readonly SemaphoreSlim _lockFile = new SemaphoreSlim(1);
-        const string fmt = "000000#";
+        private const string fmt = "000000#";
         #endregion
 
         #region Properties
@@ -157,7 +157,7 @@ namespace GS.Shared
         /// </summary>
         public static void ResetMonitorIndex()
         {
-            _monitorindex = 0;
+            _monitorIndex = 0;
         }
 
         /// <summary>
@@ -210,6 +210,9 @@ namespace GS.Shared
                     break;
             }
 
+            // Output specific entries for charting
+            if (MonitorLog.GetJEntries) ProcessChartItems(entry);
+
             // Output monitor window
             if (Settings.StartMonitor)
             {
@@ -219,16 +222,13 @@ namespace GS.Shared
 
                 // Check checkboxes for output to monitor window
                 if (!foundDevice || !foundCategory || !foundType) return;
-                ++_monitorindex;
-                entry.Index = _monitorindex;
+                ++_monitorIndex;
+                entry.Index = _monitorIndex;
                 MonitorEntry = entry;
 
                 // Write out log if selected
                 if (Settings.LogMonitor) WriteOutMonitor(entry);
             }
-
-            // Output specific entries for charting
-            if (MonitorLog.GetjEntries) ProcessChartItems(entry);
         }
 
         /// <summary>
@@ -241,7 +241,7 @@ namespace GS.Shared
                 entry.Type != MonitorType.Data) return;
             switch (entry.Method)
             {
-                case "ReceiveResponse": // skywatcher
+                case "ReceiveResponse": // sky watcher
                     if (entry.Message.Contains(":j1"))
                     {
                         var msg = entry.Message.Split(',');
@@ -355,9 +355,9 @@ namespace GS.Shared
         /// Send monitor entries to a file async
         /// </summary>
         /// <param name="filePath"></param>
-        /// <param name="messaage"></param>
+        /// <param name="message"></param>
         /// <param name="append"></param>
-        private static async void FileWriteAsync(string filePath, string messaage, bool append = true)
+        private static async void FileWriteAsync(string filePath, string message, bool append = true)
         {
             try
             {
@@ -368,7 +368,7 @@ namespace GS.Shared
                     FileAccess.Write, FileShare.None, 4096, true))
                 using (var sw = new StreamWriter(stream))
                 {
-                    await sw.WriteLineAsync(messaage);
+                    await sw.WriteLineAsync(message);
                 }
             }
             catch (Exception e)
@@ -386,9 +386,9 @@ namespace GS.Shared
         /// Deletes files by name, how old, and dir path
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="daysold"></param>
+        /// <param name="daysOld"></param>
         /// <param name="path"></param>
-        private static void DeleteFiles(string name, int daysold, string path)
+        private static void DeleteFiles(string name, int daysOld, string path)
         {
             try
             {
@@ -396,7 +396,7 @@ namespace GS.Shared
                 foreach (var file in files)
                 {
                     var fi = new FileInfo(file);
-                    if (fi.Name.Contains(name) && fi.CreationTime < (DateTime.Now - new TimeSpan(daysold, 0, 0, 0))) fi.Delete();
+                    if (fi.Name.Contains(name) && fi.CreationTime < (DateTime.Now - new TimeSpan(daysOld, 0, 0, 0))) fi.Delete();
                 }
             }
             catch (Exception e)

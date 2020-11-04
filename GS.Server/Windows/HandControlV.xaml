@@ -8,15 +8,15 @@
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="NoResize" WindowStyle="None" 
         TextOptions.TextFormattingMode="Display" Height="220" Width="330" FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" 
-        Title="{StaticResource lbHc}" FontStretch="Normal" Topmost="{Binding TopMost}"
+        Title="{StaticResource hcHc}" FontStretch="Normal" Topmost="{Binding TopMost}"
         d:DataContext="{d:DesignInstance windows:HandControlVM, IsDesignTimeCreatable=True}" 
         TextElement.Foreground="{DynamicResource MaterialDesignBody}" 
-        WindowState="{Binding Windowstate}" WindowStartupLocation="CenterOwner">
+        WindowState="{Binding WindowStates}" WindowStartupLocation="CenterOwner">
     <WindowChrome.WindowChrome>
         <WindowChrome ResizeBorderThickness="6" CaptionHeight="30" CornerRadius="5" GlassFrameThickness="1"/>
     </WindowChrome.WindowChrome>
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo Description="{StaticResource lbHc}" />
+        <TaskbarItemInfo Description="{StaticResource hcHc}" />
     </Window.TaskbarItemInfo>
     <Grid Background="{DynamicResource MaterialDesignPaper}" >
         <Grid.RowDefinitions>
@@ -24,7 +24,8 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <controls:WindowTitleBarBasic Grid.Row="0" />
-        <md:DialogHost Grid.Row="1"  HorizontalAlignment="Center" CloseOnClickAway="True" IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" Background="Transparent" />
-        <controls:HandController Grid.Row="1" Margin="3" IsEnabled="{Binding ScreenEnabled}" Background="{DynamicResource MaterialDesignPaper}"/>
+        <md:DialogHost Grid.Row="1"  HorizontalAlignment="Center" CloseOnClickAway="True" IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" Background="Transparent" >
+            <controls:HandController  Margin="3" IsEnabled="{Binding ScreenEnabled}" Background="{DynamicResource MaterialDesignPaper}"/>
+        </md:DialogHost>
     </Grid>
 </Window>

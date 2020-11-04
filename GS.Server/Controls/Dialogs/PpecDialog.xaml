@@ -3,13 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" >
-    <GroupBox Header="{StaticResource lbPpecTraining}" Margin="5">
+        xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+    <GroupBox Header="{StaticResource ppTraining}" Margin="5">
         <StackPanel Orientation="Vertical">
-            <TextBlock VerticalAlignment="Center" Margin="5" Text="{StaticResource tbStartTraining}"/>
+            <TextBlock VerticalAlignment="Center" Margin="5" Text="{StaticResource ppStartTraining}"/>
             <StackPanel Orientation="Horizontal" Margin="5">
-                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptPpecDialogCommand}" Content="{StaticResource btnAccept}"/>
-                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelPpecDialogCommand}" Content="{StaticResource btnCancel}"/>
+                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptPPecDialogCommand}" Content="{StaticResource diaAccept}"/>
+                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelPPecDialogCommand}" Content="{StaticResource diaCancel}"/>
             </StackPanel>
         </StackPanel>
     </GroupBox>

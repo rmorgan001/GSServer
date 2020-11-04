@@ -27,7 +27,7 @@ namespace GS.Principles
         /// <param name="rate">Degrees per second</param>
         /// <param name="prate">Percentage of rate</param>
         /// <returns></returns>
-        public static double Ms2Arcsec(double millSeconds, double rate, double prate)
+        public static double Ms2ArcSec(double millSeconds, double rate, double prate)
         {
             if (Math.Abs(prate) < 0.01) prate = 1;
              var a = millSeconds / 1000.0;
@@ -60,8 +60,8 @@ namespace GS.Principles
         /// <returns></returns>
         public static double Rate2Steps(double milliseconds, double rate, double prate, double totalSteps)
         {
-            var a = StepPerArcsec(totalSteps);
-            var b = a * Ms2Arcsec(milliseconds, rate, prate);
+            var a = StepPerArcSec(totalSteps);
+            var b = a * Ms2ArcSec(milliseconds, rate, prate);
             return b;
         }
 
@@ -70,7 +70,7 @@ namespace GS.Principles
         /// </summary>
         /// <param name="totalSteps"></param>
         /// <returns></returns>
-        public static double StepPerArcsec(double totalSteps)
+        public static double StepPerArcSec(double totalSteps)
         {
             var a = totalSteps / 360 / 3600.0;
             return a;

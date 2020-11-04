@@ -157,7 +157,7 @@ namespace GS.Server.Helpers
             return VoiceNames;
         }
         /// <summary>
-        /// called from the setter property.  Used to update UI elements.  propertyname is not required
+        /// called from the setter property.  Used to update UI elements.  property name is not required
         /// </summary>
         /// <param name="propertyName"></param>
         private static void OnStaticPropertyChanged([CallerMemberName] string propertyName = null)

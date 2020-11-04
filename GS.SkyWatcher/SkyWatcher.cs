@@ -26,10 +26,10 @@ using System.Threading;
 namespace GS.SkyWatcher
 {
     /// <summary>
-    /// Main Skywatcher class for movements, status, and information.
-    /// Based on the original skywatcher-pacific project 5/31/2011: release C# basic API 1.0
-    /// Contructor takes a connected ASCOM serial object. if ASCOM isn't needed replace with
-    /// standard serial obeject and remove ASCOM references. 
+    /// Main SkyWatcher class for movements, status, and information.
+    /// Based on the original skyWatcher-pacific project 5/31/2011: release C# basic API 1.0
+    /// Constructor takes a connected AsCom serial object. if AsCom isn't needed replace with
+    /// standard serial object and remove AsCom references. 
     /// </summary>
     public class SkyWatcher
     {
@@ -37,7 +37,7 @@ namespace GS.SkyWatcher
 
         private readonly Commands _commands;
         // 128.9 steps per sidereal second * rads per second = steps per rad second
-        private const double _lowSpeedMargin = (128 * Constant.Siderealrate);
+        private const double _lowSpeedMargin = (128 * Constant.SiderealRate);
         private readonly double[] _slewingSpeed = { 0, 0 }; // store for last used speed in radians
         private readonly double[] _targetPositions = { 0, 0 }; //  Store for last used target coordinate 
         private readonly double[] _trackingRates = { 0, 0 };
@@ -55,32 +55,32 @@ namespace GS.SkyWatcher
 
         internal bool IsConnected => _commands.IsConnected;
 
-        private bool _ppecOn;
-        internal bool IsPpecOn
+        private bool _pPecOn;
+        internal bool IsPPecOn
         {
             get
             {
                 ParseCapabilities();
-                return _ppecOn;
+                return _pPecOn;
             }
-            private set => _ppecOn = value;
+            private set => _pPecOn = value;
         }
 
-        private bool _ppecTrainning;
-        internal bool IsPpecInTrainingOn
+        private bool _pPecTraining;
+        internal bool IsPPecInTrainingOn
         {
             get
             {
                 ParseCapabilities();
-                return _ppecTrainning;
+                return _pPecTraining;
             }
-            private set => _ppecTrainning = value;
+            private set => _pPecTraining = value;
         }
         internal bool DecPulseGoTo { get; set; }
-        internal bool AlternatingPpec { get; set; }
+        internal bool AlternatingPPec { get; set; }
         internal bool CanAzEq { get; private set; }
         internal bool CanHomeSensors { get; private set; }
-        internal bool CanPpec { get; private set; }
+        internal bool CanPPec { get; private set; }
         internal bool CanOneStepDec { get; private set; }
         internal bool CanOneStepRa { get; private set; }
         internal bool CanDualEncoders { get; private set; }
@@ -114,10 +114,10 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// Start tracking based degree rate.  Use for tracking and guiding, not gotos
+        /// Start tracking based degree rate.  Use for tracking and guiding, not go tos
         /// </summary>
         /// <param name="axis">>AxisId.Axis1 or AxisId.Axis2</param>
-        /// <param name="rate">Rate in degrees per arcsec</param>
+        /// <param name="rate">Rate in degrees per arc sec</param>
         internal void AxisSlew(AxisId axis, double rate)
         {
             rate = Principles.Units.Deg2Rad1(rate);
@@ -131,7 +131,7 @@ namespace GS.SkyWatcher
             var highspeed = false;
 
             // Stop if speed is too slow
-            if (internalSpeed <= Constant.Siderealrate / 1000.0)
+            if (internalSpeed <= Constant.SiderealRate / 1000.0)
             {
                 AxisStop(axis);
 
@@ -162,7 +162,7 @@ namespace GS.SkyWatcher
 
             var axesstatus = _commands.GetAxisStatus(axis); // Get axis status
             if (axesstatus.FullStop || // Already stopped
-                (axesstatus.HighSpeed != highspeed) || // Change highspeed
+                (axesstatus.HighSpeed != highspeed) || // Change high speed
                 highspeed ||
                 (axesstatus.SlewingForward && !forward) || // Change direction 
                 (!axesstatus.SlewingForward && forward) // Change direction
@@ -200,14 +200,13 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// Directs a pulse guide command to an axis, hemi and tracking rate needs to be set first
+        /// Directs a pulse guide command to an axis, hemisphere and tracking rate needs to be set first
         /// </summary>
         /// <param name="axis">Axis 1 or 2</param>
-        /// <param name="guiderate">Guiderate degrees, 15.041/3600*.5, negative value denotes direction</param>
-        /// <param name="duration">length of pulse in milliseconds, aways positive numbers</param>
-        /// <param name="backlashsteps">Positive microsteps added for backlash</param>
-        /// <param name="declination"></param>
-        internal void AxisPulse(AxisId axis, double guiderate, int duration, int backlashsteps = 0, double declination = 0)
+        /// <param name="guideRate">Guide rate degrees, 15.041/3600*.5, negative value denotes direction</param>
+        /// <param name="duration">length of pulse in milliseconds, always positive numbers</param>
+        /// <param name="backlashSteps">Positive micro steps added for backlash</param>
+        internal void AxisPulse(AxisId axis, double guideRate, int duration, int backlashSteps = 0)
         {
             if (axis == AxisId.Axis1)
             {
@@ -222,29 +221,29 @@ namespace GS.SkyWatcher
 
             var datetime = Principles.HiResDateTime.UtcNow;
             var monitorItem = new MonitorEntry
-            { Datetime = datetime, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{guiderate},{duration},{backlashsteps},{MinPulseDurationRa},{MinPulseDurationDec},{DecPulseGoTo}" };
+            { Datetime = datetime, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{guideRate},{duration},{backlashSteps},{MinPulseDurationRa},{MinPulseDurationDec},{DecPulseGoTo}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             var pulseEntry = new PulseEntry
             {
                 Axis = (int)axis,
                 Duration = duration,
-                Rate = guiderate,
-                BacklashSteps = backlashsteps,
-                Declination = declination,
+                Rate = guideRate,
+                //BacklashSteps = backlashSteps,
+                //Declination = declination,
+                //EndTime = datetime,
                 Rejected = false,
                 StartTime = datetime,
-                EndTime = datetime,
             }; // setup to log and graph the pulse
 
-            backlashsteps = Math.Abs(backlashsteps);
-            var arcsecs = duration / 1000.0 * Math.Abs(guiderate) * 3600.0;
+            backlashSteps = Math.Abs(backlashSteps);
+            var arcsecs = duration / 1000.0 * Math.Abs(guideRate) * 3600.0;
 
             if (axis == AxisId.Axis1)
             {
-                if (backlashsteps > 0) // Convert lash to extra pulse duration in milliseconds
+                if (backlashSteps > 0) // Convert lash to extra pulse duration in milliseconds
                 {
-                    var lashduration = backlashsteps / _stepsPerSecond[0] / 3600 / Math.Abs(guiderate) * 1000;
+                    var lashduration = backlashSteps / _stepsPerSecond[0] / 3600 / Math.Abs(guideRate) * 1000;
                     duration += (int)lashduration;
                 }
 
@@ -259,15 +258,15 @@ namespace GS.SkyWatcher
 
                 var rate = SouthernHemisphere ? -Math.Abs(_trackingRates[0]) : Math.Abs(_trackingRates[0]);
 
-                var speedInt = CalculateSpeed(AxisId.Axis1, rate + BasicMath.DegToRad(guiderate)); // Calculate mount speed
+                var speedInt = CalculateSpeed(AxisId.Axis1, rate + BasicMath.DegToRad(guideRate)); // Calculate mount speed
 
-                if (_ppecOn && AlternatingPpec)
+                if (_pPecOn && AlternatingPPec)
                 {
-                    SetPpec(AxisId.Axis1, false);
-                } // implements the alternating PPEC 
+                    SetPPec(AxisId.Axis1, false);
+                } // implements the alternating pPEC 
 
 
-                if (MonitorPulse) { pulseEntry.PositionStart = _commands.GetAxisPositionCounter(AxisId.Axis1); }
+                //if (MonitorPulse) { pulseEntry.PositionStart = _commands.GetAxisPositionCounter(AxisId.Axis1); }
 
                 _commands.SetStepSpeed(AxisId.Axis1, speedInt); // :I Send pulse to axis
 
@@ -282,36 +281,36 @@ namespace GS.SkyWatcher
                     while (sw1.Elapsed.TotalMilliseconds < msspan) { Thread.Sleep(1); } // loop while counting to duration
                 }
 
-                pulseEntry.EndTime = Principles.HiResDateTime.UtcNow;
+                //pulseEntry.EndTime = Principles.HiResDateTime.UtcNow;
                 if (MonitorPulse)
                 {
                     pulseEntry.Duration = duration;
-                    pulseEntry.PositionEnd = _commands.GetAxisPositionCounter(AxisId.Axis1);
-                    pulseEntry.AltPPECon = AlternatingPpec;
-                    pulseEntry.PPECon = _ppecOn;
+                    //pulseEntry.PositionEnd = _commands.GetAxisPositionCounter(AxisId.Axis1);
+                    //pulseEntry.AltPPECon = AlternatingPPec;
+                    //pulseEntry.PPECon = _pPecOn;
                 }
 
                 _commands.SetStepSpeed(AxisId.Axis1, _trackingSpeeds[0]); // :I set speed back to current tracking speed
 
                 PulseRaRunning = false;
 
-                if (_ppecOn && AlternatingPpec)
+                if (_pPecOn && AlternatingPPec)
                 {
-                    SetPpec(AxisId.Axis1, true);
-                } // implements the alternating PPEC
+                    SetPPec(AxisId.Axis1, true);
+                } // implements the alternating pPEC
             }
 
             else
             {
                 if (DecPulseGoTo)
                 {
-                    // Turns the pulse into steps and does a goto which is faster than using guiderate
+                    // Turns the pulse into steps and does a goto which is faster than using guide rate
                     var stepsNeeded = (int)(arcsecs * _stepsPerSecond[1]);
-                    stepsNeeded += backlashsteps;
+                    stepsNeeded += backlashSteps;
 
-                    if (backlashsteps > 0) // Convert lash to pulse duration in milliseconds
+                    if (backlashSteps > 0) // Convert lash to pulse duration in milliseconds
                     {
-                        var lashduration = backlashsteps / _stepsPerSecond[1] / 3600 / Math.Abs(guiderate) * 1000;
+                        var lashduration = backlashSteps / _stepsPerSecond[1] / 3600 / Math.Abs(guideRate) * 1000;
                         duration += (int)lashduration;
                     }
 
@@ -323,9 +322,9 @@ namespace GS.SkyWatcher
                         MonitorLog.LogToMonitor(pulseEntry);
                         return;
                     }
-                    if (guiderate < 0) { stepsNeeded = -stepsNeeded; }
+                    if (guideRate < 0) { stepsNeeded = -stepsNeeded; }
 
-                    //Firmware for the EQ8 and EQ6 can't move a single step so this conpensates, 2015B3 corrects this 
+                    //Firmware for the EQ8 and EQ6 can't move a single step so this compensates, 2015B3 corrects this 
                     AxisStatus axesstatus;
                     if (!CanOneStepDec) // check if mount is capable of small steps in goto mode
                     {
@@ -344,10 +343,10 @@ namespace GS.SkyWatcher
                                 stepsNeeded += Math.Abs(jumpstep); // 5 + 20
                             }
 
-                            if (MonitorPulse)
-                            {
-                                pulseEntry.PositionStart = _commands.GetAxisPositionCounter(AxisId.Axis1);
-                            }
+                            //if (MonitorPulse)
+                            //{
+                            //    pulseEntry.PositionStart = _commands.GetAxisPositionCounter(AxisId.Axis1);
+                            //}
 
                             AxisMoveSteps(AxisId.Axis2, jumpstep);
 
@@ -368,7 +367,7 @@ namespace GS.SkyWatcher
                         }
                     }
 
-                    if (MonitorPulse) { pulseEntry.PositionStart = _commands.GetAxisPositionCounter(AxisId.Axis2); }
+                    // if (MonitorPulse) { pulseEntry.PositionStart = _commands.GetAxisPositionCounter(AxisId.Axis2); }
 
                     pulseEntry.StartTime = Principles.HiResDateTime.UtcNow;
 
@@ -390,21 +389,21 @@ namespace GS.SkyWatcher
 
                     PulseDecRunning = false;
 
-                    pulseEntry.EndTime = Principles.HiResDateTime.UtcNow;
+                    //pulseEntry.EndTime = Principles.HiResDateTime.UtcNow;
 
                     if (MonitorPulse)
                     {
                         pulseEntry.Duration = duration;
-                        pulseEntry.PositionEnd = _commands.GetAxisPositionCounter(AxisId.Axis2);
-                        pulseEntry.AltPPECon = AlternatingPpec;
-                        pulseEntry.PPECon = _ppecOn;
+                        //pulseEntry.PositionEnd = _commands.GetAxisPositionCounter(AxisId.Axis2);
+                        //pulseEntry.AltPPECon = AlternatingPPec;
+                        //pulseEntry.PPECon = _pPecOn;
                     }
                 }
                 else
                 {
-                    if (backlashsteps > 0) // Convert lash to extra pulse duration in milliseconds
+                    if (backlashSteps > 0) // Convert lash to extra pulse duration in milliseconds
                     {
-                        var lashduration = Convert.ToInt32(backlashsteps / _stepsPerSecond[1] / 3600 / Math.Abs(guiderate) * 1000);
+                        var lashduration = Convert.ToInt32(backlashSteps / _stepsPerSecond[1] / 3600 / Math.Abs(guideRate) * 1000);
                         if (lashduration > 1000)
                         {
                             lashduration = 1000;
@@ -421,9 +420,9 @@ namespace GS.SkyWatcher
                         return;
                     }
 
-                    if (MonitorPulse) { pulseEntry.PositionStart = _commands.GetAxisPositionCounter(AxisId.Axis2); }
+                    //if (MonitorPulse) { pulseEntry.PositionStart = _commands.GetAxisPositionCounter(AxisId.Axis2); }
 
-                    AxisSlew(AxisId.Axis2, guiderate); // Send pulse to axis 
+                    AxisSlew(AxisId.Axis2, guideRate); // Send pulse to axis 
 
                     pulseEntry.StartTime = _commands.LastJ2RunTime; // last :J2 start time
 
@@ -436,7 +435,7 @@ namespace GS.SkyWatcher
                         while (sw3.Elapsed.TotalMilliseconds < msspan) { Thread.Sleep(1); } // do something while waiting;
                     }
 
-                    pulseEntry.EndTime = Principles.HiResDateTime.UtcNow;
+                    //pulseEntry.EndTime = Principles.HiResDateTime.UtcNow;
                     AxisStop(AxisId.Axis2);
 
                     PulseDecRunning = false;
@@ -444,9 +443,9 @@ namespace GS.SkyWatcher
                     if (MonitorPulse)
                     {
                         pulseEntry.Duration = duration;
-                        pulseEntry.PositionEnd = _commands.GetAxisPositionCounter(AxisId.Axis2);
-                        pulseEntry.AltPPECon = AlternatingPpec;
-                        pulseEntry.PPECon = _ppecOn;
+                        //pulseEntry.PositionEnd = _commands.GetAxisPositionCounter(AxisId.Axis2);
+                        //pulseEntry.AltPPECon = AlternatingPPec;
+                        //pulseEntry.PPECon = _pPecOn;
                     }
                 }
             }
@@ -484,7 +483,7 @@ namespace GS.SkyWatcher
         /// Use goto mode to target position
         /// </summary>
         /// <param name="axis">>AxisId.Axis1 or AxisId.Axis2</param>
-        /// <param name="movingSteps">Microsteps to move</param>
+        /// <param name="movingSteps">Micro steps to move</param>
         internal void AxisMoveSteps(AxisId axis, long movingSteps)
         {
             var monitorItem = new MonitorEntry
@@ -531,7 +530,7 @@ namespace GS.SkyWatcher
                 }
             }
 
-            _commands.SetMotionMode(axis, 2, direction, SouthernHemisphere); // G: '2' low  speed GOTO mode, '0'  +CW  and Nth Hemi
+            _commands.SetMotionMode(axis, 2, direction, SouthernHemisphere); // G: '2' low  speed GOTO mode, '0'  +CW  and Nth Hemisphere
             _commands.SetGotoTargetIncrement(axis, movingSteps); // H:
             _commands.SetBreakPointIncrement(axis, 0); // M: send 0 steps
             _commands.StartMotion(axis); // J: Start moving
@@ -627,7 +626,7 @@ namespace GS.SkyWatcher
         /// <summary>
         /// Get axis position in degrees
         /// </summary>
-        /// <returns>array in degrees, could return array of NaN if no responces returned</returns>
+        /// <returns>array in degrees, could return array of NaN if no responses returned</returns>
         internal double[] GetPositionsInDegrees()
         {
             var positions = new double[] { 0, 0 };
@@ -694,7 +693,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// Get the sidereal rate in stepcounts
+        /// Get the sidereal rate in step counts
         /// </summary>
         /// <returns></returns>
         internal long GetSiderealRate(AxisId axis)
@@ -713,7 +712,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// Turn on/off individule axis encoders
+        /// Turn on/off individual axis encoders
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="on">on=true,off=false</param>
@@ -728,25 +727,25 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// Turn on/off PPEC
+        /// Turn on/off pPEC
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="on">on=true,off=false</param>
-        internal void SetPpec(AxisId axis, bool on)
+        internal void SetPPec(AxisId axis, bool on)
         {
-            if (!CanPpec) { return; }
-            _commands.SetPpec(axis, on);
+            if (!CanPPec) { return; }
+            _commands.SetPPec(axis, on);
         }
 
         /// <summary>
-        /// Turn on/off training PPEC
+        /// Turn on/off training pPEC
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="on">on=true,off=false</param>
-        internal void SetPpecTrain(AxisId axis, bool on)
+        internal void SetPPecTrain(AxisId axis, bool on)
         {
-            if (!CanPpec) { return; }
-            _commands.SetPpecTrain(axis, on);
+            if (!CanPPec) { return; }
+            _commands.SetPPecTrain(axis, on);
         }
 
         /// <summary>
@@ -790,7 +789,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// j Gets axis poistion counter
+        /// j Gets axis position counter
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <returns>Cardinal encoder count</returns>
@@ -858,7 +857,7 @@ namespace GS.SkyWatcher
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="func">'0' high speed GOTO slewing,'1' low speed slewing mode,'2' low speed GOTO mode,'3' High slewing mode</param>
-        /// <param name="direction">0=forward/right, 1=backaward/left</param>
+        /// <param name="direction">0=forward/right, 1=backward/left</param>
         internal void SetMotionMode(AxisId axis, int func, int direction)
         {
             _commands.SetMotionMode(axis, func, direction, SouthernHemisphere);
@@ -885,10 +884,10 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// set ST4 guiderate
+        /// set ST4 guide rate
         /// </summary>
         /// <param name="rate"> 0..4 (1.0, 0.75, 0.50, 0.25, 0.125)</param>
-        internal void SetSt4Guiderate(int rate)
+        internal void SetSt4GuideRate(int rate)
         {
             var monitorItem = new MonitorEntry
             { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{rate}" };
@@ -916,7 +915,7 @@ namespace GS.SkyWatcher
                     cmd = 2;
                     break;
             }
-            _commands.SetSt4Guiderate(cmd);
+            _commands.SetSt4GuideRate(cmd);
         }
 
         /// <summary>
@@ -934,10 +933,10 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// Sets the tracking rate in arcseconds converted to rad 
+        /// Sets the tracking rate in arc seconds converted to rad 
         /// </summary>
         /// <param name="axis">which axis</param>
-        /// <param name="rate">arcseconds in rad</param>
+        /// <param name="rate">arc seconds in rad</param>
         private void SetTrackingRate(AxisId axis, double rate)
         {
             if (axis == AxisId.Axis1)
@@ -1103,8 +1102,8 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// Used as a multiplyer to determine speed for the I command
-        /// in general divide 1 by radians then multipley by this number 
+        /// Used as a multiplier to determine speed for the I command
+        /// in general divide 1 by radians then multiply by this number 
         /// </summary>
         /// <param name="axis"></param>
         /// <param name="rateInRad"></param>
@@ -1140,14 +1139,14 @@ namespace GS.SkyWatcher
                             switch (item)
                             {
                                 case StatusBit.None: // 0
-                                    IsPpecOn = false;
-                                    IsPpecInTrainingOn = false;
+                                    IsPPecOn = false;
+                                    IsPPecInTrainingOn = false;
                                     break;
                                 case StatusBit.A: // 1
-                                    IsPpecInTrainingOn = true;
+                                    IsPPecInTrainingOn = true;
                                     break;
                                 case StatusBit.B: // 2
-                                    IsPpecOn = true;
+                                    IsPPecOn = true;
                                     break;
                                 case StatusBit.C: // 4
                                 case StatusBit.D: // 8
@@ -1164,14 +1163,14 @@ namespace GS.SkyWatcher
                                 case StatusBit.None: // 0
                                     CanAzEq = false;
                                     CanHomeSensors = false;
-                                    CanPpec = false;
+                                    CanPPec = false;
                                     CanDualEncoders = false;
                                     break;
                                 case StatusBit.A: // 1
                                     CanDualEncoders = true;
                                     break;
                                 case StatusBit.B: // 2
-                                    CanPpec = true;
+                                    CanPPec = true;
                                     break;
                                 case StatusBit.C: // 4
                                     CanHomeSensors = true;
@@ -1227,14 +1226,14 @@ namespace GS.SkyWatcher
         {
             var speed = Math.Abs(rate);
 
-            // For using function RadSpeedToInt(), change to unit Senonds/Rad.
-            // ie. sending sidereal as internalspeed will calculate how many rads per second
+            // For using function RadSpeedToInt(), change to unit Seconds/Rad.
+            // ie. sending sidereal as internal speed will calculate how many rads per second
             speed = 1 / speed;
 
             //Conversion of radians to int which sets the speed in steps
             var speedInt = RadSpeedToInt(axis, speed);
 
-            //Set maxium speed, The lower the number the faster speed
+            //Set maximum speed, The lower the number the faster speed
             if (_axisVersion[0] == 0x010600 || _axisVersion[0] == 0x010601)
             {
                 // For special MC version.

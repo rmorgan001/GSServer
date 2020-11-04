@@ -23,15 +23,15 @@ using System.Threading;
 
 namespace GS.Server.AutoHome
 {
-    public class AutohomeSky
+    public class AutoHomeSky
     {
         // private int StartCount { get; set; }
         private int TripPosition { get; set; }
 
         /// <summary>
-        /// autohome for the simulator
+        /// auto home for the simulator
         /// </summary>
-        public AutohomeSky()
+        public AutoHomeSky()
         {
             var monitorItem = new MonitorEntry
             {
@@ -162,13 +162,13 @@ namespace GS.Server.AutoHome
         }
 
         /// <summary>
-        /// Start autohome process per axis with max degrees default at 90
+        /// Start auto home process per axis with max degrees default at 90
         /// </summary>
         /// <param name="axis"></param>
-        /// <param name="offsetdec"></param>
-        /// <param name="maxmove"></param>
+        /// <param name="offSetDec"></param>
+        /// <param name="maxMove"></param>
         /// <returns></returns>
-        public int StartAutoHome(AxisId axis, int maxmove = 100, int offsetdec = 0)
+        public int StartAutoHome(AxisId axis, int maxMove = 100, int offSetDec = 0)
         {
             var _ = new SkyAxisStop(0, axis);
             if (SkyServer.Tracking) SkyServer.Tracking = false;
@@ -188,10 +188,10 @@ namespace GS.Server.AutoHome
 
 
             #region 5 degree loops to look for sensor
-            for (var i = 0; i <= (maxmove / 5); i++)
+            for (var i = 0; i <= (maxMove / 5); i++)
             {
                 if (SkyServer.AutoHomeStop) return -3; //stop requested
-                if (totalmove >= maxmove) return -2; // home not found
+                if (totalmove >= maxMove) return -2; // home not found
                 if (startovers >= 2) return -4; // too many restarts
 
                 status = GetValidStatus(axis);
@@ -207,13 +207,13 @@ namespace GS.Server.AutoHome
                         if (status != null)
                         {
                             i = 0;
-                            //totalmove = 0.0;
+                            //total move = 0.0;
                             startovers++;
                             continue; //start over
                         }
                         break; //found home
                     }
-                    if (totalmove >= maxmove) return -2; // home not found
+                    if (totalmove >= maxMove) return -2; // home not found
                 }
                 switch (status)
                 {
@@ -244,7 +244,7 @@ namespace GS.Server.AutoHome
                     if (status != null)
                     {
                         i = 0;
-                        //totalmove = 0.0;
+                        //total move = 0.0;
                         startovers++;
                         continue; //start over
                     }
@@ -252,7 +252,7 @@ namespace GS.Server.AutoHome
                 break;//found home
             }
             if (SkyServer.AutoHomeStop) return -3; //stop requested
-            if (totalmove >= maxmove) return -2; // home not found
+            if (totalmove >= maxMove) return -2; // home not found
             if (startovers >= 2) return -4; // too many restarts
             #endregion
 
@@ -311,9 +311,9 @@ namespace GS.Server.AutoHome
             slew = SlewToHome(axis);
 
             // Dec offset for side saddles
-            if (Math.Abs(offsetdec) > 0 && axis == AxisId.Axis2)
+            if (Math.Abs(offSetDec) > 0 && axis == AxisId.Axis2)
             {
-                slew = SlewAxis(Math.Abs(offsetdec), axis, offsetdec < 0);
+                slew = SlewAxis(Math.Abs(offSetDec), axis, offSetDec < 0);
                 if (slew != 0) return slew;
             }
 
@@ -328,7 +328,7 @@ namespace GS.Server.AutoHome
         {
             if (SkyServer.AutoHomeStop) return -3; //stop requested
 
-            //convert postion to mount degrees 
+            //convert position to mount degrees 
             var a = TripPosition -= 0x00800000;
             var skyCmd = new SkyGetStepToAngle(SkyQueue.NewId, axis, a);
             var b = (double)SkyQueue.GetCommandResult(skyCmd).Result;

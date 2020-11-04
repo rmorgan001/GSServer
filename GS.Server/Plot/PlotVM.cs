@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019  Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2020  Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -108,7 +108,7 @@ namespace GS.Server.Plot
         /// <param name="e"></param>
         private void XAxisTimer_Tick(object sender, EventArgs e)
         {
-            SetXaxisLimits(HiResDateTime.UtcNow.ToLocalTime());
+            SetXAxisLimits(HiResDateTime.UtcNow.ToLocalTime());
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace GS.Server.Plot
                 default:
                     return;
             }
-            ChartLogging.LogPoint(BaseLogName,ChartType.Plot, point);
+            if (IsLogging) ChartLogging.LogPoint(BaseLogName,ChartType.Plot, point);
 
             Values1.Add(point);
             if (Values1.Count > MaxPoints) Values1.RemoveAt(0);
@@ -184,7 +184,7 @@ namespace GS.Server.Plot
                     return;
             }
 
-            ChartLogging.LogPoint(BaseLogName,ChartType.Plot, point);
+            if (IsLogging) ChartLogging.LogPoint(BaseLogName,ChartType.Plot, point);
 
             Values2.Add(point);
             if (Values2.Count > MaxPoints) Values2.RemoveAt(0);
@@ -214,7 +214,7 @@ namespace GS.Server.Plot
                 .Stroke(model => model.Stroke);
 
             //lets save the mapper globally.
-            LiveCharts.Charting.For<PointModel>(Mapper);
+            Charting.For<PointModel>(Mapper);
 
             // X axis second timer
             _xAxisTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
@@ -226,12 +226,12 @@ namespace GS.Server.Plot
             FormatterX = value => new DateTime((long)value).ToString("HH:mm:ss");
             FormatterY = value => value.ToString("N2");
 
-            AxisXUnit = TimeSpan.FromSeconds(1).Ticks; //AxisXunit = 10000000
+            AxisXUnit = TimeSpan.FromSeconds(1).Ticks; //AxisXUnit = 10000000
             AxisYUnit = .5;
             AxisYMax = 3;
             AxisYMin = -3;
             AxisXSeconds = 40;
-            SetXaxisLimits(HiResDateTime.UtcNow.ToLocalTime());
+            SetXAxisLimits(HiResDateTime.UtcNow.ToLocalTime());
             Zoom = "Xy";
 
             Scale = ChartScale.Steps;
@@ -293,12 +293,12 @@ namespace GS.Server.Plot
                     _xAxisTimer.Start();
                     _cts = new CancellationTokenSource();
                     _ct = _cts.Token;
-                    StartBadgeContent = Application.Current.Resources["bdgPulsesStart"].ToString();
+                    StartBadgeContent = Application.Current.Resources["pltOn"].ToString();
                     PauseBadgeContent = "";
                 }
                 else
                 {
-                    MonitorLog.GetjEntries = false;
+                    MonitorLog.GetJEntries = false;
                     _xAxisTimer.Stop();
                     _cts?.Cancel();
                     _cts = null;
@@ -535,10 +535,10 @@ namespace GS.Server.Plot
             ChartsQuality(ChartQuality);
             TitleItems.Clear();
 
-            raStepsPerSecond = Conversions.StepPerArcsec(SkyServer.StepsPerRevolution[0]);
-            decStepsPerSecond = Conversions.StepPerArcsec(SkyServer.StepsPerRevolution[1]);
+            raStepsPerSecond = Conversions.StepPerArcSec(SkyServer.StepsPerRevolution[0]);
+            decStepsPerSecond = Conversions.StepPerArcSec(SkyServer.StepsPerRevolution[1]);
 
-            MonitorLog.GetjEntries = true;
+            MonitorLog.GetJEntries = true;
 
             ValuesCollection = new SeriesCollection();
 
@@ -561,7 +561,7 @@ namespace GS.Server.Plot
             Values2.WithQuality(chartQuality);
         }
 
-        private void SetXaxisLimits(DateTime now)
+        private void SetXAxisLimits(DateTime now)
         {
             AxisXMax = now.Ticks + AxisXUnit * 2;
             AxisXMin = now.Ticks - AxisXUnit * AxisXSeconds;
@@ -585,7 +585,7 @@ namespace GS.Server.Plot
             LogGColumnSeries(series, set);
             return series;
         }
-        private GLineSeries NewGLineSeries(string title, IChartValues values, ChartValueSet set, double pointsize, Brush color, int scaleat)
+        private GLineSeries NewGLineSeries(string title, IChartValues values, ChartValueSet set, double pointSize, Brush color, int scaleAt)
         {
             var col = new GSColors();
             var series = new GLineSeries
@@ -594,11 +594,11 @@ namespace GS.Server.Plot
                 LineSmoothness = 0,
                 MinWidth = 1,
                 Stroke = color,
-                StrokeThickness = pointsize,
+                StrokeThickness = pointSize,
                 PointForeground = color,
                 PointGeometry = DefaultGeometries.Cross,
                 PointGeometrySize = 10,
-                ScalesYAt = scaleat,
+                ScalesYAt = scaleAt,
                 Title = title,
                 Values = values
             };
@@ -606,15 +606,15 @@ namespace GS.Server.Plot
             LogGLineSeries(series, set);
             return series;
         }
-        private GScatterSeries NewGScatterSeries(string title, IChartValues values, ChartValueSet set, double pointsize, Brush color, int scaleat)
+        private GScatterSeries NewGScatterSeries(string title, IChartValues values, ChartValueSet set, double pointSize, Brush color, int scaleAt)
         {
             var series = new GScatterSeries
             {
                 Fill = color,
                 MinWidth = 1,
                 Stroke = color,
-                StrokeThickness = pointsize,
-                ScalesYAt = scaleat,
+                StrokeThickness = pointSize,
+                ScalesYAt = scaleAt,
                 Title = title,
                 Values = values
             };
@@ -622,7 +622,7 @@ namespace GS.Server.Plot
             LogGScatterSeries(series, set);
             return series;
         }
-        private GStepLineSeries NewGStepLineSeries(string title, IChartValues values, ChartValueSet set, double pointsize, Brush color, int scaleat)
+        private GStepLineSeries NewGStepLineSeries(string title, IChartValues values, ChartValueSet set, double pointSize, Brush color, int scaleAt)
         {
             var col = new GSColors();
             var series = new GStepLineSeries()
@@ -630,9 +630,9 @@ namespace GS.Server.Plot
                 Fill = col.ToBrush(Color.Transparent),
                 MinWidth = 1,
                 Stroke = color,
-                StrokeThickness = pointsize,
+                StrokeThickness = pointSize,
                 PointForeground = color,
-                ScalesYAt = scaleat,
+                ScalesYAt = scaleAt,
                 Title = title,
                 Values = values
             };
@@ -640,7 +640,7 @@ namespace GS.Server.Plot
             LogGStepLineSeries(series, set);
             return series;
         }
-        private TitleItem CreateSeries(string serColor, string title, ChartSeriesType seriesType, IChartValues values, ChartValueSet seriesSet, double pointsize, int scaleat)
+        private TitleItem CreateSeries(string serColor, string title, ChartSeriesType seriesType, IChartValues values, ChartValueSet seriesSet, double pointSize, int scaleAt)
         {
             var col = new GSColors();
             var brush = col.ToBrush(Color.FromName(serColor));
@@ -648,19 +648,19 @@ namespace GS.Server.Plot
             switch (seriesType)
             {
                 case ChartSeriesType.GLineSeries:
-                    var lSeries = NewGLineSeries(title, values, seriesSet, pointsize, brush, scaleat);
+                    var lSeries = NewGLineSeries(title, values, seriesSet, pointSize, brush, scaleAt);
                     ValuesCollection.Add(lSeries);
                     return titleItem;
                 case ChartSeriesType.GColumnSeries:
-                    var cSeries = NewGColumnSeries(title, values, seriesSet, pointsize, brush, scaleat);
+                    var cSeries = NewGColumnSeries(title, values, seriesSet, pointSize, brush, scaleAt);
                     ValuesCollection.Add(cSeries);
                     return titleItem;
                 case ChartSeriesType.GStepLineSeries:
-                    var sSeries = NewGStepLineSeries(title, values, seriesSet, pointsize, brush, scaleat);
+                    var sSeries = NewGStepLineSeries(title, values, seriesSet, pointSize, brush, scaleAt);
                     ValuesCollection.Add(sSeries);
                     return titleItem;
                 case ChartSeriesType.GScatterSeries:
-                    var scSeries = NewGScatterSeries(title, values, seriesSet, pointsize, brush, scaleat);
+                    var scSeries = NewGScatterSeries(title, values, seriesSet, pointSize, brush, scaleAt);
                     ValuesCollection.Add(scSeries);
                     return titleItem;
             }
@@ -972,7 +972,7 @@ namespace GS.Server.Plot
                 if (_xAxisTimer.IsEnabled)
                 {
                     _xAxisTimer.Stop();
-                    PauseBadgeContent = Application.Current.Resources["bdgPulsesPause"].ToString();
+                    PauseBadgeContent = Application.Current.Resources["pltOn"].ToString();
                 }
                 else
                 {
@@ -1001,7 +1001,7 @@ namespace GS.Server.Plot
                     return cmd;
                 }
 
-                return _clickPlotZoomCmd = new RelayCommand(param => PlotZoomCmd(param));
+                return _clickPlotZoomCmd = new RelayCommand(PlotZoomCmd);
             }
             set => _clickPlotZoomCmd = value;
         }
@@ -1021,20 +1021,20 @@ namespace GS.Server.Plot
             }
         }
         
-        private ICommand _clickPlotSeriesdCmd;
+        private ICommand _clickPlotSeriesCmd;
         public ICommand ClickPlotSeriesCmd
         {
             get
             {
-                var cmd = _clickPlotSeriesdCmd;
+                var cmd = _clickPlotSeriesCmd;
                 if (cmd != null)
                 {
                     return cmd;
                 }
 
-                return _clickPlotSeriesdCmd = new RelayCommand(param => PlotSeriesCmd(param));
+                return _clickPlotSeriesCmd = new RelayCommand(PlotSeriesCmd);
             }
-            set => _clickPlotSeriesdCmd = value;
+            set => _clickPlotSeriesCmd = value;
         }
         private void PlotSeriesCmd(object param)
         {
@@ -1197,7 +1197,7 @@ namespace GS.Server.Plot
         private void OpenDialog(string msg, string caption = null)
         {
             if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["msgDialog"].ToString();
+            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
             DialogContent = new DialogOK();
             IsDialogOpen = true;
 
@@ -1275,7 +1275,6 @@ namespace GS.Server.Plot
         }
         private async void ExecuteMessageDialog()
         {
-            //let's set up a little MVVM, cos that's what the cool kids are doing:
             var view = new ErrorMessageDialog
             {
                 DataContext = new ErrorMessageDialogVM()

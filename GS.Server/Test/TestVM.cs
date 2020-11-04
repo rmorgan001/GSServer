@@ -242,7 +242,7 @@ namespace GS.Server.Test
         private void OpenDialog(string msg, string caption = null)
         {
             if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["msgDialog"].ToString();
+            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
             DialogContent = new DialogOK();
             IsDialogOpen = true;
 
@@ -320,7 +320,6 @@ namespace GS.Server.Test
         }
         private async void ExecuteMessageDialog()
         {
-            //let's set up a little MVVM, cos that's what the cool kids are doing:
             var view = new ErrorMessageDialog
             {
                 DataContext = new ErrorMessageDialogVM()

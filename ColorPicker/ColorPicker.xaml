@@ -48,15 +48,15 @@
                     Background="Black">
             <Label Content="Pick swatch type" Foreground="White" FontWeight="Bold" 
                    VerticalAlignment="Center"/>
-            <Image x:Name="ImgSqaure1" Height="20" Width="20" 
+            <Image Height="20" Width="20" 
                    Source="Images/ColorSwatchSquare.png" Margin="45,0,0,0" 
                    ToolTip="Square swatch1" 
                    MouseLeftButtonDown="Swatch_MouseLeftButtonDown"/>
-            <Image x:Name="ImgSqaure2" Height="20" Width="20" 
+            <Image Height="20" Width="20" 
                    Source="Images/ColorSwatchSquare2.png" Margin="5,0,0,0" 
                    ToolTip="Square swatch2" 
                    MouseLeftButtonDown="Swatch_MouseLeftButtonDown"/>
-            <Image x:Name="ImgCircle1" Height="20" Width="20" 
+            <Image Height="20" Width="20" 
                    Source="Images/ColorSwatchCircle.png" Margin="5,0,0,0" 
                    ToolTip="Circle swatch1" 
                    MouseLeftButtonDown="Swatch_MouseLeftButtonDown"/>
@@ -69,7 +69,7 @@
                 <ColumnDefinition Width="170"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Colorbox, Column1-->
+            <!-- Color box, Column1-->
             <Grid Grid.Column="0" Grid.Row="0" Margin="10,30,0,0" >
 
                 <Border BorderBrush="Black" BorderThickness="2" 
@@ -85,13 +85,13 @@
                        VerticalAlignment="Top" Margin="2"
                        Source="Images/ColorSwatchSquare.png"/>
 
-                <Canvas x:Name="CanvImage" Width="150" Height="150" 
+                <Canvas x:Name="CanvasImage" Width="150" Height="150" 
                        HorizontalAlignment="Center"
                        Background="Transparent"
                        VerticalAlignment="Top" Margin="2"
-                       MouseDown="CanvImage_MouseDown"
-                       MouseUp="CanvImage_MouseUp"
-                       MouseMove="CanvImage_MouseMove">
+                       MouseDown="CanvasImage_MouseDown"
+                       MouseUp="CanvasImage_MouseUp"
+                       MouseMove="CanvasImage_MouseMove">
                     <Ellipse x:Name="ellipsePixel" Width="10" 
                        Height="10" Stroke="Black" Fill="White" 
                        Canvas.Left="0" Canvas.Top="0"/>
@@ -109,8 +109,7 @@
                 <Border Margin="4,5,10,0" Width="154" Height="154" 
                         HorizontalAlignment="Left" BorderBrush="Black" BorderThickness="2"
                         Background="{StaticResource CheckerboardBrush}">
-                    <InkPresenter Name="previewPresenter" Margin="0" Width="150" Height="150"
-                        Strokes="AOcBAxdIEESAgYAERYQBGwIAJAFGhAEbAgAkAQUBOBkgMgkA9P8CAekiOkUzCQD4nwIBWiA6RTgIAP4DAAAAgH8RAACAPx8JEQAAAAAAAPA/CpYBNIfm3uajgcQgUUiUkjUelEal0KkUBh0HichlM1mtJotZp9JodDl8jk8ZgcBiUOjUYl08m0+l0+lFCjksjESAh+kg6auNwaEwSBQiEQyLRKTRiVSiUSSORyLQ6JQSBIPFYnKZTL5fOZfMZXL4/H47DYLBYHFoJLIpEo9GgIP3OB5PlxLCJiZmU1MISSi4SJiS74+D4+4o" />
+                    <InkPresenter Name="previewPresenter" Margin="0" Width="150" Height="150" Strokes="AOcBAxdIEESAgYAERYQBGwIAJAFGhAEbAgAkAQUBOBkgMgkA9P8CAekiOkUzCQD4nwIBWiA6RTgIAP4DAAAAgH8RAACAPx8JEQAAAAAAAPA/CpYBNIfm3uajgcQgUUiUkjUelEal0KkUBh0HichlM1mtJotZp9JodDl8jk8ZgcBiUOjUYl08m0+l0+lFCjksjESAh+kg6auNwaEwSBQiEQyLRKTRiVSiUSSORyLQ6JQSBIPFYnKZTL5fOZfMZXL4/H47DYLBYHFoJLIpEo9GgIP3OB5PlxLCJiZmU1MISSi4SJiS74+D4+4o" />
                 </Border>
 
             </StackPanel>

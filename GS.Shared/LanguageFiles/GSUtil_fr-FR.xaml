@@ -15,57 +15,51 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 */-->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <!--Window Title bar-->
-    <system:String x:Key="lbName">GS Server</system:String>
-    <system:String x:Key="lbApps">Applications connectées:</system:String>
-    <system:String x:Key="tbCloseApps">Applications connectées. Fermer quand même?</system:String>
-    <system:String x:Key="taskbarDescription">GreenSwamp Server</system:String>
-
     <!--Dialog -->
-    <system:String x:Key="btnAccept">Accepter</system:String>
-    <system:String x:Key="btnCancel">Annuler</system:String>
-    <system:String x:Key="btnOk">Ok</system:String>
-    <system:String x:Key="btnStart">Démarrer</system:String>
-    <system:String x:Key="btnDiaStop">Arréter</system:String>
+    <system:String x:Key="diaAccept">Accepter</system:String>
+    <system:String x:Key="diaCancel">Annuler</system:String>
+    <system:String x:Key="diaOk">Ok</system:String>
+    <system:String x:Key="diaStart">Démarrer</system:String>
+    <system:String x:Key="diaStop">Arréter</system:String>
 
     <!--Converters -->
     <system:String x:Key="cvtInvNumber">Nombre invalide</system:String>
-    <system:String x:Key="cvtColorToBrush">colorToBurshConverter ne supporte que la conversion à partir de couleur et chaine</system:String>
+    <system:String x:Key="cvtColorToBrush">colorToBrushConverter ne supporte que la conversion à partir de couleur et chaine</system:String>
     <system:String x:Key="cvtEnumErr1">Le type doit être pour un Enum</system:String>
     <system:String x:Key="cvtEnumErr2">Le type de Enum doit être spécifié</system:String>
     <system:String x:Key="cvtInvIP">IP invalide</system:String>
     <system:String x:Key="cvtRequired">Requis</system:String>
 
 <!--Utilities-->
-    <system:String x:Key="cbDelLogFiles">Fichiers journal</system:String>
-    <system:String x:Key="cbDelSettings">Paramètres</system:String>
-    <system:String x:Key="btnDelFiles">Supprimer</system:String>
-    <system:String x:Key="msgDelFiles">Supprimer les fichiers GS et les préférences</system:String>
-    <system:String x:Key="btnExit">Sortir</system:String>
-    <system:String x:Key="btnDelAccept">Accepter</system:String>
-    <system:String x:Key="btnDelCancel">Annuler</system:String>
-    <system:String x:Key="msgDelFilesOk">Accepter de supprimer?</system:String>
-    <system:String x:Key="msgDelLogFiles">Fichiers journaux supprimés</system:String>
-    <system:String x:Key="msgDelSettings">Fichiers préférences supprimés</system:String>
-    <system:String x:Key="msgDelSettingsVer">Préférences de version supprimées</system:String>
-    <system:String x:Key="msgDelCloseApps">Fermer toutes les applications GS ouvertes</system:String>
-    <system:String x:Key="msgUtilLockTitle">Test de démarrage : GS Server est démarré ou vérouillé</system:String>
-    <system:String x:Key="btnUtilCheck">Vérification</system:String>
-    <system:String x:Key="btnUtilChooser">Sélection</system:String>
-    <system:String x:Key="btnUtilChooserTitle">Test de connexion : vers le driver de la monture</system:String>
-    <system:String x:Key="btnUtilStart">Démarrer</system:String>
-    <system:String x:Key="btnUtilStop">Arréter</system:String>
-    <system:String x:Key="tbUtilSerial">Test série :</system:String>
-    <system:String x:Key="tbUtilComPort">Port Com</system:String>
-    <system:String x:Key="tbUtilTimeout">Délais dépassé pour l'action #</system:String>
-    <system:String x:Key="tbUtilProcessName">Nom du process:</system:String>
-    <system:String x:Key="tbUtilId">Id:</system:String>
-    <system:String x:Key="tbUtilLocks">Verrouillage:</system:String>
-    <system:String x:Key="tbUtilCounter">Compteur:</system:String>
-    <system:String x:Key="tbUtilTimer">Compte à rebours:</system:String>
-    <system:String x:Key="tbUtilNothing">Aucun élément trouvé</system:String>
-    <system:String x:Key="tbUtilBaudRate">BaudRate</system:String>
-    <system:String x:Key="tbUtilInterval">Intervalle</system:String>
-    <system:String x:Key="msgNotfound">Non trouvé</system:String>
+    <system:String x:Key="utilLogFiles">Fichiers journal</system:String>
+    <system:String x:Key="utilSettings">Paramètres</system:String>
+    <system:String x:Key="utilDelete">Supprimer</system:String>
+    <system:String x:Key="utilDelFiles">Supprimer les fichiers GS et les préférences</system:String>
+    <system:String x:Key="utilExit">Sortir</system:String>
+    <system:String x:Key="utilAccept">Accepter</system:String>
+    <system:String x:Key="utilCancel">Annuler</system:String>
+    <system:String x:Key="utilAccDelFiles">Accepter de supprimer?</system:String>
+    <system:String x:Key="utilDelLogFiles">Fichiers journaux supprimés</system:String>
+    <system:String x:Key="utilDelSettings">Fichiers préférences supprimés</system:String>
+    <system:String x:Key="utilDelSettingsVer">Préférences de version supprimées</system:String>
+    <system:String x:Key="utilCloseApps">Fermer toutes les applications GS ouvertes</system:String>
+    <system:String x:Key="utilLockTitle">Test de démarrage : GS Server est démarré ou vérouillé</system:String>
+    <system:String x:Key="utilCheck">Vérification</system:String>
+    <system:String x:Key="utilChooser">Sélection</system:String>
+    <system:String x:Key="utilChooserTitle">Test de connexion : vers le driver de la monture</system:String>
+    <system:String x:Key="utilStart">Démarrer</system:String>
+    <system:String x:Key="utilStop">Arréter</system:String>
+    <system:String x:Key="utilSerial">Test série :</system:String>
+    <system:String x:Key="utilComPort">Port Com</system:String>
+    <system:String x:Key="utilTimeout">Délais dépassé pour l'action #</system:String>
+    <system:String x:Key="utilProcessName">Nom du process:</system:String>
+    <system:String x:Key="utilId">Id:</system:String>
+    <system:String x:Key="utilLocks">Verrouillage:</system:String>
+    <system:String x:Key="utilCounter">Compteur:</system:String>
+    <system:String x:Key="utilTimer">Compte à rebours:</system:String>
+    <system:String x:Key="utilNothing">Aucun élément trouvé</system:String>
+    <system:String x:Key="utilBaudRate">BaudRate</system:String>
+    <system:String x:Key="utilInterval">Intervalle</system:String>
+    <system:String x:Key="utilNotFound">Non trouvé</system:String>
 </ResourceDictionary>
  

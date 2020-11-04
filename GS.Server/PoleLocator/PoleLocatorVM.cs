@@ -68,7 +68,7 @@ namespace GS.Server.PoleLocator
                 //ConvertRaDec();
                 MainVM();
                 Update();
-                SetHemi();
+                SetHemisphere();
                 SetLst();
                 SetDegrees();
 
@@ -90,25 +90,12 @@ namespace GS.Server.PoleLocator
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
         #region Methods
 
-        //private void ConvertRaDec()
-        //{
-        //    var xform = new Transform();
-        //    xform.SiteElevation = SkySettings.Elevation;
-        //    xform.SiteLatitude = SkySettings.Latitude;
-        //    xform.SiteLongitude = SkySettings.Longitude;
-        //    xform.Refraction = SkySettings.Refraction;
-        //    xform.SiteTemperature = SkySettings.Temperature;
-        //    xform.SetTopocentric(2.53019444, 89.26417);
-        //    //new Vector(xform.RATopocentric, xform.DECTopocentric);
-
-        //    _polaris = xform.RATopocentric;
-        //}
 
         /// <summary>
         /// Property changes from the server
@@ -146,7 +133,7 @@ namespace GS.Server.PoleLocator
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -173,7 +160,7 @@ namespace GS.Server.PoleLocator
                 if (_mainWindowVM.CurrentPageViewModel.Uid != 5) return;
 
                 Update();
-                SetHemi();
+                SetHemisphere();
                 SetLst();
                 SetDegrees();
             }
@@ -193,7 +180,7 @@ namespace GS.Server.PoleLocator
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
 
         }
@@ -207,7 +194,7 @@ namespace GS.Server.PoleLocator
         }
 
         /// <summary>
-        /// Caclulates all the positions for both hemis
+        /// Calculates all the positions for both hemisphere
         /// </summary>
         private void SetDegrees()
         {
@@ -231,9 +218,9 @@ namespace GS.Server.PoleLocator
         }
 
         /// <summary>
-        /// Sets up hemi information 
+        /// Sets up hemisphere information 
         /// </summary>
-        private void SetHemi()
+        private void SetHemisphere()
         {
             var shemi = SkyServer.SouthernHemisphere;
             NorthernHemisphere = !shemi;
@@ -255,7 +242,7 @@ namespace GS.Server.PoleLocator
         }
 
         /// <summary>
-        /// Caclulates position of polaris based on year.
+        /// Calculates position of polaris based on year.
         /// </summary>
         /// <returns></returns>
         private double YearPosition()
@@ -386,13 +373,13 @@ namespace GS.Server.PoleLocator
             }
         }
 
-        private double _polePostion;
+        private double _polePosition;
         public double PolePosition
         {
-            get => _polePostion;
+            get => _polePosition;
             set
             {
-                _polePostion = value;
+                _polePosition = value;
                 OnPropertyChanged();
             }
         }
@@ -561,7 +548,7 @@ namespace GS.Server.PoleLocator
         private void OpenDialog(string msg, string caption = null)
         {
             if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["msgDialog"].ToString();
+            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
             DialogContent = new DialogOK();
             IsDialogOpen = true;
 
@@ -639,7 +626,6 @@ namespace GS.Server.PoleLocator
         }
         private async void ExecuteMessageDialog()
         {
-            //let's set up a little MVVM, cos that's what the cool kids are doing:
             var view = new ErrorMessageDialog
             {
                 DataContext = new ErrorMessageDialogVM()

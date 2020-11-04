@@ -36,10 +36,10 @@ namespace GS.ChartViewer.Main
             Settings.Save();
         }
 
-        private void Axis_OnRangeChanged(RangeChangedEventArgs eventargs)
+        private void Axis_OnRangeChanged(RangeChangedEventArgs eventArgs)
         {
             var vm = (MainWindowVM)DataContext;
-            var currentRange = eventargs.Range;
+            var currentRange = eventArgs.Range;
             var tmpRange = currentRange;
             var time = TimeSpan.FromTicks((long)tmpRange);
             vm.RangeTxt = time.ToString(@"hh\:mm\:ss");

@@ -1,14 +1,14 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace GS.Server.Gamepad
+namespace GS.Server.GamePad
 {
     /// <summary>
-    /// Interaction logic for FocuserView.xaml
+    /// Interaction logic for GamePad
     /// </summary>
     [ComVisible(false)]
-    public partial class GamepadV
+    public partial class GamePadV
     {
-        public GamepadV()
+        public GamePadV()
         {
             InitializeComponent();
         }

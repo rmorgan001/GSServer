@@ -52,12 +52,12 @@ namespace GS.Server.Focuser
         }
 
 
-        private ICommand _clickconnectcommand;
+        private ICommand _clickConnectCmd;
         public ICommand ClickConnectCommand
         {
             get
             {
-                return _clickconnectcommand ?? (_clickconnectcommand = new RelayCommand(
+                return _clickConnectCmd ?? (_clickConnectCmd = new RelayCommand(
                            param => ClickConnect()
                        ));
             }
@@ -140,7 +140,7 @@ namespace GS.Server.Focuser
         private void OpenDialog(string msg, string caption = null)
         {
             if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["msgDialog"].ToString();
+            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
             DialogContent = new DialogOK();
             IsDialogOpen = true;
 
@@ -200,7 +200,6 @@ namespace GS.Server.Focuser
         }
         private async void ExecuteMessageDialog()
         {
-            //let's set up a little MVVM, cos that's what the cool kids are doing:
             var view = new ErrorMessageDialog
             {
                 DataContext = new ErrorMessageDialogVM()

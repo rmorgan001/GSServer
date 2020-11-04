@@ -6,14 +6,15 @@
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:enums="clr-namespace:ASCOM.Utilities;assembly=ASCOM.Utilities"
         xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
-        mc:Ignorable="d" >
+        xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>
-    <GroupBox Header="{StaticResource btnGPS}" Margin="5">
+    <GroupBox Header="{StaticResource skyGPS}" Margin="5">
         <StackPanel Orientation="Vertical">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,10">
-                <ComboBox md:HintAssist.Hint="{StaticResource cbhintGPSCom}" ItemsSource="{Binding ComPorts}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                <ComboBox md:HintAssist.Hint="{StaticResource gpsCom}" ItemsSource="{Binding ComPorts}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                     <ComboBox.SelectedItem>
                         <Binding Path="GpsComPort" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
@@ -27,7 +28,7 @@
                         </ItemsPanelTemplate>
                     </ComboBox.ItemsPanel>
                 </ComboBox>
-                <ComboBox md:HintAssist.Hint="{StaticResource cbhintGPSBaud}" MinWidth="10" Margin="10,0,0,0" ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type enums:SerialSpeed}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                <ComboBox md:HintAssist.Hint="{StaticResource gpsBaud}" MinWidth="10" Margin="10,0,0,0" ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type enums:SerialSpeed}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                     <ComboBox.SelectedItem>
                         <Binding Path="GpsBaudRate" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
@@ -44,53 +45,53 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0">
                 <CheckBox Margin="5,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Style="{StaticResource MaterialDesignCheckBox}" IsChecked="{Binding GpsGga}" />
-                <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{StaticResource tbGPSGGA}" />
+                <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{StaticResource gpsGGA}" />
                 <CheckBox Margin="15,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Style="{StaticResource MaterialDesignCheckBox}" IsChecked="{Binding GpsRmc}" />
-                <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{StaticResource tbGPSRMC}"  />
+                <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{StaticResource gpsRMC}"  />
             </StackPanel>
-            <Button VerticalAlignment="Bottom" HorizontalAlignment="Center" IsCancel="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding RetrieveGpsDialogCommand}" Content="{StaticResource btnGPSRetrieve}" />
+            <Button VerticalAlignment="Bottom" HorizontalAlignment="Center" IsCancel="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding RetrieveGpsDialogCommand}" Content="{StaticResource gpsRetrieve}" />
             <StackPanel Orientation="Vertical" HorizontalAlignment="Left"  Margin="5,5,0,0">
                 <StackPanel Orientation="Horizontal" >
-                    <TextBlock Text="{StaticResource btnGPSNMEA}"/>
+                    <TextBlock Text="{StaticResource gpsNmEA}"/>
                     <TextBlock Margin="5,0,0,0" Text="{Binding NmeaTag}" FontWeight="Bold"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" >
-                    <TextBlock Text="{StaticResource btnGPSLat}"/>
+                    <TextBlock Text="{StaticResource gpsLat}"/>
                     <TextBlock Margin="5,0,0,0" Text="{Binding GpsLatString}" FontWeight="Bold"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{StaticResource btnGPSLong}"/>
+                    <TextBlock Text="{StaticResource gpsLong}"/>
                     <TextBlock Margin="5,0,0,0" Text="{Binding GpsLongString}" FontWeight="Bold"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{StaticResource btnGPSEle}"/>
+                    <TextBlock Text="{StaticResource gpsEle}"/>
                     <TextBlock Margin="5,0,0,0" Text="{Binding GpsElevation}" FontWeight="Bold"/>
                     <TextBlock Text="m" FontWeight="Bold"/>
                 </StackPanel>
             </StackPanel>
             <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="5,5,0,0">
-                <TextBlock Text="{StaticResource tbGPSLocal}" />
+                <TextBlock Text="{StaticResource gpsLocal}" />
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{StaticResource tbGPSPC}" />
+                    <TextBlock Text="{StaticResource gpsPC}" />
                     <TextBlock Margin="5,0,0,0" Text="{Binding GpsPcTime, StringFormat={}{0:H:mm:ss.fff}}" FontWeight="Bold" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{StaticResource tbGPSGPS}" />
+                    <TextBlock Text="{StaticResource gpsGPS}" />
                     <TextBlock Margin="5,0,0,0" Text="{Binding GpsTime, StringFormat={}{0:H:mm:ss.fff}}" FontWeight="Bold" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{StaticResource tbGPSDeviation}" />
+                    <TextBlock Text="{StaticResource gpsDeviation}" />
                     <TextBlock Margin="5,0,0,0" Text="{Binding GpsSpan, StringFormat={}{0:dd\\:hh\\:mm\\:ss\\.fff}}" FontWeight="Bold" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0" Visibility="{Binding Path=AllowTimeVis, Converter={StaticResource BoolToVis}}">
                     <CheckBox Style="{StaticResource MaterialDesignCheckBox}" IsChecked="{Binding AllowTimeChange}" />
-                    <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{StaticResource tbGPSChangeTime}" />
+                    <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{StaticResource gpsChangeTime}" />
                 </StackPanel>
             </StackPanel>
-            <TextBlock Margin="0,15,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{StaticResource tbGPSAccept}"/>
+            <TextBlock Margin="0,15,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{StaticResource gpsAccept}"/>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,5">
-                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource btnAccept}" Command="{Binding AcceptGpsDialogCommand}" IsEnabled="{Binding HasGSPData}"/>
-                <Button IsCancel="True" Margin="8,0,0,0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource btnCancel}" Command="{Binding CancelGpsDialogCommand}"/>
+                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaAccept}" Command="{Binding AcceptGpsDialogCommand}" IsEnabled="{Binding HasGSPData}"/>
+                <Button IsCancel="True" Margin="8,0,0,0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaCancel}" Command="{Binding CancelGpsDialogCommand}"/>
             </StackPanel>
         </StackPanel>
         </GroupBox>

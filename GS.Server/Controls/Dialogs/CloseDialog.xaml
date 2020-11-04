@@ -4,12 +4,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d" >
-    <GroupBox Header="{StaticResource msgClose}" Margin="5">
+    <GroupBox Header="{StaticResource titleClose}" Margin="5">
         <StackPanel Orientation="Vertical">
-            <TextBlock VerticalAlignment="Center" Margin="5" xml:space="preserve" Text="{StaticResource tbCloseApps}"/>
+            <TextBlock VerticalAlignment="Center" Margin="5" xml:space="preserve" Text="{StaticResource titleCloseApps}"/>
             <StackPanel Orientation="Horizontal" Margin="5" HorizontalAlignment="Center">
-                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptCloseDialogCommand}" Content="{StaticResource btnAccept}"/>
-                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelCloseDialogCommand}" Content="{StaticResource btnCancel}"/>
+                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptCloseDialogCommand}" Content="{StaticResource diaAccept}"/>
+                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelCloseDialogCommand}" Content="{StaticResource diaCancel}"/>
             </StackPanel>
         </StackPanel>
     </GroupBox>

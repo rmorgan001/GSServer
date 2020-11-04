@@ -68,8 +68,8 @@ namespace GS.SkyWatcher
     }
     internal static class Constant
     {
-        //public const double Siderealrate in rad = 2 * Math.PI / 360;
-        public const double Siderealrate = 2 * Math.PI / 86164.09065;
+        //public const double SiderealRate in rad = 2 * Math.PI / 360;
+        public const double SiderealRate = 2 * Math.PI / 86164.09065;
     }
     internal static class BasicMath
     {
@@ -106,7 +106,7 @@ namespace GS.SkyWatcher
         /// 1. FullStop
         /// 2. Slewing
         /// 3. SlewingTo
-        /// 4. Notinitialized
+        /// 4. NotInitialized
         /// </summary>
 
         public bool FullStop;
@@ -123,21 +123,21 @@ namespace GS.SkyWatcher
             SlewingTo = Slewing = false;
             StepSpeed = "*";
         }
-        public void SetSlewing(bool forward, bool highspeed)
+        public void SetSlewing(bool forward, bool highSpeed)
         {
             FullStop = SlewingTo = false;
             Slewing = true;
 
             SlewingForward = forward;
-            HighSpeed = highspeed;
+            HighSpeed = highSpeed;
         }
-        public void SetSlewingTo(bool forward, bool highspeed)
+        public void SetSlewingTo(bool forward, bool highSpeed)
         {
             FullStop = Slewing = false;
             SlewingTo = true;
 
             SlewingForward = forward;
-            HighSpeed = highspeed;
+            HighSpeed = highSpeed;
         }
 
 
@@ -158,15 +158,15 @@ namespace GS.SkyWatcher
         ErrInvalidData = 4, 		    // Invalid data, over range etc
         ErrSerialPortBusy = 5, 	        // Serial port is busy.
         ErrMountNotFound = 6,           // Serial test command did not get correct response
-        ErrNoresponseAxis1 = 100,	    // No response from axis1
-        ErrNoresponseAxis2 = 101,	    // The secondary axis of the telescope does not respond
+        ErrNoResponseAxis1 = 100,	    // No response from axis1
+        ErrNoResponseAxis2 = 101,	    // The secondary axis of the telescope does not respond
         ErrAxisBusy = 102,			    // This operation cannot be performed temporarily
         ErrMaxPitch = 103,              // Target position elevation angle is too high
         ErrMinPitch = 104,			    // Target position elevation angle is too low
         ErrUserInterrupt = 105,	        // User forced termination
         ErrAlignFailed = 200,		    // Calibration telescope failed
-        ErrUnimplement = 300,           // Unimplemented method
-        ErrWrongAlignmentData = 400,	// The alignment data is incorect.
+        ErrUnimplemented = 300,           // Unimplemented method
+        ErrWrongAlignmentData = 400,	// The alignment data is incorrect.
         ErrQueueFailed = 500,             // Queue timeout or not running
         ErrTooManyRetries = 501         // retries hit max limit
     };

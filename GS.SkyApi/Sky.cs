@@ -40,7 +40,7 @@ namespace GS.SkyApi
             get
             {
                 ValidateMount();
-                var r = SkyServer.AscomOn;
+                var r = SkyServer.AsComOn;
                 return r;
             }
             set
@@ -51,23 +51,23 @@ namespace GS.SkyApi
                 { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                SkyServer.AscomOn = value;
+                SkyServer.AsComOn = value;
             }
         }
         /// <inheritdoc />
-        public void AutoHomeStart(int degreelimit = 100, int offsetdec = 0)
+        public void AutoHomeStart(int degreeLimit = 100, int offsetDec = 0)
         {
             if (!SkyServer.CanHomeSensor)
             { throw new Exception("Mount doesn't support home sensors"); }
             if(!SkyServer.IsMountRunning)
             { throw new Exception("Mount not connected"); }
-            if (degreelimit < 20 || degreelimit > 179)
+            if (degreeLimit < 20 || degreeLimit > 179)
             { throw new Exception("Degrees out of limits"); }
-            if (offsetdec < -90 || offsetdec > 90)
+            if (offsetDec < -90 || offsetDec > 90)
             { throw new Exception("Offset out of limits"); }
 
             SkyServer.AutoHomeStop = false;
-            SkyServer.AutoHomeAsync(degreelimit, offsetdec);
+            SkyServer.AutoHomeAsync(degreeLimit, offsetDec);
         }
 
         /// <inheritdoc />
@@ -103,15 +103,15 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
-        public void AxisPulse(int axis, double guiderate, int duration, int backlashsteps = 0)
+        public void AxisPulse(int axis, double guideRate, int duration, int backlashSteps = 0)
         {
             var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{guiderate},{duration}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{guideRate},{duration}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
             var validAxis = ValidateAxis(axis);
-            var command = new SkyAxisPulse(SkyQueue.NewId, validAxis, guiderate, duration, backlashsteps, SkyServer.Declination);
+            var command = new SkyAxisPulse(SkyQueue.NewId, validAxis, guideRate, duration, backlashSteps);
             GetResult(command);
         }
 
@@ -251,12 +251,12 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
-        public bool CanPpec
+        public bool CanPPec
         {
             get
             {
                 ValidateMount();
-                var command = new SkyCanPpec(SkyQueue.NewId);
+                var command = new SkyCanPPec(SkyQueue.NewId);
                 var results = GetResult(command);
                 return results.Result;
             }
@@ -286,11 +286,11 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
-        public long GetAngleToStep(int axis, double angleinrad)
+        public long GetAngleToStep(int axis, double angleInRad)
         {
             ValidateMount();
             var validAxis = ValidateAxis(axis);
-            var command = new SkyGetAngleToStep(SkyQueue.NewId, validAxis, angleinrad);
+            var command = new SkyGetAngleToStep(SkyQueue.NewId, validAxis, angleInRad);
             var results = GetResult(command);
             return results.Result;
         }
@@ -617,24 +617,24 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
-        public bool IsPpecInTrainingOn
+        public bool IsPPecInTrainingOn
         {
             get
             {
                 ValidateMount();
-                var command = new SkyIsPpecInTrainingOn(SkyQueue.NewId);
+                var command = new SkyIsPPecInTrainingOn(SkyQueue.NewId);
                 var results = GetResult(command);
                 return results.Result;
             }
         }
 
         /// <inheritdoc />
-        public bool IsPpecOn
+        public bool IsPPecOn
         {
             get
             {
                 ValidateMount();
-                var command = new SkyIsPpecOn(SkyQueue.NewId);
+                var command = new SkyIsPPecOn(SkyQueue.NewId);
                 var results = GetResult(command);
                 return results.Result;
             }
@@ -674,11 +674,11 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
-        public bool IsSlewingFoward(int axis)
+        public bool IsSlewingForward(int axis)
         {
             ValidateMount();
             var validAxis = ValidateAxis(axis);
-            var command = new SkyIsSlewingFoward(SkyQueue.NewId, validAxis);
+            var command = new SkyIsSlewingForward(SkyQueue.NewId, validAxis);
             var results = GetResult(command);
             return results.Result;
         }
@@ -776,14 +776,14 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
-        public void SkySetAlternatingPpec(bool on)
+        public void SkySetAlternatingPPec(bool on)
         {
             var monitorItem = new MonitorEntry
             { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{on}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
-            var command = new SkySetAlternatingPpec(SkyQueue.NewId, on);
+            var command = new SkySetAlternatingPPec(SkyQueue.NewId, on);
             GetResult(command);
         }
 
@@ -904,7 +904,7 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
-        public void SetPpec(int axis, bool on)
+        public void SetPPec(int axis, bool on)
         {
             var monitorItem = new MonitorEntry
             { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{on}" };
@@ -912,12 +912,12 @@ namespace GS.SkyApi
 
             ValidateMount();
             var validAxis = ValidateAxis(axis);
-            var command = new SkySetPpec(SkyQueue.NewId, validAxis, on);
+            var command = new SkySetPPec(SkyQueue.NewId, validAxis, on);
             GetResult(command);
         }
 
         /// <inheritdoc />
-        public void SetPpecTrain(int axis, bool on)
+        public void SetPPecTrain(int axis, bool on)
         {
             var monitorItem = new MonitorEntry
             { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}" };
@@ -925,7 +925,7 @@ namespace GS.SkyApi
 
             ValidateMount();
             var validAxis = ValidateAxis(axis);
-            var command = new SkySetPpecTrain(SkyQueue.NewId, validAxis, on);
+            var command = new SkySetPPecTrain(SkyQueue.NewId, validAxis, on);
             GetResult(command);
         }
 
@@ -1053,7 +1053,7 @@ namespace GS.SkyApi
     public interface ISky
     {
         /// <summary>
-        /// Tells GSS not to process any ASCOM moment commands for external programs using the ASCOM driver. 
+        /// Tells GSS not to process any AsCoM moment commands for external programs using the AsCoM driver. 
         /// </summary>
         /// <returns>bool</returns>
         bool AscomOn { get; set; }
@@ -1068,21 +1068,21 @@ namespace GS.SkyApi
         /// </summary>
         void AutoHomeStop();
         /// <summary>
-        /// Move axis number of microsteps, not marked as slewing
+        /// Move axis number of micro steps, not marked as slewing
         /// </summary>
         /// <param name="axis">>axis number 1 or 2</param>
-        /// <param name="steps">number of microsteps</param>
+        /// <param name="steps">number of micro steps</param>
         /// <returns>nothing</returns>
         void AxisMoveSteps(int axis, long steps);
         /// <summary>
         /// Send a pulse command
         /// </summary>
         /// <param name="axis">Axis 1 or 2</param>
-        /// <param name="guiderate">Guiderate degrees, 15.041/3600*.5, negative value denotes direction</param>
-        /// <param name="duration">length of pulse in milliseconds, aways positive numbers</param>
-        /// <param name="backlashsteps">Positive microsteps added for backlash</param>
+        /// <param name="guideRate">GuideRate degrees, 15.041/3600*.5, negative value denotes direction</param>
+        /// <param name="duration">length of pulse in milliseconds, always positive numbers</param>
+        /// <param name="backlashSteps">Positive micro steps added for backlash</param>
         /// <returns>nothing</returns>
-        void AxisPulse(int axis, double guiderate, int duration, int backlashsteps = 0);
+        void AxisPulse(int axis, double guideRate, int duration, int backlashSteps = 0);
         /// <summary>
         /// Goto position in degrees
         /// </summary>
@@ -1092,7 +1092,7 @@ namespace GS.SkyApi
         void AxisGoToTarget(int axis, double targetPosition);
         /// <summary>
         /// Slew axis based on a rate in degrees.  Use this for small movements
-        /// like pulseguiding, rate changes, guiding changes, not gotos
+        /// like pulse guiding, rate changes, guiding changes, not go tos
         /// </summary>
         /// <param name="axis">axis number 1 or 2</param>
         /// <param name="rate">rate/sec in degrees</param>
@@ -1142,9 +1142,9 @@ namespace GS.SkyApi
         /// </summary>
         bool CanPolarLed { get; }
         /// <summary>
-        /// q Does mount support PPEC
+        /// q Does mount support PPec
         /// </summary>
-        bool CanPpec { get; }
+        bool CanPPec { get; }
         /// <summary>
         /// q Does mount support WiFi
         /// </summary>
@@ -1157,9 +1157,9 @@ namespace GS.SkyApi
         /// Gets the number of steps from the angle in rad
         /// </summary>
         /// <param name="axis"></param>
-        /// <param name="angleinrad"></param>
+        /// <param name="angleInRad"></param>
         /// <returns>Steps in rad</returns>
-        long GetAngleToStep(int axis, double angleinrad);
+        long GetAngleToStep(int axis, double angleInRad);
         /// <summary>
         /// e Gets versions of axis in long format
         /// </summary>
@@ -1179,7 +1179,7 @@ namespace GS.SkyApi
         /// <returns>Get Current Axis position as double</returns>
         double GetAxisPosition(int axis);
         /// <summary>
-        /// j Gets axis poistion counter
+        /// j Gets axis position counter
         /// </summary>
         /// <param name="axis">axis number 1 or 2</param>
         /// <returns>Cardinal encoder count as long</returns>
@@ -1240,7 +1240,7 @@ namespace GS.SkyApi
         /// <param name="axis">axis number 1 or 2</param>
         double GetPecPeriod(int axis);
         /// <summary>
-        /// c Microsteps from target where the rampdown process begins
+        /// c Micro steps from target where the ramp down process begins
         /// </summary>
         /// <param name="axis">axis number 1 or 2</param>
         double GetRampDownRange(int axis);
@@ -1282,7 +1282,7 @@ namespace GS.SkyApi
         /// </summary>
         void InitializeAxes();
         /// <summary>
-        /// Is the autohome process running
+        /// Is the auto home process running
         /// </summary>
         bool IsAutoHomeRunning { get; }
         /// <summary>
@@ -1298,13 +1298,13 @@ namespace GS.SkyApi
         /// </summary>
         bool IsParked { get; }
         /// <summary>
-        /// q Is the mount collecting PPEC data
+        /// q Is the mount collecting PPec data
         /// </summary>
-        bool IsPpecInTrainingOn { get; }
+        bool IsPPecInTrainingOn { get; }
         /// <summary>
-        /// q Does the mount have PPEC turned on
+        /// q Does the mount have PPec turned on
         /// </summary>
-        bool IsPpecOn { get; }
+        bool IsPPecOn { get; }
         /// <summary>
         /// j Is axis at full stop
         /// </summary>
@@ -1312,7 +1312,7 @@ namespace GS.SkyApi
         /// <returns></returns>
         bool IsFullStop(int axis);
         /// <summary>
-        /// j Is axis in highspeed mode
+        /// j Is axis in high speed mode
         /// </summary>
         /// <param name="axis">axis number 1 or 2</param>
         /// <returns></returns>
@@ -1332,7 +1332,7 @@ namespace GS.SkyApi
         /// </summary>
         /// <param name="axis">axis number 1 or 2</param>
         /// <returns></returns>
-        bool IsSlewingFoward(int axis);
+        bool IsSlewingForward(int axis);
         /// <summary>
         /// f Is axis slewing in goto mode
         /// </summary>
@@ -1360,10 +1360,10 @@ namespace GS.SkyApi
         /// </summary>
         string ParkPosition { get; set; }
         /// <summary>
-        /// Turns PPEC off during movements and then back on for error correction moves
+        /// Turns PPec off during movements and then back on for error correction moves
         /// </summary>
         /// <param name="on"></param>
-        void SkySetAlternatingPpec(bool on);
+        void SkySetAlternatingPPec(bool on);
         /// <summary>
         /// E Reset the position of an axis
         /// </summary>
@@ -1414,20 +1414,20 @@ namespace GS.SkyApi
         /// </summary>
         /// <param name="axis">Axis number 1 or 2</param>
         /// <param name="func">'0' high speed GOTO slewing,'1' low speed slewing mode,'2' low speed GOTO mode,'3' High slewing mode</param>
-        /// <param name="direction">0=forward (CW) right, 1=backaward (CCW) left, also based on obsertatory settings</param>
+        /// <param name="direction">0=forward (CW) right, 1=backward (CCW) left, also based on observatory settings</param>
         void SetMotionMode(int axis, int func, int direction);
         /// <summary>
-        /// W 2-3 Turn on off PPEC
+        /// W 2-3 Turn on off PPec
         /// </summary>
         /// <param name="axis">axis number 1 or 2</param>
         /// <param name="on"></param>
-        void SetPpec(int axis, bool on);
+        void SetPPec(int axis, bool on);
         /// <summary>
         /// W 0-1 Turn on off PPEC training
         /// </summary>
         /// <param name="axis">axis number 1 or 2</param>
         /// <param name="on"></param>
-        void SetPpecTrain(int axis, bool on);
+        void SetPPecTrain(int axis, bool on);
         /// <summary>
         /// I Set slewing rate, seems to relate to amount of skipped step counts.  
         /// </summary>

@@ -7,13 +7,12 @@
              xmlns:domain="clr-namespace:GS.Server.Domain"
              xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
              xmlns:deviceInterface="clr-namespace:ASCOM.DeviceInterface;assembly=ASCOM.DeviceInterfaces"
-             xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
-             mc:Ignorable="d">
+             xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared" mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
     <UserControl.Resources>
         <domain:ComparisonConverter x:Key="Compare" />
     </UserControl.Resources>
     <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" >
-        <ComboBox md:HintAssist.Hint="{StaticResource cbtipPark}" Margin="5,0,0,15" ToolTip="{StaticResource cbtipPark}" MaxWidth="120" Width="120"
+        <ComboBox md:HintAssist.Hint="{StaticResource btnTipParkPos}" Margin="5,0,0,15" ToolTip="{StaticResource btnTipParkPos}" MaxWidth="120" Width="120"
                   ItemsSource="{Binding ParkPositions}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEditable="False">
             <ComboBox.SelectedItem>
                 <Binding Path="ParkSelection" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -30,33 +29,33 @@
         </ComboBox>
         <md:Badged Badge="{Binding ParkBadgeContent}" BadgePlacementMode="TopRight">
             <Button Margin="5" Width="100" Height="25" HorizontalAlignment="Left" Padding="-5"
-                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btntipPark}"
+                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipPark}"
                     Command="{Binding ClickParkCommand}" Content="{Binding ParkButtonContent}"/>
             </md:Badged>
             <md:Badged Badge="{Binding HomeBadgeContent}" BadgePlacementMode="TopRight">
             <Button Margin="5" Height="25" Width="100" HorizontalAlignment="Left" Padding="-5"
-                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btntipHome}"
+                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipHome}"
                     Command="{Binding ClickHomeCommand}" Content="{StaticResource btnHome}">
             </Button>
         </md:Badged>
         <Button Margin="5" Width="100" Height="25" HorizontalAlignment="Left" Padding="-5"
-            Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btntipStop}" 
+            Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipStop}" 
                     Command="{Binding ClickStopCommand}" Content="{StaticResource btnStop}">
         </Button>
         <StackPanel Orientation="Horizontal">
             <md:PopupBox Margin="-10,0,-10,0" >
                     <GroupBox Header="Tracking Rate" Margin="5,0,5,0">
                         <StackPanel Orientation="Vertical">
-                        <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="tr" IsChecked="{Binding Path=TrackingRate, Converter={StaticResource Compare}, ConverterParameter={x:Static deviceInterface:DriveRates.driveSidereal}}" Content="{StaticResource rbSidereal}" />
-                        <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="tr" IsChecked="{Binding Path=TrackingRate, Converter={StaticResource Compare}, ConverterParameter={x:Static deviceInterface:DriveRates.driveLunar}}" Content="{StaticResource rbLunar}" />
-                        <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="tr" IsChecked="{Binding Path=TrackingRate, Converter={StaticResource Compare}, ConverterParameter={x:Static deviceInterface:DriveRates.driveSolar}}" Content="{StaticResource rbSolar}"/>
-                        <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="tr" IsChecked="{Binding Path=TrackingRate, Converter={StaticResource Compare}, ConverterParameter={x:Static deviceInterface:DriveRates.driveKing}}" Content="{StaticResource rbKing}"/>
+                        <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="tr" IsChecked="{Binding Path=TrackingRate, Converter={StaticResource Compare}, ConverterParameter={x:Static deviceInterface:DriveRates.driveSidereal}}" Content="{StaticResource skySidereal}" />
+                        <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="tr" IsChecked="{Binding Path=TrackingRate, Converter={StaticResource Compare}, ConverterParameter={x:Static deviceInterface:DriveRates.driveLunar}}" Content="{StaticResource skyLunar}" />
+                        <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="tr" IsChecked="{Binding Path=TrackingRate, Converter={StaticResource Compare}, ConverterParameter={x:Static deviceInterface:DriveRates.driveSolar}}" Content="{StaticResource skySolar}"/>
+                        <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="tr" IsChecked="{Binding Path=TrackingRate, Converter={StaticResource Compare}, ConverterParameter={x:Static deviceInterface:DriveRates.driveKing}}" Content="{StaticResource skyKing}"/>
                         </StackPanel>
                     </GroupBox>
             </md:PopupBox>
                 <md:Badged Badge="{Binding TrackingBadgeContent}" BadgePlacementMode="TopRight">
                 <Button Margin="0,5,0,5" Width="90" Height="25" HorizontalAlignment="Left" Padding="-5"
-                        Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btntipTracking}"
+                        Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipTracking}"
                     Command="{Binding ClickTrackingCommand}" Content="{StaticResource btnTracking}">
             </Button>
         </md:Badged>
@@ -64,13 +63,13 @@
         <md:DialogHost  VerticalAlignment="Bottom" CloseOnClickAway="True"
                        IsOpen="{Binding IsHomeResetDialogOpen}" DialogContent="{Binding HomeResetContent}">
             <Button Margin="5" Width="100" Height="25" HorizontalAlignment="Left" Padding="-5"
-Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btntipSetHome}"
+Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipSetHome}"
                 Command="{Binding OpenHomeResetDialogCommand}" Content="{StaticResource btnSetHome}">
             </Button>
         </md:DialogHost>
         <md:DialogHost VerticalAlignment="Bottom" CloseOnClickAway="True" IsOpen="{Binding IsFlipDialogOpen}" DialogContent="{Binding FlipContent}">
             <Button Margin="5" Width="100" Height="25"  HorizontalAlignment="Left" Padding="-5"
-                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btntipFlip}"
+                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipFlip}"
                     Command="{Binding OpenFlipDialogCommand}" Content="{StaticResource btnFlip}">
             </Button>
         </md:DialogHost>
@@ -82,7 +81,7 @@ Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource
         <md:DialogHost VerticalAlignment="Bottom" CloseOnClickAway="True" IsOpen="{Binding IsSchedulerDialogOpen}" DialogContent="{Binding SchedulerContent}">
             <md:Badged Badge="{Binding SchedulerBadgeContent}" BadgePlacementMode="TopRight">
                 <Button Margin="5" Width="100" Height="25" HorizontalAlignment="Left" Padding="-5"
-                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btntipScheduler}" 
+                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipScheduler}" 
                     Command="{Binding OpenSchedulerDialogCmd}" Content="{StaticResource btnScheduler}">
                 </Button>
             </md:Badged>

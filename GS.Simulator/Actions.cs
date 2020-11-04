@@ -121,12 +121,10 @@ namespace GS.Simulator
         /// Send pulse
         /// </summary>
         /// <param name="axis"></param>
-        /// <param name="guiderate"></param>
+        /// <param name="guideRate"></param>
         /// <param name="duration"></param>
-        /// <param name="backlash"></param>
-        /// <param name="declination"></param>
         /// <returns></returns>
-        internal bool AxisPulse(Axis axis, double guiderate, int duration, int backlash, double declination = 0)
+        internal bool AxisPulse(Axis axis, double guideRate, int duration)
         {
 
             if (axis == Axis.Axis1)
@@ -138,7 +136,7 @@ namespace GS.Simulator
                 PulseDecRunning = true;
             }
 
-            var arcsecs = duration / 1000.0 * Conversions.Deg2ArcSec(Math.Abs(guiderate));
+            var arcsecs = duration / 1000.0 * Conversions.Deg2ArcSec(Math.Abs(guideRate));
 
             switch (axis)
             {
@@ -167,18 +165,18 @@ namespace GS.Simulator
             {
                 pulseEntry.Axis = (int)axis;
                 pulseEntry.Duration = duration;
-                pulseEntry.Rate = guiderate;
-                pulseEntry.BacklashSteps = backlash;
-                pulseEntry.Declination = declination;
-                var loc = AxisSteps();
-                if (MonitorPulse) pulseEntry.PositionStart = loc[(int)axis];
+                pulseEntry.Rate = guideRate;
+                //pulseEntry.BacklashSteps = backlash;
+                //pulseEntry.Declination = declination;
+                //var loc = AxisSteps();
+                //if (MonitorPulse) pulseEntry.PositionStart = loc[(int)axis];
                 pulseEntry.StartTime = HiResDateTime.UtcNow;
                 //todo change back to 20
                 if (duration < 20) pulseEntry.Rejected = true;
             }
 
             // execute pulse
-            _ioSerial.Send($"pulse,{axis},{guiderate}");
+            _ioSerial.Send($"pulse,{axis},{guideRate}");
             var sw = Stopwatch.StartNew();
             while (sw.Elapsed.TotalMilliseconds < duration)
             {
@@ -198,11 +196,11 @@ namespace GS.Simulator
 
             if (MonitorPulse)
             {
-                var loc1 = AxisSteps();
-                pulseEntry.PositionEnd = loc1[(int)axis];
-                pulseEntry.EndTime = HiResDateTime.UtcNow;
-                pulseEntry.AltPPECon = false;
-                pulseEntry.PPECon = false;
+                //var loc1 = AxisSteps();
+                //pulseEntry.PositionEnd = loc1[(int)axis];
+                //pulseEntry.EndTime = HiResDateTime.UtcNow;
+                //pulseEntry.AltPPECon = false;
+                //pulseEntry.PPECon = false;
                 MonitorLog.LogToMonitor(pulseEntry);
             }
 
@@ -240,11 +238,11 @@ namespace GS.Simulator
             var strings = a.Split(',');
             var b = new AxisStatus()
             {
-                Axis = axis,
+                //Axis = axis,
                 Slewing = Convert.ToBoolean(strings[0]),
                 Stopped = Convert.ToBoolean(strings[1]),
-                Tracking = Convert.ToBoolean(strings[2]),
-                Rate = Convert.ToBoolean(strings[3])
+                //Tracking = Convert.ToBoolean(strings[2]),
+                //Rate = Convert.ToBoolean(strings[3])
             };
             return b;
         }
@@ -300,7 +298,7 @@ namespace GS.Simulator
             _revSteps[0] = a;
             _revSteps[1] = a;
             //steps per second
-            var b = Conversions.StepPerArcsec(a);
+            var b = Conversions.StepPerArcSec(a);
             _stepsPerSec[0] = b;
             _stepsPerSec[1] = b;
 
@@ -308,16 +306,16 @@ namespace GS.Simulator
             var d = c.Split(',');
             var mountInfo = new MountInfo
             {
-                CanAxisSlewsIndependent = Convert.ToBoolean(d[0]),
-                CanAzEq = Convert.ToBoolean(d[1]),
-                CanDualEncoders = Convert.ToBoolean(d[2]),
-                CanHalfTrack = Convert.ToBoolean(d[3]),
+                //CanAxisSlewsIndependent = Convert.ToBoolean(d[0]),
+                //CanAzEq = Convert.ToBoolean(d[1]),
+                //CanDualEncoders = Convert.ToBoolean(d[2]),
+                //CanHalfTrack = Convert.ToBoolean(d[3]),
                 CanHomeSensors = Convert.ToBoolean(d[4]),
-                CanPolarLed = Convert.ToBoolean(d[5]),
-                CanPpec = Convert.ToBoolean(d[6]),
-                CanWifi = Convert.ToBoolean(d[7]),
-                MountName = d[8],
-                MountVersion = d[9]
+                //CanPolarLed = Convert.ToBoolean(d[5]),
+                //CanPPec = Convert.ToBoolean(d[6]),
+                //CanWifi = Convert.ToBoolean(d[7]),
+                //MountName = d[8],
+                //MountVersion = d[9]
             };
             MountInfo = mountInfo;
         }

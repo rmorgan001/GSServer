@@ -20,7 +20,7 @@ namespace GS.Shared
     /// <summary>
     /// Specific GS Server attribute that is check when a driver assembly loads
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class GssAttribute : Attribute
     {
         /// <summary>
@@ -33,7 +33,7 @@ namespace GS.Shared
         }
 
         /// <summary>
-        ///   Gets or sets the 'friendly name' of the served class, as registered with the ASCOM Chooser.
+        ///   Gets or sets the 'friendly name' of the served class, as registered with the AsCom Chooser.
         /// </summary>
         /// <value>The 'friendly name' of the served class.</value>
         public string DisplayName { get; }

@@ -23,9 +23,9 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace GS.Server.Gamepad
+namespace GS.Server.GamePad
 {
-    public static class GamepadSettings
+    public static class GamePadSettings
     {
 
         #region Events
@@ -97,7 +97,7 @@ namespace GS.Server.Gamepad
         }
 
         /// <summary>
-        /// store for the gamepad keys
+        /// store for the game pad keys
         /// </summary>
         /// <returns></returns>
         public static Dictionary<string, string> LoadSettings()
@@ -119,7 +119,7 @@ namespace GS.Server.Gamepad
                 var data = Properties.Gamepad.Default.GetType().GetProperty(currentProperty.Name)?.GetValue(Properties.Gamepad.Default, null);
                 if (data != null) val = data.ToString();
                 settingsDict.Add(key, val);
-                LogSetting("Gamepad", $"{key} {val}");
+                LogSetting("GamePad", $"{key} {val}");
             }
 
             return settingsDict;
@@ -138,7 +138,7 @@ namespace GS.Server.Gamepad
         }
 
         /// <summary>
-        /// output gamepad keys to settings
+        /// output game pad keys to settings
         /// </summary>
         /// <param name="settingsDict"></param>
         public static void SaveSettings(Dictionary<string, string> settingsDict)

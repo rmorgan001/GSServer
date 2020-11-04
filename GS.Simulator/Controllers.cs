@@ -34,7 +34,7 @@ namespace GS.Simulator
         private const bool CanHalfTrack = false;
         private const bool CanHomeSensors = true;
         private const bool CanPolarLed = false;
-        private const bool CanPpec = false;
+        private const bool CanPPec = false;
         private const bool CanWifi = false;
         private const string MountName = "SimScope";
         private const string MountVersion = "1.0";
@@ -70,15 +70,15 @@ namespace GS.Simulator
         private bool _homeSensorX;
         private bool _homeSensorY;
 
-        private const int _maxrate = 4;
-        private const double SlewSpeedOne = .01 * _maxrate;
-        //private const double SlewSpeedTwo = .02 * _maxrate;
-        //private const double SlewSpeedThree = 1.0 * _maxrate;
-        private const double SlewSpeedFour = 1.5 * _maxrate;
-        //private const double SlewSpeedFive = 2.0 * _maxrate;
-        private const double SlewSpeedSix = 2.5 * _maxrate;
-        //private const double SlewSpeedSeven = 3.0 * _maxrate;
-        private const double SlewSpeedEight = 3.4 * _maxrate;
+        private const int _maxRate = 4;
+        private const double SlewSpeedOne = .01 * _maxRate;
+        //private const double SlewSpeedTwo = .02 * _maxRate;
+        //private const double SlewSpeedThree = 1.0 * _maxRate;
+        private const double SlewSpeedFour = 1.5 * _maxRate;
+        //private const double SlewSpeedFive = 2.0 * _maxRate;
+        private const double SlewSpeedSix = 2.5 * _maxRate;
+        //private const double SlewSpeedSeven = 3.0 * _maxRate;
+        private const double SlewSpeedEight = 3.4 * _maxRate;
 
         #endregion
 
@@ -154,7 +154,7 @@ namespace GS.Simulator
         }
 
         /// <summary>
-        /// Process incomming commands
+        /// Process incoming commands
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
@@ -166,7 +166,7 @@ namespace GS.Simulator
             {
                 case "capabilities":
                     return
-                        $"{CanAxisSlewsIndependent},{CanAzEq},{CanDualEncoders},{CanHalfTrack},{CanHomeSensors},{CanPolarLed},{CanPpec},{CanWifi},{MountName},{MountVersion}";
+                        $"{CanAxisSlewsIndependent},{CanAzEq},{CanDualEncoders},{CanHalfTrack},{CanHomeSensors},{CanPolarLed},{CanPPec},{CanWifi},{MountName},{MountVersion}";
                 case "initialize":
                     return Start().ToString();
                 case "shutdown":

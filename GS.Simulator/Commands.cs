@@ -476,19 +476,19 @@ namespace GS.Simulator
         public Exception Exception { get; set; }
         public dynamic Result { get; private set; }
         private readonly Axis _axis;
-        private readonly double _guiderate;
+        private readonly double _guideRate;
         private readonly int _duration;
-        private readonly int _backlash;
-        private readonly double _declination;
+        //private readonly int _backlash;
+        //private readonly double _declination;
 
-        public CmdAxisPulse(long id, Axis axis, double guiderate, int duration, int backlash, double declination)
+        public CmdAxisPulse(long id, Axis axis, double guideRate, int duration)
         {
             Id = id;
-            _backlash = backlash;
-            _declination = declination;
+            //_backlash = backlash;
+            //_declination = declination;
             CreatedUtc = Principles.HiResDateTime.UtcNow;
             _axis = axis;
-            _guiderate = guiderate;
+            _guideRate = guideRate;
             _duration = duration;
             Successful = false;
             Result = null;
@@ -499,7 +499,7 @@ namespace GS.Simulator
         {
             try
             {
-                Result = actions.AxisPulse(_axis, _guiderate, _duration, _backlash, _declination);
+                Result = actions.AxisPulse(_axis, _guideRate, _duration);
                 Successful = true;
             }
             catch (Exception e)

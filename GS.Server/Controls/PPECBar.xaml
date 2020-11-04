@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-             mc:Ignorable="d">
+             xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
     <StackPanel Margin="0,5,0,0" Orientation="Horizontal" VerticalAlignment="Center"  IsEnabled="{Binding PecEnabled}">
         <StackPanel.Style>
             <Style TargetType="StackPanel">
@@ -18,15 +19,15 @@
                 </Style.Triggers>
             </Style>
         </StackPanel.Style>
-        <ToggleButton Width="20" Height="20" ToolTip="{StaticResource tbOnOff}" Style="{StaticResource MaterialDesignActionLightToggleButton}" IsChecked="{Binding PPecOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        <Label Content="{StaticResource lbPpec}"/>
-        <md:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsPpecDialogOpen}" DialogContent="{Binding PpecContent}">
-            <ToggleButton  HorizontalAlignment="Center" Width="20" Height="20" ToolTip="{StaticResource tbStartTrainingMode}"
+        <ToggleButton Width="20" Height="20" ToolTip="{StaticResource ppOnOff}" Style="{StaticResource MaterialDesignActionLightToggleButton}" IsChecked="{Binding PPecOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Label Content="{StaticResource ppPec}"/>
+        <md:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsPPecDialogOpen}" DialogContent="{Binding PPecContent}">
+            <ToggleButton  HorizontalAlignment="Center" Width="20" Height="20" ToolTip="{StaticResource ppStartTrainingMode}"
                           IsChecked="{Binding PecTrainOn}" Style="{StaticResource MaterialDesignActionLightToggleButton}"
-                          Command="{Binding OpenPpecDialogCommand}"/>
+                          Command="{Binding OpenPPecDialogCommand}"/>
         </md:DialogHost>
-        <Label Content="{StaticResource lbPpecTraining}"/>
-        <md:PackIcon Kind="Timer" Width="20" Height="20" ToolTip="{StaticResource ictipPpecTimer}" VerticalAlignment="Center">
+        <Label Content="{StaticResource ppTraining}"/>
+        <md:PackIcon Kind="Timer" Width="20" Height="20" ToolTip="{StaticResource ppTipPecTimer}" VerticalAlignment="Center">
             <md:PackIcon.Style>
                 <Style TargetType="md:PackIcon">
                     <Style.Triggers>
@@ -40,6 +41,6 @@
                 </Style>
             </md:PackIcon.Style>
         </md:PackIcon>
-        <Label Content="{StaticResource lbInTraining}"/>
+        <Label Content="{StaticResource ppInTraining}"/>
     </StackPanel>
 </UserControl>

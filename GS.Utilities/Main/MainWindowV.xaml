@@ -8,6 +8,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:controls="clr-namespace:GS.Utilities.Controls"
         xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
+        xmlns:main="clr-namespace:GS.Utilities.Main"
         Closed="MainWindow_OnClosed"  TextOptions.TextFormattingMode="Display"
         WindowState="{Binding WindowState, Source={x:Static properties:Utilities.Default}, Mode=TwoWay}"
         Height="{Binding WindowHeight, Source={x:Static properties:Utilities.Default}, Mode=TwoWay}" 
@@ -15,8 +16,7 @@
         Left="{Binding WindowLeft, Source={x:Static properties:Utilities.Default}, Mode=TwoWay}"
         Top="{Binding WindowTop, Source={x:Static properties:Utilities.Default}, Mode=TwoWay}"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        Background="{DynamicResource MaterialDesignPaper}" 
-        Title="GS Utilities" FontSize="13">
+        Background="{DynamicResource MaterialDesignPaper}" Title="GS Utilities" FontSize="13" d:DataContext="{d:DesignInstance main:MainWindowVM}">
     <WindowChrome.WindowChrome>
         <WindowChrome
             ResizeBorderThickness="6"
@@ -76,19 +76,18 @@
                                 <RowDefinition />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Margin="10,10,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{DynamicResource msgDelFiles}"/>
+                            <TextBlock Grid.Row="0" Margin="10,10,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{DynamicResource utilDelFiles}"/>
                             <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="10,0,0,0">
                                 <CheckBox IsChecked="{Binding DelLogFiles}" Style="{DynamicResource MaterialDesignActionLightToggleButton}"/>
-                                <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="{DynamicResource cbDelLogFiles}"/>
+                                <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="{DynamicResource utilLogFiles}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="10,0,0,0">
                                 <CheckBox IsChecked="{Binding DelSettings}" Style="{DynamicResource MaterialDesignActionLightToggleButton}"/>
-                                <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="{DynamicResource cbDelSettings}"/>
+                                <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="{DynamicResource utilSettings}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="3" Margin="10,0,0,0">
                                 <materialDesign:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsDelDialogOpen}" DialogContent="{Binding DelDialogContent}">
-                                    <Button Margin="0,3,0,0" Width="100" ToolTip="{DynamicResource btnDelFiles}" 
-                                            Command="{Binding OpenDelDialogCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{DynamicResource btnDelFiles}"/>
+                                    <Button Margin="0,3,0,0" Width="100" ToolTip="{DynamicResource btnDelFiles}" Command="{Binding OpenDelDialogCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{DynamicResource utilDelete}"/>
                                 </materialDesign:DialogHost>
                             </StackPanel>
                         </Grid>
@@ -99,10 +98,9 @@
                                 <RowDefinition />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Margin="10,0,0,0" VerticalAlignment="Center" Text="{DynamicResource msgUtilLockTitle}"/>
+                            <TextBlock Grid.Row="0" Margin="10,0,0,0" VerticalAlignment="Center" Text="{DynamicResource utilLockTitle}"/>
                             <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10,0,0,0">
-                                <Button Margin="0,3,0,0" Width="100" ToolTip="{DynamicResource btnUtilCheck}" 
-                                    Command="{Binding ClickFileCheckCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{DynamicResource btnUtilCheck}"/>
+                                <Button Margin="0,3,0,0" Width="100" ToolTip="{DynamicResource utilCheck}" Command="{Binding ClickFileCheckCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{DynamicResource utilCheck}"/>
                             <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="{Binding FileLocked}"/>
                             </StackPanel>
                         </Grid>
@@ -113,10 +111,9 @@
                                 <RowDefinition />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Margin="10,0,0,0" VerticalAlignment="Center" Text="{DynamicResource btnUtilChooserTitle}"/>
+                            <TextBlock Grid.Row="0" Margin="10,0,0,0" VerticalAlignment="Center" Text="{DynamicResource utilChooserTitle}"/>
                             <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10,0,0,0">
-                                <Button Margin="0,3,0,0" Width="100" ToolTip="{DynamicResource btnUtilChooser}" 
-                                        Command="{Binding ClickConnectCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{DynamicResource btnUtilChooser}"/>
+                                <Button Margin="0,3,0,0" Width="100" ToolTip="{DynamicResource utilChooser}" Command="{Binding ClickConnectCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{DynamicResource utilChooser}"/>
                                 <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="{Binding Connect}" Height="55" Width="300" TextWrapping="Wrap" />
                             </StackPanel>
                         </Grid>
@@ -128,12 +125,10 @@
                                 <RowDefinition />
                             </Grid.RowDefinitions>
                             <StackPanel Grid.Row="0" Orientation="Horizontal">
-                                <TextBlock Margin="5,5,0,0" VerticalAlignment="Center" Text="{DynamicResource tbUtilSerial}"/>
-                                <Button Margin="5,5,0,0" ToolTip="{DynamicResource btnUtilStart}" 
-                                        Command="{Binding ClickSerialStartCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{DynamicResource btnUtilStart}"/>
-                                <Button Margin="5,5,0,0" ToolTip="{DynamicResource btnUtilStop}" 
-                                        Command="{Binding ClickSerialStopCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{DynamicResource btnUtilStop}"/>
-                                <ComboBox materialDesign:HintAssist.Hint="{DynamicResource tbUtilComPort}" MinWidth="10" Margin="5,5,0,0" ToolTip="{DynamicResource tbUtilComPort}"  
+                                <TextBlock Margin="5,5,0,0" VerticalAlignment="Center" Text="{DynamicResource utilSerial}"/>
+                                <Button Margin="5,5,0,0" ToolTip="{DynamicResource utilStart}" Command="{Binding ClickSerialStartCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{DynamicResource utilStart}"/>
+                                <Button Margin="5,5,0,0" ToolTip="{DynamicResource utilStop}" Command="{Binding ClickSerialStopCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{DynamicResource utilStop}"/>
+                                <ComboBox materialDesign:HintAssist.Hint="{DynamicResource utilComPort}" MinWidth="10" Margin="5,5,0,0" ToolTip="{DynamicResource utilComPort}"  
                                           ItemsSource="{Binding ComPortList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                     <ComboBox.SelectedItem>
                                         <Binding Path="ComPort" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -148,7 +143,7 @@
                                         </ItemsPanelTemplate>
                                     </ComboBox.ItemsPanel>
                                 </ComboBox>
-                                <ComboBox materialDesign:HintAssist.Hint="{DynamicResource tbUtilBaudRate}" MinWidth="10" Margin="5,5,0,0" ToolTip="{DynamicResource tbUtilBaudRate}"  
+                                <ComboBox materialDesign:HintAssist.Hint="{DynamicResource utilBaudRate}" MinWidth="10" Margin="5,5,0,0" ToolTip="{DynamicResource utilBaudRate}"  
                                           ItemsSource="{Binding BaudRates}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                     <ComboBox.SelectedItem>
                                         <Binding Path="BaudRate" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -163,7 +158,7 @@
                                         </ItemsPanelTemplate>
                                     </ComboBox.ItemsPanel>
                                 </ComboBox>
-                                <ComboBox materialDesign:HintAssist.Hint="{DynamicResource tbUtilInterval}" MinWidth="10" Margin="5,5,0,0" ToolTip="{DynamicResource tbUtilInterval}"  
+                                <ComboBox materialDesign:HintAssist.Hint="{DynamicResource utilInterval}" MinWidth="10" Margin="5,5,0,0" ToolTip="{DynamicResource utilInterval}"  
                                       ItemsSource="{Binding IntervalList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                 <ComboBox.SelectedItem>
                                         <Binding Path="Interval" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -182,8 +177,7 @@
                             <TextBlock Grid.Row="1" Margin="10,10,0,20" HorizontalAlignment="Left" Text="{Binding SerMsg}" />
                         </Grid>
                     </Border>
-                    <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,3,0,10" Width="100" ToolTip="{DynamicResource btnExit}" VerticalAlignment="Bottom"
-                            Command="{Binding ClickCloseAppCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{DynamicResource btnExit}"/>
+                    <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,3,0,10" Width="100" ToolTip="{DynamicResource utilExit}" VerticalAlignment="Bottom" Command="{Binding ClickCloseAppCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{DynamicResource utilExit}"/>
                 </Grid>
             </materialDesign:DrawerHost>
         </Grid>

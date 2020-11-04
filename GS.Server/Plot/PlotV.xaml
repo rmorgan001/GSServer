@@ -9,13 +9,12 @@
              xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              xmlns:plot="clr-namespace:GS.Server.Plot"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:geared="clr-namespace:LiveCharts.Geared;assembly=LiveCharts.Geared"
-             mc:Ignorable="d">
+             xmlns:geared="clr-namespace:LiveCharts.Geared;assembly=LiveCharts.Geared" mc:Ignorable="d" d:DataContext="{d:DesignInstance plot:PlotVM}">
     <UserControl.Resources>
         <domain:InverseBooleanConverter x:Key="InvBol" />
     </UserControl.Resources>
-    <Grid MinWidth="600">
-        <md:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" CloseOnClickAway="True"/>
+    <md:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" CloseOnClickAway="True" >
+        <Grid MinWidth="600">
         <md:DrawerHost BorderThickness="0" IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" BorderBrush="{StaticResource MaterialDesignDivider}">
         <md:DrawerHost.LeftDrawerContent>
             <Grid Width="250">
@@ -43,9 +42,9 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                         <ToggleButton Width="25" Height="25" Style="{StaticResource MaterialDesignActionLightToggleButton}" IsChecked="{Binding IsZeroBased}" />
-                            <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="{StaticResource tbPlotZero}" />
+                            <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="{StaticResource pltZero}" />
                     </StackPanel>
-                        <ComboBox Margin="0,10,0,0" md:HintAssist.Hint="{StaticResource cbPlotYscale}" HorizontalAlignment="Left" Width="100" VerticalAlignment="Bottom" Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource cbPlotYscale}"  ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type plot:ChartScale}}}">
+                        <ComboBox Margin="0,10,0,0" md:HintAssist.Hint="{StaticResource pltYScale}" HorizontalAlignment="Left" Width="100" VerticalAlignment="Bottom" Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource pltYScale}"  ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type plot:ChartScale}}}">
                         <ComboBox.SelectedItem>
                             <Binding Path="Scale" UpdateSourceTrigger="PropertyChanged">
                                 <Binding.ValidationRules>
@@ -59,7 +58,7 @@
                             </ItemsPanelTemplate>
                         </ComboBox.ItemsPanel>
                     </ComboBox>
-                        <ComboBox Margin="0,10,0,0" md:HintAssist.Hint="{StaticResource cbPlotQuality}" HorizontalAlignment="Left" Width="100" VerticalAlignment="Bottom" Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource cbPlotQuality}" ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type geared:Quality}}}">
+                        <ComboBox Margin="0,10,0,0" md:HintAssist.Hint="{StaticResource pltQuality}" HorizontalAlignment="Left" Width="100" VerticalAlignment="Bottom" Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource pltQuality}" ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type geared:Quality}}}">
                         <ComboBox.SelectedItem>
                             <Binding Path="ChartQuality" UpdateSourceTrigger="PropertyChanged">
                                 <Binding.ValidationRules>
@@ -73,7 +72,7 @@
                             </ItemsPanelTemplate>
                         </ComboBox.ItemsPanel>
                     </ComboBox>
-                        <ComboBox Margin="0,10,0,0" md:HintAssist.Hint="{StaticResource cbtipPlotMaxPoints}" HorizontalAlignment="Left" Width="100" VerticalAlignment="Bottom"  ItemsSource="{Binding MaxPointsRange}" ToolTip="{StaticResource cbPlotMaxPoints}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <ComboBox Margin="0,10,0,0" md:HintAssist.Hint="{StaticResource pltMaxPoints}" HorizontalAlignment="Left" Width="100" VerticalAlignment="Bottom"  ItemsSource="{Binding MaxPointsRange}" ToolTip="{StaticResource pltMaxPltPoints}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         <ComboBox.SelectedItem>
                             <Binding Path="MaxPoints" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                 <Binding.ValidationRules>
@@ -89,7 +88,7 @@
                     </ComboBox>
                         <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
                             <ToggleButton Width="25" Height="25" Style="{StaticResource MaterialDesignActionLightToggleButton}" IsChecked="{Binding IsLogging}" />
-                            <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="{StaticResource tbLogging}" />
+                                <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="{StaticResource pltLogging}" />
                     </StackPanel>
                     </StackPanel>
             </Grid>
@@ -103,13 +102,13 @@
                               Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
                 <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Center">
                     <md:Badged Badge="{Binding StartBadgeContent}" VerticalAlignment="Center">
-                        <Button Margin="10,0,0,0" Height="30" ToolTip="{StaticResource btnPlotStart}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPlotStartCmd}" Content="{StaticResource btnPlotStart}" />
+                        <Button Margin="10,0,0,0" Height="30" ToolTip="{StaticResource pltStart}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPlotStartCmd}" Content="{StaticResource pltStart}" />
                     </md:Badged>
-                    <Button Margin="15,0,0,0" Height="30" ToolTip="{StaticResource btnPlotClear}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPlotClearCmd}" Content="{StaticResource btnPlotClear}" />
+                    <Button Margin="15,0,0,0" Height="30" ToolTip="{StaticResource pltClear}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPlotClearCmd}" Content="{StaticResource pltClear}" />
                     <md:Badged Badge="{Binding PauseBadgeContent}" VerticalAlignment="Center">
-                        <Button Margin="10,0,0,0" Height="30" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPlotPauseCmd}" Content="{StaticResource btnPlotPause}" />
+                        <Button Margin="10,0,0,0" Height="30" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPlotPauseCmd}" Content="{StaticResource pltPause}" />
                     </md:Badged>
-                    <Button Margin="10,0,0,0" Height="30" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPlotSizeCmd}" Content="{StaticResource btnPlotSize}" />
+                    <Button Margin="10,0,0,0" Height="30" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPlotSizeCmd}" Content="{StaticResource pltSize}" />
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock VerticalAlignment="Center" Margin="10,0,0,0" Text="Zoom:" />
                         <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="X" Command="{Binding Path=ClickPlotZoomCmd}" CommandParameter="X" />
@@ -173,4 +172,5 @@
             </Grid>
     </md:DrawerHost>
     </Grid>
+    </md:DialogHost>    
 </UserControl>

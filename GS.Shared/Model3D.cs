@@ -21,10 +21,10 @@ namespace GS.Shared
     public static class Model3D
     {
         private static readonly string _directoryPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase) + "\\Models\\";
-        public static string GetModelFile(Model3DType modeltype)
+        public static string GetModelFile(Model3DType modelType)
         {
             string gpModel;
-            switch (modeltype)
+            switch (modelType)
             {
                 case Model3DType.Default:
                     gpModel = @"Default.obj";
@@ -45,7 +45,7 @@ namespace GS.Shared
                     gpModel = @"RitcheyChretienTruss.obj";
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(modeltype), modeltype, null);
+                    throw new ArgumentOutOfRangeException(nameof(modelType), modelType, null);
             }
             var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(), gpModel);
             var file = new Uri(filePath).LocalPath;
@@ -60,10 +60,10 @@ namespace GS.Shared
             var file = new Uri(filePath).LocalPath;
             return file;
         }
-        public static double[] RotateModel(string mounttype, double ax, double ay, bool southernHemisphere)
+        public static double[] RotateModel(string mountType, double ax, double ay, bool southernHemisphere)
         {
             var axes = new[] {0.0, 0.0};
-            switch (mounttype)
+            switch (mountType)
             {
                 case "Simulator":
                     axes[0] = Math.Round(ax, 3);

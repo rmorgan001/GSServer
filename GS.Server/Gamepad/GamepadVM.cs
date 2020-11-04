@@ -30,19 +30,19 @@ using System.Windows;
 using System.Windows.Input;
 using GS.Server.Controls.Dialogs;
 
-namespace GS.Server.Gamepad
+namespace GS.Server.GamePad
 {
-    public sealed class GamepadVM : ObservableObject, IPageVM, IDisposable
+    public sealed class GamePadVM : ObservableObject, IPageVM, IDisposable
     {
         public string TopName => "";
-        public string BottomName => "Gamepad";
+        public string BottomName => "GamePad";
         public int Uid => 3;
 
         private SkyTelescopeVM _skyTelescopeVM;
         private SettingsVM _settingsVM;
         private CancellationTokenSource ctsGamePad;
         private string _focusTextBox;
-        private Gamepad _gamePad;
+        private GamePad _gamePad;
 
         private int _trackingCount;
         private int _homeCount;
@@ -62,18 +62,18 @@ namespace GS.Server.Gamepad
         private int _newSpiralCount;
 
 
-        public GamepadVM()
+        public GamePadVM()
         {
             try
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading GamepadVM" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading GamePadVM" };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                GamepadSettings.Load();
+                GamePadSettings.Load();
                 SkyTelescope();
                 Settings();
-                IsGamePadRunning = GamepadSettings.Startup;
+                IsGamePadRunning = GamePadSettings.Startup;
             }
             catch (Exception ex)
             {
@@ -97,7 +97,7 @@ namespace GS.Server.Gamepad
         private bool _isGamePadRunning;
         public bool IsGamePadRunning
         {
-            get => GamepadSettings.Startup;
+            get => GamePadSettings.Startup;
             set
             {
                 if (_isGamePadRunning == value) return;
@@ -114,7 +114,7 @@ namespace GS.Server.Gamepad
                     ctsGamePad = null;
                 }
                 _isGamePadRunning = value;
-                GamepadSettings.Startup = _isGamePadRunning;
+                GamePadSettings.Startup = _isGamePadRunning;
                 OnPropertyChanged();
             }
         }
@@ -354,17 +354,17 @@ namespace GS.Server.Gamepad
         private int _delay;
         public int Delay
         {
-            get => GamepadSettings.Delay;
+            get => GamePadSettings.Delay;
             set
             {
                 _delay = value;
-                GamepadSettings.Delay = _delay;
+                GamePadSettings.Delay = _delay;
                 OnPropertyChanged();
             }
         }
 
         /// <summary>
-        /// Sets up a reference back to run any SkyTelesope commands
+        /// Sets up a reference back to run any SkyTelescope commands
         /// </summary>
         /// <returns></returns>
         private bool SkyTelescope()
@@ -396,7 +396,7 @@ namespace GS.Server.Gamepad
                 {
                     var windowHandle = new IntPtr();
                     ThreadContext.InvokeOnUiThread(delegate { windowHandle = Process.GetCurrentProcess().MainWindowHandle; }, ct);
-                    _gamePad = new Gamepad(windowHandle);
+                    _gamePad = new GamePad(windowHandle);
                     LoadTextboxes();
                     ResetCounts();
                     EnableTextBoxes = true;
@@ -455,7 +455,7 @@ namespace GS.Server.Gamepad
                         }
 
                         // Check PoVs
-                        var gamepadPovs = _gamePad.Povs;
+                        var gamepadPovs = _gamePad.POVs;
                         if (gamepadPovs != null && gamepadPovs.Length > 0)
                         {
                             if (povtocheck.Key > -1)
@@ -463,7 +463,7 @@ namespace GS.Server.Gamepad
                                 if (string.IsNullOrEmpty(key))
                                 {
                                     var pushed = povtocheck.Value == gamepadPovs[povtocheck.Key];
-                                    var dir = Gamepad.PovDirection(povtocheck.Value);
+                                    var dir = GamePad.PovDirection(povtocheck.Value);
                                     var cmd = _gamePad.Get_KeyByValue("pov" + " " + dir + " " + povtocheck.Key);
                                     var id = DoGamePadCommand(povtocheck.Key, pushed, cmd);
                                     if (id == -1) povtocheck = new PovPair(-1, 0);
@@ -475,7 +475,7 @@ namespace GS.Server.Gamepad
                                 {
                                     if (gamepadPovs[i] == -1) continue;
                                     var newhit = new PovPair(i, gamepadPovs[i]);
-                                    var dir = Gamepad.PovDirection(newhit.Value);
+                                    var dir = GamePad.PovDirection(newhit.Value);
                                     var val = "pov" + " " + dir + " " + newhit.Key;
                                     var cmd = _gamePad.Get_KeyByValue(val);
 
@@ -495,7 +495,7 @@ namespace GS.Server.Gamepad
                         // Check X Axis
                         if (xaxistocheck.Key > -1)
                         {
-                            var xDirection = Gamepad.AxisDirection(_gamePad.Xaxis);
+                            var xDirection = GamePad.AxisDirection(_gamePad.XAxis);
                             var pushed = xaxistocheck.Value == xDirection;
                             if (!pushed)
                             {
@@ -509,7 +509,7 @@ namespace GS.Server.Gamepad
                         }
                         else
                         {
-                            var xDirection = Gamepad.AxisDirection(_gamePad.Xaxis);
+                            var xDirection = GamePad.AxisDirection(_gamePad.XAxis);
                             if (xDirection != "normal")
                             {
                                 var newaxis = new AxisPair(1, xDirection);
@@ -531,7 +531,7 @@ namespace GS.Server.Gamepad
                         // Check Y Axis
                         if (yaxistocheck.Key > -1)
                         {
-                            var yDirection = Gamepad.AxisDirection(_gamePad.Yaxis);
+                            var yDirection = GamePad.AxisDirection(_gamePad.YAxis);
                             var pushed = yaxistocheck.Value == yDirection;
                             if (!pushed)
                             {
@@ -545,7 +545,7 @@ namespace GS.Server.Gamepad
                         }
                         else
                         {
-                            var yDirection = Gamepad.AxisDirection(_gamePad.Yaxis);
+                            var yDirection = GamePad.AxisDirection(_gamePad.YAxis);
                             if (yDirection != "normal")
                             {
                                 var newaxis = new AxisPair(1, yDirection);
@@ -567,7 +567,7 @@ namespace GS.Server.Gamepad
                         // Check Z Axis
                         if (zaxistocheck.Key > -1)
                         {
-                            var zDirection = Gamepad.AxisDirection(_gamePad.Zaxis);
+                            var zDirection = GamePad.AxisDirection(_gamePad.ZAxis);
                             var pushed = zaxistocheck.Value == zDirection;
                             if (!pushed)
                             {
@@ -581,7 +581,7 @@ namespace GS.Server.Gamepad
                         }
                         else
                         {
-                            var zDirection = Gamepad.AxisDirection(_gamePad.Zaxis);
+                            var zDirection = GamePad.AxisDirection(_gamePad.ZAxis);
                             if (zDirection != "normal")
                             {
                                 var newaxis = new AxisPair(1, zDirection);
@@ -627,7 +627,7 @@ namespace GS.Server.Gamepad
         }
 
         /// <summary>
-        /// Execute relay commands from a gamepad
+        /// Execute relay commands from a game pad
         /// </summary>
         /// <param name="id"></param>
         /// <param name="value"></param>
@@ -789,8 +789,8 @@ namespace GS.Server.Gamepad
                             if (!SkyTelescope()) return;
                             if (_speedDownCount == 0)
                             {
-                                if (_skyTelescopeVM.HcSpeeddownCommand.CanExecute(null))
-                                    _skyTelescopeVM.HcSpeeddownCommand.Execute(null);
+                                if (_skyTelescopeVM.HcSpeedDownCommand.CanExecute(null))
+                                    _skyTelescopeVM.HcSpeedDownCommand.Execute(null);
                             }
                             _speedDownCount++;
                             returnId = id;
@@ -807,8 +807,8 @@ namespace GS.Server.Gamepad
                             if (!Settings()) return;
                             if (_volumeUpCount == 0)
                             {
-                                if (_settingsVM.VolumeupCommand.CanExecute(null))
-                                    _settingsVM.VolumeupCommand.Execute(null);
+                                if (_settingsVM.VolumeUpCommand.CanExecute(null))
+                                    _settingsVM.VolumeUpCommand.Execute(null);
                             }
                             _volumeUpCount++;
                             returnId = id;
@@ -826,8 +826,8 @@ namespace GS.Server.Gamepad
                             if (!Settings()) return;
                             if (_volumeDownCount == 0)
                             {
-                                if (_settingsVM.VolumedownCommand.CanExecute(null))
-                                    _settingsVM.VolumedownCommand.Execute(null);
+                                if (_settingsVM.VolumeDownCommand.CanExecute(null))
+                                    _settingsVM.VolumeDownCommand.Execute(null);
                             }
                             _volumeDownCount++;
                             returnId = id;
@@ -1215,7 +1215,7 @@ namespace GS.Server.Gamepad
                 }
 
                 return _clickTextBoxGotFocusCommand = new RelayCommand(
-                    param => ClickTextBoxGotFocus(param)
+                    ClickTextBoxGotFocus
                 );
             }
         }
@@ -1254,7 +1254,7 @@ namespace GS.Server.Gamepad
                 }
 
                 return _clickPreviewMouseDoubleClickCommand = new RelayCommand(
-                    param => ClickPreviewMouseDoubleClick(param)
+                    ClickPreviewMouseDoubleClick
                 );
             }
         }
@@ -1500,7 +1500,7 @@ namespace GS.Server.Gamepad
         private void OpenDialog(string msg, string caption = null)
         {
             if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["msgDialog"].ToString();
+            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
             DialogContent = new DialogOK();
             IsDialogOpen = true;
 
@@ -1603,7 +1603,7 @@ namespace GS.Server.Gamepad
         // NOTE: Leave out the finalizer altogether if this class doesn't
         // own unmanaged resources itself, but leave the other methods
         // exactly as they are.
-        ~GamepadVM()
+        ~GamePadVM()
         {
             // Finalizer calls Dispose(false)
             Dispose(false);

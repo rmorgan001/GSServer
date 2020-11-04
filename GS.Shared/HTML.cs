@@ -15,12 +15,10 @@ namespace GS.Shared
             return tmp.Scheme == Uri.UriSchemeHttp || tmp.Scheme == Uri.UriSchemeHttps;
         }
 
-        public bool OpenUri(string uri)
+        public void OpenUri(string uri)
         {
-            if (!IsValidUri(uri))
-                return false;
+            if (!IsValidUri(uri)) return;
             System.Diagnostics.Process.Start(uri);
-            return true;
         }
         
         public List<LinkItem> FindLinks(string file)

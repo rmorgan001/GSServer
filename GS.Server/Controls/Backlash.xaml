@@ -4,12 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
-             mc:Ignorable="d">
+             xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
     <StackPanel Orientation="Vertical" Margin="0,0,0,0" >
         <StackPanel Orientation="Horizontal" >
-            <Label Content="{StaticResource lbBacklash}" />
-            <Label Content="{StaticResource lbRaBacklash}" />
-            <ComboBox Margin="5,0,0,0" Width="45" HorizontalContentAlignment="Right"  ToolTip="{StaticResource cbtipRaBacklash}" ItemsSource="{Binding RaBacklashList}" >
+            <Label Content="{StaticResource bacLashComp}" />
+            <Label Content="{StaticResource bacRa}" />
+            <ComboBox Margin="5,0,0,0" Width="45" HorizontalContentAlignment="Right" ToolTip="{StaticResource bacRaLash}" ItemsSource="{Binding RaBacklashList}" >
                 <ComboBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel />
@@ -23,8 +24,8 @@
                     </Binding>
                 </ComboBox.SelectedItem>
             </ComboBox>
-            <Label Margin="10,0,0,0" Content="{StaticResource lbDecBacklash}" />
-            <ComboBox Margin="5,0,0,0" Width="45" HorizontalContentAlignment="Right" ToolTip="{StaticResource cbtipDecBacklash}" ItemsSource="{Binding DecBacklashList}" >
+            <Label Margin="10,0,0,0" Content="{StaticResource bacDec}" />
+            <ComboBox Margin="5,0,0,0" Width="45" HorizontalContentAlignment="Right" ToolTip="{StaticResource bacDecLash}" ItemsSource="{Binding DecBacklashList}" >
                 <ComboBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel HorizontalAlignment="Right"/>
@@ -39,11 +40,6 @@
                 </ComboBox.SelectedItem>
             </ComboBox>
         </StackPanel>
-        <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <Slider Minimum="0" Maximum="500" Width="130" Name="slValue" HorizontalAlignment="Left" IsSnapToTickEnabled="True" TickFrequency="1" VerticalAlignment="Center" ToolTip="{StaticResource sldtipBacklash}" Style="{StaticResource MaterialDesignSlider}" Value="{Binding DecBacklash, UpdateSourceTrigger=PropertyChanged, Delay=800}"/>
-            <Label Content="{Binding ElementName=slValue, Path=Value, UpdateSourceTrigger=PropertyChanged}" Width="33"/>
-            <Label Content="{StaticResource lbBacklash}"/>
-        </StackPanel>-->
     </StackPanel> 
 </UserControl>
  

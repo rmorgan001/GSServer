@@ -26,8 +26,8 @@ namespace ASCOM.GS.Sky.Telescope
     // The Rate class implements IRate, and is used to hold values
     // for AxisRates. You do not need to change this class.
     //
-    // The Guid attribute sets the CLSID for ASCOM.SkyServer.Rate
-    // The ClassInterface/None addribute prevents an empty interface called
+    // The Guid attribute sets the CLS ID for AsCom.SkyServer.Rate
+    // The ClassInterface/None attribute prevents an empty interface called
     // _Rate from being created and used as the [default] interface
     //
     [Guid("4F845FFA-01F6-4DD2-8A9D-7C328CE7C79F")]
@@ -87,8 +87,8 @@ namespace ASCOM.GS.Sky.Telescope
     // both COM and .NET. The IAxisRates and IEnumerable interfaces provide
     // this polymorphism. 
     //
-    // The Guid attribute sets the CLSID for ASCOM.SkyServer.AxisRates
-    // The ClassInterface/None addribute prevents an empty interface called
+    // The Guid attribute sets the CL SID for AsCom.SkyServer.AxisRates
+    // The ClassInterface/None attribute prevents an empty interface called
     // _AxisRates from being created and used as the [default] interface
     //
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1038:EnumeratorsShouldBeStronglyTyped")]
@@ -206,8 +206,8 @@ namespace ASCOM.GS.Sky.Telescope
     // both COM and .NET. The ITrackingRates and IEnumerable interfaces provide
     // this polymorphism. 
     //
-    // The Guid attribute sets the CLSID for ASCOM.SkyServer.TrackingRates
-    // The ClassInterface/None addribute prevents an empty interface called
+    // The Guid attribute sets the CL SID for AsCom.SkyServer.TrackingRates
+    // The ClassInterface/None attribute prevents an empty interface called
     // _TrackingRates from being created and used as the [default] interface
     //
 

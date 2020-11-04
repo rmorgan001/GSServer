@@ -17,10 +17,10 @@ namespace GS.Simulator
 {
     public struct AxisStatus
     {
-        public Axis Axis { get; set; }
+        //public Axis Axis { get; set; }
         public bool Slewing { get; set; }
         public bool Stopped { get; set; }
-        public bool Tracking { get; set; }
-        public bool Rate { get; set; }
+        //public bool Tracking { get; set; }
+        //public bool Rate { get; set; }
     }
 }

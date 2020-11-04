@@ -28,7 +28,7 @@ namespace GS.Server.Notes
 {
     /// <inheritdoc cref="NotesV" />
     /// <summary>
-    /// Interaction logic for FocuserView.xaml
+    /// Interaction logic for notes
     /// </summary>
     [ComVisible(false)]
     public sealed partial class NotesV : INotifyPropertyChanged
@@ -39,8 +39,8 @@ namespace GS.Server.Notes
         private static readonly string _filePath = Path.Combine(_myDocs, "GSServer\\");
         private readonly Util _util = new Util();
         private const string _newline = "\u2028";
-        private static SolidColorBrush _fontforegroundcolor;
-        private static SolidColorBrush _fontbackgroundcolor;
+        private static SolidColorBrush _fontForeGroundColor;
+        private static SolidColorBrush _fontBackGroundColor;
 
         public NotesV()
         {
@@ -53,24 +53,24 @@ namespace GS.Server.Notes
 
                 if (rtbEditor.Foreground == null)
                 {
-                    _fontforegroundcolor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFFFFFFF"));
+                    _fontForeGroundColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFFFFFFF"));
                 }
                 else
                 {
-                    _fontforegroundcolor = (SolidColorBrush)rtbEditor.Foreground;
+                    _fontForeGroundColor = (SolidColorBrush)rtbEditor.Foreground;
                 }
-                Paintbrush.Foreground = _fontforegroundcolor;
+                Paintbrush.Foreground = _fontForeGroundColor;
 
 
                 if (rtbEditor.Background == null)
                 {
-                    _fontbackgroundcolor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FF000000"));
+                    _fontBackGroundColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FF000000"));
                 }
                 else
                 {
-                    _fontbackgroundcolor = (SolidColorBrush)rtbEditor.Background;
+                    _fontBackGroundColor = (SolidColorBrush)rtbEditor.Background;
                 }
-                ColorLens.Background = _fontbackgroundcolor;
+                ColorLens.Background = _fontBackGroundColor;
 
 
 
@@ -189,11 +189,11 @@ namespace GS.Server.Notes
                             rtbEditor.CaretPosition?.InsertTextInRun(str);
                             return;
                         }
-                        OpenDialog1($"{Application.Current.Resources["msgNoData"]}");
+                        OpenDialog1($"{Application.Current.Resources["notNoData"]}");
                     }
                     else
                     {
-                        OpenDialog1($"{Application.Current.Resources["msgTimeout"]}");
+                        OpenDialog1($"{Application.Current.Resources["notTimeout"]}");
                     }
                 }
 
@@ -215,17 +215,17 @@ namespace GS.Server.Notes
             }
         }
 
-        private string ConvertDSField(Forecast forcast, Unit unit, string field)
+        private string ConvertDSField(Forecast forCast, Unit unit, string field)
         {
             string a;
             string b = null;
             switch (field.ToLower())
             {
                 case "time":
-                    a = $"{Time.UnixTimeStampToDateTime(forcast.Currently.Time.ToUnixTime()) }";
+                    a = $"{Time.UnixTimeStampToDateTime(forCast.Currently.Time.ToUnixTime()) }";
                     break;
                 case "temperature":
-                    a = $"{forcast.Currently.Temperature}";
+                    a = $"{forCast.Currently.Temperature}";
                     switch (unit)
                     {
                         case Unit.US:
@@ -240,7 +240,7 @@ namespace GS.Server.Notes
                     }
                     break;
                 case "apparenttemperature":
-                    a = $"{forcast.Currently.ApparentTemperature}";
+                    a = $"{forCast.Currently.ApparentTemperature}";
                     switch (unit)
                     {
                         case Unit.US:
@@ -255,11 +255,11 @@ namespace GS.Server.Notes
                     }
                     break;
                 case "cloudcover":
-                    a = $"{forcast.Currently.CloudCover * 100}";
+                    a = $"{forCast.Currently.CloudCover * 100}";
                     b = "%";
                     break;
                 case "dewpoint":
-                    a = $"{forcast.Currently.DewPoint}";
+                    a = $"{forCast.Currently.DewPoint}";
                     switch (unit)
                     {
                         case Unit.US:
@@ -274,15 +274,15 @@ namespace GS.Server.Notes
                     }
                     break;
                 case "humidity":
-                    a = $"{forcast.Currently.Humidity * 100}";
+                    a = $"{forCast.Currently.Humidity * 100}";
                     b = "%";
                     break;
                 case "neareststormbearing":
-                    a = $"{forcast.Currently.NearestStormBearing}";
+                    a = $"{forCast.Currently.NearestStormBearing}";
                     b = "°";
                     break;
                 case "neareststormdistance":
-                    a = $"{forcast.Currently.NearestStormDistance}";
+                    a = $"{forCast.Currently.NearestStormDistance}";
                     switch (unit)
                     {
                         case Unit.UK2:
@@ -297,14 +297,14 @@ namespace GS.Server.Notes
                     }
                     break;
                 case "ozone":
-                    a = $"{forcast.Currently.Ozone}";
+                    a = $"{forCast.Currently.Ozone}";
                     b = "du";
                     break;
                 case "precipitationtype":
-                    a = $"{forcast.Currently.PrecipitationType}";
+                    a = $"{forCast.Currently.PrecipitationType}";
                     break;
                 case "precipitationintensity":
-                    a = $"{forcast.Currently.PrecipitationIntensity}";
+                    a = $"{forCast.Currently.PrecipitationIntensity}";
                     switch (unit)
                     {
                         case Unit.US:
@@ -319,11 +319,11 @@ namespace GS.Server.Notes
                     }
                     break;
                 case "precipitationprobability":
-                    a = $"{forcast.Currently.PrecipitationProbability * 100}";
+                    a = $"{forCast.Currently.PrecipitationProbability * 100}";
                     b = "%";
                     break;
                 case "pressure":
-                    a = $"{forcast.Currently.Pressure}";
+                    a = $"{forCast.Currently.Pressure}";
                     switch (unit)
                     {
                         case Unit.US:
@@ -338,7 +338,7 @@ namespace GS.Server.Notes
                     }
                     break;
                 case "visibility":
-                    a = $"{forcast.Currently.Visibility}";
+                    a = $"{forCast.Currently.Visibility}";
                     switch (unit)
                     {
                         case Unit.UK2:
@@ -353,10 +353,10 @@ namespace GS.Server.Notes
                     }
                     break;
                 case "uvindex":
-                    a = $"{forcast.Currently.UVIndex}";
+                    a = $"{forCast.Currently.UVIndex}";
                     break;
                 case "windspeed":
-                    a = $"{forcast.Currently.WindSpeed}";
+                    a = $"{forCast.Currently.WindSpeed}";
                     switch (unit)
                     {
                         case Unit.UK2:
@@ -373,7 +373,7 @@ namespace GS.Server.Notes
                     }
                     break;
                 case "windgust":
-                    a = $"{forcast.Currently.WindGust}";
+                    a = $"{forCast.Currently.WindGust}";
                     switch (unit)
                     {
                         case Unit.UK2:
@@ -390,11 +390,11 @@ namespace GS.Server.Notes
                     }
                     break;
                 case "windbearing":
-                    a = $"{forcast.Currently.WindBearing}";
+                    a = $"{forCast.Currently.WindBearing}";
                     b = "°";
                     break;
                 case "summary":
-                    a = $"{forcast.Currently.Summary}";
+                    a = $"{forCast.Currently.Summary}";
                     break;
                 default:
                     a = "Blank";
@@ -580,16 +580,16 @@ namespace GS.Server.Notes
                 var colorDialog = new ColorDialog
                 {
                     Owner = Window.GetWindow(this),
-                    SelectedColor = _fontforegroundcolor.Color
+                    SelectedColor = _fontForeGroundColor.Color
                 };
                 var b = colorDialog.ShowDialog();
                 if (b == null) return;
                 if ((bool)!b) return;
                 if (rtbEditor == null) return;
-                _fontforegroundcolor = new SolidColorBrush(colorDialog.SelectedColor);
-                rtbEditor?.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, _fontforegroundcolor);
+                _fontForeGroundColor = new SolidColorBrush(colorDialog.SelectedColor);
+                rtbEditor?.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, _fontForeGroundColor);
                 rtbEditor?.Focus();
-                Paintbrush.Foreground = _fontforegroundcolor;
+                Paintbrush.Foreground = _fontForeGroundColor;
 
             }
             catch (Exception ex)
@@ -617,15 +617,15 @@ namespace GS.Server.Notes
                 var colorDialog = new ColorDialog
                 {
                     Owner = Window.GetWindow(this),
-                    SelectedColor = _fontbackgroundcolor.Color
+                    SelectedColor = _fontBackGroundColor.Color
                 };
                 var b = colorDialog.ShowDialog();
                 if (b == null) return;
                 if ((bool)!b) return;
                 if (rtbEditor != null)
                 {
-                    _fontbackgroundcolor = new SolidColorBrush(colorDialog.SelectedColor);
-                    rtbEditor?.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, _fontbackgroundcolor);
+                    _fontBackGroundColor = new SolidColorBrush(colorDialog.SelectedColor);
+                    rtbEditor?.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, _fontBackGroundColor);
                     rtbEditor?.Focus();
                 }
                 ColorLens.Background = new SolidColorBrush(colorDialog.SelectedColor);
@@ -656,7 +656,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $" { Application.Current.Resources["btntipNDate"]}: {DateTime.Now:D}";
+                var str = $" { Application.Current.Resources["notDate"]}: {DateTime.Now:D}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -683,7 +683,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $" { Application.Current.Resources["btntipNTime"]}: {DateTime.Now:T}";
+                var str = $" { Application.Current.Resources["notTime"]}: {DateTime.Now:T}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -710,7 +710,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $" { Application.Current.Resources["btntipNRa"]}: {_util.HoursToHMS(SkyServer.RightAscensionXform, "h ", ":", "", 2)}";
+                var str = $" { Application.Current.Resources["notRa"]}: {_util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2)}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -737,7 +737,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $" { Application.Current.Resources["btntipNDec"]}: {_util.DegreesToDMS(SkyServer.DeclinationXform, "° ", ":", "", 2)}";
+                var str = $" { Application.Current.Resources["notDec"]}: {_util.DegreesToDMS(SkyServer.DeclinationXForm, "° ", ":", "", 2)}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -764,7 +764,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $" { Application.Current.Resources["btntipNAlt"]}: {_util.DegreesToDMS(SkyServer.Altitude, "° ", ":", "", 2)}";
+                var str = $" { Application.Current.Resources["notAlt"]}: {_util.DegreesToDMS(SkyServer.Altitude, "° ", ":", "", 2)}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -783,7 +783,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $" { Application.Current.Resources["btntipNAz"]}: {_util.DegreesToDMS(SkyServer.Azimuth, "° ", ":", "", 2)}";
+                var str = $" { Application.Current.Resources["notAz"]}: {_util.DegreesToDMS(SkyServer.Azimuth, "° ", ":", "", 2)}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -807,32 +807,32 @@ namespace GS.Server.Notes
                 switch (angle)
                 {
                     case var n when (n >= -180.0 && n <= -135.0):
-                        phase = $"{Application.Current.Resources["msgFullMoon"]}";
+                        phase = $"{Application.Current.Resources["notFullMoon"]}";
                         break;
                     case var n when (n >= -135.0 && n <= -90.0):
-                        phase = $"{Application.Current.Resources["msgWaningGibbous"]}";
+                        phase = $"{Application.Current.Resources["notWaningGibbous"]}";
                         break;
                     case var n when (n >= -90.0 && n <= -45.0):
-                        phase = $"{Application.Current.Resources["msgLastQuarter"]}";
+                        phase = $"{Application.Current.Resources["notLastQuarter"]}";
                         break;
                     case var n when (n >= -45.0 && n <= 0.0):
-                        phase = $"{Application.Current.Resources["msgWaningCrescent"]}";
+                        phase = $"{Application.Current.Resources["notWaningCrescent"]}";
                         break;
                     case var n when (n >= 0.0 && n <= 45.0):
-                        phase = $"{Application.Current.Resources["msgNewMoon"]}";
+                        phase = $"{Application.Current.Resources["notNewMoon"]}";
                         break;
                     case var n when (n >= 45.0 && n <= 90.0):
-                        phase = $"{Application.Current.Resources["msgWaxingCrescent"]}";
+                        phase = $"{Application.Current.Resources["notWaxingCrescent"]}";
                         break;
                     case var n when (n >= 90.0 && n <= 135.0):
-                        phase = $"{Application.Current.Resources["msgFirstQuarter"]}";
+                        phase = $"{Application.Current.Resources["notFirstQuarter"]}";
                         break;
                     case var n when (n >= 135.0 && n <= 180.0):
-                        phase = $"{Application.Current.Resources["msgWaxingGibbous"]}";
+                        phase = $"{Application.Current.Resources["notWaxingGibbous"]}";
                         break;
                 }
 
-                var str = $" {Application.Current.Resources["btntipNMoon"]}: {phase} ";
+                var str = $" {Application.Current.Resources["notMoon"]}: {phase} ";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -858,7 +858,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $"{Application.Current.Resources["msgLogEntry"]}: {Application.Current.Resources["btntipNDate"]} {DateTime.Now:D} {Application.Current.Resources["btntipNTime"]} {DateTime.Now:T}";
+                var str = $"{Application.Current.Resources["notLogEntry"]}: {Application.Current.Resources["notDate"]} {DateTime.Now:D} {Application.Current.Resources["notTime"]} {DateTime.Now:T}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -884,7 +884,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $"{ Application.Current.Resources["msgAlignmentMode"]}: { SkySettings.AlignmentMode}";
+                var str = $"{ Application.Current.Resources["notAlignmentMode"]}: { SkySettings.AlignmentMode}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -911,7 +911,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $"{ Application.Current.Resources["msgCoordinateType"]}: {SkySettings.EquatorialCoordinateType}";
+                var str = $"{ Application.Current.Resources["notCoordinateType"]}: {SkySettings.EquatorialCoordinateType}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -938,7 +938,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $"{ Application.Current.Resources["Observatory"]} { Application.Current.Resources["msgLat"]}: {_util.DegreesToDMS(SkySettings.Latitude, "° ", ":", "", 2)} { Application.Current.Resources["msgLong"]}: {_util.DegreesToDMS(SkySettings.Longitude, "° ", ":", "", 2)}";
+                var str = $"{ Application.Current.Resources["notObservatory"]} { Application.Current.Resources["notLat"]}: {_util.DegreesToDMS(SkySettings.Latitude, "° ", ":", "", 2)} { Application.Current.Resources["notLong"]}: {_util.DegreesToDMS(SkySettings.Longitude, "° ", ":", "", 2)}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -991,7 +991,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $" { Application.Current.Resources["msgSiderealTime"]}: {_util.HoursToHMS(SkyServer.SiderealTime)}";
+                var str = $" { Application.Current.Resources["notSiderealTime"]}: {_util.HoursToHMS(SkyServer.SiderealTime)}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -1018,7 +1018,7 @@ namespace GS.Server.Notes
         {
             try
             {
-                var str = $" { Application.Current.Resources["msgHa"]}: {_util.HoursToHMS(Coordinate.Ra2Ha12(SkyServer.RightAscensionXform,SkyServer.SiderealTime))}";
+                var str = $" { Application.Current.Resources["notHa"]}: {_util.HoursToHMS(Coordinate.Ra2Ha12(SkyServer.RightAscensionXForm,SkyServer.SiderealTime))}";
                 if (rtbEditor == null) return;
                 rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
                 rtbEditor.CaretPosition?.InsertTextInRun(str);
@@ -1071,15 +1071,15 @@ namespace GS.Server.Notes
                 var fg = rtbEditor.Selection.GetPropertyValue(TextElement.ForegroundProperty);
                 if (fg is SolidColorBrush fgbrush)
                 {
-                    _fontforegroundcolor = fgbrush;
-                    Paintbrush.Foreground = _fontforegroundcolor;
+                    _fontForeGroundColor = fgbrush;
+                    Paintbrush.Foreground = _fontForeGroundColor;
                 }
 
                 var bg = rtbEditor.Selection.GetPropertyValue(TextElement.BackgroundProperty);
                 if (bg is SolidColorBrush bgbrush)
                 {
-                    _fontbackgroundcolor = bgbrush;
-                    ColorLens.Background = _fontbackgroundcolor;
+                    _fontBackGroundColor = bgbrush;
+                    ColorLens.Background = _fontBackGroundColor;
                 }
 
                 using (var ms = new MemoryStream())
@@ -1114,8 +1114,8 @@ namespace GS.Server.Notes
                 //else { cbFontSize.SelectedItem = rtbEditor?.Selection.GetPropertyValue(TextElement.FontFamilyProperty); }
 
                 rtbEditor?.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, cbFontFamily.SelectedItem);
-                rtbEditor?.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, _fontforegroundcolor);
-                rtbEditor?.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, _fontbackgroundcolor);
+                rtbEditor?.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, _fontForeGroundColor);
+                rtbEditor?.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, _fontBackGroundColor);
                 rtbEditor?.Selection.ApplyPropertyValue(TextElement.FontSizeProperty, cbFontSize.SelectedItem.ToString());
 
             }

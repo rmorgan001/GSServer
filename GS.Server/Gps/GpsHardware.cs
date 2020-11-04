@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019  Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2020  Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -82,15 +82,15 @@ namespace GS.Server.Gps
         /// <summary>
         /// Data read from the GPS 
         /// </summary>
-        internal string NmeaTag { get; private set; }
+        internal string NmEaTag { get; private set; }
 
         /// <summary>
-        /// raw NMEA sentance
+        /// raw NmEa sentence
         /// </summary>
-        internal string NmeaSentence { get; private set; }
+        internal string NmEaSentence { get; private set; }
 
         /// <summary>
-        /// Date and time from the nema sentence
+        /// Date and time from the NmEa sentence
         /// </summary>
         internal DateTime TimeStamp { get; private set; }
 
@@ -203,21 +203,21 @@ namespace GS.Server.Gps
                 var gpsDataArr = receivedData.Split(',');
                 if (gpsDataArr[0].Length < 6) continue;
                 var code = gpsDataArr[0].Substring(3, 3);
-                LogNmeaSentence(receivedData, false);
+                LogNmEaSentence(receivedData, false);
 
 
                 switch (code)
                 {
                     case "GGA":
                         if (!Gga) break;
-                        LogNmeaSentence(receivedData, true);
+                        LogNmEaSentence(receivedData, true);
                         if (gpsDataArr.Length == 15)
                         {
                             if (!ValidateCheckSum(receivedData)) return;
                             ParseGga(gpsDataArr);
                             if (CheckProperties())
                             {
-                                NmeaSentence = receivedData;
+                                NmEaSentence = receivedData;
                                 HasData = true;
                                 return;
                             }
@@ -225,14 +225,14 @@ namespace GS.Server.Gps
                         break;
                     case "RMC":
                         if (!Rmc) break;
-                        LogNmeaSentence(receivedData,true);
+                        LogNmEaSentence(receivedData,true);
                         if (gpsDataArr.Length == 13)
                         {
                             if (!ValidateCheckSum(receivedData)) return;
                             ParseRmc(gpsDataArr);
                             if (CheckProperties())
                             {
-                                NmeaSentence = receivedData;
+                                NmEaSentence = receivedData;
                                 HasData = true;
                                 return;
                             }
@@ -243,11 +243,11 @@ namespace GS.Server.Gps
         }
 
         /// <summary>
-        /// Write to Monitor the NMEA sentence before being parced
+        /// Write to Monitor the NmEa sentence before being parsed
         /// </summary>
         /// <param name="sentence"></param>
-        /// <param name="valid">Passed prechecks</param>
-        private void LogNmeaSentence(string sentence, bool valid)
+        /// <param name="valid">Passed pre checks</param>
+        private void LogNmEaSentence(string sentence, bool valid)
         {
             var terminated = sentence.Contains("\r\n");
             var monitorItem = new MonitorEntry
@@ -263,8 +263,8 @@ namespace GS.Server.Gps
             Latitude = 0.0;
             Longitude = 0.0;
             Altitude = 0.0;
-            NmeaTag = string.Empty;
-            NmeaSentence = string.Empty;
+            NmEaTag = string.Empty;
+            NmEaSentence = string.Empty;
             TimeStamp = new DateTime();
             PcUtcNow = new DateTime();
             TimeSpan = new TimeSpan(0);
@@ -277,11 +277,11 @@ namespace GS.Server.Gps
         /// <returns></returns>
         private bool CheckProperties()
         {
-            return Math.Abs(Latitude) > 0.0 && Math.Abs(Longitude) > 0.0 && NmeaTag != string.Empty;
+            return Math.Abs(Latitude) > 0.0 && Math.Abs(Longitude) > 0.0 && NmEaTag != string.Empty;
         }
 
         /// <summary>
-        /// Check for a complete NMEA sentenence 
+        /// Check for a complete NmEa sentence 
         /// </summary>
         /// <param name="receivedData"></param>
         /// <returns></returns>
@@ -316,7 +316,7 @@ namespace GS.Server.Gps
         {
             try
             {
-                NmeaTag = gpsDataArr[0];
+                NmEaTag = gpsDataArr[0];
                 var utctime = gpsDataArr[1];
                 var lat = gpsDataArr[3];
                 var ns = gpsDataArr[4];
@@ -383,7 +383,7 @@ namespace GS.Server.Gps
         {
             try
             {
-                NmeaTag = gpsDataArr[0];
+                NmEaTag = gpsDataArr[0];
                 var utctime = gpsDataArr[1];
                 var lat = gpsDataArr[2];
                 var ns = gpsDataArr[3];
@@ -486,9 +486,9 @@ namespace GS.Server.Gps
         /// </summary>
         /// <param name="date"></param>
         /// <param name="time"></param>
-        /// <param name="timeformat"></param>
+        /// <param name="timeFormat"></param>
         /// <returns></returns>
-        private DateTime ConvertDateTime(string date, string time, string timeformat)
+        private DateTime ConvertDateTime(string date, string time, string timeFormat)
         {
             try
             {
@@ -502,7 +502,7 @@ namespace GS.Server.Gps
 
                 if (time == null) { return tmpdate + tmptime; }
 
-                if (TimeSpan.TryParseExact(time, timeformat, CultureInfo.InvariantCulture, TimeSpanStyles.None, out tmptime)) { }
+                if (TimeSpan.TryParseExact(time, timeFormat, CultureInfo.InvariantCulture, TimeSpanStyles.None, out tmptime)) { }
                 return tmpdate + tmptime;
             }
             catch (Exception ex)

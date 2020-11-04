@@ -6,8 +6,7 @@
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
              xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
-             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-             mc:Ignorable="d" >
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors" mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
     <b:Interaction.Triggers> <!--Stop Mouse Lock-->
         <b:EventTrigger EventName="PreviewKeyDown">
             <b:InvokeCommandAction Command="{Binding PressAnyKeyDownCmd}" CommandParameter="stop" />
@@ -31,11 +30,11 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <!--<md:DialogHost HorizontalAlignment="Center" CloseOnClickAway="True" IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" Background="Transparent" />-->
-            <Button Grid.Row="0" Grid.Column="0" Width="20" Height="20" ToolTip="{StaticResource btnOpenWin}" Command="{Binding OpenHCWindowCmd}" Style="{StaticResource MaterialDesignRaisedAccentButton}" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" 
+            <Button Grid.Row="0" Grid.Column="0" Width="20" Height="20" ToolTip="{StaticResource hcOpenWin}" Command="{Binding OpenHCWindowCmd}" Style="{StaticResource MaterialDesignRaisedAccentButton}" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" 
                     Visibility="{Binding HcWinVisibility, Converter={StaticResource BoolToVis}}">
                 <md:PackIcon Kind="OpenInNew" Margin="-14,-2,0,0" />
             </Button>
-            <Button Grid.Row="1" Grid.Column="0" Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{StaticResource btntipW}">
+            <Button Grid.Row="1" Grid.Column="0" Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{StaticResource hcTipW}">
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
                         <b:InvokeCommandAction Command="{Binding HcMouseDownLeftCommand}" PassEventArgsToCommand="True" />
@@ -46,7 +45,7 @@
                 </b:Interaction.Triggers>
                 <md:PackIcon Kind="ArrowLeft" />
             </Button>
-            <Button Grid.Row="0" Grid.Column="1" Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{StaticResource btntipN}">
+            <Button Grid.Row="0" Grid.Column="1" Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{StaticResource hcTipN}">
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
                         <b:InvokeCommandAction Command="{Binding HcMouseDownUpCommand}" PassEventArgsToCommand="True" />
@@ -57,7 +56,7 @@
                 </b:Interaction.Triggers>
                 <md:PackIcon Kind="ArrowUp" />
             </Button>
-            <Button Grid.Row="1" Grid.Column="2" Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{StaticResource btntipE}">
+            <Button Grid.Row="1" Grid.Column="2" Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{StaticResource hcTipE}">
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
                         <b:InvokeCommandAction Command="{Binding HcMouseDownRightCommand}" PassEventArgsToCommand="True" />
@@ -68,7 +67,7 @@
                 </b:Interaction.Triggers>
                 <md:PackIcon Kind="ArrowRight" />
             </Button>
-            <Button Grid.Row="2" Grid.Column="1" Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{StaticResource btntipS}">
+            <Button Grid.Row="2" Grid.Column="1" Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{StaticResource hcTipS}">
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
                         <b:InvokeCommandAction Command="{Binding HcMouseDownDownCommand}" PassEventArgsToCommand="True" />
@@ -88,7 +87,7 @@
                 <md:PackIcon Kind="ArrowAll" />
             </Button>
             <!--Spiral-->
-            <Button Grid.Row="2" Grid.Column="2" Width="20" Height="20" Padding="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" ToolTip="{StaticResource winSpiralSearch}" Command="{Binding OpenSpiralWindowCmd}" Style="{StaticResource MaterialDesignFlatButton}">
+            <Button Grid.Row="2" Grid.Column="2" Width="20" Height="20" Padding="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" ToolTip="{StaticResource 1021SpiralSearch}" Command="{Binding OpenSpiralWindowCmd}" Style="{StaticResource MaterialDesignFlatButton}">
                 <Canvas Width="18" Height="20">
                     <Canvas.RenderTransform>
                         <TranslateTransform X="-365" Y="-7879" />
@@ -119,7 +118,7 @@
             </md:DialogHost>-->
 
             <!--Mouse Lock-->
-            <Button Grid.Row="2" Grid.Column="0" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource tipMouseLock}" Width="40" Padding="0">
+            <Button Grid.Row="2" Grid.Column="0" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource 1018LockMouse}" Width="40" Padding="0">
                 <md:PackIcon Kind="MouseVariant" Foreground="{StaticResource SecondaryAccentBrush}" Height="25" Width="25" >
                     <md:PackIcon.Style>
                         <Style TargetType="md:PackIcon">
@@ -145,7 +144,7 @@
             </Button>
             <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="3" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Top" >
                 <!--Mode-->
-                <ComboBox Margin="0,5,0,0"  md:HintAssist.Hint="{StaticResource lbMode}" ToolTip="{StaticResource cbtipMode}" 
+                <ComboBox Margin="0,5,0,0"  md:HintAssist.Hint="{StaticResource hcMode}" ToolTip="{StaticResource hcTipMode}" 
                           ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type skyTelescope:HCMode}}}" 
                           Style="{StaticResource MaterialDesignFloatingHintComboBox}" FontSize="12">
                     <ComboBox.ItemsPanel>
@@ -158,30 +157,30 @@
                     </ComboBox.Text>
                 </ComboBox>
                 <!--Flip-->
-                <Label VerticalAlignment="Bottom" Margin="-3,5,0,0"  Content="{StaticResource lbFlip}" FontSize="12" />
+                <Label VerticalAlignment="Bottom" Margin="-3,5,0,0"  Content="{StaticResource hcFlip}" FontSize="12" />
                 <StackPanel Orientation="Horizontal" Margin="0,-5,0,0" >
-                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource tbtntipFlipEW}" IsChecked="{Binding FlipEW, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding EWEnabled}" />
-                    <Label VerticalAlignment="Bottom" Content="{StaticResource lbFlipEW}" FontSize="12" />
+                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource hcTipFlipEW}" IsChecked="{Binding FlipEW, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding EWEnabled}" />
+                    <Label VerticalAlignment="Bottom" Content="{StaticResource hcFlipEW}" FontSize="12" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,-5,0,0">
-                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource tbtntipFlipNS}" IsChecked="{Binding FlipNS, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding NSEnabled}" />
-                    <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbFlipNS}" FontSize="12" />
+                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource hcTipFlipNS}" IsChecked="{Binding FlipNS, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding NSEnabled}" />
+                    <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource hcFlipNS}" FontSize="12" />
                 </StackPanel>
                 <!--backlash-->
-                <Label VerticalAlignment="Bottom" Margin="-3,0,0,0" Content="{StaticResource lbHcBacklash}" FontSize="12" />
+                <Label VerticalAlignment="Bottom" Margin="-3,0,0,0" Content="{StaticResource hcBacklash}" FontSize="12" />
                 <StackPanel Orientation="Horizontal" Margin="0,-5,0,0">
-                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource lbtipHcAntiBacklash}" IsChecked="{Binding HcAntiRa, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource lbHcRa}" FontSize="12" />
+                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource hcTipHcAntiBacklash}" IsChecked="{Binding HcAntiRa, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource hcRa}" FontSize="12" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,-5,0,0">
-                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource lbtipHcAntiBacklash}" IsChecked="{Binding HcAntiDec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <Label VerticalAlignment="Bottom" Content="{StaticResource lbHcDec}" FontSize="12" />
+                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource hcTipHcAntiBacklash}" IsChecked="{Binding HcAntiDec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <Label VerticalAlignment="Bottom" Content="{StaticResource hcDec}" FontSize="12" />
                 </StackPanel>
             </StackPanel>
             <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="4" Grid.RowSpan="3" VerticalAlignment="Top">
                 <StackPanel Orientation="Vertical"  Margin="0,5,0,0">
-                    <Slider MinHeight="150"  HorizontalAlignment="Center" IsSnapToTickEnabled="True" TickFrequency="1" TickPlacement="Both" Orientation="Vertical" Minimum="1" Maximum="8" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" Value="{Binding HcSpeed, Mode=TwoWay, Delay=800}" ToolTip="{StaticResource sltipSpeed}" />
-                    <Label Content="{StaticResource lbSpeed}" HorizontalAlignment="Center" FontSize="12"/>
+                    <Slider MinHeight="150"  HorizontalAlignment="Center" IsSnapToTickEnabled="True" TickFrequency="1" TickPlacement="Both" Orientation="Vertical" Minimum="1" Maximum="8" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" Value="{Binding HcSpeed, Mode=TwoWay, Delay=800}" ToolTip="{StaticResource hcTipSpeed}" />
+                    <Label Content="{StaticResource hcSpeed}" HorizontalAlignment="Center" FontSize="12"/>
                 </StackPanel>
             </StackPanel>
         </Grid>

@@ -8,7 +8,7 @@
         xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
         xmlns:settings="clr-namespace:GS.Server.Settings"
         xmlns:notes="clr-namespace:GS.Server.Notes"
-        xmlns:gamepad="clr-namespace:GS.Server.Gamepad"
+        xmlns:gamepad="clr-namespace:GS.Server.GamePad"
         xmlns:model3D="clr-namespace:GS.Server.Model3D"
         xmlns:pulses="clr-namespace:GS.Server.Pulses"
         xmlns:test="clr-namespace:GS.Server.Test"
@@ -20,11 +20,11 @@
         ContentRendered="MainWindow_OnContentRendered" Closed="MainWindow_OnClosed"  Topmost="{Binding TopMost}"
         d:DataContext="{d:DesignInstance main:MainWindowVM, IsDesignTimeCreatable=True}" 
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"  Title="GS Server" FontStretch="Normal"
-        WindowState="{Binding Windowstate}"
-        Height="{Binding Windowheight, Mode=TwoWay}" 
-        Width="{Binding Windowwidth, Mode=TwoWay}"
-        Left="{Binding Windowleft, Mode=TwoWay}"
-        Top="{Binding Windowtop, Mode=TwoWay}">
+        WindowState="{Binding WindowStates}"
+        Height="{Binding WindowHeight, Mode=TwoWay}" 
+        Width="{Binding WindowWidth, Mode=TwoWay}"
+        Left="{Binding WindowLeft, Mode=TwoWay}"
+        Top="{Binding WindowTop, Mode=TwoWay}">
     <WindowChrome.WindowChrome>
         <WindowChrome
             ResizeBorderThickness="6"
@@ -46,8 +46,8 @@
         <DataTemplate DataType="{x:Type settings:SettingsVM}">
             <settings:SettingsV />
         </DataTemplate>
-        <DataTemplate DataType="{x:Type gamepad:GamepadVM}">
-            <gamepad:GamepadV />
+        <DataTemplate DataType="{x:Type gamepad:GamePadVM}">
+            <gamepad:GamePadV />
         </DataTemplate>
         <DataTemplate DataType="{x:Type model3D:Model3DVM}">
             <model3D:Model3DV />
@@ -66,7 +66,7 @@
         </DataTemplate>
     </Window.Resources>
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo x:Name="taskBarItemInfo" Description="{StaticResource taskbarDescription}" />
+        <TaskbarItemInfo x:Name="taskBarItemInfo" Description="{StaticResource titleDescription}" />
     </Window.TaskbarItemInfo>
     <Grid Background="{DynamicResource MaterialDesignBody}">
             <Grid.RowDefinitions>

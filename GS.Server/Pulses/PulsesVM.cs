@@ -550,7 +550,7 @@ namespace GS.Server.Pulses
                 if (_xAxisTimer.IsEnabled)
                 {
                     _xAxisTimer.Stop();
-                    PauseBadgeContent = Application.Current.Resources["bdgPulsesPause"].ToString();
+                    PauseBadgeContent = Application.Current.Resources["pulOn"].ToString();
                 }
                 else
                 {
@@ -568,20 +568,20 @@ namespace GS.Server.Pulses
             }
         }
 
-        private ICommand _clickPulsesSeriesdCmd;
+        private ICommand _clickPulsesSeriesCmd;
         public ICommand ClickPulsesSeriesCmd
         {
             get
             {
-                var cmd = _clickPulsesSeriesdCmd;
+                var cmd = _clickPulsesSeriesCmd;
                 if (cmd != null)
                 {
                     return cmd;
                 }
 
-                return _clickPulsesSeriesdCmd = new RelayCommand(param => PulsesSeriesCmd(param));
+                return _clickPulsesSeriesCmd = new RelayCommand(PulsesSeriesCmd);
             }
-            set => _clickPulsesSeriesdCmd = value;
+            set => _clickPulsesSeriesCmd = value;
         }
         private void PulsesSeriesCmd(object param)
         {
@@ -694,7 +694,7 @@ namespace GS.Server.Pulses
                     return cmd;
                 }
 
-                return _clickPulsesZoomCmd = new RelayCommand(param => PulsesZoomCmd(param));
+                return _clickPulsesZoomCmd = new RelayCommand(PulsesZoomCmd);
             }
             set => _clickPulsesZoomCmd = value;
         }
@@ -803,12 +803,12 @@ namespace GS.Server.Pulses
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
         private void XAxisTimer_Tick(object sender, EventArgs e)
         {
-            SetXaxisLimits(HiResDateTime.UtcNow.ToLocalTime());
+            SetXAxisLimits(HiResDateTime.UtcNow.ToLocalTime());
         }
 
 
@@ -1044,14 +1044,14 @@ namespace GS.Server.Pulses
                     _cts = new CancellationTokenSource();
                     _ct = _cts.Token;
                     SkyServer.MonitorPulse = true;
-                    StartBadgeContent = Application.Current.Resources["bdgPulsesStart"].ToString();
+                    StartBadgeContent = Application.Current.Resources["pulOn"].ToString();
                     PauseBadgeContent = "";
                 }
                 else
                 {
                     SkyServer.MonitorPulse = false;
                     MonitorLog.GetPulses = false;
-                    MonitorLog.GetjEntries = false;
+                    MonitorLog.GetJEntries = false;
                     _xAxisTimer.Stop();
                     _cts?.Cancel();
                     _cts = null;
@@ -1184,7 +1184,7 @@ namespace GS.Server.Pulses
                 .Stroke(model => model.Stroke);
 
             //lets save the mapper globally.
-            LiveCharts.Charting.For<PointModel>(Mapper);
+            Charting.For<PointModel>(Mapper);
 
             // X axis second timer
             _xAxisTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
@@ -1194,12 +1194,12 @@ namespace GS.Server.Pulses
             FormatterX = value => new DateTime((long)value).ToString("HH:mm:ss");
             FormatterY = value => value.ToString("N2");
 
-            AxisXUnit = TimeSpan.FromSeconds(1).Ticks; //AxisXunit = 10000000
+            AxisXUnit = TimeSpan.FromSeconds(1).Ticks; //AxisXUnit = 10000000
             AxisYUnit = .5;
             AxisYMax = 3;
             AxisYMin = -3;
             AxisXSeconds = 40;
-            SetXaxisLimits(HiResDateTime.UtcNow.ToLocalTime());
+            SetXAxisLimits(HiResDateTime.UtcNow.ToLocalTime());
             Zoom = "Xy";
         }
         private void LoadDefaultSettings()
@@ -1218,13 +1218,13 @@ namespace GS.Server.Pulses
             AnimationTimes = new List<int>(Enumerable.Range(0, 10));
             Smoothness = new List<int>(Enumerable.Range(0, 10));
             PointSizes = new List<int>(Enumerable.Range(0, 20));
-            ScaleList = new List<ChartScale>() { ChartScale.Arcsecs, ChartScale.Milliseconds, ChartScale.Steps };
+            ScaleList = new List<ChartScale>() { ChartScale.ArcSecs, ChartScale.Milliseconds, ChartScale.Steps };
 
             AnimationTime = 0;
             AnimationsDisabled = true;
             LineSmoothness = 0;
             MaxPoints = 3000;
-            Scale = ChartScale.Arcsecs;
+            Scale = ChartScale.ArcSecs;
 
             PhdHostText = "LocalHost";
 
@@ -1354,7 +1354,7 @@ namespace GS.Server.Pulses
                 case ChartScale.Milliseconds:
                     value = duration;
                     break;
-                case ChartScale.Arcsecs:
+                case ChartScale.ArcSecs:
                     value = arcsecs;
                     break;
                 case ChartScale.Steps:
@@ -1439,7 +1439,7 @@ namespace GS.Server.Pulses
             AxisYMax -= double.NaN;
             AxisYMin += double.NaN;
         }
-        private void SetXaxisLimits(DateTime now)
+        private void SetXAxisLimits(DateTime now)
         {
             AxisXMax = now.Ticks + AxisXUnit * 2;
             AxisXMin = now.Ticks - AxisXUnit * AxisXSeconds;
@@ -1448,7 +1448,7 @@ namespace GS.Server.Pulses
         {
             return new SolidColorBrush(System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B));
         }
-        private static GColumnSeries NewGColumnSeries(string title, IChartValues values, ChartValueSet set, int pointsize, Brush color, int scaleat)
+        private static GColumnSeries NewGColumnSeries(string title, IChartValues values, ChartValueSet set, int pointSize, Brush color, int scaleAt)
         {
             var series = new GColumnSeries
             {
@@ -1457,15 +1457,15 @@ namespace GS.Server.Pulses
                 MinWidth = 1,
                 PointGeometry = DefaultGeometries.Diamond,
                 Stroke = color,
-                StrokeThickness = pointsize,
-                ScalesYAt = scaleat,
+                StrokeThickness = pointSize,
+                ScalesYAt = scaleAt,
                 Title = title,
                 Values = values
             };
             LogGColumnSeries(series, set);
             return series;
         }
-        private GLineSeries NewGLineSeries(string title, IChartValues values, ChartValueSet set, int pointsize, Brush color, int scaleat)
+        private GLineSeries NewGLineSeries(string title, IChartValues values, ChartValueSet set, int pointSize, Brush color, int scaleAt)
         {
             var series = new GLineSeries
             {
@@ -1475,9 +1475,9 @@ namespace GS.Server.Pulses
                 Stroke = color,
                 StrokeThickness = 1,
                 PointGeometry = DefaultGeometries.Diamond,
-                PointGeometrySize = pointsize,
+                PointGeometrySize = pointSize,
                 PointForeground = color,
-                ScalesYAt = scaleat,
+                ScalesYAt = scaleAt,
                 Title = title,
                 Values = values
             };
@@ -1485,16 +1485,16 @@ namespace GS.Server.Pulses
             LogGLineSeries(series, set);
             return series;
         }
-        private static GScatterSeries NewGScatterSeries(string title, IChartValues values, ChartValueSet set, int pointsize, Brush color, int scaleat)
+        private static GScatterSeries NewGScatterSeries(string title, IChartValues values, ChartValueSet set, int pointSize, Brush color, int scaleAt)
         {
             var series = new GScatterSeries
             {
                 Fill = color,
                 MinWidth = 1,
                 Stroke = color,
-                StrokeThickness = pointsize,
+                StrokeThickness = pointSize,
                 PointGeometry = DefaultGeometries.Diamond,
-                ScalesYAt = scaleat,
+                ScalesYAt = scaleAt,
                 Title = title,
                 Values = values
             };
@@ -1502,7 +1502,7 @@ namespace GS.Server.Pulses
             LogGScatterSeries(series, set);
             return series;
         }
-        private static GStepLineSeries NewGStepLineSeries(string title, IChartValues values, ChartValueSet set, int pointsize, Brush color, int scaleat)
+        private static GStepLineSeries NewGStepLineSeries(string title, IChartValues values, ChartValueSet set, int pointSize, Brush color, int scaleAt)
         {
             var series = new GStepLineSeries()
             {
@@ -1511,9 +1511,9 @@ namespace GS.Server.Pulses
                 Stroke = color,
                 StrokeThickness = 1,
                 PointGeometry = DefaultGeometries.Diamond,
-                PointGeometrySize = pointsize,
+                PointGeometrySize = pointSize,
                 PointForeground = color,
-                ScalesYAt = scaleat,
+                ScalesYAt = scaleAt,
                 Title = title,
                 Values = values
             };
@@ -1521,26 +1521,26 @@ namespace GS.Server.Pulses
             LogGStepLineSeries(series, set);
             return series;
         }
-        private TitleItem CreateSeries(string serColor, string title, ChartSeriesType seriesType, IChartValues values, ChartValueSet seriesSet, int pointsize, int scaleat)
+        private TitleItem CreateSeries(string serColor, string title, ChartSeriesType seriesType, IChartValues values, ChartValueSet seriesSet, int pointSize, int scaleAt)
         {
             var brush = ToBrush(Color.FromName(serColor));
             var titleItem = new TitleItem { TitleName = title, Fill = brush };
             switch (seriesType)
             {
                 case ChartSeriesType.GLineSeries:
-                    var lSeries = NewGLineSeries(title, values, seriesSet, pointsize, brush, scaleat);
+                    var lSeries = NewGLineSeries(title, values, seriesSet, pointSize, brush, scaleAt);
                     PulsesCollection.Add(lSeries);
                     return titleItem;
                 case ChartSeriesType.GColumnSeries:
-                    var cSeries = NewGColumnSeries(title, values, seriesSet, pointsize, brush, scaleat);
+                    var cSeries = NewGColumnSeries(title, values, seriesSet, pointSize, brush, scaleAt);
                     PulsesCollection.Add(cSeries);
                     return titleItem;
                 case ChartSeriesType.GStepLineSeries:
-                    var sSeries = NewGStepLineSeries(title, values, seriesSet, pointsize, brush, scaleat);
+                    var sSeries = NewGStepLineSeries(title, values, seriesSet, pointSize, brush, scaleAt);
                     PulsesCollection.Add(sSeries);
                     return titleItem;
                 case ChartSeriesType.GScatterSeries:
-                    var scSeries = NewGScatterSeries(title, values, seriesSet, pointsize, brush, scaleat);
+                    var scSeries = NewGScatterSeries(title, values, seriesSet, pointSize, brush, scaleAt);
                     PulsesCollection.Add(scSeries);
                     return titleItem;
             }
@@ -1748,7 +1748,7 @@ namespace GS.Server.Pulses
 
                 _phd = new GuiderImpl(PhdHostText, 1, _ctsPhd);
                 _phd.Connect();
-                PhdBadgeContent = _phd.IsConnected() ? Application.Current.Resources["bdgPhdStart"].ToString() : "";
+                PhdBadgeContent = _phd.IsConnected() ? Application.Current.Resources["pulOn"].ToString() : "";
                 Mouse.OverrideCursor = null;
 
                 IsPhdRunning = true;
@@ -1813,7 +1813,7 @@ namespace GS.Server.Pulses
                 return false;
             }
             var con = _phd.IsConnected();
-            PhdBadgeContent = con ? Application.Current.Resources["bdgPhdStart"].ToString() : "";
+            PhdBadgeContent = con ? Application.Current.Resources["pulOn"].ToString() : "";
             return con;
         }
         private void ProcessPhd(GuideStep entry)
@@ -1836,7 +1836,7 @@ namespace GS.Server.Pulses
                         case ChartScale.Milliseconds:
                             val = arcsecs / 3600 / Math.Abs(SkyServer.GuideRateRa) * 1000;
                             break;
-                        case ChartScale.Arcsecs:
+                        case ChartScale.ArcSecs:
                             val = arcsecs;
                             break;
                         case ChartScale.Steps:
@@ -1869,7 +1869,7 @@ namespace GS.Server.Pulses
                         case ChartScale.Milliseconds:
                             val = arcsecs / 3600 / Math.Abs(SkyServer.GuideRateDec) * 1000;
                             break;
-                        case ChartScale.Arcsecs:
+                        case ChartScale.ArcSecs:
                             val = arcsecs;
                             break;
                         case ChartScale.Steps:
@@ -2016,7 +2016,7 @@ namespace GS.Server.Pulses
         private void OpenDialog(string msg, string caption = null)
         {
             if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["msgDialog"].ToString();
+            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
             DialogContent = new DialogOK();
             IsDialogOpen = true;
 

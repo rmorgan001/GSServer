@@ -18,57 +18,51 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <!--Window Title bar-->
-    <system:String x:Key="lbName">GS Server</system:String>
-    <system:String x:Key="lbApps">Connected Applications:</system:String>
-    <system:String x:Key="tbCloseApps">Application(s) still connected. Accept to close anyway?</system:String>
-    <system:String x:Key="taskbarDescription">GreenSwamp Server</system:String>
-
     <!--Dialog -->
-    <system:String x:Key="btnAccept">Accept</system:String>
-    <system:String x:Key="btnCancel">Cancel</system:String>
-    <system:String x:Key="btnOk">Ok</system:String>
-    <system:String x:Key="btnStart">Start</system:String>
-    <system:String x:Key="btnDiaStop">Stop</system:String>
+    <system:String x:Key="diaAccept">Accept</system:String>
+    <system:String x:Key="diaCancel">Cancel</system:String>
+    <system:String x:Key="diaOk">Ok</system:String>
+    <system:String x:Key="diaStart">Start</system:String>
+    <system:String x:Key="diaStop">Stop</system:String>
 
     <!--Converters -->
     <system:String x:Key="cvtInvNumber">Invalid Number</system:String>
-    <system:String x:Key="cvtColorToBrush">ColorToBurshConverter only supports converting from Color and String</system:String>
+    <system:String x:Key="cvtColorToBrush">ColorToBrushConverter only supports converting from Color and String</system:String>
     <system:String x:Key="cvtEnumErr1">Type must be for an Enum</system:String>
     <system:String x:Key="cvtEnumErr2">The EnumType must be specified</system:String>
     <system:String x:Key="cvtInvIP">Invalid IP</system:String>
     <system:String x:Key="cvtRequired">Required</system:String>
 
     <!--Utilities-->
-    <system:String x:Key="cbDelLogFiles">Log Files</system:String>
-    <system:String x:Key="cbDelSettings">Settings</system:String>
-    <system:String x:Key="btnDelFiles">Delete</system:String>
-    <system:String x:Key="msgDelFiles">Delete GS files and settings</system:String>
-    <system:String x:Key="btnExit">Exit</system:String>
-    <system:String x:Key="btnDelAccept">Accept</system:String>
-    <system:String x:Key="btnDelCancel">Cancel</system:String>
-    <system:String x:Key="msgDelFilesOk">Accept to delete?</system:String>
-    <system:String x:Key="msgDelLogFiles">Log files deleted</system:String>
-    <system:String x:Key="msgDelSettings">Setting files deleted</system:String>
-    <system:String x:Key="msgDelSettingsVer">Setting versions deleted</system:String>
-    <system:String x:Key="msgDelCloseApps">Close any open GS applications</system:String>
-    <system:String x:Key="msgUtilLockTitle">Running test: is GS Server running or locked</system:String>
-    <system:String x:Key="btnUtilCheck">Check</system:String>
-    <system:String x:Key="btnUtilChooser">Chooser</system:String>
-    <system:String x:Key="btnUtilChooserTitle">Connection test: to the telescope driver</system:String>
-    <system:String x:Key="btnUtilStart">Start</system:String>
-    <system:String x:Key="btnUtilStop">Stop</system:String>
-    <system:String x:Key="tbUtilSerial">Serial Test:</system:String>
-    <system:String x:Key="tbUtilComPort">ComPort</system:String>
-    <system:String x:Key="tbUtilTimeout">Timeout Occured Event #</system:String>
-    <system:String x:Key="tbUtilProcessName">Process Name:</system:String>
-    <system:String x:Key="tbUtilId">Id:</system:String>
-    <system:String x:Key="tbUtilLocks">Locks:</system:String>
-    <system:String x:Key="tbUtilCounter">Counter:</system:String>
-    <system:String x:Key="tbUtilTimer">Timer:</system:String>
-    <system:String x:Key="tbUtilNothing">Nothing found</system:String>
-    <system:String x:Key="tbUtilBaudRate">BaudRate</system:String>
-    <system:String x:Key="tbUtilInterval">Interval</system:String>
-    <system:String x:Key="msgNotfound">Not found</system:String>
+    <system:String x:Key="utilLogFiles">Log Files</system:String>
+    <system:String x:Key="utilSettings">Settings</system:String>
+    <system:String x:Key="utilDelete">Delete</system:String>
+    <system:String x:Key="utilDelFiles">Delete GS files and settings</system:String>
+    <system:String x:Key="utilExit">Exit</system:String>
+    <system:String x:Key="utilAccept">Accept</system:String>
+    <system:String x:Key="utilCancel">Cancel</system:String>
+    <system:String x:Key="utilAccDelFiles">Accept to delete?</system:String>
+    <system:String x:Key="utilDelLogFiles">Log files deleted</system:String>
+    <system:String x:Key="utilDelSettings">Setting files deleted</system:String>
+    <system:String x:Key="utilDelSettingsVer">Setting versions deleted</system:String>
+    <system:String x:Key="utilCloseApps">Close any open GS applications</system:String>
+    <system:String x:Key="utilLockTitle">Running test: is GS Server running or locked</system:String>
+    <system:String x:Key="utilCheck">Check</system:String>
+    <system:String x:Key="utilChooser">Chooser</system:String>
+    <system:String x:Key="utilChooserTitle">Connection test: to the telescope driver</system:String>
+    <system:String x:Key="utilStart">Start</system:String>
+    <system:String x:Key="utilStop">Stop</system:String>
+    <system:String x:Key="utilSerial">Serial Test:</system:String>
+    <system:String x:Key="utilComPort">ComPort</system:String>
+    <system:String x:Key="utilTimeout">Timeout Occurred Event #</system:String>
+    <system:String x:Key="utilProcessName">Process Name:</system:String>
+    <system:String x:Key="utilId">Id:</system:String>
+    <system:String x:Key="utilLocks">Locks:</system:String>
+    <system:String x:Key="utilCounter">Counter:</system:String>
+    <system:String x:Key="utilTimer">Timer:</system:String>
+    <system:String x:Key="utilNothing">Nothing found</system:String>
+    <system:String x:Key="utilBaudRate">BaudRate</system:String>
+    <system:String x:Key="utilInterval">Interval</system:String>
+    <system:String x:Key="utilNotFound">Not found</system:String>
 </ResourceDictionary>
  

@@ -3,26 +3,27 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" >
-    <GroupBox Header="{StaticResource btnOCheckUpdates}" Margin="5">
+        xmlns:settings="clr-namespace:GS.Server.Settings"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance settings:SettingsVM}">
+    <GroupBox Header="{StaticResource optCheckUpdates}" Margin="5">
         <StackPanel Orientation="Vertical">
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                 <TextBlock Margin="5,0,0,0">
                     <Span xml:space="preserve"><Run>If GS Server is useful please consider a </Run><Hyperlink Command="{Binding ClickDonateCmd}">donation</Hyperlink></Span>
                 </TextBlock>
                 <StackPanel Orientation="Horizontal" Margin="5,20,0,0">
-                    <TextBlock Text="{StaticResource tbOCurrentVer}"/>
+                    <TextBlock Text="{StaticResource optCurrentVer}"/>
                     <TextBlock Text="{Binding CurrentVersion}" Margin="5,0,0,0" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="5">
-                    <TextBlock Text="{StaticResource tbOUpdateVer}" />
-                    <TextBlock Text="{Binding UpdatetVersion}" Margin="5,0,0,0"  />
+                    <TextBlock Text="{StaticResource optUpdateVer}" />
+                    <TextBlock Text="{Binding UpdateVersion}" Margin="5,0,0,0"  />
                 </StackPanel>
                 
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="5" HorizontalAlignment="Center">
-                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding ClickDownloadUpdateCmd}" Content="{StaticResource btnODownload}" IsEnabled="{Binding UpdateEnabled}"/>
-                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelUpdateDialogCmd}" Content="{StaticResource btnCancel}"/>
+                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding ClickDownloadUpdateCmd}" Content="{StaticResource optDownload}" IsEnabled="{Binding UpdateEnabled}"/>
+                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelUpdateDialogCmd}" Content="{StaticResource diaCancel}"/>
             </StackPanel>
         </StackPanel>
     </GroupBox>

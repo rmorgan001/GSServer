@@ -8,15 +8,15 @@
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanResizeWithGrip" WindowStyle="None" 
         TextOptions.TextFormattingMode="Display" Height="{Binding WinHeight}" Width="{Binding WinWidth}"
-        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Title="{StaticResource lbModel}" FontStretch="Normal" Topmost="{Binding TopMost}"
+        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Title="{StaticResource 3dModel}" FontStretch="Normal" Topmost="{Binding TopMost}"
         d:DataContext="{d:DesignInstance windows:ModelVM, IsDesignTimeCreatable=True}" 
         TextElement.Foreground="{DynamicResource MaterialDesignBody}" 
-        WindowState="{Binding Windowstate}" WindowStartupLocation="CenterOwner">
+        WindowState="{Binding WindowStates}" WindowStartupLocation="CenterOwner">
     <WindowChrome.WindowChrome>
         <WindowChrome ResizeBorderThickness="6" CaptionHeight="30" CornerRadius="5" GlassFrameThickness="1"/>
     </WindowChrome.WindowChrome>
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo Description="{StaticResource lbModel}" />
+        <TaskbarItemInfo Description="{StaticResource 3dModel}" />
     </Window.TaskbarItemInfo>
     <Grid Background="{DynamicResource MaterialDesignPaper}">
         <Grid.RowDefinitions>
@@ -41,9 +41,9 @@
                 </Grid.Style>
                 <controls:HelixViewport3D Margin="3" IsEnabled="{Binding ScreenEnabled, Mode=OneWay}" Background="{DynamicResource MaterialDesignPaper}"/>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom"  HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignPaper}">
-                <Label Content="{StaticResource lbTopRaShort}" />
+                <Label Content="{StaticResource topRaShort}" />
                 <Label Foreground="{StaticResource SecondaryAccentBrush}" Content="{Binding RightAscension}" />
-                <Label Content="{StaticResource lbTopDecShort}" />
+                <Label Content="{StaticResource topDecShort}" />
                 <Label Foreground="{StaticResource SecondaryAccentBrush}" Content="{Binding Declination}" />
             </StackPanel>
             </Grid>

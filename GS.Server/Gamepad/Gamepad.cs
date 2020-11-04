@@ -20,9 +20,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 
-namespace GS.Server.Gamepad
+namespace GS.Server.GamePad
 {
-    public sealed class Gamepad : IDisposable
+    public sealed class GamePad : IDisposable
     {
         private Joystick joystick;
         private Guid joystickGuid;
@@ -33,23 +33,23 @@ namespace GS.Server.Gamepad
         private JoystickState State { get; set; }
         public bool IsAvailable { get; private set; }
         public bool[] Buttons { get; private set; }
-        public int[] Povs { get; private set; }
-        public int Yaxis { get; private set; }
-        public int Xaxis { get; private set; }
-        public int Zaxis { get; private set; }
+        public int[] POVs { get; private set; }
+        public int YAxis { get; private set; }
+        public int XAxis { get; private set; }
+        public int ZAxis { get; private set; }
         // public IList<EffectInfo> AllEffects { get; private set; }
         // public IList<DeviceObjectInstance> DeviceObjects { get; set; }
         // public DeviceFlags DeviceFlags { get; private set; }
         // public DeviceInstance DeviceInfo { get; private set; }
         // public int PovCount { get; private set; }
         // public int AxisCount { get; private set; }
-        // public JoystickUpdate[] Datas { get; private set; }  // buffered data
+        // public JoystickUpdate[] Data { get; private set; }  // buffered data
 
         /// <summary>
         /// Constructor sets up and find a joystick
         /// </summary>
         /// <param name="window_handle"></param>
-        public Gamepad(IntPtr window_handle)
+        public GamePad(IntPtr window_handle)
         {
             hWnd = window_handle;
             LoadSettings();
@@ -59,7 +59,7 @@ namespace GS.Server.Gamepad
         }
 
         /// <summary>
-        /// Finds a valid joystick or gamepad that is attached
+        /// Finds a valid joystick or game pad that is attached
         /// </summary>
         public void Find()
         {
@@ -68,7 +68,7 @@ namespace GS.Server.Gamepad
                 foreach (var deviceInstance in directInput.GetDevices(DeviceType.Gamepad, DeviceEnumerationFlags.AttachedOnly))
                     joystickGuid = deviceInstance.InstanceGuid;
 
-                // If Gamepad not found, look for a Joystick
+                // If Game pad not found, look for a Joystick
                 if (joystickGuid == Guid.Empty)
                     foreach (var deviceInstance in directInput.GetDevices(DeviceType.Joystick, DeviceEnumerationFlags.AttachedOnly))
                         joystickGuid = deviceInstance.InstanceGuid;
@@ -84,7 +84,7 @@ namespace GS.Server.Gamepad
                 joystick = new Joystick(directInput, joystickGuid);
                 joystick.SetCooperativeLevel(hWnd, CooperativeLevel.Background | CooperativeLevel.Exclusive);
 
-                // Query suported info
+                // Query supported info
                 // AllEffects = joystick.GetEffects();
                 // DeviceObjects = joystick.GetObjects();
                 // DeviceInfo = joystick.Information;
@@ -141,11 +141,11 @@ namespace GS.Server.Gamepad
                 State = null;
                 State = joystick.GetCurrentState();
                 Buttons = State.Buttons;
-                Povs = State.PointOfViewControllers;
-                Xaxis = State.X;
-                Yaxis = State.Y;
-                Zaxis = State.Z;
-                // Datas = joystick.GetBufferedData();
+                POVs = State.PointOfViewControllers;
+                XAxis = State.X;
+                YAxis = State.Y;
+                ZAxis = State.Z;
+                // Data = joystick.GetBufferedData();
             }
             catch (Exception ex)
             {
@@ -270,7 +270,7 @@ namespace GS.Server.Gamepad
         }
 
         /// <summary>
-        /// PoV commands to int coversions
+        /// PoV commands to int conversions
         /// </summary>
         /// <param name="degrees"></param>
         /// <returns></returns>
@@ -306,14 +306,14 @@ namespace GS.Server.Gamepad
 
         private void LoadSettings()
         {
-            GamepadSettings.Load();
-            _settingsDict = GamepadSettings.LoadSettings();
+            GamePadSettings.Load();
+            _settingsDict = GamePadSettings.LoadSettings();
         }
 
         public void SaveSettings()
         {
             if (_settingsDict == null) return;
-            GamepadSettings.SaveSettings(_settingsDict);
+            GamePadSettings.SaveSettings(_settingsDict);
         }
 
         /// <inheritdoc />
@@ -332,7 +332,7 @@ namespace GS.Server.Gamepad
     /// <summary>
     /// Used to store PoV commands
     /// </summary>
-    internal struct PovPair
+    internal readonly struct PovPair
     {
         public readonly int Key;
         public readonly int Value;
@@ -347,7 +347,7 @@ namespace GS.Server.Gamepad
     /// <summary>
     /// Used to store X Y Z commands
     /// </summary>
-    internal struct AxisPair
+    internal readonly struct AxisPair
     {
         public readonly int Key;
         public readonly string Value;

@@ -29,7 +29,6 @@ namespace GS.Utilities.Main
             Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles);
         private static readonly string _gsDir = "\\ASCOM\\Telescope\\GSServer\\";
         private static string _gsFilePath = _commonDir + _gsDir + "GS.Server.exe";
-        // private static string _gsTelescopeFilePath = _commonDir + _gsDir + "Drivers\\ASCOM.GS.Sky.Telescope.dll";
 
         //serial test
         private static Timer aTimer;
@@ -199,7 +198,7 @@ namespace GS.Utilities.Main
             try
             {
                 Connect = null;
-                var msg = $"{Application.Current.Resources["msgNotfound"]}";
+                var msg = $"{Application.Current.Resources["utilNotFound"]}";
                 var util = new ASCOM.Utilities.Chooser();
                 var progID = util.Choose("ASCOM.GS.Sky.Telescope");
                 if (progID != null)
@@ -324,7 +323,7 @@ namespace GS.Utilities.Main
                 if (string.IsNullOrEmpty(receivedData))
                 {
                     Stop();
-                    throw new Exception($"{Application.Current.Resources["tbUtilTimeout"]} {counter}");
+                    throw new Exception($"{Application.Current.Resources["utilTimeout"]} {counter}");
                 }
 
                 var zoomtxt = string.Empty;
@@ -338,7 +337,7 @@ namespace GS.Utilities.Main
                     delegate
                     {
                         SerMsg =
-                            $"{Application.Current.Resources["tbUtilCounter"]} {counter} {Application.Current.Resources["tbUtilTimer"]} {_startTime.Elapsed:hh\\:mm\\:ss\\.fff}, {commandStr} {receivedData} {zoomtxt}";
+                            $"{Application.Current.Resources["utilCounter"]} {counter} {Application.Current.Resources["utilTimer"]} {_startTime.Elapsed:hh\\:mm\\:ss\\.fff}, {commandStr} {receivedData} {zoomtxt}";
                     });
                 aTimer.Interval = Interval;
 
@@ -428,7 +427,7 @@ namespace GS.Utilities.Main
             {
                 if (IsGSAppOpen("GS.Server"))
                 {
-                    var str = $"{Application.Current.Resources["msgDelCloseApps"]}" + Environment.NewLine;
+                    var str = $"{Application.Current.Resources["utilCloseApps"]}" + Environment.NewLine;
                     OpenDialog(str);
                     return;
                 }
@@ -551,21 +550,19 @@ namespace GS.Utilities.Main
                         if (process.ProcessName != "GS.Server") continue;
                         var gsProcess = process;
                         msg =
-                            $"{Application.Current.Resources["tbUtilProcessName"]}  {gsProcess.ProcessName} {Application.Current.Resources["tbUtilId"]}  {gsProcess.Id}";
-                        //var gsModules = FileUtil.CollectModules(pro);
-                        // Console.WriteLine("Process: {0} ID: {1}", theprocess.ProcessName, theprocess.Id);
+                            $"{Application.Current.Resources["utilProcessName"]}  {gsProcess.ProcessName} {Application.Current.Resources["utilId"]}  {gsProcess.Id}";
                     }
                 }
 
                 var progList = FileUtil.WhoIsLocking(_gsFilePath);
                 if (progList.Count > 0)
                 {
-                    msg += $" { Application.Current.Resources["tbUtilLocks"]} { progList.Count}";
+                    msg += $" { Application.Current.Resources["utilLocks"]} { progList.Count}";
                     var combindedString = string.Join(Environment.NewLine, progList);
                     OpenDialog(combindedString);
                 }
 
-                if (msg == string.Empty) { msg = $"{Application.Current.Resources["tbUtilNothing"]}"; }
+                if (msg == string.Empty) { msg = $"{Application.Current.Resources["utilNothing"]}"; }
 
                 FileLocked = msg;
             }
@@ -673,7 +670,7 @@ namespace GS.Utilities.Main
                 {
                     if (IsGSAppOpen("GS.Server") || IsGSAppOpen("GS.ChartViewer"))
                     {
-                        var str = $"{Application.Current.Resources["msgDelCloseApps"]}" + Environment.NewLine;
+                        var str = $"{Application.Current.Resources["utilCloseApps"]}" + Environment.NewLine;
                         OpenDialog(str);
                         return;
                     }
@@ -739,7 +736,7 @@ namespace GS.Utilities.Main
                             }
                         }
 
-                        msg = $"{cntLogs} {Application.Current.Resources["msgDelLogFiles"]}" + Environment.NewLine;
+                        msg = $"{cntLogs} {Application.Current.Resources["utilDelLogFiles"]}" + Environment.NewLine;
                     }
 
                     var cntSettings = 0;
@@ -787,8 +784,8 @@ namespace GS.Utilities.Main
                             }
                         }
 
-                        msg += $"{cntSettings} {Application.Current.Resources["msgDelSettings"]}" + Environment.NewLine;
-                        msg += $"{cntSettingsDir} {Application.Current.Resources["msgDelSettingsVer"]}" +
+                        msg += $"{cntSettings} {Application.Current.Resources["utilDelSettings"]}" + Environment.NewLine;
+                        msg += $"{cntSettingsDir} {Application.Current.Resources["utilDelSettingsVer"]}" +
                                Environment.NewLine;
                     }
 
@@ -955,7 +952,6 @@ namespace GS.Utilities.Main
         }
         private async void ExecuteMessageDialog()
         {
-            //let's set up a little MVVM, cos that's what the cool kids are doing:
             var view = new ErrorMessageDialog
             {
                 DataContext = new ErrorMessageDialogVM()

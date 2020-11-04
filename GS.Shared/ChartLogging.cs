@@ -73,21 +73,21 @@ namespace GS.Shared
         /// <summary>
         /// adds a item to a blocking queue
         /// </summary>
-        /// <param name="logitem"></param>
-        private static void AddEntry(ChartLogItem logitem)
+        /// <param name="logItem"></param>
+        private static void AddEntry(ChartLogItem logItem)
         {
-            _chartBlockingCollection.TryAdd(logitem);
+            _chartBlockingCollection.TryAdd(logItem);
         }
 
         /// <summary>
         /// Process item from the blocking queue
         /// </summary>
-        /// <param name="logitem"></param>
-        private static void ProcessChartQueueItem(ChartLogItem logitem)
+        /// <param name="logItem"></param>
+        private static void ProcessChartQueueItem(ChartLogItem logItem)
         {
             try
             {
-                if (logitem.Message != string.Empty) FileWriteAsync(_fileLocation + "GS" + logitem.LogBaseName + _fileNameAddOn + _instanceFileName, logitem);
+                if (logItem.Message != string.Empty) FileWriteAsync(_fileLocation + "GS" + logItem.LogBaseName + _fileNameAddOn + _instanceFileName, logItem);
             }
             catch (Exception ex)
             {
@@ -110,15 +110,15 @@ namespace GS.Shared
         /// Deletes files by name, how old, and dir path
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="daysold"></param>
+        /// <param name="daySold"></param>
         /// <param name="path"></param>
-        private static void DeleteFiles(string name, int daysold, string path)
+        private static void DeleteFiles(string name, int daySold, string path)
         {
             var files = Directory.GetFiles(path);
             foreach (var file in files)
             {
                 var fi = new FileInfo(file);
-                if (fi.Name.Contains(name) && fi.CreationTime < (DateTime.Now - new TimeSpan(daysold, 0, 0, 0))) fi.Delete();
+                if (fi.Name.Contains(name) && fi.CreationTime < (DateTime.Now - new TimeSpan(daySold, 0, 0, 0))) fi.Delete();
             }
         }
 
@@ -126,9 +126,9 @@ namespace GS.Shared
         /// Send entries to a file async
         /// </summary>
         /// <param name="filePath"></param>
-        /// <param name="logitem"></param>
+        /// <param name="logItem"></param>
         /// <param name="append"></param>
-        private static async void FileWriteAsync(string filePath, ChartLogItem logitem, bool append = true)
+        private static async void FileWriteAsync(string filePath, ChartLogItem logItem, bool append = true)
         {
             await _lockFile.WaitAsync();
             try
@@ -137,7 +137,7 @@ namespace GS.Shared
                 using (var stream = new FileStream(filePath, append ? FileMode.Append : FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
                 using (var sw = new StreamWriter(stream))
                 {
-                    var str = $"{(int)logitem.ChartType},{(int)logitem.LogCode},{logitem.Message}";
+                    var str = $"{(int)logItem.ChartType},{(int)logItem.LogCode},{logItem.Message}";
                     await sw.WriteLineAsync(str);
                 }
             }
@@ -169,13 +169,13 @@ namespace GS.Shared
             AddEntry(chartsLogItem);
         }
 
-        public static void LogInfo(string basename, ChartType type, string value)
-        {
-            if (!IsRunning) return;
-            var str = $"{HiResDateTime.UtcNow.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{value}";
-            var chartsLogItem = new ChartLogItem { LogBaseName = basename, ChartType = type, LogCode = ChartLogCode.Info, Message = str };
-            AddEntry(chartsLogItem);
-        }
+        //public static void LogInfo(string basename, ChartType type, string value)
+        //{
+        //    if (!IsRunning) return;
+        //    var str = $"{HiResDateTime.UtcNow.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{value}";
+        //    var chartsLogItem = new ChartLogItem { LogBaseName = basename, ChartType = type, LogCode = ChartLogCode.Info, Message = str };
+        //    AddEntry(chartsLogItem);
+        //}
 
         public static void LogData(string basename, ChartType type, string key, string value)
         {
@@ -235,7 +235,7 @@ namespace GS.Shared
     public enum ChartScale
     {
         Milliseconds = 1,
-        Arcsecs = 2,
+        ArcSecs = 2,
         Steps = 3,
         Unknown = 4
     }

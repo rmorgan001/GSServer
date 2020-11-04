@@ -33,16 +33,16 @@ namespace GS.Principles
         /// <param name="ha">Decimal Hour Angle of Star Center</param>
         /// <param name="dec">Decimal Declination of Star Center</param>
         /// <param name="dha">Decimal Hour Angle Difference from Star to Delta</param>
-        /// <param name="ddec">Decimal Declination Difference from Star to Delta</param>
+        /// <param name="dDec">Decimal Declination Difference from Star to Delta</param>
         /// <param name="lat">Decimal Latitude</param>
         /// <returns>Amount of Error in Degrees in Alt and Az</returns>
-        public static double[] AlignmentError(double ha, double dec, double dha, double ddec, double lat)
+        public static double[] AlignmentError(double ha, double dec, double dha, double dDec, double lat)
         {
             var ret = new[] { 0.0, 0.0 };
             var a = Units.Deg2Rad(ha * 15.0);
             var b = Units.Deg2Rad(dha * 15.0);
             var c = Units.Deg2Rad(dec);
-            var d = Units.Deg2Rad(ddec);
+            var d = Units.Deg2Rad(dDec);
             var e = Units.Deg2Rad(lat);
 
             var i = Math.Sin(a);
@@ -72,11 +72,11 @@ namespace GS.Principles
         /// <remarks>Julius Scheiner (b1858-d1913)</remarks>
         /// <param name="ha">Decimal Hour Angle of Target Star</param>
         /// <param name="dec">Decimal Declination of Target Star</param>
-        /// <param name="alterr">Decimal Altitude Error to be Applied</param>
-        /// <param name="azerr">Decimal Azimuth Error to be applied</param>
+        /// <param name="altErr">Decimal Altitude Error to be Applied</param>
+        /// <param name="azErr">Decimal Azimuth Error to be applied</param>
         /// <param name="lat">Decimal Latitude</param>
         /// <returns>Adjustments in Degrees for Ha and Dec</returns>
-        public static IEnumerable<double> AlignmentAdjustment(double ha, double dec, double alterr, double azerr, double lat)
+        public static IEnumerable<double> AlignmentAdjustment(double ha, double dec, double altErr, double azErr, double lat)
         {
             var ret = new[] { 0.0, 0.0 };
             var a = Units.Deg2Rad(ha * 15.0);
@@ -93,8 +93,8 @@ namespace GS.Principles
             var u = l - j * m * k;
             var v = m * i;
 
-            var x = (t * alterr + u * azerr);
-            var y = (j * alterr + v * azerr);
+            var x = (t * altErr + u * azErr);
+            var y = (j * altErr + v * azErr);
 
             ret[0] = Units.Rad2Deg(x) / 15;
             ret[1] = Units.Rad2Deg(y);

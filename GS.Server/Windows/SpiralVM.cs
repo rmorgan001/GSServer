@@ -59,7 +59,7 @@ namespace GS.Server.Windows
                     SkySettings.StaticPropertyChanged += PropertyChangedSkySettings;
 
 
-                    Title = $"GSS {Application.Current.Resources["winSpiralSearch"]}";
+                    Title = $"GSS {Application.Current.Resources["1021SpiralSearch"]}";
                     ScreenEnabled = SkyServer.IsMountRunning;
                     TopMost = false;
                     Distance = SkySettings.SpiralDistance.ToString(CultureInfo.InvariantCulture);
@@ -147,7 +147,7 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -189,7 +189,7 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -896,7 +896,7 @@ namespace GS.Server.Windows
             {
                 if (_selectedDot == value) return;
                 _selectedDot = value;
-                GotoHeader = $"{Application.Current.Resources["btnGoTo"]} {value}";
+                GotoHeader = $"{Application.Current.Resources["goGoTo"]} {value}";
                 OnPropertyChanged();
             }
         }
@@ -988,7 +988,7 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -1029,7 +1029,7 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -1076,7 +1076,7 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -1124,7 +1124,7 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -1171,7 +1171,7 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
         
@@ -1255,7 +1255,7 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
 
         }
@@ -1298,7 +1298,7 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -1333,7 +1333,7 @@ namespace GS.Server.Windows
                         var flipRequired = Axes.IsFlipRequired(new[] { radec.X, radec.Y });
                         if (flipRequired)
                         {
-                            OpenDialog($"{Application.Current.Resources["msgFlipLimit"]}");  
+                            OpenDialog($"{Application.Current.Resources["1021FlipLimit"]}");  
                             return;
                         }
                     }
@@ -1364,7 +1364,7 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -1410,7 +1410,7 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -1456,7 +1456,7 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -1502,7 +1502,7 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -1548,7 +1548,7 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -1593,7 +1593,7 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["Error"]}");
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -2008,7 +2008,7 @@ namespace GS.Server.Windows
         private void OpenDialog(string msg, string caption = null)
         {
             if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["msgDialog"].ToString();
+            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
             DialogContent = new DialogOK();
             IsDialogOpen = true;
 

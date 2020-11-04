@@ -78,14 +78,14 @@ namespace GS.Server.Settings
             }
         }
 
-        private static bool _gamepad;
-        public static bool Gamepad
+        private static bool _gamePad;
+        public static bool GamePad
         {
-            get => _gamepad;
+            get => _gamePad;
             set
             {
-                if (_gamepad == value) return;
-                _gamepad = value;
+                if (_gamePad == value) return;
+                _gamePad = value;
                 Properties.Server.Default.Gamepad = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
@@ -485,7 +485,7 @@ namespace GS.Server.Settings
             Charting = Properties.Server.Default.Charting;
             Focuser = Properties.Server.Default.Focuser;
             DisableHardwareAcceleration = Properties.Server.Default.DisableHardwareAcceleration;
-            Gamepad = Properties.Server.Default.Gamepad;
+            GamePad = Properties.Server.Default.Gamepad;
             Notes = Properties.Server.Default.Notes;
             SkyWatcher = Properties.Server.Default.SkyWatcher;
             Model3D = Properties.Server.Default.Model3D;
