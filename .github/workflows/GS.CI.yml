@@ -56,10 +56,7 @@ jobs:
     env:
       Solution_Name: GSSolution.sln                             # Replace with your solution name, i.e. MyWpfApp.sln.
      
-    steps:
-      - name: Path
-        run: echo "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
-              
+    steps:             
       - name: Checkout
         uses: actions/checkout@v2
         with:
