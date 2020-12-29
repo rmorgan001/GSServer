@@ -58,7 +58,7 @@ jobs:
      
     steps:
       - name: Path
-        run: echo "C:/Program Files (x86)/Etc" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+        run: echo "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
               
       - name: Checkout
         uses: actions/checkout@v2
