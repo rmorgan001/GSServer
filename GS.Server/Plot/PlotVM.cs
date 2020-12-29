@@ -567,7 +567,7 @@ namespace GS.Server.Plot
             AxisXMin = now.Ticks - AxisXUnit * AxisXSeconds;
         }
 
-        private GColumnSeries NewGColumnSeries(string title, IChartValues values, ChartValueSet set, double pointsize, Brush color, int scaleat)
+        private GColumnSeries NewGColumnSeries(string title, IChartValues values, ChartValueSet set, double pointSize, Brush color, int scaleAt)
         {
             var series = new GColumnSeries
             {
@@ -576,8 +576,8 @@ namespace GS.Server.Plot
                 MinWidth = 1,
                 PointGeometry = DefaultGeometries.Diamond,
                 Stroke = color,
-                StrokeThickness = pointsize,
-                ScalesYAt = scaleat,
+                StrokeThickness = pointSize,
+                ScalesYAt = scaleAt,
                 Title = title,
                 Values = values
             };

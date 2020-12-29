@@ -4,7 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+             xmlns:domain="clr-namespace:GS.Server.Domain"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <domain:BoolToVisClapConverter x:Key="BoolToClap" />
+        </ResourceDictionary>
+    </UserControl.Resources>
     <StackPanel Orientation="Vertical" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="5,30,0,0">
         <StackPanel Orientation="Horizontal" >
             <TextBlock Text="{StaticResource goRa}" />
@@ -14,18 +20,17 @@
             <TextBlock Text="{StaticResource goDec}" />
             <TextBlock Margin="5,0,0,0" Text="{Binding ActualAxisY, StringFormat={}{0}°}" Foreground="{StaticResource SecondaryAccentBrush}"/>
         </StackPanel>
-        <TextBlock/>
-        <StackPanel Orientation="Horizontal" Margin="60,236,0,0">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
             <TextBlock Text="{StaticResource bugSiderealTime}" />
-            <TextBlock Margin="5,0,0,0" Text="{Binding SiderealTime}" Foreground="{StaticResource SecondaryAccentBrush}"/>
+            <TextBlock Margin="5,0,0,0" Text="{Binding SiderealTime}" Foreground="{StaticResource SecondaryAccentBrush}" />
         </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <!--<Button Margin="5,10,0,0" Width="100"
-                    Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                    Command="{Binding ClickTestCommand}">
-                Test
-            </Button>-->
+        <StackPanel Orientation="Horizontal" Visibility="{Binding PecShow, Converter={StaticResource BoolToClap}}">
+            <TextBlock Text="Rate:" />
+            <TextBlock Margin="5,0,0,0" Text="{Binding CurTrackingRate, StringFormat={}{0}°}" Foreground="{StaticResource SecondaryAccentBrush}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Visibility="{Binding PecShow, Converter={StaticResource BoolToClap}}">
+            <TextBlock Text="Pec:" />
+            <TextBlock Margin="5,0,0,0" Text="{Binding PecBinNow}" Foreground="{StaticResource SecondaryAccentBrush}" />
         </StackPanel>
     </StackPanel>
-
 </UserControl>

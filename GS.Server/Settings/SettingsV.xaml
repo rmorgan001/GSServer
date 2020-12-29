@@ -51,6 +51,7 @@
             </DataTemplate>
             <domain:ColorToBrushConverter x:Key="ColorToBrush"/>
             <domain:UtcToLocalDateTimeConverter x:Key="UTCtoLocal" />
+            <domain:BoolToVisClapConverter x:Key="BoolToClap" />
         </ResourceDictionary>
     </UserControl.Resources>
     <md:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" >
@@ -171,10 +172,6 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Orientation="Vertical" HorizontalAlignment="Left">
                             <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optTabs}"/>
-                            <StackPanel Orientation="Horizontal" Width="Auto">
-                                <CheckBox Height="25" Width="25" IsChecked="{Binding SkyWatcher}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optSkyWatcher}"/>
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optSkyWatcher}"/>
-                            </StackPanel>
                             <!--<StackPanel Orientation="Horizontal" Width="Auto"  Margin="10 10">
                                 <CheckBox IsChecked="{Binding Focuser}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
                             <TextBlock Margin="10 0" VerticalAlignment="Center">Focuser</TextBlock>
@@ -191,7 +188,11 @@
                                 <CheckBox Height="25" Width="25" IsChecked="{Binding Model3D}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optModel3D}"/>
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optModel3D}"/>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Width="Auto">
+                                <StackPanel Orientation="Horizontal" Width="Auto" Visibility="{Binding PecShow, Converter={StaticResource BoolToClap}}">
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding Pec}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource Pec}" />
+                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource Pec}" />
+                            </StackPanel>
+                                <StackPanel Orientation="Horizontal" Width="Auto">
                                 <CheckBox Height="25" Width="25" IsChecked="{Binding Plot}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource pltPlot}" />
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource pltPlot}" />
                             </StackPanel>

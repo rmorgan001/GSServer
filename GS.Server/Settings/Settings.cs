@@ -120,14 +120,14 @@ namespace GS.Server.Settings
             }
         }
 
-        private static Model3DType _modeltype;
+        private static Model3DType _modelType;
         public static Model3DType ModelType
         {
-            get => _modeltype;
+            get => _modelType;
             set
             {
-                if (_modeltype == value) return;
-                _modeltype = value;
+                if (_modelType == value) return;
+                _modelType = value;
                 Properties.Server.Default.ModelType = value.ToString();
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
@@ -217,6 +217,20 @@ namespace GS.Server.Settings
                 _modelUpDirection2 = value;
                 Properties.Server.Default.ModelUpDirection2 = value.ToString(CultureInfo.InvariantCulture);
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+            }
+        }
+
+        private static bool _pec;
+        public static bool Pec
+        {
+            get => _pec;
+            set
+            {
+                if (_pec == value) return;
+                _pec = value;
+                Properties.Server.Default.Pec = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
             }
         }
 
@@ -402,13 +416,13 @@ namespace GS.Server.Settings
             }
         }
 
-        private static WindowState _windowstate;
-        public static WindowState Windowstate
+        private static WindowState _windowState;
+        public static WindowState WindowState
         {
-            get => _windowstate;
+            get => _windowState;
             set
             {
-                _windowstate = value;
+                _windowState = value;
                 Properties.Server.Default.WindowState = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
@@ -416,7 +430,7 @@ namespace GS.Server.Settings
         }
 
         private static double _windowHeight;
-        public static double Windowheight
+        public static double WindowHeight
         {
             get => _windowHeight;
             set
@@ -430,7 +444,7 @@ namespace GS.Server.Settings
         }
 
         private static double _windowWidth;
-        public static double Windowwidth
+        public static double WindowWidth
         {
             get => _windowWidth;
             set
@@ -444,7 +458,7 @@ namespace GS.Server.Settings
         }
 
         private static double _windowLeft;
-        public static double Windowleft
+        public static double WindowLeft
         {
             get => _windowLeft;
             set
@@ -458,7 +472,7 @@ namespace GS.Server.Settings
         }
 
         private static double _windowTop;
-        public static double Windowtop
+        public static double WindowTop
         {
             get => _windowTop;
             set
@@ -495,6 +509,7 @@ namespace GS.Server.Settings
             ModelLookDirection2 = Vector3D.Parse(Properties.Server.Default.ModelLookDirection2);
             ModelPosition2 = Point3D.Parse(Properties.Server.Default.ModelPosition2);
             ModelUpDirection2 = Vector3D.Parse(Properties.Server.Default.ModelPosition2);
+            Pec = Properties.Server.Default.Pec;
             Plot = Properties.Server.Default.Plot;
             PoleLocator = Properties.Server.Default.PoleLocator;
             Pulses = Properties.Server.Default.Pulses;
@@ -508,11 +523,11 @@ namespace GS.Server.Settings
             DarkTheme = Properties.Server.Default.DarkTheme;
             PrimaryColor = Properties.Server.Default.PrimaryColor;
             AccentColor = Properties.Server.Default.AccentColor;
-            Windowheight = Properties.Server.Default.WindowHeight;
-            Windowwidth = Properties.Server.Default.WindowWidth;
-            Windowleft = Properties.Server.Default.WindowLeft;
-            Windowtop = Properties.Server.Default.WindowTop;
-            Windowstate = Properties.Server.Default.WindowState;
+            WindowHeight = Properties.Server.Default.WindowHeight;
+            WindowWidth = Properties.Server.Default.WindowWidth;
+            WindowLeft = Properties.Server.Default.WindowLeft;
+            WindowTop = Properties.Server.Default.WindowTop;
+            WindowState = Properties.Server.Default.WindowState;
 
             Enum.TryParse<Model3DType>(Properties.Server.Default.ModelType, true, out var aparse);
             ModelType = aparse;

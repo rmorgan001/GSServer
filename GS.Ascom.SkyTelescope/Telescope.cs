@@ -542,7 +542,7 @@ namespace ASCOM.GS.Sky.Telescope
         {
             get
             {
-                var r = SkySettings.CanUnpark;
+                var r = SkySettings.CanUnPark;
 
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {r}" };
@@ -1605,7 +1605,7 @@ namespace ASCOM.GS.Sky.Telescope
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "GS.Shared.MonitorEntry.set_Message(System.String)")]
         public void Unpark()
         {
-            CheckCapability(SkySettings.CanUnpark, "UnPark");
+            CheckCapability(SkySettings.CanUnPark, "UnPark");
             SkyServer.AtPark = false;
             SkyServer.Tracking = true;
 

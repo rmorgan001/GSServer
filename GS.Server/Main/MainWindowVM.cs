@@ -25,7 +25,6 @@ using GS.Server.PoleLocator;
 using GS.Server.Pulses;
 using GS.Server.Settings;
 using GS.Server.SkyTelescope;
-using GS.Server.Test;
 using GS.Shared;
 using System;
 using System.Collections.Generic;
@@ -36,6 +35,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using GS.Server.Pec;
 using MaterialDesignColors;
 
 namespace GS.Server.Main
@@ -55,7 +55,7 @@ namespace GS.Server.Main
         private PlotVM _plotVM;
         private PoleLocatorVM _poleLocatorVM;
         private PulsesVM _pulsesVM;
-        private TestVM _testVM;
+        private PecVM _pecVM;
         public static MainWindowVM _mainWindowVm;
 
         private double _tempHeight = 510;
@@ -87,7 +87,7 @@ namespace GS.Server.Main
                     AppCount = GSServer.AppCount;
                     Settings.Settings.Load();
                     if (Settings.Settings.StartMinimized)
-                        Settings.Settings.Windowstate = WindowState.Minimized;
+                        Settings.Settings.WindowState = WindowState.Minimized;
                     MountType = SkySettings.Mount;
 
                     _mainWindowVm = this;
@@ -103,7 +103,7 @@ namespace GS.Server.Main
                     UpdateTabViewModel("Plot");
                     UpdateTabViewModel("PoleLocator");
                     UpdateTabViewModel("Pulses");
-                    UpdateTabViewModel("Test");
+                    UpdateTabViewModel("Pec");
 
                     // Set starting page
                     CurrentPageViewModel = PageViewModels[0];
@@ -337,23 +337,24 @@ namespace GS.Server.Main
                         PulsesRadioVisible = false;
                     }
                     break;
-                case "Test":
-                    if (SkyServer.TestTab)
+                case "Pec":
+                    //if (Settings.Settings.Pec)
+                    if (SkyServer.PecShow)
                     {
-                        if (!PageViewModels.Contains(_testVM))
+                        if (!PageViewModels.Contains(_pecVM))
                         {
-                            _testVM = new TestVM();
-                            PageViewModels.Add(_testVM);
+                            _pecVM = new PecVM();
+                            PageViewModels.Add(_pecVM);
                         }
-                        TestRadioVisible = true;
+                        PecRadioVisible = true;
                     }
                     else
                     {
-                        if (PageViewModels.Contains(_testVM))
+                        if (PageViewModels.Contains(_pecVM))
                         {
-                            PageViewModels.Remove(_testVM);
+                            PageViewModels.Remove(_pecVM);
                         }
-                        TestRadioVisible = false;
+                        PecRadioVisible = false;
                     }
                     break;
             }
@@ -644,30 +645,30 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _testVMRadio;
-        public bool TestVMRadioRadio
+        private bool _pecVMRadio;
+        public bool PecVMRadioRadio
         {
-            get => _testVMRadio;
+            get => _pecVMRadio;
             set
             {
                 using (new WaitCursor())
                 {
-                    if (_testVMRadio == value) return;
-                    _testVMRadio = value;
-                    if (value) ChangeViewModel(_testVM);
+                    if (_pecVMRadio == value) return;
+                    _pecVMRadio = value;
+                    if (value) ChangeViewModel(_pecVM);
                     OnPropertyChanged();
                 }
             }
         }
 
-        private bool _testRadioVisible;
-        public bool TestRadioVisible
+        private bool _pecRadioVisible;
+        public bool PecRadioVisible
         {
-            get => _testRadioVisible;
+            get => _pecRadioVisible;
             set
             {
-                if (_testRadioVisible == value) return;
-                _testRadioVisible = value;
+                if (_pecRadioVisible == value) return;
+                _pecRadioVisible = value;
                 OnPropertyChanged();
             }
         }
@@ -814,50 +815,50 @@ namespace GS.Server.Main
 
         public WindowState WindowStates
         {
-            get => Settings.Settings.Windowstate;
+            get => Settings.Settings.WindowState;
             set
             {
-                Settings.Settings.Windowstate = value;
+                Settings.Settings.WindowState = value;
                 OnPropertyChanged();
             }
         }
 
         public double WindowHeight
         {
-            get => Settings.Settings.Windowheight;
+            get => Settings.Settings.WindowHeight;
             set
             {
-                Settings.Settings.Windowheight = value;
+                Settings.Settings.WindowHeight = value;
                 OnPropertyChanged();
             }
         }
 
         public double WindowWidth
         {
-            get => Settings.Settings.Windowwidth;
+            get => Settings.Settings.WindowWidth;
             set
             {
-                Settings.Settings.Windowwidth = value;
+                Settings.Settings.WindowWidth = value;
                 OnPropertyChanged();
             }
         }
 
         public double WindowLeft
         {
-            get => Settings.Settings.Windowleft;
+            get => Settings.Settings.WindowLeft;
             set
             {
-                Settings.Settings.Windowleft = value;
+                Settings.Settings.WindowLeft = value;
                 OnPropertyChanged();
             }
         }
 
         public double WindowTop
         {
-            get => Settings.Settings.Windowtop;
+            get => Settings.Settings.WindowTop;
             set
             {
-                Settings.Settings.Windowtop = value;
+                Settings.Settings.WindowTop = value;
                 OnPropertyChanged();
             }
         }
@@ -1039,7 +1040,7 @@ namespace GS.Server.Main
                 _model3dVM?.Dispose();
                 _pulsesVM?.Dispose();
                 _mainWindowVm?.Dispose();
-                _testVM?.Dispose();
+                _pecVM?.Dispose();
                 _plotVM?.Dispose();
                 _poleLocatorVM?.Dispose();
             }

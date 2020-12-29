@@ -107,7 +107,9 @@ namespace GS.Server.SkyTelescope
         GetAxisVersions,
         GetAxisStrVersions,
         MountVersion,
-        StepsPerRevolution
+        StepsPerRevolution,
+        StepsWormPerRevolution,
+        GetFactorStep
     }
 
     public enum MountType
@@ -128,6 +130,19 @@ namespace GS.Server.SkyTelescope
     {
         Ra,
         Dec
+    }
+
+    public enum PecMode
+    {
+        PecWorm = 0,
+        Pec360 = 1
+    }
+
+    public enum PecFileType
+    {
+        GSPecWorm = 0,
+        GSPec360 = 1,
+        GSPecDebug = 2
     }
 
 }

@@ -1,14 +1,14 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace GS.Server.Test
+namespace GS.Server.Pec
 {
     /// <summary>
     /// Interaction logic for FocuserView.xaml
     /// </summary>
     [ComVisible(false)]
-    public partial class TestV
+    public partial class PecV
     {
-        public TestV()
+        public PecV()
         {
             InitializeComponent();
         }

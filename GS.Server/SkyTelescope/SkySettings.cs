@@ -388,14 +388,14 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static bool _canUnpark;
-        public static bool CanUnpark
+        private static bool _canUnPark;
+        public static bool CanUnPark
         {
-            get => _canUnpark;
+            get => _canUnPark;
             private set
             {
-                if (_canUnpark == value) return;
-                _canUnpark = value;
+                if (_canUnPark == value) return;
+                _canUnPark = value;
                 Properties.SkyTelescope.Default.CanUnpark = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
@@ -589,14 +589,28 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static bool _alternatingPpec;
-        public static bool AlternatingPpec
+        private static PecMode _pecMode;
+        public static PecMode PecMode
         {
-            get => _alternatingPpec;
+            get => _pecMode;
             set
             {
-                if (_alternatingPpec == value) return;
-                _alternatingPpec = value;
+                if (_pecMode == value) return;
+                _pecMode = value;
+                Properties.SkyTelescope.Default.PecMode = $"{value}";
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static bool _alternatingPPec;
+        public static bool AlternatingPPec
+        {
+            get => _alternatingPPec;
+            set
+            {
+                if (_alternatingPPec == value) return;
+                _alternatingPPec = value;
                 Properties.SkyTelescope.Default.AlternatingPPEC = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
@@ -1156,6 +1170,62 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static bool _pecOn;
+        public static bool PecOn
+        {
+            get => _pecOn;
+            set
+            {
+                if (_pecOn == value) return;
+                _pecOn = value;
+                Properties.SkyTelescope.Default.PecOn = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static int _pecOffSet;
+        public static int PecOffSet
+        {
+            get => _pecOffSet;
+            set
+            {
+                if (_pecOffSet == value) return;
+                _pecOffSet = value;
+                Properties.SkyTelescope.Default.PecOffSet = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static string _pecWormFile;
+        public static string PecWormFile
+        {
+            get => _pecWormFile;
+            set
+            {
+                if (_pecWormFile == value) return;
+                _pecWormFile = value;
+                Properties.SkyTelescope.Default.PecWormFile = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static string _pec360File;
+        public static string Pec360File
+        {
+            get => _pec360File;
+            set
+            {
+                if (_pec360File == value) return;
+                _pec360File = value;
+                Properties.SkyTelescope.Default.Pec360File = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static bool _pPecOn;
         public static bool PPecOn
         {
@@ -1366,14 +1436,14 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static int _st4Guiderate;
-        public static int St4Guiderate
+        private static int _st4GuideRate;
+        public static int St4GuideRate
         {
-            get => _st4Guiderate;
+            get => _st4GuideRate;
             set
             {
-                if (St4Guiderate == value) return;
-                _st4Guiderate = value;
+                if (St4GuideRate == value) return;
+                _st4GuideRate = value;
                 Properties.SkyTelescope.Default.St4Guiderate = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
@@ -1502,7 +1572,7 @@ namespace GS.Server.SkyTelescope
             CanSync = Properties.SkyTelescope.Default.CanSync;
             CanSyncAltAz = Properties.SkyTelescope.Default.CanSyncAltAz;
             CanTrackingRates = Properties.SkyTelescope.Default.CanTrackingRates;
-            CanUnpark = Properties.SkyTelescope.Default.CanUnpark;
+            CanUnPark = Properties.SkyTelescope.Default.CanUnpark;
             NoSyncPastMeridian = Properties.SkyTelescope.Default.NoSyncPastMeridian;
             NumMoveAxis = Properties.SkyTelescope.Default.NumMoveAxis;
             VersionOne = Properties.SkyTelescope.Default.VersionOne;
@@ -1528,8 +1598,10 @@ namespace GS.Server.SkyTelescope
             BaudRate = brateparse;
             Enum.TryParse<SerialSpeed>(Properties.SkyTelescope.Default.GpsBaudRate, true, out var grateparse);
             GpsBaudRate = grateparse;
+            Enum.TryParse<PecMode>(Properties.SkyTelescope.Default.PecMode, true, out var pecparse);
+            PecMode = pecparse;
 
-            AlternatingPpec = Properties.SkyTelescope.Default.AlternatingPPEC;
+            AlternatingPPec = Properties.SkyTelescope.Default.AlternatingPPEC;
             ApertureArea = Properties.SkyTelescope.Default.ApertureArea;
             ApertureDiameter = Properties.SkyTelescope.Default.ApertureDiameter;
             AtPark = Properties.SkyTelescope.Default.AtPark;
@@ -1571,23 +1643,24 @@ namespace GS.Server.SkyTelescope
             ParkAxisX = Properties.SkyTelescope.Default.ParkAxisX;
             ParkAxisY = Properties.SkyTelescope.Default.ParkAxisY;
             ParkName = Properties.SkyTelescope.Default.ParkName;
+            PecOn = Properties.SkyTelescope.Default.PecOn;
+            PecOffSet = Properties.SkyTelescope.Default.PecOffSet;
             PPecOn = Properties.SkyTelescope.Default.PpecOn;
+            PecWormFile = Properties.SkyTelescope.Default.PecWormFile;
+            Pec360File = Properties.SkyTelescope.Default.Pec360File;
             RaBacklash = Properties.SkyTelescope.Default.RaBacklash;
             ReadTimeout = Properties.SkyTelescope.Default.ReadTimeout;
             Refraction = Properties.SkyTelescope.Default.Refraction;
             RaTrackingOffset = Properties.SkyTelescope.Default.RATrackingOffset;
             RtsEnable = Properties.SkyTelescope.Default.RTSEnable;
             SiderealRate = Properties.SkyTelescope.Default.SiderealRate;
-            //SpiralFov = Properties.SkyTelescope.Default.SpiralFov;
-            //SpiralPause = Properties.SkyTelescope.Default.SpiralPause;
             SpiralDistance = Properties.SkyTelescope.Default.SpiralDistance;
-            //SpiralSpeed = Properties.SkyTelescope.Default.SpiralSpeed;
             SpiralLimits = Properties.SkyTelescope.Default.SpiralLimits;
             SpiralHeight = Properties.SkyTelescope.Default.SpiralHeight;
             SpiralWidth = Properties.SkyTelescope.Default.SpiralWidth;
             DisplayInterval = Properties.SkyTelescope.Default.DisplayInterval;
             SolarRate = Properties.SkyTelescope.Default.SolarRate;
-            St4Guiderate = Properties.SkyTelescope.Default.St4Guiderate;
+            St4GuideRate = Properties.SkyTelescope.Default.St4Guiderate;
             SyncLimit = Properties.SkyTelescope.Default.SyncLimit;
             Temperature = Properties.SkyTelescope.Default.Temperature;
             UTCDateOffset = Properties.SkyTelescope.Default.UTCOffset;

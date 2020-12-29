@@ -40,7 +40,7 @@ namespace GS.Server
         #region Fields
 
         public static event PropertyChangedEventHandler StaticPropertyChanged;
-        private static int _objsInUse; // Keeps a count on the total number of objects alive.
+        private static int _objInUse; // Keeps a count on the total number of objects alive.
         private static int _serverLocks; // Keeps a lock count on this application.
         private static ArrayList _comObjectTypes; // Served COM object types
         private static ArrayList _classFactories; // Served COM object class factories
@@ -48,8 +48,8 @@ namespace GS.Server
         private static readonly object LockObject = new object();
         private static bool _removeProfile;
         private static BackgroundWorker _bgWorker;
-        private const string _drivername = "ASCOM.GS.Sky.Telescope.dll";
-        private const string _apiname = "GS.SkyApi.dll";
+        private const string _driverName = "ASCOM.GS.Sky.Telescope.dll";
+        private const string _apiName = "GS.SkyApi.dll";
 
         #endregion
 
@@ -61,13 +61,13 @@ namespace GS.Server
         /// </summary>
         public static bool SetupDialogOpen { get; set; }
 
-        private static int _appcount;
+        private static int _appCount;
         public static int AppCount
         {
-            get => _appcount;
+            get => _appCount;
             set
             {
-                _appcount = value;
+                _appCount = value;
                 OnStaticPropertyChanged();
             }
         }
@@ -104,7 +104,7 @@ namespace GS.Server
             {
                 lock (LockObject)
                 {
-                    return _objsInUse;
+                    return _objInUse;
                 }
             }
         }
@@ -114,7 +114,7 @@ namespace GS.Server
         /// </summary>
         public static void CountObject()
         {
-            Interlocked.Increment(ref _objsInUse);
+            Interlocked.Increment(ref _objInUse);
             ++AppCount;
 
         }
@@ -124,7 +124,7 @@ namespace GS.Server
         /// </summary>
         public static void UncountObject()
         {
-            Interlocked.Decrement(ref _objsInUse);
+            Interlocked.Decrement(ref _objInUse);
             --AppCount;
         }
 
@@ -207,10 +207,10 @@ namespace GS.Server
 
             var dir = new DirectoryInfo(assyPath);
             var files = new List<FileInfo>();
-            var driverpath = dir + "\\" + _drivername;
+            var driverpath = dir + "\\" + _driverName;
             if (File.Exists(driverpath)) { files.Add(new FileInfo(driverpath)); }
 
-            var apipath = dir +  "\\" + _apiname;
+            var apipath = dir +  "\\" + _apiName;
             if (File.Exists(apipath)) { files.Add(new FileInfo(apipath)); }
 
             var dllfiles = files.ToArray();
@@ -494,7 +494,7 @@ namespace GS.Server
         // Remove all traces of this from the registry. 
         // If the above does AppID/DCOM stuff, this would have
         // to remove that stuff too.
-        private static void UnregisterObjects()
+        private static void UnRegisterObjects()
         {
             if (!IsAdministrator)
             {
@@ -627,11 +627,11 @@ namespace GS.Server
                     case @"/unregister":
                     case "-unregserver": // Emulate VB6
                     case @"/unregserver":
-                        UnregisterObjects(); //Unregister each served object
+                        UnRegisterObjects(); //Unregister each served object
                         bRet = false;
                         break;
-                    case @"/test":
-                        SkyServer.TestTab = true;
+                    case @"/pec":
+                        SkyServer.PecShow = true;
                         break;
                     case @"/en":
                         Shared.Settings.Language = "en-US";
@@ -688,10 +688,10 @@ namespace GS.Server
             MonitorLog.LogToMonitor(monitorItem);
 
             if (!LoadComObjectAssemblies()) return; // Load served COM class assemblies, get types
-            if (!ProcessArguments(args)) return; // Register/Unregister
+            if (!ProcessArguments(args)) return; // Register/UnRegister
 
             // Initialize critical member variables.
-            _objsInUse = 0; _serverLocks = 0; MainThreadId = NativeMethods.GetCurrentThreadId();
+            _objInUse = 0; _serverLocks = 0; MainThreadId = NativeMethods.GetCurrentThreadId();
             Thread.CurrentThread.Name = "Main Thread";
 
             // Register the class factories of the served objects

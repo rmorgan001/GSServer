@@ -41,6 +41,8 @@ namespace GS.Simulator
         internal bool MonitorPulse { private get; set; }
         internal bool PulseRaRunning { get; private set; }
         internal bool PulseDecRunning { get; private set; }
+        //internal DateTime LastJ1RunTime { get; private set; }
+        //internal DateTime LastJ2RunTime { get; private set; }
 
         #endregion
 
@@ -268,6 +270,31 @@ namespace GS.Simulator
             return i;
         }
 
+        internal Tuple<double?, DateTime> AxisStepsDt(Axis axis)
+        {
+            switch (axis)
+            {
+                case Axis.Axis1:
+                    return new Tuple<double?, DateTime>(Convert.ToInt32(_ioSerial.Send($"steps,{Axis.Axis1}")),
+                        HiResDateTime.UtcNow);
+                case Axis.Axis2:
+                    return new Tuple<double?, DateTime>(Convert.ToInt32(_ioSerial.Send($"steps,{Axis.Axis2}")),
+                        HiResDateTime.UtcNow);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
+            }
+        }
+
+        /// <summary>
+        /// Get factor to covert steps to degrees
+        /// </summary>
+        /// <returns></returns>
+        internal int FactorSteps()
+        {
+            var x = Convert.ToInt32(_ioSerial.Send($"FactorSteps"));
+            return x;
+        }
+
         /// <summary>
         /// Hand control slew
         /// </summary>
@@ -367,6 +394,15 @@ namespace GS.Simulator
         }
 
         /// <summary>
+        /// Gets Steps Per Worm Revolution
+        /// </summary>
+        /// <returns></returns>
+        internal double Spw()
+        {
+            return Convert.ToDouble(_ioSerial.Send("spw"));
+        }
+
+        /// <summary>
         /// Rates from driver
         /// </summary>
         /// <param name="axis"></param>
@@ -374,6 +410,15 @@ namespace GS.Simulator
         internal void Rate(Axis axis, double degrees)
         {
             _ioSerial.Send($"rate,{axis},{degrees}");
+        }
+
+        /// <summary>
+        /// set simulator goto rate
+        /// </summary>
+        /// <param name="rate"></param>
+        internal void GotoRate(int rate)
+        {
+            _ioSerial.Send($"gotorate,{rate}");
         }
 
         /// <summary>

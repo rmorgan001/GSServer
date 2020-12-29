@@ -17,8 +17,8 @@ using GS.Server.Helpers;
 using GS.Server.SkyTelescope;
 using GS.Shared;
 using GS.SkyWatcher;
+using GS.Simulator;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -943,6 +943,19 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
+        public void SetSimGotoSpeed(int rate)
+        {
+            var monitorItem = new MonitorEntry
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{rate}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            ValidateRange(1,20,rate);
+            var command = new CmdGotoSpeed(MountQueue.NewId, rate);
+            var results = GetSimResult(command, true);
+            if (!results.Successful){throw new Exception("Error");}
+        }
+
+        /// <inheritdoc />
         public void SetTargetPosition(int axis, double position)
         {
             var monitorItem = new MonitorEntry
@@ -1016,7 +1029,23 @@ namespace GS.SkyApi
         }
 
         /// <summary>
-        /// pull the results of a command from the dictionary
+        /// validate a double within a range
+        /// </summary>
+        /// <param name="lower"></param>
+        /// <param name="upper"></param>
+        /// <param name="value"></param>
+        private static void ValidateRange(double lower, double upper, double value )
+        {
+            if (value >= lower && value <= upper)
+            {
+                return;
+            }
+            var exception = new ArgumentOutOfRangeException($"{value}", $"{lower}-{upper}");
+            throw exception;
+        }
+
+        /// <summary>
+        /// Check the results of a Sky command
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
@@ -1046,9 +1075,42 @@ namespace GS.SkyApi
                 throw result.Exception;
             }
         }
+
+        /// <summary>
+        /// Check the simulator results of a command
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="allowNull"></param>
+        /// <returns></returns>
+        private static IMountCommand GetSimResult(IMountCommand command, bool allowNull)
+        {
+            // look for a result by id and return it
+            var result = MountQueue.GetCommandResult(command);
+
+            if (result == null)
+            {
+                if (allowNull){return null;}
+                var exception = new Exception("Timeout processing command");
+
+                var monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{exception}" };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                throw exception;
+            }
+            else
+            {
+                if (result.Successful) return result;
+
+                var monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{result.Exception}" };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                throw result.Exception;
+            }
+        }
     }
 
-    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     [Guid("61B480B2-C2C7-453F-B197-CC585D3CD390")]
     public interface ISky
     {
@@ -1064,7 +1126,7 @@ namespace GS.SkyApi
         /// <param name="offsetdec"></param>
         void AutoHomeStart(int degreelimit = 100, int offsetdec = 0);
         /// <summary>
-        /// Stops Autohome from completing
+        /// Stops Auto home from completing
         /// </summary>
         void AutoHomeStop();
         /// <summary>
@@ -1434,6 +1496,11 @@ namespace GS.SkyApi
         /// <param name="axis">axis number 1 or 2</param>
         /// <param name="stepSpeed">StepSpeed = 1 motor step movement, higher counts means slower movements</param>
         void SetStepSpeed(int axis, long stepSpeed);
+        /// <summary>
+        /// Set simulator goto rate 
+        /// </summary>
+        /// <param name="rate">1-20</param>
+        void SetSimGotoSpeed(int rate);
         /// <summary>
         /// S Set absolute goto target 
         /// </summary>

@@ -86,8 +86,11 @@
                 </StackPanel>
             </StackPanel>
                 <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1">
-                <Grid x:Name="SpiralGrid" Margin="5" ShowGridLines="false" >
-                <Grid.RowDefinitions>
+                <Grid x:Name="SpiralGrid" Margin="5" ShowGridLines="False">
+                    <Grid.Background>
+                        <SolidColorBrush  Opacity="0.1" />
+                    </Grid.Background>
+                    <Grid.RowDefinitions>
                     <RowDefinition MinHeight="20" />
                     <RowDefinition MinHeight="20" />
                     <RowDefinition MinHeight="20" />
@@ -119,7 +122,7 @@
                         <TextBlock Text="°" />
                     </StackPanel>
                     <!--Column 0-->
-                    <md:PackIcon Grid.Row="0" Grid.Column="0" x:Name="C30" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto"  Height="Auto"  Background="Transparent" Foreground="{Binding C30}">
+                    <md:PackIcon Grid.Row="0" Grid.Column="0" x:Name="C30" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C30}">
                     <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="30" />
@@ -127,7 +130,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="1" Grid.Column="0" x:Name="C29" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C29}">
+                    <md:PackIcon Grid.Row="1" Grid.Column="0" x:Name="C29" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C29}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="29" />
@@ -135,7 +138,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="2" Grid.Column="0" x:Name="C28" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C28}">
+                    <md:PackIcon Grid.Row="2" Grid.Column="0" x:Name="C28" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C28}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="28" />
@@ -143,7 +146,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="3" Grid.Column="0" x:Name="C27" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C27}">
+                    <md:PackIcon Grid.Row="3" Grid.Column="0" x:Name="C27" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C27}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="27" />
@@ -151,7 +154,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="4" Grid.Column="0" x:Name="C26" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C26}">
+                    <md:PackIcon Grid.Row="4" Grid.Column="0" x:Name="C26" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C26}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="26" />
@@ -159,7 +162,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="5" Grid.Column="0" x:Name="C25" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C25}">
+                    <md:PackIcon Grid.Row="5" Grid.Column="0" x:Name="C25" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C25}">
                         <b:Interaction.Triggers>
                             <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                                 <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="25" />
@@ -167,7 +170,7 @@
                         </b:Interaction.Triggers>
                     </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="6" Grid.Column="0" x:Name="C48" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C48}">
+                    <md:PackIcon Grid.Row="6" Grid.Column="0" x:Name="C48" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C48}">
                         <b:Interaction.Triggers>
                             <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                                 <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="48" />
@@ -176,7 +179,7 @@
                     </md:PackIcon>
 
                 <!--Column 1-->
-                    <md:PackIcon Grid.Row="0" Grid.Column="1" x:Name="C31" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C31}">
+                    <md:PackIcon Grid.Row="0" Grid.Column="1" x:Name="C31" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C31}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="31" />
@@ -184,7 +187,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="1" Grid.Column="1" x:Name="C12" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C12}">
+                    <md:PackIcon Grid.Row="1" Grid.Column="1" x:Name="C12" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C12}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="12" />
@@ -192,7 +195,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="2" Grid.Column="1" x:Name="C11" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C11}">
+                    <md:PackIcon Grid.Row="2" Grid.Column="1" x:Name="C11" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C11}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="11" />
@@ -200,7 +203,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="3" Grid.Column="1" x:Name="C10" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C10}">
+                    <md:PackIcon Grid.Row="3" Grid.Column="1" x:Name="C10" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C10}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="10" />
@@ -208,7 +211,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="4" Grid.Column="1" x:Name="C9" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C9}">
+                    <md:PackIcon Grid.Row="4" Grid.Column="1" x:Name="C9" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C9}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="9" />
@@ -216,7 +219,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="5" Grid.Column="1" x:Name="C24" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C24}">
+                    <md:PackIcon Grid.Row="5" Grid.Column="1" x:Name="C24" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C24}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="24" />
@@ -224,7 +227,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="6" Grid.Column="1" x:Name="C47" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C47}">
+                    <md:PackIcon Grid.Row="6" Grid.Column="1" x:Name="C47" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C47}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="47" />
@@ -233,7 +236,7 @@
                 </md:PackIcon>
 
                 <!--Column 2-->
-                    <md:PackIcon Grid.Row="0" Grid.Column="2" x:Name="C32" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C32}">
+                    <md:PackIcon Grid.Row="0" Grid.Column="2" x:Name="C32" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C32}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="32" />
@@ -241,7 +244,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="1" Grid.Column="2" x:Name="C13" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C13}">
+                    <md:PackIcon Grid.Row="1" Grid.Column="2" x:Name="C13" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C13}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="13" />
@@ -249,7 +252,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="2" Grid.Column="2" x:Name="C2" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C2}">
+                    <md:PackIcon Grid.Row="2" Grid.Column="2" x:Name="C2" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C2}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="2" />
@@ -257,7 +260,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="3" Grid.Column="2" x:Name="C1" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C1}">
+                    <md:PackIcon Grid.Row="3" Grid.Column="2" x:Name="C1" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C1}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="1" />
@@ -265,7 +268,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="4" Grid.Column="2" x:Name="C8" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C8}">
+                    <md:PackIcon Grid.Row="4" Grid.Column="2" x:Name="C8" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C8}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="8" />
@@ -273,7 +276,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="5" Grid.Column="2" x:Name="C23" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C23}">
+                    <md:PackIcon Grid.Row="5" Grid.Column="2" x:Name="C23" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C23}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="23" />
@@ -281,7 +284,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="6" Grid.Column="2" x:Name="C46" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C46}">
+                    <md:PackIcon Grid.Row="6" Grid.Column="2" x:Name="C46" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C46}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="46" />
@@ -290,7 +293,7 @@
                 </md:PackIcon>
 
                 <!--Column 3-->
-                    <md:PackIcon Grid.Row="0" Grid.Column="3" x:Name="C33" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C33}">
+                    <md:PackIcon Grid.Row="0" Grid.Column="3" x:Name="C33" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C33}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="33" />
@@ -298,7 +301,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="1" Grid.Column="3" x:Name="C14" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C14}">
+                    <md:PackIcon Grid.Row="1" Grid.Column="3" x:Name="C14" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C14}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="14" />
@@ -306,7 +309,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="2" Grid.Column="3" x:Name="C3" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C3}">
+                    <md:PackIcon Grid.Row="2" Grid.Column="3" x:Name="C3" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C3}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="3" />
@@ -314,7 +317,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="3" Grid.Column="3" x:Name="C0" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" Foreground="{Binding C0}">
+                    <md:PackIcon Grid.Row="3" Grid.Column="3" x:Name="C0" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C0}">
                     <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="0" />
@@ -322,7 +325,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="4" Grid.Column="3" x:Name="C7" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C7}">
+                    <md:PackIcon Grid.Row="4" Grid.Column="3" x:Name="C7" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C7}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="7" />
@@ -330,7 +333,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="5" Grid.Column="3" x:Name="C22" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C22}">
+                    <md:PackIcon Grid.Row="5" Grid.Column="3" x:Name="C22" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C22}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="22" />
@@ -338,7 +341,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="6" Grid.Column="3" x:Name="C45" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C45}">
+                    <md:PackIcon Grid.Row="6" Grid.Column="3" x:Name="C45" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C45}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="45" />
@@ -348,7 +351,7 @@
 
                 <!--Column 4-->
 
-                    <md:PackIcon Grid.Row="0" Grid.Column="4" x:Name="C34" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C34}">
+                    <md:PackIcon Grid.Row="0" Grid.Column="4" x:Name="C34" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C34}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="34" />
@@ -356,7 +359,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="1" Grid.Column="4" x:Name="C15" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C15}">
+                    <md:PackIcon Grid.Row="1" Grid.Column="4" x:Name="C15" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C15}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                                 <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="15" />
@@ -364,7 +367,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="2" Grid.Column="4" x:Name="C4" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C4}">
+                    <md:PackIcon Grid.Row="2" Grid.Column="4" x:Name="C4" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C4}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="4" />
@@ -372,7 +375,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="3" Grid.Column="4" x:Name="C5" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C5}">
+                    <md:PackIcon Grid.Row="3" Grid.Column="4" x:Name="C5" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C5}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="5" />
@@ -380,7 +383,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="4" Grid.Column="4" x:Name="C6" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C6}">
+                    <md:PackIcon Grid.Row="4" Grid.Column="4" x:Name="C6" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C6}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="6" />
@@ -388,7 +391,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="5" Grid.Column="4" x:Name="C21" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C21}">
+                    <md:PackIcon Grid.Row="5" Grid.Column="4" x:Name="C21" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C21}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="21" />
@@ -396,7 +399,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="6" Grid.Column="4" x:Name="C44" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C44}">
+                    <md:PackIcon Grid.Row="6" Grid.Column="4" x:Name="C44" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C44}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="44" />
@@ -405,7 +408,7 @@
                 </md:PackIcon>
 
                 <!--Column 5-->
-                    <md:PackIcon Grid.Row="0" Grid.Column="5" x:Name="C35" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C35}">
+                    <md:PackIcon Grid.Row="0" Grid.Column="5" x:Name="C35" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C35}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="35" />
@@ -413,7 +416,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="1" Grid.Column="5" x:Name="C16" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C16}">
+                    <md:PackIcon Grid.Row="1" Grid.Column="5" x:Name="C16" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C16}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="16" />
@@ -421,7 +424,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="2" Grid.Column="5" x:Name="C17" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C17}">
+                    <md:PackIcon Grid.Row="2" Grid.Column="5" x:Name="C17" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C17}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="17" />
@@ -429,7 +432,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="3" Grid.Column="5" x:Name="C18" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C18}">
+                    <md:PackIcon Grid.Row="3" Grid.Column="5" x:Name="C18" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C18}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="18" />
@@ -437,7 +440,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="4" Grid.Column="5" x:Name="C19" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C19}">
+                    <md:PackIcon Grid.Row="4" Grid.Column="5" x:Name="C19" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C19}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="19" />
@@ -445,7 +448,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="5" Grid.Column="5" x:Name="C20" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C20}">
+                    <md:PackIcon Grid.Row="5" Grid.Column="5" x:Name="C20" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C20}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="20" />
@@ -453,7 +456,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="6" Grid.Column="5" x:Name="C43" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C43}">
+                    <md:PackIcon Grid.Row="6" Grid.Column="5" x:Name="C43" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C43}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="43" />
@@ -462,7 +465,7 @@
                 </md:PackIcon>
 
                 <!--Column 6-->
-                    <md:PackIcon Grid.Row="0" Grid.Column="6" x:Name="C36" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C36}">
+                    <md:PackIcon Grid.Row="0" Grid.Column="6" x:Name="C36" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C36}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="36" />
@@ -470,7 +473,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="1" Grid.Column="6" x:Name="C37" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C37}">
+                    <md:PackIcon Grid.Row="1" Grid.Column="6" x:Name="C37" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C37}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="37" />
@@ -478,7 +481,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="2" Grid.Column="6" x:Name="C38" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C38}">
+                    <md:PackIcon Grid.Row="2" Grid.Column="6" x:Name="C38" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C38}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="38" />
@@ -486,7 +489,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="3" Grid.Column="6" x:Name="C39" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C39}">
+                    <md:PackIcon Grid.Row="3" Grid.Column="6" x:Name="C39" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C39}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="39" />
@@ -494,7 +497,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="4" Grid.Column="6" x:Name="C40" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C40}">
+                    <md:PackIcon Grid.Row="4" Grid.Column="6" x:Name="C40" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C40}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="40" />
@@ -502,7 +505,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="5" Grid.Column="6" x:Name="C41" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C41}">
+                    <md:PackIcon Grid.Row="5" Grid.Column="6" x:Name="C41" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C41}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="41" />
@@ -510,7 +513,7 @@
                     </b:Interaction.Triggers>
                 </md:PackIcon>
 
-                    <md:PackIcon Grid.Row="6" Grid.Column="6" x:Name="C42" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"  Background="Transparent" Foreground="{Binding C42}">
+                    <md:PackIcon Grid.Row="6" Grid.Column="6" x:Name="C42" Kind="CircleSmall" VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto" Background="Transparent" BorderThickness="1" BorderBrush="Transparent" Foreground="{Binding C42}">
                         <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseRightButtonDown">
                             <b:InvokeCommandAction Command="{Binding OpenSpiralGoToDialogCmd}" CommandParameter="42" />

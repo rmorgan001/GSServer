@@ -10,9 +10,10 @@
              xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared" mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
     <UserControl.Resources>
         <domain:ComparisonConverter x:Key="Compare" />
-    </UserControl.Resources>
-    <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" >
-        <ComboBox md:HintAssist.Hint="{StaticResource btnTipParkPos}" Margin="5,0,0,15" ToolTip="{StaticResource btnTipParkPos}" MaxWidth="120" Width="120"
+        <domain:BoolToVisClapConverter x:Key="BoolToClap" />
+        </UserControl.Resources>
+    <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" >
+        <ComboBox md:HintAssist.Hint="{StaticResource btnTipParkPos}" Margin="5,0,0,5" ToolTip="{StaticResource btnTipParkPos}" MaxWidth="120" Width="120"
                   ItemsSource="{Binding ParkPositions}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEditable="False">
             <ComboBox.SelectedItem>
                 <Binding Path="ParkSelection" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -27,23 +28,23 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <md:Badged Badge="{Binding ParkBadgeContent}" BadgePlacementMode="TopRight">
-            <Button Margin="5" Width="100" Height="25" HorizontalAlignment="Left" Padding="-5"
+        <md:Badged Badge="{Binding ParkBadgeContent}" BadgePlacementMode="Right">
+            <Button Margin="5,8,0,0" Width="100" Height="25" HorizontalAlignment="Left" Padding="-5"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipPark}"
                     Command="{Binding ClickParkCommand}" Content="{Binding ParkButtonContent}"/>
-            </md:Badged>
-            <md:Badged Badge="{Binding HomeBadgeContent}" BadgePlacementMode="TopRight">
-            <Button Margin="5" Height="25" Width="100" HorizontalAlignment="Left" Padding="-5"
+        </md:Badged>
+        <md:Badged Badge="{Binding HomeBadgeContent}" BadgePlacementMode="Right">
+            <Button Margin="5,8,0,0" Height="25" Width="100" HorizontalAlignment="Left" Padding="-5"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipHome}"
                     Command="{Binding ClickHomeCommand}" Content="{StaticResource btnHome}">
             </Button>
         </md:Badged>
-        <Button Margin="5" Width="100" Height="25" HorizontalAlignment="Left" Padding="-5"
-            Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipStop}" 
-                    Command="{Binding ClickStopCommand}" Content="{StaticResource btnStop}">
+        <Button Margin="5,8,0,0" Width="100" Height="25" HorizontalAlignment="Left" Padding="-5"
+                Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipStop}" 
+                Command="{Binding ClickStopCommand}" Content="{StaticResource btnStop}">
         </Button>
         <StackPanel Orientation="Horizontal">
-            <md:PopupBox Margin="-10,0,-10,0" >
+            <md:PopupBox Margin="-10,5,-10,0" >
                     <GroupBox Header="Tracking Rate" Margin="5,0,5,0">
                         <StackPanel Orientation="Vertical">
                         <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="tr" IsChecked="{Binding Path=TrackingRate, Converter={StaticResource Compare}, ConverterParameter={x:Static deviceInterface:DriveRates.driveSidereal}}" Content="{StaticResource skySidereal}" />
@@ -53,38 +54,42 @@
                         </StackPanel>
                     </GroupBox>
             </md:PopupBox>
-                <md:Badged Badge="{Binding TrackingBadgeContent}" BadgePlacementMode="TopRight">
-                <Button Margin="0,5,0,5" Width="90" Height="25" HorizontalAlignment="Left" Padding="-5"
+            <md:Badged Badge="{Binding TrackingBadgeContent}" BadgePlacementMode="Right">
+                <Button Margin="0,8,0,0" Width="90" Height="25" HorizontalAlignment="Left" Padding="-5"
                         Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipTracking}"
                     Command="{Binding ClickTrackingCommand}" Content="{StaticResource btnTracking}">
-            </Button>
-        </md:Badged>
+                </Button>
+            </md:Badged>
         </StackPanel>
         <md:DialogHost  VerticalAlignment="Bottom" CloseOnClickAway="True"
                        IsOpen="{Binding IsHomeResetDialogOpen}" DialogContent="{Binding HomeResetContent}">
-            <Button Margin="5" Width="100" Height="25" HorizontalAlignment="Left" Padding="-5"
-Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipSetHome}"
-                Command="{Binding OpenHomeResetDialogCommand}" Content="{StaticResource btnSetHome}">
+            <Button Margin="5,8,0,0" Width="100" Height="25" HorizontalAlignment="Left" Padding="-5"
+                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipSetHome}"
+                    Command="{Binding OpenHomeResetDialogCommand}" Content="{StaticResource btnSetHome}">
             </Button>
         </md:DialogHost>
         <md:DialogHost VerticalAlignment="Bottom" CloseOnClickAway="True" IsOpen="{Binding IsFlipDialogOpen}" DialogContent="{Binding FlipContent}">
-            <Button Margin="5" Width="100" Height="25"  HorizontalAlignment="Left" Padding="-5"
+            <Button Margin="5,8,0,0" Width="100" Height="25"  HorizontalAlignment="Left" Padding="-5"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipFlip}"
                     Command="{Binding OpenFlipDialogCommand}" Content="{StaticResource btnFlip}">
             </Button>
         </md:DialogHost>
         <md:DialogHost VerticalAlignment="Bottom" IsOpen="{Binding IsAutoHomeDialogOpen}" DialogContent="{Binding AutoHomeContent}">
-            <Button Margin="5" Width="100" Height="25" Padding="-5" HorizontalAlignment="Left" IsEnabled="{Binding AutoHomeEnabled}"
+            <Button Margin="5,8,0,0" Width="100" Height="25" Padding="-5" HorizontalAlignment="Left" IsEnabled="{Binding AutoHomeEnabled}"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnAutoHome}"  
                     Command="{Binding OpenAutoHomeDialogCommand}" Content="{StaticResource btnAutoHome}"/>
         </md:DialogHost>
         <md:DialogHost VerticalAlignment="Bottom" CloseOnClickAway="True" IsOpen="{Binding IsSchedulerDialogOpen}" DialogContent="{Binding SchedulerContent}">
-            <md:Badged Badge="{Binding SchedulerBadgeContent}" BadgePlacementMode="TopRight">
-                <Button Margin="5" Width="100" Height="25" HorizontalAlignment="Left" Padding="-5"
-                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipScheduler}" 
-                    Command="{Binding OpenSchedulerDialogCmd}" Content="{StaticResource btnScheduler}">
+            <md:Badged Badge="{Binding SchedulerBadgeContent}" BadgePlacementMode="Right">
+                <Button Margin="5,8,0,0" Width="100" Height="25" HorizontalAlignment="Left" Padding="-5"
+                        Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipScheduler}" 
+                        Command="{Binding OpenSchedulerDialogCmd}" Content="{StaticResource btnScheduler}">
                 </Button>
             </md:Badged>
         </md:DialogHost>
+        <md:Badged Badge="{Binding PecBadgeContent}" BadgePlacementMode="Right" Visibility="{Binding PecShow, Converter={StaticResource BoolToClap}}">
+            <Button Margin="5,8,0,0" Height="25" Width="100" HorizontalAlignment="Left" Padding="-5" Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource Pec}" Command="{Binding ClickPecOnCmd}" Content="{StaticResource Pec}">
+            </Button>
+        </md:Badged>
     </StackPanel>
 </UserControl>

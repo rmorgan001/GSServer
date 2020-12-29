@@ -656,6 +656,39 @@ namespace GS.SkyWatcher
         }
     }
 
+    public class SkyGetAxisPositionDate : ISkyCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; private set; }
+        private readonly AxisId _axis;
+
+        public SkyGetAxisPositionDate(long id, AxisId axis)
+        {
+            Id = id;
+            _axis = axis;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            Successful = false;
+            SkyQueue.AddCommand(this);
+        }
+
+        public void Execute(SkyWatcher skyWatcher)
+        {
+            try
+            {
+                Result = skyWatcher.GetAxisPositionDate(_axis);
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
     public class SkyGetRampDownRange : ISkyCommand
     {
         public long Id { get; }
@@ -1034,6 +1067,37 @@ namespace GS.SkyWatcher
             try
             {
                 Result = skyWatcher.GetPositionsInDegrees();
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
+    public class SkyGetSteps : ISkyCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; private set; }
+
+        public SkyGetSteps(long id)
+        {
+            Id = id;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            Successful = false;
+            SkyQueue.AddCommand(this);
+        }
+
+        public void Execute(SkyWatcher skyWatcher)
+        {
+            try
+            {
+                Result = skyWatcher.GetSteps();
                 Successful = true;
             }
             catch (Exception e)
@@ -2443,6 +2507,37 @@ namespace GS.SkyWatcher
             try
             {
                 Result = skyWatcher.GetFactorRadRateToInt();
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
+    public class SkyGetFactorStepToRad : ISkyCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; private set; }
+
+        public SkyGetFactorStepToRad(long id)
+        {
+            Id = id;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            Successful = false;
+            SkyQueue.AddCommand(this);
+        }
+
+        public void Execute(SkyWatcher skyWatcher)
+        {
+            try
+            {
+                Result = skyWatcher.GetFactorStepToRad();
                 Successful = true;
             }
             catch (Exception e)

@@ -47,7 +47,8 @@
             <ResourceDictionary Source="pack://application:,,,/GS.Shared;component/Languages/StringResChart_en-us.xaml"/>
             <ResourceDictionary Source="pack://application:,,,/GS.Shared;component/Languages/StringResServer_en-us.xaml"/>
             <ResourceDictionary Source="pack://application:,,,/GS.Shared;component/Languages/StringResUtil_en-us.xaml"/>
-         </ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary Source="pack://application:,,,/GS.Server;component/Resources/Vectors.xaml" />
+            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

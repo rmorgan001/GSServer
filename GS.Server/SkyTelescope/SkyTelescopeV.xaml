@@ -621,7 +621,7 @@
                             <controls:RaDecGoTo />
                             <controls:HandController Margin="0,5,10,0"  />
                             <controls:Backlash />
-                            <controls:PpecBar/>
+                            <controls:PPecBar/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1">
                             <controls:StandardButtonBar/>

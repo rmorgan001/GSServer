@@ -11,10 +11,10 @@
         xmlns:gamepad="clr-namespace:GS.Server.GamePad"
         xmlns:model3D="clr-namespace:GS.Server.Model3D"
         xmlns:pulses="clr-namespace:GS.Server.Pulses"
-        xmlns:test="clr-namespace:GS.Server.Test"
         xmlns:controls="clr-namespace:GS.Server.Controls"
         xmlns:pole="clr-namespace:GS.Server.PoleLocator"
         xmlns:plot="clr-namespace:GS.Server.Plot"
+        xmlns:pec="clr-namespace:GS.Server.Pec"
         mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanResizeWithGrip"  WindowStyle="None"  TextOptions.TextFormattingMode="Display"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         ContentRendered="MainWindow_OnContentRendered" Closed="MainWindow_OnClosed"  Topmost="{Binding TopMost}"
@@ -61,8 +61,8 @@
         <DataTemplate DataType="{x:Type pulses:PulsesVM}">
             <pulses:PulsesV />
         </DataTemplate>
-        <DataTemplate DataType="{x:Type test:TestVM}">
-            <test:TestV />
+        <DataTemplate DataType="{x:Type pec:PecVM}">
+            <pec:PecV />
         </DataTemplate>
     </Window.Resources>
     <Window.TaskbarItemInfo>

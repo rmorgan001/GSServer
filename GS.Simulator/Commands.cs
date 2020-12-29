@@ -101,6 +101,39 @@ namespace GS.Simulator
         }
     }
 
+    public class CmdGotoSpeed : IMountCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; set; }
+        private readonly int _rate;
+        public CmdGotoSpeed(long id, int rate)
+        {
+            Id = id;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            _rate = rate;
+            Successful = false;
+            Result = null;
+            MountQueue.AddCommand(this);
+        }
+        public void Execute(Actions actions)
+        {
+            try
+            {
+                actions.GotoRate(_rate);
+                Result = _rate;
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -196,6 +229,40 @@ namespace GS.Simulator
             try
             {
                 Result = actions.AxisSteps();
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
+    public class AxisStepsDt : IMountCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; private set; }
+        private readonly Axis _axis;
+
+        public AxisStepsDt(long id, Axis axis)
+        {
+            Id = id;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            _axis = axis;
+            Successful = false;
+            Result = null;
+            MountQueue.AddCommand(this);
+        }
+
+        public void Execute(Actions actions)
+        {
+            try
+            {
+                Result = actions.AxisStepsDt(_axis);
                 Successful = true;
             }
             catch (Exception e)
@@ -584,6 +651,40 @@ namespace GS.Simulator
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    public class CmdFactorSteps : IMountCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; private set; }
+
+        public CmdFactorSteps(long id)
+        {
+            Id = id;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            Successful = false;
+            MountQueue.AddCommand(this);
+        }
+
+        public void Execute(Actions actions)
+        {
+            try
+            {
+                Result = actions.FactorSteps();
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
 
     /// <summary>
     /// Get Mount Name
@@ -742,6 +843,40 @@ namespace GS.Simulator
             try
             {
                 Result = actions.Spr();
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets Steps Per Worm Revolution
+    /// </summary>
+    public class CmdSpw : IMountCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; private set; }
+
+        public CmdSpw(long id)
+        {
+            Id = id;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            Successful = false;
+            MountQueue.AddCommand(this);
+        }
+
+        public void Execute(Actions actions)
+        {
+            try
+            {
+                Result = actions.Spw();
                 Successful = true;
             }
             catch (Exception e)

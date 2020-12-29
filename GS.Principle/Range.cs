@@ -13,6 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 namespace GS.Principles
 {
     /// <summary>
@@ -166,6 +167,22 @@ namespace GS.Principles
         {
             double[] xy = { Range270(axes[1]), Range360(axes[0]) };
             return xy;
+        }
+
+        /// <summary>
+        /// Returns double in the range of another double
+        /// </summary>
+        /// <param name="d">Number to range</param>
+        /// <param name="a">Maximum range</param>
+        /// <returns></returns>
+        public static double RangeDouble(double d, double a)
+        {
+            while (d >= a || d < 0.0)
+            {
+                if (d < 0.0) d += a;
+                if (d >= a) d -= a;
+            }
+            return d;
         }
     }
 }

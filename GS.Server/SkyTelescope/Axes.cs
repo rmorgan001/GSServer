@@ -25,7 +25,7 @@ namespace GS.Server.SkyTelescope
     public static class Axes
     {
         /// <summary>
-        /// Convert internal mountaxis degrees to mount with corrrect hemi
+        /// Convert internal mount axis degrees to mount with correct hemisphere
         /// </summary>
         /// <returns></returns>
         public static double[] MountAxis2Mount()

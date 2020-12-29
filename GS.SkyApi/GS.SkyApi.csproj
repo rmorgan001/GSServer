@@ -65,6 +65,7 @@
     <ProjectReference Include="..\GS.Shared\GS.Shared.csproj">
       <Private>false</Private>
     </ProjectReference>
+    <ProjectReference Include="..\GS.Simulator\GS.Simulator.csproj" />
     <ProjectReference Include="..\GS.SkyWatcher\GS.SkyWatcher.csproj">
       <Private>false</Private>
     </ProjectReference>

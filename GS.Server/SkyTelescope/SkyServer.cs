@@ -26,12 +26,15 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using GS.Server.Pec;
 using GS.Server.Windows;
 using AxisStatus = GS.Simulator.AxisStatus;
 
@@ -151,15 +154,16 @@ namespace GS.Server.SkyTelescope
         private static Exception _mountError;
         private static bool _openSetupDialog;
         private static ParkPosition _parkSelected;
+        private static bool _canPPec;
         private static Vector _raDec;
         private static Vector _rateAxes;
         private static Vector _rateRaDec;
         private static double _rightAscensionXForm;
         private static double _slewSettleTime;
         private static double _siderealTime;
+        private static double _trackingRate;
         private static bool _spiralChanged;
         private static Vector _targetRaDec;
-        private static bool _testTab;
         private static TrackingMode _trackingMode;
         private static bool _tracking;
         #endregion
@@ -407,6 +411,11 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        /// <summary>
+        /// Factor to covert steps, Sky Watcher in rad
+        /// </summary>
+        private static double[] FactorStep { get; set; }
+        
         /// <summary>
         /// The current Declination movement rate offset for telescope guiding (degrees/sec) 
         /// </summary>
@@ -962,9 +971,21 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Total steps per worm gear
+        /// Total steps per 360
         /// </summary>
         public static long[] StepsPerRevolution { get; private set; }
+
+        private static double[] Steps{ get; set; }
+
+        /// <summary>
+        /// Total worm teeth
+        /// </summary>
+        public static int[] WormTeethCount { get; private set; }
+
+        /// <summary>
+        /// Total worm step per 360
+        /// </summary>
+        private static double[] StepsWormPerRevolution { get; set; }
 
         /// <summary>
         /// Set for all types of go tos
@@ -1012,16 +1033,6 @@ namespace GS.Server.SkyTelescope
             set => _targetRaDec.X = value;
         }
 
-        public static bool TestTab
-        {
-            get => _testTab;
-            set
-            {
-                if (_testTab == value) { return; }
-                _testTab = value;
-                OnStaticPropertyChanged();
-            }
-        }
 
         /// <summary>
         /// Counts any overlapping events with updating UI that might occur
@@ -1086,6 +1097,19 @@ namespace GS.Server.SkyTelescope
                 _tracking = value;
 
                 SetTracking();
+                OnStaticPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Current Tracking rate
+        /// </summary>
+        public static double TrackingRate
+        {
+            get => _trackingRate;
+            private set
+            {
+                _trackingRate = value;
                 OnStaticPropertyChanged();
             }
         }
@@ -1323,7 +1347,7 @@ namespace GS.Server.SkyTelescope
                         case MountTaskName.AlternatingPpec:
                             break;
                         case MountTaskName.CanPpec:
-                            CanPec = false;
+                            CanPPec = false;
                             break;
                         case MountTaskName.CanHomeSensor:
                             var canHomeCmda = new CmdCapabilities(MountQueue.NewId);
@@ -1397,9 +1421,19 @@ namespace GS.Server.SkyTelescope
                             var sprnum = (long)MountQueue.GetCommandResult(spr).Result;
                             StepsPerRevolution = new[] { sprnum, sprnum };
                             break;
+                        case MountTaskName.StepsWormPerRevolution:
+                            var spw = new CmdSpw(MountQueue.NewId);
+                            var spwnum = (double)MountQueue.GetCommandResult(spw).Result;
+                            StepsWormPerRevolution = new[] { spwnum, spwnum };
+                            break;
                         case MountTaskName.SetHomePositions:
                             _ = new CmdAxisToDegrees(0, Axis.Axis1, _homeAxes.X);
                             _ = new CmdAxisToDegrees(0, Axis.Axis2, _homeAxes.Y);
+                            break;
+                        case MountTaskName.GetFactorStep:
+                            var factorStep = new CmdFactorSteps(MountQueue.NewId);
+                            FactorStep[0] = (double)MountQueue.GetCommandResult(factorStep).Result;
+                            FactorStep[1] = FactorStep[0];
                             break;
                         default:
                             throw new ArgumentOutOfRangeException(nameof(taskName), taskName, null);
@@ -1419,121 +1453,6 @@ namespace GS.Server.SkyTelescope
         // include tracking, hand controller, etc..
         private static Vector SkyHCRate;
         private static Vector SkyTrackingRate;
-
-        // pPEC info
-        private static bool _canPec;
-        public static bool CanPec
-        {
-            get => _canPec;
-            private set
-            {
-                if (_canPec == value) return;
-                _canPec = value;
-                OnStaticPropertyChanged();
-            }
-        }
-
-        public static bool Pec
-        {
-            get => SkySettings.PPecOn;
-            set
-            {
-                if (SkySettings.PPecOn == value) return;
-                SkySettings.PPecOn = value;
-
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Server,
-                    Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{value}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyTasks(MountTaskName.Pec);
-                OnStaticPropertyChanged();
-            }
-        }
-
-        private static bool _pecTraining;
-        public static bool PecTraining
-        {
-            get => _pecTraining;
-            set
-            {
-                if (PecTraining == value) return;
-                _pecTraining = value;
-                Synthesizer.Speak(value ? Application.Current.Resources["vcePeckTrainOn"].ToString() : Application.Current.Resources["vcePeckTrainOff"].ToString());
-
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Server,
-                    Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{value}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyTasks(MountTaskName.PecTraining);
-                OnStaticPropertyChanged();
-            }
-        }
-
-        private static bool _pecTrainInProgress;
-        public static bool PecTrainInProgress
-        {
-            get => _pecTrainInProgress;
-            private set
-            {
-                if (_pecTrainInProgress == value) return;
-                _pecTrainInProgress = value;
-
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Server,
-                    Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{value}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                OnStaticPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// Monitors the mount doing pPEC training
-        /// </summary>
-        private static void CheckPecTraining()
-        {
-            switch (SkySettings.Mount)
-            {
-                case MountType.Simulator:
-                    break;
-                case MountType.SkyWatcher:
-                    if (!PecTraining)
-                    {
-                        PecTrainInProgress = false;
-                        return;
-                    }
-
-                    var ppectrain = new SkyIsPPecInTrainingOn(SkyQueue.NewId);
-                    PecTraining = (bool)SkyQueue.GetCommandResult(ppectrain).Result;
-                    PecTrainInProgress = PecTraining;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
 
         /// <summary>
         /// combines multiple rates for a single slew rate
@@ -1793,14 +1712,14 @@ namespace GS.Server.SkyTelescope
                     switch (taskName)
                     {
                         case MountTaskName.AlternatingPpec:
-                            _ = new SkySetAlternatingPPec(0, SkySettings.AlternatingPpec);
+                            _ = new SkySetAlternatingPPec(0, SkySettings.AlternatingPPec);
                             break;
                         case MountTaskName.DecPulseToGoTo:
                             _ = new SkySetDecPulseToGoTo(0, SkySettings.DecPulseToGoTo);
                             break;
                         case MountTaskName.CanPpec:
                             var SkyMountCanPpec = new SkyCanPPec(SkyQueue.NewId);
-                            CanPec = (bool)SkyQueue.GetCommandResult(SkyMountCanPpec).Result;
+                            CanPPec = (bool)SkyQueue.GetCommandResult(SkyMountCanPpec).Result;
                             break;
                         case MountTaskName.CanHomeSensor:
                             var canHomeSky = new SkyCanHomeSensors(SkyQueue.NewId);
@@ -1817,6 +1736,10 @@ namespace GS.Server.SkyTelescope
                         case MountTaskName.FullCurrent:
                             _ = new SkySetFullCurrent(0, AxisId.Axis1, SkySettings.FullCurrent);
                             _ = new SkySetFullCurrent(0, AxisId.Axis2, SkySettings.FullCurrent);
+                            break;
+                        case MountTaskName.GetFactorStep:
+                            var skyFactor = new SkyGetFactorStepToRad(SkyQueue.NewId);
+                            FactorStep = (double[])SkyQueue.GetCommandResult(skyFactor).Result;
                             break;
                         case MountTaskName.GetOneStepIndicators:
                             //tests if mount can one step
@@ -1845,14 +1768,14 @@ namespace GS.Server.SkyTelescope
                             _ = new SkySetPPecTrain(0, AxisId.Axis1, PecTraining);
                             break;
                         case MountTaskName.Pec:
-                            _ = new SkySetPPec(0, AxisId.Axis1, Pec);
+                            _ = new SkySetPPec(0, AxisId.Axis1, PPecOn);
                             break;
                         case MountTaskName.StopAxes:
                             _ = new SkyAxisStop(0, AxisId.Axis1);
                             _ = new SkyAxisStop(0, AxisId.Axis2);
                             break;
                         case MountTaskName.SetSt4Guiderate:
-                            _ = new SkySetSt4GuideRate(0, SkySettings.St4Guiderate);
+                            _ = new SkySetSt4GuideRate(0, SkySettings.St4GuideRate);
                             break;
                         case MountTaskName.SetSouthernHemisphere:
                             _ = new SkySetSouthernHemisphere(0, SouthernHemisphere);
@@ -1904,6 +1827,12 @@ namespace GS.Server.SkyTelescope
                         case MountTaskName.StepsPerRevolution:
                             var SkyMountRevolutions = new SkyGetStepsPerRevolution(SkyQueue.NewId);
                             StepsPerRevolution = (long[])SkyQueue.GetCommandResult(SkyMountRevolutions).Result;
+                            break;
+                        case MountTaskName.StepsWormPerRevolution:
+                            var SkyWormRevolutions1 = new SkyGetPecPeriod(SkyQueue.NewId, AxisId.Axis1);
+                            StepsWormPerRevolution[0] = (double)SkyQueue.GetCommandResult(SkyWormRevolutions1).Result;
+                            var SkyWormRevolutions2 = new SkyGetPecPeriod(SkyQueue.NewId, AxisId.Axis2);
+                            StepsWormPerRevolution[1] = (double)SkyQueue.GetCommandResult(SkyWormRevolutions2).Result;
                             break;
                         case MountTaskName.SetHomePositions:
                             _ = new SkySetAxisPosition(0, AxisId.Axis1, _homeAxes.X);
@@ -2462,7 +2391,7 @@ namespace GS.Server.SkyTelescope
         /// Calculates the current tracking rate used in arc seconds per degree
         /// </summary>
         /// <returns></returns>
-        private static double CurrentTrackingRate()
+        public static double CurrentTrackingRate()
         {
             double rate;
             switch (SkySettings.TrackingRate)
@@ -2483,6 +2412,16 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
 
+            //Implement Pec
+            if (PecOn && Tracking && PecBinNow != null && !double.IsNaN(PecBinNow.Item2))
+            {
+                // safety check to make sure factor isn't too big
+                if (Math.Abs(PecBinNow.Item2 - 1) < .04)
+                {
+                    rate *= PecBinNow.Item2;
+                }
+            }
+            TrackingRate = rate;
             rate /= 3600;
             if (SkySettings.RaTrackingOffset <= 0) { return rate; }
             var offsetrate = rate * (Convert.ToDouble(SkySettings.RaTrackingOffset) / 100000);
@@ -2579,6 +2518,55 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
+        /// Convert steps to degrees
+        /// </summary>
+        /// <param name="steps"></param>
+        /// <param name="axis"></param>
+        /// <returns>degrees</returns>
+        private static double ConvertStepsToDegrees(double steps, int axis)
+        {
+            double degrees;
+            switch (SkySettings.Mount)
+            {
+                case MountType.Simulator:
+                    degrees = steps / FactorStep[axis];
+                    break;
+                case MountType.SkyWatcher:
+                    degrees = Principles.Units.Rad2Deg1(steps * FactorStep[axis]);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            return degrees;
+        }
+
+        /// <summary>
+        /// Get steps from the mount
+        /// </summary>
+        /// <returns>double array</returns>
+        private static double[] GetRawSteps()
+        {
+            var steps = new[] { double.NaN, double.NaN };
+            if (!IsMountRunning) { return steps; }
+            switch (SkySettings.Mount)
+            {
+                case MountType.Simulator:
+                    var simPositions = new CmdAxesDegrees(MountQueue.NewId);
+                    steps = (double[])MountQueue.GetCommandResult(simPositions).Result;
+                    steps[0] *= FactorStep[0];
+                    steps[1] *= FactorStep[1];
+                    break;
+                case MountType.SkyWatcher:
+                    var skySteps = new SkyGetSteps(SkyQueue.NewId);
+                    steps = (double[])SkyQueue.GetCommandResult(skySteps).Result;
+                    return CheckSkyErrors(skySteps) ? null : steps;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            return steps;
+        }
+
+        /// <summary>
         /// Gets current positions from the mount in steps
         /// </summary>
         /// <returns></returns>
@@ -2617,35 +2605,69 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        /// <summary>
-        /// gets HC speed in degrees
-        /// </summary>
-        /// <param name="speed"></param>
-        /// <returns></returns>
-        public static double GetSlewSpeed(SlewSpeed speed)
+        public static Tuple<double?, DateTime> GetRawStepsDt(int axis)
         {
-            switch (speed)
+            if (!IsMountRunning) { return null; }
+            switch (SkySettings.Mount)
             {
-                case SlewSpeed.One:
-                    return SlewSpeedOne;
-                case SlewSpeed.Two:
-                    return SlewSpeedTwo;
-                case SlewSpeed.Three:
-                    return SlewSpeedThree;
-                case SlewSpeed.Four:
-                    return SlewSpeedFour;
-                case SlewSpeed.Five:
-                    return SlewSpeedFive;
-                case SlewSpeed.Six:
-                    return SlewSpeedSix;
-                case SlewSpeed.Seven:
-                    return SlewSpeedSeven;
-                case SlewSpeed.Eight:
-                    return SlewSpeedEight;
+                case MountType.Simulator:
+                    switch (axis)
+                    {
+                        case 0:
+                            var a = new AxisStepsDt(MountQueue.NewId, Axis.Axis1);
+                            return MountQueue.GetCommandResult(a).Result;
+                        case 1:
+                            var b = new AxisStepsDt(MountQueue.NewId, Axis.Axis2);
+                            return MountQueue.GetCommandResult(b).Result;
+                        default:
+                            return null;
+                    }
+                case MountType.SkyWatcher:
+                    switch (axis)
+                    {
+                        case 0:
+                            var b = new SkyGetAxisPositionDate(SkyQueue.NewId, AxisId.Axis1);
+                            return SkyQueue.GetCommandResult(b).Result;
+                        case 1:
+                            var c = new SkyGetAxisPositionCounter(SkyQueue.NewId, AxisId.Axis2);
+                            return SkyQueue.GetCommandResult(c).Result;
+                        default:
+                            return null;
+                    }
                 default:
-                    return 0.0;
+                    return null;
             }
         }
+        
+        ///// <summary>
+        ///// gets HC speed in degrees
+        ///// </summary>
+        ///// <param name="speed"></param>
+        ///// <returns></returns>
+        //public static double GetSlewSpeed(SlewSpeed speed)
+        //{
+        //    switch (speed)
+        //    {
+        //        case SlewSpeed.One:
+        //            return SlewSpeedOne;
+        //        case SlewSpeed.Two:
+        //            return SlewSpeedTwo;
+        //        case SlewSpeed.Three:
+        //            return SlewSpeedThree;
+        //        case SlewSpeed.Four:
+        //            return SlewSpeedFour;
+        //        case SlewSpeed.Five:
+        //            return SlewSpeedFive;
+        //        case SlewSpeed.Six:
+        //            return SlewSpeedSix;
+        //        case SlewSpeed.Seven:
+        //            return SlewSpeedSeven;
+        //        case SlewSpeed.Eight:
+        //            return SlewSpeedEight;
+        //        default:
+        //            return 0.0;
+        //    }
+        //}
 
         /// <summary>
         /// Runs the Goto in async so not to block the driver or UI threads.
@@ -3250,6 +3272,9 @@ namespace GS.Server.SkyTelescope
             var counter = 0;
 
             MonitorEntry monitorItem;
+            int raWormTeeth;
+            int decWormTeeth;
+
             switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
@@ -3257,7 +3282,14 @@ namespace GS.Server.SkyTelescope
                     SimTasks(MountTaskName.MountName);
                     SimTasks(MountTaskName.MountVersion);
                     SimTasks(MountTaskName.StepsPerRevolution);
+                    SimTasks(MountTaskName.StepsWormPerRevolution);
                     SimTasks(MountTaskName.CanHomeSensor);
+                    SimTasks(MountTaskName.GetFactorStep);
+
+                    raWormTeeth = (int) Math.Round(StepsPerRevolution[0] / StepsWormPerRevolution[0],0);
+                    decWormTeeth = (int) Math.Round(StepsPerRevolution[1] / StepsWormPerRevolution[1],0);
+                    WormTeethCount = new[] {raWormTeeth, decWormTeeth};
+                    PecBinSteps = StepsPerRevolution[0] / (WormTeethCount[0] * 1.0) / PecBinCount;
 
                     // checks if the mount is close enough to home position to set default position. If not use the positions from the mount
                     while (rawPositions == null)
@@ -3304,6 +3336,7 @@ namespace GS.Server.SkyTelescope
                     SkyTasks(MountTaskName.MountName);
                     SkyTasks(MountTaskName.MountVersion);
                     SkyTasks(MountTaskName.StepsPerRevolution);
+                    SkyTasks(MountTaskName.StepsWormPerRevolution);
                     SkyTasks(MountTaskName.InitialiseAxes);
                     SkyTasks(MountTaskName.GetOneStepIndicators);
                     SkyTasks(MountTaskName.CanPpec);
@@ -3312,7 +3345,13 @@ namespace GS.Server.SkyTelescope
                     SkyTasks(MountTaskName.AlternatingPpec);
                     SkyTasks(MountTaskName.MinPulseDec);
                     SkyTasks(MountTaskName.MinPulseRa);
-                    if(CanPec) SkyTasks(MountTaskName.Pec);
+                    SkyTasks(MountTaskName.GetFactorStep);
+                    if (CanPPec) SkyTasks(MountTaskName.Pec);
+
+                    raWormTeeth = (int)Math.Round(StepsPerRevolution[0] / StepsWormPerRevolution[0], 0);
+                    decWormTeeth = (int)Math.Round(StepsPerRevolution[1] / StepsWormPerRevolution[1], 0);
+                    WormTeethCount = new[] { raWormTeeth, decWormTeeth };
+                    PecBinSteps = StepsPerRevolution[0] / (WormTeethCount[0] * 1.0) / PecBinCount;
 
                     // checks if the mount is close enough to home position to set default position. If not use the positions from the mount
                     while (rawPositions == null)
@@ -3359,6 +3398,25 @@ namespace GS.Server.SkyTelescope
 
             monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"StepsPerRevolution:{StepsPerRevolution[0]},{StepsPerRevolution[1]}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            //Load Pec Files
+            var pecmsg = string.Empty;
+            PecOn = SkySettings.PecOn;
+            if (File.Exists(SkySettings.PecWormFile))
+            {
+                LoadPecFile(SkySettings.PecWormFile);
+                pecmsg += SkySettings.PecWormFile;
+            }
+
+            if (File.Exists(SkySettings.Pec360File))
+            {
+                LoadPecFile(SkySettings.Pec360File);
+                pecmsg += ", " + SkySettings.PecWormFile;
+            }
+
+            monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Pec: {pecmsg}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             return true;
@@ -3637,7 +3695,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{_guideRate.X},{_guideRate.Y}"
+                Message = $"{_guideRate.X * 3600},{_guideRate.Y * 3600}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -3749,7 +3807,7 @@ namespace GS.Server.SkyTelescope
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
+            
             dynamic _;
             switch (SkySettings.Mount)
             {
@@ -3765,15 +3823,18 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
 
+            // don't log if pec is on
+            if (PecOn){return;}
+
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
-                Type = MonitorType.Data,
+                Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{_trackingMode},{rateChange}"
+                Message = $"{_trackingMode},{rateChange * 3600},{PecBinNow}"
             };
             MonitorLog.LogToMonitor(monitorItem);
         }
@@ -4006,147 +4067,7 @@ namespace GS.Server.SkyTelescope
             Tracking = false;
             Synthesizer.Speak(Application.Current.Resources["vceStop"].ToString());
         }
-
-        public static void StopAxesTask(int axis, bool validate, bool speak, bool stopTracking, bool trackingSpeak, SlewType? slewState)
-        {
-            if (!IsMountRunning) { return; }
-
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Telescope,
-                Category = MonitorCategory.Server,
-                Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{axis},{validate},{slewState} "
-            };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            Task raTask = null;
-            Task decTask = null;
-            switch (axis)
-            {
-                case 1:
-                    decTask = Task.Run(() => StopAxis(axis, validate, speak, stopTracking, trackingSpeak, slewState));
-                    Task.WaitAll(decTask);
-                    break;
-                case 2:
-                    raTask = Task.Run(() => StopAxis(axis, validate, speak, stopTracking, trackingSpeak, slewState));
-                    Task.WaitAll(raTask);
-                    break;
-                case 3:
-                    decTask = Task.Run(() => StopAxis(axis, validate, speak, stopTracking, trackingSpeak, slewState));
-                    raTask = Task.Run(() => StopAxis(axis, validate, speak, stopTracking, trackingSpeak, slewState));
-                    Task.WaitAll(decTask, raTask);
-                    break;
-            }
-        }
-
-        private static void StopAxis(int axis, bool validate, bool speak, bool stopTracking, bool trackingSpeak, SlewType? slewState)
-        {
-            object _;
-            bool istracking;
-            var axis1stopped = false;
-            var axis2stopped = false;
-            Stopwatch stopwatch;
-
-            if (!IsMountRunning) { return; }
-
-            switch (SkySettings.Mount)
-            {
-                case MountType.Simulator:
-                    istracking = Tracking;
-                    TrackingSpeak = trackingSpeak;
-                    Tracking = false;
-
-                    switch (axis)
-                    {
-                        case 1:
-                            stopwatch = Stopwatch.StartNew();
-                            while (stopwatch.Elapsed.TotalMilliseconds < 3000)
-                            {
-                                _ = new CmdAxisStop(0, Axis.Axis1);
-                                if (!validate) { break;}
-                                
-                                var statusx = new CmdAxisStatus(MountQueue.NewId, Axis.Axis1);
-                                var axis1Status = (AxisStatus)MountQueue.GetCommandResult(statusx).Result;
-                                axis1stopped = axis1Status.Stopped;
-                                if (axis1stopped) { break; }
-                            }
-
-                            if (!axis1stopped) { return; }
-                            Tracking = !stopTracking || istracking;
-                            TrackingSpeak = true;
-                            break;
-                        case 2:
-                            stopwatch = Stopwatch.StartNew();
-                            while (stopwatch.Elapsed.TotalMilliseconds < 3000)
-                            {
-                                _ = new CmdAxisStop(0, Axis.Axis2);
-                                if (!validate) { break; }
-
-                                var statusy = new CmdAxisStatus(MountQueue.NewId, Axis.Axis2);
-                                var axis2Status = (AxisStatus)MountQueue.GetCommandResult(statusy).Result;
-                                axis2stopped = axis2Status.Stopped;
-                                if (axis2stopped) { break; }
-                            }
-                            if (!axis2stopped) { return; }
-                            break;
-                        case 3:
-                            break;
-
-                    }
-                    break;
-                case MountType.SkyWatcher:
-                    istracking = Tracking;
-                    TrackingSpeak = trackingSpeak;
-                    Tracking = false;
-
-                    switch (axis)
-                    {
-                        case 1:
-                            stopwatch = Stopwatch.StartNew();
-                            while (stopwatch.Elapsed.TotalMilliseconds < 3000)
-                            {
-                                _ = new SkyAxisStop(0, AxisId.Axis1);
-                                if (!validate) { break; }
-
-                                var statusx = new SkyIsAxisFullStop(SkyQueue.NewId, AxisId.Axis1);
-                                axis1stopped = Convert.ToBoolean(SkyQueue.GetCommandResult(statusx).Result);
-                                if (axis1stopped) { break; }
-                            }
-                            if (!axis1stopped) { return; }
-                            Tracking = !stopTracking || istracking;
-                            TrackingSpeak = true;
-                            break;
-                        case 2:
-                            stopwatch = Stopwatch.StartNew();
-                            while (stopwatch.Elapsed.TotalMilliseconds < 3000)
-                            {
-                                _ = new SkyAxisStop(0, AxisId.Axis2);
-                                if (!validate) { break; }
-
-                                var statusy = new SkyIsAxisFullStop(SkyQueue.NewId, AxisId.Axis2);
-                                axis2stopped = Convert.ToBoolean(SkyQueue.GetCommandResult(statusy).Result);
-
-                                if (!axis2stopped) { break; }
-                            }
-                            if (!axis2stopped) { return; }
-                            break;
-                    }
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            _rateAxes = new Vector();
-            _rateRaDec = new Vector();
-            if (slewState != null) { SlewState = (SlewType)slewState; }
-            if (speak) { Synthesizer.Speak(Application.Current.Resources["vceStop"].ToString()); }
-
-        }
-
+        
         /// <summary>
         /// Sync using az/alt
         /// </summary>
@@ -4338,8 +4259,14 @@ namespace GS.Server.SkyTelescope
             // set default snap port but don't run task
             SnapPort = false;
 
-            StepsPerRevolution = new long[] { 1296000, 1296000 };
+            FactorStep = new[] {0.0, 0.0};
+            StepsPerRevolution = new long[] { 12960000, 12960000 };
+            WormTeethCount = new[]{ 180, 180 };
+            StepsWormPerRevolution = new[] { StepsPerRevolution[0] / (double) WormTeethCount[0], StepsPerRevolution[1] / (double)WormTeethCount[1] };
             SlewSettleTime = 0;
+
+            //Pec
+            PecBinCount = 100;
 
             // reset any rates so slewing doesn't start
             _rateRaDec = new Vector(0, 0);
@@ -4468,11 +4395,21 @@ namespace GS.Server.SkyTelescope
                 SiderealTime = Time.Lst(JDate.Epoch2000Days(), gsjd, false, SkySettings.Longitude);
 
                 // Get raw positions, some are non-responses from mount and are returned as NaN
-                var rawPositions = GetRawDegrees();
+                var rawPositions = GetRawSteps(); //var rawPositions = GetRawDegrees();
                 if (rawPositions == null) { return; }
                 if (double.IsNaN(rawPositions[0]) || double.IsNaN(rawPositions[1])) { return; }
 
-                // UI diagnostics
+                // store actual steps
+                Steps = rawPositions;
+
+                //Implement Pec
+                PecCheck();
+
+                //Convert Positions to degrees
+                rawPositions[0] = ConvertStepsToDegrees(rawPositions[0],0);
+                rawPositions[1] = ConvertStepsToDegrees(rawPositions[1], 1);
+
+                // UI diagnostics in degrees
                 ActualAxisX = rawPositions[0];
                 ActualAxisY = rawPositions[1];
 
@@ -4522,6 +4459,637 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        #endregion
+
+        #region PEC & PPEC
+
+        private static bool _pecShow;
+        /// <summary>
+        /// sets up bool to load a test tab
+        /// </summary>
+        public static bool PecShow
+        {
+            get => _pecShow;
+            set
+            {
+                _pecShow = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Can mount do PPec
+        /// </summary>
+        public static bool CanPPec
+        {
+            get => _canPPec;
+            private set
+            {
+                if (_canPPec == value) return;
+                _canPPec = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Turn on/off mount PPec
+        /// </summary>
+        public static bool PPecOn
+        {
+            get => SkySettings.PPecOn;
+            set
+            {
+                SkySettings.PPecOn = value;
+                SkyTasks(MountTaskName.Pec);
+                OnStaticPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// turn on/off mount training
+        /// </summary>
+        private static bool _pPecTraining;
+        public static bool PecTraining
+        {
+            get => _pPecTraining;
+            set
+            {
+                if (PecTraining == value) return;
+                _pPecTraining = value;
+                Synthesizer.Speak(value ? Application.Current.Resources["vcePeckTrainOn"].ToString() : Application.Current.Resources["vcePeckTrainOff"].ToString());
+
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{value}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyTasks(MountTaskName.PecTraining);
+                OnStaticPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Tracks training within mount
+        /// </summary>
+        private static bool _pPecTrainInProgress;
+        public static bool PecTrainInProgress
+        {
+            get => _pPecTrainInProgress;
+            private set
+            {
+                if (_pPecTrainInProgress == value) return;
+                _pPecTrainInProgress = value;
+
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{value}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OnStaticPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Pec status
+        /// </summary>
+        public static bool PecOn
+        {
+            get => SkySettings.PecOn;
+            set
+            {
+               SkySettings.PecOn = value;
+                // set back to normal tracking
+                if (!value && Tracking) { SetTracking(); }
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static Tuple<int, double, int> _pecBinNow;
+        /// <summary>
+        /// Pec Currently used bin for Pec
+        /// </summary>
+        public static Tuple<int, double, int> PecBinNow
+        {
+            get => _pecBinNow;
+            private set
+            {
+                if (Equals(_pecBinNow, value)){return;}
+                _pecBinNow = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Pec Worm count bins
+        /// </summary>
+        public static int PecBinCount { get; private set; }
+
+        /// <summary>
+        /// Pec size by steps
+        /// </summary>
+        public static double PecBinSteps { get; private set; }
+
+        /// <summary>
+        /// Pec worm mode, list that holds all pec rate factors
+        /// </summary>
+        public static SortedList<int, Tuple<double, int>> PecWormMaster { get; private set; }
+
+        /// <summary>
+        /// Pec 360 mode, list that holds all pec rate factors
+        /// </summary>
+        public static SortedList<int, Tuple<double, int>> Pec360Master { get; set; }
+
+        /// <summary>
+        /// Pec bin list that holds subset of the mater list, used as a cache
+        /// </summary>
+        private static SortedList<int, Tuple<double, int>> PecBinsSubs { get; set; }
+
+        /// <summary>
+        /// pPEC Monitors the mount doing pPEC training
+        /// </summary>
+        private static void CheckPecTraining()
+        {
+            switch (SkySettings.Mount)
+            {
+                case MountType.Simulator:
+                    break;
+                case MountType.SkyWatcher:
+                    if (!PecTraining)
+                    {
+                        PecTrainInProgress = false;
+                        return;
+                    }
+
+                    var ppectrain = new SkyIsPPecInTrainingOn(SkyQueue.NewId);
+                    PecTraining = (bool)SkyQueue.GetCommandResult(ppectrain).Result;
+                    PecTrainInProgress = PecTraining;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        /// <summary>
+        /// Pec Implement
+        /// </summary>
+        private static void PecCheck()
+        {
+            try
+            {
+                if (!PecOn || !Tracking || PecBinCount < 0 || IsSlewing || !PecShow) return;
+                
+                // Get axis position and range it
+                var position = (int)Range.RangeDouble(Steps[0], Convert.ToDouble(StepsPerRevolution[0]));
+
+                // calc current bin number
+                var newBinNo = (int)((position + SkySettings.PecOffSet) / PecBinSteps);
+
+                // Holder for new bin
+                Tuple<double, int> pecBin = null;
+
+                switch (SkySettings.PecMode)
+                {
+                    case PecMode.PecWorm:
+                        newBinNo %= 100;
+                        // No bin change return
+                        if (PecBinNow?.Item1 == newBinNo) return;
+                        if (PecWormMaster == null || PecWormMaster?.Count == 0) {return;}
+                        PecWormMaster.TryGetValue(newBinNo, out pecBin);
+                        break;
+                    case PecMode.Pec360:
+                        // No bin change return
+                        if (PecBinNow?.Item1 == newBinNo) return;
+                        if (Pec360Master == null || Pec360Master?.Count == 0) {return;}
+                        if (PecBinsSubs == null) { PecBinsSubs = new SortedList<int, Tuple<double, int>>(); }
+                        var count = 0;
+                        // search subs for new bin
+                        while (PecBinsSubs.TryGetValue(newBinNo, out pecBin) == false && count < 2)
+                        {
+                            // stay within limits
+                            var binStart = newBinNo - 100 < 0 ? 0 : newBinNo - 100;
+                            var binEnd = newBinNo + 100 > StepsPerRevolution[0] -1  //adjust for going over max?
+                                ? (int)StepsPerRevolution[0] - 1
+                                : newBinNo + 100;
+
+                            // create sub list
+                            PecBinsSubs.Clear();
+                            for (var i = binStart; i <= binEnd; i++)
+                            {
+                                var masterResult = Pec360Master.TryGetValue(i, out var mi);
+                                if (masterResult) PecBinsSubs.Add(i, mi);
+                            }
+
+                            count++;
+                        }
+                        if (PecBinsSubs.Count == 0)
+                        {
+                            throw new Exception($"Pec sub not found");
+                        }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                // bin must exist or throw error
+                if (pecBin == null){throw new Exception($"Pec not found");}
+
+                var binNew = new Tuple<int, double, int>(newBinNo, pecBin.Item1, pecBin.Item2);
+
+                // assign new bin info
+                PecBinNow = binNew;
+
+                // Send to mount
+                SetTracking();
+            }
+            catch (Exception ex)
+            {
+                PecOn = false;
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Mount,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                MountError = ex;
+            }
+
+        }
+
+        /// <summary>
+        /// Loads both types of pec files
+        /// </summary>
+        /// <param name="fileName"></param>
+        public static void LoadPecFile(string fileName)
+        {
+            var def = new PecTrainingDefinition();
+            var bins = new List<PecBinData>();
+
+            // load file
+            var lines = File.ReadAllLines(fileName);
+            for (var i = 0; i < lines.Length; i += 1)
+            {
+                var line = lines[i];
+                if (line.Length == 0) { continue; }
+
+                switch (line[0])
+                {
+                    case '#':
+                        var keys = line.Split('=');
+                        if (keys.Length != 2) { break; }
+
+                        switch (keys[0].Trim())
+                        {
+                            case "#StartTime":
+                                if (DateTime.TryParseExact(keys[1].Trim(), "yyyy:MM:dd:HH:mm:ss.fff",
+                                    CultureInfo.InvariantCulture, DateTimeStyles.None, out var startTime))
+                                {
+                                    def.StartTime = startTime;
+                                }
+                                break;
+                            case "#StartPosition":
+                                if (double.TryParse(keys[1].Trim(), out var startPosition))
+                                {
+                                    def.StartPosition = startPosition;
+                                }
+                                break;
+                            case "#EndTime":
+                                if (DateTime.TryParseExact(keys[1].Trim(), "yyyy:MM:dd:HH:mm:ss.fff",
+                                    CultureInfo.InvariantCulture, DateTimeStyles.None, out var endTime))
+                                {
+                                    def.EndTime = endTime;
+                                }
+                                break;
+                            case "#EndPosition":
+                                if (double.TryParse(keys[1].Trim(), out var EndPosition))
+                                {
+                                    def.StartPosition = EndPosition;
+                                }
+                                break;
+                            case "#Index":
+                                if (int.TryParse(keys[1].Trim(), out var index))
+                                {
+                                    def.Index = index;
+                                }
+                                break;
+                            case "#Cycles":
+                                if (int.TryParse(keys[1].Trim(), out var cycles))
+                                {
+                                    def.Cycles = cycles;
+                                }
+                                break;
+                            case "#WormPeriod":
+                                if (double.TryParse(keys[1].Trim(), out var WormPeriod))
+                                {
+                                    def.WormPeriod = WormPeriod;
+                                }
+                                break;
+                            case "#WormTeeth":
+                                if (int.TryParse(keys[1].Trim(), out var WormTeeth))
+                                {
+                                    def.WormTeeth = WormTeeth;
+                                }
+                                break;
+                            case "#WormSteps":
+                                if (double.TryParse(keys[1].Trim(), out var WormSteps))
+                                {
+                                    def.WormSteps = WormSteps;
+                                }
+                                break;
+                            case "#TrackingRate":
+                                if (double.TryParse(keys[1].Trim(), out var TrackingRate1))
+                                {
+                                    def.TrackingRate = TrackingRate1;
+                                }
+                                break;
+                            case "#PositionOffset":
+                                if (double.TryParse(keys[1].Trim(), out var PositionOffset))
+                                {
+                                    def.PositionOffset = PositionOffset;
+                                }
+                                break;
+                            case "#Ra":
+                                if (double.TryParse(keys[1].Trim(), out var Ra))
+                                {
+                                    def.Ra = Ra;
+                                }
+                                break;
+                            case "#Dec":
+                                if (double.TryParse(keys[1].Trim(), out var Dec))
+                                {
+                                    def.Dec = Dec;
+                                }
+                                break;
+                            case "#BinCount":
+                                if (int.TryParse(keys[1].Trim(), out var BinCount))
+                                {
+                                    def.BinCount = BinCount;
+                                }
+                                break;
+                            case "#BinSteps":
+                                if (double.TryParse(keys[1].Trim(), out var BinSteps))
+                                {
+                                    def.BinSteps = BinSteps;
+                                }
+                                break;
+                            case "#BinTime":
+                                if (double.TryParse(keys[1].Trim(), out var BinTime))
+                                {
+                                    def.BinTime = BinTime;
+                                }
+                                break;
+                            case "#StepsPerSec":
+                                if (double.TryParse(keys[1].Trim(), out var StepsPerSec))
+                                {
+                                    def.StepsPerSec = StepsPerSec;
+                                }
+                                break;
+                            case "#StepsPerRev":
+                                if (double.TryParse(keys[1].Trim(), out var StepsPerRev))
+                                {
+                                    def.StepsPerRev = StepsPerRev;
+                                }
+                                break;
+                            case "#InvertCapture":
+                                if (bool.TryParse(keys[1].Trim(), out var InvertCapture))
+                                {
+                                    def.InvertCapture = InvertCapture;
+                                }
+                                break;
+                            case "#FileName":
+                                if (File.Exists(keys[1].Trim()))
+                                {
+                                    def.FileName = keys[1].Trim();
+                                }
+                                break;
+                            case "#FileType":
+                                if (Enum.TryParse<PecFileType>(keys[1].Trim(), true, out var FileType))
+                                {
+                                    def.FileType = FileType;
+                                }
+                                break;
+                        }
+                        break;
+                    default:
+                        var data = line.Split('~');
+                        if (data.Length != 3) { break; }
+                        var bin = new PecBinData();
+                        if (int.TryParse(data[0].Trim(), out var binNumber))
+                        {
+                            bin.BinNumber = binNumber;
+                        }
+                        if (double.TryParse(data[1].Trim(), out var binFactor))
+                        {
+                            bin.BinFactor = binFactor;
+                        }
+                        if (int.TryParse(data[2].Trim(), out var binUpdates))
+                        {
+                            bin.BinUpdates = binUpdates;
+                        }
+                        if (binFactor > 0 && binFactor < 2) { bins.Add(bin); }
+                        break;
+                }
+            }
+
+            // validate
+            var msg = string.Empty;
+            var paramError = false;
+
+            if (def.FileType != PecFileType.GSPecWorm && def.FileType != PecFileType.GSPec360)
+            {
+                paramError = true;
+                msg = "FileType";
+            }
+            if (def.BinCount != SkyServer.PecBinCount)
+            {
+                paramError = true;
+                msg = "BinCount";
+            }
+            if (Math.Abs(def.BinSteps - SkyServer.PecBinSteps) > 0)
+            {
+                paramError = true;
+                msg = "BinSteps";
+            }
+            if (Math.Abs((long)def.StepsPerRev - SkyServer.StepsPerRevolution[0]) > 0)
+            {
+                paramError = true;
+                msg = "StepsPerRev";
+            }
+            if (def.WormTeeth != SkyServer.WormTeethCount[0])
+            {
+                paramError = true;
+                msg = "WormTeeth";
+            }
+            switch (def.FileType)
+            {
+                case PecFileType.GSPecWorm:
+                    if (def.BinCount == bins.Count) { break; }
+                    paramError = true;
+                    msg = $"BinCount {PecFileType.GSPecWorm}";
+                    break;
+                case PecFileType.GSPec360:
+                    if (bins.Count == (int)(def.StepsPerRev / def.BinSteps)) { break; }
+                    paramError = true;
+                    msg = $"BinCount {PecFileType.GSPec360}";
+                    break;
+                case PecFileType.GSPecDebug:
+                    paramError = true;
+                    msg = $"BinCount {PecFileType.GSPecDebug}";
+                    break;
+                default:
+                    paramError = true;
+                    msg = $"FileType Error";
+                    break;
+            }
+
+            if (paramError) { throw new Exception($"Error Pec Parameter ({msg})"); }
+
+            bins = CleanUpBins(bins);
+
+            // load to master
+            switch (def.FileType)
+            {
+                case PecFileType.GSPecWorm:
+                    var master = MakeWormMaster(bins);
+                    UpdateWormMaster(master, PecMergeType.Replace);
+                    SkySettings.PecWormFile = fileName;
+                    break;
+                case PecFileType.GSPec360:
+                    SkySettings.Pec360File = fileName;
+                    break;
+                case PecFileType.GSPecDebug:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+        }
+
+        /// <summary>
+        /// Corrects missing bins
+        /// </summary>
+        /// <returns>new list of bins</returns>
+        public static List<PecBinData> CleanUpBins(IReadOnlyCollection<PecBinData> bins)
+        {
+            if (bins == null) { return null; }
+
+            // Correct for missing bins
+            var sortedList = bins.OrderBy(o => o.BinNumber).ToList();
+            var validBins = new List<PecBinData>();
+            for (var i = sortedList[0].BinNumber; i <= sortedList[sortedList.Count - 1].BinNumber; i++)
+            {
+                var result = sortedList.Find(o => o.BinNumber == i);
+                validBins.Add(result ?? new PecBinData { BinFactor = 1.0, BinNumber = i });
+            }
+
+            validBins = validBins.OrderBy(o => o.BinNumber).ToList();
+            return validBins;
+        }
+
+        /// <summary>
+        /// Creates a new master list using 100 bins
+        /// </summary>
+        /// <param name="bins"></param>
+        /// <returns></returns>
+        public static SortedList<int, Tuple<double, int>> MakeWormMaster(IReadOnlyList<PecBinData> bins)
+        {
+            // find the start of a worm period
+            var index = 0;
+            for (var i = 0; i < bins.Count; i++)
+            {
+                var binNo = bins[i].BinNumber * 1.0 / PecBinCount;
+                var remainder = binNo % 1;
+                if (remainder != 0) { continue; }
+                index = i;
+                break;
+            }
+            if (double.IsNaN(index)) { return null; }
+
+            // create new bin set, zero based on worm start position
+            var orderBins = new List<PecBinData>();
+            for (var i = index; i < PecBinCount; i++)
+            {
+                orderBins.Add(bins[i]);
+            }
+            for (var i = 0; i < index; i++)
+            {
+                orderBins.Add(bins[i]);
+            }
+
+            // create master set of bins using train data
+            var binsMaster = new SortedList<int, Tuple<double, int>>();
+            for (var j = 0; j < PecBinCount; j++)
+            {
+                binsMaster.Add(j, new Tuple<double, int>(orderBins[j].BinFactor, 1));
+            }
+            return binsMaster;
+        }
+
+        /// <summary>
+        /// Updates the server pec master list with applied bins
+        /// </summary>
+        /// <param name="mBins"></param>
+        /// <param name="mergeType"></param>
+        public static void UpdateWormMaster(SortedList<int, Tuple<double, int>> mBins, PecMergeType mergeType)
+        {
+            if (mBins == null) { return; }
+            if (PecWormMaster == null) { mergeType = PecMergeType.Replace; }
+            if (PecWormMaster?.Count != mBins.Count) { mergeType = PecMergeType.Replace; }
+
+            switch (mergeType)
+            {
+                case PecMergeType.Replace:
+                    PecWormMaster = mBins;
+                    SkySettings.PecOffSet = 0; // reset offset
+                    return;
+                case PecMergeType.Merge:
+                    var pecBins = PecWormMaster;
+                    if (pecBins == null)
+                    {
+                        PecWormMaster = mBins;
+                        SkySettings.PecOffSet = 0;
+                        return;
+                    }
+                    for (var i = 0; i < mBins.Count; i++)
+                    {
+                        if (double.IsNaN(pecBins[i].Item1))
+                        {
+                            pecBins[i] = new Tuple<double, int>(mBins[i].Item1, 1);
+                            continue;
+                        }
+
+                        var updateCount = pecBins[i].Item2;
+                        if (updateCount < 1) { updateCount = 1; }
+                        updateCount++;
+                        var newFactor = (pecBins[i].Item1 * updateCount + mBins[i].Item1) / (updateCount + 1);
+                        var newBin = new Tuple<double, int>(newFactor, updateCount);
+                        pecBins[i] = newBin;
+
+                    }
+                    PecWormMaster = pecBins;
+                    return;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(mergeType), mergeType, null);
+            }
+        }
         #endregion
     }
 }

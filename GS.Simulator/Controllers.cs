@@ -28,6 +28,7 @@ namespace GS.Simulator
 
         private static CancellationTokenSource _ctsMount = new CancellationTokenSource();
         private const long RevolutionSteps = 12960000;
+        private const long WormRevolutionSteps = 64800;
         private const bool CanAxisSlewsIndependent = false;
         private const bool CanAzEq = false;
         private const bool CanDualEncoders = false;
@@ -70,6 +71,7 @@ namespace GS.Simulator
         private bool _homeSensorX;
         private bool _homeSensorY;
 
+        private const int _factorSteps = 36000;
         private const int _maxRate = 4;
         private const double SlewSpeedOne = .01 * _maxRate;
         //private const double SlewSpeedTwo = .02 * _maxRate;
@@ -78,7 +80,7 @@ namespace GS.Simulator
         //private const double SlewSpeedFive = 2.0 * _maxRate;
         private const double SlewSpeedSix = 2.5 * _maxRate;
         //private const double SlewSpeedSeven = 3.0 * _maxRate;
-        private const double SlewSpeedEight = 3.4 * _maxRate;
+        //private const double SlewSpeedEight = 3.4 * _maxRate;
 
         #endregion
 
@@ -86,12 +88,13 @@ namespace GS.Simulator
 
         private double DegreesX { get; set; }
         private double DegreesY { get; set; }
-        private int StepsX => (int)(DegreesX * 36000);
-        private int StepsY => (int)(DegreesY * 36000);
+        private int StepsX => (int)(DegreesX * _factorSteps);
+        private int StepsY => (int)(DegreesY * _factorSteps);
         private double HcX { get; set; }
         private double HcY { get; set; }
         private int HomeSensorX { get; set; }
         private int HomeSensorY { get; set; }
+        private int SlewSpeedEight { get; set; }
 
         #endregion
 
@@ -99,6 +102,7 @@ namespace GS.Simulator
         {
             DegreesX = 0;
             DegreesY = 0;
+            SlewSpeedEight = 13;
         }
 
         /// <summary>
@@ -337,6 +341,17 @@ namespace GS.Simulator
                     return $"{MountVersion}";
                 case "spr":
                     return $"{RevolutionSteps}";
+                case "spw":
+                    return $"{WormRevolutionSteps}";
+                case "factorsteps":
+                    return $"{_factorSteps}";
+                case "gotorate":
+                    var x = Convert.ToInt32(cmd[1]);
+                    if (x >= 1 && x <= 20)
+                    {
+                        SlewSpeedEight = x;
+                    }
+                    break;
                 default:
                     return "!";
 

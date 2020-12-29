@@ -45,7 +45,8 @@
     <AssemblyOriginatorKeyFile>Resources\ASCOM.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\greenswamp1.ico</ApplicationIcon>
+    <ApplicationIcon>greenswamp1.ico</ApplicationIcon>
+    <Copyright>Copyright © GreenSwamp Software 2019-2021</Copyright>
   </PropertyGroup>
  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>

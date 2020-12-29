@@ -51,8 +51,10 @@ namespace GS.SkyWatcher
         private readonly object _syncObject = new object();
 
         public DateTime LastI1RunTime { get; private set; }
+        public DateTime Last_j1RunTime { get; private set; }
+        public DateTime Last_j2RunTime { get; private set; }
         public DateTime LastJ2RunTime { get; private set; }
-
+        
         // use for serial event
         //private string IncomingData;
         // number of retries sending the same command
@@ -181,6 +183,15 @@ namespace GS.SkyWatcher
         internal double[] GetFactorRadRateToInt()
         {
             return (double[])_factorRadRateToInt.Clone();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        internal double[] GetFactorStepToRad()
+        {
+            return (double[])_factorStepToRad.Clone();
         }
 
         /// <summary>
@@ -411,7 +422,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// j Gets radians position of an axis
+        /// j Gets radians position of an axis or returns NaN
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <returns>Radians of the axis or NaN if no response is received</returns>
@@ -426,7 +437,21 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// j Gets axis position counter
+        /// j Gets axis position steps or returns NaN
+        /// </summary>
+        /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
+        /// <returns>Cardinal encoder count</returns>
+        internal double GetAxisStepsNaN(AxisId axis)
+        {
+            var response = CmdToAxis(axis, 'j', null, true);
+            if (string.IsNullOrEmpty(response)) return double.NaN;
+            var iPosition = StringToLong(response);
+            iPosition -= 0x00800000;
+            return iPosition;
+        }
+
+        /// <summary>
+        /// j Gets axis position steps
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <returns>Cardinal encoder count</returns>
@@ -869,18 +894,25 @@ namespace GS.SkyWatcher
             commandStr.Append(cmdDataStr);
             commandStr.Append(_endChar);                         // CR Character            
 
+            var dt = Principles.HiResDateTime.UtcNow;
             var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{commandStr.ToString().Trim()}" };
+            { Datetime = dt, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{commandStr.ToString().Trim()}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             switch (command)
             {
                 // store time for any measurements
+                case 'j' when axis == AxisId.Axis1:
+                    Last_j1RunTime = dt;
+                    break;
+                case 'j' when axis == AxisId.Axis2:
+                    Last_j2RunTime = dt;
+                    break;
                 case 'J' when axis == AxisId.Axis2:
-                    LastJ2RunTime = Principles.HiResDateTime.UtcNow;
+                    LastJ2RunTime = dt;
                     break;
                 case 'I' when axis == AxisId.Axis1:
-                    LastI1RunTime = Principles.HiResDateTime.UtcNow;
+                    LastI1RunTime = dt;
                     break;
             }
 

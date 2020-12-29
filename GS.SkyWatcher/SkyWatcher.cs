@@ -643,6 +643,23 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
+        /// Get axis position in steps
+        /// </summary>
+        /// <returns>array in steps, could return array of NaN if no responses returned</returns>
+        internal double[] GetSteps()
+        {
+            var positions = new double[] { 0, 0 };
+
+            var x = _commands.GetAxisStepsNaN(AxisId.Axis1);
+            positions[0] = x;
+
+            var y = _commands.GetAxisStepsNaN(AxisId.Axis2);
+            positions[1] = y;
+
+            return positions;
+        }
+
+        /// <summary>
         /// Gets axes board versions in a readable format
         /// </summary>
         /// <returns></returns>
@@ -796,6 +813,26 @@ namespace GS.SkyWatcher
         internal long GetAxisPositionCounter(AxisId axis)
         {
             return _commands.GetAxisPositionCounter(axis);
+        }
+
+        /// <summary>
+        /// Gets the position and the timestamp
+        /// </summary>
+        /// <param name="axis"></param>
+        /// <returns></returns>
+        internal Tuple<double?, DateTime> GetAxisPositionDate(AxisId axis)
+        {
+            switch (axis)
+            {
+                case AxisId.Axis1:
+                    return new Tuple<double?, DateTime>(_commands.GetAxisPositionCounter(axis),
+                        _commands.Last_j1RunTime);
+                case AxisId.Axis2:
+                    return new Tuple<double?, DateTime>(_commands.GetAxisPositionCounter(axis),
+                        _commands.Last_j2RunTime);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
+            }
         }
 
         internal double GetRampDownRange(AxisId axis)
@@ -979,6 +1016,11 @@ namespace GS.SkyWatcher
         internal double[] GetFactorRadRateToInt()
         {
             return _commands.GetFactorRadRateToInt();
+        }
+
+        internal double[] GetFactorStepToRad()
+        {
+            return _commands.GetFactorStepToRad();
         }
 
         internal string GetCapabilities()
@@ -1245,8 +1287,6 @@ namespace GS.SkyWatcher
             return speedInt;
         }
 
-        #endregion
-
         private static string GetEnumDescription(Enum value)
         {
             var fi = value.GetType().GetField(value.ToString());
@@ -1258,6 +1298,8 @@ namespace GS.SkyWatcher
 
             return value.ToString();
         }
+
+        #endregion
     }
 
     [Flags]

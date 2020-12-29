@@ -1,0 +1,203 @@
+﻿<UserControl x:Class="GS.Server.Pec.PecV"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:wpf="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             xmlns:pec="clr-namespace:GS.Server.Pec"
+             xmlns:domain="clr-namespace:GS.Server.Domain"
+             xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance pec:PecVM}">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <domain:EnumBooleanConverter x:Key="EnumBoolean" />
+    </UserControl.Resources>
+    <md:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}">
+        <Grid >
+        <md:DrawerHost BorderThickness="0" IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" BorderBrush="{StaticResource MaterialDesignDivider}">
+        <md:DrawerHost.LeftDrawerContent>
+            <Grid Width="750" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18">Settings</Label>
+                <ToggleButton Grid.Row="0" DockPanel.Dock="Top" HorizontalAlignment="Right" Margin="5" 
+                    Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
+                    Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
+                    CommandParameter="{x:Static Dock.Left}"
+                    IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"/>
+                <StackPanel Grid.Row="1" Orientation="Vertical" IsEnabled="{Binding IsMountRunning}">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
+                        <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
+                            <ToggleButton Margin="10,0,0,2" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="Debug" IsChecked="{Binding Debug, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="Create debug file" />
+                        </StackPanel>
+                    </StackPanel>
+                    <Border Margin="10,15,10,0" CornerRadius="5" BorderThickness="2" BorderBrush="DimGray" Background="{StaticResource MaterialDesignToolBarBackground}">
+                        <Grid IsEnabled="{Binding IsMountRunning}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Vertical" Margin="5,8,0,10">
+                                <StackPanel Orientation="Horizontal">
+                                            <RadioButton Margin="5,0,0,0" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="PEC Worm" IsChecked="{Binding PecMode, Converter={StaticResource EnumBoolean}, ConverterParameter={x:Static skyTelescope:PecMode.PecWorm}}" />
+                                    <Label Margin="0,5,0,0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="Worm" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                            <RadioButton Margin="5,0,0,0" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="PEC 360" IsChecked="{Binding PecMode, Converter={StaticResource EnumBoolean}, ConverterParameter={x:Static skyTelescope:PecMode.Pec360}}" />
+                                    <Label Margin="0,5,0,0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="360" />
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,5,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <Button Command="{Binding ClickPecImportCmd}" CommandParameter="Worm" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="Import PEC Worm" Width="40" Padding="0" VerticalAlignment="Bottom">
+                                    <md:PackIcon Kind="FileFind" Foreground="{StaticResource SecondaryAccentBrush}" Height="25" Width="25">
+                                        <md:PackIcon.Style>
+                                            <Style TargetType="md:PackIcon">
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsEnabled" Value="False">
+                                                        <Setter Property="Opacity" Value="0.3" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </md:PackIcon.Style>
+                                    </md:PackIcon>
+                                </Button>
+                                            <TextBox Margin="5,0,0,0" Width="550" Text="{Binding PecWormFileName}" VerticalAlignment="Center" IsReadOnly="True" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Command="{Binding ClickPecImportCmd}" CommandParameter="360"  Style="{StaticResource MaterialDesignFlatButton}" ToolTip="Import PEC 360" Width="40" Padding="0" >
+                                    <md:PackIcon Kind="FileFind" Foreground="{StaticResource SecondaryAccentBrush}" Height="25" Width="25">
+                                        <md:PackIcon.Style>
+                                            <Style TargetType="md:PackIcon">
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsEnabled" Value="False">
+                                                        <Setter Property="Opacity" Value="0.3" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </md:PackIcon.Style>
+                                    </md:PackIcon>
+                                </Button>
+                                            <TextBox Margin="5,0,0,0" Width="550" Text="{Binding Pec360FileName}" VerticalAlignment="Center" IsReadOnly="True" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                    </Border>
+                    <Button Margin="20,15,0,0" HorizontalAlignment="Left" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickStartPecTrainingCmd}" Content="Export PEC" ToolTip="Export PEC" Width="150"/>
+                    <Button Margin="20,15,0,0" HorizontalAlignment="Left" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickStartPecTrainingCmd}" Content="Bin Update Chart" ToolTip="Export PEC" Width="150" />
+                        </StackPanel>
+            </Grid>
+        </md:DrawerHost.LeftDrawerContent>
+            <Grid Margin="5,5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+                    <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False" x:Name="MenuToggleButton"
+                        Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
+                </StackPanel>
+                <Grid Grid.Row="1" IsEnabled="{Binding IsMountRunning}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Margin="30,5,0,0" Grid.Row="0" Orientation="Horizontal">
+                        <ComboBox md:HintAssist.Hint="Cycles" ToolTip="Cycles" HorizontalAlignment="Left" IsEditable="True" Width="55" ItemsSource="{Binding Range20}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                            <ComboBox.Text>
+                                <Binding Path="Cycles" Mode="TwoWay" UpdateSourceTrigger="LostFocus" />
+                            </ComboBox.Text>
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                        </ComboBox>
+                        <md:Badged Badge="{Binding TrainingBadge}" BadgePlacementMode="TopRight" Margin="10,10,0,0">
+                            <Button Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickStartPecTrainingCmd}" Content="Start" ToolTip="Start" />
+                        </md:Badged>
+                        <Border Margin="15,5,0,-5" CornerRadius="5" BorderThickness="2" BorderBrush="DimGray">
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel Orientation="Horizontal">
+                                        <RadioButton Margin="5,0,0,0" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="PEC Worm" IsChecked="{Binding ApplyMode, Converter={StaticResource EnumBoolean}, ConverterParameter={x:Static skyTelescope:PecMode.PecWorm}}" />
+                                        <Label Margin="0,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="Worm" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                        <RadioButton Margin="5,0,0,0" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="PEC 360" IsChecked="{Binding ApplyMode, Converter={StaticResource EnumBoolean}, ConverterParameter={x:Static skyTelescope:PecMode.Pec360}}" />
+                                        <Label Margin="0,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="360" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                        <Border Margin="10,5,0,-5" CornerRadius="5" BorderThickness="2" BorderBrush="DimGray">
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel Orientation="Horizontal">
+                                        <RadioButton Margin="5,0,0,0" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="Replace" IsChecked="{Binding MergeType, Converter={StaticResource EnumBoolean}, ConverterParameter={x:Static pec:PecMergeType.Replace}}" />
+                                    <Label Margin="0,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="Replace" />
+                                </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <RadioButton Margin="5,0,0,0" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="Merge" IsChecked="{Binding MergeType, Converter={StaticResource EnumBoolean}, ConverterParameter={x:Static pec:PecMergeType.Merge}}"/>
+                                    <Label Margin="0,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="Merge" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                        <StackPanel Orientation="Horizontal" Margin="10,6,0,0">
+                                <ToggleButton Margin="0,5,0,0" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="Auto Apply" IsChecked="{Binding AutoApply, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <Label Margin="0,8,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Auto Apply" />
+                        </StackPanel>
+                        <Button Margin="10,10,0,0" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPecApplyCmd}" Content="Apply" ToolTip="Apply" IsEnabled="{Binding Apply}" />
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Orientation="Vertical" Margin="10,10,0,0" IsEnabled="{Binding IsMountRunning}">
+
+                    </StackPanel>
+                    <StackPanel Grid.Row="2" Orientation="Vertical" Margin="10,10,0,0" IsEnabled="{Binding IsMountRunning}">
+                        <DockPanel IsEnabled="{Binding IsMountRunning}">
+                            <DockPanel.Style>
+                                <Style TargetType="DockPanel">
+                                    <Style.Triggers>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Opacity" Value="0.2" />
+                                        </Trigger>
+                                            <Trigger Property="IsEnabled" Value="True">
+                                            <Setter Property="Opacity" Value="1.0" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                                </DockPanel.Style>
+                            <TextBlock Margin="20,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Right" ToolTip="Timer" Text="{Binding IndexTimeSpan}" Foreground="{StaticResource SecondaryAccentBrush}" />
+                            <ProgressBar Margin="10,0,12,0" HorizontalAlignment="Stretch" ToolTip="{Binding ProgressBarValue}" Value="{Binding ProgressBarValue}" Height="2" Width="Auto" Foreground="{StaticResource SecondaryAccentBrush}" IsEnabled="{Binding ProgressBarEnabled, Converter={StaticResource BoolToVis}}" />
+                        </DockPanel>
+                        <wpf:CartesianChart Margin="0,10,0,0" Height="300" Foreground="DarkGray" Hoverable="False" Zoom="None" LegendLocation="None" DisableAnimations="True" Series="{Binding ValuesCollection, Mode=OneWay}">
+                            <wpf:CartesianChart.DataTooltip>
+                                <wpf:DefaultTooltip Visibility="Hidden"  SelectionMode="SharedXValues"  Foreground="Black" />
+                            </wpf:CartesianChart.DataTooltip>
+                        <wpf:CartesianChart.AxisX>
+                            <wpf:Axis FontSize="12" Title="Bins" DisableAnimations="True" Foreground="DarkGray" LabelFormatter="{Binding FormatterX, Mode=TwoWay}" MaxValue="{Binding AxisXMax, Mode=TwoWay}" MinValue="{Binding AxisXMin, Mode=TwoWay}" >
+                                <wpf:Axis.Separator>
+                                    <wpf:Separator Stroke="DarkGray" StrokeThickness=".1" />
+                                </wpf:Axis.Separator>
+                            </wpf:Axis>
+                        </wpf:CartesianChart.AxisX>
+                        <wpf:CartesianChart.AxisY>
+                                    <wpf:Axis Title="Seconds" FontSize="12" Foreground="DarkGray" ShowLabels="True" DisableAnimations="True" LabelFormatter="{Binding FormatterY, Mode=TwoWay}" MaxValue="{Binding AxisYMax, Mode=TwoWay}" MinValue="{Binding AxisYMin, Mode=TwoWay}">
+                                <wpf:Axis.Sections>
+                                    <wpf:AxisSection Value="0" StrokeThickness=".5" Stroke="DarkGray" DisableAnimations="True" />
+                                </wpf:Axis.Sections>
+                                <wpf:Axis.Separator>
+                                    <wpf:Separator Stroke="DimGray" StrokeThickness="1" />
+                                </wpf:Axis.Separator>
+                            </wpf:Axis>
+                        </wpf:CartesianChart.AxisY>
+                    </wpf:CartesianChart>
+                    </StackPanel>
+                 </Grid>
+            </Grid>
+    </md:DrawerHost>
+    </Grid>
+    </md:DialogHost>
+</UserControl>

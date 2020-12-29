@@ -25,8 +25,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="titleDescription">GreenSwamp Server</system:String>
     <system:String x:Key="titleClose">Close GS Server</system:String>
 
-    <!--Tab bar-->
-    <system:String x:Key="tabSkyWatcher">SkyWatcher</system:String>
+    <!--Tab bar
+    <system:String x:Key="tabSkyWatcher">SkyWatcher</system:String>-->
     <system:String x:Key="tabFocuser">Focuser</system:String>
     <system:String x:Key="tabNotes">Notes</system:String> 
     <system:String x:Key="tabOptions">Options</system:String>
@@ -563,5 +563,13 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="1021NoHomeSensor">Mount doesn't support a home sensor</system:String>
     <system:String x:Key="1021Center">Center</system:String>
     <system:String x:Key="1021End">End</system:String>
+
+    <!--1.0.2.3 -->
+    <system:String x:Key="botTipPec">PEC Status</system:String>
+    <system:String x:Key="Pec">PEC</system:String>
+    <system:String x:Key="tabMain">Main</system:String>
+    <system:String x:Key="PecBadge">On</system:String>
+    <system:String x:Key="PecStatus">PEC Status</system:String>
+
 </ResourceDictionary>
  

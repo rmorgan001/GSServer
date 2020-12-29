@@ -138,6 +138,7 @@ namespace GS.Server.SkyTelescope
                     HcWinVisibility = true;
                     ModelWinVisibility = true;
                     DebugVisibility = SkySettings.Diagnostics;
+                    PecShow = SkyServer.PecShow;
                 }
 
                 // check to make sure window is visible then connect if requested.
@@ -164,6 +165,21 @@ namespace GS.Server.SkyTelescope
         }
 
         #region View Model Items
+
+        private static bool _pecShow;
+        /// <summary>
+        /// sets up bool to load a test tab
+        /// </summary>
+        public bool PecShow
+        {
+            get => _pecShow;
+            set
+            {
+                if (_pecShow == value) { return; }
+                _pecShow = value;
+                OnPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Enable or Disable screen items if connected
@@ -285,7 +301,7 @@ namespace GS.Server.SkyTelescope
                                     Azimuth = _util.DegreesToDMS(SkyServer.Azimuth, "° ", ":", "", 2);
                                     break;
                                 case "CanPec":
-                                    PecEnabled = SkyServer.CanPec;
+                                    PPecEnabled = SkyServer.CanPPec;
                                     break;
                                 case "DeclinationXForm":
                                     Declination = _util.DegreesToDMS(SkyServer.DeclinationXForm, "° ", ":", "", 2);
@@ -331,9 +347,6 @@ namespace GS.Server.SkyTelescope
                                 case "PecTrainInProgress":
                                     PecTrainInProgress = SkyServer.PecTrainInProgress;
                                     break;
-                                case "PecOn":
-                                    PPecOn = SkyServer.Pec;
-                                    break;
                                 case "PecTrainOn":
                                     PecTrainOn = SkyServer.PecTraining;
                                     break;
@@ -357,6 +370,22 @@ namespace GS.Server.SkyTelescope
                                     break;
                                 case "ParkSelected":
                                     ParkSelection = SkyServer.ParkSelected;
+                                    break;
+                                case "TrackingRate":
+                                    CurTrackingRate = $"{SkyServer.TrackingRate}";
+                                    break;
+                                case "PecBinNow":
+                                    PecBinNow = SkyServer.PecBinNow.Item1;
+                                    break;
+                                case "PecOn":
+                                    if (SkyServer.PecOn) { PecState = true; }
+                                    if (!SkyServer.PPecOn && !SkyServer.PecOn) { PecState = false; }
+                                    PecBadgeContent = SkyServer.PecOn ? Application.Current.Resources["PecBadge"].ToString() : "";
+                                    break;
+                                case "PPecOn":
+                                    PPecOn = SkyServer.PPecOn;
+                                    if (SkyServer.PPecOn) { PecState = true; }
+                                    if (!SkyServer.PPecOn && !SkyServer.PecOn) { PecState = false; }
                                     break;
                             }
                         });
@@ -735,7 +764,7 @@ namespace GS.Server.SkyTelescope
             get
             {
                 double ret;
-                switch (SkySettings.St4Guiderate)
+                switch (SkySettings.St4GuideRate)
                 {
                     case 0:
                         ret = 1.0;
@@ -782,7 +811,7 @@ namespace GS.Server.SkyTelescope
                         ret = 2;
                         break;
                 }
-                SkySettings.St4Guiderate = ret;
+                SkySettings.St4GuideRate = ret;
                 OnPropertyChanged();
             }
         }
@@ -924,11 +953,11 @@ namespace GS.Server.SkyTelescope
         }
         public bool AlternatingPPec
         {
-            get => SkySettings.AlternatingPpec;
+            get => SkySettings.AlternatingPPec;
             set
             {
-                if (value == SkySettings.AlternatingPpec) return;
-                SkySettings.AlternatingPpec = value;
+                if (value == SkySettings.AlternatingPPec) return;
+                SkySettings.AlternatingPPec = value;
                 OnPropertyChanged();
             }
         }
@@ -1375,6 +1404,18 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private string _curTrackingRate;
+        public string CurTrackingRate
+        {
+            get => _curTrackingRate;
+            private set
+            {
+                if (_curTrackingRate == value) return;
+                _curTrackingRate = value;
+                OnPropertyChanged();
+            }
+        }
+
         private bool _debugVisibility;
         public bool DebugVisibility
         {
@@ -1390,51 +1431,15 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private ICommand _testCommand;
-        public ICommand ClickTestCommand
+        private int _pecBinNow;
+        public int PecBinNow
         {
-            get
+            get => _pecBinNow;
+            private set
             {
-                var command = _testCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _testCommand = new RelayCommand(param => Test());
-            }
-            set => _testCommand = value;
-        }
-        private void Test()
-        {
-            try
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Warning,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"test warning"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+                if (_pecBinNow == value) return;
+                _pecBinNow = value;
+                OnPropertyChanged();
             }
         }
 
@@ -2006,6 +2011,18 @@ namespace GS.Server.SkyTelescope
             {
                 if (HomeBadgeContent == value) return;
                 _homeBadgeContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _pecBadgeContent;
+        public string PecBadgeContent
+        {
+            get => _pecBadgeContent;
+            set
+            {
+                if (_pecBadgeContent == value) return;
+                _pecBadgeContent = value;
                 OnPropertyChanged();
             }
         }
@@ -2635,13 +2652,13 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private bool _scheduleparkon;
+        private bool _scheduleParkOn;
         public bool ScheduleParkOn
         {
-            get => _scheduleparkon;
+            get => _scheduleParkOn;
             set
             {
-                if (_scheduleparkon == value) return;
+                if (_scheduleParkOn == value) return;
                 if (value)
                 {
                     if (!ValidParkEvent()) {return;}
@@ -2679,20 +2696,20 @@ namespace GS.Server.SkyTelescope
                         SchedulerBadgeContent = string.Empty;
                     }
                 }
-                _scheduleparkon = value;
+                _scheduleParkOn = value;
                 OnPropertyChanged();
             }
         }
 
-        private string _futureparktime;
+        private string _futureParkTime;
         public string FutureParkTime
         {
-            get => _futureparktime;
+            get => _futureParkTime;
             set
             {
-                if (_futureparktime == value) return;
+                if (_futureParkTime == value) return;
                 ScheduleParkOn = false;
-                _futureparktime = value;
+                _futureParkTime = value;
                 OnPropertyChanged();
             }
         }
@@ -2791,6 +2808,38 @@ namespace GS.Server.SkyTelescope
 
             }
 
+        }
+
+        private ICommand _clickPecOnCmd;
+        public ICommand ClickPecOnCmd
+        {
+            get
+            {
+                var command = _clickPecOnCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickPecOnCmd = new RelayCommand(
+                    param => ClickPecOn()
+                );
+            }
+        }
+        private void ClickPecOn()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    SkyServer.PecOn = !SkySettings.PecOn;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                SkyServer.SkyErrorHandler(ex);
+            }
         }
         #endregion
 
@@ -3294,25 +3343,25 @@ namespace GS.Server.SkyTelescope
 
         #region PPEC Control
 
-        private bool _pecEnabled;
-        public bool PecEnabled
+        private bool _pPecEnabled;
+        public bool PPecEnabled
         {
-            get => _pecEnabled;
+            get => _pPecEnabled;
             set
             {
-                if (_pecEnabled == value) return;
-                _pecEnabled = value;
+                if (_pPecEnabled == value) return;
+                _pPecEnabled = value;
                 OnPropertyChanged();
             }
         }
 
         public bool PPecOn
         {
-            get => SkyServer.Pec;
+            get => SkyServer.PPecOn;
             set
             {
-                if (SkyServer.Pec == value) return;
-                SkyServer.Pec = value;
+                if (SkyServer.PPecOn == value) return;
+                SkyServer.PPecOn = value;
                 Synthesizer.Speak(value ? Application.Current.Resources["vcePeckOn"].ToString() : Application.Current.Resources["vcePeckOff"].ToString());
                 OnPropertyChanged();
             }
@@ -5083,6 +5132,18 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private bool _pecState;
+        public bool PecState
+        {
+            get => _pecState;
+            set
+            {
+                if (_pecState == value) return;
+                _pecState = value;
+                OnPropertyChanged();
+            }
+        }
+
         private bool _isConnected;
         public bool IsConnected
         {
@@ -5406,7 +5467,7 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
-                var canppec = SkyServer.CanPec ? $"{Application.Current.Resources["mntSupported"]}" : $"{Application.Current.Resources["mntNotSupported"]}";
+                var canppec = SkyServer.CanPPec ? $"{Application.Current.Resources["mntSupported"]}" : $"{Application.Current.Resources["mntNotSupported"]}";
                 var canhome = SkyServer.CanHomeSensor ? $"{Application.Current.Resources["mntSupported"]}" : $"{Application.Current.Resources["mntNotSupported"]}";
                 var msg = $"{Application.Current.Resources["mntMount"]} {SkyServer.MountName}" + Environment.NewLine;
                 msg += $"{Application.Current.Resources["mntVersion"]} {SkyServer.MountVersion}" + Environment.NewLine;

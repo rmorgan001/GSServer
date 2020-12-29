@@ -110,6 +110,9 @@ namespace GS.Server.Settings
 
                     RenderCapability = (System.Windows.Media.RenderCapability.Tier >> 16).ToString();
                     CurrentVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                    Settings.SkyWatcher = true;
+                    PecShow = SkyServer.PecShow;
+
                 }
             }
             catch (Exception ex)
@@ -237,13 +240,28 @@ namespace GS.Server.Settings
 
         #region Bindings
 
+        private static bool _pecShow;
+        /// <summary>
+        /// sets up bool to load a test tab
+        /// </summary>
+        public bool PecShow
+        {
+            get => _pecShow;
+            set
+            {
+                if (_pecShow == value) { return; }
+                _pecShow = value;
+                OnPropertyChanged();
+            }
+        }
+
         public bool SkyWatcher
         {
             get => Settings.SkyWatcher;
             set
             {
                 Settings.SkyWatcher = value;
-                _mainWindowVm.UpdateTabViewModel("SkyWatcher");
+                //_mainWindowVm.UpdateTabViewModel("SkyWatcher");
                 OnPropertyChanged();
             }
         }
@@ -333,6 +351,17 @@ namespace GS.Server.Settings
             }
         }
 
+        public bool Pec
+        {
+            get => Settings.Pec;
+            set
+            {
+                Settings.Pec = value;
+                _mainWindowVm.UpdateTabViewModel("Pec");
+                OnPropertyChanged();
+            }
+        }
+        
         public bool Plot
         {
             get => Settings.Plot;

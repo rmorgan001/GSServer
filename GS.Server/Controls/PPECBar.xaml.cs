@@ -6,9 +6,9 @@ namespace GS.Server.Controls
     /// Interaction logic for TopCoordsBar.xaml
     /// </summary>
     [ComVisible(false)]
-    public partial class PpecBar
+    public partial class PPecBar
     {
-        public PpecBar()
+        public PPecBar()
         {
             InitializeComponent();
         }
