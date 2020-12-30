@@ -53,8 +53,6 @@ jobs:
     runs-on: windows-latest  # For a list of available runner types, refer to 
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
                              
-          #    echo “::add-path::C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin”
-
     env:    
       Solution_Name: GSSolution.sln                             # Replace with your solution name, i.e. MyWpfApp.sln.
      
@@ -76,12 +74,16 @@ jobs:
         #uses: microsoft/setup-msbuild@2008f912f56e61277eefaac6d1888b750582aa16
           #echo “::add-path::C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin”
       
-    # Restore the application to populate the obj folder with RuntimeIdentifiers
-      - name: Restore the application
+      - name: MSBuild
         working-directory: src
-        run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration 
-        env: 
-          Configuration: ${{ matrix.configuration }}
+        run: msbuild $env:Solution_Name
+       
+    # Restore the application to populate the obj folder with RuntimeIdentifiers
+      # - name: Restore the application
+        # working-directory: src
+        # run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration 
+        # env: 
+         #  Configuration: ${{ matrix.configuration }}
 
    # - name: Upload a Build Artifact
     #  uses: actions/upload-artifact@v1
