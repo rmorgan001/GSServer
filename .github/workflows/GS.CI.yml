@@ -71,20 +71,20 @@ jobs:
 
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
       - name: Setup MSBuild.exe
-        uses: warrenbuckley/Setup-MSBuild@v1
-        #uses: microsoft/setup-msbuild@2008f912f56e61277eefaac6d1888b750582aa16
+        #uses: warrenbuckley/Setup-MSBuild@v1
+        uses: microsoft/setup-msbuild@2008f912f56e61277eefaac6d1888b750582aa16
           #echo “::add-path::C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin”
       
-      - name: MSBuild
-        working-directory: src
-        run: msbuild $env:Solution_Name
+      #- name: MSBuild
+        #working-directory: src
+        #run: msbuild $env:Solution_Name
        
     # Restore the application to populate the obj folder with RuntimeIdentifiers
-      # - name: Restore the application
-        # working-directory: src
-        # run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration 
-        # env: 
-         #  Configuration: ${{ matrix.configuration }}
+      - name: Restore the application
+        #working-directory: src
+        run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration 
+        env: 
+           Configuration: ${{ matrix.configuration }}
 
    # - name: Upload a Build Artifact
     #  uses: actions/upload-artifact@v1
