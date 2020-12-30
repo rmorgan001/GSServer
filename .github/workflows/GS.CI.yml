@@ -72,7 +72,7 @@ jobs:
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
       - name: Setup MSBuild.exe
         #uses: warrenbuckley/Setup-MSBuild@v1
-        uses: microsoft/setup-msbuild@1.0.2
+        uses: microsoft/setup-msbuild@v1.0.2
         with:
           vs-version: '[16.8)'
         #2008f912f56e61277eefaac6d1888b750582aa16
