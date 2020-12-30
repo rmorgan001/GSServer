@@ -55,6 +55,7 @@ jobs:
                              
     env:    
       Solution_Name: GSSolution.sln                             # Replace with your solution name, i.e. MyWpfApp.sln.
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true  
      
     steps:             
       - name: Checkout
