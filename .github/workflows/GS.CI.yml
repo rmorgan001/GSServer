@@ -55,7 +55,7 @@ jobs:
                              
     env:    
       Solution_Name: GSSolution.sln                             # Replace with your solution name, i.e. MyWpfApp.sln.
-      ACTIONS_ALLOW_UNSECURE_COMMANDS: true  
+      #ACTIONS_ALLOW_UNSECURE_COMMANDS: true  
      
     steps:             
       - name: Checkout
@@ -67,13 +67,16 @@ jobs:
       - name: Install .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 3.1.101
+          dotnet-version: 3.1.x
 
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
       - name: Setup MSBuild.exe
         #uses: warrenbuckley/Setup-MSBuild@v1
-        uses: microsoft/setup-msbuild@2008f912f56e61277eefaac6d1888b750582aa16
-          #echo “::add-path::C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin”
+        uses: microsoft/setup-msbuild@1.0.2
+        with:
+          vs-version: '[16.8)'
+        #2008f912f56e61277eefaac6d1888b750582aa16
+        #echo “::add-path::C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin”
       
       #- name: MSBuild
         #working-directory: src
