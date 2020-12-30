@@ -74,7 +74,7 @@ jobs:
         #uses: warrenbuckley/Setup-MSBuild@v1
         uses: microsoft/setup-msbuild@v1.0.2
         with:
-          vs-version: '[16.8)'
+          vs-version: '[16.4,16.8)'
         #2008f912f56e61277eefaac6d1888b750582aa16
         #echo “::add-path::C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin”
       
