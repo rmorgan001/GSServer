@@ -60,7 +60,7 @@ jobs:
      
     steps:             
       - name: Checkout
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
@@ -68,14 +68,17 @@ jobs:
       - name: Install .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 3.1.x
+          dotnet-version: 3.1.101
 
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
       - name: Setup MSBuild.exe
-        uses: microsoft/setup-msbuild@2008f912f56e61277eefaac6d1888b750582aa16
+        uses: warrenbuckley/Setup-MSBuild@v1
+        #uses: microsoft/setup-msbuild@2008f912f56e61277eefaac6d1888b750582aa16
+          #echo “::add-path::C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin”
       
     # Restore the application to populate the obj folder with RuntimeIdentifiers
       - name: Restore the application
+        working-directory: src
         run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration 
         env: 
           Configuration: ${{ matrix.configuration }}
