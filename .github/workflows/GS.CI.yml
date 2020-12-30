@@ -36,13 +36,15 @@
 # For a complete CI/CD sample to get started with GitHub Action workflows for Desktop Applications,
 # refer to https://github.com/microsoft/github-actions-for-desktop-apps
 
-name: Builds
+name: Main Workflow
 
 on:
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  schedule:
+    - cron: "0 18 * * 0" 
 
 jobs:
   build:
@@ -54,9 +56,9 @@ jobs:
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
                              
     env:    
-      Solution_Name: GSSolution.sln                             # Replace with your solution name, i.e. MyWpfApp.sln.
-      #ACTIONS_ALLOW_UNSECURE_COMMANDS: true  
-     
+      Solution_Name: GSSolution.sln           # Replace with your solution name, i.e. MyWpfApp.sln.
+      #ACTIONS_ALLOW_UNSECURE_COMMANDS: true  # https://github.blog/changelog/2020-10-01-github-actions-deprecating-set-env-and-add-path-commands/
+          
     steps:             
       - name: Checkout
         uses: actions/checkout@v2
@@ -71,20 +73,10 @@ jobs:
 
     # Add MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
       - name: Add msbuild to PATH
-        #uses: warrenbuckley/Setup-MSBuild@v1
-        uses: microsoft/setup-msbuild@v1.0.2
-        #with:
-          #vs-version: '[16.4,16.5)'
-        #2008f912f56e61277eefaac6d1888b750582aa16
-        #echo “::add-path::C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin”
-      
-      #- name: MSBuild
-        #working-directory: src
-        #run: msbuild $env:Solution_Name
-       
+        uses: microsoft/setup-msbuild@v1.0.2 #2008f912f56e61277eefaac6d1888b750582aa16
+
     # Restore the application to populate the obj folder with RuntimeIdentifiers
       - name: Restore the application
-        #working-directory: src
         run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration 
         env: 
            Configuration: ${{ matrix.configuration }}
@@ -92,6 +84,6 @@ jobs:
    # - name: Upload a Build Artifact
     #  uses: actions/upload-artifact@v1
     #  with: 
-   #     name: GSServerBundle
-   #     # A file, directory or wildcard pattern that describes what to upload
-   #     path: "./Builds/Release"
+    #    name: GSServerBundle
+    #    # A file, directory or wildcard pattern that describes what to upload
+    #    path: "./Builds/Release"
