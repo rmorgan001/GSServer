@@ -728,7 +728,7 @@ namespace GS.Server.SkyTelescope
                 OnStaticPropertyChanged();
             }
         }
-
+        
         /// <summary>
         /// Positions converted from mount
         /// </summary>
@@ -974,7 +974,6 @@ namespace GS.Server.SkyTelescope
         /// Total steps per 360
         /// </summary>
         public static long[] StepsPerRevolution { get; private set; }
-
         private static double[] Steps{ get; set; }
 
         /// <summary>
@@ -1032,8 +1031,7 @@ namespace GS.Server.SkyTelescope
             get => _targetRaDec.X;
             set => _targetRaDec.X = value;
         }
-
-
+        
         /// <summary>
         /// Counts any overlapping events with updating UI that might occur
         /// should always be 0 or event interval is too fast
@@ -2271,6 +2269,19 @@ namespace GS.Server.SkyTelescope
 
             if (limitHit && Tracking && SkySettings.LimitTracking) { Tracking = false; } // turn off tracking
 
+            if (limitHit && SkySettings.LimitPark)
+            {
+                var found = SkySettings.ParkPositions.Find(x => x.Name == SkySettings.ParkLimitName);
+                if (found == null)
+                {
+                    StopAxes();
+                }
+                else
+                {
+                    ParkSelected = found;
+                    GoToPark();
+                }
+            } 
         }
 
         /// <summary>

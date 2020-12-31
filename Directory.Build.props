@@ -4,10 +4,10 @@
 	<Company>GS Server</Company>
 	<Trademark>GS Server</Trademark>
 	<NeutralLanguage>en</NeutralLanguage>
-	<Copyright>Copyright © GreenSwamp Software 2019-2020</Copyright>
-    	<AssemblyVersion>1.0.2.3</AssemblyVersion>
-    	<FileVersion>1.0.2.3</FileVersion>
-	<ProductVersion>1.0.2.3</ProductVersion>
-	<Version>1.0.2.3</Version>
+	<Copyright>Copyright © GreenSwamp Software 2019-2021</Copyright>
+    	<AssemblyVersion>1.0.2.4</AssemblyVersion>
+    	<FileVersion>1.0.2.4</FileVersion>
+	<ProductVersion>1.0.2.4</ProductVersion>
+	<Version>1.0.2.4</Version>
  </PropertyGroup>
 </Project>

@@ -1055,6 +1055,20 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static bool _limitPark;
+        public static bool LimitPark
+        {
+            get => _limitPark;
+            set
+            {
+                if (_limitPark == value) return;
+                _limitPark = value;
+                Properties.SkyTelescope.Default.LimitPark = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static double _longitude;
         public static double Longitude
         {
@@ -1420,7 +1434,6 @@ namespace GS.Server.SkyTelescope
                 OnStaticPropertyChanged();
             }
         }
-
         
         private static int _displayInterval;
         public static int DisplayInterval
@@ -1535,6 +1548,20 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static string _parkLimitName;
+        public static string ParkLimitName
+        {
+            get => _parkLimitName;
+            set
+            {
+                if (_parkLimitName == value) return;
+                _parkLimitName = value;
+                Properties.SkyTelescope.Default.ParkLimitName = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -1634,6 +1661,7 @@ namespace GS.Server.SkyTelescope
             KingRate = Properties.SkyTelescope.Default.KingRate;
             Latitude = Properties.SkyTelescope.Default.Latitude;
             LimitTracking = Properties.SkyTelescope.Default.LimitTracking;
+            LimitPark = Properties.SkyTelescope.Default.LimitPark;
             Longitude = Properties.SkyTelescope.Default.Longitude;
             LunarRate = Properties.SkyTelescope.Default.LunarRate;
             MaxSlewRate = Properties.SkyTelescope.Default.MaximumSlewRate;
@@ -1643,6 +1671,7 @@ namespace GS.Server.SkyTelescope
             ParkAxisX = Properties.SkyTelescope.Default.ParkAxisX;
             ParkAxisY = Properties.SkyTelescope.Default.ParkAxisY;
             ParkName = Properties.SkyTelescope.Default.ParkName;
+            ParkLimitName = Properties.SkyTelescope.Default.ParkLimitName;
             PecOn = Properties.SkyTelescope.Default.PecOn;
             PecOffSet = Properties.SkyTelescope.Default.PecOffSet;
             PPecOn = Properties.SkyTelescope.Default.PpecOn;

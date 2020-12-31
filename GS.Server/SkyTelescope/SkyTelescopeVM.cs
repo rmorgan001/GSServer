@@ -134,6 +134,7 @@ namespace GS.Server.SkyTelescope
                     Lha = "00h 00m 00s";
                     ModelOn = SkySettings.ModelOn;
                     SetTrackingIcon(SkySettings.TrackingRate);
+                    SetParkLimitSelection(SkySettings.ParkLimitName);
 
                     HcWinVisibility = true;
                     ModelWinVisibility = true;
@@ -257,6 +258,9 @@ namespace GS.Server.SkyTelescope
                          break;
                      case "TrackingRate":
                          TrackingRate = SkySettings.TrackingRate;
+                         break;
+                     case "ParkLimitName":
+                         SetParkLimitSelection(SkySettings.ParkLimitName);
                          break;
                  }
              });
@@ -5087,6 +5091,42 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private bool _limitPark;
+        public bool LimitPark
+        {
+            get => _limitPark;
+            set
+            {
+                _limitPark = value;
+                SkySettings.LimitPark = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _limitNothing;
+        public bool LimitNothing
+        {
+            get => _limitNothing;
+            set
+            {
+                _limitNothing = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ParkPosition _parkLimitSelection;
+        public ParkPosition ParkLimitSelection
+        {
+            get => _parkLimitSelection;
+            set
+            {
+                if (_parkLimitSelection == value) return;
+                _parkLimitSelection = value;
+                SkySettings.ParkLimitName = value.Name;
+                OnPropertyChanged();
+            }
+        }
+        
         private bool _warningState;
         public bool WarningState
         {
@@ -5238,6 +5278,19 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private void SetParkLimitSelection(string name)
+        {
+            var found = ParkPositions.Find(x => x.Name == name);
+            if (found != null) // did not find match in list
+            {
+                ParkLimitSelection = found;
+            }
+            else
+            {
+                ParkLimitSelection = ParkPositions.FirstOrDefault();
+            }
+        }
+
         private ICommand _openLimitDialogCommand;
         public ICommand OpenLimitDialogCommand
         {
@@ -5261,6 +5314,10 @@ namespace GS.Server.SkyTelescope
                 using (new WaitCursor())
                 {
                     LimitTracking = SkySettings.LimitTracking;
+                    LimitPark = SkySettings.LimitPark;
+                    SetParkLimitSelection(SkySettings.ParkLimitName);
+                    if (!LimitPark && !LimitTracking){LimitNothing = true;}
+                    if (LimitPark || LimitTracking){LimitNothing = false;}
                     LimitContent = new LimitDialog();
                     IsLimitDialogOpen = true;
                 }

@@ -571,5 +571,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="PecBadge">On</system:String>
     <system:String x:Key="PecStatus">PEC Status</system:String>
 
+    <!--1.0.2.4 -->
+    <system:String x:Key="LimitNothing">Nothing</system:String>
+
 </ResourceDictionary>
  

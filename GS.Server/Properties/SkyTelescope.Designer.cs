@@ -1366,5 +1366,29 @@ namespace GS.Server.Properties {
                 this["PecMode"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool LimitPark {
+            get {
+                return ((bool)(this["LimitPark"]));
+            }
+            set {
+                this["LimitPark"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ParkLimitName {
+            get {
+                return ((string)(this["ParkLimitName"]));
+            }
+            set {
+                this["ParkLimitName"] = value;
+            }
+        }
     }
 }

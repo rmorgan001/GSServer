@@ -3,15 +3,34 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d" >
     <GroupBox Header="{StaticResource botLimitOptions}" Margin="5">
         <StackPanel Orientation="Vertical">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
-                <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource botLimitOptions}"
-                              IsChecked="{Binding LimitTracking, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <Label Content="{StaticResource botLimitTracking}" VerticalAlignment="Bottom"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="5">
+                <RadioButton GroupName="limit" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource botLimitOptions}" IsChecked="{Binding LimitNothing, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label Content="{StaticResource LimitNothing}" VerticalAlignment="Center" />
             </StackPanel>
-            <Button Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding OkLimitDialogCommand}" Content="{StaticResource diaOk}"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left"  Margin="5">
+                <RadioButton GroupName="limit" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource botLimitOptions}" IsChecked="{Binding LimitTracking, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label Content="{StaticResource botLimitTracking}" VerticalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="5">
+                <RadioButton GroupName="limit" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource botLimitOptions}" IsChecked="{Binding LimitPark, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label Content="{StaticResource btnPark}" VerticalAlignment="Center" />
+                <ComboBox materialDesign:HintAssist.Hint="{StaticResource btnTipParkPos}" VerticalAlignment="Center" Margin="10,-10,0,5" ToolTip="{StaticResource btnTipParkPos}" MaxWidth="120" Width="120" ItemsSource="{Binding ParkPositions}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEditable="False">
+                    <ComboBox.SelectedItem>
+                        <Binding Path="ParkLimitSelection" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                    </ComboBox.SelectedItem>
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="skyTelescope:ParkPosition">
+                            <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+            <Button Margin="0,10,0,0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding OkLimitDialogCommand}" Content="{StaticResource diaOk}"/>
         </StackPanel>
     </GroupBox>
     </UserControl>

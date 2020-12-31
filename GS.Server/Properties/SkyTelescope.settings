@@ -338,5 +338,11 @@
     <Setting Name="PecMode" Type="System.String" Scope="User">
       <Value Profile="(Default)">PecWorm</Value>
     </Setting>
+    <Setting Name="LimitPark" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ParkLimitName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

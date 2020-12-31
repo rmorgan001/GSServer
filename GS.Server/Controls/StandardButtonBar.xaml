@@ -61,7 +61,7 @@
                 </Button>
             </md:Badged>
         </StackPanel>
-        <md:DialogHost  VerticalAlignment="Bottom" CloseOnClickAway="True"
+        <md:DialogHost VerticalAlignment="Bottom" CloseOnClickAway="True"
                        IsOpen="{Binding IsHomeResetDialogOpen}" DialogContent="{Binding HomeResetContent}">
             <Button Margin="5,8,0,0" Width="100" Height="25" HorizontalAlignment="Left" Padding="-5"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipSetHome}"
