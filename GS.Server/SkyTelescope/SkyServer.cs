@@ -4648,6 +4648,11 @@ namespace GS.Server.SkyTelescope
                     var ppectrain = new SkyIsPPecInTrainingOn(SkyQueue.NewId);
                     PecTraining = (bool)SkyQueue.GetCommandResult(ppectrain).Result;
                     PecTrainInProgress = PecTraining;
+                    if (!PecTraining && PPecOn) //restart pec
+                    {
+                        PPecOn = false;
+                        PPecOn = true;
+                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
