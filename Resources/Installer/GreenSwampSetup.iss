@@ -25,16 +25,16 @@ DisableDirPage=yes
 DisableProgramGroupPage=yes
 OutputDir="."
 Compression=lzma
-SetupIconFile="C:\Users\Rob\source\repos\GSSolution\Resources\Installer\greenswamp2.ico"       
+SetupIconFile="greenswamp2.ico"       
 SetupLogging=yes
 SolidCompression=yes
 ; Put there by Platform if Driver Installer Support selected
-WizardImageFile="C:\Users\Rob\source\repos\GSSolution\Resources\Installer\WizardImage1.bmp"
-LicenseFile="C:\Users\Rob\source\repos\GSSolution\Resources\Installer\License.txt"
+WizardImageFile="WizardImage1.bmp"
+LicenseFile="License.txt"
 ; {cf}\ASCOM\Uninstall\Telescope folder created by Platform, always
 UninstallFilesDir="{cf}\ASCOM\Uninstall\Telescope\GSServer"
 ;"C:\Program Files (x86)\Windows Kits\10\Tools\bin\i386\signtool.exe" sign /f "C:\Users\Rob\source\repos\GSSolution\Resources\Installer\GreenSwamp.pfx" /p rem /d "GreenSwamp Installer"  $f
-SignTool=Signtool
+;SignTool=Signtool
 DisableWelcomePage=No 
 
 [Languages]
@@ -49,13 +49,13 @@ Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\LanguageFiles"
 ; TODO: Add subfolders below {app} as needed (e.g. Name: "{app}\MyFolder")
 
 [Files]
-Source: "C:\Users\Rob\source\repos\GSSolution\Builds\Release\*.*"; DestDir: "{app}"
-Source: "C:\Users\Rob\source\repos\GSSolution\Builds\Release\SkyScripts\*.*"; DestDir: "{app}\SkyScripts";
-Source: "C:\Users\Rob\source\repos\GSSolution\Builds\Release\Notes\NotesTemplates\*.*"; DestDir: "{app}\NotesTemplates";
-Source: "C:\Users\Rob\source\repos\GSSolution\Builds\Release\Models\*.*"; DestDir: "{app}\Models";
-Source: "C:\Users\Rob\source\repos\GSSolution\Builds\Release\LanguageFiles\*.*"; DestDir: "{app}\LanguageFiles";
+Source: "..\..\Builds\Release\*.*"; DestDir: "{app}"
+Source: "..\..\Builds\Release\SkyScripts\*.*"; DestDir: "{app}\SkyScripts";
+Source: "..\..\Builds\Release\Notes\NotesTemplates\*.*"; DestDir: "{app}\NotesTemplates";
+Source: "..\..\Builds\Release\Models\*.*"; DestDir: "{app}\Models";
+Source: "..\..\Builds\Release\LanguageFiles\*.*"; DestDir: "{app}\LanguageFiles";
 ; Require a read-me to appear after installation, maybe driver's Help doc
-Source: "C:\Users\Rob\source\repos\GSSolution\Resources\Manuals\GSS Manual.pdf"; DestDir: "{app}"; DestName:"{#ManualName}"; Flags: isreadme
+Source: "..\Manuals\GSS Manual.pdf"; DestDir: "{app}"; DestName:"{#ManualName}"; Flags: isreadme
 ; TODO: Add other files needed by your driver here (add subfolders above)
 
 [Languages]
@@ -90,42 +90,52 @@ Filename: "{app}\GS.Server.exe"; Parameters: "/register /{language}"
 ; Only for .NET local-server drivers, use /unprofile to remove ascom profile 
 Filename: "{app}\GS.Server.exe"; Parameters: "/unregister /unprofile"
 
-[CODE]
+[Code]
+const
+   REQUIRED_PLATFORM_VERSION = 6.2;    // Set this to the minimum required ASCOM Platform version for this application
+
 procedure InitializeWizard();
 begin
   //WizardForm.WelcomeLabel2.Font.Style := [fsBold]; //Bold
   WizardForm.WelcomeLabel2.Font.Color := clRed; // And red colour
   WizardForm.WelcomeLabel2.Font.Size  := 10;
 end;
+
 //
-// Before the installer UI appears, verify that the (prerequisite)
-// ASCOM Platform 6.4 or greater is installed, including both Helper
-// components. Utility is required for all types (COM and .NET)!
+// Function to return the ASCOM Platform's version number as a double.
+//
+function PlatformVersion(): Double;
+var
+   PlatVerString : String;
+begin
+   Result := 0.0;  // Initialise the return value in case we can't read the registry
+   try
+      if RegQueryStringValue(HKEY_LOCAL_MACHINE_32, 'Software\ASCOM','PlatformVersion', PlatVerString) then 
+      begin // Successfully read the value from the registry
+         Result := StrToFloat(PlatVerString); // Create a double from the X.Y Platform version string
+      end;
+   except                                                                   
+      ShowExceptionMessage;
+      Result:= -1.0; // Indicate in the return value that an exception was generated
+   end;
+end;
+
+//
+// Before the installer UI appears, verify that the required ASCOM Platform version is installed.
 //
 function InitializeSetup(): Boolean;
 var
-   U: Variant;
-   H: Variant;
-begin
+   PlatformVersionNumber : double;
+ begin
    Result := FALSE;  // Assume failure
-   // check that the DriverHelper and Utilities objects exist, report errors if they don't
-   try
-      H := CreateOleObject('DriverHelper.Util');
-   except
-      MsgBox('The ASCOM DriverHelper object has failed to load, this indicates a serious problem with the ASCOM installation', mbInformation, MB_OK);
-   end;
-   try
-      U := CreateOleObject('ASCOM.Utilities.Util');
-   except
-      MsgBox('The ASCOM Utilities object has failed to load, this indicates that the ASCOM Platform has not been installed correctly', mbInformation, MB_OK);
-   end;
-   try
-      if (U.IsMinimumRequiredVersion(6,4)) then	// this will work in all locales
-         Result := TRUE;
-   except
-   end;
-   if(not Result) then
-      MsgBox('The ASCOM Platform 6.4 or greater is required for this driver.  Please download and install ASCOM from https://ascom-standards.org', mbInformation, MB_OK);
+   PlatformVersionNumber := PlatformVersion(); // Get the installed Platform version as a double
+   If PlatformVersionNumber >= REQUIRED_PLATFORM_VERSION then	// Check whether we have the minimum required Platform or newer
+      Result := TRUE
+   else
+      if PlatformVersionNumber = 0.0 then
+         MsgBox('No ASCOM Platform is installed. Please install Platform ' + Format('%3.1f', [REQUIRED_PLATFORM_VERSION]) + ' or later from https://www.ascom-standards.org', mbCriticalError, MB_OK)
+      else 
+         MsgBox('ASCOM Platform ' + Format('%3.1f', [REQUIRED_PLATFORM_VERSION]) + ' or later is required, but Platform '+ Format('%3.1f', [PlatformVersionNumber]) + ' is installed. Please install the latest Platform before continuing; you will find it at https://www.ascom-standards.org', mbCriticalError, MB_OK);
 end;
 
 // Code to enable the installer to uninstall previous versions of itself when a new version is installed
@@ -146,14 +156,14 @@ begin
           if ActiveLanguage = 'en' then
           begin
             MsgBox('Setup will now remove the previous version.', mbInformation, MB_OK);
-          end
+          end;
           if ActiveLanguage = 'fr' then
           begin
             MsgBox('Le programme d''installation supprimera désormais la version précédente.', mbInformation, MB_OK);
-          end
+          end;
           Exec(RemoveQuotes(UninstallExe), ' /SILENT', '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode);
           sleep(1000);    //Give enough time for the install screen to be repainted before continuing
-        end
+        end;
   end;
   // copy install log to the app folder
   if CurStep = ssDone then
