@@ -397,7 +397,6 @@ namespace GS.Server.Settings
 
         private SleepMode _sleepMode;
         private bool sleepMode;
-
         public bool SleepMode
         {
             get => Settings.SleepMode;
@@ -423,6 +422,17 @@ namespace GS.Server.Settings
 
                 sleepMode = value;
                 Settings.SleepMode = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        public bool Snap
+        {
+            get => Settings.Snap;
+            set
+            {
+                Settings.Snap = value;
+                _mainWindowVm.UpdateTabViewModel("Snap");
                 OnPropertyChanged();
             }
         }

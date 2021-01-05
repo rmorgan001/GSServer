@@ -819,6 +819,40 @@ namespace GS.Simulator
         }
     }
 
+    public class CmdSnapPort : IMountCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; }
+        private readonly int _port;
+        private readonly bool _on;
+        public CmdSnapPort(long id, int port, bool on)
+        {
+            Id = id;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            _port = port;
+            _on = on;
+            Successful = false;
+            Result = null;
+            MountQueue.AddCommand(this);
+        }
+        public void Execute(Actions actions)
+        {
+            try
+            {
+                actions.SnapPort(_port, _on);
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
     /// <summary>
     /// Gets Steps Per Revolution
     /// </summary>

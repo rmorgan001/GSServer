@@ -442,5 +442,17 @@ namespace GS.Server.Properties {
                 this["Pec"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Snap {
+            get {
+                return ((bool)(this["Snap"]));
+            }
+            set {
+                this["Snap"] = value;
+            }
+        }
     }
 }

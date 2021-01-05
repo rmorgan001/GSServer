@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019-2020  Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2021  Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -166,6 +166,8 @@ namespace GS.Server.SkyTelescope
         private static Vector _targetRaDec;
         private static TrackingMode _trackingMode;
         private static bool _tracking;
+        private static bool _canSnapPort1;
+        private static bool _canSnapPort2;
         #endregion
 
         /// <summary>
@@ -994,7 +996,31 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Camera Port
         /// </summary>
-        private static bool SnapPort { get; set; }
+        public static bool SnapPort1 { get; set; }
+
+        public static bool SnapPort2 { get; set; }
+
+        public static bool CanSnapPort1
+        {
+            get => _canSnapPort1;
+            set
+            {
+                if (_canSnapPort1 == value) { return; }
+                _canSnapPort1 = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
+        public static bool CanSnapPort2
+        {
+            get => _canSnapPort2;
+            set
+            {
+                if (_canSnapPort2 == value){return;}
+                _canSnapPort2 = value;
+                OnStaticPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Southern alignment status
@@ -1317,7 +1343,7 @@ namespace GS.Server.SkyTelescope
         /// Creates tasks that are put in the MountQueue
         /// </summary>
         /// <param name="taskName"></param>
-        private static void SimTasks(MountTaskName taskName)
+        public static void SimTasks(MountTaskName taskName)
         {
             if (!IsMountRunning) return;
 
@@ -1400,7 +1426,13 @@ namespace GS.Server.SkyTelescope
                             break;
                         case MountTaskName.SetSt4Guiderate:
                             break;
-                        case MountTaskName.SkySetSnapPort:
+                        case MountTaskName.SetSnapPort1:
+                            _ = new CmdSnapPort(0, 1, SnapPort1);
+                            CanSnapPort1 = false;
+                            break;
+                        case MountTaskName.SetSnapPort2:
+                            _ = new CmdSnapPort(0, 2, SnapPort2);
+                            CanSnapPort2 = true;
                             break;
                         case MountTaskName.MountName:
                             var mountName = new CmdMountName(MountQueue.NewId);
@@ -1776,10 +1808,15 @@ namespace GS.Server.SkyTelescope
                             _ = new SkySetSt4GuideRate(0, SkySettings.St4GuideRate);
                             break;
                         case MountTaskName.SetSouthernHemisphere:
-                            _ = new SkySetSouthernHemisphere(0, SouthernHemisphere);
+                            _ = new SkySetSouthernHemisphere(SkyQueue.NewId, SouthernHemisphere);
                             break;
-                        case MountTaskName.SkySetSnapPort:
-                            _ = new SkySetSnapPort(0, SnapPort);
+                        case MountTaskName.SetSnapPort1:
+                            var sp1 = new SkySetSnapPort(SkyQueue.NewId, 1, SnapPort1);
+                            CanSnapPort1 = (bool)SkyQueue.GetCommandResult(sp1).Result;
+                            break;
+                        case MountTaskName.SetSnapPort2:
+                            var sp2 = new SkySetSnapPort(SkyQueue.NewId, 2, SnapPort2);
+                            CanSnapPort2 = (bool)SkyQueue.GetCommandResult(sp2).Result;
                             break;
                         case MountTaskName.SyncAxes:
                             var sync = Axes.AxesAppToMount(new[] { _mountAxes.X, _mountAxes.Y });
@@ -3397,6 +3434,7 @@ namespace GS.Server.SkyTelescope
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
             monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"MountAxes:{_mountAxes.X},{_mountAxes.Y} Actual:{ActualAxisX},{ActualAxisY}" };
             MonitorLog.LogToMonitor(monitorItem);
@@ -4267,8 +4305,11 @@ namespace GS.Server.SkyTelescope
             // default set for dec goto pulse
             LastDecDirection = GuideDirections.guideEast;
 
-            // set default snap port but don't run task
-            SnapPort = false;
+            // default snap port
+            SnapPort1 = false;
+            SnapPort2 = false;
+            CanSnapPort1 = false;
+            CanSnapPort2 = false;
 
             FactorStep = new[] {0.0, 0.0};
             StepsPerRevolution = new long[] { 12960000, 12960000 };
@@ -4278,6 +4319,8 @@ namespace GS.Server.SkyTelescope
 
             //Pec
             PecBinCount = 100;
+            Pec360Master = null;
+            PecWormMaster = null;
 
             // reset any rates so slewing doesn't start
             _rateRaDec = new Vector(0, 0);
@@ -4622,7 +4665,7 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Pec 360 mode, list that holds all pec rate factors
         /// </summary>
-        public static SortedList<int, Tuple<double, int>> Pec360Master { get; set; }
+        public static SortedList<int, Tuple<double, int>> Pec360Master { get; private set; }
 
         /// <summary>
         /// Pec bin list that holds subset of the mater list, used as a cache
@@ -4932,27 +4975,27 @@ namespace GS.Server.SkyTelescope
             if (def.FileType != PecFileType.GSPecWorm && def.FileType != PecFileType.GSPec360)
             {
                 paramError = true;
-                msg = "FileType";
+                msg = $"FileType {def.FileType}";
             }
-            if (def.BinCount != SkyServer.PecBinCount)
+            if (def.BinCount != PecBinCount)
             {
                 paramError = true;
-                msg = "BinCount";
+                msg = $"BinCount {def.BinCount},{PecBinCount}";
             }
-            if (Math.Abs(def.BinSteps - SkyServer.PecBinSteps) > 0)
+            if (Math.Abs(def.BinSteps - PecBinSteps) > 0.000000001)
             {
                 paramError = true;
-                msg = "BinSteps";
+                msg = $"BinSteps {def.BinSteps},{PecBinSteps}";
             }
-            if (Math.Abs((long)def.StepsPerRev - SkyServer.StepsPerRevolution[0]) > 0)
+            if (Math.Abs((long)def.StepsPerRev - StepsPerRevolution[0]) > 0.000000001)
             {
                 paramError = true;
-                msg = "StepsPerRev";
+                msg = $"StepsPerRev{def.StepsPerRev},{StepsPerRevolution[0]}";
             }
-            if (def.WormTeeth != SkyServer.WormTeethCount[0])
+            if (def.WormTeeth != WormTeethCount[0])
             {
                 paramError = true;
-                msg = "WormTeeth";
+                msg = $"WormTeeth {def.WormTeeth},{WormTeethCount[0]}";
             }
             switch (def.FileType)
             {
@@ -4976,7 +5019,7 @@ namespace GS.Server.SkyTelescope
                     break;
             }
 
-            if (paramError) { throw new Exception($"Error Pec Parameter ({msg})"); }
+            if (paramError) { throw new Exception($"Error Loading Pec File ({msg})"); }
 
             bins = CleanUpBins(bins);
 

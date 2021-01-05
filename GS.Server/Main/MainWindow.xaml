@@ -15,6 +15,7 @@
         xmlns:pole="clr-namespace:GS.Server.PoleLocator"
         xmlns:plot="clr-namespace:GS.Server.Plot"
         xmlns:pec="clr-namespace:GS.Server.Pec"
+        xmlns:snap="clr-namespace:GS.Server.Snap"
         mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanResizeWithGrip"  WindowStyle="None"  TextOptions.TextFormattingMode="Display"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         ContentRendered="MainWindow_OnContentRendered" Closed="MainWindow_OnClosed"  Topmost="{Binding TopMost}"
@@ -63,6 +64,9 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type pec:PecVM}">
             <pec:PecV />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type snap:SnapVM}">
+            <snap:SnapV />
         </DataTemplate>
     </Window.Resources>
     <Window.TaskbarItemInfo>

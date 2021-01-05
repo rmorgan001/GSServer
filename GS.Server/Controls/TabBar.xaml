@@ -24,6 +24,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40" />
@@ -41,6 +42,7 @@
                 <RadioButton Grid.Column="9" FontSize="16" MinWidth="0" Padding="10,0,10,0" IsChecked="{Binding PlotVMRadioRadio}" Visibility="{Binding Path=PlotRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource tabPlot}" />
                 <RadioButton Grid.Column="10" FontSize="16" MinWidth="0" Padding="10,0,10,0" IsChecked="{Binding PoleLocatorVMRadioRadio}" Visibility="{Binding Path=PoleLocatorRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource tabPole}" />
                 <RadioButton Grid.Column="11" FontSize="16" MinWidth="0" Padding="10,0,10,0" IsChecked="{Binding PulsesVMRadioRadio}" Visibility="{Binding Path=PulsesRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource tabPulses}" />
+                <RadioButton Grid.Column="12" FontSize="16" MinWidth="0" Padding="10,0,10,0" IsChecked="{Binding SnapVMRadioRadio}" Visibility="{Binding Path=SnapRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource tabSnap}" />
             </Grid>
         </ScrollViewer>
     </md:ColorZone>

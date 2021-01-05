@@ -290,6 +290,20 @@ namespace GS.Server.Settings
             }
         }
 
+        private static bool _snap;
+        public static bool Snap
+        {
+            get => _snap;
+            set
+            {
+                if (_snap == value) return;
+                _snap = value;
+                Properties.Server.Default.Snap = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static bool _startMinimized;
         public static bool StartMinimized
         {
@@ -514,6 +528,7 @@ namespace GS.Server.Settings
             PoleLocator = Properties.Server.Default.PoleLocator;
             Pulses = Properties.Server.Default.Pulses;
             SleepMode = Properties.Server.Default.SleepMode;
+            Snap = Properties.Server.Default.Snap;
             StartMinimized = Properties.Server.Default.StartMinimized;
             StartOnTop = Properties.Server.Default.StartOnTop;
             VoiceActive = Properties.Server.Default.VoiceActive;

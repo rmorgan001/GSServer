@@ -1,0 +1,157 @@
+﻿<UserControl x:Class="GS.Server.Snap.SnapV"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:snap="clr-namespace:GS.Server.Snap"
+             xmlns:wpf="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             xmlns:domain="clr-namespace:GS.Server.Domain"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance snap:SnapVM}">
+    <md:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" CloseOnClickAway="True" >
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="0">
+                <CheckBox ToolTip="{StaticResource tabSnap}" VerticalAlignment="Center" IsChecked="{Binding SnapEnabled}" Style="{StaticResource MaterialDesignActionLightToggleButton}" />
+                <Label Margin="0,0,0,0" VerticalAlignment="Center" Content="{StaticResource snapEnable}"/>
+            </StackPanel>
+            <Grid HorizontalAlignment="Center" IsEnabled="{Binding Snap1Enabled}" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+                <Label Grid.Row="1" Grid.Column="0" Content="{StaticResource snap1}" VerticalAlignment="Bottom"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Margin="20,0,0,0" Width="50" ToolTip="{StaticResource edSeconds}" md:HintAssist.Hint="{StaticResource snapTimer}" VerticalAlignment="Bottom" Style="{StaticResource MaterialDesignFloatingHintTextBox}" >
+                    <TextBox.Text>
+                        <Binding Path="Snap1Timer" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                            <Binding.ValidationRules>
+                                <domain:DoubleValidationRule ValidatesOnTargetUpdated="True" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <TextBox Grid.Row="1" Grid.Column="2" Margin="20,0,0,0" Width="50" ToolTip="{StaticResource snapCounter}" md:HintAssist.Hint="{StaticResource snapLoops}" VerticalAlignment="Bottom" Style="{StaticResource MaterialDesignFloatingHintTextBox}" >
+                    <TextBox.Text>
+                        <Binding Path="Snap1Loops" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                            <Binding.ValidationRules>
+                                <domain:IntValidationRule ValidatesOnTargetUpdated="True" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <TextBox Grid.Row="1" Grid.Column="3" Margin="20,0,0,0" Width="50" ToolTip="{StaticResource edSeconds}" md:HintAssist.Hint="{StaticResource snapDelay}" VerticalAlignment="Bottom" Style="{StaticResource MaterialDesignFloatingHintTextBox}" >
+                    <TextBox.Text>
+                        <Binding Path="Snap1Delay" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                            <Binding.ValidationRules>
+                                <domain:DoubleValidationRule ValidatesOnTargetUpdated="True" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <md:Badged Grid.Row="1" Grid.Column="4" VerticalAlignment="Bottom" Badge="{Binding Snap1StartBadgeContent}">
+                    <Button Margin="20,0,0,0" Height="30" ToolTip="{StaticResource diaStart}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSnap1StartCmd}" Content="{StaticResource diaStart}" />
+            </md:Badged>
+                <md:Badged Grid.Row="1" Grid.Column="5" VerticalAlignment="Bottom" Badge="{Binding Snap1PauseBadgeContent}" >
+                    <Button Margin="20,0,0,0" Height="30" ToolTip="{StaticResource snapPause}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSnap1PauseCmd}" Content="{StaticResource snapPause}" />
+            </md:Badged>
+                <wpf:Gauge Grid.Row="1" Grid.Column="6" Margin="30,0,0,-5" From="0" To="{Binding Snap1GaugeMax}" Value="{Binding Snap1GaugeValue}" Width="80" Height="50" LabelsVisibility="Collapsed" VerticalAlignment="Bottom" GaugeBackground="{StaticResource SecondaryAccentForegroundBrush}"  GaugeActiveFill="{StaticResource SecondaryAccentBrush}">
+                <wpf:Gauge.Style>
+                    <Style TargetType="wpf:Gauge">
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.2" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="True">
+                                <Setter Property="Opacity" Value="1.0" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                    </wpf:Gauge.Style>
+            </wpf:Gauge>
+        </Grid>
+            <Grid HorizontalAlignment="Center" IsEnabled="{Binding Snap2Enabled}" Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Label Grid.Row="1" Grid.Column="0" Content="{StaticResource snap2}" VerticalAlignment="Bottom" />
+                <TextBox Grid.Row="1" Grid.Column="1" Margin="20,0,0,0" Width="50" ToolTip="{StaticResource edSeconds}" md:HintAssist.Hint="{StaticResource snapTimer}" VerticalAlignment="Bottom" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
+                    <TextBox.Text>
+                        <Binding Path="Snap2Timer" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                            <Binding.ValidationRules>
+                                <domain:DoubleValidationRule ValidatesOnTargetUpdated="True" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <TextBox Grid.Row="1" Grid.Column="2" Margin="20,0,0,0" Width="50" ToolTip="{StaticResource snapCounter}" md:HintAssist.Hint="{StaticResource snapLoops}" VerticalAlignment="Bottom" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
+                    <TextBox.Text>
+                        <Binding Path="Snap2Loops" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                            <Binding.ValidationRules>
+                                <domain:IntValidationRule ValidatesOnTargetUpdated="True" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <TextBox Grid.Row="1" Grid.Column="3" Margin="20,0,0,0" Width="50" ToolTip="{StaticResource edSeconds}" md:HintAssist.Hint="{StaticResource snapDelay}" VerticalAlignment="Bottom" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
+                    <TextBox.Text>
+                        <Binding Path="Snap2Delay" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                            <Binding.ValidationRules>
+                                <domain:DoubleValidationRule ValidatesOnTargetUpdated="True" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <md:Badged Grid.Row="1" Grid.Column="4" VerticalAlignment="Bottom" Badge="{Binding Snap2StartBadgeContent}">
+                    <Button Margin="20,0,0,0" Height="30" ToolTip="{StaticResource diaStart}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSnap2StartCmd}" Content="{StaticResource diaStart}" />
+                </md:Badged>
+                <md:Badged Grid.Row="1" Grid.Column="5" VerticalAlignment="Bottom" Badge="{Binding Snap2PauseBadgeContent}">
+                    <Button Margin="20,0,0,0" Height="30" ToolTip="{StaticResource snapPause}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSnap2PauseCmd}" Content="{StaticResource snapPause}" />
+                </md:Badged>
+                <wpf:Gauge Grid.Row="1" Grid.Column="6" Margin="30,0,0,-5" From="0" To="{Binding Snap2GaugeMax}" Value="{Binding Snap2GaugeValue}" Width="80" Height="50" LabelsVisibility="Collapsed" VerticalAlignment="Bottom" GaugeBackground="{StaticResource SecondaryAccentForegroundBrush}" GaugeActiveFill="{StaticResource SecondaryAccentBrush}">
+                    <wpf:Gauge.Style>
+                        <Style TargetType="wpf:Gauge">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.2" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="True">
+                                    <Setter Property="Opacity" Value="1.0" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </wpf:Gauge.Style>
+                </wpf:Gauge>
+            </Grid>
+        </Grid>
+    </md:DialogHost>
+</UserControl>

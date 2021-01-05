@@ -36,6 +36,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using GS.Server.Pec;
+using GS.Server.Snap;
 using MaterialDesignColors;
 
 namespace GS.Server.Main
@@ -56,6 +57,7 @@ namespace GS.Server.Main
         private PoleLocatorVM _poleLocatorVM;
         private PulsesVM _pulsesVM;
         private PecVM _pecVM;
+        private SnapVM _snapVM;
         public static MainWindowVM _mainWindowVm;
 
         private double _tempHeight = 510;
@@ -104,6 +106,7 @@ namespace GS.Server.Main
                     UpdateTabViewModel("PoleLocator");
                     UpdateTabViewModel("Pulses");
                     UpdateTabViewModel("Pec");
+                    UpdateTabViewModel("Snap");
 
                     // Set starting page
                     CurrentPageViewModel = PageViewModels[0];
@@ -357,6 +360,25 @@ namespace GS.Server.Main
                         PecRadioVisible = false;
                     }
                     break;
+                case "Snap":
+                    if (Settings.Settings.Snap)
+                    {
+                        if (!PageViewModels.Contains(_snapVM))
+                        {
+                            _snapVM = new SnapVM();
+                            PageViewModels.Add(_snapVM);
+                        }
+                        SnapRadioVisible = true;
+                    }
+                    else
+                    {
+                        if (PageViewModels.Contains(_snapVM))
+                        {
+                            PageViewModels.Remove(_snapVM);
+                        }
+                        SnapRadioVisible = false;
+                    }
+                    break;
             }
         }
 
@@ -587,8 +609,7 @@ namespace GS.Server.Main
                 OnPropertyChanged();
             }
         }
-
-
+        
         private bool _poleLocatorVMRadio;
         public bool PoleLocatorVMRadioRadio
         {
@@ -669,6 +690,34 @@ namespace GS.Server.Main
             {
                 if (_pecRadioVisible == value) return;
                 _pecRadioVisible = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _snapVMRadio;
+        public bool SnapVMRadioRadio
+        {
+            get => _snapVMRadio;
+            set
+            {
+                using (new WaitCursor())
+                {
+                    if (_snapVMRadio == value) return;
+                    _snapVMRadio = value;
+                    if (value) ChangeViewModel(_snapVM);
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _snapRadioVisible;
+        public bool SnapRadioVisible
+        {
+            get => _snapRadioVisible;
+            set
+            {
+                if (_snapRadioVisible == value) return;
+                _snapRadioVisible = value;
                 OnPropertyChanged();
             }
         }
@@ -905,7 +954,6 @@ namespace GS.Server.Main
         #endregion
 
         #region Close 
-
         private void CloseServer()
         {
             SkyServer.ShutdownServer();

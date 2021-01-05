@@ -204,7 +204,11 @@
                                 <CheckBox Height="25" Width="25" IsChecked="{Binding Pulses}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource pulPulses}"/>
                                 <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource pulPulses}"/>
                             </StackPanel>
-                        </StackPanel>
+                            <StackPanel Orientation="Horizontal" Width="Auto">
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding Snap}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource tabSnap}" />
+                                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource tabSnap}" />
+                            </StackPanel>
+                            </StackPanel>
                         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" >
                             <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" HorizontalAlignment="Left" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optOptions}"/>
                             <StackPanel Orientation="Horizontal" >

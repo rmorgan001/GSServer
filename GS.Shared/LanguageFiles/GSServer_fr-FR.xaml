@@ -567,4 +567,20 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="tabMain">Main</system:String>
     <system:String x:Key="PecBadge">On</system:String>
     <system:String x:Key="PecStatus">PEC Status</system:String>
+
+    <!--1.0.2.4 -->
+    <system:String x:Key="LimitNothing">Nothing</system:String>
+    <system:String x:Key="tabSnap">Snap</system:String>
+    <system:String x:Key="snapOn">On</system:String>
+    <system:String x:Key="snapPause">Pause</system:String>
+    <system:String x:Key="snap1">Snap Port 1:</system:String>
+    <system:String x:Key="snap2">Snap Port 2:</system:String>
+    <system:String x:Key="snapTimer">Timer</system:String>
+    <system:String x:Key="snapCounter">Counter</system:String>
+    <system:String x:Key="snapLoops">Loops</system:String>
+    <system:String x:Key="snapDelay">Delay</system:String>
+    <system:String x:Key="snapTimerEr">Set timer amount</system:String>
+    <system:String x:Key="snapEnable">Enable Snap</system:String>
+    <system:String x:Key="snapConn">Not connected to mount</system:String>
+    <system:String x:Key="snapSupport">Not supported on this mount</system:String>
 </ResourceDictionary>

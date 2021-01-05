@@ -384,6 +384,11 @@ namespace GS.Simulator
             return _ioSerial.Send("mountversion");
         }
 
+        internal void SnapPort(int port, bool on)
+        {
+            _ioSerial.Send($"snapport,{port},{on}");
+        }
+
         /// <summary>
         /// Gets Steps Per Revolution
         /// </summary>

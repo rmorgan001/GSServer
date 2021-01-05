@@ -49,26 +49,20 @@ namespace GS.SkyWatcher
         private readonly long[] _highSpeedRatio = new long[2];          // HiSpeed multiplier  EQ6Pro, AZEeQ5, EQ8 = 16   AZeQ6 = 32
         private const int _threadLockTimeout = 50; // milliseconds
         private readonly object _syncObject = new object();
-
-        public DateTime LastI1RunTime { get; private set; }
-        public DateTime Last_j1RunTime { get; private set; }
-        public DateTime Last_j2RunTime { get; private set; }
-        public DateTime LastJ2RunTime { get; private set; }
         
         // use for serial event
         //private string IncomingData;
         // number of retries sending the same command
         private int _retryCount;
-        // total allowed limit of retries before error
-        //private const int _totalRetriesLimit = 20;
+
         #endregion
 
         #region Properties
 
-        /// <summary>
-        /// Quick check to see if serial is connected and mount is receiving and sending data
-        /// </summary> 
-        internal bool IsConnected => Serial.IsOpen && MountConnected;
+        public DateTime LastI1RunTime { get; private set; }
+        public DateTime Last_j1RunTime { get; private set; }
+        public DateTime Last_j2RunTime { get; private set; }
+        public DateTime LastJ2RunTime { get; private set; }
 
         /// <summary>
         /// Serial object
@@ -76,6 +70,11 @@ namespace GS.SkyWatcher
         private SerialPort Serial { get; }
 
         private bool MountConnected { get; set; }
+        
+        /// <summary>
+        /// Quick check to see if serial is connected and mount is receiving and sending data
+        /// </summary> 
+        internal bool IsConnected => Serial.IsOpen && MountConnected;
 
         #endregion
 
@@ -643,10 +642,12 @@ namespace GS.SkyWatcher
         /// <summary>
         /// O on/off trigger
         /// </summary>
+        /// <param name="axis"></param>
         /// <param name="on"></param>
-        internal void SetSnapPort(bool on)
+        internal string SetSnapPort(AxisId axis, bool on)
         {
-            CmdToAxis(AxisId.Axis1, 'O', on ? "1" : "0");
+            var response = CmdToAxis(axis, 'O', on ? "1" : "0");
+            return response;
         }
 
         /// <summary>
@@ -1065,6 +1066,9 @@ namespace GS.SkyWatcher
                                 case 'q':
                                 case 'W':
                                     subdata = "=000000"; // EQ6R W1060100,!0 workaround
+                                    break;
+                                case 'O':
+                                    subdata = "!0"; // for not supported
                                     break;
                             }
                             break;

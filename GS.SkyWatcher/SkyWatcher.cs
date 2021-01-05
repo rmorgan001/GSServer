@@ -958,10 +958,24 @@ namespace GS.SkyWatcher
         /// <summary>
         /// O on/off trigger
         /// </summary>
+        /// <param name="port"></param>
         /// <param name="on"></param>
-        internal void SetSnapPort(bool on)
+        internal bool SetSnapPort(int port, bool on)
         {
-            _commands.SetSnapPort(on);
+            AxisId axis;
+            switch (port)
+            {
+                case 1:
+                    axis = AxisId.Axis1;
+                    break;
+                case 2:
+                    axis = AxisId.Axis2;
+                    break;
+                default:
+                    return false;
+            }
+            var a = _commands.SetSnapPort(axis, on).Trim();
+            return a == "=";
         }
 
         internal void SetTargetPosition(AxisId axis, double position)

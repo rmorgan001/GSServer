@@ -95,6 +95,8 @@ namespace GS.Simulator
         private int HomeSensorX { get; set; }
         private int HomeSensorY { get; set; }
         private int SlewSpeedEight { get; set; }
+        private bool SnapPort1 { get; set; }
+        private bool SnapPort2 { get; set; }
 
         #endregion
 
@@ -103,6 +105,8 @@ namespace GS.Simulator
             DegreesX = 0;
             DegreesY = 0;
             SlewSpeedEight = 13;
+            SnapPort1 = false;
+            SnapPort2 = false;
         }
 
         /// <summary>
@@ -350,6 +354,18 @@ namespace GS.Simulator
                     if (x >= 1 && x <= 20)
                     {
                         SlewSpeedEight = x;
+                    }
+                    break;
+                case "snapport":
+                    var s = Convert.ToBoolean(cmd[2]);
+                    switch (Convert.ToInt32(cmd[1]))
+                    {
+                        case 1:
+                            if (SnapPort1 != s){SnapPort1 = s;}
+                            break;
+                        case 2:
+                            if (SnapPort2 != s) { SnapPort2 = s; }
+                            break;
                     }
                     break;
                 default:

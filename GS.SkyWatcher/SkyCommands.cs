@@ -2264,13 +2264,15 @@ namespace GS.SkyWatcher
         public DateTime CreatedUtc { get; }
         public bool Successful { get; set; }
         public Exception Exception { get; set; }
-        public dynamic Result { get; }
+        public dynamic Result { get; private set; }
         private readonly bool _on;
+        private readonly int _port;
 
-        public SkySetSnapPort(long id, bool on)
+        public SkySetSnapPort(long id, int port, bool on)
         {
             Id = id;
             _on = on;
+            _port = port;
             CreatedUtc = Principles.HiResDateTime.UtcNow;
             Successful = false;
             Result = null;
@@ -2281,7 +2283,7 @@ namespace GS.SkyWatcher
         {
             try
             {
-                skyWatcher.SetSnapPort(_on);
+                Result = skyWatcher.SetSnapPort(_port, _on);
                 Successful = true;
             }
             catch (Exception e)

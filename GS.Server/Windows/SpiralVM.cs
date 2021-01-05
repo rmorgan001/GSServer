@@ -1599,6 +1599,7 @@ namespace GS.Server.Windows
 
         private void UpdateBackGrounds()
         {
+            if (!SkyServer.SpiralChanged){return;}
             ClearBackGrounds();
             foreach (var point in SkyServer.SpiralCollection)
             {

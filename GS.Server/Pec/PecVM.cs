@@ -578,18 +578,19 @@ namespace GS.Server.Pec
 
         private void SavePecFile(PecMode pecMode)
         {
-            if (SkyServer.PecWormMaster == null) { return; }
-
+            
             PecFileType fileType;
             string filePath;
             switch (pecMode)
             {
                 case PecMode.PecWorm:
+                    if (SkyServer.PecWormMaster == null) { return; }
                     fileType = PecFileType.GSPecWorm;
                     filePath = GetNextFileName(fileType + "_");
                     PecWormFileName = filePath;
                     break;
                 case PecMode.Pec360:
+                    if (SkyServer.Pec360Master == null) { return; }
                     fileType = PecFileType.GSPec360;
                     filePath = GetNextFileName(fileType + "_");
                     Pec360FileName = filePath;
