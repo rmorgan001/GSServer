@@ -87,6 +87,7 @@
     <ProjectReference Include="..\GS.SkyWatcher\GS.SkyWatcher.csproj">
       <Private>false</Private>
     </ProjectReference>
+    <ProjectReference Include="..\XInputDotNetPure\XInputDotNetPure.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\M33.png" />

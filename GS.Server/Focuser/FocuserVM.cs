@@ -25,6 +25,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using GS.Server.Controls.Dialogs;
+using GS.Shared.Command;
 
 namespace GS.Server.Focuser
 {

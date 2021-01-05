@@ -40,6 +40,7 @@ using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using GS.Server.Controls.Dialogs;
 using GS.Server.Windows;
+using GS.Shared.Command;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 using Color = System.Windows.Media.Color;
@@ -121,7 +122,7 @@ namespace GS.Server.SkyTelescope
                     //SpiralPauses = new List<int>(Enumerable.Range(0, 61));
 
                     // defaults
-                    AtPark = SkyServer.AtPark; 
+                    AtPark = SkyServer.AtPark;
                     ConnectButtonContent = Application.Current.Resources["skyConnect"].ToString();
                     VoiceState = Synthesizer.VoiceActive;
                     ParkSelection = ParkPositions.FirstOrDefault();
@@ -2665,7 +2666,7 @@ namespace GS.Server.SkyTelescope
                 if (_scheduleParkOn == value) return;
                 if (value)
                 {
-                    if (!ValidParkEvent()) {return;}
+                    if (!ValidParkEvent()) { return; }
                     _ctsPark = new CancellationTokenSource();
                     _ctPark = _ctsPark.Token;
                     var oktime = TimeSpan.TryParse(FutureParkTime, out var ftime);
@@ -2755,7 +2756,7 @@ namespace GS.Server.SkyTelescope
             return true;
         }
 
-        public async void ScheduleAction(Action action, DateTime ExecutionTime, CancellationToken token )
+        public async void ScheduleAction(Action action, DateTime ExecutionTime, CancellationToken token)
         {
             try
             {
@@ -4454,7 +4455,7 @@ namespace GS.Server.SkyTelescope
 
                 if (e.XButton1 == MouseButtonState.Released)
                 {
-                   
+
                 }
 
                 if (e.XButton2 == MouseButtonState.Released)
@@ -4716,6 +4717,50 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private ICommand _syncCmd;
+        public ICommand SyncCmd
+        {
+            get
+            {
+                var command = _syncCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _syncCmd = new RelayCommand(
+                    param => Sync()
+                );
+            }
+        }
+        private void Sync()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    SkyServer.SyncToTargetRaDec();
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
         private ICommand _spiralGenerateCmd;
         public ICommand SpiralGenerateCmd
         {
@@ -4863,7 +4908,7 @@ namespace GS.Server.SkyTelescope
 
             var currentpoint = SkyServer.SpiralCollection.Find(x => x.Status == SpiralPointStatus.Current);
             var index = currentpoint.Index + amt;
-            if (index < 0 )
+            if (index < 0)
             {
                 Synthesizer.Speak(Application.Current.Resources["1021Center"].ToString());
                 return;
@@ -4897,7 +4942,7 @@ namespace GS.Server.SkyTelescope
                 if (flipRequired)
                 {
                     LogSpiral(Application.Current.Resources["1021FlipLimit"].ToString(), MonitorType.Warning);
-                    Synthesizer.Speak(Application.Current.Resources["1021FlipLimit"].ToString()); 
+                    Synthesizer.Speak(Application.Current.Resources["1021FlipLimit"].ToString());
                     return;
                 }
             }
@@ -4978,7 +5023,7 @@ namespace GS.Server.SkyTelescope
             {
                 _atPark = value;
                 ParkButtonContent = value ? Application.Current.Resources["btnUnPark"].ToString() : Application.Current.Resources["btnPark"].ToString();
-                ParkBadgeContent = value ? SkySettings.ParkName : ""; 
+                ParkBadgeContent = value ? SkySettings.ParkName : "";
                 OnPropertyChanged();
             }
         }
@@ -5126,7 +5171,7 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-        
+
         private bool _warningState;
         public bool WarningState
         {
@@ -5316,8 +5361,8 @@ namespace GS.Server.SkyTelescope
                     LimitTracking = SkySettings.LimitTracking;
                     LimitPark = SkySettings.LimitPark;
                     SetParkLimitSelection(SkySettings.ParkLimitName);
-                    if (!LimitPark && !LimitTracking){LimitNothing = true;}
-                    if (LimitPark || LimitTracking){LimitNothing = false;}
+                    if (!LimitPark && !LimitTracking) { LimitNothing = true; }
+                    if (LimitPark || LimitTracking) { LimitNothing = false; }
                     LimitContent = new LimitDialog();
                     IsLimitDialogOpen = true;
                 }
@@ -5876,7 +5921,7 @@ namespace GS.Server.SkyTelescope
             }
         }
         public bool IsGpsRunning { get; set; }
-        public  SerialSpeed GpsBaudRate
+        public SerialSpeed GpsBaudRate
         {
             get => SkySettings.GpsBaudRate;
             set
@@ -6123,7 +6168,7 @@ namespace GS.Server.SkyTelescope
                     if (IsGpsRunning) return;
                     IsGpsRunning = true;
                     HasGSPData = false;
-                    var gpsHardware = new GpsHardware(GpsComPort, GpsBaudRate) {Gga = GpsGga, Rmc = GpsRmc};
+                    var gpsHardware = new GpsHardware(GpsComPort, GpsBaudRate) { Gga = GpsGga, Rmc = GpsRmc };
                     gpsHardware.GpsOn();
                     var stopwatch = Stopwatch.StartNew();
                     while (gpsHardware.GpsRunning && stopwatch.Elapsed.TotalSeconds < 30)
@@ -6131,7 +6176,7 @@ namespace GS.Server.SkyTelescope
                         if (gpsHardware.HasData) break;
                     }
 
-                    
+
                     if (gpsHardware.HasData)
                     {
                         GpsLong = gpsHardware.Longitude;
@@ -6760,7 +6805,7 @@ namespace GS.Server.SkyTelescope
             try
             {
                 CameraVis = false;
-                
+
                 //camera direction
                 LookDirection = Settings.Settings.ModelLookDirection2;
                 UpDirection = Settings.Settings.ModelUpDirection2;
@@ -7229,10 +7274,10 @@ namespace GS.Server.SkyTelescope
         // exactly as they are.
         ~SkyTelescopeVM()
         {
-                Settings.Settings.ModelLookDirection2 = LookDirection;
-                Settings.Settings.ModelUpDirection2 = UpDirection;
-                Settings.Settings.ModelPosition2= Position;
-                Settings.Settings.Save();
+            Settings.Settings.ModelLookDirection2 = LookDirection;
+            Settings.Settings.ModelUpDirection2 = UpDirection;
+            Settings.Settings.ModelPosition2 = Position;
+            Settings.Settings.Save();
 
             // Finalizer calls Dispose(false)
             Dispose(false);

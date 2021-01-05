@@ -62,6 +62,20 @@ namespace GS.Server.GamePad
             }
         }
 
+        private static int _doubleClickSpeed;
+        public static int DoubleClickSpeed
+        {
+            get => _doubleClickSpeed;
+            set
+            {
+                if (_doubleClickSpeed == value) return;
+                _doubleClickSpeed = value;
+                Properties.Gamepad.Default.DoubleClickSpeed = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         /// <summary>
         /// will upgrade if necessary
         /// </summary>
@@ -71,6 +85,7 @@ namespace GS.Server.GamePad
 
             Startup = Properties.Gamepad.Default.Startup;
             Delay = Properties.Gamepad.Default.Delay;
+            DoubleClickSpeed = Properties.Gamepad.Default.DoubleClickSpeed;
         }
 
         /// <summary>
@@ -215,6 +230,10 @@ namespace GS.Server.GamePad
                     case "abort":
                         Properties.Gamepad.Default.abort = setting.Value;
                         LogSetting(MethodBase.GetCurrentMethod().Name, $"abort {setting.Value}");
+                        break;
+                    case "sync":
+                        Properties.Gamepad.Default.sync = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"sync {setting.Value}");
                         break;
                     case "spiralin":
                         Properties.Gamepad.Default.spiralin = setting.Value;

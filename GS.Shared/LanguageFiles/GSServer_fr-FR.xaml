@@ -165,6 +165,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--Gamepad-->
     <system:String x:Key="gpOn">Manette On</system:String>
     <system:String x:Key="gpSen">Sensitivité:</system:String>
+    <system:String x:Key="gpDoubleClickSpeed">Vitesse du double-clic:</system:String>
     <system:String x:Key="gpTracking">Suivi</system:String>
     <system:String x:Key="gpStop">Stop</system:String>
     <system:String x:Key="gpPark">Parker</system:String>

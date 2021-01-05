@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Input;
 using ASCOM.DriverAccess;
 using GS.Shared;
+using GS.Shared.Command;
 using GS.Utilities.Controls.Dialogs;
 using GS.Utilities.Helpers;
 using MaterialDesignThemes.Wpf;

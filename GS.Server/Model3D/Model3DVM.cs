@@ -33,6 +33,7 @@ using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using GS.Server.Controls.Dialogs;
 using GS.Server.Windows;
+using GS.Shared.Command;
 
 namespace GS.Server.Model3D
 {

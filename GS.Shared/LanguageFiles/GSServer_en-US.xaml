@@ -165,6 +165,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--Gamepad-->
     <system:String x:Key="gpOn">Gamepad On</system:String>
     <system:String x:Key="gpSen">Sensitivity:</system:String>
+    <system:String x:Key="gpDoubleClickSpeed">Double Click Speed:</system:String>
     <system:String x:Key="gpTracking">Tracking</system:String>
     <system:String x:Key="gpStop">Stop</system:String>
     <system:String x:Key="gpPark">Park</system:String>

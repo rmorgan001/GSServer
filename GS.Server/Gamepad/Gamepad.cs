@@ -13,174 +13,38 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using GS.Shared;
-using SharpDX.DirectInput;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
 
 namespace GS.Server.GamePad
 {
-    public sealed class GamePad : IDisposable
+    public abstract class GamePad : IGamePad
     {
-        private Joystick joystick;
-        private Guid joystickGuid;
         private Dictionary<string, string> _settingsDict;
-        private readonly DirectInput directInput;
-        private readonly IntPtr hWnd;
 
-        private JoystickState State { get; set; }
-        public bool IsAvailable { get; private set; }
-        public bool[] Buttons { get; private set; }
-        public int[] POVs { get; private set; }
-        public int YAxis { get; private set; }
-        public int XAxis { get; private set; }
-        public int ZAxis { get; private set; }
-        // public IList<EffectInfo> AllEffects { get; private set; }
-        // public IList<DeviceObjectInstance> DeviceObjects { get; set; }
-        // public DeviceFlags DeviceFlags { get; private set; }
-        // public DeviceInstance DeviceInfo { get; private set; }
-        // public int PovCount { get; private set; }
-        // public int AxisCount { get; private set; }
-        // public JoystickUpdate[] Data { get; private set; }  // buffered data
+        public abstract bool IsAvailable { get; }
+        public bool[] Buttons { get; protected set; }
+        public int[] POVs { get; protected set; }
+        public int YAxis { get; protected set; }
+        public int XAxis { get; protected set; }
+        public int ZAxis { get; protected set; }
+        public int YRotation { get; protected set; }
+        public int XRotation { get; protected set; }
 
         /// <summary>
         /// Constructor sets up and find a joystick
         /// </summary>
         /// <param name="window_handle"></param>
-        public GamePad(IntPtr window_handle)
+        protected GamePad()
         {
-            hWnd = window_handle;
             LoadSettings();
-            directInput = new DirectInput();
-            joystickGuid = Guid.Empty;
-            Find();
         }
 
-        /// <summary>
-        /// Finds a valid joystick or game pad that is attached
-        /// </summary>
-        public void Find()
-        {
-            try
-            {
-                foreach (var deviceInstance in directInput.GetDevices(DeviceType.Gamepad, DeviceEnumerationFlags.AttachedOnly))
-                    joystickGuid = deviceInstance.InstanceGuid;
+        public abstract void Find();
 
-                // If Game pad not found, look for a Joystick
-                if (joystickGuid == Guid.Empty)
-                    foreach (var deviceInstance in directInput.GetDevices(DeviceType.Joystick, DeviceEnumerationFlags.AttachedOnly))
-                        joystickGuid = deviceInstance.InstanceGuid;
+        public abstract void Poll(float vibrateLeft, float vibrateRight);
 
-                // If Joystick not found, throws an error
-                if (joystickGuid == Guid.Empty)
-                {
-                    IsAvailable = false;
-                    return;
-                }
-
-                // Instantiate the joystick
-                joystick = new Joystick(directInput, joystickGuid);
-                joystick.SetCooperativeLevel(hWnd, CooperativeLevel.Background | CooperativeLevel.Exclusive);
-
-                // Query supported info
-                // AllEffects = joystick.GetEffects();
-                // DeviceObjects = joystick.GetObjects();
-                // DeviceInfo = joystick.Information;
-                // var cps = joystick.Capabilities;
-                // AxisCount = cps.AxeCount;
-                // PovCount = cps.PovCount;
-                // DeviceFlags = cps.Flags;
-
-                // Set BufferSize in order to use buffered data.
-                joystick.Properties.BufferSize = 128;
-
-                // Acquire the joystick
-                joystick.Acquire();
-
-                IsAvailable = true;
-            }
-            catch (Exception ex)
-            {
-                IsAvailable = false;
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = Principles.HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
-                    Category = MonitorCategory.Server,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                switch (ex.HResult)
-                {
-                    case unchecked((int)0x8007001E):
-                    case unchecked((int)0x80040154):
-                        return;
-                    default:
-                        throw;
-                }
-            }
-
-        }
-
-        /// <summary>
-        /// Query the joystick for all items
-        /// </summary>
-        public void Poll()
-        {
-            try
-            {
-                if (!IsAvailable) return;
-                // joystick.Acquire();
-                // joystick.Poll();
-                State = null;
-                State = joystick.GetCurrentState();
-                Buttons = State.Buttons;
-                POVs = State.PointOfViewControllers;
-                XAxis = State.X;
-                YAxis = State.Y;
-                ZAxis = State.Z;
-                // Data = joystick.GetBufferedData();
-            }
-            catch (Exception ex)
-            {
-                IsAvailable = false;
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = Principles.HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
-                    Category = MonitorCategory.Server,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                switch (ex.HResult)
-                {
-                    case unchecked((int)0x8007001E):
-                    case unchecked((int)0x80040154):
-                        return;
-                    default:
-                        throw;
-                }
-            }
-
-        }
-
-        /// <summary>
-        /// Releases the use of the joystick object
-        /// </summary>
-        private void Release()
-        {
-            joystick?.Unacquire();
-        }
+        public abstract void Dispose();
 
         /// <summary>
         /// Load a setting into the local dictionary
@@ -269,40 +133,6 @@ namespace GS.Server.GamePad
             return null;
         }
 
-        /// <summary>
-        /// PoV commands to int conversions
-        /// </summary>
-        /// <param name="degrees"></param>
-        /// <returns></returns>
-        public static string PovDirection(int degrees)
-        {
-            switch (degrees)
-            {
-                case 0:
-                    return "up";
-                case 9000:
-                    return "right";
-                case 18000:
-                    return "down";
-                case 27000:
-                    return "left";
-                default:
-                    return "";
-            }
-        }
-
-        /// <summary>
-        /// Axis values to commands
-        /// </summary>
-        /// <param name="number"></param>
-        /// <returns></returns>
-        public static string AxisDirection(int number)
-        {
-            if (number >= 0 && number < 2000) return "low";
-            if (number >= 2000 && number <= 64000) return "normal";
-            if (number > 64000 && number <= 66000) return "high";
-            return null;
-        }
 
         private void LoadSettings()
         {
@@ -316,17 +146,6 @@ namespace GS.Server.GamePad
             GamePadSettings.SaveSettings(_settingsDict);
         }
 
-        /// <inheritdoc />
-        /// <summary>
-        /// clean up
-        /// </summary>
-        public void Dispose()
-        {
-            Release();
-            _settingsDict = null;
-            joystick.Dispose();
-            directInput.Dispose();
-        }
     }
 
     /// <summary>

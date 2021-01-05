@@ -35,6 +35,7 @@ using System.Windows;
 using System.Windows.Input;
 using GS.Principles;
 using GS.Server.Controls.Dialogs;
+using GS.Shared.Command;
 
 namespace GS.Server.Settings
 {

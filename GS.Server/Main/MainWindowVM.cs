@@ -35,6 +35,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using GS.Shared.Command;
 using GS.Server.Pec;
 using GS.Server.Snap;
 using MaterialDesignColors;
