@@ -396,6 +396,17 @@ namespace GS.Server.Settings
             }
         }
 
+        public bool AlignmentTabVisible
+        {
+            get => Settings.AlignmentTabVisible;
+            set
+            {
+                Settings.AlignmentTabVisible = value;
+                _mainWindowVm.UpdateTabViewModel("Alignment");
+                OnPropertyChanged();
+            }
+        }
+
         private SleepMode _sleepMode;
         private bool sleepMode;
         public bool SleepMode
@@ -1194,6 +1205,12 @@ namespace GS.Server.Settings
         {
             get => MonitorLog.InCategory(MonitorCategory.Mount);
             set => MonitorLog.CategoriesToMonitor(MonitorCategory.Mount, value);
+        }
+
+        public bool Alignment
+        {
+            get => MonitorLog.InCategory(MonitorCategory.Alignment);
+            set => MonitorLog.CategoriesToMonitor(MonitorCategory.Alignment, value);
         }
 
         public bool Information

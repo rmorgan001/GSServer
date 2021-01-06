@@ -25,7 +25,7 @@ namespace GS.Server.SkyTelescope
     public static class Axes
     {
         /// <summary>
-        /// Convert internal mount axis degrees to mount with correct hemisphere
+        /// Convert internal mountaxis degrees to mount with corrrect hemi
         /// </summary>
         /// <returns></returns>
         public static double[] MountAxis2Mount()
@@ -158,14 +158,23 @@ namespace GS.Server.SkyTelescope
         /// <returns></returns>
         internal static double[] AltAzToAxesYX(double[] altAz)
         {
+            return AltAzToAxesYX(altAz, SkyServer.SiderealTime);
+        }
+
+        /// <summary>
+        /// convert a decimal Alt/Az positions to an axes positions at a given time
+        /// </summary>
+        /// <param name="altAz"></param>
+        /// <param name="lst">Local Sidereal Time</param>
+        /// <returns></returns>
+        internal static double[] AltAzToAxesYX(double[] altAz, double lst)
+        {
             var axes = new[] { altAz[0], altAz[1] };
-            double lst;
             switch (SkySettings.AlignmentMode)
             {
                 case AlignmentModes.algAltAz:
                     break;
                 case AlignmentModes.algGermanPolar:
-                    lst = SkyServer.SiderealTime;
                     axes = Coordinate.AltAz2RaDec(axes[0], axes[1], SkySettings.Latitude, lst);
 
                     axes[0] = Coordinate.Ra2Ha12(axes[0], lst) * 15.0; // ha in degrees
@@ -259,15 +268,16 @@ namespace GS.Server.SkyTelescope
         /// Conversion of mount axis positions in degrees to Ra and Dec
         /// </summary>
         /// <param name="axes"></param>
+        /// <param name="localSiderealTime"></param>
         /// <returns></returns>
-        internal static double[] AxesXYToRaDec(double[] axes)
+        internal static double[] AxesXYToRaDec(double[] axes, double localSiderealTime)
         {
             var raDec = new[] { axes[0], axes[1] };
             switch (SkySettings.AlignmentMode)
             {
                 case AlignmentModes.algAltAz:
-                    var radec = Coordinate.AltAz2RaDec(SkyServer.Altitude, SkyServer.Azimuth, SkySettings.Latitude, SkyServer.SiderealTime);
-                    raDec[0] = Coordinate.Ra2Ha12(radec[0], SkyServer.SiderealTime) * 15.0; // ha in degrees
+                    var radec = Coordinate.AltAz2RaDec(SkyServer.Altitude, SkyServer.Azimuth, SkySettings.Latitude, localSiderealTime);
+                    raDec[0] = Coordinate.Ra2Ha12(radec[0], localSiderealTime) * 15.0; // ha in degrees
                     raDec[1] = radec[1];
                     break;
                 case AlignmentModes.algGermanPolar:
@@ -279,7 +289,7 @@ namespace GS.Server.SkyTelescope
                         raDec = Range.RangeAzAlt(raDec);
                     }
 
-                    raDec[0] = SkyServer.SiderealTime - raDec[0] / 15.0;
+                    raDec[0] = localSiderealTime - raDec[0] / 15.0;
                     //southern hemi
                     if (SkyServer.SouthernHemisphere) raDec[1] = -raDec[1];
                     break;
@@ -291,21 +301,43 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
+        /// Conversion of mount axis positions in degrees to Ra and Dec
+        /// </summary>
+        /// <param name="axes"></param>
+        /// <returns></returns>
+        internal static double[] AxesXYToRaDec(double[] axes)
+        {
+            return AxesXYToRaDec(axes, SkyServer.SiderealTime);
+        }
+
+
+        /// <summary>
         /// convert a RaDec position to an axes positions. 
         /// </summary>
         /// <param name="raDec"></param>
         /// <returns></returns>
         internal static double[] RaDecToAxesXY(double[] raDec)
         {
+            return RaDecToAxesXY(raDec, SkyServer.SiderealTime);
+        }
+
+        /// <summary>
+        /// convert a RaDec position to an axes positions. 
+        /// </summary>
+        /// <param name="raDec"></param>
+        /// <param name="lst">Local Sidereal Time</param>
+        /// <returns></returns>
+        internal static double[] RaDecToAxesXY(double[] raDec, double lst)
+        {
             var axes = new[] { raDec[0], raDec[1] };
             switch (SkySettings.AlignmentMode)
             {
                 case AlignmentModes.algAltAz:
                     axes = Range.RangeAzAlt(axes);
-                    axes = Coordinate.RaDec2AltAz(axes[0], axes[1], SkyServer.SiderealTime, SkySettings.Latitude);
+                    axes = Coordinate.RaDec2AltAz(axes[0], axes[1], lst, SkySettings.Latitude);
                     return axes;
                 case AlignmentModes.algGermanPolar:
-                    axes[0] = (SkyServer.SiderealTime - axes[0]) * 15.0;
+                    axes[0] = (lst - axes[0]) * 15.0;
                     if (SkyServer.SouthernHemisphere) axes[1] = -axes[1];
                     axes[0] = Range.Range360(axes[0]);
 
@@ -319,12 +351,13 @@ namespace GS.Server.SkyTelescope
 
                     //check for alternative position within meridian limits
                     var b = AxesAppToMount(axes);
+
                     var alt = SkyServer.CheckAlternatePosition(b);
                     if (alt != null) axes = alt;
 
                     return axes;
                 case AlignmentModes.algPolar:
-                    axes[0] = (SkyServer.SiderealTime - axes[0]) * 15.0;
+                    axes[0] = (lst - axes[0]) * 15.0;
                     axes[1] = (SkyServer.SouthernHemisphere) ? -axes[1] : axes[1];
                     break;
                 default:
