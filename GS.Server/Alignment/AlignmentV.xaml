@@ -9,6 +9,13 @@
              xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              xmlns:alignment="clr-namespace:GS.Server.Alignment"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance alignment:AlignmentVM}">
+    <UserControl.Resources>
+        <domain:OrdinalConverter x:Key="OrdinalConverter" />
+        <DataTemplate x:Key="OrdinalColumnDataTemplate">
+            <TextBlock Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGridRow},
+            Converter={StaticResource ResourceKey=OrdinalConverter}}" HorizontalAlignment="Right" />
+        </DataTemplate>
+    </UserControl.Resources>
     <Grid MinWidth="600">
         <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Center" CloseOnClickAway="True"
                       IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
@@ -94,7 +101,13 @@
                           CanUserDeleteRows="False"
                           AutoGenerateColumns="False"
                           >
+                    <DataGrid.Resources>
+                        <Style x:Key="RightAlignedGridHeaderStyle" TargetType="DataGridColumnHeader" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                            <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                        </Style>
+                    </DataGrid.Resources>
                     <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="#" CellTemplate="{StaticResource OrdinalColumnDataTemplate}" HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Altitude" Binding="{Binding AltAz[0]}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Azimuth" Binding="{Binding AltAz[1]}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Correction" Binding="{Binding Correction}" IsReadOnly="True" />
