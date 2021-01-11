@@ -1491,6 +1491,19 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static bool _syncLimitOn;
+        public static bool SyncLimitOn
+        {
+            get => _syncLimitOn;
+            set
+            {
+                if (_syncLimitOn == value) return;
+                _syncLimitOn = value;
+                Properties.SkyTelescope.Default.SyncLimitOn = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static double _temperature;
         public static double Temperature
         {
@@ -1691,6 +1704,7 @@ namespace GS.Server.SkyTelescope
             SolarRate = Properties.SkyTelescope.Default.SolarRate;
             St4GuideRate = Properties.SkyTelescope.Default.St4Guiderate;
             SyncLimit = Properties.SkyTelescope.Default.SyncLimit;
+            SyncLimitOn = Properties.SkyTelescope.Default.SyncLimitOn;
             Temperature = Properties.SkyTelescope.Default.Temperature;
             UTCDateOffset = Properties.SkyTelescope.Default.UTCOffset;
 

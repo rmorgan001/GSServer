@@ -214,7 +214,7 @@
                             <VirtualizingStackPanel />
                         </ItemsPanelTemplate>
                     </ComboBox.ItemsPanel>
-                </ComboBox>
+                    </ComboBox>
                     <ComboBox Grid.Row="2" Grid.Column="2" md:HintAssist.Hint="{StaticResource skyST4}" MinWidth="10" Margin="10,0,0,0" ToolTip="{StaticResource skyST4}" 
                               ItemsSource="{Binding St4GuideRates}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         <ComboBox.SelectedItem>
@@ -326,37 +326,45 @@
                             </TextBox.Text>
                         </TextBox>
                     </StackPanel>
-                    <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,0,0,0">
-                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyRefraction}"
-                                      IsChecked="{Binding Refraction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyRefraction}"/>
-                    </StackPanel>
-                    <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,0,0,0">
-                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}"  HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyEncoders}"
-                                      IsChecked="{Binding EncodersOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyEncoders}"/>
-                    </StackPanel>
-                    <StackPanel Grid.Row="5" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,0,0,0">
-                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyAltPpEC}"
-                                      IsChecked="{Binding AlternatingPPec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyAltPpEC}"/>
-                    </StackPanel>
-                    <StackPanel Grid.Row="6" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,0,0,0">
-                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyGoToDecPulse}"
-                                      IsChecked="{Binding DecPulseToGoTo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyGoToDecPulse}"/>
-                    </StackPanel>
-                    <StackPanel Grid.Row="7" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,0,0,0">
-                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyFullCurrent}"
-                                      IsChecked="{Binding FullCurrent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyFullCurrent}"/>
-                    </StackPanel>
-                    <StackPanel Grid.Row="8" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,0,0,0">
-                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyDiagnostics}"
-                                      IsChecked="{Binding DebugVisibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyDiagnostics}"/>
-                    </StackPanel>
-                    <Border Margin="0,0,4,0" Grid.Row="8" Grid.Column="3" Grid.ColumnSpan="2" BorderThickness="3" BorderBrush="DimGray" CornerRadius="5"
+                     
+                    <StackPanel Grid.Row="3" Grid.Column="0" Grid.RowSpan="6" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,15,0,0">
+                            <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyRefraction}"
+                                          IsChecked="{Binding Refraction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyRefraction}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,15,0,0">
+                            <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}"  HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyEncoders}"
+                                          IsChecked="{Binding EncodersOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyEncoders}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,15,0,0">
+                            <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyAltPpEC}"
+                                          IsChecked="{Binding AlternatingPPec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyAltPpEC}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,15,0,0">
+                            <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyGoToDecPulse}"
+                                          IsChecked="{Binding DecPulseToGoTo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyGoToDecPulse}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,15,0,0">
+                            <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyFullCurrent}"
+                                          IsChecked="{Binding FullCurrent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyFullCurrent}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,15,0,0">
+                            <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyDiagnostics}"
+                                          IsChecked="{Binding DebugVisibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyDiagnostics}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,15,0,0">
+                            <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyDiagnostics}" IsChecked="{Binding SyncLimitOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skySyncLimitOn}" />
+                        </StackPanel>
+                            </StackPanel>
+
+                        <Border Margin="0,0,4,0" Grid.Row="8" Grid.Column="3" Grid.ColumnSpan="2" BorderThickness="3" BorderBrush="DimGray" CornerRadius="5"
                             Background="{StaticResource MaterialDesignToolBarBackground}">
                             <StackPanel Orientation="Horizontal" >
                             <ComboBox md:HintAssist.Hint="{StaticResource btnTipParkPos}" Margin="15,0,0,0" ToolTip="{StaticResource btnTipParkPos}" Width="125"
@@ -391,7 +399,7 @@
                                         Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSaveParkCommand}" />
                             </StackPanel>
                         </Border>
-                    <Border Margin="3" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3" Grid.RowSpan="4" CornerRadius="5" BorderThickness="3" BorderBrush="DimGray"
+                        <Border Margin="3" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3" Grid.RowSpan="4" CornerRadius="5" BorderThickness="3" BorderBrush="DimGray"
                             Background="{StaticResource MaterialDesignToolBarBackground}"  >
                         <Grid Margin="10,0,10,10">
                         <Grid.ColumnDefinitions>
@@ -409,7 +417,7 @@
                         </Grid.RowDefinitions>
                             <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" HorizontalAlignment="Center" Content="{StaticResource skyOBL}"/>
                             <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="{StaticResource skyLatitude}"/>
-                                <ComboBox Grid.Row="1" Grid.Column="1" IsEnabled="True" md:HintAssist.Hint="{StaticResource skyLat01}" Margin="10,0,0,0" ToolTip="{StaticResource skyLat0}"
+                            <ComboBox Grid.Row="1" Grid.Column="1" IsEnabled="True" md:HintAssist.Hint="{StaticResource skyLat01}" Margin="10,0,0,0" ToolTip="{StaticResource skyLat0}"
                                       ItemsSource="{Binding LatitudeRangeNS}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                 <ComboBox.SelectedItem>
                                     <Binding Path="Lat0" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -424,7 +432,7 @@
                                     </ItemsPanelTemplate>
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
-                                <ComboBox Grid.Row="1" Grid.Column="2" IsEnabled="True" md:HintAssist.Hint="{StaticResource edDegrees}" Margin="10,0,0,0" ToolTip="{StaticResource edDegrees}"
+                            <ComboBox Grid.Row="1" Grid.Column="2" IsEnabled="True" md:HintAssist.Hint="{StaticResource edDegrees}" Margin="10,0,0,0" ToolTip="{StaticResource edDegrees}"
                                 ItemsSource="{Binding Range90}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                 <ComboBox.SelectedItem>
                                     <Binding Path="Lat1" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -439,7 +447,7 @@
                                     </ItemsPanelTemplate>
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
-                                <ComboBox Grid.Row="1" Grid.Column="3" IsEnabled="True" md:HintAssist.Hint="{StaticResource edMinutes}" Margin="10,0,0,0" ToolTip="{StaticResource edMinutes}"
+                            <ComboBox Grid.Row="1" Grid.Column="3" IsEnabled="True" md:HintAssist.Hint="{StaticResource edMinutes}" Margin="10,0,0,0" ToolTip="{StaticResource edMinutes}"
                             ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.SelectedItem>
                                 <Binding Path="Lat2" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -454,7 +462,7 @@
                                 </ItemsPanelTemplate>
                             </ComboBox.ItemsPanel>
                         </ComboBox>
-                                <ComboBox Grid.Row="1" Grid.Column="4" IsEnabled="True" md:HintAssist.Hint="{StaticResource edSeconds}" IsEditable="True" Margin="10,0,0,0" ToolTip="{StaticResource edSeconds}"
+                            <ComboBox Grid.Row="1" Grid.Column="4" IsEnabled="True" md:HintAssist.Hint="{StaticResource edSeconds}" IsEditable="True" Margin="10,0,0,0" ToolTip="{StaticResource edSeconds}"
                            ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.Text>
                                 <Binding Path="Lat3" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">

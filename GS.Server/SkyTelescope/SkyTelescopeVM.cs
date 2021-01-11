@@ -984,6 +984,15 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
+        public bool SyncLimitOn
+        {
+            get => SkySettings.SyncLimitOn;
+            set
+            {
+                SkySettings.SyncLimitOn = value;
+                OnPropertyChanged();
+            }
+        }
         public IList<string> LatitudeRangeNS { get; }
         public string Lat0
         {

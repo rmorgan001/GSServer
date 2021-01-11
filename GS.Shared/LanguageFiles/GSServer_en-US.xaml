@@ -583,5 +583,6 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="snapEnable">Enable Snap</system:String>
     <system:String x:Key="snapConn">Not connected to mount</system:String>
     <system:String x:Key="snapSupport">Not supported on this mount</system:String>
+    <system:String x:Key="skySyncLimitOn">Sync Limits</system:String>
 </ResourceDictionary>
  
