@@ -1,5 +1,4 @@
 ﻿using System;
-using ASCOM.DeviceInterface;
 using NStarAlignment.DataTypes;
 using NStarAlignment.Utilities;
 
@@ -8,14 +7,13 @@ namespace NStarAlignment.Model
     public partial class AlignmentModel
     {
         #region Going from calculated to synched axis
-        public double[] GetSkyAxes(double[] mountAxes, DateTime utcTime)
+        public double[] GetSkyAxes(double[] mountAxes, TimeRecord time)
         {
             if (!IsAlignmentOn) return mountAxes;   // Fast exist as alignment modeling is switched off.
 
-            var time = new TimeRecord(utcTime, SiteLongitude);
             var skyAxes = new[] { 0.0, 0.0 };
             CarteseanCoordinate result;
-
+            System.Diagnostics.Debug.WriteLine($"Alignment model Sidereal time: {time.LocalSiderealTime}");
             if (!ThreeStarEnable)
             {
                 result = DeltaMap(mountAxes);
@@ -92,13 +90,13 @@ namespace NStarAlignment.Model
 
             switch (AlignmentMode)
             {
-                case AlignmentModes.algAltAz:
+                case AlignmentMode.AltAz:
                     var tempRaDec = AstroConvert.AltAz2RaDec(axes[1], axes[0], SiteLatitude, localSiderealTime);
                     raDec[0] = AstroConvert.Ra2Ha12(tempRaDec[0], localSiderealTime) * 15.0; // ha in degrees
                     raDec[1] = tempRaDec[1];
                     break;
-                case AlignmentModes.algGermanPolar:
-                case AlignmentModes.algPolar:
+                case AlignmentMode.GermanPolar:
+                case AlignmentMode.Polar:
                     if (raDec[1] > HomePosition.DecAxis)
                     {
                         raDec[0] += 180.0;
@@ -123,17 +121,17 @@ namespace NStarAlignment.Model
         /// <param name="raDec"></param>
         /// <param name="time"></param>
         /// <returns></returns>
-        public double[] RaDecToAxes(double[] raDec, TimeRecord time)
+        public double[] RaDecToAxesXY(double[] raDec, TimeRecord time)
         {
             var axes = new[] { raDec[0], raDec[1] };
             var localSiderealTime = time.LocalSiderealTime;
             switch (AlignmentMode)
             {
-                case AlignmentModes.algAltAz:
+                case AlignmentMode.AltAz:
                     axes = Range.RangeAzAlt(axes);
                     axes = AstroConvert.RaDec2AltAz(axes[0], axes[1], localSiderealTime, SiteLatitude);
                     return axes;
-                case AlignmentModes.algGermanPolar:
+                case AlignmentMode.GermanPolar:
                     axes[0] = (localSiderealTime - axes[0]) * 15.0;
                     if (SiteLatitude < 0) axes[1] = -axes[1];
                     axes[0] = Range.Range360(axes[0]);
@@ -144,7 +142,7 @@ namespace NStarAlignment.Model
                         axes[0] += 180;
                         axes[1] = 180 - axes[1];
                     }
-                    axes = Range.RangeAxes(axes);
+                    axes = Range.RangeAxesXY(axes);
 
                     ////check for alternative position within meridian limits
                     //var b = AxesAppToMount(axes);
@@ -153,26 +151,125 @@ namespace NStarAlignment.Model
                     //if (alt != null) axes = alt;
 
                     return axes;
-                case AlignmentModes.algPolar:
+                case AlignmentMode.Polar:
                     axes[0] = (localSiderealTime - axes[0]) * 15.0;
                     axes[1] = (SiteLatitude < 0) ? -axes[1] : axes[1];
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            axes = Range.RangeAxes(axes);
+            axes = Range.RangeAxesXY(axes);
             return axes;
+        }
+
+        /// <summary>
+        /// Conversion of mount axis positions in degrees to Alt and Az
+        /// </summary>
+        /// <param name="axes"></param>
+        /// <returns>AzAlt</returns>
+        internal double[] AxesXYToAzAlt(double[] axes)
+        {
+            var a = AxesYXToAltAz(new[] { axes[1], axes[0] });
+            var b = new[] { a[1], a[0] };
+            return b;
+        }
+
+
+
+        /// <summary>
+        /// Conversion of mount axis positions in degrees to Alt and Az
+        /// </summary>
+        /// <param name="axes"></param>
+        /// <returns>AltAz</returns>
+        internal double[] AxesYXToAltAz(double[] axes)
+        {
+            var altAz = new[] { axes[0], axes[1] };
+            switch (AlignmentMode)
+            {
+                case AlignmentMode.AltAz:
+                    break;
+                case AlignmentMode.GermanPolar:
+                    if (altAz[0] > 90)
+                    {
+                        altAz[1] += 180.0;
+                        altAz[0] = 180 - altAz[0];
+                        altAz = Range.RangeAltAz(altAz);
+                    }
+
+                    //southern hemisphere
+                    if (SiteLatitude < 0) altAz[0] = -altAz[0];
+
+                    //axis degrees to ha
+                    var ha = altAz[1] / 15.0;
+                    altAz = AstroConvert.HaDec2AltAz(ha, altAz[0], SiteLatitude);
+                    break;
+                case AlignmentMode.Polar:
+                    //axis degrees to ha
+                    ha = altAz[1] / 15.0;
+                    if (SiteLatitude < 0) altAz[0] = -altAz[0];
+                    altAz = AstroConvert.HaDec2AltAz(ha, altAz[0], SiteLatitude);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            altAz = Range.RangeAltAz(altAz);
+            return altAz;
+        }
+
+
+        /// <summary>
+        /// convert a decimal Alt/Az positions to an axes positions at a given time
+        /// </summary>
+        /// <param name="altAz"></param>
+        /// <param name="lst">Local Sidereal Time</param>
+        /// <returns></returns>
+        internal double[] AltAzToAxesYX(double[] altAz, TimeRecord time)
+        {
+            var axes = new[] {altAz[0], altAz[1]};
+            switch (AlignmentMode)
+            {
+                case AlignmentMode.AltAz:
+                    break;
+                case AlignmentMode.GermanPolar:
+                    axes = AstroConvert.AltAz2RaDec(axes[0], axes[1], SiteLatitude, time.LocalSiderealTime);
+
+                    axes[0] = AstroConvert.Ra2Ha12(axes[0], time.LocalSiderealTime) * 15.0; // ha in degrees
+
+                    if (SiteLatitude < 0) axes[1] = -axes[1];
+
+                    axes = Range.RangeAzAlt(axes);
+
+                    if (axes[0] > 180.0 || axes[0] < 0)
+                    {
+                        // adjust the targets to be through the pole
+                        axes[0] += 180;
+                        axes[1] = 180 - axes[1];
+                    }
+                    break;
+                case AlignmentMode.Polar:
+                    axes = AstroConvert.AltAz2RaDec(axes[0], axes[1], SiteLatitude, time.LocalSiderealTime);
+
+                    axes[0] = AstroConvert.Ra2Ha12(axes[0], time.LocalSiderealTime) * 15.0; // ha in degrees
+
+                    if (SiteLatitude < 0) axes[1] = -axes[1];
+
+                    axes = Range.RangeAzAlt(axes);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            axes = Range.RangeAxesXY(axes);
+            return new[] { axes[1], axes[0] };
         }
 
         #endregion
 
 
         #region Going from sky position to mount position ...
-        public double[] GetMountAxes(double[] skyAxes, DateTime utcTime)
+        public double[] GetMountAxes(double[] skyAxes, TimeRecord time)
         {
             if (!IsAlignmentOn) return skyAxes; // Fast exit as alignment modeling is switched off.
 
-            var time = new TimeRecord(utcTime, SiteLongitude);
             var mountAxes = new[] { 0.0, 0.0 };
             CarteseanCoordinate result;
 

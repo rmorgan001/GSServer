@@ -28,10 +28,10 @@ namespace NStarAlignment.Utilities
         /// <returns>-5.8305555555555486</returns>
         public static double Range12(double d)
         {
-            while ((d >= 12.0) || (d <= -12.0))
+            while ((d > 12.0) || (d <= -12.0))
             {
                 if (d <= -12.0) d += 24.0;
-                if (d >= 12.0) d -= 24.0;
+                if (d > 12.0) d -= 24.0;
             }
             return d;
         }
@@ -97,6 +97,18 @@ namespace NStarAlignment.Utilities
         }
 
         /// <summary>
+        /// Force range for Altitude and Azimuth
+        /// </summary>
+        ///  <remarks>Attention to the order given and received</remarks>
+        /// <param name="altAz"></param>
+        /// <returns></returns>
+        public static double[] RangeAltAz(double[] altAz)
+        {
+            double[] a = { Range90(altAz[0]), Range360(altAz[1]) };
+            return a;
+        }
+
+        /// <summary>
         /// Force range for Azimuth an Altitude
         /// </summary>
         /// <remarks>Attention to the order given and received</remarks>
@@ -124,9 +136,20 @@ namespace NStarAlignment.Utilities
         /// </summary>
         /// <param name="axes"></param>
         /// <returns></returns>
-        public static double[] RangeAxes(double[] axes)
+        public static double[] RangeAxesXY(double[] axes)
         {
             double[] xy = { Range360(axes[0]), Range270(axes[1]) };
+            return xy;
+        }
+
+        /// <summary>
+        /// Force range for secondary and primary axes
+        /// </summary>
+        /// <param name="axes"></param>
+        /// <returns></returns>
+        public static double[] RangeAxesYX(double[] axes)
+        {
+            double[] xy = { Range270(axes[1]), Range360(axes[0]) };
             return xy;
         }
     }

@@ -7,7 +7,7 @@ namespace NStarAlignment.DataTypes
     {
         public Angle X;
         public Angle Y;
-        public double R;
+        public int R;
 
         #region Operator overloads ...
         /// <summary>

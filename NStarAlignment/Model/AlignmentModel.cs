@@ -4,13 +4,19 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using ASCOM.DeviceInterface;
 using Newtonsoft.Json;
 using NStarAlignment.DataTypes;
 using NStarAlignment.Utilities;
 
 namespace NStarAlignment.Model
 {
+    public enum AlignmentMode
+    {
+        AltAz,
+        GermanPolar,
+        Polar
+    }
+
     public enum AlignmentAlgorithm
     {
         [Description("Nearest star")]
@@ -49,7 +55,7 @@ namespace NStarAlignment.Model
         }
     }
 
-    public partial class AlignmentModel : IDisposable
+    public partial class AlignmentModel 
     {
         public event EventHandler<NotificationEventArgs> Notification = delegate {};
 
@@ -77,7 +83,7 @@ namespace NStarAlignment.Model
 
         public double[] OneStarAdjustment { get; } = { 0d, 0d };
 
-        public AlignmentModes AlignmentMode { get; set; } = AlignmentModes.algGermanPolar;
+        public AlignmentMode AlignmentMode { get; set; } = AlignmentMode.GermanPolar;
 
         /// <summary>
         /// Set to True when the model has at least 3 alignment points.
@@ -110,34 +116,16 @@ namespace NStarAlignment.Model
         /// </summary>
         public bool LocalToPier { get; set; } = false;
 
-        public double SiteLongitude
-        {
-            get => _ascomTools.Transform.SiteLongitude;
-            set => _ascomTools.Transform.SiteLongitude = value;
-        }
+        public double SiteLongitude { get; set; }
 
-        public double SiteLatitude
-        {
-            get => _ascomTools.Transform.SiteLatitude;
-            set => _ascomTools.Transform.SiteLatitude = value;
-        }
+        public double SiteLatitude { get; set; }
 
-        public double SiteElevation
-        {
-            get => _ascomTools.Transform.SiteElevation;
-            set => _ascomTools.Transform.SiteElevation = value;
-        }
-
-        public double SiteTemperature
-        {
-            get => _ascomTools.Transform.SiteTemperature;
-            set => _ascomTools.Transform.SiteTemperature = value;
-        }
+        public double SiteElevation { get; set; }
 
 
         public AlignmentPointCollection AlignmentPoints { get; } = new AlignmentPointCollection();
 
-        private AscomTools _ascomTools;
+        // private AscomTools _ascomTools;
 
         private readonly List<AxisPosition> _mountAxes = new List<AxisPosition>();
         private readonly List<CarteseanCoordinate> _mountAxisCoordinates = new List<CarteseanCoordinate>();
@@ -152,13 +140,11 @@ namespace NStarAlignment.Model
 
         private readonly string _configFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"NStarAlignment\Points.config");
 
-        public AlignmentModel(double siteLatitude, double siteLongitude, double siteElevation, double siteTemperature, bool clearPointsOnStartup = false)
+        public AlignmentModel(double siteLatitude, double siteLongitude, double siteElevation, bool clearPointsOnStartup = false)
         {
-            _ascomTools = new AscomTools();
             SiteLatitude = siteLatitude;
             SiteLongitude = siteLongitude;
             SiteElevation = siteElevation;
-            SiteTemperature = siteTemperature;
             HomePosition = new AxisPosition(90.0, 90.0);
 
             if (!clearPointsOnStartup)
@@ -172,16 +158,16 @@ namespace NStarAlignment.Model
         #endregion
 
         #region Alignment point management ...
-        public void AddAlignmentPoint(double[] targetRaDec, double[] mountAxes, double[] skyAxes, DateTime utcTime)
+        public void AddAlignmentPoint(double[] targetRaDec, double[] mountAxes, double[] skyAxes, TimeRecord time)
         {
             AddAlignmentPoint(targetRaDec,
                 new AxisPosition(mountAxes[0], mountAxes[1]),
                 new AxisPosition(skyAxes[0], skyAxes[1]),
-                utcTime);
+                time);
         }
 
         public void AddAlignmentPoint(double[] targetRaDec, AxisPosition mountAxes, AxisPosition skyAxes,
-            DateTime utcTime)
+            TimeRecord time)
         {
             // To protect against calculation errors near the pole reject positions that are too close
             if (Math.Abs(targetRaDec[1]) > 89.9)
@@ -202,9 +188,8 @@ namespace NStarAlignment.Model
                 }
             }
 
-            var timeRecord = new TimeRecord(utcTime, SiteLongitude);
-            var altAz = _ascomTools.GetAltAz(targetRaDec[0], targetRaDec[1], utcTime);
-            AlignmentPoints.Add(new AlignmentPoint(targetRaDec, altAz, mountAxes, skyAxes, timeRecord));
+            var altAz = AstroConvert.RaDec2AltAz(targetRaDec[0], targetRaDec[1], time.LocalSiderealTime, SiteLatitude);
+            AlignmentPoints.Add(new AlignmentPoint(targetRaDec, altAz, mountAxes, skyAxes, time));
 
             OneStarAdjustment[0] = skyAxes[0] - mountAxes[0];
             OneStarAdjustment[1] = skyAxes[1] - mountAxes[1];
@@ -627,7 +612,7 @@ namespace NStarAlignment.Model
         {
             var result = new SphericalCoordinate();
             var raDec = AxesToRaDec(axisPositions, time);
-            var altAz = _ascomTools.GetAltAz(raDec[0], raDec[1], time.UtcTime);
+            var altAz = AstroConvert.RaDec2AltAz(raDec[0], raDec[1], time.LocalSiderealTime, SiteLatitude);
 
             // System.Diagnostics.Debug.WriteLine($"AxesToSpherical - Axes: {axisPositions[0]}/{axisPositions[1]}, RA/Dec: {raDec[0]}/{raDec[1]}, AltAz: {altAz[0]}/{altAz[1]}");
             result.X = (altAz[1] - 180) + HomePosition.RaAxis;
@@ -656,8 +641,8 @@ namespace NStarAlignment.Model
         {
             var altAz = new double[] { ((raDec.Y - HomePosition.DecAxis) * 0.5) - 90.0, (raDec.X - HomePosition.RaAxis) + 180.0 };
             // Use ASCOM Transform
-            var tmpRaDec = _ascomTools.GetRaDec(altAz, time.UtcTime);
-            var axes = new AxisPosition(RaDecToAxes(tmpRaDec, time));
+            var tmpRaDec = AstroConvert.AltAz2RaDec(altAz[0], altAz[1], SiteLatitude, time.LocalSiderealTime);
+            var axes = new AxisPosition(RaDecToAxesXY(tmpRaDec, time));
             // Calculate difference between Home Ra and Ra Axis
             var deltaRa = Math.Abs(HomePosition.RaAxis - axes[0]);
             deltaRa = Math.Abs((deltaRa + 180) % 360 - 180);
@@ -801,6 +786,7 @@ namespace NStarAlignment.Model
                 {
                     result[i] = i;
                 }
+                RaiseNotification($"Nearest centered triangle ({targetAxis[0]}, {targetAxis[1]}) by points {result[0]}, {result[1]} and {result[2]}");
                 return result;
             }
 
@@ -916,11 +902,11 @@ namespace NStarAlignment.Model
                 result[0] = sortedPoints[l].AlignmentPointIndex;
                 result[1] = sortedPoints[m].AlignmentPointIndex;
                 result[2] = sortedPoints[n].AlignmentPointIndex;
-                RaiseNotification($"Near centered triangle to defined ({targetAxis[0]}, {targetAxis[1]}) by points {result[0]}, {result[1]} and {result[2]}");
+                RaiseNotification($"Nearest centered triangle to defined ({targetAxis[0]}, {targetAxis[1]}) by points {result[0]}, {result[1]} and {result[2]}");
             }
             else
             {
-                RaiseNotification($"Near centered triangle could not be determined for axes ({targetAxis[0]}, {targetAxis[1]}).");
+                RaiseNotification($"Nearest centered triangle could not be determined for axes ({targetAxis[0]}, {targetAxis[1]}).");
             }
 
             return result;
@@ -941,6 +927,7 @@ namespace NStarAlignment.Model
                 {
                     result[i] = i;
                 }
+                RaiseNotification($"Nearest three points to ({targetAxis[0]}, {targetAxis[1]}) by points {result[0]}, {result[1]} and {result[2]}");
                 return result;
             }
 
@@ -1034,28 +1021,6 @@ namespace NStarAlignment.Model
         }
 
         #endregion
-
-
-        #region IDisposable ...
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (_ascomTools != null)
-                {
-                    _ascomTools.Dispose();
-                    _ascomTools = null;
-                }
-            }
-        }
-        #endregion
-
 
     }
 }

@@ -40,8 +40,6 @@ SOFTWARE.
 */
 
 using System;
-using ASCOM.Astrometry;
-using ASCOM.Astrometry.NOVAS;
 
 namespace NStarAlignment.Utilities
 {
@@ -71,37 +69,6 @@ namespace NStarAlignment.Utilities
 
         public static double RadToDeg(double rad) { return (rad * RAD_DEG); }
 
-        #endregion
-
-        #region Sidereal time ...
-
-        /// <summary>
-        /// Returns LAST for a given longitude and local time.
-        /// </summary>
-        /// <param name="longitude"></param>
-        /// <param name="utcTime"></param>
-        /// <returns></returns>
-        public static double UtcToLocalApparentSiderealTime(double longitude, DateTime utcTime)
-        {
-            // get greenwich sidereal time: https://en.wikipedia.org/wiki/Sidereal_time
-            //double siderealTime = (18.697374558 + 24.065709824419081 * (utilities.DateUTCToJulian(DateTime.UtcNow) - 2451545.0));
-
-            // alternative using NOVAS 3.1
-            double siderealTime = 0.0;
-            using (var novas = new NOVAS31())
-            {
-                var jd = utcTime.ToOADate() + 2415018.5;      // Taken from ASCOM.Util.DateUTCToJulian
-                novas.SiderealTime(jd, 0, novas.DeltaT(jd),
-                    GstType.GreenwichApparentSiderealTime,
-                    Method.EquinoxBased,
-                    Accuracy.Reduced, ref siderealTime);
-            }
-            // allow for the longitude
-            siderealTime += longitude / 360.0 * 24.0;
-            // reduce to the range 0 to 24 hours (allowing for possible -ve values when longitude is -ve).
-            siderealTime = (siderealTime + 24.0) % 24.0;
-            return siderealTime;
-        }
         #endregion
 
         /// <summary>

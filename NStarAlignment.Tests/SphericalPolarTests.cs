@@ -12,23 +12,17 @@ namespace NStarAlignment.Tests
         private const double latitude = 52.6666666666667;
         private const double longitude = -1.33333333333333;
         private const double elevation = 201.0;
-        private const double temperature = 10.0;
         private readonly DateTime utcTime = new DateTime(2020, 1, 1, 00, 00, 00).ToUniversalTime();
         private TimeRecord timeRecord;
         private AlignmentModel model;
-        private AscomTools ascomTools = null;
+        private double tolerance = 0.002F;
 
         [TestInitialize]
         public void Initialise()
         {
-            model = new AlignmentModel(latitude, longitude, elevation, temperature);
+            model = new AlignmentModel(latitude, longitude, elevation);
             model.ClearAlignmentPoints();
             timeRecord = new TimeRecord(this.utcTime, longitude);
-            ascomTools = new AscomTools();
-            ascomTools.Transform.SiteLatitude = latitude;
-            ascomTools.Transform.SiteLongitude = longitude;
-            ascomTools.Transform.SiteElevation = elevation;
-            ascomTools.Transform.SiteTemperature = temperature;
 
         }
 
@@ -36,10 +30,7 @@ namespace NStarAlignment.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            model.Dispose();
             model = null;
-            ascomTools.Dispose();
-            ascomTools = null;
         }
 
         [DataTestMethod]
@@ -118,7 +109,7 @@ namespace NStarAlignment.Tests
             AxisPosition axes = new AxisPosition(az, alt);
             SphericalCoordinate spherical1 = model.AxesToSpherical(new double[] {az, alt}, timeRecord);
             AxisPosition outAxes = model.SphericalToAxes(spherical1, timeRecord, spherical1.R);
-            Assert.IsTrue(outAxes.Equals(axes, 0.001));
+            Assert.IsTrue(outAxes.Equals(axes, tolerance));
 
         }
 
@@ -174,9 +165,9 @@ namespace NStarAlignment.Tests
         public void AxisToRaDecTests(double dec, double ra)
         {
             double[] raDec = model.AxesToRaDec(new double[] { ra, dec }, timeRecord);
-            double[] axes = model.RaDecToAxes(raDec, timeRecord);
-            Assert.AreEqual(ra, axes[0]);
-            Assert.AreEqual(dec, axes[1]);
+            double[] axes = model.RaDecToAxesXY(raDec, timeRecord);
+            Assert.AreEqual(ra, axes[0], tolerance);
+            Assert.AreEqual(dec, axes[1], tolerance);
         }
 
 
@@ -231,10 +222,11 @@ namespace NStarAlignment.Tests
         [DataRow(8.58561821949163, 89)]
         public void RADecAltAxRADecTest(double ra, double dec)
         {
-            double[] altAz = ascomTools.GetAltAz(ra, dec, timeRecord.UtcTime);
-            double[] raDec = ascomTools.GetRaDec(altAz, timeRecord.UtcTime);
-            Assert.AreEqual(ra, raDec[0], 0.001);
-            Assert.AreEqual(dec, raDec[1], 0.001);
+            double lst = TimeUtils.GetLocalSiderealTime(timeRecord.UtcTime, new TimeSpan(), longitude);
+            double[] altAz = AstroConvert.RaDec2AltAz(ra, dec, lst, latitude);
+            double[] raDec = AstroConvert.AltAz2RaDec(altAz[0], altAz[1], latitude, lst);
+            Assert.AreEqual(ra, raDec[0], tolerance);
+            Assert.AreEqual(dec, raDec[1], tolerance);
         }
     }
 }

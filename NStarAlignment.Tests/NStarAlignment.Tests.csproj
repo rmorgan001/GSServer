@@ -55,7 +55,7 @@
     <Compile Include="NStarTriangleCentre.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SphericalPolarTests.cs" />
-    <Compile Include="AscomToolsTests.cs" />
+    <Compile Include="TimeUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
