@@ -28,6 +28,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using ASCOM.Utilities;
 using GS.Server.Controls.Dialogs;
+using GS.Shared.Command;
 
 namespace GS.Server.PoleLocator
 {

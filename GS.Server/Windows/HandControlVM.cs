@@ -11,6 +11,7 @@ using GS.Server.Controls.Dialogs;
 using GS.Server.Helpers;
 using GS.Server.SkyTelescope;
 using GS.Shared;
+using GS.Shared.Command;
 using MaterialDesignThemes.Wpf;
 using NativeMethods = GS.Server.Helpers.NativeMethods;
 
