@@ -16,7 +16,6 @@
         xmlns:plot="clr-namespace:GS.Server.Plot"
         xmlns:pec="clr-namespace:GS.Server.Pec"
         xmlns:snap="clr-namespace:GS.Server.Snap"
-        xmlns:alignment="clr-namespace:GS.Server.Alignment"
         mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanResizeWithGrip"  WindowStyle="None"  TextOptions.TextFormattingMode="Display"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         ContentRendered="MainWindow_OnContentRendered" Closed="MainWindow_OnClosed"  Topmost="{Binding TopMost}"
@@ -68,9 +67,6 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type snap:SnapVM}">
             <snap:SnapV />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type alignment:AlignmentVM}">
-            <alignment:AlignmentV />
         </DataTemplate>
     </Window.Resources>
     <Window.TaskbarItemInfo>

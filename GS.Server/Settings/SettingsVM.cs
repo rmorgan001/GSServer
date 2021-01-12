@@ -35,7 +35,6 @@ using System.Windows;
 using System.Windows.Input;
 using GS.Principles;
 using GS.Server.Controls.Dialogs;
-using GS.Shared.Command;
 
 namespace GS.Server.Settings
 {
@@ -392,17 +391,6 @@ namespace GS.Server.Settings
             {
                 Settings.Pulses = value;
                 _mainWindowVm.UpdateTabViewModel("Pulses");
-                OnPropertyChanged();
-            }
-        }
-
-        public bool AlignmentTabVisible
-        {
-            get => Settings.AlignmentTabVisible;
-            set
-            {
-                Settings.AlignmentTabVisible = value;
-                _mainWindowVm.UpdateTabViewModel("Alignment");
                 OnPropertyChanged();
             }
         }
@@ -1205,12 +1193,6 @@ namespace GS.Server.Settings
         {
             get => MonitorLog.InCategory(MonitorCategory.Mount);
             set => MonitorLog.CategoriesToMonitor(MonitorCategory.Mount, value);
-        }
-
-        public bool Alignment
-        {
-            get => MonitorLog.InCategory(MonitorCategory.Alignment);
-            set => MonitorLog.CategoriesToMonitor(MonitorCategory.Alignment, value);
         }
 
         public bool Information

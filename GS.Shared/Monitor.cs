@@ -52,7 +52,6 @@ namespace GS.Shared
             if (Settings.Interface) CategoriesToMonitor(MonitorCategory.Interface, Settings.Interface);
             if (Settings.Server) CategoriesToMonitor(MonitorCategory.Server, Settings.Server);
             if (Settings.Mount) CategoriesToMonitor(MonitorCategory.Mount, Settings.Mount);
-            if (Settings.Alignment) CategoriesToMonitor(MonitorCategory.Alignment, Settings.Alignment);
 
             if (Settings.Information) TypesToMonitor(MonitorType.Information, Settings.Information);
             if (Settings.Data) TypesToMonitor(MonitorType.Data, Settings.Data);
@@ -98,9 +97,6 @@ namespace GS.Shared
                     break;
                 case MonitorCategory.Mount:
                     Settings.Mount = value;
-                    break;
-                case MonitorCategory.Alignment:
-                    Settings.Alignment = value;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(monitorCategory), monitorCategory, null);
@@ -340,8 +336,7 @@ namespace GS.Shared
         Interface,
         Server,
         Mount,
-        Notes,
-        Alignment
+        Notes
     }
     #endregion
 

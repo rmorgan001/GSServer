@@ -37,7 +37,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using GS.Server.Controls.Dialogs;
-using GS.Shared.Command;
 using Brush = System.Windows.Media.Brush;
 using Color = System.Drawing.Color;
 
