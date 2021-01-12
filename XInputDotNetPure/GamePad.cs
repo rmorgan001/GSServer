@@ -22,7 +22,7 @@
    
     https://github.com/speps/XInputDotNet
 */
-using System;
+
 using System.Runtime.InteropServices;
 
 namespace XInputDotNetPure

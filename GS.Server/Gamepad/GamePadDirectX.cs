@@ -15,11 +15,6 @@
  */
 using System;
 using SharpDX.DirectInput;
-
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GS.Shared;
 using System.Reflection;
 using System.Threading;
@@ -43,7 +38,7 @@ namespace GS.Server.GamePad
         /// Constructor sets up and find a joystick
         /// </summary>
         /// <param name="window_handle"></param>
-        public GamePadDirectX(IntPtr window_handle):base()
+        public GamePadDirectX(IntPtr window_handle)
         {
             hWnd = window_handle;
             directInput = new DirectInput();
