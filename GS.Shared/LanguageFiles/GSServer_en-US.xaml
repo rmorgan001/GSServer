@@ -585,8 +585,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="snapEnable">Enable Snap</system:String>
     <system:String x:Key="snapConn">Not connected to mount</system:String>
     <system:String x:Key="snapSupport">Not supported on this mount</system:String>
-
-	<!-- 1.0.2.5? -->
+    <system:String x:Key="skySyncLimitOn">Sync Limits</system:String>
     <!-- Alignment -->
     <system:String x:Key="aliOpenTooltip">Open</system:String>
     <system:String x:Key="aliCloseTooltip">Close</system:String>
@@ -604,19 +603,14 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliDelete">Delete</system:String>
     <system:String x:Key="aliDeleteTooltip">Click this button to delete the selected alignment point.</system:String>
     <system:String x:Key="optAlignment">Alignment</system:String>
-
     <!-- Alignment enumerations -->
     <system:String x:Key="enumAlignmentAlgorithm_0">Nearest star</system:String>
     <system:String x:Key="enumAlignmentAlgorithm_1">N-Star</system:String>
     <system:String x:Key="enumAlignmentAlgorithm_2">N-Star + Nearest</system:String>
-
     <system:String x:Key="enumPointFilterMode_0">All points</system:String>
     <system:String x:Key="enumPointFilterMode_1">Same side of meridian</system:String>
     <system:String x:Key="enumPointFilterMode_2">Local quadrant</system:String>
-
     <system:String x:Key="enumThreePointMode_0">Nearest enclosing triangle</system:String>
     <system:String x:Key="enumThreePointMode_1">Enclosing triangle with nearest centre</system:String>
-
-
 </ResourceDictionary>
  

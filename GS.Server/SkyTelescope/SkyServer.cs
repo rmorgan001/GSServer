@@ -4416,10 +4416,8 @@ namespace GS.Server.SkyTelescope
         /// <returns>False is out of limit</returns>
         public static bool CheckRaDecSyncLimit(double ra, double dec)
         {
-            if (SkySettings.NoSyncPastMeridian)
-            {
-                return false;
-            } // add check later if needed
+            if (!SkySettings.SyncLimitOn){return true;}
+            if (SkySettings.NoSyncPastMeridian){return false;} // add more checks later if needed
 
             //convert ra dec to mount positions
             var xy = GetAlignmentAdjustedAxes(Axes.RaDecToAxesXY(new[] { ra, dec }));
@@ -4458,10 +4456,8 @@ namespace GS.Server.SkyTelescope
         /// <returns>False is out of limit</returns>
         public static bool CheckAltAzSyncLimit(double alt, double az)
         {
-            if (SkySettings.NoSyncPastMeridian)
-            {
-                return false;
-            } // add check later if needed
+            if (!SkySettings.SyncLimitOn) { return true; }
+            if (SkySettings.NoSyncPastMeridian) { return false; } // add more checks later if needed
 
             //convert ra dec to mount positions
             var yx = Axes.AltAzToAxesYX(new[] { alt, az });
