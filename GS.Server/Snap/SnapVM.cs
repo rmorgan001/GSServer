@@ -28,6 +28,7 @@ using System.Windows;
 using System.Windows.Input;
 using GS.Server.Controls.Dialogs;
 using GS.Server.SkyTelescope;
+using GS.Shared.Command;
 
 namespace GS.Server.Snap
 {

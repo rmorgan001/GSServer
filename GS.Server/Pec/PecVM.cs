@@ -36,6 +36,7 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using GS.Shared.Command;
 using Timer = System.Timers.Timer;
 
 namespace GS.Server.Pec

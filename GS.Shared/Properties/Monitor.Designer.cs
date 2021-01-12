@@ -178,7 +178,22 @@ namespace GS.Shared.Properties {
                 this["Mount"] = value;
             }
         }
-        
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Alignment
+        {
+            get
+            {
+                return ((bool)(this["Alignment"]));
+            }
+            set
+            {
+                this["Alignment"] = value;
+            }
+        }
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]

@@ -77,6 +77,7 @@ namespace GS.Server
             Properties.Server.Default.Save();
             Properties.SkyTelescope.Default.Save();
             Properties.Gamepad.Default.Save();
+            Properties.Alignment.Default.Save();
             Settings.Settings.Save();
             Shared.Settings.Save();
         }
@@ -627,7 +628,7 @@ namespace GS.Server
                     case @"/unregister":
                     case "-unregserver": // Emulate VB6
                     case @"/unregserver":
-                        UnRegisterObjects(); //Unregister each served object
+                        UnRegisterObjects(); //Un-register each served object
                         bRet = false;
                         break;
                     case @"/pec":
@@ -653,8 +654,8 @@ namespace GS.Server
         }
 
         /// <summary>
-        /// When all calling applications disconnct this will destroy
-        /// the main wondow in the Garbage Collector.
+        /// When all calling applications disconnect this will destroy
+        /// the main window in the Garbage Collector.
         /// </summary>
         private static void GarbageCollection_DoWork(object sender, DoWorkEventArgs e)
         {

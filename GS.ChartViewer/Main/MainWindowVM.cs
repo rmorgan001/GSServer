@@ -29,6 +29,7 @@ using GS.ChartViewer.Controls.Dialogs;
 using GS.ChartViewer.Helpers;
 using GS.Principles;
 using GS.Shared;
+using GS.Shared.Command;
 using LiveCharts;
 using LiveCharts.Configurations;
 using LiveCharts.Geared;

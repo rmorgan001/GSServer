@@ -304,6 +304,20 @@ namespace GS.Server.Settings
             }
         }
 
+        private static bool _alignmentTabVisible;
+        public static bool AlignmentTabVisible
+        {
+            get => _alignmentTabVisible;
+            set
+            {
+                if (_alignmentTabVisible == value) return;
+                _alignmentTabVisible = value;
+                Properties.Server.Default.AlignmentTabVisible = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static bool _startMinimized;
         public static bool StartMinimized
         {
@@ -543,6 +557,7 @@ namespace GS.Server.Settings
             WindowLeft = Properties.Server.Default.WindowLeft;
             WindowTop = Properties.Server.Default.WindowTop;
             WindowState = Properties.Server.Default.WindowState;
+            AlignmentTabVisible = Properties.Server.Default.AlignmentTabVisible;
 
             Enum.TryParse<Model3DType>(Properties.Server.Default.ModelType, true, out var aparse);
             ModelType = aparse;

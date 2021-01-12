@@ -104,6 +104,10 @@
                             <CheckBox IsChecked="{Binding Mount}" Style="{StaticResource MaterialDesignCheckBox}"/>
                             <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optMount}"/>
                         </StackPanel>
+                        <StackPanel Orientation="Horizontal" >
+                            <CheckBox IsChecked="{Binding Alignment}" Style="{StaticResource MaterialDesignCheckBox}"/>
+                            <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optAlignment}"/>
+                        </StackPanel>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Grid.Row="3" Margin="20 0">
                         <Label Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Content="{StaticResource optType}"/>
@@ -207,6 +211,10 @@
                             <StackPanel Orientation="Horizontal" Width="Auto">
                                     <CheckBox Height="25" Width="25" IsChecked="{Binding Snap}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource tabSnap}" />
                                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource tabSnap}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Width="Auto">
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding AlignmentTabVisible}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource aliAlignment}"/>
+                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource aliAlignment}"/>
                             </StackPanel>
                             </StackPanel>
                         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" >

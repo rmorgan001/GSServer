@@ -29,6 +29,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using GS.Server.Controls.Dialogs;
 using GS.Server.SkyTelescope;
+using GS.Shared.Command;
 using LiveCharts;
 using LiveCharts.Configurations;
 using LiveCharts.Geared;

@@ -34,6 +34,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="tabModel3D">3D</system:String>
     <system:String x:Key="tabPole">Pole</system:String>
     <system:String x:Key="tabPulses">Pulses</system:String>
+    <system:String x:Key="tabAlignment">Alignment</system:String>
     <system:String x:Key="tabPlot">Plot</system:String>
     <system:String x:Key="tabWindowFlip">Flip Window Size</system:String>
 
@@ -168,6 +169,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--Gamepad-->
     <system:String x:Key="gpOn">Gamepad On</system:String>
     <system:String x:Key="gpSen">Sensitivity:</system:String>
+    <system:String x:Key="gpDoubleClickSpeed">Double Click Speed:</system:String>
     <system:String x:Key="gpTracking">Tracking</system:String>
     <system:String x:Key="gpStop">Stop</system:String>
     <system:String x:Key="gpPark">Park</system:String>
@@ -587,5 +589,31 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="snapConn">Not connected to mount</system:String>
     <system:String x:Key="snapSupport">Not supported on this mount</system:String>
     <system:String x:Key="skySyncLimitOn">Sync Limits</system:String>
+    <!-- Alignment -->
+    <system:String x:Key="aliOpenTooltip">Open</system:String>
+    <system:String x:Key="aliCloseTooltip">Close</system:String>
+    <system:String x:Key="aliAlignment">Alignment</system:String>
+    <system:String x:Key="aliAlignmentOn">Alignment On</system:String>
+    <system:String x:Key="aliAlignmentOnTooltip">Switch on star alignment modeling</system:String>
+    <system:String x:Key="aliClearModelOnStartup">Clear model on startup</system:String>
+    <system:String x:Key="aliAlignmentSettings">Settings</system:String>
+    <system:String x:Key="aliAlignmentAlgorithmTooltip">Alignment Algorithm</system:String>
+    <system:String x:Key="aliPointFilterModeTooltip">Point Filter Mode</system:String>
+    <system:String x:Key="aliThreePointModeTooltip">Three Point Mode</system:String>
+    <system:String x:Key="aliClearModelOnStartupTooltip">Tick if you want to create a fresh model every time you reconnect.</system:String>
+    <system:String x:Key="aliClearAll">Clear All</system:String>
+    <system:String x:Key="aliClearAllTooltip">Click this button to clear all alignment points from the model.</system:String>
+    <system:String x:Key="aliDelete">Delete</system:String>
+    <system:String x:Key="aliDeleteTooltip">Click this button to delete the selected alignment point.</system:String>
+    <system:String x:Key="optAlignment">Alignment</system:String>
+    <!-- Alignment enumerations -->
+    <system:String x:Key="enumAlignmentAlgorithm_0">Nearest star</system:String>
+    <system:String x:Key="enumAlignmentAlgorithm_1">N-Star</system:String>
+    <system:String x:Key="enumAlignmentAlgorithm_2">N-Star + Nearest</system:String>    
+    <system:String x:Key="enumPointFilterMode_0">All points</system:String>
+    <system:String x:Key="enumPointFilterMode_1">Same side of meridian</system:String>
+    <system:String x:Key="enumPointFilterMode_2">Local quadrant</system:String>    
+    <system:String x:Key="enumThreePointMode_0">Nearest enclosing triangle</system:String>
+    <system:String x:Key="enumThreePointMode_1">Enclosing triangle with nearest centre</system:String>
 </ResourceDictionary>
  

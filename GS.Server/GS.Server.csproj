@@ -87,6 +87,8 @@
     <ProjectReference Include="..\GS.SkyWatcher\GS.SkyWatcher.csproj">
       <Private>false</Private>
     </ProjectReference>
+    <ProjectReference Include="..\NStarAlignment\NStarAlignment.csproj" />
+    <ProjectReference Include="..\XInputDotNetPure\XInputDotNetPure.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\M33.png" />
@@ -139,6 +141,11 @@
     <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.2" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Properties\Alignment.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Alignment.settings</DependentUpon>
+    </Compile>
     <Compile Update="Properties\Gamepad.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
@@ -173,6 +180,10 @@
     </None>
     <None Update="Models\SchmidtCassegrain.obj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Properties\Alignment.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Alignment.Designer.cs</LastGenOutput>
     </None>
     <None Update="Properties\Gamepad.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

@@ -20,7 +20,7 @@ using System.Reflection;
 using System.Threading;
 using System.Windows.Input;
 
-namespace GS.Server.Helpers
+namespace GS.Shared.Command
 {
     /// <inheritdoc />
     /// <summary>
@@ -48,6 +48,10 @@ namespace GS.Server.Helpers
         {
             _execute = execute ?? throw new ArgumentNullException($"execute");
             _canExecute = canExecute;
+        }
+
+        public RelayCommand()
+        {
         }
 
         #endregion // Constructors
@@ -94,5 +98,10 @@ namespace GS.Server.Helpers
         }
 
         #endregion // ICommand Members
+
+        public void RaiseCanExecuteChanged()
+        {
+            CommandManager.InvalidateRequerySuggested();
+        }
     }
 }

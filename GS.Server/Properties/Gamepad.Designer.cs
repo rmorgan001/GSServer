@@ -12,7 +12,7 @@ namespace GS.Server.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.7.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.8.1.0")]
     internal sealed partial class Gamepad : global::System.Configuration.ApplicationSettingsBase {
         
         private static Gamepad defaultInstance = ((Gamepad)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Gamepad())));
@@ -296,6 +296,30 @@ namespace GS.Server.Properties {
             }
             set {
                 this["newspiral"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string sync {
+            get {
+                return ((string)(this["sync"]));
+            }
+            set {
+                this["sync"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("250")]
+        public int DoubleClickSpeed {
+            get {
+                return ((int)(this["DoubleClickSpeed"]));
+            }
+            set {
+                this["DoubleClickSpeed"] = value;
             }
         }
     }
