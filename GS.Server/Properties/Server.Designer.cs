@@ -454,17 +454,5 @@ namespace GS.Server.Properties {
                 this["Snap"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool AlignmentTabVisible {
-            get {
-                return ((bool)(this["AlignmentTabVisible"]));
-            }
-            set {
-                this["AlignmentTabVisible"] = value;
-            }
-        }
     }
 }
