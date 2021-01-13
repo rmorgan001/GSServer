@@ -13,7 +13,6 @@ namespace NStarAlignment.Model
 
             var skyAxes = new[] { 0.0, 0.0 };
             CarteseanCoordinate result;
-            System.Diagnostics.Debug.WriteLine($"Alignment model Sidereal time: {time.LocalSiderealTime}");
             if (!ThreeStarEnable)
             {
                 result = DeltaMap(mountAxes);
@@ -83,7 +82,7 @@ namespace NStarAlignment.Model
         /// <param name="axes"></param>
         /// <param name="time"></param>
         /// <returns></returns>
-        public double[] AxesToRaDec(double[] axes, TimeRecord time)
+        public double[] AxesXYToRaDec(double[] axes, TimeRecord time)
         {
             var raDec = new[] { axes[0], axes[1] };
             var localSiderealTime = time.LocalSiderealTime;

@@ -164,7 +164,7 @@ namespace NStarAlignment.Tests
         [DataRow(90.00, 330.00)]
         public void AxisToRaDecTests(double dec, double ra)
         {
-            double[] raDec = model.AxesToRaDec(new double[] { ra, dec }, timeRecord);
+            double[] raDec = model.AxesXYToRaDec(new double[] { ra, dec }, timeRecord);
             double[] axes = model.RaDecToAxesXY(raDec, timeRecord);
             Assert.AreEqual(ra, axes[0], tolerance);
             Assert.AreEqual(dec, axes[1], tolerance);

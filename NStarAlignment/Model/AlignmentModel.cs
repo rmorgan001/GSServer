@@ -611,7 +611,7 @@ namespace NStarAlignment.Model
         public SphericalCoordinate AxesToSpherical(double[] axisPositions, TimeRecord time)
         {
             var result = new SphericalCoordinate();
-            var raDec = AxesToRaDec(axisPositions, time);
+            var raDec = AxesXYToRaDec(axisPositions, time);
             var altAz = AstroConvert.RaDec2AltAz(raDec[0], raDec[1], time.LocalSiderealTime, SiteLatitude);
 
             // System.Diagnostics.Debug.WriteLine($"AxesToSpherical - Axes: {axisPositions[0]}/{axisPositions[1]}, RA/Dec: {raDec[0]}/{raDec[1]}, AltAz: {altAz[0]}/{altAz[1]}");
@@ -786,7 +786,8 @@ namespace NStarAlignment.Model
                 {
                     result[i] = i;
                 }
-                RaiseNotification($"Nearest centered triangle ({targetAxis[0]}, {targetAxis[1]}) by points {result[0]}, {result[1]} and {result[2]}");
+                RaiseNotification($"Nearest centered triangle ({targetAxis[0]}, {targetAxis[1]}) by points  {AlignmentPoints[result[0]].Id:D3}, {AlignmentPoints[result[1]].Id:D3} and {AlignmentPoints[result[2]].Id:D3}");
+                System.Diagnostics.Debug.WriteLine($"Nearest centered triangle ({targetAxis[0]}, {targetAxis[1]}) by points  {AlignmentPoints[result[0]].Id:D3}, {AlignmentPoints[result[1]].Id:D3} and {AlignmentPoints[result[2]].Id:D3}");
                 return result;
             }
 
@@ -902,11 +903,14 @@ namespace NStarAlignment.Model
                 result[0] = sortedPoints[l].AlignmentPointIndex;
                 result[1] = sortedPoints[m].AlignmentPointIndex;
                 result[2] = sortedPoints[n].AlignmentPointIndex;
-                RaiseNotification($"Nearest centered triangle to defined ({targetAxis[0]}, {targetAxis[1]}) by points {result[0]}, {result[1]} and {result[2]}");
+                RaiseNotification($"Nearest centered triangle to defined ({targetAxis[0]}, {targetAxis[1]}) by points  {AlignmentPoints[result[0]].Id:D3}, {AlignmentPoints[result[1]].Id:D3} and {AlignmentPoints[result[2]].Id:D3}");
+                System.Diagnostics.Debug.WriteLine($"Nearest centered triangle to defined ({targetAxis[0]}, {targetAxis[1]}) by points  {AlignmentPoints[result[0]].Id:D3}, {AlignmentPoints[result[1]].Id:D3} and {AlignmentPoints[result[2]].Id:D3}");
+
             }
             else
             {
                 RaiseNotification($"Nearest centered triangle could not be determined for axes ({targetAxis[0]}, {targetAxis[1]}).");
+                System.Diagnostics.Debug.WriteLine($"Nearest centered triangle could not be determined for axes ({targetAxis[0]}, {targetAxis[1]}).");
             }
 
             return result;
@@ -927,7 +931,8 @@ namespace NStarAlignment.Model
                 {
                     result[i] = i;
                 }
-                RaiseNotification($"Nearest three points to ({targetAxis[0]}, {targetAxis[1]}) by points {result[0]}, {result[1]} and {result[2]}");
+                RaiseNotification($"Nearest three points to ({targetAxis[0]}, {targetAxis[1]}) by points {AlignmentPoints[result[0]].Id:D3}, {AlignmentPoints[result[1]].Id:D3} and {AlignmentPoints[result[2]].Id:D3}");
+                System.Diagnostics.Debug.WriteLine($"Nearest three points to ({targetAxis[0]}, {targetAxis[1]}) by points {AlignmentPoints[result[0]].Id:D3}, {AlignmentPoints[result[1]].Id:D3} and {AlignmentPoints[result[2]].Id:D3}");
                 return result;
             }
 
@@ -1007,8 +1012,8 @@ namespace NStarAlignment.Model
                             result[0] = sortedPoints[i].AlignmentPointIndex;
                             result[1] = sortedPoints[j].AlignmentPointIndex;
                             result[2] = sortedPoints[k].AlignmentPointIndex;
-                            RaiseNotification($"Nearest three points to ({targetAxis[0]}, {targetAxis[1]}) are: {result[0]}, {result[1]} and {result[2]}");
-
+                            RaiseNotification($"Nearest three points to ({targetAxis[0]}, {targetAxis[1]}) are:  {AlignmentPoints[result[0]].Id:D3}, {AlignmentPoints[result[1]].Id:D3} and {AlignmentPoints[result[2]].Id:D3}");
+                            System.Diagnostics.Debug.WriteLine($"Nearest three points to ({targetAxis[0]}, {targetAxis[1]}) are:  {AlignmentPoints[result[0]].Id:D3}, {AlignmentPoints[result[1]].Id:D3} and {AlignmentPoints[result[2]].Id:D3}");
                             return result;
                         }
                     }
@@ -1017,6 +1022,7 @@ namespace NStarAlignment.Model
 
             // If it gets to here nothing was found and result still has all -1s
             RaiseNotification($"Nearest three points to ({targetAxis[0]}, {targetAxis[1]}) could not be determined.");
+            System.Diagnostics.Debug.WriteLine($"Nearest three points to ({targetAxis[0]}, {targetAxis[1]}) could not be determined.");
             return result;
         }
 

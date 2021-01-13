@@ -2,15 +2,35 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace NStarAlignment.DataTypes
 {
     public class AlignmentPointCollection : ObservableCollection<AlignmentPoint>
     {
+        protected override void InsertItem(int index, AlignmentPoint item)
+        {
+            if (item != null && item.Id == 0)
+            {
+                if (Items.Any())
+                {
+                    item.Id = Items.Max(i => i.Id) + 1;
+                }
+                else
+                {
+                    item.Id = 1;
+                }
+            }
+            base.InsertItem(index, item);
+        }
+
+
     }
 
     public class AlignmentPoint
     {
+        public int Id { get; set; }
+
         public double[] RaDec { get; set; }
         
         /// <summary>
