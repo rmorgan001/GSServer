@@ -75,6 +75,7 @@
     <ProjectReference Include="..\ColorPicker\ColorPicker.csproj">
       <Private>false</Private>
     </ProjectReference>
+    <ProjectReference Include="..\GS.FitsImageManager\GS.FitsImageManager.csproj" />
     <ProjectReference Include="..\GS.Principle\GS.Principles.csproj">
       <Private>false</Private>
     </ProjectReference>

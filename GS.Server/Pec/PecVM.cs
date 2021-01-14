@@ -25,7 +25,6 @@ using LiveCharts.Defaults;
 using LiveCharts.Geared;
 using LiveCharts.Wpf;
 using MaterialDesignThemes.Wpf;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -55,7 +54,6 @@ namespace GS.Server.Pec
         private readonly SkyTelescopeVM _skyTelescopeVM;
         private Timer _timer;
         private readonly object _timerLock = new object();
-        private static readonly SemaphoreSlim _lockFile = new SemaphoreSlim(1);
         private static readonly string _logPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments, Environment.SpecialFolderOption.Create);
         private PecTrainingDefinition PecTrainDef;
         private PecLogData PrevCapture;
@@ -408,10 +406,10 @@ namespace GS.Server.Pec
                     switch (key)
                     {
                         case "Worm":
-                            filename = GetFileName(PecFileType.GSPecWorm.ToString(), _logPath);
+                            filename = GetFileName(PecFileType.GSPecWorm + "_*", _logPath);
                             break;
                         case "360":
-                            filename = GetFileName(PecFileType.GSPec360.ToString(), _logPath);
+                            filename = GetFileName(PecFileType.GSPec360 + "_*", _logPath);
                             break;
                     }
                     if (filename == null) return;
@@ -645,19 +643,12 @@ namespace GS.Server.Pec
                     throw new ArgumentOutOfRangeException();
             }
 
-            FileWriteAsync(filePath, message);
+           GSFile.FileWriteAsync(filePath, message);
         }
         
         private static string GetFileName(string name, string dir)
         {
-            var openFileDialog = new OpenFileDialog
-            {
-                FileName = $"{name}_*",
-                InitialDirectory = dir,
-                Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
-                Multiselect = false,
-            };
-            return openFileDialog.ShowDialog() != true ? null : openFileDialog.FileName;
+            return GSFile.GetFileName(name, dir);
         }
 
         /// <summary>
@@ -815,7 +806,7 @@ namespace GS.Server.Pec
             {
                 message += $"{capData.Index}{_tab}{capData.TimeStamp:yyyy:MM:dd:HH:mm:ss.fff}{_tab}{capData.Position}{_tab}{capData.DeltaSteps}{_tab}{capData.DeltaTime.TotalSeconds}{_tab}{capData.RateEstimate}{_tab}{capData.Normalized}{_tab}{capData.BinNumber}{_tab}{capData.BinFactor}{_tab}{capData.BinEstimate}{_tab}{capData.Status}" + Environment.NewLine;
             }
-            FileWriteAsync(filePath, message);
+            GSFile.FileWriteAsync(filePath, message);
         }
 
         /// <summary>
@@ -1052,36 +1043,6 @@ namespace GS.Server.Pec
             }
         }
 
-        /// <summary>
-        /// Send entries to a file async
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <param name="message"></param>
-        /// <param name="append"></param>
-        private static async void FileWriteAsync(string filePath, string message, bool append = true)
-        {
-            try
-            {
-                await _lockFile.WaitAsync();
-
-                Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? throw new InvalidOperationException());
-                using (var stream = new FileStream(filePath, append ? FileMode.Append : FileMode.Create,
-                    FileAccess.Write, FileShare.None, 4096, true))
-                using (var sw = new StreamWriter(stream))
-                {
-                    await sw.WriteLineAsync(message);
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                //throw;
-            }
-            finally
-            {
-                _lockFile.Release();
-            }
-        }
 
         #endregion
 
@@ -1434,7 +1395,6 @@ namespace GS.Server.Pec
             _skyTelescopeVM?.Dispose();
             _timer?.Dispose();
             _cts?.Dispose();
-            _lockFile?.Dispose();
         }
         #endregion
     }

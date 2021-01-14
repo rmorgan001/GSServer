@@ -21,6 +21,7 @@ using GS.Server.Gps;
 using GS.Server.Helpers;
 using GS.Server.Main;
 using GS.Shared;
+using GS.FitsImageManager;
 using HelixToolkit.Wpf;
 using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
@@ -29,6 +30,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Management;
 using System.Reflection;
@@ -2968,6 +2970,84 @@ namespace GS.Server.SkyTelescope
                     RaSeconds = Convert.ToDouble(ras[2]);
 
                     var dec = _util.HoursToHMS(SkyServer.DeclinationXForm, ":", ":", ":", 3);
+                    var decs = dec.Split(':');
+                    DecDegrees = Convert.ToDouble(decs[0]);
+                    DecMinutes = Convert.ToDouble(decs[1]);
+                    DecSeconds = Convert.ToDouble(decs[2]);
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _importGoToRaDec;
+        public ICommand ImportGoToRaDecCmd
+        {
+            get
+            {
+                var dec = _importGoToRaDec;
+                if (dec != null)
+                {
+                    return dec;
+                }
+
+                return _importGoToRaDec = new RelayCommand(
+                    param => ImportGoToRaDec()
+                );
+            }
+        }
+        private void ImportGoToRaDec()
+        {
+            try
+            {
+                var filename = GSFile.GetFileName("*.fit", @"C:\");
+                if (!File.Exists(filename)){return;}
+                
+                using (new WaitCursor())
+                {
+                    var status = ImageManager.LoadImage(filename, out var headerData);
+                    if (status != 0){return;}
+
+                    var hra = headerData.GetItemByKeyName("RA");
+                    var hdec = headerData.GetItemByKeyName("DEC");
+
+                    if (hra == null || hdec == null)
+                    {
+                        OpenDialog($"{Application.Current.Resources["msgKey"]}", $"{Application.Current.Resources["exError"]}");
+                        return;
+                    }
+
+                    var resultra = double.TryParse(hra.Value, out var vra);
+                    var resultdec = double.TryParse(hdec.Value, out var vdec);
+
+                    if (!resultra || !resultdec)
+                    {
+                        OpenDialog($"{Application.Current.Resources["msgValue"]}", $"{Application.Current.Resources["exError"]}");
+                        return;
+                    }
+
+                    var ra = _util.HoursToHMS(vra, ":", ":", ":", 3);
+                    var ras = ra.Split(':');
+                    RaHours = Convert.ToDouble(ras[0]);
+                    RaMinutes = Convert.ToDouble(ras[1]);
+                    RaSeconds = Convert.ToDouble(ras[2]);
+
+                    var dec = _util.HoursToHMS(vdec, ":", ":", ":", 3);
                     var decs = dec.Split(':');
                     DecDegrees = Convert.ToDouble(decs[0]);
                     DecMinutes = Convert.ToDouble(decs[1]);
