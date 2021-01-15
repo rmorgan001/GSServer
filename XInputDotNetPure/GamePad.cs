@@ -31,9 +31,9 @@ namespace XInputDotNetPure
     {
         internal const string DLLName = "XInputInterface";
 
-        [DllImport(DLLName)]
+        [DllImport(DLLName, CallingConvention = CallingConvention.Cdecl)]
         public static extern uint XInputGamePadGetState(uint playerIndex, out GamePadState.RawState state);
-        [DllImport(DLLName)]
+        [DllImport(DLLName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void XInputGamePadSetState(uint playerIndex, float leftMotor, float rightMotor);
     }
 
