@@ -150,7 +150,7 @@
                 </Style>
             </Path.Style>
         </Path>
-        <md:DialogHost VerticalAlignment="Top"  CloseOnClickAway="True" Grid.Column="6" IsOpen="{Binding IsLimitDialogOpen}"  DialogContent="{Binding LimitContent}">
+        <md:DialogHost CloseOnClickAway="True" Grid.Column="6" IsOpen="{Binding IsLimitDialogOpen}"  DialogContent="{Binding LimitContent}">
             <Button Command="{Binding OpenLimitDialogCommand}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource botTipAxisLimit}" Padding="9">
                 <md:PackIcon Kind="WarningCircle" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-5">
                     <md:PackIcon.Style>

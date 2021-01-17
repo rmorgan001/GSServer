@@ -138,11 +138,14 @@ namespace GS.Server.SkyTelescope
                     ModelOn = SkySettings.ModelOn;
                     SetTrackingIcon(SkySettings.TrackingRate);
                     SetParkLimitSelection(SkySettings.ParkLimitName);
+                    TrackingRate = SkySettings.TrackingRate;
 
                     HcWinVisibility = true;
                     ModelWinVisibility = true;
+                    ButtonsWinVisibility = true;
                     DebugVisibility = SkySettings.Diagnostics;
                     PecShow = SkyServer.PecShow;
+                    SchedulerShow = true;
                 }
 
                 // check to make sure window is visible then connect if requested.
@@ -170,7 +173,7 @@ namespace GS.Server.SkyTelescope
 
         #region View Model Items
 
-        private static bool _pecShow;
+        private bool _pecShow;
         /// <summary>
         /// sets up bool to load a test tab
         /// </summary>
@@ -181,6 +184,18 @@ namespace GS.Server.SkyTelescope
             {
                 if (_pecShow == value) { return; }
                 _pecShow = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _schedulerShow;
+        public bool SchedulerShow
+        {
+            get => _schedulerShow;
+            set
+            {
+                if (_schedulerShow == value) { return; }
+                _schedulerShow = value;
                 OnPropertyChanged();
             }
         }
@@ -385,9 +400,7 @@ namespace GS.Server.SkyTelescope
                                     PecBinNow = SkyServer.PecBinNow.Item1;
                                     break;
                                 case "PecOn":
-                                    if (SkyServer.PecOn) { PecState = true; }
-                                    if (!SkyServer.PPecOn && !SkyServer.PecOn) { PecState = false; }
-                                    PecBadgeContent = SkyServer.PecOn ? Application.Current.Resources["PecBadge"].ToString() : "";
+                                    PecOn = SkyServer.PecOn;
                                     break;
                                 case "PPecOn":
                                     PPecOn = SkyServer.PPecOn;
@@ -640,7 +653,7 @@ namespace GS.Server.SkyTelescope
             ImageFile = "../Resources/" + ImageFiles[random.Next(ImageFiles.Count)];
         }
 
-        private void CloseDialogs(bool screen)
+        public void CloseDialogs(bool screen)
         {
             if (screen)
             {
@@ -851,11 +864,15 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
+
+        private DriveRates _trackingRate;
         public DriveRates TrackingRate
         {
-            get => SkySettings.TrackingRate;
+            get => _trackingRate;
             set
             {
+                if (_trackingRate == value) return;
+                _trackingRate = value;
                 SkySettings.TrackingRate = value;
                 SetTrackingIcon(value);
                 if (SkyServer.Tracking)
@@ -1553,6 +1570,18 @@ namespace GS.Server.SkyTelescope
 
         #region Button Control
 
+        private bool _buttonsWinVisibility;
+        public bool ButtonsWinVisibility
+        {
+            get => _buttonsWinVisibility;
+            set
+            {
+                if (_buttonsWinVisibility == value) return;
+                _buttonsWinVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
         private List<ParkPosition> _parkPositions;
         public List<ParkPosition> ParkPositions
         {
@@ -1648,6 +1677,19 @@ namespace GS.Server.SkyTelescope
                 if (_parkAddContent == value) return;
                 _parkAddContent = value;
                 OnPropertyChanged();
+            }
+        }
+
+        private bool _pecOn;
+        public bool PecOn
+        {
+            get => _pecOn;
+            set
+            {
+                _pecOn = value;
+               if (SkyServer.PecOn) { PecState = true; }
+               if (!SkyServer.PPecOn && !SkyServer.PecOn) { PecState = false; }
+               PecBadgeContent = SkyServer.PecOn ? Application.Current.Resources["PecBadge"].ToString() : "";
             }
         }
 
@@ -2855,6 +2897,46 @@ namespace GS.Server.SkyTelescope
             catch (Exception ex)
             {
                 SkyServer.SkyErrorHandler(ex);
+            }
+        }
+
+        private ICommand _openButtonsWindowCmd;
+        public ICommand OpenButtonsWindowCmd
+        {
+            get
+            {
+                var cmd = _openButtonsWindowCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openButtonsWindowCmd = new RelayCommand(param => OpenButtonsWindow());
+            }
+        }
+        private void OpenButtonsWindow()
+        {
+            try
+            {
+                var win = Application.Current.Windows.OfType<ButtonsControlV>().FirstOrDefault();
+                if (win != null) return;
+                var bWin = new ButtonsControlV();
+                bWin.Show();
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
         #endregion
@@ -5166,7 +5248,7 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private void SetTrackingIcon(DriveRates rate)
+        public void SetTrackingIcon(DriveRates rate)
         {
             switch (rate)
             {

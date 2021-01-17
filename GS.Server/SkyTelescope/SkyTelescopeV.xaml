@@ -16,8 +16,7 @@
     </UserControl.Resources>
     <md:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" CloseOnClickAway="True">
         <Grid MinWidth="800">
-        
-        <md:DrawerHost IsLeftDrawerOpen="{Binding OpenSetupDialog}" BorderBrush="{StaticResource MaterialDesignDivider}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0">
+            <md:DrawerHost IsLeftDrawerOpen="{Binding OpenSetupDialog}" BorderBrush="{StaticResource MaterialDesignDivider}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0">
             <!-- switched lines for openDialog so COM can open the settings IsLeftDrawerOpen="{Binding OpenSetupDialog}"-->
             <!--IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}"-->
             <md:DrawerHost.LeftDrawerContent>
