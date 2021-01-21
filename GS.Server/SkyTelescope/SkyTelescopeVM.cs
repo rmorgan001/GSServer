@@ -322,7 +322,7 @@ namespace GS.Server.SkyTelescope
                                 case "Azimuth":
                                     Azimuth = _util.DegreesToDMS(SkyServer.Azimuth, "° ", ":", "", 2);
                                     break;
-                                case "CanPec":
+                                case "CanPPec":
                                     PPecEnabled = SkyServer.CanPPec;
                                     break;
                                 case "DeclinationXForm":
