@@ -20,8 +20,6 @@ namespace NStarAlignment.Tests
         {
             model = new AlignmentModel(latitude, longitude, elevation)
             {
-                AlignmentAlgorithm = AlignmentAlgorithm.NStar,
-                ThreePointMode = ThreePointMode.TriangleWithNearestCentre,
                 IsAlignmentOn = true
             };
             model.ClearAlignmentPoints();

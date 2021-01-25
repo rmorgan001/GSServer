@@ -56,6 +56,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SphericalPolarTests.cs" />
     <Compile Include="TimeUtils.cs" />
+    <Compile Include="MatrixTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

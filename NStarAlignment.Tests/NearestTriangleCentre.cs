@@ -21,8 +21,6 @@ namespace NStarAlignment.Tests
         {
             model = new AlignmentModel(latitude, longitude, elevation)
             {
-                AlignmentAlgorithm = AlignmentAlgorithm.Nearest,
-                ThreePointMode = ThreePointMode.TriangleWithNearestCentre,
                 IsAlignmentOn = true
             };
             model.ClearAlignmentPoints();

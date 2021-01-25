@@ -33,6 +33,71 @@ namespace NStarAlignment.Tests
             model = null;
         }
 
+
+
+
+        [DataTestMethod]
+        [DataRow(0.00, 0.00)]
+        [DataRow(0.00, 30.00)]
+        [DataRow(0.00, 60.00)]
+        [DataRow(0.00, 90.00)]
+        [DataRow(0.00, 120.00)]
+        [DataRow(0.00, 150.00)]
+        [DataRow(0.00, 180.00)]
+        [DataRow(0.00, 210.00)]
+        [DataRow(0.00, 240.00)]
+        [DataRow(0.00, 270.00)]
+        [DataRow(0.00, 300.00)]
+        [DataRow(0.00, 330.00)]
+        [DataRow(30.00, 0.00)]
+        [DataRow(30.00, 30.00)]
+        [DataRow(30.00, 60.00)]
+        [DataRow(30.00, 90.00)]
+        [DataRow(30.00, 120.00)]
+        [DataRow(30.00, 150.00)]
+        [DataRow(30.00, 180.00)]
+        [DataRow(30.00, 210.00)]
+        [DataRow(30.00, 240.00)]
+        [DataRow(30.00, 270.00)]
+        [DataRow(30.00, 300.00)]
+        [DataRow(30.00, 330.00)]
+        [DataRow(60.00, 0.00)]
+        [DataRow(60.00, 30.00)]
+        [DataRow(60.00, 60.00)]
+        [DataRow(60.00, 90.00)]
+        [DataRow(60.00, 120.00)]
+        [DataRow(60.00, 150.00)]
+        [DataRow(60.00, 180.00)]
+        [DataRow(60.00, 210.00)]
+        [DataRow(60.00, 240.00)]
+        [DataRow(60.00, 270.00)]
+        [DataRow(60.00, 300.00)]
+        [DataRow(60.00, 330.00)]
+        [DataRow(90.00, 0.00)]
+        [DataRow(90.00, 30.00)]
+        [DataRow(90.00, 60.00)]
+        [DataRow(90.00, 90.00)]
+        [DataRow(90.00, 120.00)]
+        [DataRow(90.00, 150.00)]
+        [DataRow(90.00, 180.00)]
+        [DataRow(90.00, 210.00)]
+        [DataRow(90.00, 240.00)]
+        [DataRow(90.00, 270.00)]
+        [DataRow(90.00, 300.00)]
+        [DataRow(90.00, 330.00)]
+        public void RoundTripAxesToSpherical(double x, double y)
+        {
+            SphericalCoordinate spherical = model.AxesToSpherical(new double[] { x, y }, timeRecord);
+            double[] axes = model.SphericalToAxes(spherical, timeRecord, spherical.WeightsDown);
+            double cosx = Math.Cos(Angle.DegreesToRadians(x));
+            double cosy = Math.Cos(Angle.DegreesToRadians(y));
+            double cosa0 = Math.Cos(Angle.DegreesToRadians(axes[0]));
+            double cosa1 = Math.Cos(Angle.DegreesToRadians(axes[1]));
+
+            Assert.AreEqual(cosx, cosa0, tolerance);
+            Assert.AreEqual(cosy, cosa1, tolerance);
+        }
+
         [DataTestMethod]
         [DataRow(0.0, 45.0)]
         [DataRow(10.0, 45.0)]
@@ -47,10 +112,10 @@ namespace NStarAlignment.Tests
             {
                 X = az,
                 Y = alt,
-                R = 0
+                WeightsDown = false
             };
-            CarteseanCoordinate outCart = model.PolarToCartesean(inSpherical);
-            SphericalCoordinate outSpherical = model.CarteseanToPolar(outCart);
+            CarteseanCoordinate outCart = model.SphericalToCartesean(inSpherical);
+            SphericalCoordinate outSpherical = model.CarteseanToSpherical(outCart);
             Assert.AreEqual(inSpherical, outSpherical);
 
         }
@@ -108,7 +173,7 @@ namespace NStarAlignment.Tests
         {
             AxisPosition axes = new AxisPosition(az, alt);
             SphericalCoordinate spherical1 = model.AxesToSpherical(new double[] {az, alt}, timeRecord);
-            AxisPosition outAxes = model.SphericalToAxes(spherical1, timeRecord, spherical1.R);
+            AxisPosition outAxes = model.SphericalToAxes(spherical1, timeRecord, spherical1.WeightsDown);
             Assert.IsTrue(outAxes.Equals(axes, tolerance));
 
         }
@@ -228,5 +293,187 @@ namespace NStarAlignment.Tests
             Assert.AreEqual(ra, raDec[0], tolerance);
             Assert.AreEqual(dec, raDec[1], tolerance);
         }
+
+
+
+        [DataTestMethod]
+        #region Test Data ...
+        [DataRow(0.00, 0.00)]
+        [DataRow(0.00, 30.00)]
+        [DataRow(0.00, 60.00)]
+        [DataRow(0.00, 90.00)]
+        [DataRow(0.00, 120.00)]
+        [DataRow(0.00, 150.00)]
+        [DataRow(0.00, 180.00)]
+        [DataRow(0.00, 210.00)]
+        [DataRow(0.00, 240.00)]
+        [DataRow(0.00, 270.00)]
+        [DataRow(0.00, 300.00)]
+        [DataRow(0.00, 330.00)]
+        [DataRow(30.00, 0.00)]
+        [DataRow(30.00, 30.00)]
+        [DataRow(30.00, 60.00)]
+        [DataRow(30.00, 90.00)]
+        [DataRow(30.00, 120.00)]
+        [DataRow(30.00, 150.00)]
+        [DataRow(30.00, 180.00)]
+        [DataRow(30.00, 210.00)]
+        [DataRow(30.00, 240.00)]
+        [DataRow(30.00, 270.00)]
+        [DataRow(30.00, 300.00)]
+        [DataRow(30.00, 330.00)]
+        [DataRow(60.00, 0.00)]
+        [DataRow(60.00, 30.00)]
+        [DataRow(60.00, 60.00)]
+        [DataRow(60.00, 90.00)]
+        [DataRow(60.00, 120.00)]
+        [DataRow(60.00, 150.00)]
+        [DataRow(60.00, 180.00)]
+        [DataRow(60.00, 210.00)]
+        [DataRow(60.00, 240.00)]
+        [DataRow(60.00, 270.00)]
+        [DataRow(60.00, 300.00)]
+        [DataRow(60.00, 330.00)]
+        [DataRow(90.00, 0.00)]
+        [DataRow(90.00, 30.00)]
+        [DataRow(90.00, 60.00)]
+        [DataRow(90.00, 90.00)]
+        [DataRow(90.00, 120.00)]
+        [DataRow(90.00, 150.00)]
+        [DataRow(90.00, 180.00)]
+        [DataRow(90.00, 210.00)]
+        [DataRow(90.00, 240.00)]
+        [DataRow(90.00, 270.00)]
+        [DataRow(90.00, 300.00)]
+        [DataRow(90.00, 330.00)]
+        [DataRow(120.00, 0.00)]
+        [DataRow(120.00, 30.00)]
+        [DataRow(120.00, 60.00)]
+        [DataRow(120.00, 90.00)]
+        [DataRow(120.00, 120.00)]
+        [DataRow(120.00, 150.00)]
+        [DataRow(120.00, 180.00)]
+        [DataRow(120.00, 210.00)]
+        [DataRow(120.00, 240.00)]
+        [DataRow(120.00, 270.00)]
+        [DataRow(120.00, 300.00)]
+        [DataRow(120.00, 330.00)]
+        [DataRow(150.00, 0.00)]
+        [DataRow(150.00, 30.00)]
+        [DataRow(150.00, 60.00)]
+        [DataRow(150.00, 90.00)]
+        [DataRow(150.00, 120.00)]
+        [DataRow(150.00, 150.00)]
+        [DataRow(150.00, 180.00)]
+        [DataRow(150.00, 210.00)]
+        [DataRow(150.00, 240.00)]
+        [DataRow(150.00, 270.00)]
+        [DataRow(150.00, 300.00)]
+        [DataRow(150.00, 330.00)]
+        [DataRow(180.00, 0.00)]
+        [DataRow(180.00, 30.00)]
+        [DataRow(180.00, 60.00)]
+        [DataRow(180.00, 90.00)]
+        [DataRow(180.00, 120.00)]
+        [DataRow(180.00, 150.00)]
+        [DataRow(180.00, 180.00)]
+        [DataRow(180.00, 210.00)]
+        [DataRow(180.00, 240.00)]
+        [DataRow(180.00, 270.00)]
+        [DataRow(180.00, 300.00)]
+        [DataRow(180.00, 330.00)]
+        [DataRow(210.00, 0.00)]
+        [DataRow(210.00, 30.00)]
+        [DataRow(210.00, 60.00)]
+        [DataRow(210.00, 90.00)]
+        [DataRow(210.00, 120.00)]
+        [DataRow(210.00, 150.00)]
+        [DataRow(210.00, 180.00)]
+        [DataRow(210.00, 210.00)]
+        [DataRow(210.00, 240.00)]
+        [DataRow(210.00, 270.00)]
+        [DataRow(210.00, 300.00)]
+        [DataRow(210.00, 330.00)]
+        [DataRow(240.00, 0.00)]
+        [DataRow(240.00, 30.00)]
+        [DataRow(240.00, 60.00)]
+        [DataRow(240.00, 90.00)]
+        [DataRow(240.00, 120.00)]
+        [DataRow(240.00, 150.00)]
+        [DataRow(240.00, 180.00)]
+        [DataRow(240.00, 210.00)]
+        [DataRow(240.00, 240.00)]
+        [DataRow(240.00, 270.00)]
+        [DataRow(240.00, 300.00)]
+        [DataRow(240.00, 330.00)]
+        [DataRow(270.00, 0.00)]
+        [DataRow(270.00, 30.00)]
+        [DataRow(270.00, 60.00)]
+        [DataRow(270.00, 90.00)]
+        [DataRow(270.00, 120.00)]
+        [DataRow(270.00, 150.00)]
+        [DataRow(270.00, 180.00)]
+        [DataRow(270.00, 210.00)]
+        [DataRow(270.00, 240.00)]
+        [DataRow(270.00, 270.00)]
+        [DataRow(270.00, 300.00)]
+        [DataRow(270.00, 330.00)]
+        [DataRow(300.00, 0.00)]
+        [DataRow(300.00, 30.00)]
+        [DataRow(300.00, 60.00)]
+        [DataRow(300.00, 90.00)]
+        [DataRow(300.00, 120.00)]
+        [DataRow(300.00, 150.00)]
+        [DataRow(300.00, 180.00)]
+        [DataRow(300.00, 210.00)]
+        [DataRow(300.00, 240.00)]
+        [DataRow(300.00, 270.00)]
+        [DataRow(300.00, 300.00)]
+        [DataRow(300.00, 330.00)]
+        [DataRow(330.00, 0.00)]
+        [DataRow(330.00, 30.00)]
+        [DataRow(330.00, 60.00)]
+        [DataRow(330.00, 90.00)]
+        [DataRow(330.00, 120.00)]
+        [DataRow(330.00, 150.00)]
+        [DataRow(330.00, 180.00)]
+        [DataRow(330.00, 210.00)]
+        [DataRow(330.00, 240.00)]
+        [DataRow(330.00, 270.00)]
+        [DataRow(330.00, 300.00)]
+        [DataRow(330.00, 330.00)]
+        #endregion
+        public void AxesXYToRaDecTest(double x, double y)
+        {
+            double[] raDec = model.AxesXYToRaDec(new double[]{x, y}, timeRecord);
+            double[] axes = model.RaDecToAxesXY(raDec, timeRecord);
+            System.Diagnostics.Debug.WriteLine($"Original Axes = {x}/{y}, raDec = {raDec[0]}/{raDec[1]}, axes = {axes[0]}/{axes[1]}");
+            Assert.IsTrue(Angle.AreSameDegrees(x, axes[0], tolerance));
+            Assert.IsTrue(Angle.AreSameDegrees(y, axes[1], tolerance));
+        }
+
+
+        [DataTestMethod]
+        [DataRow(0, 30, 12, 0, 30, 12)]
+        public void GenerateAngleData(double xStart, double xIncrement, int xSteps, double yStart, double yIncrement, int ySteps)
+        {
+            System.Diagnostics.Debug.WriteLine("#region Test Data ...");
+            double x = xStart;
+            double y = yStart;
+            for (int xs = 0; xs < xSteps; xs++)
+            {
+                for (int ys = 0; ys < ySteps; ys++)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[DataRow({x:F2}, {y:F2})]");
+                    y += yIncrement;
+                }
+
+                y = yStart;
+                x += xIncrement;
+            }
+            System.Diagnostics.Debug.WriteLine("#endregion");
+            Assert.IsTrue(true);
+        }
+
     }
 }
