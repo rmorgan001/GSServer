@@ -37,37 +37,25 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int AlignmentAlgorithm {
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public double ProximityLimit {
             get {
-                return ((int)(this["AlignmentAlgorithm"]));
+                return ((double)(this["ProximityLimit"]));
             }
             set {
-                this["AlignmentAlgorithm"] = value;
+                this["ProximityLimit"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int PointFilterMode {
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        public int SampleSize {
             get {
-                return ((int)(this["PointFilterMode"]));
+                return ((int)(this["SampleSize"]));
             }
             set {
-                this["PointFilterMode"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int ThreePointMode {
-            get {
-                return ((int)(this["ThreePointMode"]));
-            }
-            set {
-                this["ThreePointMode"] = value;
+                this["SampleSize"] = value;
             }
         }
         
@@ -92,6 +80,18 @@ namespace GS.Server.Properties {
             }
             set {
                 this["Version"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
+        public double NearbyLimit {
+            get {
+                return ((double)(this["NearbyLimit"]));
+            }
+            set {
+                this["NearbyLimit"] = value;
             }
         }
     }

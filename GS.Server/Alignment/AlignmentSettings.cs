@@ -36,45 +36,45 @@ namespace GS.Server.Alignment
 
         }
 
-        private static AlignmentAlgorithm _alignmentAlgorithm;
-        public static AlignmentAlgorithm AlignmentAlgorithm
+        private static double _proximityLimit;
+        public static double ProximityLimit
         {
-            get => _alignmentAlgorithm;
+            get => _proximityLimit;
             set
             {
-                if (_alignmentAlgorithm == value) return;
-                _alignmentAlgorithm = value;
-                Properties.Alignment.Default.AlignmentAlgorithm = (int)value;
+                if (_proximityLimit == value) return;
+                _proximityLimit = value;
+                Properties.Alignment.Default.ProximityLimit = (double)value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
 
         }
 
-        private static PointFilterMode _pointFilterMode;
-        public static PointFilterMode PointFilterMode
+        private static double _nearbyLimit;
+        public static double NearbyLimit
         {
-            get => _pointFilterMode;
+            get => _nearbyLimit;
             set
             {
-                if (_pointFilterMode == value) return;
-                _pointFilterMode = value;
-                Properties.Alignment.Default.PointFilterMode = (int)value;
+                if (_nearbyLimit == value) return;
+                _nearbyLimit = value;
+                Properties.Alignment.Default.NearbyLimit = (double)value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
 
         }
 
-        private static ThreePointMode _threePointMode;
-        public static ThreePointMode ThreePointMode
+        private static int _sampleSize;
+        public static int SampleSize
         {
-            get => _threePointMode;
+            get => _sampleSize;
             set
             {
-                if (_threePointMode == value) return;
-                _threePointMode = value;
-                Properties.Alignment.Default.ThreePointMode = (int)value;
+                if (_sampleSize == value) return;
+                _sampleSize = value;
+                Properties.Alignment.Default.SampleSize = (int)value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
                 OnStaticPropertyChanged();
             }
@@ -109,9 +109,9 @@ namespace GS.Server.Alignment
             // properties
             IsAlignmentOn = Properties.Alignment.Default.IsAlignmentOn;
             ClearModelOnStartup = Properties.Alignment.Default.ClearModelOnStartup;
-            AlignmentAlgorithm = (AlignmentAlgorithm)Properties.Alignment.Default.AlignmentAlgorithm;
-            PointFilterMode = (PointFilterMode) Properties.Alignment.Default.PointFilterMode;
-            ThreePointMode = (ThreePointMode) Properties.Alignment.Default.ThreePointMode;
+            ProximityLimit = Properties.Alignment.Default.ProximityLimit;
+            NearbyLimit = Properties.Alignment.Default.NearbyLimit;
+            SampleSize = Properties.Alignment.Default.SampleSize;
         }
 
         /// <summary>

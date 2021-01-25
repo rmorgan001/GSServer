@@ -9,13 +9,14 @@
              xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              xmlns:alignment="clr-namespace:GS.Server.Alignment"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance alignment:AlignmentVM}">
-    <UserControl.Resources>
+    <!-- Ordinal formatting left in for reference -->
+    <!--<UserControl.Resources>
         <domain:OrdinalConverter x:Key="OrdinalConverter" />
         <DataTemplate x:Key="OrdinalColumnDataTemplate">
             <TextBlock Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGridRow},
             Converter={StaticResource ResourceKey=OrdinalConverter}}" HorizontalAlignment="Right" />
         </DataTemplate>
-    </UserControl.Resources>
+    </UserControl.Resources>-->
     <Grid MinWidth="600">
         <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Center" CloseOnClickAway="True"
                       IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
@@ -38,33 +39,12 @@
                                   Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
                                   CommandParameter="{x:Static Dock.Left}"
                                   IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"/>
-                    <ComboBox Grid.Row="1" md:HintAssist.Hint="{StaticResource aliAlignmentAlgorithmTooltip}" MinWidth="10" Margin="20,0,5,20" Width="300" HorizontalAlignment="Left" VerticalAlignment="Top"
-                              ToolTip="{StaticResource aliAlignmentAlgorithmTooltip}" ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type alignment:AlignmentAlgorithm}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}"
-                              SelectedItem="{Binding AlignmentAlgorithm}">
-                        <ComboBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel />
-                            </ItemsPanelTemplate>
-                        </ComboBox.ItemsPanel>
-                    </ComboBox>
-                    <ComboBox Grid.Row="2" md:HintAssist.Hint="{StaticResource aliPointFilterModeTooltip}" MinWidth="10" Margin="20,0,5,20" Width="300" HorizontalAlignment="Left" VerticalAlignment="Top"
-                              ToolTip="{StaticResource aliPointFilterModeTooltip}" ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type alignment:PointFilterMode}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}"
-                              SelectedItem="{Binding PointFilterMode}">
-                        <ComboBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel />
-                            </ItemsPanelTemplate>
-                        </ComboBox.ItemsPanel>
-                    </ComboBox>
-                    <ComboBox Grid.Row="3" md:HintAssist.Hint="{StaticResource aliThreePointModeTooltip}" MinWidth="10" Margin="20,0,5,20" Width="300" HorizontalAlignment="Left" VerticalAlignment="Top"
-                              ToolTip="{StaticResource aliThreePointModeTooltip}" ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type alignment:ThreePointMode}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}"
-                              SelectedItem="{Binding ThreePointMode}">
-                        <ComboBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel />
-                            </ItemsPanelTemplate>
-                        </ComboBox.ItemsPanel>
-                    </ComboBox>
+                    <TextBox Grid.Row="1" Margin="20,0,5,20" md:HintAssist.Hint="{StaticResource optProximityLimit}" Width="120" HorizontalAlignment="Left" ToolTip="{StaticResource aliProximityLimitTooltip}" 
+                             Text="{Binding ProximityLimit}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" domain:TextBoxMaskBehaviour.Mask="Decimal" />
+                    <TextBox Grid.Row="2" Margin="20,0,5,20" md:HintAssist.Hint="{StaticResource optNearbyLimit}" Width="120" HorizontalAlignment="Left" ToolTip="{StaticResource aliNearbyLimitTooltip}" 
+                             Text="{Binding NearbyLimit}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" domain:TextBoxMaskBehaviour.Mask="Decimal"/>
+                    <TextBox Grid.Row="3" Margin="20,0,5,20" md:HintAssist.Hint="{StaticResource optSampleSize}" Width="120" HorizontalAlignment="Left" ToolTip="{StaticResource aliSampleSizeTooltip}" 
+                             Text="{Binding SampleSize}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" domain:TextBoxMaskBehaviour.Mask="Integer"/>
                     <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="20,0,5,20">
                         <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource aliClearModelOnStartupTooltip}"
                                       IsChecked="{Binding ClearModelOnStartup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -107,9 +87,17 @@
                         </Style>
                     </DataGrid.Resources>
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="#" CellTemplate="{StaticResource OrdinalColumnDataTemplate}" HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Altitude" Binding="{Binding AltAz[0]}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Azimuth" Binding="{Binding AltAz[1]}" IsReadOnly="True" />
+                        <!-- Ordinal formatting left in for reference -->
+                        <!--<DataGridTemplateColumn Header="#" CellTemplate="{StaticResource OrdinalColumnDataTemplate}" HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>-->
+                        <DataGridTextColumn Header="###" Binding="{Binding Id, StringFormat='{}{0:D3}'}"  HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Altitude" Binding="{Binding AltAz[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Azimuth" Binding="{Binding AltAz[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Mount RA/Dec Axes" Binding="{Binding MountAxes}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Mount X" Binding="{Binding MountXY.X, StringFormat='{}{0:F2}'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Mount Y" Binding="{Binding MountXY.Y, StringFormat='{}{0:F2}'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Sky RA/Dec Axis" Binding="{Binding SkyAxes}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Sky X" Binding="{Binding SkyXY.X, StringFormat='{}{0:F2}'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Sky Y" Binding="{Binding SkyXY.Y, StringFormat='{}{0:F2}'}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Correction" Binding="{Binding Correction}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Synched" Binding="{Binding Synched}" IsReadOnly="True" />
                     </DataGrid.Columns>

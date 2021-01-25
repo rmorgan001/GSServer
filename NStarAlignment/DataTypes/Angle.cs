@@ -218,6 +218,13 @@ namespace NStarAlignment.DataTypes
             return degrees / (180.0 / Math.PI);
         }
 
+        public static bool AreSameDegrees(double a1, double a2, double tolerance = 0)
+        {
+            double cosa1 = Math.Cos(Angle.DegreesToRadians(a1));
+            double cosa2 = Math.Cos(Angle.DegreesToRadians(a2));
+            return Math.Abs(cosa2 - cosa1) <= tolerance;
+        }
+
         private void SetDmsFromDegrees(double angle)
         {
             _degrees = (int)Truncate(angle);
@@ -278,17 +285,6 @@ namespace NStarAlignment.DataTypes
         public static double Truncate(double value)
         {
             return Math.Truncate(value);
-        }
-
-        public double Range360()
-        {
-            var ang = this.Value;
-            ang = ang % 360.0;
-            while (ang < 0.0)
-            {
-                ang = ang + 360.0;
-            }
-            return ang;
         }
 
         /// <summary>

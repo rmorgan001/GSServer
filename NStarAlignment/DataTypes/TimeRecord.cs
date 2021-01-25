@@ -1,5 +1,4 @@
-﻿using NStarAlignment.Utilities;
-using System;
+﻿using System;
 
 namespace NStarAlignment.DataTypes
 {

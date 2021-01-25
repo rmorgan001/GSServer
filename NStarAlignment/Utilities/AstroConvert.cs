@@ -204,6 +204,5 @@ namespace NStarAlignment.Utilities
             var altAz2Ra = Range.Range24(lst - l);
             return altAz2Ra;
         }
-
     }
 }

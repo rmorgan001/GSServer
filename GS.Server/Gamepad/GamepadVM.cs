@@ -59,14 +59,14 @@ namespace GS.Server.GamePad
         private int _rateKingCount;
         private int _abortCount;
         private int _syncCount;
-        private Stopwatch _syncClickTimer = new Stopwatch();
+        private readonly Stopwatch _syncClickTimer = new Stopwatch();
         private int _spiralInCount;
         private int _spiralOutCount;
         private int _newSpiralCount;
 
-        private float _vibrateLeft = 0.0f;
-        private float _vibrateRight = 0.0f;
-        private object _vibrateLock = new object();
+        private const float _vibrateLeft = 0.0f;
+        private float _vibrateRight;
+        private readonly object _vibrateLock = new object();
 
         public GamePadVM()
         {
@@ -448,8 +448,8 @@ namespace GS.Server.GamePad
         /// </summary>
         private async void GamePadLoopAsync()
         {
-            float vibrateL = 0.0f;
-            float vibrateR = 0.0f;
+            float vibrateL;
+            float vibrateR;
             try
             {
                 if (ctsGamePad == null) ctsGamePad = new CancellationTokenSource();

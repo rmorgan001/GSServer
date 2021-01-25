@@ -181,7 +181,7 @@ namespace NStarAlignment.DataTypes
 
         public override string ToString()
         {
-            return $"RAAxis = {Math.Round(_raAxis.Value, 2)}°, DecAxis = {Math.Round(_decAxis.Value, 2)}°";
+            return $"{Math.Round(_raAxis.Value, 2)}°/{Math.Round(_decAxis.Value, 2)}°";
         }
 
         /// <summary>
@@ -190,10 +190,31 @@ namespace NStarAlignment.DataTypes
         /// <returns></returns>
         public AxisPosition Flip()
         {
-            return new AxisPosition(RaAxis + 180.0, (DecAxis * -1).Range360());
+            var d = new[] { 0.0, 0.0 };
+            if (RaAxis > 90)
+            {
+                d[0] = RaAxis - 180;
+                d[1] = 180 - DecAxis;
+            }
+            else
+            {
+                d[0] = RaAxis + 180;
+                d[1] = 180 - DecAxis;
+            }
+            return new AxisPosition(d);
         }
 
+        public Angle IncludedAngleTo(AxisPosition axisPosition2)
+        {
+            double piby2 = Math.PI * 0.5;
+            // Using the law of Cosines
+            double c = (Math.Cos(piby2 - this.DecAxis.Radians) * Math.Cos(piby2 - axisPosition2.DecAxis.Radians))
+                       + (Math.Sin(piby2 - this.DecAxis.Radians) * Math.Sin(piby2 - axisPosition2.DecAxis.Radians) *
+                          Math.Cos(this.RaAxis.Radians - axisPosition2.RaAxis.Radians));
+            Angle result = new Angle(Math.Abs(Math.Acos(c)), true);
+            return result;
 
+        }
 
     }
 }

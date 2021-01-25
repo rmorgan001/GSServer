@@ -25,7 +25,7 @@ namespace GS.Server.SkyTelescope
     public static class Axes
     {
         /// <summary>
-        /// Convert internal mountaxis degrees to mount with corrrect hemi
+        /// Convert internal mount axis degrees to mount with correct hemisphere
         /// </summary>
         /// <returns></returns>
         public static double[] MountAxis2Mount()
@@ -366,8 +366,7 @@ namespace GS.Server.SkyTelescope
             axes = Range.RangeAxesXY(axes);
             return axes;
         }
-
-        internal static bool IsFlipRequired(double[] raDec)
+        internal static bool IsFlipRequired(double[] raDec, double lst)
         {
             var axes = new[] { raDec[0], raDec[1] };
             switch (SkySettings.AlignmentMode)
@@ -375,7 +374,7 @@ namespace GS.Server.SkyTelescope
                 case AlignmentModes.algAltAz:
                     return false;
                 case AlignmentModes.algGermanPolar:
-                    axes[0] = (SkyServer.SiderealTime - axes[0]) * 15.0;
+                    axes[0] = (lst - axes[0]) * 15.0;
                     if (SkyServer.SouthernHemisphere) axes[1] = -axes[1];
                     axes[0] = Range.Range360(axes[0]);
 
@@ -401,6 +400,11 @@ namespace GS.Server.SkyTelescope
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        internal static bool IsFlipRequired(double[] raDec)
+        {
+            return IsFlipRequired(raDec, SkyServer.SiderealTime);
         }
     }
 }

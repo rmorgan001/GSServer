@@ -107,33 +107,34 @@ namespace GS.Server.Alignment
             }
         }
 
-        public AlignmentAlgorithm AlignmentAlgorithm
+        public double ProximityLimit
         {
-            get => AlignmentSettings.AlignmentAlgorithm;
+            get => AlignmentSettings.ProximityLimit;
             set
             {
-                AlignmentSettings.AlignmentAlgorithm = value;
+                AlignmentSettings.ProximityLimit = value;
                 OnPropertyChanged();
             }
 
         }
 
-        public PointFilterMode PointFilterMode
+        public double NearbyLimit
         {
-            get => AlignmentSettings.PointFilterMode;
+            get => AlignmentSettings.NearbyLimit;
             set
             {
-                AlignmentSettings.PointFilterMode = value;
+                AlignmentSettings.NearbyLimit = value;
                 OnPropertyChanged();
             }
+
         }
 
-        public ThreePointMode ThreePointMode
+        public int SampleSize
         {
-            get => AlignmentSettings.ThreePointMode;
+            get => AlignmentSettings.SampleSize;
             set
             {
-                AlignmentSettings.ThreePointMode = value;
+                AlignmentSettings.SampleSize = value;
                 OnPropertyChanged();
             }
         }

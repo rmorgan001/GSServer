@@ -39,12 +39,8 @@ SOFTWARE.
 
 */
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using GS.Shared;
 using XInputDotNetPure;
 
@@ -54,22 +50,19 @@ namespace GS.Server.GamePad
     {
         private bool _IsAvailable;
 
-        public override bool IsAvailable
-        {
-            get => _IsAvailable;
-        }
+        public override bool IsAvailable => _IsAvailable;
 
         //static PlayerIndex[] playerIndices = new PlayerIndex[] { PlayerIndex.One, PlayerIndex.Two, PlayerIndex.Three, PlayerIndex.Four };
 
         private GamePadState gamePadState;
         private uint lastPacketNumber;
 
-        public GamePadDeadZone DeadZone { get; set; }
+        private GamePadDeadZone DeadZone { get; }
 
 
         // public bool LinkTriggersToVibration { get; set; }
 
-        public GamePadXInput() : base()
+        public GamePadXInput()
         {
             DeadZone = GamePadDeadZone.IndependentAxes;
             Find();
@@ -149,18 +142,18 @@ namespace GS.Server.GamePad
         private void UpdateState()
         {
             //  checkGuide.Checked = reporterState.LastActiveState.Buttons.Guide == XInputDotNetPure.ButtonState.Pressed;
-            Buttons = new bool[]
+            Buttons = new[]
             {
-                gamePadState.Buttons.A == XInputDotNetPure.ButtonState.Pressed,
-                gamePadState.Buttons.B == XInputDotNetPure.ButtonState.Pressed,
-                gamePadState.Buttons.X == XInputDotNetPure.ButtonState.Pressed,
-                gamePadState.Buttons.Y == XInputDotNetPure.ButtonState.Pressed,
-                gamePadState.Buttons.LeftShoulder == XInputDotNetPure.ButtonState.Pressed,
-                gamePadState.Buttons.RightShoulder == XInputDotNetPure.ButtonState.Pressed,
-                gamePadState.Buttons.Back == XInputDotNetPure.ButtonState.Pressed,
-                gamePadState.Buttons.Start == XInputDotNetPure.ButtonState.Pressed,
-                gamePadState.Buttons.LeftStick == XInputDotNetPure.ButtonState.Pressed,
-                gamePadState.Buttons.RightStick == XInputDotNetPure.ButtonState.Pressed
+                gamePadState.Buttons.A == ButtonState.Pressed,
+                gamePadState.Buttons.B == ButtonState.Pressed,
+                gamePadState.Buttons.X == ButtonState.Pressed,
+                gamePadState.Buttons.Y == ButtonState.Pressed,
+                gamePadState.Buttons.LeftShoulder == ButtonState.Pressed,
+                gamePadState.Buttons.RightShoulder == ButtonState.Pressed,
+                gamePadState.Buttons.Back == ButtonState.Pressed,
+                gamePadState.Buttons.Start == ButtonState.Pressed,
+                gamePadState.Buttons.LeftStick == ButtonState.Pressed,
+                gamePadState.Buttons.RightStick == ButtonState.Pressed
             };
 
             //checkDPadUp.Checked = reporterState.LastActiveState.DPad.Up == XInputDotNetPure.ButtonState.Pressed;
@@ -168,52 +161,52 @@ namespace GS.Server.GamePad
             //checkDPadDown.Checked = reporterState.LastActiveState.DPad.Down == XInputDotNetPure.ButtonState.Pressed;
             //checkDPadLeft.Checked = reporterState.LastActiveState.DPad.Left == XInputDotNetPure.ButtonState.Pressed;
             int povState = -1;
-            if (gamePadState.DPad.Up == XInputDotNetPure.ButtonState.Pressed
-                && gamePadState.DPad.Right != XInputDotNetPure.ButtonState.Pressed
-                && gamePadState.DPad.Left != XInputDotNetPure.ButtonState.Pressed)
+            if (gamePadState.DPad.Up == ButtonState.Pressed
+                && gamePadState.DPad.Right != ButtonState.Pressed
+                && gamePadState.DPad.Left != ButtonState.Pressed)
             {
                 povState = 0;
             }
-            else if (gamePadState.DPad.Up == XInputDotNetPure.ButtonState.Pressed
-                     && gamePadState.DPad.Right == XInputDotNetPure.ButtonState.Pressed)
+            else if (gamePadState.DPad.Up == ButtonState.Pressed
+                     && gamePadState.DPad.Right == ButtonState.Pressed)
             {
                 povState = 4500;
             }
-            else if (gamePadState.DPad.Right == XInputDotNetPure.ButtonState.Pressed
-                     && gamePadState.DPad.Up != XInputDotNetPure.ButtonState.Pressed
-                     && gamePadState.DPad.Down != XInputDotNetPure.ButtonState.Pressed)
+            else if (gamePadState.DPad.Right == ButtonState.Pressed
+                     && gamePadState.DPad.Up != ButtonState.Pressed
+                     && gamePadState.DPad.Down != ButtonState.Pressed)
             {
                 povState = 9000;
             }
-            else if (gamePadState.DPad.Right == XInputDotNetPure.ButtonState.Pressed
-                     && gamePadState.DPad.Down == XInputDotNetPure.ButtonState.Pressed)
+            else if (gamePadState.DPad.Right == ButtonState.Pressed
+                     && gamePadState.DPad.Down == ButtonState.Pressed)
             {
                 povState = 13500;
             }
 
-            else if (gamePadState.DPad.Down == XInputDotNetPure.ButtonState.Pressed
-                && gamePadState.DPad.Right != XInputDotNetPure.ButtonState.Pressed
-                && gamePadState.DPad.Left != XInputDotNetPure.ButtonState.Pressed)
+            else if (gamePadState.DPad.Down == ButtonState.Pressed
+                && gamePadState.DPad.Right != ButtonState.Pressed
+                && gamePadState.DPad.Left != ButtonState.Pressed)
             {
                 povState = 18000;
             }
-            else if (gamePadState.DPad.Down == XInputDotNetPure.ButtonState.Pressed
-                     && gamePadState.DPad.Left == XInputDotNetPure.ButtonState.Pressed)
+            else if (gamePadState.DPad.Down == ButtonState.Pressed
+                     && gamePadState.DPad.Left == ButtonState.Pressed)
             {
                 povState = 22500;
             }
-            else if (gamePadState.DPad.Left == XInputDotNetPure.ButtonState.Pressed
-                    && gamePadState.DPad.Up != XInputDotNetPure.ButtonState.Pressed
-                     && gamePadState.DPad.Down != XInputDotNetPure.ButtonState.Pressed)
+            else if (gamePadState.DPad.Left == ButtonState.Pressed
+                    && gamePadState.DPad.Up != ButtonState.Pressed
+                     && gamePadState.DPad.Down != ButtonState.Pressed)
             {
                 povState = 27000;
             }
-            else if (gamePadState.DPad.Left == XInputDotNetPure.ButtonState.Pressed
-                     && gamePadState.DPad.Up == XInputDotNetPure.ButtonState.Pressed)
+            else if (gamePadState.DPad.Left == ButtonState.Pressed
+                     && gamePadState.DPad.Up == ButtonState.Pressed)
             {
                 povState = 31500;
             }
-            POVs = new int[] { povState, -1, -1, -1};
+            POVs = new[] { povState, -1, -1, -1};
 
             //labelTriggerLeft.Text = FormatFloat(reporterState.LastActiveState.Triggers.Left);
             //labelTriggerRight.Text = FormatFloat(reporterState.LastActiveState.Triggers.Right);

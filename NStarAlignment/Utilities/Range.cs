@@ -97,6 +97,25 @@ namespace NStarAlignment.Utilities
         }
 
         /// <summary>
+        /// Returns double in the range -180 to 180
+        /// </summary>
+        /// <param name="d">590.169444444444451</param>
+        /// <returns>230.16944444444448</returns>
+        public static double RangePlusOrMinus180(double d)
+        {
+            while (d <= 180.0)
+            {
+                d = d + 360.0;
+            }
+
+            while (d > 180)
+            {
+                d = d - 360.0;
+            }
+            return d;
+        }
+
+        /// <summary>
         /// Force range for Altitude and Azimuth
         /// </summary>
         ///  <remarks>Attention to the order given and received</remarks>

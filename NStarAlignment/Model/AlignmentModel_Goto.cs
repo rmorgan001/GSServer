@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using NStarAlignment.DataTypes;
 using NStarAlignment.Utilities;
 
@@ -11,70 +13,62 @@ namespace NStarAlignment.Model
         {
             if (!IsAlignmentOn) return mountAxes;   // Fast exist as alignment modeling is switched off.
 
-            var skyAxes = new[] { 0.0, 0.0 };
-            CarteseanCoordinate result;
-            if (!ThreeStarEnable)
-            {
-                result = DeltaMap(mountAxes);
-                skyAxes[0] = result[0];
-                skyAxes[1] = result[1];
-            }
-            else
-            {
-                // Transform target using model
-                switch (AlignmentAlgorithm)
-                {
-                    case AlignmentAlgorithm.Nearest:
-                        // Nearest 
-                        result = DeltaSyncReverseMatrixMap(mountAxes, time);
-                        break;
-                    case AlignmentAlgorithm.NStar:
-                        // n-star 
-                        result = DeltaMatrixMap(mountAxes, time);
-                        break;
-                    case AlignmentAlgorithm.NStarPlusNearest:
-                        // n-Star or failing that nearest 
-                        result = DeltaMatrixMap(mountAxes, time);
+            AxisPosition mAxes = new AxisPosition(mountAxes);
+            //System.Diagnostics.Debug.WriteLine($"Mount axes: {mountAxes[0]}/{mountAxes[1]} -> {mAxes[0]}/{mAxes[1]}");
 
-                        if (!result.Flag)
-                        {
-                            result = DeltaSyncReverseMatrixMap(mountAxes, time);
-                        }
-                        break;
-                    default:
-                        throw new InvalidOperationException("Unrecognized value for property AlignmentAlgorithm");
-                }
-                skyAxes[0] = result[0];
-                skyAxes[1] = result[1];
-            }
-            if (Math.Abs(skyAxes[0] - mountAxes[0]) > 90)
+            IEnumerable<AlignmentPoint> nearestPoints = GetNearestMountPoints(mAxes, SampleSize);
+            var alignmentPoints = nearestPoints as AlignmentPoint[] ?? nearestPoints.ToArray();
+            int rows = alignmentPoints.Count();
+
+            // Build features and values from registered points
+            Matrix features = Matrix.CreateInstance(rows, 3);
+            Matrix values = Matrix.CreateInstance(rows, 2);
+            // System.Diagnostics.Debug.Write("Points chosen are");
+            for(int i = 0; i < rows; i++)
             {
-                // Switch axis positions
-                skyAxes = GetAltAxisPosition(skyAxes);
+                var pt = alignmentPoints[i];
+                // System.Diagnostics.Debug.Write($" ({pt.Id:D3})");
+                features[i, 0] = 1f;
+                features[i, 1] = pt.MountAxes[0] * pt.MountAxes[0];
+                features[i, 2] = pt.MountAxes[1] * pt.MountAxes[1];
+                values[i, 0] = Range.RangePlusOrMinus180(pt.SkyAxes[0] - pt.MountAxes[0]);
+                values[i, 1] = Range.RangePlusOrMinus180(pt.SkyAxes[1] - pt.MountAxes[1]);
             }
+            // System.Diagnostics.Debug.WriteLine(".");
+
+
+
+            // Solve the normal equation to get theta
+            Matrix theta = SolveNormalEquation(features, values);
+
+            // Calculate the difference for the incoming points
+            Matrix target = Matrix.CreateInstance(1, 3);
+            target[0, 0] = 1f;
+            target[0, 1] = mAxes[0] * mAxes[0];
+            target[0, 2] = mAxes[1] * mAxes[1];
+
+            Matrix offsets = target * theta;
+
+
+            //System.Diagnostics.Debug.WriteLine("Features");
+            //System.Diagnostics.Debug.WriteLine(features.ToString());
+            //System.Diagnostics.Debug.WriteLine("Values");
+            //System.Diagnostics.Debug.WriteLine(values.ToString());
+            //System.Diagnostics.Debug.WriteLine("Theta");
+            //System.Diagnostics.Debug.WriteLine(theta.ToString());
+            //System.Diagnostics.Debug.WriteLine("Target");
+            //System.Diagnostics.Debug.WriteLine(target.ToString());
+            //System.Diagnostics.Debug.WriteLine("Offsets");
+            //System.Diagnostics.Debug.WriteLine(offsets.ToString());
+
+            var skyAxes = new[]
+            {
+                mountAxes[0] + offsets[0, 0],
+                mountAxes[1] + offsets[0, 1]
+            };
             return skyAxes;
         }
 
-        /// <summary>
-        /// GEMs have two possible axes positions, given an axis position this returns the other 
-        /// </summary>
-        /// <param name="alt">position</param>
-        /// <returns>other axis position</returns>
-        private double[] GetAltAxisPosition(double[] alt)
-        {
-            var d = new[] { 0.0, 0.0 };
-            if (alt[0] > 90)
-            {
-                d[0] = alt[0] - 180;
-                d[1] = 180 - alt[1];
-            }
-            else
-            {
-                d[0] = alt[0] + 180;
-                d[1] = 180 - alt[1];
-            }
-            return d;
-        }
 
         /// <summary>
         /// Conversion of mount axis positions in degrees to Ra and Dec
@@ -96,7 +90,7 @@ namespace NStarAlignment.Model
                     break;
                 case AlignmentMode.GermanPolar:
                 case AlignmentMode.Polar:
-                    if (raDec[1] > HomePosition.DecAxis)
+                    if (raDec[1] > 90)
                     {
                         raDec[0] += 180.0;
                         raDec[1] = 180 - raDec[1];
@@ -135,7 +129,7 @@ namespace NStarAlignment.Model
                     if (SiteLatitude < 0) axes[1] = -axes[1];
                     axes[0] = Range.Range360(axes[0]);
 
-                    if (axes[0] > HomePosition.RaAxis + 90 && axes[0] < HomePosition.RaAxis - 90)
+                    if (axes[0] > 180 || axes[0] < 0)
                     {
                         // adjust the targets to be through the pole
                         axes[0] += 180;
@@ -161,105 +155,6 @@ namespace NStarAlignment.Model
             return axes;
         }
 
-        /// <summary>
-        /// Conversion of mount axis positions in degrees to Alt and Az
-        /// </summary>
-        /// <param name="axes"></param>
-        /// <returns>AzAlt</returns>
-        internal double[] AxesXYToAzAlt(double[] axes)
-        {
-            var a = AxesYXToAltAz(new[] { axes[1], axes[0] });
-            var b = new[] { a[1], a[0] };
-            return b;
-        }
-
-
-
-        /// <summary>
-        /// Conversion of mount axis positions in degrees to Alt and Az
-        /// </summary>
-        /// <param name="axes"></param>
-        /// <returns>AltAz</returns>
-        internal double[] AxesYXToAltAz(double[] axes)
-        {
-            var altAz = new[] { axes[0], axes[1] };
-            switch (AlignmentMode)
-            {
-                case AlignmentMode.AltAz:
-                    break;
-                case AlignmentMode.GermanPolar:
-                    if (altAz[0] > 90)
-                    {
-                        altAz[1] += 180.0;
-                        altAz[0] = 180 - altAz[0];
-                        altAz = Range.RangeAltAz(altAz);
-                    }
-
-                    //southern hemisphere
-                    if (SiteLatitude < 0) altAz[0] = -altAz[0];
-
-                    //axis degrees to ha
-                    var ha = altAz[1] / 15.0;
-                    altAz = AstroConvert.HaDec2AltAz(ha, altAz[0], SiteLatitude);
-                    break;
-                case AlignmentMode.Polar:
-                    //axis degrees to ha
-                    ha = altAz[1] / 15.0;
-                    if (SiteLatitude < 0) altAz[0] = -altAz[0];
-                    altAz = AstroConvert.HaDec2AltAz(ha, altAz[0], SiteLatitude);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-            altAz = Range.RangeAltAz(altAz);
-            return altAz;
-        }
-
-
-        /// <summary>
-        /// convert a decimal Alt/Az positions to an axes positions at a given time
-        /// </summary>
-        /// <param name="altAz"></param>
-        /// <param name="lst">Local Sidereal Time</param>
-        /// <returns></returns>
-        internal double[] AltAzToAxesYX(double[] altAz, TimeRecord time)
-        {
-            var axes = new[] {altAz[0], altAz[1]};
-            switch (AlignmentMode)
-            {
-                case AlignmentMode.AltAz:
-                    break;
-                case AlignmentMode.GermanPolar:
-                    axes = AstroConvert.AltAz2RaDec(axes[0], axes[1], SiteLatitude, time.LocalSiderealTime);
-
-                    axes[0] = AstroConvert.Ra2Ha12(axes[0], time.LocalSiderealTime) * 15.0; // ha in degrees
-
-                    if (SiteLatitude < 0) axes[1] = -axes[1];
-
-                    axes = Range.RangeAzAlt(axes);
-
-                    if (axes[0] > 180.0 || axes[0] < 0)
-                    {
-                        // adjust the targets to be through the pole
-                        axes[0] += 180;
-                        axes[1] = 180 - axes[1];
-                    }
-                    break;
-                case AlignmentMode.Polar:
-                    axes = AstroConvert.AltAz2RaDec(axes[0], axes[1], SiteLatitude, time.LocalSiderealTime);
-
-                    axes[0] = AstroConvert.Ra2Ha12(axes[0], time.LocalSiderealTime) * 15.0; // ha in degrees
-
-                    if (SiteLatitude < 0) axes[1] = -axes[1];
-
-                    axes = Range.RangeAzAlt(axes);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-            axes = Range.RangeAxesXY(axes);
-            return new[] { axes[1], axes[0] };
-        }
 
         #endregion
 
@@ -268,53 +163,74 @@ namespace NStarAlignment.Model
         public double[] GetMountAxes(double[] skyAxes, TimeRecord time)
         {
             if (!IsAlignmentOn) return skyAxes; // Fast exit as alignment modeling is switched off.
+            AxisPosition sAxes = new AxisPosition(skyAxes);
+            //System.Diagnostics.Debug.WriteLine($"Sky axes: {skyAxes[0]}/{skyAxes[1]} -> {sAxes[0]}/{sAxes[1]}");
+            IEnumerable<AlignmentPoint> nearestPoints = GetNearestSkyPoints(sAxes, SampleSize);
+            var alignmentPoints = nearestPoints as AlignmentPoint[] ?? nearestPoints.ToArray();
+            int rows = alignmentPoints.Count();
 
-            var mountAxes = new[] { 0.0, 0.0 };
-            CarteseanCoordinate result;
-
-            if (!ThreeStarEnable)
+            // Build features and values from registered points
+            Matrix features = Matrix.CreateInstance(rows, 3);
+            Matrix values = Matrix.CreateInstance(rows, 2);
+            // System.Diagnostics.Debug.Write("Points chosen are");
+            for (int i = 0; i < rows; i++)
             {
-                result = DeltaReverseMap(skyAxes);
-                mountAxes[0] = result[0];
-                mountAxes[1] = result[1];
+                var pt = alignmentPoints[i];
+                // System.Diagnostics.Debug.Write($" ({pt.Id:D3})");
+                features[i, 0] = 1f;
+                features[i, 1] = pt.SkyAxes[0] * pt.SkyAxes[0];
+                features[i, 2] = pt.SkyAxes[1] * pt.SkyAxes[1];
+                values[i, 0] = Range.RangePlusOrMinus180(pt.MountAxes[0] - pt.SkyAxes[0]);
+                values[i, 1] = Range.RangePlusOrMinus180(pt.MountAxes[1] - pt.SkyAxes[1]);
             }
-            else
-            {
-                // Transform target using model
-                switch (AlignmentAlgorithm)
-                {
-                    case AlignmentAlgorithm.Nearest:
-                        //  use nearest point (not very accurate)
-                        result = DeltaSyncMatrixMap(skyAxes, time);
-                        break;
-                    case AlignmentAlgorithm.NStar:
-                        // n-star 
-                        result = DeltaMatrixReverseMap(skyAxes, time);
-                        break;
-                    case AlignmentAlgorithm.NStarPlusNearest:
-                        // n-star, failing that nearest
-                        result = DeltaMatrixReverseMap(skyAxes, time);
+            // System.Diagnostics.Debug.WriteLine(".");
 
-                        if (!result.Flag)
-                        {
-                            result = DeltaSyncMatrixMap(skyAxes, time);
-                        }
-                        break;
-                    default:
-                        throw new InvalidOperationException("Unrecognized value for property AlignmentAlgorithm");
 
-                }
-                mountAxes[0] = result[0];
-                mountAxes[1] = result[1];
-            }
-            if (Math.Abs(mountAxes[0] - skyAxes[0]) > 90)
+
+            // Solve the normal equation to get theta
+            Matrix theta = SolveNormalEquation(features, values);
+
+            // Calculate the difference for the incoming points
+            Matrix target = Matrix.CreateInstance(1, 3);
+            target[0, 0] = 1f;
+            target[0, 1] = sAxes[0] * sAxes[0];
+            target[0, 2] = sAxes[1] * sAxes[1];
+
+            Matrix offsets = target * theta;
+
+
+            //System.Diagnostics.Debug.WriteLine("Features");
+            //System.Diagnostics.Debug.WriteLine(features.ToString());
+            //System.Diagnostics.Debug.WriteLine("Values");
+            //System.Diagnostics.Debug.WriteLine(values.ToString());
+            //System.Diagnostics.Debug.WriteLine("Theta");
+            //System.Diagnostics.Debug.WriteLine(theta.ToString());
+            //System.Diagnostics.Debug.WriteLine("Target");
+            //System.Diagnostics.Debug.WriteLine(target.ToString());
+            //System.Diagnostics.Debug.WriteLine("Offsets");
+            //System.Diagnostics.Debug.WriteLine(offsets.ToString());
+
+            var mountAxes = new[]
             {
-                // Switch axis positions
-                mountAxes = GetAltAxisPosition(mountAxes);
-            }
+                skyAxes[0] + offsets[0, 0],
+                skyAxes[1] + offsets[0, 1]
+            };
             return mountAxes;
         }
 
         #endregion
+
+        public static Matrix SolveNormalEquation(Matrix inputFeatures, Matrix outputValue)
+        {
+            Matrix inputFeaturesT = inputFeatures.Transpose();
+            Matrix xx = inputFeaturesT * inputFeatures;
+            Matrix xxi = xx.Invert();
+
+            Matrix xy = inputFeaturesT * outputValue;
+
+            Matrix result = xxi * xy;
+            return result;
+        }
+
     }
 }

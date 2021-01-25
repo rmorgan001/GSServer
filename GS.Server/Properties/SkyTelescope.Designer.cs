@@ -1390,5 +1390,17 @@ namespace GS.Server.Properties {
                 this["ParkLimitName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SyncLimitOn {
+            get {
+                return ((bool)(this["SyncLimitOn"]));
+            }
+            set {
+                this["SyncLimitOn"] = value;
+            }
+        }
     }
 }

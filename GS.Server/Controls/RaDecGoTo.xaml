@@ -11,11 +11,11 @@
     <Border Margin="0,0,10,0" BorderBrush="DimGray"  BorderThickness="2" CornerRadius="5">
         <Grid Background="{StaticResource MaterialDesignToolBarBackground}">
             <Grid.RowDefinitions>
-                <RowDefinition Height="45"/>
-                <RowDefinition Height="45"/>
+                <RowDefinition Height="47"/>
+                <RowDefinition Height="47"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="90"/>
                 <ColumnDefinition Width="40"/>
                 <ColumnDefinition Width="60"/>
                 <ColumnDefinition Width="70"/>
@@ -120,16 +120,17 @@
                 </ComboBox.ItemsPanel>
             </ComboBox>
             <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Orientation="Vertical" VerticalAlignment="Center">
-                    <Button Margin="0,2,0,0" Height="25" Width="70" ToolTip="{StaticResource goTipCopy}" 
+                    <Button Margin="0,0,0,0" Height="20" Padding="-5" Width="85" ToolTip="{StaticResource goTipCopy}" 
                     Command="{Binding PopulateGoToRaDecCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource goCopy}"/>
                 <md:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsRaGoToDialogOpen}" DialogContent="{Binding RaGoToContent}">
-                    <Button Margin="0,3,0,0" Height="25" Width="70" ToolTip="{StaticResource goTipGoTo}" 
+                    <Button Margin="0,2,0,0" Height="20" Padding="-5" Width="85" ToolTip="{StaticResource goTipGoTo}" 
                         Command="{Binding OpenRaGoToDialogCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource goGoTo}"/>
                 </md:DialogHost>
                 <md:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsRaGoToSyncDialogOpen}" DialogContent="{Binding RaGoToSyncContent}">
-                    <Button Margin="0,3,0,0" Height="25" Width="70" ToolTip="{StaticResource goSync}" 
+                    <Button Margin="0,2,0,0" Height="20" Padding="-5" Width="85" ToolTip="{StaticResource goSync}" 
                             Command="{Binding OpenRaGoToSyncDialogCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource goSync}"/>
                 </md:DialogHost>
+                <Button Margin="0,2,0,0" Height="20" Padding="-5" Width="85" ToolTip="{StaticResource diaImport}" Command="{Binding ImportGoToRaDecCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource diaImport}" />
             </StackPanel>
             </Grid>
     </Border>

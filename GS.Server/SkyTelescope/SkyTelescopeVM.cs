@@ -21,6 +21,7 @@ using GS.Server.Gps;
 using GS.Server.Helpers;
 using GS.Server.Main;
 using GS.Shared;
+using GS.FitsImageManager;
 using HelixToolkit.Wpf;
 using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
@@ -29,6 +30,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Management;
 using System.Reflection;
@@ -136,11 +138,14 @@ namespace GS.Server.SkyTelescope
                     ModelOn = SkySettings.ModelOn;
                     SetTrackingIcon(SkySettings.TrackingRate);
                     SetParkLimitSelection(SkySettings.ParkLimitName);
+                    TrackingRate = SkySettings.TrackingRate;
 
                     HcWinVisibility = true;
                     ModelWinVisibility = true;
+                    ButtonsWinVisibility = true;
                     DebugVisibility = SkySettings.Diagnostics;
                     PecShow = SkyServer.PecShow;
+                    SchedulerShow = true;
                 }
 
                 // check to make sure window is visible then connect if requested.
@@ -168,7 +173,7 @@ namespace GS.Server.SkyTelescope
 
         #region View Model Items
 
-        private static bool _pecShow;
+        private bool _pecShow;
         /// <summary>
         /// sets up bool to load a test tab
         /// </summary>
@@ -179,6 +184,18 @@ namespace GS.Server.SkyTelescope
             {
                 if (_pecShow == value) { return; }
                 _pecShow = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _schedulerShow;
+        public bool SchedulerShow
+        {
+            get => _schedulerShow;
+            set
+            {
+                if (_schedulerShow == value) { return; }
+                _schedulerShow = value;
                 OnPropertyChanged();
             }
         }
@@ -305,7 +322,7 @@ namespace GS.Server.SkyTelescope
                                 case "Azimuth":
                                     Azimuth = _util.DegreesToDMS(SkyServer.Azimuth, "° ", ":", "", 2);
                                     break;
-                                case "CanPec":
+                                case "CanPPec":
                                     PPecEnabled = SkyServer.CanPPec;
                                     break;
                                 case "DeclinationXForm":
@@ -383,9 +400,7 @@ namespace GS.Server.SkyTelescope
                                     PecBinNow = SkyServer.PecBinNow.Item1;
                                     break;
                                 case "PecOn":
-                                    if (SkyServer.PecOn) { PecState = true; }
-                                    if (!SkyServer.PPecOn && !SkyServer.PecOn) { PecState = false; }
-                                    PecBadgeContent = SkyServer.PecOn ? Application.Current.Resources["PecBadge"].ToString() : "";
+                                    PecOn = SkyServer.PecOn;
                                     break;
                                 case "PPecOn":
                                     PPecOn = SkyServer.PPecOn;
@@ -638,7 +653,7 @@ namespace GS.Server.SkyTelescope
             ImageFile = "../Resources/" + ImageFiles[random.Next(ImageFiles.Count)];
         }
 
-        private void CloseDialogs(bool screen)
+        public void CloseDialogs(bool screen)
         {
             if (screen)
             {
@@ -849,11 +864,15 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
+
+        private DriveRates _trackingRate;
         public DriveRates TrackingRate
         {
-            get => SkySettings.TrackingRate;
+            get => _trackingRate;
             set
             {
+                if (_trackingRate == value) return;
+                _trackingRate = value;
                 SkySettings.TrackingRate = value;
                 SetTrackingIcon(value);
                 if (SkyServer.Tracking)
@@ -982,6 +1001,15 @@ namespace GS.Server.SkyTelescope
             set
             {
                 SkySettings.Refraction = value;
+                OnPropertyChanged();
+            }
+        }
+        public bool SyncLimitOn
+        {
+            get => SkySettings.SyncLimitOn;
+            set
+            {
+                SkySettings.SyncLimitOn = value;
                 OnPropertyChanged();
             }
         }
@@ -1542,6 +1570,18 @@ namespace GS.Server.SkyTelescope
 
         #region Button Control
 
+        private bool _buttonsWinVisibility;
+        public bool ButtonsWinVisibility
+        {
+            get => _buttonsWinVisibility;
+            set
+            {
+                if (_buttonsWinVisibility == value) return;
+                _buttonsWinVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
         private List<ParkPosition> _parkPositions;
         public List<ParkPosition> ParkPositions
         {
@@ -1637,6 +1677,19 @@ namespace GS.Server.SkyTelescope
                 if (_parkAddContent == value) return;
                 _parkAddContent = value;
                 OnPropertyChanged();
+            }
+        }
+
+        private bool _pecOn;
+        public bool PecOn
+        {
+            get => _pecOn;
+            set
+            {
+                _pecOn = value;
+               if (SkyServer.PecOn) { PecState = true; }
+               if (!SkyServer.PPecOn && !SkyServer.PecOn) { PecState = false; }
+               PecBadgeContent = SkyServer.PecOn ? Application.Current.Resources["PecBadge"].ToString() : "";
             }
         }
 
@@ -2846,6 +2899,46 @@ namespace GS.Server.SkyTelescope
                 SkyServer.SkyErrorHandler(ex);
             }
         }
+
+        private ICommand _openButtonsWindowCmd;
+        public ICommand OpenButtonsWindowCmd
+        {
+            get
+            {
+                var cmd = _openButtonsWindowCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openButtonsWindowCmd = new RelayCommand(param => OpenButtonsWindow());
+            }
+        }
+        private void OpenButtonsWindow()
+        {
+            try
+            {
+                var win = Application.Current.Windows.OfType<ButtonsControlV>().FirstOrDefault();
+                if (win != null) return;
+                var bWin = new ButtonsControlV();
+                bWin.Show();
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
         #endregion
 
         #region RA Coord GoTo Control
@@ -2959,6 +3052,84 @@ namespace GS.Server.SkyTelescope
                     RaSeconds = Convert.ToDouble(ras[2]);
 
                     var dec = _util.HoursToHMS(SkyServer.DeclinationXForm, ":", ":", ":", 3);
+                    var decs = dec.Split(':');
+                    DecDegrees = Convert.ToDouble(decs[0]);
+                    DecMinutes = Convert.ToDouble(decs[1]);
+                    DecSeconds = Convert.ToDouble(decs[2]);
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _importGoToRaDec;
+        public ICommand ImportGoToRaDecCmd
+        {
+            get
+            {
+                var dec = _importGoToRaDec;
+                if (dec != null)
+                {
+                    return dec;
+                }
+
+                return _importGoToRaDec = new RelayCommand(
+                    param => ImportGoToRaDec()
+                );
+            }
+        }
+        private void ImportGoToRaDec()
+        {
+            try
+            {
+                var filename = GSFile.GetFileName("*.fit", @"C:\");
+                if (!File.Exists(filename)){return;}
+                
+                using (new WaitCursor())
+                {
+                    var status = ImageManager.LoadImage(filename, out var headerData);
+                    if (status != 0){return;}
+
+                    var hra = headerData.GetItemByKeyName("RA");
+                    var hdec = headerData.GetItemByKeyName("DEC");
+
+                    if (hra == null || hdec == null)
+                    {
+                        OpenDialog($"{Application.Current.Resources["msgKey"]}", $"{Application.Current.Resources["exError"]}");
+                        return;
+                    }
+
+                    var resultra = double.TryParse(hra.Value, out var vra);
+                    var resultdec = double.TryParse(hdec.Value, out var vdec);
+
+                    if (!resultra || !resultdec)
+                    {
+                        OpenDialog($"{Application.Current.Resources["msgValue"]}", $"{Application.Current.Resources["exError"]}");
+                        return;
+                    }
+
+                    var ra = _util.HoursToHMS(vra, ":", ":", ":", 3);
+                    var ras = ra.Split(':');
+                    RaHours = Convert.ToDouble(ras[0]);
+                    RaMinutes = Convert.ToDouble(ras[1]);
+                    RaSeconds = Convert.ToDouble(ras[2]);
+
+                    var dec = _util.HoursToHMS(vdec, ":", ":", ":", 3);
                     var decs = dec.Split(':');
                     DecDegrees = Convert.ToDouble(decs[0]);
                     DecMinutes = Convert.ToDouble(decs[1]);
@@ -5077,7 +5248,7 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private void SetTrackingIcon(DriveRates rate)
+        public void SetTrackingIcon(DriveRates rate)
         {
             switch (rate)
             {

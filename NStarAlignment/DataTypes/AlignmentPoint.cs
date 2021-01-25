@@ -1,6 +1,4 @@
-﻿using System;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -41,6 +39,10 @@ namespace NStarAlignment.DataTypes
         public AxisPosition MountAxes { get; set; }
         public AxisPosition SkyAxes { get; set; }
 
+        public CarteseanCoordinate SkyXY { get; set; }
+
+        public CarteseanCoordinate MountXY { get; set; }
+
         [JsonIgnore]
         public string Correction => $"{(SkyAxes[0] - MountAxes[0])*3600.0:F2}/{(SkyAxes[1] - MountAxes[1])*3600.0:F2}";
 
@@ -66,13 +68,15 @@ namespace NStarAlignment.DataTypes
         /// <param name="mountAxes"></param>
         /// <param name="skyAxes"></param>
         /// <param name="syncTime"></param>
-        public AlignmentPoint(double[] raDec, double[] altAz, AxisPosition mountAxes, AxisPosition skyAxes, TimeRecord syncTime)
+        public AlignmentPoint(double[] raDec, double[] altAz, AxisPosition mountAxes, AxisPosition skyAxes, CarteseanCoordinate mountXY, CarteseanCoordinate skyXY, TimeRecord syncTime)
         :this()
         {
             RaDec = raDec;
             AltAz = altAz;
             MountAxes = mountAxes;
             SkyAxes = skyAxes;
+            MountXY = mountXY;
+            SkyXY = skyXY;
             SyncTime = syncTime;
         }
 

@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Product>GS.FitsImageManager</Product>
+    <Title>GS.FitsImageManager</Title>
+    <Description>GS.FitsImageManager</Description>
+    <ProjectGuid>{74B0434D-F37A-4B53-967C-85881529D45C}</ProjectGuid>
+    <TargetFramework>net472</TargetFramework>
+    <OutputPath>..\Builds\$(Configuration)\</OutputPath>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+  </PropertyGroup>
+<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>Resources\ASCOM.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ASCOM.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="cfitsio\cfitsio_32.dll">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="cfitsio\cfitsio_64.dll">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="IF &quot;$(PlatformName)&quot; == &quot;x64&quot; ECHO f | COPY /Y &quot;$(ProjectDir)cfitsio\cfitsio_64.dll&quot; &quot;$(TargetDir)cfitsio.dll&quot;&#xD;&#xA;IF NOT &quot;$(PlatformName)&quot; == &quot;x64&quot; ECHO f | COPY /Y &quot;$(ProjectDir)cfitsio\cfitsio_32.dll&quot; &quot;$(TargetDir)cfitsio.dll&quot;&#xD;&#xA;XCOPY /Y &quot;$(TargetPath)&quot; &quot;$(ProjectDir)..\Builds\&quot;" />
+  </Target>
+</Project>

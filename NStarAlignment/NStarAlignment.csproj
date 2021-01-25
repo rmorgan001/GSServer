@@ -22,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -58,7 +59,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Model\AlignmentModel_AlignmentStars.cs" />
-    <Compile Include="Model\AlignmentModel_Math.cs" />
     <Compile Include="DataTypes\AlignmentPoint.cs" />
     <Compile Include="DataTypes\AlignmentStar.cs" />
     <Compile Include="Model\AlignmentModel_Goto.cs" />
@@ -67,11 +67,9 @@
     <Compile Include="DataTypes\Matrix.cs" />
     <Compile Include="Utilities\Range.cs" />
     <Compile Include="DataTypes\TimeRecord.cs" />
-    <Compile Include="DataTypes\TriangleDataHolder.cs" />
     <Compile Include="DataTypes\Angle.cs" />
     <Compile Include="DataTypes\AxisPosition.cs" />
     <Compile Include="DataTypes\CarteseanCoordinate.cs" />
-    <Compile Include="DataTypes\HourAngle.cs" />
     <Compile Include="DataTypes\SphericalCoordinate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -90,8 +88,6 @@
     <None Include="Resources\ASCOM.snk" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Documentation\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

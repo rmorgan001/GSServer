@@ -15,7 +15,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <!--Dialog -->
-    <system:String x:Key="diaAccept">Accepter</system:String>
+    <system:String x:Key="diaAccept">Valider</system:String>
     <system:String x:Key="diaCancel">Annuler</system:String>
     <system:String x:Key="diaOk">Ok</system:String>
     <system:String x:Key="diaStart">Démarrer</system:String>

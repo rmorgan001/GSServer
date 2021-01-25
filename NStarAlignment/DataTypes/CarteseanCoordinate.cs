@@ -59,23 +59,22 @@ namespace NStarAlignment.DataTypes
 
         public bool Flag { get; set; }
 
+        /// <summary>
+        /// Equivalent AltAz quadrant.
+        /// </summary>
         public Quadrant Quadrant
         {
             get
             {
                 if (X >= 0)
                 {
-                    return Y >= 0 ? Quadrant.Ne : Quadrant.Se;
+                    return Y >= 0 ? Quadrant.Sw : Quadrant.Se;
                 }
                 else
                 {
-                    return Y < 0 ? Quadrant.Sw : Quadrant.Nw;
+                    return Y < 0 ? Quadrant.Ne : Quadrant.Nw;
                 }
             }
-        }
-
-        public CarteseanCoordinate(double x, double y) : this(x, y, 0.0)
-        {
         }
 
         public CarteseanCoordinate(double x, double y, double z)
@@ -166,10 +165,11 @@ namespace NStarAlignment.DataTypes
 
         public override string ToString()
         {
-            return $"({X},{Y})";
+            return $"({X}, {Y}, {Z})";
         }
         #endregion
 
+        
     }
 
 }

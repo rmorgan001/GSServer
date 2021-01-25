@@ -7,7 +7,7 @@ namespace NStarAlignment.DataTypes
     {
         public Angle X;
         public Angle Y;
-        public int R;
+        public bool WeightsDown;
 
         #region Operator overloads ...
         /// <summary>
@@ -15,7 +15,7 @@ namespace NStarAlignment.DataTypes
         /// </summary>
         public static bool operator ==(SphericalCoordinate pos1, SphericalCoordinate pos2)
         {
-            return (pos1.X == pos2.X && pos1.Y == pos2.Y && pos1.R == pos2.R);
+            return (pos1.X == pos2.X && pos1.Y == pos2.Y && pos1.WeightsDown == pos2.WeightsDown);
         }
 
         public static bool operator !=(SphericalCoordinate pos1, SphericalCoordinate pos2)
@@ -28,10 +28,11 @@ namespace NStarAlignment.DataTypes
             unchecked // Overflow is fine, just wrap
             {
                 int hash = 17;
+                int wd = (WeightsDown ? 1 : 0);
                 // Suitable nullity checks etc, of course :)
                 hash = hash * 23 + X.GetHashCode();
                 hash = hash * 23 + Y.GetHashCode();
-                hash = hash * 23 + R.GetHashCode();
+                hash = hash * 23 + wd.GetHashCode();
                 return hash;
             }
         }
