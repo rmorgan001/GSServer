@@ -1,26 +1,21 @@
 ﻿using GS.Principles;
+using GS.Server.Controls.Dialogs;
 using GS.Server.Helpers;
 using GS.Server.Main;
 using GS.Server.SkyTelescope;
 using GS.Shared;
+using GS.Shared.Command;
 using MaterialDesignThemes.Wpf;
+using NStarAlignment.DataTypes;
 using System;
-using System.ComponentModel;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
-using System.Windows.Input;
-using System.Windows.Threading;
-using ASCOM.Utilities;
-using GS.Server.Controls.Dialogs;
-using System.Collections.ObjectModel;
-using NStarAlignment.DataTypes;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Windows.Data;
-using Microsoft.Xaml.Behaviors.Core;
-using GS.Shared.Command;
+using System.Windows.Input;
 
 namespace GS.Server.Alignment
 {

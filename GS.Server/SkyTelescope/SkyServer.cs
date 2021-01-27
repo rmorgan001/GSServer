@@ -4008,7 +4008,7 @@ namespace GS.Server.SkyTelescope
         public static void SlewRaDec(double rightAscension, double declination)
         {
             // convert RA/Dec to axis
-            var a = GetAlignmentAdjustedAxes(Axes.RaDecToAxesXY(new[] { rightAscension, declination }));
+            var a = GetAdjustedAxesForSlewing(Axes.RaDecToAxesXY(new[] { rightAscension, declination }));
 
             _targetAxes = new Vector(a[0], a[1]);
             SlewMount(_targetAxes, SlewType.SlewRaDec);
@@ -4095,7 +4095,7 @@ namespace GS.Server.SkyTelescope
 
             if (target.LengthSquared > 0)
             {
-                var a = GetAlignmentAdjustedAxes(new double[]{ yx[1], yx[0] });
+                var a = GetAdjustedAxesForSlewing(new double[]{ target.X, target.Y });
                 SlewMount(new Vector(a[0], a[1]), SlewType.SlewAltAz);
             }
         }
@@ -4267,8 +4267,7 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
 
-            // AddAlignmentPoint();
-            GenerateTestModel();
+            AddAlignmentPoint();
 
             if (trackingstate)
             {
@@ -4303,7 +4302,6 @@ namespace GS.Server.SkyTelescope
             double[] rawPosition = GetRawDegrees();
             if (rawPosition == null) { return; }
             if (double.IsNaN(rawPosition[0]) || double.IsNaN(rawPosition[1])) { return; }
-            double[] currentPosition = Axes.AxesMountToApp(rawPosition);
 
 
             // Get calculate axis position for targetRA and TargetDec
@@ -4317,7 +4315,7 @@ namespace GS.Server.SkyTelescope
             AlignmentModel.AddAlignmentPoint(
                 new double[] { SkyServer.TargetRa, SkyServer.TargetDec },
                 calculatedAxes,
-                currentPosition,
+                rawPosition,
                 new TimeRecord(utcNow, lstNow));
 
             var monitorItem = new MonitorEntry
@@ -4328,7 +4326,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"Alignment point added: { _util.HoursToHMS(SkyServer.TargetRa, ":", ":", ":", 2) }/{ _util.DegreesToDMS(SkyServer.TargetDec, "° ", ":", "", 2) }, ({calculatedAxes[0]}, {calculatedAxes[1]}), ({currentPosition[0]}, {currentPosition[1]}), {utcNow:O}, {lstNow}"
+                Message = $"Alignment point added: { _util.HoursToHMS(SkyServer.TargetRa, ":", ":", ":", 2) }/{ _util.DegreesToDMS(SkyServer.TargetDec, "° ", ":", "", 2) }, ({calculatedAxes[0]}, {calculatedAxes[1]}), ({rawPosition[0]}, {rawPosition[1]}), {utcNow:O}, {lstNow}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -4336,10 +4334,11 @@ namespace GS.Server.SkyTelescope
 
         /// <summary>
         /// Returns the actual axis position that alignment says should be used for a mount calculated axis position
+        /// used to get the axis positions to slew to.
         /// </summary>
         /// <param name="calculatedAxes">Calculated axis positions</param>
         /// <returns>Adjusted axis positions</returns>
-        private static double[] GetAlignmentAdjustedAxes(double[] calculatedAxes)
+        private static double[] GetAdjustedAxesForSlewing(double[] calculatedAxes)
         {
             DateTime utcNow = HiResDateTime.UtcNow;
             // Apply alignment adjustment.
@@ -4362,10 +4361,11 @@ namespace GS.Server.SkyTelescope
 
         /// <summary>
         /// Converts an actual axis position to the position the mount would calculate to get there.
+        /// Used when determining current position coordinate for display.
         /// </summary>
         /// <param name="actualAxes"></param>
         /// <returns></returns>
-        private static double[] GetAlignmentCalculatedAxes(double[] actualAxes)
+        private static double[] GetAdjustAxesForReporting(double[] actualAxes)
         {
             DateTime utcNow = HiResDateTime.UtcNow;
             var calculatedAxes = AlignmentModel.GetSkyAxes(actualAxes,  new TimeRecord(utcNow, GetLocalSiderealTime(utcNow)));
@@ -4388,141 +4388,6 @@ namespace GS.Server.SkyTelescope
             return calculatedAxes;
         }
 
-        #region Generating alignment mode for testing ...
-        private static readonly List<double[]> AlignmentModelPositions =  new List<double[]>
-        {
-            // SE Triangle
-            new double[] {35, 100},     // 1
-            new double[] {55, 97},     // 2
-            new double[] {37, 91},     // 3
-            // NE Triangle
-            new double[] {47, 29},      // 4
-            new double[] {36, 46},      // 5
-            new double[] {29, 28},      // 6
-            // NW Triangle
-            new double[] {40, 302},      // 7
-            new double[] {53, 317},      // 8
-            new double[] {37, 319},      // 9
-            // SW Triangle
-            new double[] {32, 234},      // 10
-            new double[] {49, 227},      // 11
-            new double[] {35, 215},      // 12
-            
-            //// SE Target
-            //new double[] {39, 100},      // 13
-            //// NE Target
-            //new double[] {37, 34},      // 14
-            //// NW Target
-            //new double[] {44, 313},      // 15
-            //// SW Target
-            //new double[] {39, 223}      // 16
-
-        };
-
-        private static readonly List<double[]> AlignmentTestPositions = new List<double[]>
-        {
-            // SE Target
-            new double[] {39, 100},      // 13
-            // NE Target
-            new double[] {37, 34},      // 14
-            // NW Target
-            new double[] {44, 313},      // 15
-            // SW Target
-            new double[] {39, 223}      // 16
-        };
-
-        private static void GenerateTestModel()
-        {
-            AlignmentModel.ClearAlignmentPoints();
-            DateTime utcNow = new DateTime(2021, 1, 13, 20, 7, 0);
-            TimeSpan interval = new TimeSpan(0, 0, 30);
-            foreach(var altAz in AlignmentModelPositions)
-            {
-                GenerateTestPoint(altAz, utcNow);
-                utcNow += interval;
-            }
-
-            System.Diagnostics.Debug.WriteLine("============= Plot data =============");
-            foreach (var pt in AlignmentModel.AlignmentPoints)
-            {
-                // System.Diagnostics.Debug.WriteLine($"{pt.MountXY.X:F4},{pt.MountXY.Y:F4},{pt.SkyXY.X:F4},{pt.SkyXY.Y:F4}");
-                // System.Diagnostics.Debug.WriteLine($"{pt.MountXY.X}\t{pt.MountXY.Y}\t{pt.SkyXY.X}\t{pt.SkyXY.Y}\t{pt.SkyXY.Quadrant}");
-                System.Diagnostics.Debug.WriteLine($"{pt.MountAxes[0]:F4},{pt.MountAxes[1]:F4},{pt.SkyAxes[0]:F4},{pt.SkyAxes[1]:F4}");
-            }
-            System.Diagnostics.Debug.WriteLine("============= Plot data =============");
-            utcNow += interval;
-            // Now run the tests
-            foreach (var altAz in AlignmentTestPositions)
-            {
-                CompareTestPoint(altAz, utcNow);
-                utcNow += interval;
-            }
-
-        }
-
-        private static void GenerateTestPoint(double[] altAz, DateTime utcNow)
-        {
-            double lstNow = GetLocalSiderealTime(utcNow);
-            double[] mountRaDec = Coordinate.AltAz2RaDec(altAz[0], altAz[1], SkySettings.Latitude, lstNow);
-            double[] skyRaDec = Coordinate.AltAz2RaDec(altAz[0]+2.0, altAz[1]+2.0, SkySettings.Latitude, lstNow);
-            // System.Diagnostics.Debug.WriteLine($"{altAz[0]}/{altAz[1]} => {mountRaDec[0]}/{mountRaDec[1]}");
-            double[] calculatedAxes = Axes.RaDecToAxesXY(new[] { mountRaDec[0], mountRaDec[1] }, lstNow);
-            double[] rawAxes = Axes.RaDecToAxesXY(new[] { skyRaDec[0], skyRaDec[1] }, lstNow);
-
-            // Check if the calculated Axes is way off (as in from the alternative position)
-            //if (Axes.IsFlipRequired(calculatedAxes))
-            //{
-            //    // System.Diagnostics.Debug.WriteLine("Flipped axes");
-            //    calculatedAxes = Axes.GetAltAxisPosition(calculatedAxes);
-            //    rawAxes = Axes.GetAltAxisPosition(rawAxes);
-            //}
-
-
-
-            // Mock calculated and raw axis position
-            // double[] calculatedAxes = new double[]{axesYX[1], axesYX[0]};
-            // Generate RaDec
-            AlignmentModel.AddAlignmentPoint(
-                new double[] { mountRaDec[0], mountRaDec[1] },
-                calculatedAxes,
-                rawAxes,
-                new TimeRecord(utcNow, lstNow));
-
-        }
-
-        private static void CompareTestPoint(double[] altAz, DateTime utcNow)
-        {
-            double lstNow = GetLocalSiderealTime(utcNow);
-            TimeRecord time = new TimeRecord(utcNow, lstNow); 
-            double[] mountRaDec = Coordinate.AltAz2RaDec(altAz[0], altAz[1], SkySettings.Latitude, lstNow);
-            double[] skyRaDec = Coordinate.AltAz2RaDec(altAz[0] + 2.0, altAz[1] + 2.0, SkySettings.Latitude, lstNow);
-
-            double[] expectedCalculatedAxes = Axes.RaDecToAxesXY(new[] { mountRaDec[0], mountRaDec[1] }, lstNow);
-
-            //// Check if the calculated Axes is way off (as in from the alternative position)
-            //if (Axes.IsFlipRequired(expectedCalculatedAxes))
-            //{
-            //    expectedCalculatedAxes = Axes.GetAltAxisPosition(expectedCalculatedAxes);
-            //}
-
-            double[] expectedRawAxes = Axes.RaDecToAxesXY(new[] { skyRaDec[0], skyRaDec[1] }, lstNow);
-            //if (Axes.IsFlipRequired(expectedRawAxes))
-            //{
-            //    expectedRawAxes = Axes.GetAltAxisPosition(expectedRawAxes);
-            //}
-
-            // Generate RaDec
-            //System.Diagnostics.Debug.WriteLine($"\n=== Testing Alt/Az {altAz[0]:F4}/{altAz[1]:F4} ====");
-            double[] rawAxes = AlignmentModel.GetSkyAxes(expectedCalculatedAxes, time);
-            double[] calculatedAxes = AlignmentModel.GetMountAxes(expectedRawAxes, time);
-            //System.Diagnostics.Debug.WriteLine($" Raw axes - expected: {expectedRawAxes[0]:F4}/{expectedRawAxes[1]:F4} actual: {rawAxes[0]:F4}/{rawAxes[1]:F4}");
-            //System.Diagnostics.Debug.WriteLine($"Calc axes - expected: {expectedCalculatedAxes[0]:F4}/{expectedCalculatedAxes[1]:F4} actual: {calculatedAxes[0]:F4}/{calculatedAxes[1]:F4}");
-            //System.Diagnostics.Debug.WriteLine($"=== Testing Alt/Az {altAz[0]:F4}/{altAz[1]:F4} ====\n");
-
-        }
-
-        #endregion
-        
         #endregion
 
         /// <summary>
@@ -4537,7 +4402,7 @@ namespace GS.Server.SkyTelescope
             if (SkySettings.NoSyncPastMeridian){return false;} // add more checks later if needed
 
             //convert ra dec to mount positions
-            var xy = GetAlignmentAdjustedAxes(Axes.RaDecToAxesXY(new[] { ra, dec }));
+            var xy = GetAdjustedAxesForSlewing(Axes.RaDecToAxesXY(new[] { ra, dec }));
             var target = Axes.AxesAppToMount(xy);
 
             //convert current position to mount position
@@ -4773,14 +4638,14 @@ namespace GS.Server.SkyTelescope
                 PecCheck();
 
                 //Convert Positions to degrees
-                double[] calculatedAxes = new[]
+                double[] rawPositions = new[]
                 {
                     ConvertStepsToDegrees(rawSteps[0], 0),
                     ConvertStepsToDegrees(rawSteps[1], 1)
                 };
 
                 //Apply any alignment adjustments
-                //var calculatedAxes = GetAlignmentCalculatedAxes(rawPositions);
+                var calculatedAxes = GetAdjustAxesForReporting(rawPositions);
 
                 // UI diagnostics in degrees
                 ActualAxisX = calculatedAxes[0];
