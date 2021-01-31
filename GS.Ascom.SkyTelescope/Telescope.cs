@@ -836,14 +836,14 @@ namespace ASCOM.GS.Sky.Telescope
                 return;
             }
             SkyServer.GoToPark();
-            while (SkyServer.SlewState == SlewType.SlewPark)
-            {
-                Thread.Sleep(1);
-                DoEvents();
-            }
+            //while (SkyServer.SlewState == SlewType.SlewPark)
+            //{
+            //    Thread.Sleep(1);
+            //    DoEvents();
+            //}
 
             monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Parked" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Parking" };
             MonitorLog.LogToMonitor(monitorItem);
 
         }
@@ -994,7 +994,7 @@ namespace ASCOM.GS.Sky.Telescope
                 var r = SkyServer.SiderealTime;
 
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToHMS(r)}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.HoursToHMS(r)}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 return r;

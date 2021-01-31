@@ -556,6 +556,12 @@ namespace GS.Server.SkyTelescope
                                 WarningState = MonitorQueue.WarningState;
                                 break;
                         }
+                        switch (e.PropertyName)
+                        {
+                            case "AlertState":
+                                if (MonitorQueue.AlertState){SkyServer.AlertState = true;}
+                                break;
+                        }
                     });
             }
             catch (Exception ex)
