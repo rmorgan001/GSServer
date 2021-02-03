@@ -301,64 +301,64 @@
                                 </ComboBox>
                                 <ComboBox IsEnabled="True" md:HintAssist.Hint="{StaticResource optAccentColor}"  ToolTip="{StaticResource optAccentColor}"
                                       ItemsSource="{Binding AccentColors}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
-                                    <ComboBox.SelectedItem>
-                                        <Binding Path="AccentColor" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
-                                    </ComboBox.SelectedItem>
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate DataType="{x:Type mdc:Swatch}">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="20"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <md:PackIcon Grid.Column="0" Kind="CameraIris" Width="20" Height="20" Foreground="{Binding ExemplarHue.Color, Converter={StaticResource ColorToBrush}}"/>
-                                                <TextBlock Grid.Column="1" Margin="10,0,0,0" Text="{Binding Name}" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                    <ComboBox.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <VirtualizingStackPanel />
-                                        </ItemsPanelTemplate>
-                                    </ComboBox.ItemsPanel>
-                                </ComboBox>
+                                <ComboBox.SelectedItem>
+                                    <Binding Path="AccentColor" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                                </ComboBox.SelectedItem>
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type mdc:Swatch}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="20"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <md:PackIcon Grid.Column="0" Kind="CameraIris" Width="20" Height="20" Foreground="{Binding ExemplarHue.Color, Converter={StaticResource ColorToBrush}}"/>
+                                            <TextBlock Grid.Column="1" Margin="10,0,0,0" Text="{Binding Name}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Left" Margin="0,60,0,0">
+                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optPerf}" />
+                            <ComboBox md:HintAssist.Hint="{StaticResource optDisplayInterval}" Width="120" HorizontalAlignment="Left" ToolTip="{StaticResource optDisplayInterval}" ItemsSource="{Binding IntervalList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                                <ComboBox.SelectedItem>
+                                    <Binding Path="DisplayInterval" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </ComboBox.SelectedItem>
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
+                            <StackPanel Orientation="Horizontal" Width="Auto" Margin="0,5,0,0">
+                                <TextBlock Text="{StaticResource optRender}"></TextBlock>
+                                <TextBlock Text="{Binding RenderCapability}" Margin="10,0,0,0"></TextBlock>
                             </StackPanel>
-                            <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Left" Margin="0,60,0,0">
-                                <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optPerf}" />
-                                <ComboBox md:HintAssist.Hint="{StaticResource optDisplayInterval}" Width="120" HorizontalAlignment="Left" ToolTip="{StaticResource optDisplayInterval}" ItemsSource="{Binding IntervalList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
-                                    <ComboBox.SelectedItem>
-                                        <Binding Path="DisplayInterval" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
-                                            <Binding.ValidationRules>
-                                                <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
-                                            </Binding.ValidationRules>
-                                        </Binding>
-                                    </ComboBox.SelectedItem>
-                                    <ComboBox.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <VirtualizingStackPanel />
-                                        </ItemsPanelTemplate>
-                                    </ComboBox.ItemsPanel>
-                                </ComboBox>
-                                <StackPanel Orientation="Horizontal" Width="Auto" Margin="0,5,0,0">
-                                    <TextBlock Text="{StaticResource optRender}"></TextBlock>
-                                    <TextBlock Text="{Binding RenderCapability}" Margin="10,0,0,0"></TextBlock>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Width="Auto" Margin="0,5,0,0">
-                                    <CheckBox Height="25" Width="25" IsChecked="{Binding DisableHardwareAcceleration}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optHardware}" />
-                                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optHardware}" />
-                                </StackPanel>
+                            <StackPanel Orientation="Horizontal" Width="Auto" Margin="0,5,0,0">
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding DisableHardwareAcceleration}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optHardware}" />
+                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optHardware}" />
                             </StackPanel>
-                            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" >
-                                <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optSettings}"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <CheckBox Height="25" Width="25" IsChecked="{Binding ServerSettings}" ToolTip="{StaticResource optServerSettings}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optServerSettings}"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <CheckBox Height="25" Width="25" IsChecked="{Binding SkyTelescopeSettings}" ToolTip="{StaticResource optSkyTelescopeSettings}"  Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optSkyTelescopeSettings}"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" >
+                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optSettings}"/>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding ServerSettings}" ToolTip="{StaticResource optServerSettings}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
+                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optServerSettings}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Height="25" Width="25" IsChecked="{Binding SkyTelescopeSettings}" ToolTip="{StaticResource optSkyTelescopeSettings}"  Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
+                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optSkyTelescopeSettings}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
                                     <CheckBox Height="25" Width="25" IsChecked="{Binding GamePadSettings}" ToolTip="{StaticResource optGamePad}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
                                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optGamePad}"/>
                                 </StackPanel>

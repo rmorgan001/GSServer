@@ -33,9 +33,10 @@ WizardImageFile="WizardImage1.bmp"
 LicenseFile="License.txt"
 ; {cf}\ASCOM\Uninstall\Telescope folder created by Platform, always
 UninstallFilesDir="{cf}\ASCOM\Uninstall\Telescope\GSServer"
-; "C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x86\signtool.exe" sign /f "C:\Users\phil\source\repos\GSServer\Resources\Installer\GreenSwamp.pfx" /p rem /d "GreenSwamp Installer" $f
-DisableWelcomePage=No
-SignTool=Signtool
+;"C:\Program Files (x86)\Windows Kits\10\Tools\bin\i386\signtool.exe" sign /f "C:\Users\Rob\source\repos\GSSolution\Resources\Installer\GreenSwamp.pfx" /p rem /d "GreenSwamp Installer"  $f
+;"C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x86\signtool.exe" sign /f "C:\Users\phil\source\repos\GSServer\Resources\Installer\GreenSwamp.pfx" /p rem /d "GreenSwamp Installer" $f
+;SignTool=Signtool
+DisableWelcomePage=No 
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

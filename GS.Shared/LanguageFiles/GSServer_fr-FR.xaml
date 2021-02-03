@@ -92,7 +92,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="botTipMonitor">Affichage</system:String>
     <system:String x:Key="botTipConnected">Cliquer pour les informations de la monture</system:String>
     <system:String x:Key="botLimitOptions">Options des limites</system:String>
-    <system:String x:Key="botLimitTracking">Arréter le suivi</system:String>
+    <system:String x:Key="botLimitTracking">Arrêter le suivi</system:String>
 
     <!--Hand Controller-->
     <system:String x:Key="hcTipW">W</system:String>
