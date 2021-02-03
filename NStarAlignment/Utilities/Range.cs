@@ -67,21 +67,6 @@ namespace NStarAlignment.Utilities
         }
 
         /// <summary>
-        /// Returns double in the range -90 to 0 to 90 to 180 to 270.
-        /// </summary>
-        /// <param name="d">290.169444444444451</param>
-        /// <returns>-69.830555555555577</returns>
-        public static double Range270(double d)
-        {
-            while ((d >= 270) || (d < -90))
-            {
-                if (d < -90) d += 360.0;
-                if (d >= 270) d -= 360.0;
-            }
-            return d;
-        }
-
-        /// <summary>
         /// Returns double in the range 0 to 360
         /// </summary>
         /// <param name="d">590.169444444444451</param>
@@ -115,61 +100,5 @@ namespace NStarAlignment.Utilities
             return d;
         }
 
-        /// <summary>
-        /// Force range for Altitude and Azimuth
-        /// </summary>
-        ///  <remarks>Attention to the order given and received</remarks>
-        /// <param name="altAz"></param>
-        /// <returns></returns>
-        public static double[] RangeAltAz(double[] altAz)
-        {
-            double[] a = { Range90(altAz[0]), Range360(altAz[1]) };
-            return a;
-        }
-
-        /// <summary>
-        /// Force range for Azimuth an Altitude
-        /// </summary>
-        /// <remarks>Attention to the order given and received</remarks>
-        /// <param name="azAlt"></param>
-        /// <returns></returns>
-        public static double[] RangeAzAlt(double[] azAlt)
-        {
-            double[] aa = { Range360(azAlt[0]), Range90(azAlt[1]) };
-            return aa;
-        }
-
-        /// <summary>
-        /// Force range for Right Ascension and Declination
-        /// </summary>
-        /// <param name="raDec"></param>
-        /// <returns></returns>
-        public static double[] RangeRaDec(double[] raDec)
-        {
-            double[] rd = { Range24(raDec[0]), Range90(raDec[1]) };
-            return rd;
-        }
-
-        /// <summary>
-        /// Force range for primary and secondary axes
-        /// </summary>
-        /// <param name="axes"></param>
-        /// <returns></returns>
-        public static double[] RangeAxesXY(double[] axes)
-        {
-            double[] xy = { Range360(axes[0]), Range270(axes[1]) };
-            return xy;
-        }
-
-        /// <summary>
-        /// Force range for secondary and primary axes
-        /// </summary>
-        /// <param name="axes"></param>
-        /// <returns></returns>
-        public static double[] RangeAxesYX(double[] axes)
-        {
-            double[] xy = { Range270(axes[1]), Range360(axes[0]) };
-            return xy;
-        }
     }
 }

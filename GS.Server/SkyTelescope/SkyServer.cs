@@ -23,7 +23,6 @@ using GS.Shared;
 using GS.Simulator;
 using GS.SkyWatcher;
 using NStarAlignment.Model;
-using NStarAlignment.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -120,10 +119,9 @@ namespace GS.Server.SkyTelescope
                     SkySettings.Elevation,
                     AlignmentSettings.ClearModelOnStartup)
                 {
-                    IsAlignmentOn = AlignmentSettings.IsAlignmentOn,
-                    HomePosition = new AxisPosition(_homeAxes.X, _homeAxes.Y)
+                    IsAlignmentOn = (AlignmentShow && AlignmentSettings.IsAlignmentOn)
                 };
-
+                AlignmentModel.SetHomePosition(_homeAxes.X, _homeAxes.Y);
                 AlignmentModel.Notification += AlignmentModel_Notification;
                 WeakEventManager<AlignmentModel, NotificationEventArgs>.AddHandler(AlignmentModel, "Notification", AlignmentModel_Notification);
 
@@ -1040,7 +1038,7 @@ namespace GS.Server.SkyTelescope
         /// Total steps per 360
         /// </summary>
         public static long[] StepsPerRevolution { get; private set; }
-        private static double[] Steps{ get; set; }
+        private static double[] Steps { get; set; }
 
         /// <summary>
         /// Total worm teeth
@@ -1080,7 +1078,7 @@ namespace GS.Server.SkyTelescope
             get => _canSnapPort2;
             set
             {
-                if (_canSnapPort2 == value){return;}
+                if (_canSnapPort2 == value) { return; }
                 _canSnapPort2 = value;
                 OnStaticPropertyChanged();
             }
@@ -1594,7 +1592,7 @@ namespace GS.Server.SkyTelescope
             var stopwatch = Stopwatch.StartNew();
 
             SkyTasks(MountTaskName.StopAxes);
-            var skyTarget = Axes.AxesAppToMount(target);
+            var skyTarget = GetAdjustedAxesForSlewing(Axes.AxesAppToMount(target), SideOfPierRaDec(TargetRa));
 
             #region First Slew
             // time could be off a bit may need to deal with each axis separate
@@ -1743,8 +1741,7 @@ namespace GS.Server.SkyTelescope
                 if (deltaDegree < gotoPrecision) { break; }
 
                 target[0] += deltaDegree;
-                var deltaTarget = Axes.AxesAppToMount(target);
-
+                var deltaTarget = GetAdjustedAxesForSlewing(Axes.AxesAppToMount(target), SideOfPierRaDec(TargetRa));
                 if (SlewState == SlewType.SlewNone) { break; } //check for a stop
 
                 object _ = new SkyAxisGoToTarget(0, AxisId.Axis1, deltaTarget[0]); //move to new target
@@ -2081,7 +2078,7 @@ namespace GS.Server.SkyTelescope
             Tracking = tracking;
             TrackingSpeak = true;
 
-            if(speak) {Synthesizer.Speak(Application.Current.Resources["vceAbortSlew"].ToString());}
+            if (speak) { Synthesizer.Speak(Application.Current.Resources["vceAbortSlew"].ToString()); }
         }
 
         /// <summary>
@@ -3398,9 +3395,9 @@ namespace GS.Server.SkyTelescope
                     SimTasks(MountTaskName.CanHomeSensor);
                     SimTasks(MountTaskName.GetFactorStep);
 
-                    raWormTeeth = (int) Math.Round(StepsPerRevolution[0] / StepsWormPerRevolution[0],0);
-                    decWormTeeth = (int) Math.Round(StepsPerRevolution[1] / StepsWormPerRevolution[1],0);
-                    WormTeethCount = new[] {raWormTeeth, decWormTeeth};
+                    raWormTeeth = (int)Math.Round(StepsPerRevolution[0] / StepsWormPerRevolution[0], 0);
+                    decWormTeeth = (int)Math.Round(StepsPerRevolution[1] / StepsWormPerRevolution[1], 0);
+                    WormTeethCount = new[] { raWormTeeth, decWormTeeth };
                     PecBinSteps = StepsPerRevolution[0] / (WormTeethCount[0] * 1.0) / PecBinCount;
 
                     // checks if the mount is close enough to home position to set default position. If not use the positions from the mount
@@ -3533,7 +3530,7 @@ namespace GS.Server.SkyTelescope
             MonitorLog.LogToMonitor(monitorItem);
 
             // Update Alignment Model home position
-            AlignmentModel.HomePosition = new AxisPosition(_homeAxes.X, _homeAxes.Y);
+            AlignmentModel.SetHomePosition(_homeAxes.X, _homeAxes.Y);
             return true;
         }
 
@@ -3939,7 +3936,7 @@ namespace GS.Server.SkyTelescope
             }
 
             // don't log if pec is on
-            if (PecOn){return;}
+            if (PecOn) { return; }
 
             var monitorItem = new MonitorEntry
             {
@@ -4008,7 +4005,7 @@ namespace GS.Server.SkyTelescope
         public static void SlewRaDec(double rightAscension, double declination)
         {
             // convert RA/Dec to axis
-            var a = GetAdjustedAxesForSlewing(Axes.RaDecToAxesXY(new[] { rightAscension, declination }));
+            var a = Axes.RaDecToAxesXY(new[] { rightAscension, declination });
 
             _targetAxes = new Vector(a[0], a[1]);
             SlewMount(_targetAxes, SlewType.SlewRaDec);
@@ -4095,7 +4092,9 @@ namespace GS.Server.SkyTelescope
 
             if (target.LengthSquared > 0)
             {
-                var a = GetAdjustedAxesForSlewing(new double[]{ target.X, target.Y });
+                var targetAxes = new double[] { target.X, target.Y };
+                var raDec = Axes.AxesXYToRaDec(targetAxes);
+                var a = GetAdjustedAxesForSlewing(targetAxes, SideOfPierRaDec(raDec[0]));
                 SlewMount(new Vector(a[0], a[1]), SlewType.SlewAltAz);
             }
         }
@@ -4257,17 +4256,31 @@ namespace GS.Server.SkyTelescope
             {
                 case MountType.Simulator:
                     SimTasks(MountTaskName.StopAxes);
-                    SimTasks(MountTaskName.SyncTarget);
+                    if (AlignmentModel.IsAlignmentOn)
+                    {
+                        AddAlignmentPoint();
+                    }
+                    else
+                    {
+                        SimTasks(MountTaskName.SyncTarget);
+                    }
                     break;
                 case MountType.SkyWatcher:
                     SkyTasks(MountTaskName.StopAxes);
-                    SkyTasks(MountTaskName.SyncTarget);
+                    if (AlignmentModel.IsAlignmentOn)
+                    {
+                        AddAlignmentPoint();
+                    }
+                    else
+                    {
+                        SkyTasks(MountTaskName.SyncTarget);
+                    }
+
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            AddAlignmentPoint();
 
             if (trackingstate)
             {
@@ -4279,14 +4292,34 @@ namespace GS.Server.SkyTelescope
         }
 
         #region Alignment ...
+        private static bool _alignmentShow;
+        /// <summary>
+        /// sets up bool to load a test tab
+        /// </summary>
+        public static bool AlignmentShow
+        {
+            get => _alignmentShow;
+            set
+            {
+                _alignmentShow = value;
+                if (_alignmentShow && AlignmentSettings.IsAlignmentOn)
+                {
+                    AlignmentModel.IsAlignmentOn = true;
+                }
+                OnStaticPropertyChanged();
+            }
+        }
+
+
         private static void AlignmentModel_Notification(object sender, NotificationEventArgs e)
         {
+            // Luckily the NotificationType enum and mimics MonitorType enum.
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Alignment,
-                Type = MonitorType.Data,
+                Type = (MonitorType)e.NotificationType,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = e.Message
@@ -4296,27 +4329,22 @@ namespace GS.Server.SkyTelescope
 
         private static void AddAlignmentPoint()
         {
-            DateTime utcNow = HiResDateTime.UtcNow;
-            double lstNow = GetLocalSiderealTime(utcNow);
-            // Get current axis position (but with alignment modeling off
-            double[] rawPosition = GetRawDegrees();
-            if (rawPosition == null) { return; }
-            if (double.IsNaN(rawPosition[0]) || double.IsNaN(rawPosition[1])) { return; }
-
-
-            // Get calculate axis position for targetRA and TargetDec
-            double[] calculatedAxes = Axes.RaDecToAxesXY(new[] {SkyServer.TargetRa, SkyServer.TargetDec, lstNow});
-            // Check if the calculated Axes is way off (as in from the alternative position)
-            if (Axes.IsFlipRequired(calculatedAxes, lstNow))
-            {
-                calculatedAxes = Axes.GetAltAxisPosition(calculatedAxes);
-            }
+            // The mount axis and alt az are are the mount things it should be pointing based on the target RA and Dec
+            // The sky axis and alt az are the positions last determined from GetRawDegrees in the UpdateUIEvent.
+            double[] target = Axes.RaDecToAxesXY(new[] { SkyServer.TargetRa, SkyServer.TargetDec, SiderealTime });
+            var mountAxes = Axes.AxesAppToMount(target);
+            var mountAzAlt = Axes.AxesXYToAzAlt(target);
+            var mountAltAz = new[] { mountAzAlt[1], mountAzAlt[0] };
+            double[] observedAxes = new double[] { ActualAxisX, ActualAxisY };
+            double[] observedAltAz = new double[] { Altitude, Azimuth };
 
             AlignmentModel.AddAlignmentPoint(
-                new double[] { SkyServer.TargetRa, SkyServer.TargetDec },
-                calculatedAxes,
-                rawPosition,
-                new TimeRecord(utcNow, lstNow));
+                mountAltAz,
+                observedAltAz,
+                mountAxes,
+                observedAxes,
+                (int)SideOfPier,
+                DateTime.Now);
 
             var monitorItem = new MonitorEntry
             {
@@ -4326,7 +4354,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"Alignment point added: { _util.HoursToHMS(SkyServer.TargetRa, ":", ":", ":", 2) }/{ _util.DegreesToDMS(SkyServer.TargetDec, "° ", ":", "", 2) }, ({calculatedAxes[0]}, {calculatedAxes[1]}), ({rawPosition[0]}, {rawPosition[1]}), {utcNow:O}, {lstNow}"
+                Message = $"Alignment point added: Mount axis = {mountAxes[0]}/{mountAxes[1]}, observed axis = {observedAxes[0]}/{observedAxes[1]}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -4337,12 +4365,12 @@ namespace GS.Server.SkyTelescope
         /// used to get the axis positions to slew to.
         /// </summary>
         /// <param name="calculatedAxes">Calculated axis positions</param>
+        /// <param name="pierSide"></param>
         /// <returns>Adjusted axis positions</returns>
-        private static double[] GetAdjustedAxesForSlewing(double[] calculatedAxes)
+        private static double[] GetAdjustedAxesForSlewing(double[] calculatedAxes, PierSide pierSide)
         {
-            DateTime utcNow = HiResDateTime.UtcNow;
             // Apply alignment adjustment.
-            var alignedAxes = AlignmentModel.GetMountAxes(calculatedAxes, new TimeRecord(utcNow, GetLocalSiderealTime(utcNow)));
+            var alignedAxes = AlignmentModel.GetObservedAxes(calculatedAxes, (int)pierSide);
             if (!AlignmentModel.IsAlignmentOn) return alignedAxes;
             var monitorItem = new MonitorEntry
             {
@@ -4367,8 +4395,7 @@ namespace GS.Server.SkyTelescope
         /// <returns></returns>
         private static double[] GetAdjustAxesForReporting(double[] actualAxes)
         {
-            DateTime utcNow = HiResDateTime.UtcNow;
-            var calculatedAxes = AlignmentModel.GetSkyAxes(actualAxes,  new TimeRecord(utcNow, GetLocalSiderealTime(utcNow)));
+            var calculatedAxes = AlignmentModel.GetMountAxes(actualAxes, (int)SideOfPier);
             if (AlignmentModel.IsAlignmentOn)
             {
                 var monitorItem = new MonitorEntry
@@ -4398,12 +4425,12 @@ namespace GS.Server.SkyTelescope
         /// <returns>False is out of limit</returns>
         public static bool CheckRaDecSyncLimit(double ra, double dec)
         {
-            if (!SkySettings.SyncLimitOn){return true;}
-            if (SkySettings.NoSyncPastMeridian){return false;} // add more checks later if needed
+            if (!SkySettings.SyncLimitOn) { return true; }
+            if (SkySettings.NoSyncPastMeridian) { return false; } // add more checks later if needed
 
             //convert ra dec to mount positions
-            var xy = GetAdjustedAxesForSlewing(Axes.RaDecToAxesXY(new[] { ra, dec }));
-            var target = Axes.AxesAppToMount(xy);
+            var xy = Axes.RaDecToAxesXY(new[] { ra, dec });
+            var target = GetAdjustedAxesForSlewing(Axes.AxesAppToMount(xy), SideOfPierRaDec(ra));
 
             //convert current position to mount position
             var current = Axes.AxesMountToApp(new[] { _mountAxisX, _mountAxisY });
@@ -4489,10 +4516,10 @@ namespace GS.Server.SkyTelescope
             CanSnapPort1 = false;
             CanSnapPort2 = false;
 
-            FactorStep = new[] {0.0, 0.0};
+            FactorStep = new[] { 0.0, 0.0 };
             StepsPerRevolution = new long[] { 12960000, 12960000 };
-            WormTeethCount = new[]{ 180, 180 };
-            StepsWormPerRevolution = new[] { StepsPerRevolution[0] / (double) WormTeethCount[0], StepsPerRevolution[1] / (double)WormTeethCount[1] };
+            WormTeethCount = new[] { 180, 180 };
+            StepsWormPerRevolution = new[] { StepsPerRevolution[0] / (double)WormTeethCount[0], StepsPerRevolution[1] / (double)WormTeethCount[1] };
             SlewSettleTime = 0;
 
             //Pec
@@ -4671,7 +4698,7 @@ namespace GS.Server.SkyTelescope
                 var radec = Axes.AxesXYToRaDec(axes);
                 RightAscension = radec[0];
                 Declination = radec[1];
-
+                
                 Lha = Coordinate.Ra2Ha12(RightAscensionXForm, SiderealTime);
 
                 // Track slewing state
@@ -4839,7 +4866,7 @@ namespace GS.Server.SkyTelescope
             get => _pecBinNow;
             private set
             {
-                if (Equals(_pecBinNow, value)){return;}
+                if (Equals(_pecBinNow, value)) { return; }
                 _pecBinNow = value;
                 OnStaticPropertyChanged();
             }
@@ -4924,13 +4951,13 @@ namespace GS.Server.SkyTelescope
                         newBinNo %= 100;
                         // No bin change return
                         if (PecBinNow?.Item1 == newBinNo) return;
-                        if (PecWormMaster == null || PecWormMaster?.Count == 0) {return;}
+                        if (PecWormMaster == null || PecWormMaster?.Count == 0) { return; }
                         PecWormMaster.TryGetValue(newBinNo, out pecBin);
                         break;
                     case PecMode.Pec360:
                         // No bin change return
                         if (PecBinNow?.Item1 == newBinNo) return;
-                        if (Pec360Master == null || Pec360Master?.Count == 0) {return;}
+                        if (Pec360Master == null || Pec360Master?.Count == 0) { return; }
                         if (PecBinsSubs == null) { PecBinsSubs = new SortedList<int, Tuple<double, int>>(); }
                         var count = 0;
                         // search subs for new bin
@@ -4938,7 +4965,7 @@ namespace GS.Server.SkyTelescope
                         {
                             // stay within limits
                             var binStart = newBinNo - 100 < 0 ? 0 : newBinNo - 100;
-                            var binEnd = newBinNo + 100 > StepsPerRevolution[0] -1  //adjust for going over max?
+                            var binEnd = newBinNo + 100 > StepsPerRevolution[0] - 1  //adjust for going over max?
                                 ? (int)StepsPerRevolution[0] - 1
                                 : newBinNo + 100;
 
@@ -4962,7 +4989,7 @@ namespace GS.Server.SkyTelescope
                 }
 
                 // bin must exist or throw error
-                if (pecBin == null){throw new Exception($"Pec not found");}
+                if (pecBin == null) { throw new Exception($"Pec not found"); }
 
                 var binNew = new Tuple<int, double, int>(newBinNo, pecBin.Item1, pecBin.Item2);
 

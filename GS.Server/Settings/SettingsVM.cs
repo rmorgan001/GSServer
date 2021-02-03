@@ -113,6 +113,7 @@ namespace GS.Server.Settings
                     CurrentVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
                     Settings.SkyWatcher = true;
                     PecShow = SkyServer.PecShow;
+                    AlignmentShow = SkyServer.AlignmentShow;
 
                 }
             }
@@ -252,6 +253,21 @@ namespace GS.Server.Settings
             {
                 if (_pecShow == value) { return; }
                 _pecShow = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private static bool _alignmentShow;
+        /// <summary>
+        /// sets up bool to load a test tab
+        /// </summary>
+        public bool AlignmentShow
+        {
+            get => _alignmentShow;
+            set
+            {
+                if (_alignmentShow == value) { return; }
+                _alignmentShow = value;
                 OnPropertyChanged();
             }
         }

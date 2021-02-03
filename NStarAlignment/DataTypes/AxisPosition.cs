@@ -65,8 +65,8 @@ namespace NStarAlignment.DataTypes
         /// <param name="dec">Dec axis angle in degrees</param>
         public AxisPosition(double ra, double dec)
         {
-                _raAxis = Angle.Range360(ra);
-                _decAxis = Angle.Range360(dec);
+                _raAxis = ra;
+                _decAxis = dec;
         }
 
 
@@ -75,8 +75,8 @@ namespace NStarAlignment.DataTypes
             var positions = axisPositions.Split(',');
             try
             {
-                _raAxis = Angle.Range360(double.Parse(positions[0]));
-                _decAxis = Angle.Range360(double.Parse(positions[1]));
+                _raAxis = double.Parse(positions[0]);
+                _decAxis = double.Parse(positions[1]);
             }
             catch
             {

@@ -49,25 +49,25 @@ namespace NStarAlignment.Utilities
         /// <summary>
         /// Radians per degree
         /// </summary>
-        private const double DEG_RAD = 0.0174532925;           // Radians per degree
+        private const double DegRad = 0.0174532925;           // Radians per degree
         /// <summary>
         /// Degrees per radian
         /// </summary>
-        private const double RAD_DEG = 57.2957795;             // Degrees per Radian
+        private const double RadDeg = 57.2957795;             // Degrees per Radian
 
         /// <summary>
         /// Radians per hour
         /// </summary>
-        private const double HRS_RAD = 0.2617993881;           // Radians per hour
+        private const double HrsRad = 0.2617993881;           // Radians per hour
 
         #region Unit convertsions ...
 
-        public static double DegToRad(double degrees) { return (degrees * DEG_RAD); }
-        public static double HrsToRad(double hours) { return (hours * HRS_RAD); }
+        public static double DegToRad(double degrees) { return (degrees * DegRad); }
+        public static double HrsToRad(double hours) { return (hours * HrsRad); }
 
-        public static double RadToHrs(double radians) { return (radians / HRS_RAD); }
+        public static double RadToHrs(double radians) { return (radians / HrsRad); }
 
-        public static double RadToDeg(double rad) { return (rad * RAD_DEG); }
+        public static double RadToDeg(double rad) { return (rad * RadDeg); }
 
         #endregion
 

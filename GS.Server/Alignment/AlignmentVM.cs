@@ -370,12 +370,6 @@ namespace GS.Server.Alignment
                 _skyTelescopeVM?.Dispose();
             }
 
-            // free native resources if there are any.
-            //if (nativeResource != IntPtr.Zero)
-            //{
-            //    Marshal.FreeHGlobal(nativeResource);
-            //    nativeResource = IntPtr.Zero;
-            //}
         }
 
         #endregion

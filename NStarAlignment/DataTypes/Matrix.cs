@@ -70,13 +70,7 @@ namespace NStarAlignment.DataTypes
             set => _element[i] = value;
         }
 
-        public int Length
-        {
-            get
-            {
-                return _element.GetLength(0);
-            }
-        }
+        public int Length => _element.GetLength(0);
 
         public static Matrix operator *(Matrix matrix1, Matrix matrix2)
         {
@@ -128,7 +122,7 @@ namespace NStarAlignment.DataTypes
             int w = this.Length;
             int h = this[0].Length;
 
-            Matrix result = Matrix.CreateInstance(w, h);
+            Matrix result = Matrix.CreateInstance(h, w);
 
             for (int i = 0; i < w; i++)
             {
@@ -262,7 +256,7 @@ namespace NStarAlignment.DataTypes
         static Matrix MatrixDecompose(Matrix matrix, out int[] perm, out int toggle)
         {
             // Doolittle LUP decomposition with partial pivoting.
-            // rerturns: result is L (with 1s on diagonal) and U;
+            // returns: result is L (with 1s on diagonal) and U;
             // perm holds row permutations; toggle is +1 or -1 (even or odd)
             int rows = matrix.Length;
             int cols = matrix[0].Length; // assume square
@@ -397,9 +391,7 @@ namespace NStarAlignment.DataTypes
 
         private double MatrixDeterminant(Matrix matrix)
         {
-            int[] perm;
-            int toggle;
-            Matrix lum = MatrixDecompose(matrix, out perm, out toggle);
+            Matrix lum = MatrixDecompose(matrix, out _, out var toggle);
             if (lum == null)
                 throw new Exception("Unable to compute MatrixDeterminant");
             double result = toggle;
@@ -441,15 +433,13 @@ namespace NStarAlignment.DataTypes
 
         // --------------------------------------------------
 
-        static double[] SystemSolve(Matrix A, double[] b)
+        static double[] SystemSolve(Matrix a, double[] b)
         {
             // Solve Ax = b
-            int n = A.Length;
+            int n = a.Length;
 
             // 1. decompose A
-            Matrix luMatrix = MatrixDecompose(A, out var perm, out _);
-            if (luMatrix == null)
-                return null;
+            Matrix luMatrix = MatrixDecompose(a, out var perm, out _);
 
             // 2. permute b according to perm[] into bp
             double[] bp = new double[b.Length];

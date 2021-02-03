@@ -634,6 +634,9 @@ namespace GS.Server
                     case @"/pec":
                         SkyServer.PecShow = true;
                         break;
+                    case @"/showalignment":
+                        SkyServer.AlignmentShow = true;
+                        break;
                     case @"/en":
                         Shared.Settings.Language = "en-US";
                         break;

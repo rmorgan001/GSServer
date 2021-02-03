@@ -51,14 +51,6 @@ namespace NStarAlignment.DataTypes
 
         public double Y { get; set; }
 
-        public double Z { get; set; }
-
-        public double R { get; set; }
-
-        public double Ra { get; set; }
-
-        public bool Flag { get; set; }
-
         /// <summary>
         /// Equivalent AltAz quadrant.
         /// </summary>
@@ -68,38 +60,34 @@ namespace NStarAlignment.DataTypes
             {
                 if (X >= 0)
                 {
-                    return Y >= 0 ? Quadrant.Sw : Quadrant.Se;
+                    return Y >= 0 ? Quadrant.Se : Quadrant.Ne;
                 }
                 else
                 {
-                    return Y < 0 ? Quadrant.Ne : Quadrant.Nw;
+                    return Y < 0 ? Quadrant.Nw : Quadrant.Sw;
                 }
             }
         }
 
-        public CarteseanCoordinate(double x, double y, double z)
+        public CarteseanCoordinate(double x, double y)
         {
             X = x;
             Y = y;
-            Z = z;
-            R = 0.0;
-            Ra = 0.0;
-            Flag = false;
         }
 
         public double this[int index]
         {
             get
             {
-                if (index < 0 || index > 2)
+                if (index < 0 || index > 1)
                 {
                     throw new ArgumentOutOfRangeException();
                 }
-                return (index == 0 ? X : (index == 1 ? Y : Z));
+                return (index == 0 ? X : Y);
             }
             set
             {
-                if (index < 0 || index > 2)
+                if (index < 0 || index > 1)
                 {
                     throw new ArgumentOutOfRangeException();
                 }
@@ -107,14 +95,9 @@ namespace NStarAlignment.DataTypes
                 {
                     X = value;
                 }
-                else switch (index)
+                else
                 {
-                    case 1:
-                        Y = value;
-                        break;
-                    default:
-                        Z = value;
-                        break;
+                    Y = value;
                 }
             }
         }
@@ -126,7 +109,7 @@ namespace NStarAlignment.DataTypes
         /// </summary>
         public static bool operator ==(CarteseanCoordinate pos1, CarteseanCoordinate pos2)
         {
-            return (pos1.X == pos2.X && pos1.Y == pos2.Y && pos1.Z == pos2.Z && pos1.R == pos2.R && pos1.Ra == pos2.Ra && pos1.Flag == pos2.Flag);
+            return pos1.X == pos2.X && pos1.Y == pos2.Y;
         }
 
         public static bool operator !=(CarteseanCoordinate pos1, CarteseanCoordinate pos2)
@@ -142,11 +125,10 @@ namespace NStarAlignment.DataTypes
                 // Suitable nullity checks etc, of course :)
                 hash = hash * 23 + X.GetHashCode();
                 hash = hash * 23 + Y.GetHashCode();
-                hash = hash * 23 + Z.GetHashCode();
                 return hash;
             }
         }
-        
+
         public override bool Equals(object obj)
         {
             return (obj is CarteseanCoordinate coordinate
@@ -155,21 +137,21 @@ namespace NStarAlignment.DataTypes
 
         public static CarteseanCoordinate operator -(CarteseanCoordinate pos1, CarteseanCoordinate pos2)
         {
-            return new CarteseanCoordinate(pos1.X - pos2.X, pos1.Y - pos2.Y, pos1.Z - pos2.Z);
+            return new CarteseanCoordinate(pos1.X - pos2.X, pos1.Y - pos2.Y);
         }
 
         public static CarteseanCoordinate operator +(CarteseanCoordinate pos1, CarteseanCoordinate pos2)
         {
-            return new CarteseanCoordinate(pos1.X + pos2.X, pos1.Y + pos2.Y, pos1.Z + pos2.Z);
+            return new CarteseanCoordinate(pos1.X + pos2.X, pos1.Y + pos2.Y);
         }
 
         public override string ToString()
         {
-            return $"({X}, {Y}, {Z})";
+            return $"({X}, {Y})";
         }
         #endregion
 
-        
+
     }
 
 }

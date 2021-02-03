@@ -49,7 +49,7 @@ namespace NStarAlignment.DataTypes
         private int _degrees;
         private int _minutes;
         private double _seconds;
-        private const double DEFAULT_DEGREES_DELTA = 0.000001D;    /* In decimal degrees */
+        private const double DefaultDegreesDelta = 0.000001D;    /* In decimal degrees */
 
         public Angle(double angle, bool radians = false)
         {
@@ -143,10 +143,10 @@ namespace NStarAlignment.DataTypes
         public static bool operator ==(Angle angle1, Angle angle2)
         {
             /* Just in case of rounding errors... */
-            return (Math.Abs(angle1._value - angle2._value) <= Angle.DEFAULT_DEGREES_DELTA
+            return (Math.Abs(angle1._value - angle2._value) <= Angle.DefaultDegreesDelta
                     || (angle1._degrees == angle2._degrees
                         && angle1._minutes == angle2._minutes
-                        && Math.Abs(angle1._seconds - angle2._seconds) <= (Angle.DEFAULT_DEGREES_DELTA * 3600D)));
+                        && Math.Abs(angle1._seconds - angle2._seconds) <= (Angle.DefaultDegreesDelta * 3600D)));
         }
 
         public static bool operator !=(Angle angle1, Angle angle2)
@@ -218,13 +218,6 @@ namespace NStarAlignment.DataTypes
             return degrees / (180.0 / Math.PI);
         }
 
-        public static bool AreSameDegrees(double a1, double a2, double tolerance = 0)
-        {
-            double cosa1 = Math.Cos(Angle.DegreesToRadians(a1));
-            double cosa2 = Math.Cos(Angle.DegreesToRadians(a2));
-            return Math.Abs(cosa2 - cosa1) <= tolerance;
-        }
-
         private void SetDmsFromDegrees(double angle)
         {
             _degrees = (int)Truncate(angle);
@@ -285,19 +278,6 @@ namespace NStarAlignment.DataTypes
         public static double Truncate(double value)
         {
             return Math.Truncate(value);
-        }
-
-        /// <summary>
-        /// Converts an angle to the range 0.0 to 360.0 degrees
-        /// </summary>
-        public static double Range360(double ang)
-        {
-            ang = ang % 360.0;
-            while (ang < 0.0)
-            {
-                ang = ang + 360.0;
-            }
-            return ang;
         }
     }
 }

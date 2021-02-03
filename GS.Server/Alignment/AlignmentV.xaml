@@ -86,6 +86,18 @@
                             <Setter Property="HorizontalContentAlignment" Value="Right"/>
                         </Style>
                     </DataGrid.Resources>
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow" BasedOn="{StaticResource MaterialDesignDataGridRow}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Selected}" Value="true">
+                                    <Setter Property="FontWeight" Value="ExtraBold"></Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Selected}" Value="false">
+                                    <Setter Property="FontWeight" Value="Normal"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.RowStyle>
                     <DataGrid.Columns>
                         <!-- Ordinal formatting left in for reference -->
                         <!--<DataGridTemplateColumn Header="#" CellTemplate="{StaticResource OrdinalColumnDataTemplate}" HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>-->
@@ -93,11 +105,7 @@
                         <DataGridTextColumn Header="Altitude" Binding="{Binding AltAz[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Azimuth" Binding="{Binding AltAz[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Mount RA/Dec Axes" Binding="{Binding MountAxes}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Mount X" Binding="{Binding MountXY.X, StringFormat='{}{0:F2}'}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Mount Y" Binding="{Binding MountXY.Y, StringFormat='{}{0:F2}'}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Sky RA/Dec Axis" Binding="{Binding SkyAxes}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Sky X" Binding="{Binding SkyXY.X, StringFormat='{}{0:F2}'}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Sky Y" Binding="{Binding SkyXY.Y, StringFormat='{}{0:F2}'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Observed RA/Dec Axis" Binding="{Binding ObservedAxes}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Correction" Binding="{Binding Correction}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Synched" Binding="{Binding Synched}" IsReadOnly="True" />
                     </DataGrid.Columns>
