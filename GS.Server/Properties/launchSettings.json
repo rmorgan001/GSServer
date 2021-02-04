@@ -1,7 +1,8 @@
 {
   "profiles": {
     "GS.Server": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "/showalignment"
     }
   }
 }

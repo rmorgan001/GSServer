@@ -836,14 +836,14 @@ namespace ASCOM.GS.Sky.Telescope
                 return;
             }
             SkyServer.GoToPark();
-            while (SkyServer.SlewState == SlewType.SlewPark)
-            {
-                Thread.Sleep(1);
-                DoEvents();
-            }
+            //while (SkyServer.SlewState == SlewType.SlewPark)
+            //{
+            //    Thread.Sleep(1);
+            //    DoEvents();
+            //}
 
             monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Parked" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Parking" };
             MonitorLog.LogToMonitor(monitorItem);
 
         }
