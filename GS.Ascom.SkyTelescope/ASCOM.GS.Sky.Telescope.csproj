@@ -94,17 +94,11 @@
     <PackageReference Include="StrongNamer" Version="0.2.5" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GS.Principle\GS.Principles.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\GS.Server\GS.Server.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\GS.Shared\GS.Shared.csproj">
-      <Private>false</Private>
-    </ProjectReference>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Properties\" />
+    <ProjectReference Include="..\GS.Principle\GS.Principles.csproj" />
+    <ProjectReference Include="..\GS.Server\GS.Server.csproj" />
+    <ProjectReference Include="..\GS.Shared\GS.Shared.csproj" />
   </ItemGroup>
 </Project>

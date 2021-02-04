@@ -328,42 +328,42 @@
                      
                     <StackPanel Grid.Row="3" Grid.Column="0" Grid.RowSpan="6" Orientation="Vertical">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,15,0,0">
-                            <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyRefraction}"
-                                          IsChecked="{Binding Refraction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyRefraction}"/>
-                        </StackPanel>
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyRefraction}"
+                                      IsChecked="{Binding Refraction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyRefraction}"/>
+                    </StackPanel>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,15,0,0">
-                            <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}"  HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyEncoders}"
-                                          IsChecked="{Binding EncodersOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyEncoders}"/>
-                        </StackPanel>
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}"  HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyEncoders}"
+                                      IsChecked="{Binding EncodersOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyEncoders}"/>
+                    </StackPanel>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,15,0,0">
-                            <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyAltPpEC}"
-                                          IsChecked="{Binding AlternatingPPec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyAltPpEC}"/>
-                        </StackPanel>
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyAltPpEC}"
+                                      IsChecked="{Binding AlternatingPPec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyAltPpEC}"/>
+                    </StackPanel>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,15,0,0">
-                            <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyGoToDecPulse}"
-                                          IsChecked="{Binding DecPulseToGoTo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyGoToDecPulse}"/>
-                        </StackPanel>
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyGoToDecPulse}"
+                                      IsChecked="{Binding DecPulseToGoTo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyGoToDecPulse}"/>
+                    </StackPanel>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,15,0,0">
-                            <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyFullCurrent}"
-                                          IsChecked="{Binding FullCurrent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyFullCurrent}"/>
-                        </StackPanel>
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyFullCurrent}"
+                                      IsChecked="{Binding FullCurrent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyFullCurrent}"/>
+                    </StackPanel>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,15,0,0">
-                            <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyDiagnostics}"
-                                          IsChecked="{Binding DebugVisibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyDiagnostics}"/>
-                        </StackPanel>
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyDiagnostics}"
+                                      IsChecked="{Binding DebugVisibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyDiagnostics}"/>
+                    </StackPanel>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,15,0,0">
                                     <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skySyncLimitOn}" IsChecked="{Binding SyncLimitOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                     <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skySyncLimitOn}" />
                         </StackPanel>
                             </StackPanel>
 
-                        <Border Margin="0,0,4,0" Grid.Row="8" Grid.Column="3" Grid.ColumnSpan="2" BorderThickness="3" BorderBrush="DimGray" CornerRadius="5"
+                    <Border Margin="0,0,4,0" Grid.Row="8" Grid.Column="3" Grid.ColumnSpan="2" BorderThickness="3" BorderBrush="DimGray" CornerRadius="5"
                             Background="{StaticResource MaterialDesignToolBarBackground}">
                             <StackPanel Orientation="Horizontal" >
                             <ComboBox md:HintAssist.Hint="{StaticResource btnTipParkPos}" Margin="15,0,0,0" ToolTip="{StaticResource btnTipParkPos}" Width="125"

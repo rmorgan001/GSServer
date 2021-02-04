@@ -1,0 +1,119 @@
+﻿<UserControl x:Class="GS.Server.Alignment.AlignmentV"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:enums="clr-namespace:GS.Shared;assembly=GS.Shared"
+             xmlns:nstar="clr-namespace:NStarAlignment.Model;assembly=NStarAlignment"
+             xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
+             xmlns:alignment="clr-namespace:GS.Server.Alignment"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance alignment:AlignmentVM}">
+    <!-- Ordinal formatting left in for reference -->
+    <!--<UserControl.Resources>
+        <domain:OrdinalConverter x:Key="OrdinalConverter" />
+        <DataTemplate x:Key="OrdinalColumnDataTemplate">
+            <TextBlock Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGridRow},
+            Converter={StaticResource ResourceKey=OrdinalConverter}}" HorizontalAlignment="Right" />
+        </DataTemplate>
+    </UserControl.Resources>-->
+    <Grid MinWidth="600">
+        <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Center" CloseOnClickAway="True"
+                      IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
+
+        <md:DrawerHost HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0" 
+                       IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" 
+                       BorderBrush="{StaticResource MaterialDesignDivider}">
+            <md:DrawerHost.LeftDrawerContent>
+                <Grid Width="350">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" Content="{StaticResource aliAlignmentSettings}"/>
+                    <ToggleButton Grid.Row="0"  HorizontalAlignment="Right" Margin="5" ToolTip="{StaticResource aliCloseTooltip}"
+                                  Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
+                                  Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
+                                  CommandParameter="{x:Static Dock.Left}"
+                                  IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"/>
+                    <TextBox Grid.Row="1" Margin="20,0,5,20" md:HintAssist.Hint="{StaticResource optProximityLimit}" Width="120" HorizontalAlignment="Left" ToolTip="{StaticResource aliProximityLimitTooltip}" 
+                             Text="{Binding ProximityLimit}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" domain:TextBoxMaskBehaviour.Mask="Decimal" />
+                    <TextBox Grid.Row="2" Margin="20,0,5,20" md:HintAssist.Hint="{StaticResource optNearbyLimit}" Width="120" HorizontalAlignment="Left" ToolTip="{StaticResource aliNearbyLimitTooltip}" 
+                             Text="{Binding NearbyLimit}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" domain:TextBoxMaskBehaviour.Mask="Decimal"/>
+                    <TextBox Grid.Row="3" Margin="20,0,5,20" md:HintAssist.Hint="{StaticResource optSampleSize}" Width="120" HorizontalAlignment="Left" ToolTip="{StaticResource aliSampleSizeTooltip}" 
+                             Text="{Binding SampleSize}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" domain:TextBoxMaskBehaviour.Mask="Integer"/>
+                    <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="20,0,5,20">
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource aliClearModelOnStartupTooltip}"
+                                      IsChecked="{Binding ClearModelOnStartup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource aliClearModelOnStartup}"/>
+                    </StackPanel>
+
+                </Grid>
+            </md:DrawerHost.LeftDrawerContent>
+            <Grid Margin="5,5" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+                    <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False" x:Name="MenuToggleButton" ToolTip="{StaticResource aliOpenTooltip}" 
+                                  Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" IsHitTestVisible="True" 
+                                  Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
+                    <ToggleButton Margin="10 0" Style="{StaticResource MaterialDesignActionLightToggleButton}"
+                                  HorizontalAlignment="Center" Width="25" Height="25"  IsHitTestVisible="True"
+                                  IsChecked="{Binding IsAlignmentOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip="{StaticResource aliAlignmentOnTooltip}"/>
+                    <Label  VerticalAlignment="Center" Content="{StaticResource aliAlignmentOn}"/>
+                    <Button Margin="15,0,0,0" Height="30" 
+                            ToolTip="{StaticResource aliClearAllTooltip}"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClearAllPointsCommand}"
+                            Content="{StaticResource aliClearAll}"/>
+                    <Button Margin="10,0,0,0" Height="30" 
+                            ToolTip="{StaticResource aliDeleteTooltip}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding DeleteSelectedPointCommand}"
+                            Content="{StaticResource aliDelete}"/>
+                </StackPanel>
+                <DataGrid Grid.Row="1" 
+                          ItemsSource="{Binding AlignmentPoints}" 
+                          SelectedItem="{Binding DataContext.SelectedAlignmentPoint, RelativeSource={RelativeSource AncestorType=alignment:AlignmentV}}"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          AutoGenerateColumns="False"
+                          >
+                    <DataGrid.Resources>
+                        <Style x:Key="RightAlignedGridHeaderStyle" TargetType="DataGridColumnHeader" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                            <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                        </Style>
+                    </DataGrid.Resources>
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow" BasedOn="{StaticResource MaterialDesignDataGridRow}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Selected}" Value="true">
+                                    <Setter Property="FontWeight" Value="ExtraBold"></Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Selected}" Value="false">
+                                    <Setter Property="FontWeight" Value="Normal"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.RowStyle>
+                    <DataGrid.Columns>
+                        <!-- Ordinal formatting left in for reference -->
+                        <!--<DataGridTemplateColumn Header="#" CellTemplate="{StaticResource OrdinalColumnDataTemplate}" HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>-->
+                        <DataGridTextColumn Header="###" Binding="{Binding Id, StringFormat='{}{0:D3}'}"  HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Altitude" Binding="{Binding AltAz[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Azimuth" Binding="{Binding AltAz[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Mount RA/Dec Axes" Binding="{Binding MountAxes}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Observed RA/Dec Axis" Binding="{Binding ObservedAxes}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Correction" Binding="{Binding Correction}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Synched" Binding="{Binding Synched}" IsReadOnly="True" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+            </Grid>
+        </md:DrawerHost>
+        <Grid >
+        </Grid>
+    </Grid>
+</UserControl>

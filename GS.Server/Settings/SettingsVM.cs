@@ -113,6 +113,7 @@ namespace GS.Server.Settings
                     CurrentVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
                     Settings.SkyWatcher = true;
                     PecShow = SkyServer.PecShow;
+                    AlignmentShow = SkyServer.AlignmentShow;
 
                 }
             }
@@ -256,6 +257,21 @@ namespace GS.Server.Settings
             }
         }
 
+        private static bool _alignmentShow;
+        /// <summary>
+        /// sets up bool to load a test tab
+        /// </summary>
+        public bool AlignmentShow
+        {
+            get => _alignmentShow;
+            set
+            {
+                if (_alignmentShow == value) { return; }
+                _alignmentShow = value;
+                OnPropertyChanged();
+            }
+        }
+
         public bool SkyWatcher
         {
             get => Settings.SkyWatcher;
@@ -392,6 +408,17 @@ namespace GS.Server.Settings
             {
                 Settings.Pulses = value;
                 _mainWindowVm.UpdateTabViewModel("Pulses");
+                OnPropertyChanged();
+            }
+        }
+
+        public bool AlignmentTabVisible
+        {
+            get => Settings.AlignmentTabVisible;
+            set
+            {
+                Settings.AlignmentTabVisible = value;
+                _mainWindowVm.UpdateTabViewModel("Alignment");
                 OnPropertyChanged();
             }
         }
@@ -1194,6 +1221,12 @@ namespace GS.Server.Settings
         {
             get => MonitorLog.InCategory(MonitorCategory.Mount);
             set => MonitorLog.CategoriesToMonitor(MonitorCategory.Mount, value);
+        }
+
+        public bool Alignment
+        {
+            get => MonitorLog.InCategory(MonitorCategory.Alignment);
+            set => MonitorLog.CategoriesToMonitor(MonitorCategory.Alignment, value);
         }
 
         public bool Information

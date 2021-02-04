@@ -38,6 +38,7 @@ using System.Windows.Media;
 using GS.Shared.Command;
 using GS.Server.Pec;
 using GS.Server.Snap;
+using GS.Server.Alignment;
 using MaterialDesignColors;
 
 namespace GS.Server.Main
@@ -59,6 +60,7 @@ namespace GS.Server.Main
         private PulsesVM _pulsesVM;
         private PecVM _pecVM;
         private SnapVM _snapVM;
+        private AlignmentVM _alignmentVM;
         public static MainWindowVM _mainWindowVm;
 
         private double _tempHeight = 510;
@@ -108,6 +110,7 @@ namespace GS.Server.Main
                     UpdateTabViewModel("Pulses");
                     UpdateTabViewModel("Pec");
                     UpdateTabViewModel("Snap");
+                    UpdateTabViewModel("Alignment");
 
                     // Set starting page
                     CurrentPageViewModel = PageViewModels[0];
@@ -378,6 +381,26 @@ namespace GS.Server.Main
                             PageViewModels.Remove(_snapVM);
                         }
                         SnapRadioVisible = false;
+                    }
+                    break;
+                case "Alignment":
+                    if (SkyServer.AlignmentShow && Settings.Settings.AlignmentTabVisible)
+                    {
+                        if (!PageViewModels.Contains(_alignmentVM))
+                        {
+                            _alignmentVM = new AlignmentVM();
+                            PageViewModels.Add(_alignmentVM);
+                        }
+                        AlignmentRadioVisible = true;
+                    }
+                    else
+                    {
+                        if (PageViewModels.Contains(_alignmentVM))
+                        {
+                            PageViewModels.Remove(_alignmentVM);
+                        }
+
+                        AlignmentRadioVisible = false;
                     }
                     break;
             }
@@ -723,6 +746,33 @@ namespace GS.Server.Main
             }
         }
 
+        private bool _alignmentVMRadio;
+        public bool AlignmentVMRadioRadio
+        {
+            get => _alignmentVMRadio;
+            set
+            {
+                using (new WaitCursor())
+                {
+                    if (_alignmentVMRadio == value) return;
+                    _alignmentVMRadio = value;
+                    if (value) ChangeViewModel(_alignmentVM);
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _alignmentRadioVisible;
+        public bool AlignmentRadioVisible
+        {
+            get => _alignmentRadioVisible;
+            set
+            {
+                if (_alignmentRadioVisible == value) return;
+                _alignmentRadioVisible = value;
+                OnPropertyChanged();
+            }
+        }
         #endregion
 
         #region Window Info
@@ -1092,6 +1142,7 @@ namespace GS.Server.Main
                 _pecVM?.Dispose();
                 _plotVM?.Dispose();
                 _poleLocatorVM?.Dispose();
+                _alignmentVM?.Dispose();
             }
             // free native resources if there are any.
             //if (nativeResource != IntPtr.Zero)

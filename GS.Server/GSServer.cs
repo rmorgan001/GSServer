@@ -77,6 +77,7 @@ namespace GS.Server
             Properties.Server.Default.Save();
             Properties.SkyTelescope.Default.Save();
             Properties.Gamepad.Default.Save();
+            Properties.Alignment.Default.Save();
             Settings.Settings.Save();
             Shared.Settings.Save();
         }
@@ -632,6 +633,9 @@ namespace GS.Server
                         break;
                     case @"/pec":
                         SkyServer.PecShow = true;
+                        break;
+                    case @"/showalignment":
+                        SkyServer.AlignmentShow = true;
                         break;
                     case @"/en":
                         Shared.Settings.Language = "en-US";

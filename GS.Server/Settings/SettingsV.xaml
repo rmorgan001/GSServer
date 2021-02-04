@@ -56,242 +56,250 @@
     </UserControl.Resources>
     <md:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" >
         <Grid MinWidth="750" >
-        <md:DrawerHost HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0" 
+            <md:DrawerHost HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0" 
                        IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" 
                        BorderBrush="{StaticResource MaterialDesignDivider}">
-            <md:DrawerHost.LeftDrawerContent>
-                <Grid Width="750">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="40"/>
-                        <RowDefinition Height="26"/>
-                        <RowDefinition Height="26"/>
-                        <RowDefinition Height="26"/>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="40"/>
-                    </Grid.RowDefinitions>
-                    <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" Content="{StaticResource optMonitor}"/>
-                    <ToggleButton Grid.Row="0"  HorizontalAlignment="Right" Margin="5" ToolTip="{StaticResource optClose}"
+                <md:DrawerHost.LeftDrawerContent>
+                    <Grid Width="750">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="40"/>
+                            <RowDefinition Height="26"/>
+                            <RowDefinition Height="26"/>
+                            <RowDefinition Height="26"/>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="40"/>
+                        </Grid.RowDefinitions>
+                        <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" Content="{StaticResource optMonitor}"/>
+                        <ToggleButton Grid.Row="0"  HorizontalAlignment="Right" Margin="5" ToolTip="{StaticResource optClose}"
                               Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
                               Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
                               CommandParameter="{x:Static Dock.Left}"
                               IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"/>
-                    <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="20 0">
-                        <Label Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Content="{StaticResource optDevice}"/>
-                        <StackPanel Orientation="Horizontal" >
-                            <CheckBox IsChecked="{Binding ServerDevice}" Style="{StaticResource MaterialDesignCheckBox}"/>
-                            <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optServer}"/>
+                        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="20 0">
+                            <Label Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Content="{StaticResource optDevice}"/>
+                            <StackPanel Orientation="Horizontal" >
+                                <CheckBox IsChecked="{Binding ServerDevice}" Style="{StaticResource MaterialDesignCheckBox}"/>
+                                <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optServer}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" >
+                                <CheckBox IsChecked="{Binding Telescope}" Style="{StaticResource MaterialDesignCheckBox}"/>
+                                <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optTelescope}"/>
+                            </StackPanel>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" >
-                            <CheckBox IsChecked="{Binding Telescope}" Style="{StaticResource MaterialDesignCheckBox}"/>
-                            <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optTelescope}"/>
+                        <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="20 0">
+                            <Label Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Content="{StaticResource optCategory}"/>
+                            <StackPanel Orientation="Horizontal" >
+                                <CheckBox IsChecked="{Binding Driver}" Style="{StaticResource MaterialDesignCheckBox}"/>
+                                <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optDriver}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" >
+                                <CheckBox IsChecked="{Binding Interface}" Style="{StaticResource MaterialDesignCheckBox}"/>
+                                <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optInterface}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" >
+                                <CheckBox IsChecked="{Binding Server}" Style="{StaticResource MaterialDesignCheckBox}"/>
+                                <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optServer1}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" >
+                                <CheckBox IsChecked="{Binding Mount}" Style="{StaticResource MaterialDesignCheckBox}"/>
+                                <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optMount}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Visibility="{Binding AlignmentShow, Converter={StaticResource BoolToClap}}">
+                                <CheckBox IsChecked="{Binding Alignment}" Style="{StaticResource MaterialDesignCheckBox}"/>
+                                <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optAlignment}"/>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="20 0">
-                        <Label Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Content="{StaticResource optCategory}"/>
-                        <StackPanel Orientation="Horizontal" >
-                            <CheckBox IsChecked="{Binding Driver}" Style="{StaticResource MaterialDesignCheckBox}"/>
-                            <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optDriver}"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" >
-                            <CheckBox IsChecked="{Binding Interface}" Style="{StaticResource MaterialDesignCheckBox}"/>
-                            <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optInterface}"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" >
-                            <CheckBox IsChecked="{Binding Server}" Style="{StaticResource MaterialDesignCheckBox}"/>
-                            <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optServer1}"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" >
-                            <CheckBox IsChecked="{Binding Mount}" Style="{StaticResource MaterialDesignCheckBox}"/>
-                            <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optMount}"/>
-                        </StackPanel>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Grid.Row="3" Margin="20 0">
-                        <Label Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Content="{StaticResource optType}"/>
-                        <StackPanel Orientation="Horizontal" >
-                            <CheckBox IsChecked="{Binding Information}" Style="{StaticResource MaterialDesignCheckBox}"/>
+                        <StackPanel Orientation="Horizontal" Grid.Row="3" Margin="20 0">
+                            <Label Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Content="{StaticResource optType}"/>
+                            <StackPanel Orientation="Horizontal" >
+                                <CheckBox IsChecked="{Binding Information}" Style="{StaticResource MaterialDesignCheckBox}"/>
                                 <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optInfo}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" >
+                                <CheckBox IsChecked="{Binding Data}" Style="{StaticResource MaterialDesignCheckBox}"/>
+                                <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optData}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" >
+                                <CheckBox IsChecked="{Binding Warning}" Style="{StaticResource MaterialDesignCheckBox}"/>
+                                <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optWarning}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" >
+                                <CheckBox IsChecked="{Binding Error}" Style="{StaticResource MaterialDesignCheckBox}"/>
+                                <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optError}"/>
+                            </StackPanel>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" >
-                            <CheckBox IsChecked="{Binding Data}" Style="{StaticResource MaterialDesignCheckBox}"/>
-                            <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optData}"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" >
-                            <CheckBox IsChecked="{Binding Warning}" Style="{StaticResource MaterialDesignCheckBox}"/>
-                            <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optWarning}"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" >
-                            <CheckBox IsChecked="{Binding Error}" Style="{StaticResource MaterialDesignCheckBox}"/>
-                            <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optError}"/>
-                        </StackPanel>
-                    </StackPanel>
-                    <Border Grid.Row="4" Background="Black" Margin="5,5" >
-                    <ItemsControl FontFamily="Segoe UI" FontSize="8" Foreground="DarkSeaGreen" ItemsSource="{Binding Path=MonitorEntries}" Style="{StaticResource LogViewerStyle}"/>
-                    </Border>
-                    <StackPanel Orientation="Horizontal" Grid.Row="5" VerticalAlignment="Top" HorizontalAlignment="Center">
-                        <StackPanel Orientation="Horizontal" >
-                            <CheckBox IsChecked="{Binding SessionLog}" Style="{StaticResource MaterialDesignCheckBox}"/>
-                            <TextBlock Width="Auto" ToolTip="{StaticResource optSessionLog}" Margin="5 0" VerticalAlignment="Center" Text="{StaticResource optSessionLog}"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" >
-                            <CheckBox IsChecked="{Binding MonitorToFile}" Style="{StaticResource MaterialDesignCheckBox}"/>
-                            <TextBlock Width="Auto" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource optWriteFile}" Text="{StaticResource optLogFile}"/>
-                        </StackPanel>
-                        <Button Margin="5 0" ToolTip="Start/Stop Monitoring" Style="{StaticResource MaterialDesignRaisedDarkButton}" Width="75"
+                        <Border Grid.Row="4" Background="Black" Margin="5,5" >
+                            <ItemsControl FontFamily="Segoe UI" FontSize="8" Foreground="DarkSeaGreen" ItemsSource="{Binding Path=MonitorEntries}" Style="{StaticResource LogViewerStyle}"/>
+                        </Border>
+                        <StackPanel Orientation="Horizontal" Grid.Row="5" VerticalAlignment="Top" HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" >
+                                <CheckBox IsChecked="{Binding SessionLog}" Style="{StaticResource MaterialDesignCheckBox}"/>
+                                <TextBlock Width="Auto" ToolTip="{StaticResource optSessionLog}" Margin="5 0" VerticalAlignment="Center" Text="{StaticResource optSessionLog}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" >
+                                <CheckBox IsChecked="{Binding MonitorToFile}" Style="{StaticResource MaterialDesignCheckBox}"/>
+                                <TextBlock Width="Auto" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource optWriteFile}" Text="{StaticResource optLogFile}"/>
+                            </StackPanel>
+                            <Button Margin="5 0" ToolTip="Start/Stop Monitoring" Style="{StaticResource MaterialDesignRaisedDarkButton}" Width="75"
                         Command="{Binding ClickStartStopCommand}" Content="{Binding StartStopButtonText}"/>
-                        <Button Margin="5 0" ToolTip="{StaticResource optClearText}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Width="75"
+                            <Button Margin="5 0" ToolTip="{StaticResource optClearText}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Width="75"
                         Command="{Binding ClickClearCommand}" Content="{StaticResource optClear}"/>
-                        <Button Margin="5 0" ToolTip="{StaticResource optExportText}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Width="75"
+                            <Button Margin="5 0" ToolTip="{StaticResource optExportText}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Width="75"
                         Command="{Binding ClickExportCommand}" Content="{StaticResource optExport}"/>
-                        <Button Margin="5 0" ToolTip="{StaticResource optCopyClip}" Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                            <Button Margin="5 0" ToolTip="{StaticResource optCopyClip}" Style="{StaticResource MaterialDesignRaisedDarkButton}"
                                 Width="75" Command="{Binding ClickCopyCommand}" Content="{StaticResource optCopy}"/>
-                        <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" ToolTip="{StaticResource optTotal}" Text="{Binding Path=MonitorEntries.Count}"/>
-                    </StackPanel>
-                </Grid>
-            </md:DrawerHost.LeftDrawerContent>
-            <Grid Margin="5,5" > 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="30" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
-                    <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False" x:Name="MenuToggleButton" ToolTip="Open"
+                            <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" ToolTip="{StaticResource optTotal}" Text="{Binding Path=MonitorEntries.Count}"/>
+                        </StackPanel>
+                    </Grid>
+                </md:DrawerHost.LeftDrawerContent>
+                <Grid Margin="5,5" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+                        <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False" x:Name="MenuToggleButton" ToolTip="Open"
                                   Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}"
                                   Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
-                </StackPanel>
-                <ScrollViewer Grid.Row="1"  VerticalScrollBarVisibility="Auto">
-                    <Grid Margin="10" MinHeight="350">
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Orientation="Vertical" HorizontalAlignment="Left">
-                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optTabs}"/>
-                            <!--<StackPanel Orientation="Horizontal" Width="Auto"  Margin="10 10">
+                    </StackPanel>
+                    <ScrollViewer Grid.Row="1"  VerticalScrollBarVisibility="Auto">
+                        <Grid Margin="10" MinHeight="350">
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Orientation="Vertical" HorizontalAlignment="Left">
+                                <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optTabs}"/>
+                                <!--<StackPanel Orientation="Horizontal" Width="Auto"  Margin="10 10">
                                 <CheckBox IsChecked="{Binding Focuser}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
                             <TextBlock Margin="10 0" VerticalAlignment="Center">Focuser</TextBlock>
                             </StackPanel>-->
-                            <StackPanel Orientation="Horizontal" Width="Auto">
-                                <CheckBox Height="25" Width="25" IsChecked="{Binding Notes}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optNotes}"/>
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optNotes}"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Width="Auto">
-                                <CheckBox Height="25" Width="25" IsChecked="{Binding GamePad}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optGamePad}"/>
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optGamePad}"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Width="Auto">
-                                <CheckBox Height="25" Width="25" IsChecked="{Binding Model3D}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optModel3D}"/>
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optModel3D}"/>
-                            </StackPanel>
-                                <StackPanel Orientation="Horizontal" Width="Auto" Visibility="{Binding PecShow, Converter={StaticResource BoolToClap}}">
-                                <CheckBox Height="25" Width="25" IsChecked="{Binding Pec}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource Pec}" />
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource Pec}" />
-                            </StackPanel>
                                 <StackPanel Orientation="Horizontal" Width="Auto">
-                                <CheckBox Height="25" Width="25" IsChecked="{Binding Plot}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource pltPlot}" />
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource pltPlot}" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Width="Auto">
-                                <CheckBox Height="25" Width="25" IsChecked="{Binding PoleLocator}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optPole}" />
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optPole}" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Width="Auto">
-                                <CheckBox Height="25" Width="25" IsChecked="{Binding Pulses}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource pulPulses}"/>
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource pulPulses}"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Width="Auto">
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding Notes}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optNotes}"/>
+                                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optNotes}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Width="Auto">
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding GamePad}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optGamePad}"/>
+                                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optGamePad}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Width="Auto">
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding Model3D}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optModel3D}"/>
+                                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optModel3D}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Width="Auto" Visibility="{Binding PecShow, Converter={StaticResource BoolToClap}}">
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding Pec}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource Pec}" />
+                                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource Pec}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Width="Auto">
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding Plot}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource pltPlot}" />
+                                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource pltPlot}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Width="Auto">
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding PoleLocator}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optPole}" />
+                                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optPole}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Width="Auto">
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding Pulses}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource pulPulses}"/>
+                                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource pulPulses}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Width="Auto">
                                     <CheckBox Height="25" Width="25" IsChecked="{Binding Snap}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource tabSnap}" />
                                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource tabSnap}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Width="Auto" Visibility="{Binding AlignmentShow, Converter={StaticResource BoolToClap}}">
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding AlignmentTabVisible}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource aliAlignment}"/>
+                                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource aliAlignment}"/>
+                                </StackPanel>
                             </StackPanel>
+                            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" >
+                                <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" HorizontalAlignment="Left" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optOptions}"/>
+                                <StackPanel Orientation="Horizontal" >
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding SleepMode}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optSleepMode}"/>
+                                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optSleepMode}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding StartMinimized}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optStartMin}"/>
+                                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optStartMin}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding StartOnTop}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optStartTop}"/>
+                                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optStartTop}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding HomeWarning}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optHomeWarning}"/>
+                                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optHomeWarning}"/>
+                                </StackPanel>
                             </StackPanel>
-                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" >
-                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" HorizontalAlignment="Left" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optOptions}"/>
-                            <StackPanel Orientation="Horizontal" >
-                                <CheckBox Height="25" Width="25" IsChecked="{Binding SleepMode}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optSleepMode}"/>
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optSleepMode}"/>
-                        </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox Height="25" Width="25" IsChecked="{Binding StartMinimized}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optStartMin}"/>
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optStartMin}"/>
-                        </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox Height="25" Width="25" IsChecked="{Binding StartOnTop}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optStartTop}"/>
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optStartTop}"/>
-                        </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox Height="25" Width="25" IsChecked="{Binding HomeWarning}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optHomeWarning}"/>
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optHomeWarning}"/>
-                        </StackPanel>
-                    </StackPanel>
-                        <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Left">
-                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optVoice}"/>
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox Height="25" Width="25" IsChecked="{Binding VoiceActive}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optVoiceSpeech}"/>
-                                <TextBlock Margin="10 10" VerticalAlignment="Center" Text="{StaticResource optVoiceSpeech}"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal"  Margin="0,0,0,0">
-                                <ComboBox md:HintAssist.Hint="{StaticResource optVoiceName}" MinWidth="10" HorizontalAlignment="Left" ItemsSource="{Binding VoiceNames}"
+                            <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Left">
+                                <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optVoice}"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding VoiceActive}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optVoiceSpeech}"/>
+                                    <TextBlock Margin="10 10" VerticalAlignment="Center" Text="{StaticResource optVoiceSpeech}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal"  Margin="0,0,0,0">
+                                    <ComboBox md:HintAssist.Hint="{StaticResource optVoiceName}" MinWidth="10" HorizontalAlignment="Left" ItemsSource="{Binding VoiceNames}"
                                     Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource optVoiceName}">
-                                    <ComboBox.Text>
-                                        <Binding Path="VoiceName" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
-                                    </ComboBox.Text>
-                                    <ComboBox.ItemsPanel >
-                                        <ItemsPanelTemplate >
-                                            <VirtualizingStackPanel  />
-                                        </ItemsPanelTemplate>
-                                    </ComboBox.ItemsPanel>
-                                </ComboBox>
-                            </StackPanel>
-                            <StackPanel Orientation="Vertical" Margin="0,5,0,0" HorizontalAlignment="Left" >
-                                <ComboBox md:HintAssist.Hint="{StaticResource optVolumeLevel}" MinWidth="10" HorizontalAlignment="Left" ItemsSource="{Binding VolumeList}"
+                                        <ComboBox.Text>
+                                            <Binding Path="VoiceName" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                                        </ComboBox.Text>
+                                        <ComboBox.ItemsPanel >
+                                            <ItemsPanelTemplate >
+                                                <VirtualizingStackPanel  />
+                                            </ItemsPanelTemplate>
+                                        </ComboBox.ItemsPanel>
+                                    </ComboBox>
+                                </StackPanel>
+                                <StackPanel Orientation="Vertical" Margin="0,5,0,0" HorizontalAlignment="Left" >
+                                    <ComboBox md:HintAssist.Hint="{StaticResource optVolumeLevel}" MinWidth="10" HorizontalAlignment="Left" ItemsSource="{Binding VolumeList}"
                                           Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource optVolumeLevel}">
-                                    <ComboBox.SelectedValue >
-                                        <Binding Path="VoiceVolume" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
-                                    </ComboBox.SelectedValue>
-                                    <ComboBox.ItemsPanel >
-                                        <ItemsPanelTemplate >
-                                            <VirtualizingStackPanel  />
+                                        <ComboBox.SelectedValue >
+                                            <Binding Path="VoiceVolume" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                                        </ComboBox.SelectedValue>
+                                        <ComboBox.ItemsPanel >
+                                            <ItemsPanelTemplate >
+                                                <VirtualizingStackPanel  />
+                                            </ItemsPanelTemplate>
+                                        </ComboBox.ItemsPanel>
+                                    </ComboBox>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Vertical" HorizontalAlignment="Left">
+                                <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optColors}"/>
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <TextBlock VerticalAlignment="Center" Text="{StaticResource optLight}"/>
+                                    <ToggleButton Margin="5,0,5,0" IsChecked="{Binding DarkTheme}" Command="{Binding ClickBaseCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=IsChecked}" ToolTip="{StaticResource optColors}" />
+                                    <TextBlock VerticalAlignment="Center" Text="{StaticResource optDark}"/>
+                                </StackPanel>
+                                <ComboBox md:HintAssist.Hint="{StaticResource optPrimaryColor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                      ItemsSource="{Binding PrimaryColors}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource optPrimaryColor}">
+                                    <ComboBox.SelectedItem>
+                                        <Binding Path="PrimaryColor" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                                    </ComboBox.SelectedItem>
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type mdc:Swatch}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="20"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <md:PackIcon Grid.Column="0" Kind="CameraIris" Width="20" Height="20" Foreground="{Binding ExemplarHue.Color, Converter={StaticResource ColorToBrush}}"/>
+                                                <TextBlock Grid.Column="1" Margin="10,0,0,0" Text="{Binding Name}"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                    <ComboBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <VirtualizingStackPanel />
                                         </ItemsPanelTemplate>
                                     </ComboBox.ItemsPanel>
                                 </ComboBox>
-                            </StackPanel>
-                        </StackPanel>
-                        <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Vertical" HorizontalAlignment="Left">
-                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optColors}"/>
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <TextBlock VerticalAlignment="Center" Text="{StaticResource optLight}"/>
-                                <ToggleButton Margin="5,0,5,0" IsChecked="{Binding DarkTheme}" Command="{Binding ClickBaseCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=IsChecked}" ToolTip="{StaticResource optColors}" />
-                                <TextBlock VerticalAlignment="Center" Text="{StaticResource optDark}"/>
-                            </StackPanel>
-                            <ComboBox md:HintAssist.Hint="{StaticResource optPrimaryColor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                      ItemsSource="{Binding PrimaryColors}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource optPrimaryColor}">
-                                <ComboBox.SelectedItem>
-                                    <Binding Path="PrimaryColor" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
-                                </ComboBox.SelectedItem>
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate DataType="{x:Type mdc:Swatch}">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="20"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <md:PackIcon Grid.Column="0" Kind="CameraIris" Width="20" Height="20" Foreground="{Binding ExemplarHue.Color, Converter={StaticResource ColorToBrush}}"/>
-                                            <TextBlock Grid.Column="1" Margin="10,0,0,0" Text="{Binding Name}"/>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ComboBox.ItemTemplate>
-                                <ComboBox.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <VirtualizingStackPanel />
-                                    </ItemsPanelTemplate>
-                                </ComboBox.ItemsPanel>
-                            </ComboBox>
-                            <ComboBox IsEnabled="True" md:HintAssist.Hint="{StaticResource optAccentColor}"  ToolTip="{StaticResource optAccentColor}"
+                                <ComboBox IsEnabled="True" md:HintAssist.Hint="{StaticResource optAccentColor}"  ToolTip="{StaticResource optAccentColor}"
                                       ItemsSource="{Binding AccentColors}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                 <ComboBox.SelectedItem>
                                     <Binding Path="AccentColor" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
@@ -353,62 +361,62 @@
                             <StackPanel Orientation="Horizontal">
                                     <CheckBox Height="25" Width="25" IsChecked="{Binding GamePadSettings}" ToolTip="{StaticResource optGamePad}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
                                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optGamePad}"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox Height="25" Width="25" IsChecked="{Binding MonitorSettings}" ToolTip="{StaticResource optMonitorSettings}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
-                                <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optMonitorSettings}"/>
-                            </StackPanel>
-                            <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Bottom" CloseOnClickAway="True"
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding MonitorSettings}" ToolTip="{StaticResource optMonitorSettings}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
+                                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optMonitorSettings}"/>
+                                </StackPanel>
+                                <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Bottom" CloseOnClickAway="True"
                                            IsOpen="{Binding IsSettingsResetDialogOpen}" DialogContent="{Binding SettingsResetContent}">
-                                <Button Margin="5" Height="30" ToolTip="{StaticResource optSettings}" Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                                    <Button Margin="5" Height="30" ToolTip="{StaticResource optSettings}" Style="{StaticResource MaterialDesignRaisedDarkButton}"
                                         Command="{Binding OpenSettingsResetDialogCommand}" Content="{StaticResource optReset}">
-                                </Button>
-                            </md:DialogHost>
-                        </StackPanel>
-                        <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Left" >
-                            <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optLanguage}"/>
-                            <ComboBox md:HintAssist.Hint="{StaticResource optLanguage}" MinWidth="10" HorizontalAlignment="Left" ItemsSource="{Binding Languages}"
-                                      Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource optLanguage}">
-                                <ComboBox.Text>
-                                    <Binding Path="Lang" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
-                                </ComboBox.Text>
-                                <ComboBox.ItemsPanel >
-                                    <ItemsPanelTemplate >
-                                        <VirtualizingStackPanel  />
-                                    </ItemsPanelTemplate>
-                                </ComboBox.ItemsPanel>
-                            </ComboBox>
-                            <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Bottom" CloseOnClickAway="True" IsOpen="{Binding IsUpdateDialogOpen}" DialogContent="{Binding UpdateDialogContent}">
-                                <Button Margin="0,10,0,0" Height="30" ToolTip="{StaticResource optCheckUpdates}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding OpenUpdateDialogCmd}" Content="{StaticResource optCheckUpdates}">
-                                </Button>
-                            </md:DialogHost>
-                        </StackPanel>
-                        <StackPanel Grid.Row="1" Grid.Column="3" Orientation="Vertical" HorizontalAlignment="Left">
-                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optUTCOffset}" />
-                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                <md:PopupBox StaysOpen="False" Margin="-10,0,0,0" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{StaticResource skyReset}">
-                                    <Grid Width="150">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="30" />
-                                            <RowDefinition Height="40" />
-                                        </Grid.RowDefinitions>
-                                        <Label Grid.Row="0" HorizontalAlignment="Center" Content="{StaticResource SkyResetDef}" />
-                                        <Button Grid.Row="1" HorizontalAlignment="Center" Content="{StaticResource diaAccept}" Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ClickResetUtcOffsetCmd}" />
-                                    </Grid>
-                                </md:PopupBox>
-                                <TextBlock VerticalAlignment="Center" Text="{Binding UTCDateOffset, StringFormat={}{0:G}}" />
+                                    </Button>
+                                </md:DialogHost>
                             </StackPanel>
-                            <TextBlock Margin="0,5,0,0" VerticalAlignment="Center" Text="{StaticResource optLSTAdjusted}" />
-                            <TextBlock Margin="0,5,0,0" VerticalAlignment="Center" Text="{Binding UTCTime, StringFormat={}{0:D}}" Opacity=".4" />
-                            <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" Text="{Binding UTCTime, StringFormat={}{0:T}}" Opacity=".4" />
-                            <TextBlock Margin="0,5,0,0" VerticalAlignment="Center" Text="{StaticResource optLocalAdjusted}" />
-                            <TextBlock Margin="0,5,0,0" VerticalAlignment="Center" Text="{Binding Path=UTCTime, Converter={StaticResource UTCtoLocal}, StringFormat={}{0:D}}" IsEnabled="False" Opacity=".4" />
-                            <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" Text="{Binding Path=UTCTime, Converter={StaticResource UTCtoLocal}, StringFormat={}{0:T}}" IsEnabled="False" Opacity=".4" />
-                        </StackPanel>
-                    </Grid>
-                </ScrollViewer>
-            </Grid>
-        </md:DrawerHost>
-    </Grid>
+                            <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Left" >
+                                <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optLanguage}"/>
+                                <ComboBox md:HintAssist.Hint="{StaticResource optLanguage}" MinWidth="10" HorizontalAlignment="Left" ItemsSource="{Binding Languages}"
+                                      Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource optLanguage}">
+                                    <ComboBox.Text>
+                                        <Binding Path="Lang" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                                    </ComboBox.Text>
+                                    <ComboBox.ItemsPanel >
+                                        <ItemsPanelTemplate >
+                                            <VirtualizingStackPanel  />
+                                        </ItemsPanelTemplate>
+                                    </ComboBox.ItemsPanel>
+                                </ComboBox>
+                                <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Bottom" CloseOnClickAway="True" IsOpen="{Binding IsUpdateDialogOpen}" DialogContent="{Binding UpdateDialogContent}">
+                                    <Button Margin="0,10,0,0" Height="30" ToolTip="{StaticResource optCheckUpdates}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding OpenUpdateDialogCmd}" Content="{StaticResource optCheckUpdates}">
+                                    </Button>
+                                </md:DialogHost>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="3" Orientation="Vertical" HorizontalAlignment="Left">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optUTCOffset}" />
+                                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                    <md:PopupBox StaysOpen="False" Margin="-10,0,0,0" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{StaticResource skyReset}">
+                                        <Grid Width="150">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="30" />
+                                                <RowDefinition Height="40" />
+                                            </Grid.RowDefinitions>
+                                            <Label Grid.Row="0" HorizontalAlignment="Center" Content="{StaticResource SkyResetDef}" />
+                                            <Button Grid.Row="1" HorizontalAlignment="Center" Content="{StaticResource diaAccept}" Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ClickResetUtcOffsetCmd}" />
+                                        </Grid>
+                                    </md:PopupBox>
+                                    <TextBlock VerticalAlignment="Center" Text="{Binding UTCDateOffset, StringFormat={}{0:G}}" />
+                                </StackPanel>
+                                <TextBlock Margin="0,5,0,0" VerticalAlignment="Center" Text="{StaticResource optLSTAdjusted}" />
+                                <TextBlock Margin="0,5,0,0" VerticalAlignment="Center" Text="{Binding UTCTime, StringFormat={}{0:D}}" Opacity=".4" />
+                                <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" Text="{Binding UTCTime, StringFormat={}{0:T}}" Opacity=".4" />
+                                <TextBlock Margin="0,5,0,0" VerticalAlignment="Center" Text="{StaticResource optLocalAdjusted}" />
+                                <TextBlock Margin="0,5,0,0" VerticalAlignment="Center" Text="{Binding Path=UTCTime, Converter={StaticResource UTCtoLocal}, StringFormat={}{0:D}}" IsEnabled="False" Opacity=".4" />
+                                <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" Text="{Binding Path=UTCTime, Converter={StaticResource UTCtoLocal}, StringFormat={}{0:T}}" IsEnabled="False" Opacity=".4" />
+                            </StackPanel>
+                        </Grid>
+                    </ScrollViewer>
+                </Grid>
+            </md:DrawerHost>
+        </Grid>
     </md:DialogHost>
 </UserControl>

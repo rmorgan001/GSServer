@@ -185,6 +185,20 @@ namespace GS.Shared
             }
         }
 
+        private static bool _alignment;
+        public static bool Alignment
+        {
+            get => _alignment;
+            set
+            {
+                if (_alignment == value) return;
+                _alignment = value;
+                Properties.Monitor.Default.Alignment = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static string _language;
         public static string Language
         {

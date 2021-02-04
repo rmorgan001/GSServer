@@ -29,10 +29,10 @@ namespace GS.Principles
         /// <returns>-5.8305555555555486</returns>
         public static double Range12(double d)
         {
-            while ((d >= 12.0) || (d <= -12.0))
+            while ((d > 12.0) || (d <= -12.0))
             {
                 if (d <= -12.0) d += 24.0;
-                if (d >= 12.0) d -= 24.0;
+                if (d > 12.0) d -= 24.0;
             }
             return d;
         }
