@@ -45,7 +45,7 @@ namespace GS.Shared.Domain
 
         private static void MinimumValueChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            TextBox _this = (d as TextBox);
+            var _this = (d as TextBox);
             ValidateTextBox(_this);
         }
         #endregion
@@ -72,7 +72,7 @@ namespace GS.Shared.Domain
 
         private static void MaximumValueChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            TextBox _this = (d as TextBox);
+            var _this = (d as TextBox);
             ValidateTextBox(_this);
         }
         #endregion
@@ -105,7 +105,7 @@ namespace GS.Shared.Domain
                 DataObject.RemovePastingHandler((e.OldValue as TextBox), (DataObjectPastingEventHandler)TextBoxPastingEventHandler);
             }
 
-            TextBox _this = (d as TextBox);
+            var _this = (d as TextBox);
             if (_this == null)
                 return;
 
@@ -132,8 +132,8 @@ namespace GS.Shared.Domain
 
         private static void TextBoxPastingEventHandler(object sender, DataObjectPastingEventArgs e)
         {
-            TextBox _this = (sender as TextBox);
-            string clipboard = e.DataObject.GetData(typeof(string)) as string;
+            var _this = (sender as TextBox);
+            var clipboard = e.DataObject.GetData(typeof(string)) as string;
             clipboard = ValidateValue(GetMask(_this), clipboard, GetMinimumValue(_this), GetMaximumValue(_this));
             if (!string.IsNullOrEmpty(clipboard))
             {
@@ -145,15 +145,15 @@ namespace GS.Shared.Domain
 
         private static void TextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
-            TextBox _this = (sender as TextBox);
-            bool isValid = IsSymbolValid(GetMask(_this), e.Text);
+            var _this = (sender as TextBox);
+            var isValid = IsSymbolValid(GetMask(_this), e.Text);
             e.Handled = !isValid;
             if (isValid)
             {
-                int caret = _this.CaretIndex;
-                string text = _this.Text;
-                bool textInserted = false;
-                int selectionLength = 0;
+                var caret = _this.CaretIndex;
+                var text = _this.Text;
+                var textInserted = false;
+                var selectionLength = 0;
 
                 if (_this.SelectionLength > 0)
                 {
@@ -166,7 +166,7 @@ namespace GS.Shared.Domain
                 {
                     while (true)
                     {
-                        int ind = text.IndexOf(NumberFormatInfo.CurrentInfo.NumberDecimalSeparator);
+                        var ind = text.IndexOf(NumberFormatInfo.CurrentInfo.NumberDecimalSeparator);
                         if (ind == -1)
                             break;
 
@@ -223,8 +223,8 @@ namespace GS.Shared.Domain
 
                 try
                 {
-                    double val = Convert.ToDouble(text);
-                    double newVal = ValidateLimits(GetMinimumValue(_this), GetMaximumValue(_this), val);
+                    var val = Convert.ToDouble(text);
+                    var newVal = ValidateLimits(GetMinimumValue(_this), GetMaximumValue(_this), val);
                     if (val != newVal)
                     {
                         text = newVal.ToString();
@@ -281,7 +281,9 @@ namespace GS.Shared.Domain
                     }
                     catch
                     {
+                        // ignored
                     }
+
                     return string.Empty;
 
                 case MaskType.Decimal:
@@ -293,7 +295,9 @@ namespace GS.Shared.Domain
                     }
                     catch
                     {
+                        // ignored
                     }
+
                     return string.Empty;
             }
 
@@ -338,7 +342,7 @@ namespace GS.Shared.Domain
 
             if (mask.Equals(MaskType.Integer) || mask.Equals(MaskType.Decimal))
             {
-                foreach (char ch in str)
+                foreach (var ch in str)
                 {
                     if (!Char.IsDigit(ch))
                         return false;

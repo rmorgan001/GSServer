@@ -1,4 +1,4 @@
-/* Copyright(C) 2019  Rob Morgan (robert.morgan.e@gmail.com)
+/* Copyright(C) 2019-2021  Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -994,7 +994,7 @@ namespace ASCOM.GS.Sky.Telescope
                 var r = SkyServer.SiderealTime;
 
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToHMS(r)}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.HoursToHMS(r)}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 return r;

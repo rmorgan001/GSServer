@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019  Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2021  Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -1040,7 +1040,7 @@ namespace GS.SkyApi
             {
                 return;
             }
-            var exception = new ArgumentOutOfRangeException($"{value}", $"{lower}-{upper}");
+            var exception = new ArgumentOutOfRangeException($"{value}", $@"{lower}-{upper}");
             throw exception;
         }
 

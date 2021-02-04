@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019-2021  Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2021-2021  Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -4092,7 +4092,7 @@ namespace GS.Server.SkyTelescope
 
             if (target.LengthSquared > 0)
             {
-                var targetAxes = new double[] { target.X, target.Y };
+                var targetAxes = new[] { target.X, target.Y };
                 var raDec = Axes.AxesXYToRaDec(targetAxes);
                 var a = GetAdjustedAxesForSlewing(targetAxes, SideOfPierRaDec(raDec[0]));
                 SlewMount(new Vector(a[0], a[1]), SlewType.SlewAltAz);

@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019-2020  Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2021-2020  Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -554,6 +554,9 @@ namespace GS.Server.SkyTelescope
                         {
                             case "WarningState":
                                 WarningState = MonitorQueue.WarningState;
+                                break;
+                            case "AlertState":
+                                if (MonitorQueue.AlertState) { SkyServer.AlertState = true; }
                                 break;
                         }
                     });
@@ -5173,7 +5176,7 @@ namespace GS.Server.SkyTelescope
 
         #region Bottom Bar Control
 
-        public bool _isHome;
+        private bool _isHome;
         public bool IsHome
         {
             get => _isHome;
@@ -5186,7 +5189,7 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        public bool _atPark;
+        private bool _atPark;
         public bool AtPark
         {
             get => _atPark;

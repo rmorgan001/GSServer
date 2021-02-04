@@ -4,8 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:enums="clr-namespace:GS.Shared;assembly=GS.Shared"
-             xmlns:nstar="clr-namespace:NStarAlignment.Model;assembly=NStarAlignment"
              xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              xmlns:alignment="clr-namespace:GS.Server.Alignment"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance alignment:AlignmentVM}">

@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019  Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2021  Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -65,6 +65,18 @@ namespace GS.Shared
             if (!WarningState) return;
             await Task.Delay(100);
             WarningState = false;
+        }
+
+        private static bool _alertState;
+        public static bool AlertState
+        {
+            get => _alertState;
+            set
+            {
+                if (_alertState == value) return;
+                _alertState = value;
+                OnStaticPropertyChanged();
+            }
         }
 
         /// <summary>
@@ -197,8 +209,10 @@ namespace GS.Shared
             {
                 // Output error log
                 case MonitorType.Error:
+                    AlertState = true;
                     WriteOutErrors(entry);
                     WriteOutSession(entry);
+                    AlertState = false;
                     break;
                 // Output session log
                 case MonitorType.Warning:
