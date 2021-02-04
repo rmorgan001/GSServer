@@ -708,7 +708,7 @@ namespace GS.SkyWatcher
             {
                 szCmd = LongToHex(2);
             }
-            CmdToAxis(axis, 'W', szCmd, true);
+            CmdToAxis(axis, 'W', szCmd);
         }
 
         /// <summary>
@@ -1045,8 +1045,6 @@ namespace GS.SkyWatcher
             receivedData = receivedData?.Replace("\0", string.Empty);
             if (string.IsNullOrEmpty(receivedData)) return null;
 
-            var triggerError = false;
-
             switch (receivedData[0].ToString())
             {
                 //receive '=DDDDDD [0D]'    or '!D [0D]'
@@ -1097,18 +1095,10 @@ namespace GS.SkyWatcher
                             break;
                         case "!8":
                             errormsg = "Invalid pPEC model";
-                            triggerError = true;
                             break;
                         default:
                             errormsg = "Code Not Found";
                             break;
-                    }
-
-                    if (triggerError)
-                    {
-                        monitorItem = new MonitorEntry
-                            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" Abnormal Response: Axis:{axis}, Command:{command}, Received:{receivedData}, CommandStr:{cmdDataStr}, Message: {errormsg}" };
-                        MonitorLog.LogToMonitor(monitorItem);
                     }
                     monitorItem = new MonitorEntry
                     { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" Abnormal Response: Axis:{axis}, Command:{command}, Received:{receivedData}, CommandStr:{cmdDataStr}, Message: {errormsg}" };

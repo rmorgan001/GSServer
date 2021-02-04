@@ -67,18 +67,6 @@ namespace GS.Shared
             WarningState = false;
         }
 
-        private static bool _alertState;
-        public static bool AlertState
-        {
-            get => _alertState;
-            set
-            {
-                if (_alertState == value) return;
-                _alertState = value;
-                OnStaticPropertyChanged();
-            }
-        }
-
         /// <summary>
         /// Holds an entry and triggers the Monitor UI to pick up
         /// </summary>
@@ -209,10 +197,8 @@ namespace GS.Shared
             {
                 // Output error log
                 case MonitorType.Error:
-                    AlertState = true;
                     WriteOutErrors(entry);
                     WriteOutSession(entry);
-                    AlertState = false;
                     break;
                 // Output session log
                 case MonitorType.Warning:
