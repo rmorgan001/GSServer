@@ -166,7 +166,6 @@ namespace NStarAlignment.Model
 
             lock (_accessLock)
             {
-                ClearSelectedPoints();
                 AxisPosition sAxes = new AxisPosition(observedAxes);
                 if (sAxes.IncludedAngleTo(_homePosition) < ProximityLimit) return observedAxes;    // Fast exit if we are going home.
                 RaiseNotification(NotificationType.Information, $"GetMountAxes for {observedAxes[0]}/{observedAxes[1]}");
@@ -186,6 +185,7 @@ namespace NStarAlignment.Model
                     }
                     else
                     {
+                        ClearSelectedPoints();
                         offsets[0, 0] = AlignmentPoints[0].MountAxes[0] - AlignmentPoints[0].ObservedAxes[0];
                         offsets[0, 1] = AlignmentPoints[0].MountAxes[1] - AlignmentPoints[0].ObservedAxes[1];
                         AlignmentPoints[0].Selected = true;
@@ -209,9 +209,9 @@ namespace NStarAlignment.Model
                     else
                     {
                         int rows = alignmentPoints.Length;
-
                         if (rows > 2)
                         {
+                            ClearSelectedPoints();
                             // Build features and values from registered points
                             Matrix features = Matrix.CreateInstance(rows, 3);
                             Matrix values = Matrix.CreateInstance(rows, 2);
@@ -273,6 +273,7 @@ namespace NStarAlignment.Model
                             }
                             else
                             {
+                                ClearSelectedPoints();
                                 // Use the nearest point of the two.
                                 offsets[0, 0] = alignmentPoints[0].MountAxes[0] - alignmentPoints[0].ObservedAxes[0];
                                 offsets[0, 1] = alignmentPoints[0].MountAxes[1] - alignmentPoints[0].ObservedAxes[1];
