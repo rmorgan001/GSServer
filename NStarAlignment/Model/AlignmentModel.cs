@@ -288,5 +288,6 @@ namespace NStarAlignment.Model
             _stringBuilder.Clear();
         }
 
+
     }
 }
