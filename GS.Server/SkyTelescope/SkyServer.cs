@@ -123,7 +123,6 @@ namespace GS.Server.SkyTelescope
                 };
                 AlignmentModel.SetHomePosition(_homeAxes.X, _homeAxes.Y);
                 AlignmentModel.Notification += AlignmentModel_Notification;
-                WeakEventManager<AlignmentModel, NotificationEventArgs>.AddHandler(AlignmentModel, "Notification", AlignmentModel_Notification);
 
                 // attach handler to watch for SkySettings changing.
                 SkySettings.StaticPropertyChanged += PropertyChangedSkySettings;
@@ -4395,24 +4394,7 @@ namespace GS.Server.SkyTelescope
         /// <returns></returns>
         private static double[] GetAdjustAxesForReporting(double[] actualAxes)
         {
-            var calculatedAxes = AlignmentModel.GetMountAxes(actualAxes, (int)SideOfPier);
-            if (AlignmentModel.IsAlignmentOn)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Alignment,
-                    Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message =
-                        $"Alignment applied to raw axes: {actualAxes[0]},{actualAxes[1]} -> {calculatedAxes[0]},{calculatedAxes[1]}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-            }
-
-            return calculatedAxes;
+            return AlignmentModel.GetMountAxes(actualAxes, (int)SideOfPier);
         }
 
         #endregion

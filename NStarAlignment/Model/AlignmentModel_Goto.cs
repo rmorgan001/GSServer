@@ -53,8 +53,6 @@ namespace NStarAlignment.Model
 
             lock (_accessLock)
             {
-                ClearSelectedPoints();
-
                 AxisPosition mAxes = new AxisPosition(mountAxes);
                 if (mAxes.IncludedAngleTo(_homePosition) < ProximityLimit) return mountAxes;    // Fast exist if we are going home.
                 RaiseNotification(NotificationType.Information, $"GetObservedAxes for {mountAxes[0]}/{mountAxes[1]}");
@@ -65,8 +63,6 @@ namespace NStarAlignment.Model
                 {
                     offsets[0, 0] = AlignmentPoints[0].ObservedAxes[0] - AlignmentPoints[0].MountAxes[0];
                     offsets[0, 1] = AlignmentPoints[0].ObservedAxes[1] - AlignmentPoints[0].MountAxes[1];
-                    AlignmentPoints[0].Selected = true;
-                    _selectedPoints.Add(AlignmentPoints[0]);
                     RaiseNotification(NotificationType.Data, $"Single alignment point selected {AlignmentPoints[0].Id:D3}, Mount axes: {AlignmentPoints[0].MountAxes.RaAxis}/{AlignmentPoints[0].MountAxes.RaAxis}, Observed axes: {AlignmentPoints[0].ObservedAxes.RaAxis}/{AlignmentPoints[0].ObservedAxes.RaAxis}");
                 }
                 else
@@ -91,8 +87,6 @@ namespace NStarAlignment.Model
                             features[i, 2] = pt.MountAxes[1] * pt.MountAxes[1];
                             values[i, 0] = Range.RangePlusOrMinus180(pt.ObservedAxes[0] - pt.MountAxes[0]);
                             values[i, 1] = Range.RangePlusOrMinus180(pt.ObservedAxes[1] - pt.MountAxes[1]);
-                            pt.Selected = true;
-                            _selectedPoints.Add(pt);
                         }
 
                         _stringBuilder.AppendLine(".");
@@ -129,20 +123,18 @@ namespace NStarAlignment.Model
                         // Just use the nearest point of the two.
                         offsets[0, 0] = alignmentPoints[0].ObservedAxes[0] - alignmentPoints[0].MountAxes[0];
                         offsets[0, 1] = alignmentPoints[0].ObservedAxes[1] - alignmentPoints[0].MountAxes[1];
-                        alignmentPoints[0].Selected = true;
-                        _selectedPoints.Add(alignmentPoints[0]);
                         RaiseNotification(NotificationType.Data, $"Using nearest point of two {alignmentPoints[0].Id:D3}, Mount axes: {alignmentPoints[0].MountAxes.RaAxis}/{alignmentPoints[0].MountAxes.RaAxis}, Observed axes: {alignmentPoints[0].ObservedAxes.RaAxis}/{alignmentPoints[0].ObservedAxes.RaAxis}");
 
                     }
                     // Otherwise default to using no correcting offset 
 
                 }
-                RaiseNotification(NotificationType.Data, $"Correction -> Observer = {offsets[0, 0]}/{offsets[0, 1]}");
                 var observedAxes = new[]
                 {
                     mountAxes[0] + offsets[0, 0],
                     mountAxes[1] + offsets[0, 1]
                 };
+                RaiseNotification(NotificationType.Data, $"Correction -> Observer = {offsets[0, 0]}/{offsets[0, 1]}");
                 RaiseNotification(NotificationType.Information, $"Mount axes: {mountAxes[0]}/{mountAxes[1]} -> Observed axes: {observedAxes[0]}/{observedAxes[1]}");
 
                 return observedAxes;
@@ -166,9 +158,9 @@ namespace NStarAlignment.Model
 
             lock (_accessLock)
             {
+                bool postLogMessages = false;
                 AxisPosition sAxes = new AxisPosition(observedAxes);
                 if (sAxes.IncludedAngleTo(_homePosition) < ProximityLimit) return observedAxes;    // Fast exit if we are going home.
-                RaiseNotification(NotificationType.Information, $"GetMountAxes for {observedAxes[0]}/{observedAxes[1]}");
 
                 PierSide pSide = (PierSide)pierSide;
                 WriteLastAccessTime();
@@ -185,6 +177,7 @@ namespace NStarAlignment.Model
                     }
                     else
                     {
+                        RaiseNotification(NotificationType.Information, $"GetMountAxes for {observedAxes[0]}/{observedAxes[1]}");
                         ClearSelectedPoints();
                         offsets[0, 0] = AlignmentPoints[0].MountAxes[0] - AlignmentPoints[0].ObservedAxes[0];
                         offsets[0, 1] = AlignmentPoints[0].MountAxes[1] - AlignmentPoints[0].ObservedAxes[1];
@@ -195,6 +188,7 @@ namespace NStarAlignment.Model
                         _currentChecksum = checksum;
                         RaiseNotification(NotificationType.Data,
                             $"Single alignment point selected {AlignmentPoints[0].Id:D3}, Mount axes: {AlignmentPoints[0].MountAxes.RaAxis}/{AlignmentPoints[0].MountAxes.RaAxis}, Observed axes: {AlignmentPoints[0].ObservedAxes.RaAxis}/{AlignmentPoints[0].ObservedAxes.RaAxis}");
+                        postLogMessages = true;
                     }
                 }
                 else
@@ -211,6 +205,7 @@ namespace NStarAlignment.Model
                         int rows = alignmentPoints.Length;
                         if (rows > 2)
                         {
+                            RaiseNotification(NotificationType.Information, $"GetMountAxes for {observedAxes[0]}/{observedAxes[1]}");
                             ClearSelectedPoints();
                             // Build features and values from registered points
                             Matrix features = Matrix.CreateInstance(rows, 3);
@@ -262,6 +257,7 @@ namespace NStarAlignment.Model
                             // Cache the offsets and the checksum
                             _lastOffsets = offsets;
                             _currentChecksum = checksum;
+                            postLogMessages = true;
                         }
                         else if (rows > 0)
                         {
@@ -273,6 +269,8 @@ namespace NStarAlignment.Model
                             }
                             else
                             {
+                                RaiseNotification(NotificationType.Information, $"GetMountAxes for {observedAxes[0]}/{observedAxes[1]}");
+
                                 ClearSelectedPoints();
                                 // Use the nearest point of the two.
                                 offsets[0, 0] = alignmentPoints[0].MountAxes[0] - alignmentPoints[0].ObservedAxes[0];
@@ -282,22 +280,37 @@ namespace NStarAlignment.Model
                                 // Cache the offsets and checksum
                                 _lastOffsets = offsets;
                                 _currentChecksum = checksum;
+                                postLogMessages = true;
                                 RaiseNotification(NotificationType.Data,
                                     $"Using nearest point of two {alignmentPoints[0].Id:D3}, Mount axes: {alignmentPoints[0].MountAxes.RaAxis}/{alignmentPoints[0].MountAxes.RaAxis}, Observed axes: {alignmentPoints[0].ObservedAxes.RaAxis}/{alignmentPoints[0].ObservedAxes.RaAxis}");
+                            }
+                        }
+                        else
+                        {
+                            if (_currentChecksum != int.MinValue)
+                            {
+                                _currentChecksum = int.MinValue;
+                                RaiseNotification(NotificationType.Warning,
+                                    $"No alignment points selected, Mount axes: {alignmentPoints[0].MountAxes.RaAxis}/{alignmentPoints[0].MountAxes.RaAxis}, Observed axes: {alignmentPoints[0].ObservedAxes.RaAxis}/{alignmentPoints[0].ObservedAxes.RaAxis}");
                             }
                         }
                     }
 
                     // Otherwise default to using zero offset
                 }
-                RaiseNotification(NotificationType.Data, $"Correction -> Mount = {offsets[0, 0]}/{offsets[0, 1]}");
 
                 var mountAxes = new[]
                 {
                     observedAxes[0] + offsets[0, 0],
                     observedAxes[1] + offsets[0, 1]
                 };
-                RaiseNotification(NotificationType.Information, $"Observed axes: {observedAxes[0]}/{observedAxes[1]} -> Mount axes: {mountAxes[0]}/{mountAxes[1]}");
+                if (postLogMessages)
+                {
+                    RaiseNotification(NotificationType.Data, $"Correction -> Mount = {offsets[0, 0]}/{offsets[0, 1]}");
+                    RaiseNotification(NotificationType.Information,
+                        $"Observed axes: {observedAxes[0]}/{observedAxes[1]} -> Mount axes: {mountAxes[0]}/{mountAxes[1]}");
+                }
+
                 return mountAxes;
             }
         }
