@@ -24,6 +24,19 @@ namespace NStarAlignment.Model
 {
     public partial class AlignmentModel
     {
+        /// <summary>
+        /// Checksum used as a quick to see if the seleted points have changed
+        /// </summary>
+        private int _currentChecksum = int.MinValue;
+
+        /// <summary>
+        /// The cached offsets linked with the current checksum 
+        /// </summary>
+        private Matrix _lastOffsets = Matrix.CreateInstance(1, 2);
+
+        /// <summary>
+        /// List of selected alignment points.
+        /// </summary>
         private readonly List<AlignmentPoint> _selectedPoints = new List<AlignmentPoint>();
 
 
@@ -40,27 +53,21 @@ namespace NStarAlignment.Model
 
             lock (_accessLock)
             {
-                ClearSelectedPoints();
-
                 AxisPosition mAxes = new AxisPosition(mountAxes);
                 if (mAxes.IncludedAngleTo(_homePosition) < ProximityLimit) return mountAxes;    // Fast exist if we are going home.
                 RaiseNotification(NotificationType.Information, $"GetObservedAxes for {mountAxes[0]}/{mountAxes[1]}");
                 PierSide pSide = (PierSide)pierSide;
                 WriteLastAccessTime();
-
                 Matrix offsets = Matrix.CreateInstance(1, 2);
                 if (AlignmentPoints.Count == 1)
                 {
                     offsets[0, 0] = AlignmentPoints[0].ObservedAxes[0] - AlignmentPoints[0].MountAxes[0];
                     offsets[0, 1] = AlignmentPoints[0].ObservedAxes[1] - AlignmentPoints[0].MountAxes[1];
-                    AlignmentPoints[0].Selected = true;
-                    _selectedPoints.Add(AlignmentPoints[0]);
                     RaiseNotification(NotificationType.Data, $"Single alignment point selected {AlignmentPoints[0].Id:D3}, Mount axes: {AlignmentPoints[0].MountAxes.RaAxis}/{AlignmentPoints[0].MountAxes.RaAxis}, Observed axes: {AlignmentPoints[0].ObservedAxes.RaAxis}/{AlignmentPoints[0].ObservedAxes.RaAxis}");
                 }
                 else
                 {
-                    IEnumerable<AlignmentPoint> nearestPoints = GetNearestMountPoints(mAxes, pSide, SampleSize);
-                    var alignmentPoints = nearestPoints as AlignmentPoint[] ?? nearestPoints.ToArray();
+                    AlignmentPoint[] alignmentPoints = GetNearestMountPoints(mAxes, pSide, SampleSize);
                     int rows = alignmentPoints.Length;
 
                     if (rows > 2)
@@ -80,8 +87,6 @@ namespace NStarAlignment.Model
                             features[i, 2] = pt.MountAxes[1] * pt.MountAxes[1];
                             values[i, 0] = Range.RangePlusOrMinus180(pt.ObservedAxes[0] - pt.MountAxes[0]);
                             values[i, 1] = Range.RangePlusOrMinus180(pt.ObservedAxes[1] - pt.MountAxes[1]);
-                            pt.Selected = true;
-                            _selectedPoints.Add(pt);
                         }
 
                         _stringBuilder.AppendLine(".");
@@ -118,20 +123,18 @@ namespace NStarAlignment.Model
                         // Just use the nearest point of the two.
                         offsets[0, 0] = alignmentPoints[0].ObservedAxes[0] - alignmentPoints[0].MountAxes[0];
                         offsets[0, 1] = alignmentPoints[0].ObservedAxes[1] - alignmentPoints[0].MountAxes[1];
-                        alignmentPoints[0].Selected = true;
-                        _selectedPoints.Add(alignmentPoints[0]);
                         RaiseNotification(NotificationType.Data, $"Using nearest point of two {alignmentPoints[0].Id:D3}, Mount axes: {alignmentPoints[0].MountAxes.RaAxis}/{alignmentPoints[0].MountAxes.RaAxis}, Observed axes: {alignmentPoints[0].ObservedAxes.RaAxis}/{alignmentPoints[0].ObservedAxes.RaAxis}");
 
                     }
                     // Otherwise default to using no correcting offset 
 
                 }
-                RaiseNotification(NotificationType.Data, $"Correction -> Observer = {offsets[0, 0]}/{offsets[0, 1]}");
                 var observedAxes = new[]
                 {
                     mountAxes[0] + offsets[0, 0],
                     mountAxes[1] + offsets[0, 1]
                 };
+                RaiseNotification(NotificationType.Data, $"Correction -> Observer = {offsets[0, 0]}/{offsets[0, 1]}");
                 RaiseNotification(NotificationType.Information, $"Mount axes: {mountAxes[0]}/{mountAxes[1]} -> Observed axes: {observedAxes[0]}/{observedAxes[1]}");
 
                 return observedAxes;
@@ -155,96 +158,159 @@ namespace NStarAlignment.Model
 
             lock (_accessLock)
             {
-                ClearSelectedPoints();
+                bool postLogMessages = false;
                 AxisPosition sAxes = new AxisPosition(observedAxes);
                 if (sAxes.IncludedAngleTo(_homePosition) < ProximityLimit) return observedAxes;    // Fast exit if we are going home.
-                RaiseNotification(NotificationType.Information, $"GetMountAxes for {observedAxes[0]}/{observedAxes[1]}");
 
                 PierSide pSide = (PierSide)pierSide;
                 WriteLastAccessTime();
                 Matrix offsets = Matrix.CreateInstance(1, 2);
+                int checksum;
+
                 if (AlignmentPoints.Count == 1)
                 {
-                    offsets[0, 0] = AlignmentPoints[0].MountAxes[0] - AlignmentPoints[0].ObservedAxes[0];
-                    offsets[0, 1] = AlignmentPoints[0].MountAxes[1] - AlignmentPoints[0].ObservedAxes[1];
-                    AlignmentPoints[0].Selected = true;
-                    _selectedPoints.Add(AlignmentPoints[0]);
-                    RaiseNotification(NotificationType.Data, $"Single alignment point selected {AlignmentPoints[0].Id:D3}, Mount axes: {AlignmentPoints[0].MountAxes.RaAxis}/{AlignmentPoints[0].MountAxes.RaAxis}, Observed axes: {AlignmentPoints[0].ObservedAxes.RaAxis}/{AlignmentPoints[0].ObservedAxes.RaAxis}");
+                    checksum = GetChecksum(AlignmentPoints[0].Id);
+                    if (checksum == _currentChecksum)
+                    {
+                        // Checksum hasn't changed so use the last offsets
+                        offsets = _lastOffsets;
+                    }
+                    else
+                    {
+                        RaiseNotification(NotificationType.Information, $"GetMountAxes for {observedAxes[0]}/{observedAxes[1]}");
+                        ClearSelectedPoints();
+                        offsets[0, 0] = AlignmentPoints[0].MountAxes[0] - AlignmentPoints[0].ObservedAxes[0];
+                        offsets[0, 1] = AlignmentPoints[0].MountAxes[1] - AlignmentPoints[0].ObservedAxes[1];
+                        AlignmentPoints[0].Selected = true;
+                        _selectedPoints.Add(AlignmentPoints[0]);
+                        // Cache the offsets and checksum
+                        _lastOffsets = offsets;
+                        _currentChecksum = checksum;
+                        RaiseNotification(NotificationType.Data,
+                            $"Single alignment point selected {AlignmentPoints[0].Id:D3}, Mount axes: {AlignmentPoints[0].MountAxes.RaAxis}/{AlignmentPoints[0].MountAxes.RaAxis}, Observed axes: {AlignmentPoints[0].ObservedAxes.RaAxis}/{AlignmentPoints[0].ObservedAxes.RaAxis}");
+                        postLogMessages = true;
+                    }
                 }
                 else
                 {
-                    IEnumerable<AlignmentPoint> nearestPoints = GetNearestObservedPoints(sAxes, pSide, SampleSize);
-                    var alignmentPoints = nearestPoints as AlignmentPoint[] ?? nearestPoints.ToArray();
-                    int rows = alignmentPoints.Length;
-
-                    if (rows > 2)
+                    // Get the nearest points and their corresponding checksum value
+                    AlignmentPoint[] alignmentPoints = GetNearestObservedPoints(sAxes, pSide, SampleSize, out checksum);
+                    if (checksum == _currentChecksum)
                     {
-                        // Build features and values from registered points
-                        Matrix features = Matrix.CreateInstance(rows, 3);
-                        Matrix values = Matrix.CreateInstance(rows, 2);
-                        _stringBuilder.Clear();
-                        _stringBuilder.Append("Points chosen are");
-                        for (int i = 0; i < rows; i++)
+                        // Checksum hasn't changed to use the last offsets
+                        offsets = _lastOffsets;
+                    }
+                    else
+                    {
+                        int rows = alignmentPoints.Length;
+                        if (rows > 2)
                         {
-                            var pt = alignmentPoints[i];
-                            _stringBuilder.Append($" ({pt.Id:D3})");
-                            features[i, 0] = 1f;
-                            features[i, 1] = pt.ObservedAxes[0] * pt.ObservedAxes[0];
-                            features[i, 2] = pt.ObservedAxes[1] * pt.ObservedAxes[1];
-                            values[i, 0] = Range.RangePlusOrMinus180(pt.MountAxes[0] - pt.ObservedAxes[0]);
-                            values[i, 1] = Range.RangePlusOrMinus180(pt.MountAxes[1] - pt.ObservedAxes[1]);
-                            pt.Selected = true;
-                            _selectedPoints.Add(pt);
+                            RaiseNotification(NotificationType.Information, $"GetMountAxes for {observedAxes[0]}/{observedAxes[1]}");
+                            ClearSelectedPoints();
+                            // Build features and values from registered points
+                            Matrix features = Matrix.CreateInstance(rows, 3);
+                            Matrix values = Matrix.CreateInstance(rows, 2);
+                            _stringBuilder.Clear();
+                            _stringBuilder.Append("Points chosen are");
+                            for (int i = 0; i < rows; i++)
+                            {
+                                var pt = alignmentPoints[i];
+                                _stringBuilder.Append($" ({pt.Id:D3})");
+                                features[i, 0] = 1f;
+                                features[i, 1] = pt.ObservedAxes[0] * pt.ObservedAxes[0];
+                                features[i, 2] = pt.ObservedAxes[1] * pt.ObservedAxes[1];
+                                values[i, 0] = Range.RangePlusOrMinus180(pt.MountAxes[0] - pt.ObservedAxes[0]);
+                                values[i, 1] = Range.RangePlusOrMinus180(pt.MountAxes[1] - pt.ObservedAxes[1]);
+                                pt.Selected = true;
+                                _selectedPoints.Add(pt);
+                            }
+
+                            _stringBuilder.AppendLine(".");
+
+
+
+                            // Solve the normal equation to get theta
+                            Matrix theta = SolveNormalEquation(features, values);
+
+                            // Calculate the difference for the incoming points
+                            Matrix target = Matrix.CreateInstance(1, 3);
+                            target[0, 0] = 1f;
+                            target[0, 1] = sAxes[0] * sAxes[0];
+                            target[0, 2] = sAxes[1] * sAxes[1];
+
+                            offsets = target * theta;
+
+
+                            _stringBuilder.AppendLine("Features");
+                            _stringBuilder.AppendLine(features.ToString());
+                            _stringBuilder.AppendLine("Values");
+                            _stringBuilder.AppendLine(values.ToString());
+                            _stringBuilder.AppendLine("Theta");
+                            _stringBuilder.AppendLine(theta.ToString());
+                            _stringBuilder.AppendLine("Target");
+                            _stringBuilder.AppendLine(target.ToString());
+                            _stringBuilder.AppendLine("Offsets");
+                            _stringBuilder.AppendLine(offsets.ToString());
+                            RaiseNotification(NotificationType.Data, _stringBuilder.ToString());
+                            _stringBuilder.Clear();
+
+                            // Cache the offsets and the checksum
+                            _lastOffsets = offsets;
+                            _currentChecksum = checksum;
+                            postLogMessages = true;
                         }
-                        _stringBuilder.AppendLine(".");
+                        else if (rows > 0)
+                        {
+                            checksum = GetChecksum(AlignmentPoints[0].Id);
+                            if (checksum == _currentChecksum)
+                            {
+                                // Checksum hasn't changed so use the last offsets
+                                offsets = _lastOffsets;
+                            }
+                            else
+                            {
+                                RaiseNotification(NotificationType.Information, $"GetMountAxes for {observedAxes[0]}/{observedAxes[1]}");
 
-
-
-                        // Solve the normal equation to get theta
-                        Matrix theta = SolveNormalEquation(features, values);
-
-                        // Calculate the difference for the incoming points
-                        Matrix target = Matrix.CreateInstance(1, 3);
-                        target[0, 0] = 1f;
-                        target[0, 1] = sAxes[0] * sAxes[0];
-                        target[0, 2] = sAxes[1] * sAxes[1];
-
-                        offsets = target * theta;
-
-
-                        _stringBuilder.AppendLine("Features");
-                        _stringBuilder.AppendLine(features.ToString());
-                        _stringBuilder.AppendLine("Values");
-                        _stringBuilder.AppendLine(values.ToString());
-                        _stringBuilder.AppendLine("Theta");
-                        _stringBuilder.AppendLine(theta.ToString());
-                        _stringBuilder.AppendLine("Target");
-                        _stringBuilder.AppendLine(target.ToString());
-                        _stringBuilder.AppendLine("Offsets");
-                        _stringBuilder.AppendLine(offsets.ToString());
-                        RaiseNotification(NotificationType.Data, _stringBuilder.ToString());
-                        _stringBuilder.Clear();
+                                ClearSelectedPoints();
+                                // Use the nearest point of the two.
+                                offsets[0, 0] = alignmentPoints[0].MountAxes[0] - alignmentPoints[0].ObservedAxes[0];
+                                offsets[0, 1] = alignmentPoints[0].MountAxes[1] - alignmentPoints[0].ObservedAxes[1];
+                                alignmentPoints[0].Selected = true;
+                                _selectedPoints.Add(alignmentPoints[0]);
+                                // Cache the offsets and checksum
+                                _lastOffsets = offsets;
+                                _currentChecksum = checksum;
+                                postLogMessages = true;
+                                RaiseNotification(NotificationType.Data,
+                                    $"Using nearest point of two {alignmentPoints[0].Id:D3}, Mount axes: {alignmentPoints[0].MountAxes.RaAxis}/{alignmentPoints[0].MountAxes.RaAxis}, Observed axes: {alignmentPoints[0].ObservedAxes.RaAxis}/{alignmentPoints[0].ObservedAxes.RaAxis}");
+                            }
+                        }
+                        else
+                        {
+                            if (_currentChecksum != int.MinValue)
+                            {
+                                _currentChecksum = int.MinValue;
+                                RaiseNotification(NotificationType.Warning,
+                                    $"No alignment points selected, Mount axes: {alignmentPoints[0].MountAxes.RaAxis}/{alignmentPoints[0].MountAxes.RaAxis}, Observed axes: {alignmentPoints[0].ObservedAxes.RaAxis}/{alignmentPoints[0].ObservedAxes.RaAxis}");
+                            }
+                        }
                     }
-                    else if (rows > 0)
-                    {
-                        // Use the nearest point of the two.
-                        offsets[0, 0] = alignmentPoints[0].MountAxes[0] - alignmentPoints[0].ObservedAxes[0];
-                        offsets[0, 1] = alignmentPoints[0].MountAxes[1] - alignmentPoints[0].ObservedAxes[1];
-                        alignmentPoints[0].Selected = true;
-                        _selectedPoints.Add(alignmentPoints[0]);
-                        RaiseNotification(NotificationType.Data, $"Using nearest point of two {alignmentPoints[0].Id:D3}, Mount axes: {alignmentPoints[0].MountAxes.RaAxis}/{alignmentPoints[0].MountAxes.RaAxis}, Observed axes: {alignmentPoints[0].ObservedAxes.RaAxis}/{alignmentPoints[0].ObservedAxes.RaAxis}");
 
-                    }
                     // Otherwise default to using zero offset
                 }
-                RaiseNotification(NotificationType.Data, $"Correction -> Mount = {offsets[0, 0]}/{offsets[0, 1]}");
 
                 var mountAxes = new[]
                 {
                     observedAxes[0] + offsets[0, 0],
                     observedAxes[1] + offsets[0, 1]
                 };
-                RaiseNotification(NotificationType.Information, $"Observed axes: {observedAxes[0]}/{observedAxes[1]} -> Mount axes: {mountAxes[0]}/{mountAxes[1]}");
+                if (postLogMessages)
+                {
+                    RaiseNotification(NotificationType.Data, $"Correction -> Mount = {offsets[0, 0]}/{offsets[0, 1]}");
+                    RaiseNotification(NotificationType.Information,
+                        $"Observed axes: {observedAxes[0]}/{observedAxes[1]} -> Mount axes: {mountAxes[0]}/{mountAxes[1]}");
+                }
+
                 return mountAxes;
             }
         }
@@ -263,18 +329,20 @@ namespace NStarAlignment.Model
             _selectedPoints.Clear();
         }
 
-        private IEnumerable<AlignmentPoint> GetNearestMountPoints(AxisPosition axisPosition, PierSide pierSide, int numberOfPoints)
+        private AlignmentPoint[] GetNearestMountPoints(AxisPosition axisPosition, PierSide pierSide, int numberOfPoints)
         {
             return AlignmentPoints
                 .Where(p => p.PierSide == pierSide && p.MountAxes.IncludedAngleTo(axisPosition) <= NearbyLimit)
-                .OrderBy(d => d.MountAxes.IncludedAngleTo(axisPosition)).Take(numberOfPoints);
+                .OrderBy(d => d.MountAxes.IncludedAngleTo(axisPosition)).Take(numberOfPoints).ToArray();
         }
 
-        private IEnumerable<AlignmentPoint> GetNearestObservedPoints(AxisPosition axisPosition, PierSide pierSide, int numberOfPoints)
+        private AlignmentPoint[] GetNearestObservedPoints(AxisPosition axisPosition, PierSide pierSide, int numberOfPoints, out int checkSum)
         {
-            return AlignmentPoints
+            AlignmentPoint[] points = AlignmentPoints
                 .Where(p => p.PierSide == pierSide && p.ObservedAxes.IncludedAngleTo(axisPosition) <= NearbyLimit)
-                .OrderBy(d => d.ObservedAxes.IncludedAngleTo(axisPosition)).Take(numberOfPoints);
+                .OrderBy(d => d.ObservedAxes.IncludedAngleTo(axisPosition)).Take(numberOfPoints).ToArray();
+            checkSum = GetChecksum(points.Select(p => p.Id).ToArray());
+            return points;
         }
 
         public static Matrix SolveNormalEquation(Matrix inputFeatures, Matrix outputValue)
@@ -288,6 +356,31 @@ namespace NStarAlignment.Model
             Matrix result = xxi * xy;
             return result;
         }
+
+        #region Adler checksum
+        private const int Mod = 65521;
+        private static int GetChecksum(int[] array)
+        {
+            int i;
+            var a = 1;
+            var b = 0;
+            var size = array.Length;
+            for (i = 0; i < size; i++)
+            {
+                a = (a + array[i]) % Mod;
+                b = (b + a) % Mod;
+            }
+            return (b << 16) | a;
+        }
+
+        private static int GetChecksum(int singleValue)
+        {
+            var a = (1 + singleValue) % Mod;
+            var b = a % Mod;
+            return (b << 16) | a;
+        }
+        #endregion
+
         #endregion
 
     }

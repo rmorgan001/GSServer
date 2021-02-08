@@ -42,6 +42,6 @@
     </None>
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="IF &quot;$(PlatformName)&quot; == &quot;x64&quot; ECHO f | COPY /Y &quot;$(ProjectDir)cfitsio\cfitsio_64.dll&quot; &quot;$(TargetDir)cfitsio.dll&quot;&#xD;&#xA;IF NOT &quot;$(PlatformName)&quot; == &quot;x64&quot; ECHO f | COPY /Y &quot;$(ProjectDir)cfitsio\cfitsio_32.dll&quot; &quot;$(TargetDir)cfitsio.dll&quot;&#xD;&#xA;XCOPY /Y &quot;$(TargetPath)&quot; &quot;$(ProjectDir)..\Builds\&quot;" />
+    <Exec Command="IF &quot;$(PlatformName)&quot; == &quot;x64&quot; ECHO f | COPY /Y &quot;$(ProjectDir)cfitsio\cfitsio_64.dll&quot; &quot;$(TargetDir)cfitsio.dll&quot;&#xD;&#xA;IF NOT &quot;$(PlatformName)&quot; == &quot;x64&quot; ECHO f | COPY /Y &quot;$(ProjectDir)cfitsio\cfitsio_32.dll&quot; &quot;$(TargetDir)cfitsio.dll&quot;" />
   </Target>
 </Project>

@@ -67,9 +67,10 @@ namespace GS.Server.Alignment
             if (_skyTelescopeVM == null) _skyTelescopeVM = SkyTelescopeVM._skyTelescopeVM;
 
             BindingOperations.EnableCollectionSynchronization(AlignmentPoints, _alignmentPointsLock);
+            SkyServer.AlignmentModel.AlignmentPoints.CollectionChanged += AlignmentPoints_CollectionChanged;
 
-            WeakEventManager<AlignmentPointCollection, NotifyCollectionChangedEventArgs>.AddHandler(SkyServer.AlignmentModel.AlignmentPoints, "CollectionChanged", AlignmentPoints_CollectionChanged);
         }
+
 
         private void AlignmentPoints_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
