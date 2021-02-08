@@ -60,7 +60,7 @@ namespace NStarAlignment.Model
         /// Tolerance used when comparing angles to allow for rounding errors.
         /// Used when determining whether axis positions need flipping.
         /// </summary>
-        private const double AxisAngleComparisonTolerance = 0.001;
+        //private const double AxisAngleComparisonTolerance = 0.001;
 
 
         private AxisPosition _homePosition = new AxisPosition(90.0, 90.0);

@@ -14,6 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+using System;
 using GS.Shared;
 using System.ComponentModel;
 using System.Reflection;
@@ -53,10 +55,10 @@ namespace GS.Server.Alignment
             get => _proximityLimit;
             set
             {
-                if (_proximityLimit == value) return;
+                if (Math.Abs(_proximityLimit - value) < 0.0000000000001) return;
                 _proximityLimit = value;
-                Properties.Alignment.Default.ProximityLimit = (double)value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
+                Properties.Alignment.Default.ProximityLimit = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
 
@@ -68,10 +70,10 @@ namespace GS.Server.Alignment
             get => _nearbyLimit;
             set
             {
-                if (_nearbyLimit == value) return;
+                if (Math.Abs(_nearbyLimit - value) < 0.0000000000001) return;
                 _nearbyLimit = value;
-                Properties.Alignment.Default.NearbyLimit = (double)value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
+                Properties.Alignment.Default.NearbyLimit = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
 
@@ -85,8 +87,8 @@ namespace GS.Server.Alignment
             {
                 if (_sampleSize == value) return;
                 _sampleSize = value;
-                Properties.Alignment.Default.SampleSize = (int)value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
+                Properties.Alignment.Default.SampleSize = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
 
@@ -101,7 +103,7 @@ namespace GS.Server.Alignment
                 if (_clearModelOnStartup == value) return;
                 _clearModelOnStartup = value;
                 Properties.Alignment.Default.ClearModelOnStartup = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
             }
 
