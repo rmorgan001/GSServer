@@ -4632,7 +4632,6 @@ namespace GS.Server.SkyTelescope
                 }
 
                 // the time is?
-                // var gsjd = JDate.Ole2Jd(HiResDateTime.UtcNow.Add(SkySettings.UTCDateOffset));
                 SiderealTime = GetLocalSiderealTime();
 
                 // Get raw positions, some are non-responses from mount and are returned as NaN
@@ -4647,11 +4646,7 @@ namespace GS.Server.SkyTelescope
                 PecCheck();
 
                 //Convert Positions to degrees
-                double[] rawPositions = new[]
-                {
-                    ConvertStepsToDegrees(rawSteps[0], 0),
-                    ConvertStepsToDegrees(rawSteps[1], 1)
-                };
+                double[] rawPositions = {ConvertStepsToDegrees(rawSteps[0], 0), ConvertStepsToDegrees(rawSteps[1], 1)};
 
                 //Apply any alignment adjustments
                 var calculatedAxes = GetAdjustAxesForReporting(rawPositions);
@@ -4713,12 +4708,8 @@ namespace GS.Server.SkyTelescope
 
         private static double GetLocalSiderealTime(DateTime utcNow)
         {
-            double gsjd = JDate.Ole2Jd(utcNow.Add(SkySettings.UTCDateOffset));
-            //var ascomjd = _util.JulianDate;
-            //var altjd = JDate.Utc2Jd2(HiResDateTime.UtcNow.Add(SkySettings.UTCDateOffset));
-            //var dtsdiff = ascomjd - altjd;
+            var gsjd = JDate.Ole2Jd(utcNow.Add(SkySettings.UTCDateOffset));
             return Time.Lst(JDate.Epoch2000Days(), gsjd, false, SkySettings.Longitude);
-
         }
         #endregion
 

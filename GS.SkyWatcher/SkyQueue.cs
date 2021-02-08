@@ -128,6 +128,12 @@ namespace GS.SkyWatcher
             {
                 if (!IsRunning || _cts.IsCancellationRequested || !_skyWatcher.IsConnected) return;
                 command.Execute(_skyWatcher);
+                if (command.Exception != null)
+                {
+                    var monitorItem = new MonitorEntry
+                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{command.Exception.Message}, {command.Exception.StackTrace}" };
+                    MonitorLog.LogToMonitor(monitorItem);
+                }
                 if (command.Id <= 0) return;
                 if (_resultsDictionary.TryAdd(command.Id, command) == false)
                 {
