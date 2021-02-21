@@ -21,6 +21,7 @@ using System.IO.Ports;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using GS.Principles;
 
 namespace GS.SkyWatcher
 {
@@ -428,11 +429,21 @@ namespace GS.SkyWatcher
         internal double GetAxisPositionNaN(AxisId axis)
         {
             var response = CmdToAxis(axis, 'j', null, true);
-            if (string.IsNullOrEmpty(response)) return double.NaN;
-            var iPosition = StringToLong(response);
-            iPosition -= 0x00800000;
-            _positions[(int)axis] = StepToAngle(axis, iPosition);
-            return _positions[(int)axis];
+            try
+            {
+                if (string.IsNullOrEmpty(response)) return double.NaN;
+                var iPosition = StringToLong(response);
+                iPosition -= 0x00800000;
+                _positions[(int)axis] = StepToAngle(axis, iPosition);
+                return _positions[(int)axis];
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
+                MonitorLog.LogToMonitor(monitorItem);
+                return double.NaN;
+            }
         }
 
         /// <summary>
@@ -443,10 +454,20 @@ namespace GS.SkyWatcher
         internal double GetAxisStepsNaN(AxisId axis)
         {
             var response = CmdToAxis(axis, 'j', null, true);
-            if (string.IsNullOrEmpty(response)) return double.NaN;
-            var iPosition = StringToLong(response);
-            iPosition -= 0x00800000;
-            return iPosition;
+            try
+            {
+                if (string.IsNullOrEmpty(response)) return double.NaN;
+                var iPosition = StringToLong(response);
+                iPosition -= 0x00800000;
+                return iPosition;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
+                MonitorLog.LogToMonitor(monitorItem);
+                return double.NaN;
+            }
         }
 
         /// <summary>
@@ -801,7 +822,7 @@ namespace GS.SkyWatcher
                                 _retryCount++;
                                 monitorItem = new MonitorEntry
                                 {
-                                    Datetime = Principles.HiResDateTime.UtcNow,
+                                    Datetime = HiResDateTime.UtcNow,
                                     Device = MonitorDevice.Telescope,
                                     Category = MonitorCategory.Mount,
                                     Type = MonitorType.Warning,
@@ -840,7 +861,7 @@ namespace GS.SkyWatcher
                         {
                             MountConnected = false;
                             monitorItem = new MonitorEntry
-                            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
+                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
                             MonitorLog.LogToMonitor(monitorItem);
 
                             throw new MountControlException(ErrorCode.ErrNotConnected, "IO Error", ex);
@@ -849,7 +870,7 @@ namespace GS.SkyWatcher
                         {
                             MountConnected = false;
                             monitorItem = new MonitorEntry
-                            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
+                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
                             MonitorLog.LogToMonitor(monitorItem);
                             throw;
                         }
@@ -858,7 +879,7 @@ namespace GS.SkyWatcher
                     {
                         // deal with the fact that the lock was not acquired.
                         monitorItem = new MonitorEntry
-                        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Lock not acquired #{i} Command:{command} String:{cmdDataStr}" };
+                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Lock not acquired #{i} Command:{command} String:{cmdDataStr}" };
                         MonitorLog.LogToMonitor(monitorItem);
                     }
                 }
@@ -870,7 +891,7 @@ namespace GS.SkyWatcher
             }
             // deal with the fact that the lock was not acquired.
             monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Thread Lock Timeout" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Thread Lock Timeout" };
             MonitorLog.LogToMonitor(monitorItem);
             return null;
         }
@@ -895,7 +916,7 @@ namespace GS.SkyWatcher
             commandStr.Append(cmdDataStr);
             commandStr.Append(_endChar);                         // CR Character            
 
-            var dt = Principles.HiResDateTime.UtcNow;
+            var dt = HiResDateTime.UtcNow;
             var monitorItem = new MonitorEntry
             { Datetime = dt, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{commandStr.ToString().Trim()}" };
             MonitorLog.LogToMonitor(monitorItem);
@@ -1037,7 +1058,7 @@ namespace GS.SkyWatcher
             var receivedData = ReceiveResponse();
 
             var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{cmdDataStr},{receivedData}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{cmdDataStr},{receivedData}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             // process incoming data string
@@ -1106,12 +1127,12 @@ namespace GS.SkyWatcher
                     if (triggerError)
                     {
                         monitorItem = new MonitorEntry
-                            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" Abnormal Response: Axis:{axis}, Command:{command}, Received:{receivedData}, CommandStr:{cmdDataStr}, Message: {errormsg}" };
+                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" Abnormal Response: Axis:{axis}, Command:{command}, Received:{receivedData}, CommandStr:{cmdDataStr}, Message: {errormsg}" };
                         MonitorLog.LogToMonitor(monitorItem);
                     }
 
                     monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" Abnormal Response: Axis:{axis}, Command:{command}, Received:{receivedData}, CommandStr:{cmdDataStr}, Message: {errormsg}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" Abnormal Response: Axis:{axis}, Command:{command}, Received:{receivedData}, CommandStr:{cmdDataStr}, Message: {errormsg}" };
                     MonitorLog.LogToMonitor(monitorItem);
                     if(!string.IsNullOrEmpty(subdata)) return subdata;
                     receivedData = null;
