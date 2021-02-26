@@ -20,6 +20,7 @@ using NStarAlignment.Utilities;
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 
@@ -38,32 +39,36 @@ namespace NStarAlignment.Model
     public class NotificationEventArgs : EventArgs
     {
         public NotificationType NotificationType { get; set; }
+        public string Method { get; set; }
+
+        public int Thread { get; set; }
         public string Message { get; set; }
 
-        public NotificationEventArgs(NotificationType notificationType, string message)
+
+        public NotificationEventArgs(NotificationType notificationType, string method, string message)
         {
             this.NotificationType = notificationType;
+            this.Method = method;
             this.Message = message;
+            this.Thread = System.Threading.Thread.CurrentThread.ManagedThreadId;
         }
     }
 
     public partial class AlignmentModel
     {
+        #region Events ...
+
         public event EventHandler<NotificationEventArgs> Notification = delegate { };
 
-        private void RaiseNotification(NotificationType notificationType, string message)
+        private void RaiseNotification(NotificationType notificationType, string method,  string message)
         {
-            Volatile.Read(ref Notification).Invoke(this, new NotificationEventArgs(notificationType, message));
+            Volatile.Read(ref Notification).Invoke(this, new NotificationEventArgs(notificationType, method,  message));
         }
 
-        /// <summary>
-        /// Tolerance used when comparing angles to allow for rounding errors.
-        /// Used when determining whether axis positions need flipping.
-        /// </summary>
-        //private const double AxisAngleComparisonTolerance = 0.001;
+        #endregion
 
-
-        private AxisPosition _homePosition = new AxisPosition(90.0, 90.0);
+        #region Properties ...
+        private AxisPosition _homePosition;
 
         public void SetHomePosition(double raAxis, double decAxis)
         {
@@ -114,34 +119,53 @@ namespace NStarAlignment.Model
 
         private readonly string _timeStampFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"NStarAlignment\TimeStamp.config");
 
+        #endregion
+
+        #region Constructor ...
         public AlignmentModel(double siteLatitude, double siteLongitude, double siteElevation, bool clearPointsOnStartup = false)
         {
             SiteLatitude = siteLatitude;
             SiteLongitude = siteLongitude;
             SiteElevation = siteElevation;
             _homePosition = new AxisPosition(90.0, 90.0);
-            // Load the last access time property.
-            ReadLastAccessTime();
-            // Re-load alignment points unless clear points on start up is specified
-            // In case of lost connections or restarts the points are only cleared if the last time the model was accessed is more than an hour ago.
-            if (!clearPointsOnStartup || (LastAccessDateTime != null && (LastAccessDateTime.Value > DateTime.Now - new TimeSpan(1, 0, 0))))
+            try
             {
-                LoadAlignmentPoints();
+                // Load the last access time property.
+                ReadLastAccessTime();
+                // Re-load alignment points unless clear points on start up is specified
+                // In case of lost connections or restarts the points are only cleared if the last time the model was accessed is more than an hour ago.
+                if (!clearPointsOnStartup || (LastAccessDateTime != null &&
+                                              (LastAccessDateTime.Value > DateTime.Now - new TimeSpan(1, 0, 0))))
+                {
+                    LoadAlignmentPoints();
+                }
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, true);
             }
         }
+        #endregion  
 
         #region Alignment point management ...
         public void AddAlignmentPoint(double[] mountAltAz, double[] observedAltAz, double[] mountAxes, double[] observedAxes, int pierSide, DateTime syncTime)
         {
-            AddAlignmentPoint(mountAltAz,
-                observedAltAz,
-                new AxisPosition(mountAxes[0], mountAxes[1]),
-                new AxisPosition(observedAxes[0], observedAxes[1]),
-                (PierSide)pierSide,
-                syncTime);
+            try
+            {
+                AddAlignmentPoint(mountAltAz,
+                    observedAltAz,
+                    new AxisPosition(mountAxes[0], mountAxes[1]),
+                    new AxisPosition(observedAxes[0], observedAxes[1]),
+                    (PierSide) pierSide,
+                    syncTime);
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, true);
+            }
         }
 
-        public void AddAlignmentPoint(double[] mountAltAz, double[] observedAltAz, AxisPosition mountAxes, AxisPosition observedAxes, PierSide pierSide, DateTime syncTime)
+        private void AddAlignmentPoint(double[] mountAltAz, double[] observedAltAz, AxisPosition mountAxes, AxisPosition observedAxes, PierSide pierSide, DateTime syncTime)
         {
             lock (_accessLock)
             {
@@ -168,12 +192,21 @@ namespace NStarAlignment.Model
 
         public bool RemoveAlignmentPoint(AlignmentPoint pointToDelete)
         {
-            bool result = AlignmentPoints.Remove(pointToDelete);
-            if (result)
+            try
             {
-                SaveAlignmentPoints();
+                bool result = AlignmentPoints.Remove(pointToDelete);
+                if (result)
+                {
+                    SaveAlignmentPoints();
+                }
+
+                return result;
             }
-            return result;
+            catch (Exception ex)
+            {
+                LogException(ex, true);
+                return false;
+            }
         }
 
         private void SaveAlignmentPoints()
@@ -215,8 +248,15 @@ namespace NStarAlignment.Model
 
         public void ClearAlignmentPoints()
         {
-            AlignmentPoints.Clear();
-            SaveAlignmentPoints();
+            try
+            {
+                AlignmentPoints.Clear();
+                SaveAlignmentPoints();
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, true);
+            }
         }
 
         #endregion
@@ -252,6 +292,7 @@ namespace NStarAlignment.Model
         }
         #endregion
 
+        #region Helper methods ..
         private CarteseanCoordinate AltAzToCartesean(double[] altAz)
         {
             // The next line replaces AxesToSpherical,
@@ -284,10 +325,21 @@ namespace NStarAlignment.Model
                 _stringBuilder.AppendLine(
                     $"{pt.Id:D3}\t{pt.AltAz[0]}/{pt.AltAz[1]}\t{pt.MountAxes.RaAxis}/{pt.MountAxes.DecAxis}\t{pt.ObservedAxes.RaAxis}/{pt.ObservedAxes.DecAxis}");
             }
-            RaiseNotification(NotificationType.Data, _stringBuilder.ToString());
+            RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name, _stringBuilder.ToString());
             _stringBuilder.Clear();
         }
 
+        private void LogException(Exception ex, bool allowDuplicates = false)
+        {
+            if (allowDuplicates || !_exceptionMessages.Contains(ex.Message))
+            {
+                _exceptionMessages.Add(ex.Message);
+                string message = $"{ex.Message}, {ex.StackTrace}";
+                RaiseNotification(NotificationType.Error, MethodBase.GetCurrentMethod().Name, message);
+            }
+        }
+
+        #endregion
 
     }
 }

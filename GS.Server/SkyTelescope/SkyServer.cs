@@ -4319,8 +4319,8 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Alignment,
                 Type = (MonitorType)e.NotificationType,
-                Method = MethodBase.GetCurrentMethod().Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
+                Method = e.Method,
+                Thread = e.Thread,
                 Message = e.Message
             };
             MonitorLog.LogToMonitor(monitorItem);
