@@ -167,6 +167,7 @@ namespace GS.Server.SkyTelescope
                     break;
             }
         }
+
         private static void PropertyChangedAlignmentSettings(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
