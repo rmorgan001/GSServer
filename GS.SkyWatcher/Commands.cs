@@ -722,14 +722,15 @@ namespace GS.SkyWatcher
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="on"></param>
-        internal void SetPPec(AxisId axis, bool on)
+        internal string SetPPec(AxisId axis, bool on)
         {
             var szCmd = LongToHex(3);
             if (on)
             {
                 szCmd = LongToHex(2);
             }
-            CmdToAxis(axis, 'W', szCmd, true);
+            var response = CmdToAxis(axis, 'W', szCmd, true);
+            return response;
         }
 
         /// <summary>
@@ -1066,8 +1067,6 @@ namespace GS.SkyWatcher
             receivedData = receivedData?.Replace("\0", string.Empty);
             if (string.IsNullOrEmpty(receivedData)) return null;
 
-            var triggerError = false;
-
             switch (receivedData[0].ToString())
             {
                 //receive '=DDDDDD [0D]'    or '!D [0D]'
@@ -1118,17 +1117,11 @@ namespace GS.SkyWatcher
                             break;
                         case "!8":
                             errormsg = "Invalid pPEC model";
-                            triggerError = true;
+                            subdata = "!8";
                             break;
                         default:
                             errormsg = "Code Not Found";
                             break;
-                    }
-                    if (triggerError)
-                    {
-                        monitorItem = new MonitorEntry
-                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" Abnormal Response: Axis:{axis}, Command:{command}, Received:{receivedData}, CommandStr:{cmdDataStr}, Message: {errormsg}" };
-                        MonitorLog.LogToMonitor(monitorItem);
                     }
 
                     monitorItem = new MonitorEntry

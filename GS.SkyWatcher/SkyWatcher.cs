@@ -748,10 +748,9 @@ namespace GS.SkyWatcher
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="on">on=true,off=false</param>
-        internal void SetPPec(AxisId axis, bool on)
+        internal string SetPPec(AxisId axis, bool on)
         {
-            if (!CanPPec) { return; }
-            _commands.SetPPec(axis, on);
+            return !CanPPec ? null : _commands.SetPPec(axis, @on);
         }
 
         /// <summary>

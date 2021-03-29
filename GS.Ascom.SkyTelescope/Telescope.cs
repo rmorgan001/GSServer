@@ -90,7 +90,18 @@ namespace ASCOM.GS.Sky.Telescope
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" ActionName: {ActionName}, ActionParameters{ActionParameters}" };
             MonitorLog.LogToMonitor(monitorItem);
 
-            throw new MethodNotImplementedException("Action");
+            switch (ActionName.Trim().ToUpperInvariant())
+            {
+                // ReSharper disable once StringLiteralTypo
+                case @"TELESCOPE:SETPARKPOSITION":
+                    if (SkyServer.IsMountRunning == false){throw new NotConnectedException();}
+                    var found = SkySettings.ParkPositions.Find(x => x.Name == ActionParameters.Trim());
+                    if (found == null) return null;
+                    SkyServer.ParkSelected = found;
+                    return found.Name;
+                default:
+                    throw new ActionNotImplementedException("ActionName");
+            }
         }
 
         /// <summary>
@@ -105,7 +116,9 @@ namespace ASCOM.GS.Sky.Telescope
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Started" };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                var sa = new ArrayList();
+                // ReSharper disable once StringLiteralTypo
+                var sa = new ArrayList {@"Telescope:SetParkPosition"};
+
                 return sa;
             }
         }

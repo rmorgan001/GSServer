@@ -2014,7 +2014,7 @@ namespace GS.SkyWatcher
         public DateTime CreatedUtc { get; }
         public bool Successful { get; set; }
         public Exception Exception { get; set; }
-        public dynamic Result { get; }
+        public dynamic Result { get; set; }
         private readonly AxisId _axis;
         private readonly bool _on;
 
@@ -2033,7 +2033,7 @@ namespace GS.SkyWatcher
         {
             try
             {
-                skyWatcher.SetPPec(_axis, _on);
+                Result = skyWatcher.SetPPec(_axis, _on);
                 Successful = true;
             }
             catch (Exception e)
