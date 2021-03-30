@@ -23,10 +23,12 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Threading;
+using Newtonsoft.Json;
 
 
 namespace ASCOM.GS.Sky.Telescope
@@ -86,32 +88,34 @@ namespace ASCOM.GS.Sky.Telescope
 
         public string Action(string ActionName, string ActionParameters)
         {
-            ActionName = ActionName.ToUpper();
+            ActionName = ActionName?.Trim();
+            ActionParameters = ActionParameters?.Trim();
 
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Driver, Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $" ActionName:{ActionName}, ActionParameters:{ActionParameters}"
+                Message = $" ActionName:{ActionName}, ActionParameters:'{ActionParameters}'"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
             switch (ActionName)
             {
                 // ReSharper disable once StringLiteralTypo
-                case "TELESCOPE:SETPARKPOSITION":
-                    if (SkyServer.IsMountRunning == false)
+                case string str when str.Equals("telescope:setparkposition", StringComparison.InvariantCultureIgnoreCase):
+                    if (SkyServer.IsMountRunning == false){throw new NotConnectedException("Mount Not Connected");}
+                    var found = SkySettings.ParkPositions.Find(x => string.Equals(x.Name, ActionParameters, StringComparison.InvariantCultureIgnoreCase));
+                    if (found == null)
                     {
-                        throw new NotConnectedException();
+                        var _parkPositions = SkySettings.ParkPositions.OrderBy(ParkPosition => ParkPosition.Name).ToList();
+                        var output = JsonConvert.SerializeObject(_parkPositions);
+                        throw new Exception($"Param Not Found:'{ActionParameters}', {output}");
                     }
-
-                    var found = SkySettings.ParkPositions.Find(x => x.Name == ActionParameters);
-                    if (found == null) return null;
                     SkyServer.ParkSelected = found;
                     return found.Name;
                 default:
-                    throw new ActionNotImplementedException(ActionName);
+                    throw new ActionNotImplementedException($"Not Found:'{ActionName}'");
             }
         }
 
