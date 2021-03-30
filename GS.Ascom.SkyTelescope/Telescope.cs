@@ -86,21 +86,32 @@ namespace ASCOM.GS.Sky.Telescope
 
         public string Action(string ActionName, string ActionParameters)
         {
+            ActionName = ActionName.ToUpper();
+
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" ActionName: {ActionName}, ActionParameters{ActionParameters}" };
+            {
+                Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Driver, Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $" ActionName:{ActionName}, ActionParameters:{ActionParameters}"
+            };
             MonitorLog.LogToMonitor(monitorItem);
 
-            switch (ActionName.Trim().ToUpperInvariant())
+            switch (ActionName)
             {
                 // ReSharper disable once StringLiteralTypo
-                case @"TELESCOPE:SETPARKPOSITION":
-                    if (SkyServer.IsMountRunning == false){throw new NotConnectedException();}
-                    var found = SkySettings.ParkPositions.Find(x => x.Name == ActionParameters.Trim());
+                case "TELESCOPE:SETPARKPOSITION":
+                    if (SkyServer.IsMountRunning == false)
+                    {
+                        throw new NotConnectedException();
+                    }
+
+                    var found = SkySettings.ParkPositions.Find(x => x.Name == ActionParameters);
                     if (found == null) return null;
                     SkyServer.ParkSelected = found;
                     return found.Name;
                 default:
-                    throw new ActionNotImplementedException("ActionName");
+                    throw new ActionNotImplementedException(ActionName);
             }
         }
 
