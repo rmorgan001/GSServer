@@ -1861,7 +1861,12 @@ namespace GS.Server.SkyTelescope
                         case MountTaskName.Pec:
                             var ppecon = new SkySetPPec(SkyQueue.NewId, AxisId.Axis1, SkySettings.PPecOn);
                             var ppeconstr = (string)SkyQueue.GetCommandResult(ppecon).Result;
-                            if (ppeconstr.Contains("!")){SkySettings.PPecOn = false;}
+                            if (string.IsNullOrEmpty(ppeconstr))
+                            {
+                                SkySettings.PPecOn = false;
+                                break;
+                            }
+                            if (ppeconstr.Contains("!")){SkySettings.PPecOn = false; }
                             break;
                         case MountTaskName.StopAxes:
                             _ = new SkyAxisStop(0, AxisId.Axis1);
