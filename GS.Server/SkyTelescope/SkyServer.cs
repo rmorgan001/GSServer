@@ -4660,8 +4660,8 @@ namespace GS.Server.SkyTelescope
                 var calculatedAxes = GetAdjustAxesForReporting(rawPositions);
 
                 // UI diagnostics in degrees
-                ActualAxisX = calculatedAxes[0];
-                ActualAxisY = calculatedAxes[1];
+                ActualAxisX = rawPositions[0];
+                ActualAxisY = rawPositions[1];
 
                 // convert positions to local
                 var axes = Axes.AxesMountToApp(calculatedAxes);
