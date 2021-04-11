@@ -283,7 +283,7 @@ namespace NStarAlignment.Model
                             }
                             else if (rows > 0)
                             {
-                                checksum = GetChecksum(AlignmentPoints[0].Id);
+                                checksum = GetChecksum(alignmentPoints[0].Id);
                                 if (checksum == _currentChecksum)
                                 {
                                     // Checksum hasn't changed so use the last offsets
@@ -315,7 +315,7 @@ namespace NStarAlignment.Model
                                 if (_currentChecksum != int.MinValue)
                                 {
                                     _currentChecksum = int.MinValue;
-                                    RaiseNotification(NotificationType.Warning, MethodBase.GetCurrentMethod().Name,
+                                    RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
                                         $"No alignment points selected, Mount axes: {alignmentPoints[0].MountAxes.RaAxis}/{alignmentPoints[0].MountAxes.RaAxis}, Observed axes: {alignmentPoints[0].ObservedAxes.RaAxis}/{alignmentPoints[0].ObservedAxes.RaAxis}");
                                 }
                             }
