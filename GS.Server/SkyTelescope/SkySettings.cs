@@ -1518,19 +1518,19 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static TimeSpan _uTCDateOffset;
-        public static TimeSpan UTCDateOffset
-        {
-            get => _uTCDateOffset;
-            set
-            {
-                if (_uTCDateOffset == value) return;
-                _uTCDateOffset = value;
-                Properties.SkyTelescope.Default.UTCOffset = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
-                OnStaticPropertyChanged();
-            }
-        }
+        //private static TimeSpan _uTCDateOffset;
+        //public static TimeSpan UTCDateOffset
+        //{
+        //    get => _uTCDateOffset;
+        //    set
+        //    {
+        //        if (_uTCDateOffset == value) return;
+        //        _uTCDateOffset = value;
+        //        Properties.SkyTelescope.Default.UTCOffset = value;
+        //        LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+        //        OnStaticPropertyChanged();
+        //    }
+        //}
 
         private static List<ParkPosition> _parkPositions;
         public static List<ParkPosition> ParkPositions
@@ -1706,7 +1706,7 @@ namespace GS.Server.SkyTelescope
             SyncLimit = Properties.SkyTelescope.Default.SyncLimit;
             SyncLimitOn = Properties.SkyTelescope.Default.SyncLimitOn;
             Temperature = Properties.SkyTelescope.Default.Temperature;
-            UTCDateOffset = Properties.SkyTelescope.Default.UTCOffset;
+            //UTCDateOffset = Properties.SkyTelescope.Default.UTCOffset;
 
             //first time load from old park positions
             var pp = Properties.SkyTelescope.Default.ParkPositions;

@@ -911,9 +911,10 @@ namespace GS.SkyApi
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
-            var validAxis = ValidateAxis(axis);
-            var command = new SkySetPPec(SkyQueue.NewId, validAxis, on);
-            GetResult(command);
+            SkyServer.PPecOn = on;
+            //var validAxis = ValidateAxis(axis);
+            //var command = new SkySetPPec(SkyQueue.NewId, validAxis, on);
+            //GetResult(command);
         }
 
         /// <inheritdoc />
@@ -924,9 +925,10 @@ namespace GS.SkyApi
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
-            var validAxis = ValidateAxis(axis);
-            var command = new SkySetPPecTrain(SkyQueue.NewId, validAxis, on);
-            GetResult(command);
+            SkyServer.PecTraining = on;
+            //var validAxis = ValidateAxis(axis);
+            //var command = new SkySetPPecTrain(SkyQueue.NewId, validAxis, on);
+            //GetResult(command);
         }
 
         /// <inheritdoc />

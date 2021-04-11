@@ -169,7 +169,7 @@ namespace GS.Server
                 SaveAllAppSettings();
 
                 var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Server Exiting" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer: Exiting" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 var wParam = new UIntPtr(0);
@@ -688,7 +688,7 @@ namespace GS.Server
         {
 
             var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Main Thread" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer: Starting Main Thread" };
             MonitorLog.LogToMonitor(monitorItem);
 
             if (!LoadComObjectAssemblies()) return; // Load served COM class assemblies, get types
@@ -714,6 +714,10 @@ namespace GS.Server
                 var app = new App();
                 app.InitializeComponent();
                 app.Run();
+
+                monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer: Shutdown" };
+                MonitorLog.LogToMonitor(monitorItem);
 
             }
             catch (Exception ex)

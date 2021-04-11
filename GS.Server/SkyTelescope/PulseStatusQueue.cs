@@ -156,7 +156,7 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Set pulseguiding to false for an entry
+        /// Set pulse guiding to false for an entry
         /// </summary>
         /// <param name="entry"></param>
         private static void ResetGuiding(PulseStatusEntry entry)
@@ -168,20 +168,20 @@ namespace GS.Server.SkyTelescope
         /// Set a pulse guide to false for an axis
         /// </summary>
         /// <param name="axis"></param>
-        /// <param name="pulserunning"></param>
-        private static void ResetGuiding(int axis, bool pulserunning)
+        /// <param name="pulseRunning"></param>
+        private static void ResetGuiding(int axis, bool pulseRunning)
         {
             switch (axis)
             {
                 case 0:
-                    SkyServer._isPulseGuidingRa = pulserunning;
+                    SkyServer._isPulseGuidingRa = pulseRunning;
                     break;
                 case 1:
-                    SkyServer._isPulseGuidingDec = pulserunning;
+                    SkyServer._isPulseGuidingDec = pulseRunning;
                     break;
                 default:
-                    SkyServer._isPulseGuidingDec = pulserunning;
-                    SkyServer._isPulseGuidingRa = pulserunning;
+                    SkyServer._isPulseGuidingDec = pulseRunning;
+                    SkyServer._isPulseGuidingRa = pulseRunning;
                     break;
             }
         }

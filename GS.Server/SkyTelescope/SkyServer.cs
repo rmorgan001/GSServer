@@ -4716,7 +4716,8 @@ namespace GS.Server.SkyTelescope
 
         private static double GetLocalSiderealTime(DateTime utcNow)
         {
-            var gsjd = JDate.Ole2Jd(utcNow.Add(SkySettings.UTCDateOffset));
+            var gsjd = JDate.Ole2Jd(utcNow);
+            //var gsjd = JDate.Ole2Jd(utcNow.Add(SkySettings.UTCDateOffset));
             return Time.Lst(JDate.Epoch2000Days(), gsjd, false, SkySettings.Longitude);
         }
         #endregion

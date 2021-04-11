@@ -1486,7 +1486,8 @@ namespace ASCOM.GS.Sky.Telescope
         {
             get
             {
-                var r = HiResDateTime.UtcNow.Add(SkySettings.UTCDateOffset);
+               // var r = HiResDateTime.UtcNow.Add(SkySettings.UTCDateOffset);
+               var r = HiResDateTime.UtcNow;
 
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{r}" };
@@ -1496,13 +1497,16 @@ namespace ASCOM.GS.Sky.Telescope
             }
             set
             {
-                var r = value.Subtract(HiResDateTime.UtcNow);
-                if (Math.Abs(r.TotalMilliseconds) < 100) r = new TimeSpan();
-                SkySettings.UTCDateOffset = r;
+
+                //var r = value.Subtract(HiResDateTime.UtcNow);
+                //if (Math.Abs(r.TotalMilliseconds) < 100) r = new TimeSpan();
+                //SkySettings.UTCDateOffset = r;
 
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{r}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
                 MonitorLog.LogToMonitor(monitorItem);
+
+                throw new PropertyNotImplementedException(MethodBase.GetCurrentMethod().Name);
             }
         }
 

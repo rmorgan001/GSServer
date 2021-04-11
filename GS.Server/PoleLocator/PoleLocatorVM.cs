@@ -237,7 +237,8 @@ namespace GS.Server.PoleLocator
         private void SetLst()
         {
             UTCNow = HiResDateTime.UtcNow;
-            var gsjd = JDate.Ole2Jd(UTCNow.Add(SkySettings.UTCDateOffset));
+            //var gsjd = JDate.Ole2Jd(UTCNow.Add(SkySettings.UTCDateOffset));
+            var gsjd = JDate.Ole2Jd(UTCNow);
             Lst = Time.Lst(JDate.Epoch2000Days(), gsjd, false, SkySettings.Longitude);
             LST = _util.HoursToHMS(Lst);
         }

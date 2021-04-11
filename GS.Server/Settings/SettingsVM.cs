@@ -600,32 +600,32 @@ namespace GS.Server.Settings
 
         #region Time
 
-        public TimeSpan UTCDateOffset => SkySettings.UTCDateOffset;
+       //public TimeSpan UTCDateOffset => SkySettings.UTCDateOffset;
 
-        public DateTime UTCTime => HiResDateTime.UtcNow.Add(SkySettings.UTCDateOffset);
+        //public DateTime UTCTime => HiResDateTime.UtcNow.Add(SkySettings.UTCDateOffset);
 
-        private ICommand _clickResetUtcOffsetCmd;
+        //private ICommand _clickResetUtcOffsetCmd;
 
-        public ICommand ClickResetUtcOffsetCmd
-        {
-            get
-            {
-                var cmd = _clickResetUtcOffsetCmd;
-                if (cmd != null)
-                {
-                    return cmd;
-                }
+        //public ICommand ClickResetUtcOffsetCmd
+        //{
+        //    get
+        //    {
+        //        var cmd = _clickResetUtcOffsetCmd;
+        //        if (cmd != null)
+        //        {
+        //            return cmd;
+        //        }
 
-                return _clickResetUtcOffsetCmd = new RelayCommand(
-                    param => ClickResetUtcOffset()
-                );
-            }
-        }
+        //        return _clickResetUtcOffsetCmd = new RelayCommand(
+        //            param => ClickResetUtcOffset()
+        //        );
+        //    }
+        //}
 
-        private void ClickResetUtcOffset()
-        {
-            SkySettings.UTCDateOffset = new TimeSpan();
-        }
+        //private void ClickResetUtcOffset()
+        //{
+        //    SkySettings.UTCDateOffset = new TimeSpan();
+        //}
 
         #endregion
 
