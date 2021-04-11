@@ -63,7 +63,7 @@ namespace NStarAlignment.Model
                         return mountAxes; // Fast exist if we are going home.
                     RaiseNotification(NotificationType.Information, MethodBase.GetCurrentMethod().Name,
                         $"GetObservedAxes for {mountAxes[0]}/{mountAxes[1]}");
-                    PierSide pSide = (PierSide)pierSide;
+                    PierSide pSide = (PierSide) pierSide;
                     WriteLastAccessTime();
                     Matrix offsets = Matrix.CreateInstance(1, 2);
                     if (AlignmentPoints.Count == 1)
@@ -135,18 +135,8 @@ namespace NStarAlignment.Model
                                 $"Using nearest point of two {alignmentPoints[0].Id:D3}, Mount axes: {alignmentPoints[0].MountAxes.RaAxis}/{alignmentPoints[0].MountAxes.RaAxis}, Observed axes: {alignmentPoints[0].ObservedAxes.RaAxis}/{alignmentPoints[0].ObservedAxes.RaAxis}");
 
                         }
-                        else
-                        {
-                            // Otherwise default to just using the nearest point
-                            AlignmentPoint alignmentPoint = GetNearestMountPoint(mAxes);
-                            if (alignmentPoint != null)
-                            {
-                                offsets[0, 0] = alignmentPoint.ObservedAxes[0] - alignmentPoint.MountAxes[0];
-                                offsets[0, 1] = alignmentPoint.ObservedAxes[1] - alignmentPoint.MountAxes[1];
-                                RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
-                                    $"Using nearest point in whole sky {alignmentPoint.Id:D3}, Mount axes: {alignmentPoint.MountAxes.RaAxis}/{alignmentPoint.MountAxes.RaAxis}, Observed axes: {alignmentPoint.ObservedAxes.RaAxis}/{alignmentPoint.ObservedAxes.RaAxis}");
-                            }
-                        }
+                        // Otherwise default to using no correcting offset 
+
                     }
 
                     var observedAxes = new[]
@@ -193,7 +183,7 @@ namespace NStarAlignment.Model
                     if (sAxes.IncludedAngleTo(_homePosition) < ProximityLimit)
                         return observedAxes; // Fast exit if we are going home.
 
-                    PierSide pSide = (PierSide)pierSide;
+                    PierSide pSide = (PierSide) pierSide;
                     WriteLastAccessTime();
                     Matrix offsets = Matrix.CreateInstance(1, 2);
                     int checksum;
@@ -293,7 +283,7 @@ namespace NStarAlignment.Model
                             }
                             else if (rows > 0)
                             {
-                                checksum = GetChecksum(alignmentPoints[0].Id);
+                                checksum = GetChecksum(AlignmentPoints[0].Id);
                                 if (checksum == _currentChecksum)
                                 {
                                     // Checksum hasn't changed so use the last offsets
@@ -322,29 +312,11 @@ namespace NStarAlignment.Model
                             }
                             else
                             {
-                                // Otherwise default to just using the nearest point in the whole sky
-                                AlignmentPoint alignmentPoint = GetNearestObservedPoint(sAxes, out checksum);
-                                if (alignmentPoint != null)
+                                if (_currentChecksum != int.MinValue)
                                 {
-                                    offsets[0, 0] = alignmentPoint.MountAxes[0] - alignmentPoint.ObservedAxes[0];
-                                    offsets[0, 1] = alignmentPoint.MountAxes[1] - alignmentPoint.ObservedAxes[1];
-                                    alignmentPoint.Selected = true;
-                                    _selectedPoints.Add(alignmentPoint);
-                                    // Cache the offsets and checksum
-                                    _lastOffsets = offsets;
-                                    _currentChecksum = checksum;
-                                    postLogMessages = true;
-                                    RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
-                                            $"Using nearest point in whole sky {alignmentPoint.Id:D3}, Mount axes: {alignmentPoint.MountAxes.RaAxis}/{alignmentPoint.MountAxes.RaAxis}, Observed axes: {alignmentPoint.ObservedAxes.RaAxis}/{alignmentPoint.ObservedAxes.RaAxis}");
-                                }
-                                else
-                                {
-                                    if (_currentChecksum != int.MinValue)
-                                    {
-                                        _currentChecksum = int.MinValue;
-                                        RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
-                                            $"No alignment points selected, Mount axes: {alignmentPoints[0].MountAxes.RaAxis}/{alignmentPoints[0].MountAxes.RaAxis}, Observed axes: {alignmentPoints[0].ObservedAxes.RaAxis}/{alignmentPoints[0].ObservedAxes.RaAxis}");
-                                    }
+                                    _currentChecksum = int.MinValue;
+                                    RaiseNotification(NotificationType.Warning, MethodBase.GetCurrentMethod().Name,
+                                        $"No alignment points selected, Mount axes: {alignmentPoints[0].MountAxes.RaAxis}/{alignmentPoints[0].MountAxes.RaAxis}, Observed axes: {alignmentPoints[0].ObservedAxes.RaAxis}/{alignmentPoints[0].ObservedAxes.RaAxis}");
                                 }
                             }
                         }
@@ -396,12 +368,6 @@ namespace NStarAlignment.Model
                 .OrderBy(d => d.MountAxes.IncludedAngleTo(axisPosition)).Take(numberOfPoints).ToArray();
         }
 
-        private AlignmentPoint GetNearestMountPoint(AxisPosition axisPosition)
-        {
-            return AlignmentPoints
-                .OrderBy(d => d.MountAxes.IncludedAngleTo(axisPosition)).FirstOrDefault();
-        }
-
         private AlignmentPoint[] GetNearestObservedPoints(AxisPosition axisPosition, PierSide pierSide, int numberOfPoints, out int checkSum)
         {
             AlignmentPoint[] points = AlignmentPoints
@@ -409,13 +375,6 @@ namespace NStarAlignment.Model
                 .OrderBy(d => d.ObservedAxes.IncludedAngleTo(axisPosition)).Take(numberOfPoints).ToArray();
             checkSum = GetChecksum(points.Select(p => p.Id).ToArray());
             return points;
-        }
-        private AlignmentPoint GetNearestObservedPoint(AxisPosition axisPosition, out int checkSum)
-        {
-            AlignmentPoint alignmentPoint = AlignmentPoints
-                .OrderBy(d => d.ObservedAxes.IncludedAngleTo(axisPosition)).FirstOrDefault();
-            checkSum = alignmentPoint != null ? GetChecksum(alignmentPoint.Id) : int.MinValue;
-            return alignmentPoint;
         }
 
         private static Matrix SolveNormalEquation(Matrix inputFeatures, Matrix outputValue)
