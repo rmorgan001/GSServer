@@ -60,9 +60,9 @@ namespace NStarAlignment.Model
 
         public event EventHandler<NotificationEventArgs> Notification = delegate { };
 
-        private void RaiseNotification(NotificationType notificationType, string method,  string message)
+        private void RaiseNotification(NotificationType notificationType, string method, string message)
         {
-            Volatile.Read(ref Notification).Invoke(this, new NotificationEventArgs(notificationType, method,  message));
+            Volatile.Read(ref Notification).Invoke(this, new NotificationEventArgs(notificationType, method, message));
         }
 
         #endregion
@@ -112,7 +112,7 @@ namespace NStarAlignment.Model
 
         // String builder for building more detailed messages.
         private readonly StringBuilder _stringBuilder = new StringBuilder();
-        
+
         private readonly object _accessLock = new object();
 
         private readonly string _configFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"NStarAlignment\Points.config");
@@ -156,7 +156,7 @@ namespace NStarAlignment.Model
                     observedAltAz,
                     new AxisPosition(mountAxes[0], mountAxes[1]),
                     new AxisPosition(observedAxes[0], observedAxes[1]),
-                    (PierSide) pierSide,
+                    (PierSide)pierSide,
                     syncTime);
             }
             catch (Exception ex)
@@ -183,6 +183,8 @@ namespace NStarAlignment.Model
                 CarteseanCoordinate mountXy = AltAzToCartesean(mountAltAz);
                 CarteseanCoordinate observedXy = AltAzToCartesean(observedAltAz);
                 AlignmentPoints.Add(new AlignmentPoint(observedAltAz, mountAxes, observedAxes, mountXy, observedXy, pierSide, syncTime));
+
+                _currentChecksum = int.MinValue;    // Reset checksum so that offsets are recalculated
 
                 OneStarAdjustment[0] = observedAxes[0] - mountAxes[0];
                 OneStarAdjustment[1] = observedAxes[1] - mountAxes[1];
@@ -309,8 +311,8 @@ namespace NStarAlignment.Model
             var x = Math.Sin(azRadians);
             var y = -Math.Cos(azRadians);
             // Get unit vector
-            result[0] =  x * radius;
-            result[1] =  y * radius;
+            result[0] = x * radius;
+            result[1] = y * radius;
 
             return result;
         }
