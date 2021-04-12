@@ -75,10 +75,12 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.2 #2008f912f56e61277eefaac6d1888b750582aa16
        
-
+      - name: Clean
+        run: dotnet clean && dotnet nuget locals all --clear
+  
     # Restore the application to populate the obj folder with RuntimeIdentifiers
       - name: Restore the application
-        run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration 
+        run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration 
         env: 
            Configuration: ${{ matrix.configuration }}
 
