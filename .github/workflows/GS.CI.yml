@@ -64,17 +64,17 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+          
+      # fix for error NU1101: Unable to find package    
+      - name: Clean
+        run: dotnet clean $env:Solution_Name -c $env:Configuration && dotnet nuget locals all --clear
+
 
     # Install the .NET Core workload
       - name: Install .NET Core
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.1.x
-
-    # fix for error NU1101: Unable to find package    
-      - name: Clean
-        run: dotnet clean $env:Solution_Name -c Release && dotnet nuget locals all --clear
-
 
     # Add MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
       - name: Add msbuild to PATH
