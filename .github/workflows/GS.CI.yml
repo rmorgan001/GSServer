@@ -71,13 +71,15 @@ jobs:
         with:
           dotnet-version: 3.1.x
 
+    # fix for error NU1101: Unable to find package    
+      - name: Clean
+        run: dotnet clean $env:Solution_Name -c Release && dotnet nuget locals all --clear
+
+
     # Add MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.2 #2008f912f56e61277eefaac6d1888b750582aa16
-       
-      - name: Clean
-        run: dotnet clean && dotnet nuget locals all --clear
-  
+        
     # Restore the application to populate the obj folder with RuntimeIdentifiers
       - name: Restore the application
         run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration 
