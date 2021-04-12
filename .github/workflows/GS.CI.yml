@@ -67,7 +67,7 @@ jobs:
           
       # fix for error NU1101: Unable to find package    
       - name: Clean
-        run: dotnet clean $env:Solution_Name -c $env:Configuration && dotnet nuget locals all --clear
+        run: dotnet clean $env:Solution_Name -c Debug && dotnet nuget locals all --clear
 
 
     # Install the .NET Core workload
