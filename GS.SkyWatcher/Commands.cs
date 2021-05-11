@@ -1099,6 +1099,9 @@ namespace GS.SkyWatcher
                             break;
                         case "!2":
                             errormsg = "Motor not Stopped: Valid command failed to run ( ie sending :G whilst motor is running )";
+                            // send stop
+                            SendRequest(axis, 'K', null);
+                            Thread.Sleep(500);
                             break;
                         case "!3":
                             errormsg = "NonHex Param: Parameter contains a non uppercase Hex Char ";

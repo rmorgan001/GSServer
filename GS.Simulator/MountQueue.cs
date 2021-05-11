@@ -95,19 +95,13 @@ namespace GS.Simulator
                 return command;
             }
             var sw = Stopwatch.StartNew();
-            while (sw.Elapsed.TotalMilliseconds < 20000)
+            while (sw.Elapsed.TotalMilliseconds < 22000)
             {
                 if (_resultsDictionary == null) break;
                 var success = _resultsDictionary.TryRemove(command.Id, out var result);
-                if (!success)
-                {
-                    Thread.Sleep(1);
-                    continue;
-                }
-                sw.Stop();
-                return result;
+                if (success) return result;
+                Thread.Sleep(1);
             }
-            sw.Stop();
             var ex = new MountException(ErrorCode.ErrQueueFailed, $"Queue Read Timeout {command.Id}, {command}");
             command.Exception = ex;
             command.Successful = false;
