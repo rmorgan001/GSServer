@@ -365,6 +365,8 @@
                                     <Button Margin="0,10,0,0" Height="30" ToolTip="{StaticResource optCheckUpdates}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding OpenUpdateDialogCmd}" Content="{StaticResource optCheckUpdates}">
                                     </Button>
                                 </md:DialogHost>
+                                <Button Margin="0,10,0,0" Height="30" ToolTip="{StaticResource optCheckUpdates}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickUtilCmd}" Content="GS.Utilities.exe">
+                                </Button>
                             </StackPanel>
                             <StackPanel Grid.Row="1" Grid.Column="3" Orientation="Vertical" HorizontalAlignment="Left" Margin="0,0,0,0">
                                 <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optPerf}" />

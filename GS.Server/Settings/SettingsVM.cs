@@ -1123,6 +1123,36 @@ namespace GS.Server.Settings
             }
         }
 
+        private ICommand _clickUtilCmd;
+
+        public ICommand ClickUtilCmd
+        {
+            get
+            {
+                var cmd = _clickUtilCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _clickUtilCmd = new RelayCommand(
+                    param => OpenUtilitiesCmd()
+                );
+            }
+        }
+
+        private void OpenUtilitiesCmd()
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo(Path.Combine(Environment.CurrentDirectory, "GS.Utilities.exe")));
+            }
+            catch (Exception ex)
+            {
+                OpenDialog(ex.Message);
+            }
+        }
+
         #endregion
 
         #region Monitor
