@@ -37,9 +37,14 @@ namespace NStarAlignment.Model
         private Matrix _lastOffsets = Matrix.CreateInstance(1, 2);
 
         /// <summary>
-        /// List of selected alignment points.
+        /// List of selected alignment points for GetMountAxis.
         /// </summary>
         private readonly List<AlignmentPoint> _selectedPoints = new List<AlignmentPoint>();
+
+        /// <summary>
+        /// List of selected alignment points for GetObservedAxis.
+        /// </summary>
+        private readonly List<AlignmentPoint> _selectedGotoPoints = new List<AlignmentPoint>();
 
         private readonly List<string> _exceptionMessages = new List<string>();
 
@@ -58,6 +63,7 @@ namespace NStarAlignment.Model
             {
                 try
                 {
+                    ClearSelectedGotoPoints();
                     AxisPosition mAxes = new AxisPosition(mountAxes);
                     if (mAxes.IncludedAngleTo(_homePosition) < ProximityLimit)
                         return mountAxes; // Fast exist if we are going home.
@@ -68,10 +74,15 @@ namespace NStarAlignment.Model
                     Matrix offsets = Matrix.CreateInstance(1, 2);
                     if (AlignmentPoints.Count == 1)
                     {
-                        offsets[0, 0] = AlignmentPoints[0].ObservedAxes[0] - AlignmentPoints[0].MountAxes[0];
-                        offsets[0, 1] = AlignmentPoints[0].ObservedAxes[1] - AlignmentPoints[0].MountAxes[1];
-                        RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
-                            $"Single alignment point selected {AlignmentPoints[0].Id:D3}, Mount axes: {AlignmentPoints[0].MountAxes.RaAxis}/{AlignmentPoints[0].MountAxes.RaAxis}, Observed axes: {AlignmentPoints[0].ObservedAxes.RaAxis}/{AlignmentPoints[0].ObservedAxes.RaAxis}");
+                        if (AlignmentPoints[0].PierSide == pSide)
+                        {
+                            offsets[0, 0] = AlignmentPoints[0].ObservedAxes[0] - AlignmentPoints[0].MountAxes[0];
+                            offsets[0, 1] = AlignmentPoints[0].ObservedAxes[1] - AlignmentPoints[0].MountAxes[1];
+                            AlignmentPoints[0].SelectedForGoto = true;
+                            _selectedGotoPoints.Add(AlignmentPoints[0]);
+                            RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
+                                $"Single alignment point selected {AlignmentPoints[0].Id:D3}, Mount axes: {AlignmentPoints[0].MountAxes.RaAxis}/{AlignmentPoints[0].MountAxes.RaAxis}, Observed axes: {AlignmentPoints[0].ObservedAxes.RaAxis}/{AlignmentPoints[0].ObservedAxes.RaAxis}");
+                        }
                     }
                     else
                     {
@@ -95,6 +106,8 @@ namespace NStarAlignment.Model
                                 features[i, 2] = pt.MountAxes[1] * pt.MountAxes[1];
                                 values[i, 0] = Range.RangePlusOrMinus180(pt.ObservedAxes[0] - pt.MountAxes[0]);
                                 values[i, 1] = Range.RangePlusOrMinus180(pt.ObservedAxes[1] - pt.MountAxes[1]);
+                                pt.SelectedForGoto = true;
+                                _selectedGotoPoints.Add(pt);
                             }
 
                             _stringBuilder.AppendLine(".");
@@ -131,20 +144,30 @@ namespace NStarAlignment.Model
                             // Just use the nearest point of the two.
                             offsets[0, 0] = alignmentPoints[0].ObservedAxes[0] - alignmentPoints[0].MountAxes[0];
                             offsets[0, 1] = alignmentPoints[0].ObservedAxes[1] - alignmentPoints[0].MountAxes[1];
+                            AlignmentPoints[0].SelectedForGoto = true;
+                            _selectedGotoPoints.Add(AlignmentPoints[0]);
                             RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
                                 $"Using nearest point of two {alignmentPoints[0].Id:D3}, Mount axes: {alignmentPoints[0].MountAxes.RaAxis}/{alignmentPoints[0].MountAxes.RaAxis}, Observed axes: {alignmentPoints[0].ObservedAxes.RaAxis}/{alignmentPoints[0].ObservedAxes.RaAxis}");
 
                         }
                         else
                         {
-                            // Otherwise default to just using the nearest point
-                            AlignmentPoint alignmentPoint = GetNearestMountPoint(mAxes);
+                            // Otherwise default to just using the nearest point with the same pier side
+                            AlignmentPoint alignmentPoint = GetNearestMountPoint(mAxes, pSide);
                             if (alignmentPoint != null)
                             {
                                 offsets[0, 0] = alignmentPoint.ObservedAxes[0] - alignmentPoint.MountAxes[0];
                                 offsets[0, 1] = alignmentPoint.ObservedAxes[1] - alignmentPoint.MountAxes[1];
+                                alignmentPoint.SelectedForGoto = true;
+                                _selectedGotoPoints.Add(alignmentPoint);
                                 RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
                                     $"Using nearest point in whole sky {alignmentPoint.Id:D3}, Mount axes: {alignmentPoint.MountAxes.RaAxis}/{alignmentPoint.MountAxes.RaAxis}, Observed axes: {alignmentPoint.ObservedAxes.RaAxis}/{alignmentPoint.ObservedAxes.RaAxis}");
+                            }
+                            else
+                            {
+                                RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
+                                    $"No alignment points selected, Observed axes: {mountAxes[0]}/{mountAxes[1]}, pier side: {pierSide}");
+
                             }
                         }
                     }
@@ -208,19 +231,22 @@ namespace NStarAlignment.Model
                         }
                         else
                         {
-                            RaiseNotification(NotificationType.Information, MethodBase.GetCurrentMethod().Name,
-                                $"GetMountAxes for {observedAxes[0]}/{observedAxes[1]}");
-                            ClearSelectedPoints();
-                            offsets[0, 0] = AlignmentPoints[0].MountAxes[0] - AlignmentPoints[0].ObservedAxes[0];
-                            offsets[0, 1] = AlignmentPoints[0].MountAxes[1] - AlignmentPoints[0].ObservedAxes[1];
-                            AlignmentPoints[0].Selected = true;
-                            _selectedPoints.Add(AlignmentPoints[0]);
-                            // Cache the offsets and checksum
-                            _lastOffsets = offsets;
-                            _currentChecksum = checksum;
-                            RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
-                                $"Single alignment point selected {AlignmentPoints[0].Id:D3}, Mount axes: {AlignmentPoints[0].MountAxes.RaAxis}/{AlignmentPoints[0].MountAxes.RaAxis}, Observed axes: {AlignmentPoints[0].ObservedAxes.RaAxis}/{AlignmentPoints[0].ObservedAxes.RaAxis}");
-                            postLogMessages = true;
+                            if (AlignmentPoints[0].PierSide == pSide)
+                            {
+                                RaiseNotification(NotificationType.Information, MethodBase.GetCurrentMethod().Name,
+                                    $"GetMountAxes for {observedAxes[0]}/{observedAxes[1]}");
+                                ClearSelectedPoints();
+                                offsets[0, 0] = AlignmentPoints[0].MountAxes[0] - AlignmentPoints[0].ObservedAxes[0];
+                                offsets[0, 1] = AlignmentPoints[0].MountAxes[1] - AlignmentPoints[0].ObservedAxes[1];
+                                AlignmentPoints[0].Selected = true;
+                                _selectedPoints.Add(AlignmentPoints[0]);
+                                // Cache the offsets and checksum
+                                _lastOffsets = offsets;
+                                _currentChecksum = checksum;
+                                RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
+                                    $"Single alignment point selected {AlignmentPoints[0].Id:D3}, Mount axes: {AlignmentPoints[0].MountAxes.RaAxis}/{AlignmentPoints[0].MountAxes.RaAxis}, Observed axes: {AlignmentPoints[0].ObservedAxes.RaAxis}/{AlignmentPoints[0].ObservedAxes.RaAxis}");
+                                postLogMessages = true;
+                            }
                         }
                     }
                     else
@@ -322,8 +348,9 @@ namespace NStarAlignment.Model
                             }
                             else
                             {
-                                // Otherwise default to just using the nearest point in the whole sky
-                                AlignmentPoint alignmentPoint = GetNearestObservedPoint(sAxes, out checksum);
+                                // Otherwise default to just using the nearest point in the whole
+                                ClearSelectedPoints();
+                                AlignmentPoint alignmentPoint = GetNearestObservedPoint(sAxes, pSide, out checksum);
                                 if (alignmentPoint != null)
                                 {
                                     offsets[0, 0] = alignmentPoint.MountAxes[0] - alignmentPoint.ObservedAxes[0];
@@ -343,7 +370,7 @@ namespace NStarAlignment.Model
                                     {
                                         _currentChecksum = int.MinValue;
                                         RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
-                                            $"No alignment points selected, Mount axes: {alignmentPoints[0].MountAxes.RaAxis}/{alignmentPoints[0].MountAxes.RaAxis}, Observed axes: {alignmentPoints[0].ObservedAxes.RaAxis}/{alignmentPoints[0].ObservedAxes.RaAxis}");
+                                            $"No alignment points selected, Observed axes: {observedAxes[0]}/{observedAxes[1]}, pier side: {pierSide}");
                                     }
                                 }
                             }
@@ -389,6 +416,15 @@ namespace NStarAlignment.Model
             _selectedPoints.Clear();
         }
 
+        private void ClearSelectedGotoPoints()
+        {
+            foreach (AlignmentPoint pt in _selectedGotoPoints)
+            {
+                pt.SelectedForGoto = false;
+            }
+            _selectedGotoPoints.Clear();
+        }
+
         private AlignmentPoint[] GetNearestMountPoints(AxisPosition axisPosition, PierSide pierSide, int numberOfPoints)
         {
             return AlignmentPoints
@@ -396,9 +432,10 @@ namespace NStarAlignment.Model
                 .OrderBy(d => d.MountAxes.IncludedAngleTo(axisPosition)).Take(numberOfPoints).ToArray();
         }
 
-        private AlignmentPoint GetNearestMountPoint(AxisPosition axisPosition)
+        private AlignmentPoint GetNearestMountPoint(AxisPosition axisPosition, PierSide pierSide)
         {
             return AlignmentPoints
+                .Where(p => p.PierSide == pierSide)
                 .OrderBy(d => d.MountAxes.IncludedAngleTo(axisPosition)).FirstOrDefault();
         }
 
@@ -410,9 +447,10 @@ namespace NStarAlignment.Model
             checkSum = GetChecksum(points.Select(p => p.Id).ToArray());
             return points;
         }
-        private AlignmentPoint GetNearestObservedPoint(AxisPosition axisPosition, out int checkSum)
+        private AlignmentPoint GetNearestObservedPoint(AxisPosition axisPosition, PierSide pierSide, out int checkSum)
         {
             AlignmentPoint alignmentPoint = AlignmentPoints
+                .Where(p => p.PierSide == pierSide)
                 .OrderBy(d => d.ObservedAxes.IncludedAngleTo(axisPosition)).FirstOrDefault();
             checkSum = alignmentPoint != null ? GetChecksum(alignmentPoint.Id) : int.MinValue;
             return alignmentPoint;

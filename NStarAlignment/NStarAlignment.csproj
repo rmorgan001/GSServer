@@ -59,6 +59,7 @@
     <Compile Include="Utilities\AstroConvert.cs" />
     <Compile Include="Model\AlignmentModel.cs" />
     <Compile Include="DataTypes\Matrix.cs" />
+    <Compile Include="Utilities\EnumTypeConverter.cs" />
     <Compile Include="Utilities\Range.cs" />
     <Compile Include="DataTypes\Angle.cs" />
     <Compile Include="DataTypes\AxisPosition.cs" />
