@@ -85,7 +85,7 @@
                         </Style>
                     </DataGrid.Resources>
                     <DataGrid.RowStyle>
-                        <Style TargetType="DataGridRow" BasedOn="{StaticResource MaterialDesignDataGridRow}">
+                        <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource MaterialDesignDataGridRow}">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Selected}" Value="true">
                                     <Setter Property="FontWeight" Value="ExtraBold"></Setter>
@@ -96,12 +96,23 @@
                             </Style.Triggers>
                         </Style>
                     </DataGrid.RowStyle>
+                    <DataGrid.CellStyle>
+                        <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedForGoto}" Value="true">
+                                    <Setter Property="Foreground" Value="{DynamicResource SecondaryAccentBrush}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.CellStyle>
+
                     <DataGrid.Columns>
                         <!-- Ordinal formatting left in for reference -->
                         <!--<DataGridTemplateColumn Header="#" CellTemplate="{StaticResource OrdinalColumnDataTemplate}" HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>-->
                         <DataGridTextColumn Header="###" Binding="{Binding Id, StringFormat='{}{0:D3}'}"  HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Altitude" Binding="{Binding AltAz[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Azimuth" Binding="{Binding AltAz[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Pier Side" Binding="{Binding PierSide}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Mount RA/Dec Axes" Binding="{Binding MountAxes}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Observed RA/Dec Axis" Binding="{Binding ObservedAxes}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Correction" Binding="{Binding Correction}" IsReadOnly="True" />

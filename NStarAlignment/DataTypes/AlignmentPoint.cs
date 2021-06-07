@@ -20,13 +20,18 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using NStarAlignment.Utilities;
 
 namespace NStarAlignment.DataTypes
 {
+    [TypeConverter(typeof(EnumTypeConverter))]
     public enum PierSide
     {
+        [Description("East")]
         EastLookingWest,
+        [Description("West")]
         WestLookingEast,
+        [Description("Unknown")]
         Unknown
     }
 
@@ -72,6 +77,10 @@ namespace NStarAlignment.DataTypes
 
         private bool _selected;
 
+        /// <summary>
+        /// Selected for correcting display
+        /// </summary>
+        [JsonIgnore]
         public bool Selected
         {
             get => _selected;
@@ -79,6 +88,23 @@ namespace NStarAlignment.DataTypes
             {
                 if (value == _selected) return;
                 _selected = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _selectedForGoto;
+
+        /// <summary>
+        /// Selected for slew/goto calculation
+        /// </summary>
+        [JsonIgnore]
+        public bool SelectedForGoto
+        {
+            get => _selectedForGoto;
+            set
+            {
+                if (value == _selectedForGoto) return;
+                _selectedForGoto = value;
                 OnPropertyChanged();
             }
         }
