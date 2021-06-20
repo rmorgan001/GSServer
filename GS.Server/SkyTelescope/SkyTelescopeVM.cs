@@ -87,7 +87,7 @@ namespace GS.Server.SkyTelescope
 
                     // Deals with applications trying to open the setup dialog more than once. 
                     OpenSetupDialog = SkyServer.OpenSetupDialog;
-                    SkyServer.OpenSetupDialog = true;
+                    //SkyServer.OpenSetupDialog = true;
                     SettingsGridEnabled = true;
 
                     // setup property events to monitor
@@ -1537,8 +1537,9 @@ namespace GS.Server.SkyTelescope
             get => _openSetupDialog;
             set
             {
-                if (value == _openSetupDialog) return;
+                if (value == _openSetupDialog){return;}
                 _openSetupDialog = value;
+                if (!value) { ClickCloseSettings(); }
                 OnPropertyChanged();
                 // forces the updating of the com ports
                 OnPropertyChanged($"ComPorts");
@@ -6889,7 +6890,7 @@ namespace GS.Server.SkyTelescope
                 if (value)
                 {
                     Rotate();
-                    LoadGEM();
+                    OpenResetView();
                 }
                 OnPropertyChanged();
             }

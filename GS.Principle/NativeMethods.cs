@@ -13,6 +13,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace GS.Principles
@@ -48,6 +51,28 @@ namespace GS.Principles
 
         [DllImport("Kernel32.dll")]
         internal static extern bool QueryPerformanceFrequency(out long lpFrequency);
+
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr handle);
+
+        [DllImport("user32.dll")]
+        public static extern bool ShowWindowAsync(HandleRef handle, int nCmdShow);
+
+        [DllImport("user32.dll")]
+        private static extern bool IsIconic(IntPtr handle);
+
+        /// <summary>
+        /// Bring a window to the top most even if it is minimized
+        /// </summary>
+        public static void SetForegroundWindow(string name)
+        {
+            const int SW_RESTORE = 9;
+            var objProcesses = Process.GetProcessesByName(name);
+            if (objProcesses.Length <= 0) { return; }
+            var handle = objProcesses[0].MainWindowHandle;
+            if (IsIconic(handle)){ShowWindowAsync(new HandleRef(null, handle), SW_RESTORE);}
+            SetForegroundWindow(objProcesses[0].MainWindowHandle);
+        }
 
         #endregion
     }

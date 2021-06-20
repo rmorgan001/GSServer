@@ -34,7 +34,7 @@ namespace GS.SkyWatcher
     {
         #region Fields
 
-        private const char _endChar = (char)13;                          // Tailing character of command and response.
+        private const char _endChar = (char)13;                         // Tailing character of command and response.
         private readonly AxisStatus[] _axesStatus = new AxisStatus[2];  // Status and state information for each axis
         private readonly double[] _positions = { 0, 0 };
         private readonly double[] _factorStepToRad = { 0, 0 };          // radians per step based on gear ratio
@@ -42,20 +42,16 @@ namespace GS.SkyWatcher
         private readonly long[] _breakSteps = new long[2];
         private readonly long[] _stepTimerFreq = new long[2];
         private readonly long[] _peSteps = new long[2];
-        private readonly string[] _axisStringVersion = new string[2];   //Readable string version format
+        private readonly string[] _axisStringVersion = new string[2];   // Readable string version format
         private readonly long[] _axisGearRatios = new long[2];
         private readonly double[] _factorRadRateToInt = { 0, 0 };
         private readonly long[] _lowSpeedGotoMargin = new long[2];
         private readonly long[] _axisVersion = new long[2];             // Axes versions
         private readonly long[] _highSpeedRatio = new long[2];          // HiSpeed multiplier  EQ6Pro, AZEeQ5, EQ8 = 16   AZeQ6 = 32
-        private const int _threadLockTimeout = 50; // milliseconds
+        private const int _threadLockTimeout = 50;                      // milliseconds
         private readonly object _syncObject = new object();
-        
-        // use for serial event
-        //private string IncomingData;
-        // number of retries sending the same command
-        private int _retryCount;
-
+        private int _conErrCnt;                                         // Number of continuous errors
+        private const int ConErrMax = 100;                              // Max number of allowed continuous errors                                  
         #endregion
 
         #region Properties
@@ -818,9 +814,13 @@ namespace GS.SkyWatcher
                                 var cmdData = SendRequest(axis, command, cmdDataStr);
                                 // receive the response
                                 responseString = ReceiveResponse(axis, command, cmdData);
-                                if (!string.IsNullOrEmpty(responseString)) { break; }
+                                if (!string.IsNullOrEmpty(responseString))
+                                {
+                                    _conErrCnt = 0;
+                                    break;
+                                }
 
-                                _retryCount++;
+                                _conErrCnt++;
                                 monitorItem = new MonitorEntry
                                 {
                                     Datetime = HiResDateTime.UtcNow,
@@ -830,9 +830,15 @@ namespace GS.SkyWatcher
                                     Method = MethodBase.GetCurrentMethod().Name,
                                     Thread = Thread.CurrentThread.ManagedThreadId,
                                     Message =
-                                        $"Serial Retry Warning:{_retryCount},{cmdData},{ignoreWarnings}"
+                                        $"Serial Retry:{_conErrCnt},{cmdData},{ignoreWarnings}"
                                 };
                                 MonitorLog.LogToMonitor(monitorItem);
+                                if (_conErrCnt > ConErrMax)
+                                {
+                                    var msg = "Count:" + _conErrCnt;
+                                    _conErrCnt = 0;
+                                    throw new MountControlException(ErrorCode.ErrTooManyRetries, msg);
+                                }
                                 Thread.Sleep(10);
                             }
 

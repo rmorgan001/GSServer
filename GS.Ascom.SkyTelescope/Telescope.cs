@@ -966,13 +966,14 @@ namespace ASCOM.GS.Sky.Telescope
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Started" };
             MonitorLog.LogToMonitor(monitorItem);
 
-            var alreadyopen = SkyServer.OpenSetupDialog;
-            if (alreadyopen) throw new InvalidOperationException("Driver is already open");
             SkyServer.OpenSetupDialog = true;
+            //check if window is minimized or not top most
+            NativeMethods.SetForegroundWindow("GS.Server"); //may cause flashing in task bar due to windows restrictions 
+            //Calling app will destroy instance after the dialog is finished
             while (true)
             {
                 Thread.Sleep(100);
-                if (SkyServer.OpenSetupDialogFinished) break;
+                if (SkyServer.OpenSetupDialogFinished){break;}
             }
 
             monitorItem = new MonitorEntry

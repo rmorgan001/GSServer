@@ -116,8 +116,7 @@ namespace GS.Server.Main
                     CurrentPageViewModel = PageViewModels[0];
                     SkyWatcherVMRadio = true;
 
-                    TopMost = Properties.Server.Default.StartOnTop;
-
+                    TopMost = Properties.Server.Default.StartOnTop || SkyServer.OpenSetupDialog;
                 }
 
             }

@@ -2675,7 +2675,7 @@ namespace GS.Server.SkyTelescope
                 case MountType.SkyWatcher:
                     var skySteps = new SkyGetSteps(SkyQueue.NewId);
                     steps = (double[])SkyQueue.GetCommandResult(skySteps).Result;
-                    return CheckSkyErrors(skySteps) ? null : steps;
+                    return CheckSkyErrors(skySteps) ? throw skySteps.Exception : steps;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -4702,6 +4702,10 @@ namespace GS.Server.SkyTelescope
 
                 // Event interval time set for UI performance
                 _mediaTimer.Period = SkySettings.DisplayInterval;
+            }
+            catch (Exception ex)
+            {
+                SkyErrorHandler(ex);
             }
             finally
             {
