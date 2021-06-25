@@ -543,6 +543,7 @@ namespace GS.Server.Settings
             Pulses = Properties.Server.Default.Pulses;
             SleepMode = Properties.Server.Default.SleepMode;
             Snap = Properties.Server.Default.Snap;
+            WindowState = Properties.Server.Default.WindowState;   //Load WindowState before StartMinimized or Height and Width
             StartMinimized = Properties.Server.Default.StartMinimized;
             StartOnTop = Properties.Server.Default.StartOnTop;
             VoiceActive = Properties.Server.Default.VoiceActive;
@@ -556,7 +557,6 @@ namespace GS.Server.Settings
             WindowWidth = Properties.Server.Default.WindowWidth;
             WindowLeft = Properties.Server.Default.WindowLeft;
             WindowTop = Properties.Server.Default.WindowTop;
-            WindowState = Properties.Server.Default.WindowState;
             AlignmentTabVisible = Properties.Server.Default.AlignmentTabVisible;
 
             Enum.TryParse<Model3DType>(Properties.Server.Default.ModelType, true, out var aparse);

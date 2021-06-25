@@ -66,6 +66,8 @@ namespace GS.Server.Main
         private double _tempHeight = 510;
         private double _tempWidth = 850;
         private WindowState _tempWindowState = WindowState.Normal;
+        private double MinHeight = 100;
+        private double MinWidth = 200;
 
         #endregion
 
@@ -91,8 +93,8 @@ namespace GS.Server.Main
 
                     AppCount = GSServer.AppCount;
                     Settings.Settings.Load();
-                    if (Settings.Settings.StartMinimized)
-                        Settings.Settings.WindowState = WindowState.Minimized;
+                    Settings.Settings.WindowState = Settings.Settings.StartMinimized ? WindowState.Minimized : WindowState.Normal;
+
                     MountType = SkySettings.Mount;
 
                     _mainWindowVm = this;
@@ -927,6 +929,7 @@ namespace GS.Server.Main
             get => Settings.Settings.WindowHeight;
             set
             {
+                if (value <= MinHeight){return;}
                 Settings.Settings.WindowHeight = value;
                 OnPropertyChanged();
             }
@@ -937,6 +940,7 @@ namespace GS.Server.Main
             get => Settings.Settings.WindowWidth;
             set
             {
+                if (value <= MinWidth) { return; }
                 Settings.Settings.WindowWidth = value;
                 OnPropertyChanged();
             }
