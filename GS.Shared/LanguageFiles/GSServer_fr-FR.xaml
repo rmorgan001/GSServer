@@ -599,8 +599,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliAlignmentOn">Activer la modélisation de l'alignement des étoiles</system:String>
     <system:String x:Key="aliAlignmentOnTooltip">Activer la modélisation de l'alignement des étoiles</system:String>
     <system:String x:Key="aliAlignmentSettings">Paramètres</system:String>
-    <system:String x:Key="aliProximityLimitTooltip">À quelle distance les uns des autres peuvent être synchronisés les points avant qu'ils ne remplacent les points précédents (degrés).</system:String>
-    <system:String x:Key="aliSampleSizeTooltip">Combien de points de synchronisation à proximité doivent être utilisés lors du calcul des positions (degrés).</system:String>
+    <system:String x:Key="aliProximityLimitTooltip">À quelle distance les uns des autres peuvent être synchronisés les points avant qu'ils ne remplacent les points précédents (Secondes d'arc).</system:String>
+    <system:String x:Key="aliSampleSizeTooltip">Combien de points de synchronisation à proximité doivent être utilisés lors du calcul des positions.</system:String>
     <system:String x:Key="aliNearbyLimitTooltip">À quelle distance les points de synchronisation doivent-ils être avant d’être utilisés dans les calculs (degrés).</system:String>
     <system:String x:Key="aliClearModelOnStartup">Modèle clair au démarrage</system:String>
     <system:String x:Key="aliClearModelOnStartupTooltip">Cochez si vous souhaitez créer un nouveau modèle chaque fois que vous vous reconnectez.</system:String>

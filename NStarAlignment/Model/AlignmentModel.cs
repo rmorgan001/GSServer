@@ -84,9 +84,9 @@ namespace NStarAlignment.Model
 
         /// <summary>
         /// How close existing alignment points have to be to the new alignment point
-        /// before they are removed and replaced with the new one (Degrees)
+        /// before they are removed and replaced with the new one (degrees)
         /// </summary>
-        public double ProximityLimit { get; set; } = 2.0;
+        public double ProximityLimit { get; set; } = 0.5;
 
         /// <summary>
         /// How many sample points should be used.
@@ -96,7 +96,7 @@ namespace NStarAlignment.Model
         /// <summary>
         /// How close do points have to be to be considered for inclusion in the sample (Degrees)
         /// </summary>
-        public double NearbyLimit { get; set; } = 90.0;
+        public double NearbyLimit { get; set; } = 45.0;
 
 
         public double SiteLongitude { get; set; }

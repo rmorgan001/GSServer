@@ -23,27 +23,69 @@
                        IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" 
                        BorderBrush="{StaticResource MaterialDesignDivider}">
             <md:DrawerHost.LeftDrawerContent>
-                <Grid Width="350">
+                <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="40" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" MinHeight="150"/>
+                        <RowDefinition Height="Auto" MinHeight="150"/>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <Label Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" Content="{StaticResource aliAlignmentSettings}"/>
-                    <ToggleButton Grid.Row="0"  HorizontalAlignment="Right" Margin="5" ToolTip="{StaticResource aliCloseTooltip}"
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="50" />
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" Content="{StaticResource aliAlignmentSettings}"/>
+                    <ToggleButton Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" Margin="5" ToolTip="{StaticResource aliCloseTooltip}"
                                   Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
                                   Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
                                   CommandParameter="{x:Static Dock.Left}"
                                   IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"/>
-                    <TextBox Grid.Row="1" Margin="20,0,5,20" md:HintAssist.Hint="{StaticResource optProximityLimit}" Width="120" HorizontalAlignment="Left" ToolTip="{StaticResource aliProximityLimitTooltip}" 
-                             Text="{Binding ProximityLimit}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" domain:TextBoxMaskBehaviour.Mask="Decimal" />
-                    <TextBox Grid.Row="2" Margin="20,0,5,20" md:HintAssist.Hint="{StaticResource optNearbyLimit}" Width="120" HorizontalAlignment="Left" ToolTip="{StaticResource aliNearbyLimitTooltip}" 
+                    <TextBox Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left"  VerticalAlignment="Bottom" Margin="20,0,5,20" Width="120" IsReadOnly="True"
+                             md:HintAssist.Hint="{StaticResource optProximityLimit}" 
+                             Text="{Binding ProximityLimitArcSeconds}"
+                             ToolTip="{StaticResource aliProximityLimitTooltip}"
+                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" domain:TextBoxMaskBehaviour.Mask="Decimal" />
+                    <Slider Grid.Row="1" Grid.Column="2" Value="{Binding ProximityLimitArcSeconds}" 
+                            Style="{StaticResource MaterialDesignDiscreteSlider}"
+                            ToolTip="{StaticResource aliProximityLimitTooltip}"
+                            Width="75"
+                            Orientation="Vertical"
+                            Minimum="0" Maximum="7200" 
+                            TickFrequency="200"
+                            TickPlacement="None" />
+                    <TextBox Grid.Row="2" Grid.Column="0"  Margin="20,0,5,20" 
+                             md:HintAssist.Hint="{StaticResource optNearbyLimit}" Width="120" HorizontalAlignment="Left" VerticalAlignment="Bottom" IsReadOnly="True"
+                             ToolTip="{StaticResource aliNearbyLimitTooltip}" 
                              Text="{Binding NearbyLimit}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" domain:TextBoxMaskBehaviour.Mask="Decimal"/>
-                    <TextBox Grid.Row="3" Margin="20,0,5,20" md:HintAssist.Hint="{StaticResource optSampleSize}" Width="120" HorizontalAlignment="Left" ToolTip="{StaticResource aliSampleSizeTooltip}" 
-                             Text="{Binding SampleSize}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" domain:TextBoxMaskBehaviour.Mask="Integer"/>
-                    <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="20,0,5,20">
+
+                    <Slider Grid.Row="2" Grid.Column="2" Value="{Binding NearbyLimit}" 
+                            Style="{StaticResource MaterialDesignDiscreteSlider}"
+                            ToolTip="{StaticResource aliNearbyLimitTooltip}"
+                            Width="75"
+                            Orientation="Vertical"
+                            Minimum="5" Maximum="90" 
+                            TickFrequency="5"
+                            TickPlacement="None" />
+                    <!--<TextBox Grid.Row="3" Margin="20,0,5,20" md:HintAssist.Hint="{StaticResource optSampleSize}" Width="120" HorizontalAlignment="Left" ToolTip="{StaticResource aliSampleSizeTooltip}" 
+                             Text="{Binding SampleSize}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" domain:TextBoxMaskBehaviour.Mask="Integer"/>-->
+                    <ComboBox Grid.Row="3" Grid.ColumnSpan="3" Grid.Column="0" Margin="20,0,5,20" md:HintAssist.Hint="{StaticResource optSampleSize}" Width="120" HorizontalAlignment="Left" ToolTip="{StaticResource aliSampleSizeTooltip}"
+                              ItemsSource="{Binding SampleSizeList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <ComboBox.SelectedItem>
+                            <Binding Path="SampleSize" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </ComboBox.SelectedItem>
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                    </ComboBox>
+                    <StackPanel Grid.Row="4" Grid.ColumnSpan="3" Grid.Column="0" Orientation="Horizontal" Margin="20,0,5,20">
                         <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource aliClearModelOnStartupTooltip}"
                                       IsChecked="{Binding ClearModelOnStartup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource aliClearModelOnStartup}"/>

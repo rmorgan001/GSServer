@@ -598,8 +598,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliAlignmentOnTooltip">Switch on star alignment modeling</system:String>
     <system:String x:Key="aliClearModelOnStartup">Clear model on startup</system:String>
     <system:String x:Key="aliAlignmentSettings">Settings</system:String>
-    <system:String x:Key="aliProximityLimitTooltip">How near to each other can sync points be before they replace earlier points (degrees).</system:String>
-    <system:String x:Key="aliSampleSizeTooltip">How many nearby sync points should be used when calculating positions (degrees).</system:String>
+    <system:String x:Key="aliProximityLimitTooltip">How near to each other can sync points be before they replace earlier points (arc seconds).</system:String>
+    <system:String x:Key="aliSampleSizeTooltip">How many nearby sync points should be used when calculating positions.</system:String>
     <system:String x:Key="aliNearbyLimitTooltip">How close should sync points be before they are used in calculations (degrees).</system:String>
     <system:String x:Key="aliClearModelOnStartupTooltip">Tick if you want to create a fresh model every time you reconnect.</system:String>
     <system:String x:Key="aliClearAll">Clear All</system:String>
