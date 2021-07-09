@@ -24,6 +24,7 @@ using GS.Shared.Command;
 using MaterialDesignThemes.Wpf;
 using NStarAlignment.DataTypes;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -119,12 +120,12 @@ namespace GS.Server.Alignment
             }
         }
 
-        public double ProximityLimit
+        public double ProximityLimitArcSeconds
         {
-            get => AlignmentSettings.ProximityLimit;
+            get => AlignmentSettings.ProximityLimit * 3600;
             set
             {
-                AlignmentSettings.ProximityLimit = value;
+                AlignmentSettings.ProximityLimit = value / 3600;
                 OnPropertyChanged();
             }
 
@@ -140,6 +141,8 @@ namespace GS.Server.Alignment
             }
 
         }
+
+        public IList<int> SampleSizeList { get; } = new List<int>(Enumerable.Range(2, 8));
 
         public int SampleSize
         {
