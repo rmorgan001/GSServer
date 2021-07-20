@@ -593,7 +593,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="msgValue">Value Not found</system:String>
     <system:String x:Key="msgKey">Key Not found</system:String>
 
-	<!--1.0.2.5? -->
+	<!--1.0.2.5 -->
     <!-- Alignment -->
     <system:String x:Key="aliOpenTooltip">Open</system:String>
     <system:String x:Key="aliCloseTooltip">Close</system:String>
@@ -615,6 +615,21 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="optSampleSize">Sample Size</system:String>
     <system:String x:Key="optNearbyLimit">Near by Limit</system:String>
 
-
+    <!--1.0.3.2 -->
+    <system:String x:Key="customGears">Custom Gears</system:String>
+    <system:String x:Key="raTotalSteps">RA Total Steps</system:String>
+    <system:String x:Key="decTotalSteps">Dec Total Steps</system:String>
+    <system:String x:Key="raWormTeeth">RA Worm Teeth</system:String>
+    <system:String x:Key="decWormTeeth">Dec Worm Teeth</system:String>
+    <system:String x:Key="raTrackingOffset">RA Tracking Offset</system:String>
+    <system:String x:Key="decTrackingOffset">Dec Tracking Offset</system:String>
+    <system:String x:Key="gearingConnect">Reconnect for changes to take effect</system:String>
+    <system:String x:Key="applyGearing">Apply custom gearing?</system:String>
+    <system:String x:Key="mntWormStepsRa">Worm Steps Ra:</system:String>
+    <system:String x:Key="mntWormStepsDec">Worm Steps Dec:</system:String>
+    <system:String x:Key="mntCustomOffsetRa">Custom Offset Ra:</system:String>
+    <system:String x:Key="mntCustomOffsetDec">Custom Offset Dec:</system:String>
+    <system:String x:Key="mntFreqRa">Frequency Ra:</system:String>
+    <system:String x:Key="mntFreqDec">Frequency Dec:</system:String>
 </ResourceDictionary>
  

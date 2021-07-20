@@ -57,8 +57,8 @@
             </StackPanel>
             <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5"  Text="{StaticResource cdcAccept}"/>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" >
-                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaAccept}" Command="{Binding AcceptCdcDialogCommand}"/>
-                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaCancel}" Command="{Binding CancelCdcDialogCommand}"/>
+                <Button IsDefault="False" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaAccept}" Command="{Binding AcceptCdcDialogCommand}"/>
+                <Button IsCancel="True" IsDefault="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaCancel}" Command="{Binding CancelCdcDialogCommand}"/>
             </StackPanel>
         </StackPanel>
     </GroupBox>

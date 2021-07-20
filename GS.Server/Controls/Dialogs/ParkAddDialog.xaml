@@ -21,8 +21,8 @@
                 </TextBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="5" >
-                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaAccept}" Command="{Binding AcceptParkAddDialogCommand}"/>
-                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaCancel}" Command="{Binding CancelParkAddDialogCommand}"/>
+                <Button IsDefault="False"  Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaAccept}" Command="{Binding AcceptParkAddDialogCommand}"/>
+                <Button IsCancel="True" IsDefault="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaCancel}" Command="{Binding CancelParkAddDialogCommand}"/>
             </StackPanel>
         </StackPanel>
 </GroupBox>

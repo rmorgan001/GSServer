@@ -201,10 +201,20 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Controls\Dialogs\MountInfoDialog.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Controls\Dialogs\CustomGearingDialog.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
     <Page Update="Controls\Dialogs\SpiralFovDialog.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Snap\SnapV.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
+    <Page Update="Windows\MessageControlV.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
     <Page Update="Windows\ButtonsControlV.xaml">

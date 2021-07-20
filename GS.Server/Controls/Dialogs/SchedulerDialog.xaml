@@ -45,7 +45,7 @@
                     </md:TimePicker.Text>
                 </md:TimePicker>
             </Grid>
-         <Button Margin="0,5,0,0" Width="50"  IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptSchedulerDialogCmd}" Content="{StaticResource diaOk}"/>
+         <Button IsCancel="True" Margin="0,5,0,0" Width="50"  IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptSchedulerDialogCmd}" Content="{StaticResource diaOk}"/>
         </StackPanel>
     </GroupBox>
     </UserControl>

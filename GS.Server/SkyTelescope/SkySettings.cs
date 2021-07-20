@@ -475,6 +475,104 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static int _customDec360Steps;
+        public static int CustomDec360Steps
+        {
+            get => _customDec360Steps;
+            set
+            {
+                if (_customDec360Steps == value) return;
+                _customDec360Steps = value;
+                Properties.SkyTelescope.Default.CustomDec360Steps = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static int _customDecTrackingOffset;
+        public static int CustomDecTrackingOffset
+        {
+            get => _customDecTrackingOffset;
+            set
+            {
+                if (_customDecTrackingOffset == value) return;
+                _customDecTrackingOffset = value;
+                Properties.SkyTelescope.Default.CustomDecTrackingOffset = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static int _customDecWormTeeth;
+        public static int CustomDecWormTeeth
+        {
+            get => _customDecWormTeeth;
+            set
+            {
+                if (_customDecWormTeeth == value) return;
+                _customDecWormTeeth = value;
+                Properties.SkyTelescope.Default.CustomDecWormTeeth = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static int _customRa360Steps;
+        public static int CustomRa360Steps
+        {
+            get => _customRa360Steps;
+            set
+            {
+                if (_customRa360Steps == value) return;
+                _customRa360Steps = value;
+                Properties.SkyTelescope.Default.CustomRa360Steps = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static int _customRaTrackingOffset;
+        public static int CustomRaTrackingOffset
+        {
+            get => _customRaTrackingOffset;
+            set
+            {
+                if (_customRaTrackingOffset == value) return;
+                _customRaTrackingOffset = value;
+                Properties.SkyTelescope.Default.CustomRaTrackingOffset = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static int _customRaWormTeeth;
+        public static int CustomRaWormTeeth
+        {
+            get => _customRaWormTeeth;
+            set
+            {
+                if (_customRaWormTeeth == value) return;
+                _customRaWormTeeth = value;
+                Properties.SkyTelescope.Default.CustomRaWormTeeth = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static bool _customGearing;
+        public static bool CustomGearing
+        {
+            get => _customGearing;
+            set
+            {
+                if (_customGearing == value) return;
+                _customGearing = value;
+                Properties.SkyTelescope.Default.CustomGearing = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static int _gpsComPort;
         public static int GpsComPort
         {
@@ -1649,6 +1747,13 @@ namespace GS.Server.SkyTelescope
             CameraHeight = Properties.SkyTelescope.Default.CameraHeight;
             CameraWidth = Properties.SkyTelescope.Default.CameraWidth;
             ComPort = Properties.SkyTelescope.Default.ComPort;
+            CustomDec360Steps = Properties.SkyTelescope.Default.CustomDec360Steps;
+            CustomDecTrackingOffset = Properties.SkyTelescope.Default.CustomDecTrackingOffset;
+            CustomDecWormTeeth = Properties.SkyTelescope.Default.CustomDecWormTeeth;
+            CustomRa360Steps = Properties.SkyTelescope.Default.CustomRa360Steps;
+            CustomRaTrackingOffset = Properties.SkyTelescope.Default.CustomRaTrackingOffset;
+            CustomRaWormTeeth = Properties.SkyTelescope.Default.CustomRaWormTeeth;
+            CustomGearing = Properties.SkyTelescope.Default.CustomGearing;
             DataBits = Properties.SkyTelescope.Default.DataBits;
             DecBacklash = Properties.SkyTelescope.Default.DecBacklash;
             DecPulseToGoTo = Properties.SkyTelescope.Default.DecPulseToGoTo;

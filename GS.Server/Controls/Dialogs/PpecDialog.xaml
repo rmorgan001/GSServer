@@ -9,8 +9,8 @@
         <StackPanel Orientation="Vertical">
             <TextBlock VerticalAlignment="Center" Margin="5" Text="{StaticResource ppStartTraining}"/>
             <StackPanel Orientation="Horizontal" Margin="5">
-                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptPPecDialogCommand}" Content="{StaticResource diaAccept}"/>
-                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelPPecDialogCommand}" Content="{StaticResource diaCancel}"/>
+                <Button IsDefault="False" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptPPecDialogCommand}" Content="{StaticResource diaAccept}"/>
+                <Button IsCancel="True" IsDefault="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelPPecDialogCommand}" Content="{StaticResource diaCancel}"/>
             </StackPanel>
         </StackPanel>
     </GroupBox>

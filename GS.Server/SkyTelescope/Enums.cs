@@ -110,6 +110,7 @@ namespace GS.Server.SkyTelescope
         MountVersion,
         StepsPerRevolution,
         StepsWormPerRevolution,
+        StepTimeFreq,
         GetFactorStep
     }
 

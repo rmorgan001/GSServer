@@ -209,7 +209,7 @@
                 </md:PackIcon.Style>
             </md:PackIcon>
         </Button>
-        <Button Grid.Column="9" Command="{Binding ClickMountInfoDialogCommand}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource botTipConnected}" Padding="9">
+        <Button Grid.Column="9" Command="{Binding OpenMountInfoDialogCmd}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource botTipConnected}" Padding="9">
             <md:PackIcon Kind="Usb" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-5" ToolTip="{StaticResource botTipConnected}">
                 <md:PackIcon.Style>
                     <Style TargetType="md:PackIcon">

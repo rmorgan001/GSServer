@@ -155,13 +155,13 @@ namespace GS.SkyWatcher
         /// Startup Queues
         /// </summary>
         /// <param name="serial"></param>
-        public static void Start(SerialPort serial)
+        public static void Start(SerialPort serial, int[] customMount360Steps, double[] customRaWormSteps)
         {
             Stop();
             if (_cts == null) _cts = new CancellationTokenSource();
             var ct = _cts.Token;
 
-            _skyWatcher = new SkyWatcher(serial);
+            _skyWatcher = new SkyWatcher(serial, customMount360Steps,  customRaWormSteps);
             _resultsDictionary = new ConcurrentDictionary<long, ISkyCommand>();
             _commandBlockingCollection = new BlockingCollection<ISkyCommand>();
 

@@ -22,8 +22,8 @@
                 
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="5" HorizontalAlignment="Center">
-                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding ClickDownloadUpdateCmd}" Content="{StaticResource optDownload}" IsEnabled="{Binding UpdateEnabled}"/>
-                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelUpdateDialogCmd}" Content="{StaticResource diaCancel}"/>
+                <Button IsDefault="False" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding ClickDownloadUpdateCmd}" Content="{StaticResource optDownload}" IsEnabled="{Binding UpdateEnabled}"/>
+                <Button IsCancel="True" IsDefault="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelUpdateDialogCmd}" Content="{StaticResource diaCancel}"/>
             </StackPanel>
         </StackPanel>
     </GroupBox>

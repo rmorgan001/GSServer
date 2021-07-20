@@ -53,6 +53,8 @@ namespace GS.Server.SkyTelescope
 
         #region Fields
 
+        const double _siderealRate = 15.0410671786691;
+
         private static readonly Util _util = new Util();
         private static readonly object _timerLock = new object();
         private static MediaTimer _mediaTimer;
@@ -148,42 +150,6 @@ namespace GS.Server.SkyTelescope
 
                 AlertState = true;
                 throw;
-            }
-        }
-
-
-        private static void PropertyChangedSkySettings(object sender, PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case "Latitude":
-                    AlignmentModel.SiteLatitude = SkySettings.Latitude;
-                    break;
-                case "Longitude":
-                    AlignmentModel.SiteLongitude = SkySettings.Longitude;
-                    break;
-                case "Elevation":
-                    AlignmentModel.SiteElevation = SkySettings.Elevation;
-                    break;
-            }
-        }
-
-        private static void PropertyChangedAlignmentSettings(object sender, PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case "IsAlignmentOn":
-                    AlignmentModel.IsAlignmentOn = AlignmentSettings.IsAlignmentOn;
-                    break;
-                case "ProximityLimit":
-                    AlignmentModel.ProximityLimit = AlignmentSettings.ProximityLimit;
-                    break;
-                case "NearbyLimit":
-                    AlignmentModel.NearbyLimit = AlignmentSettings.NearbyLimit;
-                    break;
-                case "SampleSize":
-                    AlignmentModel.SampleSize = AlignmentSettings.SampleSize;
-                    break;
             }
         }
 
@@ -469,7 +435,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Data,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{_rateRaDec.X}"
+                    Message = $"{_rateRaDec.X},{SkyTrackingOffset[0]}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -849,7 +815,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Data,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{_rateAxes.Y}"
+                    Message = $"{_rateAxes.Y},{SkyTrackingOffset[1]}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -897,7 +863,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Data,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{_rateAxes.X}"
+                    Message = $"{_rateAxes.X},{SkyTrackingOffset[0]}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -1038,6 +1004,12 @@ namespace GS.Server.SkyTelescope
         /// Total steps per 360
         /// </summary>
         public static long[] StepsPerRevolution { get; private set; }
+
+        /// <summary>
+        /// :b Timer Freq
+        /// </summary>
+        public static long[] StepsTimeFreq { get; private set; }
+
         private static double[] Steps { get; set; }
 
         /// <summary>
@@ -1048,7 +1020,7 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Total worm step per 360
         /// </summary>
-        private static double[] StepsWormPerRevolution { get; set; }
+        public static double[] StepsWormPerRevolution { get; private set; }
 
         /// <summary>
         /// Set for all types of go tos
@@ -1139,7 +1111,8 @@ namespace GS.Server.SkyTelescope
             get => _trackingMode != TrackingMode.Off;
             set
             {
-                if (value == _tracking) return;
+                if (value == _tracking){return;}
+
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
@@ -1156,7 +1129,7 @@ namespace GS.Server.SkyTelescope
                 {
                     if (AtPark)
                     {
-                        if (TrackingSpeak) Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
+                        if (TrackingSpeak){Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());}
                         throw new ASCOM.ParkedException(Application.Current.Resources["exParked"].ToString());
                     }
 
@@ -1537,14 +1510,66 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        #endregion 
+        #endregion
 
         #region SkyWatcher Items
+
+        private static Vector _trackingOffsetRate;
+
+        /// <summary>
+        /// Custom Tracking Offset for RA calculate into arc seconds per sec
+        /// </summary>
+        public static double TrackingOffsetRaRate
+        {
+            get => _trackingOffsetRate.X;
+            private set => _trackingOffsetRate.X = value;
+        }
+
+        /// <summary>
+        /// Custom Tracking Offset for Dec calculate into arc seconds per sec
+        /// </summary>
+        public static double TrackingOffsetDecRate
+        {
+            get => _trackingOffsetRate.Y;
+            private set => _trackingOffsetRate.Y = value;
+        }
+
+        /// <summary>
+        /// Adjust tracking rate for Custom Mount Gearing Offset settings
+        /// </summary>
+        /// <returns>difference in rates</returns>
+        private static void CalcCustomTrackingOffset()
+        {
+            _trackingOffsetRate = new Vector(0.0, 0.0);
+
+            //calculate mount sidereal :I, add offset to :I, Calculate new rate, Add rate difference to rate
+            if (SkySettings.Mount != MountType.SkyWatcher){return;} //only use for sky watcher mounts
+
+            if (SkySettings.CustomGearing == false) {return;}
+
+            var ratioFactor = (double)StepsTimeFreq[0] / StepsPerRevolution[0] * 1296000.0;  //generic factor for calc
+            var siderealI = ratioFactor / _siderealRate;
+            siderealI += SkySettings.CustomRaTrackingOffset;  //calc :I and add offset
+            var newRate = ratioFactor / siderealI; //calc new rate from offset
+            TrackingOffsetRaRate = _siderealRate - newRate;
+
+            ratioFactor = (double)StepsTimeFreq[1] / StepsPerRevolution[1] * 1296000.0;  //generic factor for calc
+            siderealI = ratioFactor / _siderealRate;
+            siderealI += SkySettings.CustomDecTrackingOffset;  //calc :I and add offset
+            newRate = ratioFactor / siderealI; //calc new rate from offset
+            TrackingOffsetDecRate = _siderealRate - newRate;
+
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{TrackingOffsetRaRate},{TrackingOffsetDecRate}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+        }
 
         // used to combine multiple sources for a single slew rate
         // include tracking, hand controller, etc..
         private static Vector SkyHCRate;
         private static Vector SkyTrackingRate;
+        private static readonly int[] SkyTrackingOffset = { 0, 0 }; // Store for custom mount :I offset
 
         /// <summary>
         /// combines multiple rates for a single slew rate
@@ -1554,6 +1579,7 @@ namespace GS.Server.SkyTelescope
         {
             var change = new Vector();
             change += SkyTrackingRate; // Tracking
+
             if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
             {
                 change = ConvertRateToAltAz(change.X);
@@ -1561,7 +1587,7 @@ namespace GS.Server.SkyTelescope
 
             change += SkyHCRate; // Hand controller
             change += _rateAxes; // MoveAxis at the given rate
-            change += _rateRaDec; // tracking rate
+            change += _rateRaDec;// External tracking rate
 
             //todo might be a good place to reject for axis limits
             CheckAxisLimits();
@@ -1936,6 +1962,10 @@ namespace GS.Server.SkyTelescope
                             StepsWormPerRevolution[0] = (double)SkyQueue.GetCommandResult(SkyWormRevolutions1).Result;
                             var SkyWormRevolutions2 = new SkyGetPecPeriod(SkyQueue.NewId, AxisId.Axis2);
                             StepsWormPerRevolution[1] = (double)SkyQueue.GetCommandResult(SkyWormRevolutions2).Result;
+                            break;
+                        case MountTaskName.StepTimeFreq:
+                            var SkyStepTimeFreq = new SkyGetStepTimeFreq(SkyQueue.NewId);
+                            StepsTimeFreq = (long[])SkyQueue.GetCommandResult(SkyStepTimeFreq).Result;
                             break;
                         case MountTaskName.SetHomePositions:
                             _ = new SkySetAxisPosition(0, AxisId.Axis1, _homeAxes.X);
@@ -2528,6 +2558,11 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
 
+            if (rate < _siderealRate * 2 & rate != 0) //add any custom gearing offset
+            {
+                rate += TrackingOffsetRaRate;  
+            }
+
             //Implement Pec
             if (PecOn && Tracking && PecBinNow != null && !double.IsNaN(PecBinNow.Item2))
             {
@@ -2577,6 +2612,7 @@ namespace GS.Server.SkyTelescope
                 _homeAxes.Y = SkySettings.HomeAxisY;
             }
 
+            MonitorEntry monitorItem;
             if (AtPark)
             {
                 if (SkySettings.AutoTrack)
@@ -2588,13 +2624,26 @@ namespace GS.Server.SkyTelescope
                 positions = Axes.AxesAppToMount(new[] { SkySettings.ParkAxisX, SkySettings.ParkAxisY });
                 var p = new ParkPosition { Name = SkySettings.ParkName, X = SkySettings.ParkAxisX, Y = SkySettings.ParkAxisY };
                 ParkSelected = p;
+
+                monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{SkySettings.ParkAxisX}={positions[0]},{SkySettings.ParkAxisY}={positions[1]}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
             }
             else
             {
                 positions = new[] { _homeAxes.X, _homeAxes.Y };
             }
 
-            var monitorItem = new MonitorEntry
+            monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
                 Device = MonitorDevice.Telescope,
@@ -3402,8 +3451,8 @@ namespace GS.Server.SkyTelescope
                     SimTasks(MountTaskName.CanHomeSensor);
                     SimTasks(MountTaskName.GetFactorStep);
 
-                    raWormTeeth = (int)Math.Round(StepsPerRevolution[0] / StepsWormPerRevolution[0], 0);
-                    decWormTeeth = (int)Math.Round(StepsPerRevolution[1] / StepsWormPerRevolution[1], 0);
+                    raWormTeeth = (int)(StepsPerRevolution[0] / StepsWormPerRevolution[0]);
+                    decWormTeeth = (int)(StepsPerRevolution[1] / StepsWormPerRevolution[1]);
                     WormTeethCount = new[] { raWormTeeth, decWormTeeth };
                     PecBinSteps = StepsPerRevolution[0] / (WormTeethCount[0] * 1.0) / PecBinCount;
 
@@ -3453,6 +3502,7 @@ namespace GS.Server.SkyTelescope
                     SkyTasks(MountTaskName.MountVersion);
                     SkyTasks(MountTaskName.StepsPerRevolution);
                     SkyTasks(MountTaskName.StepsWormPerRevolution);
+                    SkyTasks(MountTaskName.StepTimeFreq);
                     SkyTasks(MountTaskName.InitialiseAxes);
                     SkyTasks(MountTaskName.GetOneStepIndicators);
                     SkyTasks(MountTaskName.CanPpec);
@@ -3464,10 +3514,12 @@ namespace GS.Server.SkyTelescope
                     SkyTasks(MountTaskName.GetFactorStep);
                     if (CanPPec) SkyTasks(MountTaskName.Pec);
 
-                    raWormTeeth = (int)Math.Round(StepsPerRevolution[0] / StepsWormPerRevolution[0], 0);
-                    decWormTeeth = (int)Math.Round(StepsPerRevolution[1] / StepsWormPerRevolution[1], 0);
+                    raWormTeeth = (int)(StepsPerRevolution[0] / StepsWormPerRevolution[0]);
+                    decWormTeeth = (int)(StepsPerRevolution[1] / StepsWormPerRevolution[1]);
                     WormTeethCount = new[] { raWormTeeth, decWormTeeth };
                     PecBinSteps = StepsPerRevolution[0] / (WormTeethCount[0] * 1.0) / PecBinCount;
+
+                    CalcCustomTrackingOffset();  //generates rates for the custom gearing offsets
 
                     // checks if the mount is close enough to home position to set default position. If not use the positions from the mount
                     while (rawPositions == null)
@@ -3567,8 +3619,16 @@ namespace GS.Server.SkyTelescope
                         throw new SkyServerException(ErrorCode.ErrSerialFailed,
                             $"Serial Failed COM{SkySettings.ComPort}");
                     }
-                    // Start up
-                    SkyQueue.Start(SkySystem.Serial);
+                    // Start up, pass custom mount gearing if needed
+                    var Custom360Steps = new[] {0,0};
+                    var CustomWormSteps = new[] {0.0,0.0};
+                    if (SkySettings.CustomGearing)
+                    {
+                        Custom360Steps = new[] { SkySettings.CustomRa360Steps, SkySettings.CustomDec360Steps };
+                        CustomWormSteps= new[] { (double) SkySettings.CustomRa360Steps / SkySettings.CustomRaWormTeeth, (double) SkySettings.CustomDec360Steps / SkySettings.CustomDecWormTeeth};
+                    }
+
+                    SkyQueue.Start(SkySystem.Serial,  Custom360Steps, CustomWormSteps);
                     if (!SkyQueue.IsRunning)
                     {
                         throw new SkyServerException(ErrorCode.ErrMount, "Failed to start sky queue");
@@ -3953,7 +4013,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{_trackingMode},{rateChange * 3600},{PecBinNow}"
+                Message = $"{_trackingMode},{rateChange * 3600},{PecBinNow},{SkyTrackingOffset}"
             };
             MonitorLog.LogToMonitor(monitorItem);
         }
@@ -4298,7 +4358,91 @@ namespace GS.Server.SkyTelescope
             Synthesizer.Speak(Application.Current.Resources["vceSyncCoords"].ToString());
         }
 
-        #region Alignment ...
+        /// <summary>
+        /// Check if sync is too far from RaDec position
+        /// </summary>
+        /// <param name="ra"></param>
+        /// <param name="dec"></param>
+        /// <returns>False is out of limit</returns>
+        public static bool CheckRaDecSyncLimit(double ra, double dec)
+        {
+            if (!SkySettings.SyncLimitOn) { return true; }
+            if (SkySettings.NoSyncPastMeridian) { return false; } // add more checks later if needed
+
+            //convert ra dec to mount positions
+            var xy = Axes.RaDecToAxesXY(new[] { ra, dec });
+            var target = GetAdjustedAxesForSlewing(Axes.AxesAppToMount(xy), SideOfPierRaDec(ra));
+
+            //convert current position to mount position
+            var current = Axes.AxesMountToApp(new[] { _mountAxisX, _mountAxisY });
+
+            //compare ra dec to current position
+            var a = Math.Abs(target[0]) - Math.Abs(current[0]);
+            var b = Math.Abs(target[1]) - Math.Abs(current[1]);
+            var ret = !(Math.Abs(a) > SkySettings.SyncLimit || Math.Abs(b) > SkySettings.SyncLimit);
+            if (ret) return true;
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Warning,
+                Method = MethodBase.GetCurrentMethod().Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{xy[0]},{xy[1]},{target[0]},{target[1]},{current[0]},{current[1]},{SkySettings.SyncLimit}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            return false;
+
+        }
+
+        /// <summary>
+        /// Check if sync is too far from AltAz position
+        /// </summary>
+        /// <param name="alt"></param>
+        /// <param name="az"></param>
+        /// <returns>False is out of limit</returns>
+        public static bool CheckAltAzSyncLimit(double alt, double az)
+        {
+            if (!SkySettings.SyncLimitOn) { return true; }
+            if (SkySettings.NoSyncPastMeridian) { return false; } // add more checks later if needed
+
+            //convert ra dec to mount positions
+            var yx = Axes.AltAzToAxesYX(new[] { alt, az });
+            var target = Axes.AxesAppToMount(new[] { yx[1], yx[0] });
+
+            //convert current position to mount position
+            var current = Axes.AxesMountToApp(new[] { _mountAxisX, _mountAxisY });
+
+            //compare ra dec to current position
+            var a = Math.Abs(target[0]) - Math.Abs(current[0]);
+            var b = Math.Abs(target[1]) - Math.Abs(current[1]);
+
+            var ret = !(Math.Abs(a) > SkySettings.SyncLimit || Math.Abs(b) > SkySettings.SyncLimit);
+
+            if (ret) return true;
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Warning,
+                Method = MethodBase.GetCurrentMethod().Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{yx[1]},{yx[0]},{target[0]},{target[1]},{current[0]},{current[1]},{SkySettings.SyncLimit}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            return false;
+        }
+
+        #endregion
+
+        #region Alignment
+
         private static bool _alignmentShow;
         /// <summary>
         /// sets up bool to load a test tab
@@ -4316,7 +4460,6 @@ namespace GS.Server.SkyTelescope
                 OnStaticPropertyChanged();
             }
         }
-
 
         private static void AlignmentModel_Notification(object sender, NotificationEventArgs e)
         {
@@ -4407,90 +4550,41 @@ namespace GS.Server.SkyTelescope
 
         #endregion
 
-        /// <summary>
-        /// Check if sync is too far from RaDec position
-        /// </summary>
-        /// <param name="ra"></param>
-        /// <param name="dec"></param>
-        /// <returns>False is out of limit</returns>
-        public static bool CheckRaDecSyncLimit(double ra, double dec)
-        {
-            if (!SkySettings.SyncLimitOn) { return true; }
-            if (SkySettings.NoSyncPastMeridian) { return false; } // add more checks later if needed
-
-            //convert ra dec to mount positions
-            var xy = Axes.RaDecToAxesXY(new[] { ra, dec });
-            var target = GetAdjustedAxesForSlewing(Axes.AxesAppToMount(xy), SideOfPierRaDec(ra));
-
-            //convert current position to mount position
-            var current = Axes.AxesMountToApp(new[] { _mountAxisX, _mountAxisY });
-
-            //compare ra dec to current position
-            var a = Math.Abs(target[0]) - Math.Abs(current[0]);
-            var b = Math.Abs(target[1]) - Math.Abs(current[1]);
-            var ret = !(Math.Abs(a) > SkySettings.SyncLimit || Math.Abs(b) > SkySettings.SyncLimit);
-            if (ret) return true;
-
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Telescope,
-                Category = MonitorCategory.Server,
-                Type = MonitorType.Warning,
-                Method = MethodBase.GetCurrentMethod().Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{xy[0]},{xy[1]},{target[0]},{target[1]},{current[0]},{current[1]},{SkySettings.SyncLimit}"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            return false;
-
-        }
-
-        /// <summary>
-        /// Check if sync is too far from AltAz position
-        /// </summary>
-        /// <param name="alt"></param>
-        /// <param name="az"></param>
-        /// <returns>False is out of limit</returns>
-        public static bool CheckAltAzSyncLimit(double alt, double az)
-        {
-            if (!SkySettings.SyncLimitOn) { return true; }
-            if (SkySettings.NoSyncPastMeridian) { return false; } // add more checks later if needed
-
-            //convert ra dec to mount positions
-            var yx = Axes.AltAzToAxesYX(new[] { alt, az });
-            var target = Axes.AxesAppToMount(new[] { yx[1], yx[0] });
-
-            //convert current position to mount position
-            var current = Axes.AxesMountToApp(new[] { _mountAxisX, _mountAxisY });
-
-            //compare ra dec to current position
-            var a = Math.Abs(target[0]) - Math.Abs(current[0]);
-            var b = Math.Abs(target[1]) - Math.Abs(current[1]);
-
-            var ret = !(Math.Abs(a) > SkySettings.SyncLimit || Math.Abs(b) > SkySettings.SyncLimit);
-
-            if (ret) return true;
-
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Telescope,
-                Category = MonitorCategory.Server,
-                Type = MonitorType.Warning,
-                Method = MethodBase.GetCurrentMethod().Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{yx[1]},{yx[0]},{target[0]},{target[1]},{current[0]},{current[1]},{SkySettings.SyncLimit}"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            return false;
-        }
-
-        #endregion
-
         #region Server Items
+
+        private static void PropertyChangedSkySettings(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "Latitude":
+                    AlignmentModel.SiteLatitude = SkySettings.Latitude;
+                    break;
+                case "Longitude":
+                    AlignmentModel.SiteLongitude = SkySettings.Longitude;
+                    break;
+                case "Elevation":
+                    AlignmentModel.SiteElevation = SkySettings.Elevation;
+                    break;
+            }
+        }
+        private static void PropertyChangedAlignmentSettings(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "IsAlignmentOn":
+                    AlignmentModel.IsAlignmentOn = AlignmentSettings.IsAlignmentOn;
+                    break;
+                case "ProximityLimit":
+                    AlignmentModel.ProximityLimit = AlignmentSettings.ProximityLimit;
+                    break;
+                case "NearbyLimit":
+                    AlignmentModel.NearbyLimit = AlignmentSettings.NearbyLimit;
+                    break;
+                case "SampleSize":
+                    AlignmentModel.SampleSize = AlignmentSettings.SampleSize;
+                    break;
+            }
+        }
 
         /// <summary>
         /// initial defaults
@@ -4537,7 +4631,7 @@ namespace GS.Server.SkyTelescope
             Tracking = false;
             TrackingSpeak = true;
 
-
+            StepsTimeFreq = new long[2];
         }
 
         /// <summary>
@@ -4721,7 +4815,6 @@ namespace GS.Server.SkyTelescope
         private static double GetLocalSiderealTime(DateTime utcNow)
         {
             var gsjd = JDate.Ole2Jd(utcNow);
-            //var gsjd = JDate.Ole2Jd(utcNow.Add(SkySettings.UTCDateOffset));
             return Time.Lst(JDate.Epoch2000Days(), gsjd, false, SkySettings.Longitude);
         }
         #endregion

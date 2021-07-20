@@ -28,6 +28,7 @@ using System.Windows;
 using System.Windows.Input;
 using GS.Server.Controls.Dialogs;
 using GS.Server.SkyTelescope;
+using GS.Server.Windows;
 using GS.Shared.Command;
 
 namespace GS.Server.Snap
@@ -996,10 +997,17 @@ namespace GS.Server.Snap
         }
         private void OpenDialog(string msg, string caption = null)
         {
-            if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
-            DialogContent = new DialogOK();
-            IsDialogOpen = true;
+            if (IsDialogOpen)
+            {
+                OpenDialogWin(msg, caption);
+            }
+            else
+            {
+                if (msg != null) DialogMsg = msg;
+                DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
+                DialogContent = new DialogOK();
+                IsDialogOpen = true;
+            }
 
             var monitorItem = new MonitorEntry
             {
@@ -1012,7 +1020,13 @@ namespace GS.Server.Snap
                 Message = $"{msg}"
             };
             MonitorLog.LogToMonitor(monitorItem);
+        }
 
+        private void OpenDialogWin(string msg, string caption = null)
+        {
+            //Open as new window
+            var bWin = new MessageControlV(caption, msg) { Owner = Application.Current.MainWindow };
+            bWin.Show();
         }
 
         private ICommand _clickOkDialogCommand;

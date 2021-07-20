@@ -1,0 +1,101 @@
+﻿<UserControl x:Class="GS.Server.Controls.Dialogs.CustomGearingDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
+        xmlns:domain1="clr-namespace:GS.Server.Domain"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+    <GroupBox Header="{StaticResource customGears}" Margin="5">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="55"/>
+                <RowDefinition Height="55"/>
+                <RowDefinition Height="55"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40" />
+                <RowDefinition Height="40"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Row="0" Grid.Column="0" Width="110" VerticalAlignment="Top" md:HintAssist.Hint="{StaticResource raTotalSteps}" ToolTip="{StaticResource raTotalSteps}" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
+                <TextBox.Text>
+                    <Binding Path="CustomRa360Steps" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <domain1:IntValidationRule ValidatesOnTargetUpdated="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+            <TextBox Grid.Row="0" Grid.Column="2" Width="110" VerticalAlignment="Top" md:HintAssist.Hint="{StaticResource decTotalSteps}" ToolTip="{StaticResource decTotalSteps}"  Style="{StaticResource MaterialDesignFloatingHintTextBox}">
+                <TextBox.Text>
+                    <Binding Path="CustomDec360Steps" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <domain1:IntValidationRule ValidatesOnTargetUpdated="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+            <TextBox Grid.Row="1" Grid.Column="0" Width="110" VerticalAlignment="Top" md:HintAssist.Hint="{StaticResource raWormTeeth}" ToolTip="{StaticResource raWormTeeth}" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
+                <TextBox.Text>
+                    <Binding Path="CustomRaWormTeeth" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <domain1:IntValidationRule ValidatesOnTargetUpdated="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+            <TextBox Grid.Row="1" Grid.Column="2" Width="110" VerticalAlignment="Top" md:HintAssist.Hint="{StaticResource decWormTeeth}" ToolTip="{StaticResource decWormTeeth}" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
+                <TextBox.Text>
+                    <Binding Path="CustomDecWormTeeth" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <domain1:IntValidationRule ValidatesOnTargetUpdated="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+            <ComboBox Grid.Row="2" Grid.Column="0" Width="110" VerticalAlignment="Center" md:HintAssist.Hint="{StaticResource raTrackingOffset}" MinWidth="10" ToolTip="{StaticResource raTrackingOffset}" ItemsSource="{Binding CustomMountOffset}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                <ComboBox.SelectedItem>
+                    <Binding Path="CustomRaTrackingOffset" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </ComboBox.SelectedItem>
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
+            <ComboBox Grid.Row="2" Grid.Column="2" Width="110" VerticalAlignment="Center" md:HintAssist.Hint="{StaticResource decTrackingOffset}" ToolTip="{StaticResource decTrackingOffset}" ItemsSource="{Binding CustomMountOffset}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                <ComboBox.SelectedItem>
+                    <Binding Path="CustomDecTrackingOffset" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </ComboBox.SelectedItem>
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
+            <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource applyGearing}" />
+                <ToggleButton Style="{StaticResource MaterialDesignSwitchAccentToggleButton}" IsChecked="{Binding CustomGearing}" />
+            </StackPanel>
+            <Label Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource gearingConnect}"/>
+            <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal"  HorizontalAlignment="Center" >
+                <Button IsDefault="False" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptGearDialogCommand}" Content="{StaticResource diaAccept}" />
+                <Button IsCancel="True" IsDefault="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelGearDialogCommand}" Content="{StaticResource diaCancel}" />
+            </StackPanel>
+        </Grid>
+    </GroupBox>
+    </UserControl>
