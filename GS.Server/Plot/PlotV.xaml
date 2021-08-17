@@ -112,12 +112,16 @@
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock VerticalAlignment="Center" Margin="10,0,0,0" Text="Zoom:" />
                         <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="X" Command="{Binding Path=ClickPlotZoomCmd}" CommandParameter="X" />
-                        <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Y" Command="{Binding Path=ClickPlotZoomCmd}" CommandParameter="Y" />
-                        <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Xy" Command="{Binding Path=ClickPlotZoomCmd}" CommandParameter="Xy" IsChecked="True" />
+                            <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Y" Command="{Binding Path=ClickPlotZoomCmd}" CommandParameter="Y" IsChecked="True" />
+                        <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Xy" Command="{Binding Path=ClickPlotZoomCmd}" CommandParameter="Xy" />
                     </StackPanel>
-                </StackPanel>
-                <wpf:CartesianChart Grid.Row="1" Foreground="DarkGray" Hoverable="True" Zoom="{Binding Zoom}" LegendLocation="Bottom" DisableAnimations="True"  
-                                    Series="{Binding ValuesCollection, Mode=OneWay}" >
+                    <Button Margin="10,0,0,0" Height="30" Width="30" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickUpZoomCmd}" >
+                        <md:PackIcon Kind="ArrowUp" Margin="-10" HorizontalAlignment="Center" VerticalAlignment="Center" Height="20" Width="20"/></Button>
+                    <Button Margin="10,0,0,0" Height="30" Width="30" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickDownZoomCmd}">
+                        <md:PackIcon Kind="ArrowDown" Margin="-10" HorizontalAlignment="Center" VerticalAlignment="Center" Height="20" Width="20" />
+                    </Button>
+                    </StackPanel>
+                    <wpf:CartesianChart Grid.Row="1" Foreground="DarkGray" Hoverable="True" Zoom="{Binding Zoom}" LegendLocation="Bottom" DisableAnimations="True" Series="{Binding ValuesCollection, Mode=TwoWay}">
                     <wpf:CartesianChart.DataTooltip>
                         <wpf:DefaultTooltip SelectionMode="OnlySender" Foreground="Black" />
                     </wpf:CartesianChart.DataTooltip>
@@ -129,10 +133,9 @@
                             </wpf:Axis.Separator>
                         </wpf:Axis>
                     </wpf:CartesianChart.AxisX>
-                    <wpf:CartesianChart.AxisY>
-                        <wpf:Axis Title="{Binding Scale, Mode=TwoWay}" FontSize="15" Foreground="DarkGray" ShowLabels="True" DisableAnimations="True" 
-                                  LabelFormatter="{Binding FormatterY, Mode=OneTime}" MaxValue="{Binding AxisYMax, Mode=TwoWay}" MinValue="{Binding AxisYMin, Mode=TwoWay}"
-                                  Unit="{Binding AxisYUnit, Mode=TwoWay}">
+                        <wpf:CartesianChart.AxisY >
+                        <wpf:Axis Title="{Binding Scale, Mode=TwoWay}" FontSize="15" Foreground="DarkGray" ShowLabels="True" DisableAnimations="False" LabelFormatter="{Binding FormatterY, Mode=TwoWay}" 
+                                  MaxValue="{Binding AxisYMax, Mode=TwoWay}" MinValue="{Binding AxisYMin, Mode=TwoWay}" Unit="{Binding AxisYUnit, Mode=TwoWay}" RangeChangedCommand="{Binding RangeChangedCmd}">
                             <wpf:Axis.Sections>
                                 <wpf:AxisSection Value="0" StrokeThickness="1" Stroke="DarkGray" DisableAnimations="True"/>
                             </wpf:Axis.Sections>

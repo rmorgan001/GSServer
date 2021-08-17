@@ -752,7 +752,7 @@ namespace GS.Server.SkyTelescope
                 if (_parkSelected != null)
                 {
                     if (_parkSelected.Name == value.Name && Math.Abs(_parkSelected.X - value.X) < 0 &&
-                        Math.Abs(_parkSelected.Y - value.Y) < 0) return;
+                        Math.Abs(_parkSelected.Y - value.Y) < 0) { return; }
                 }
                 _parkSelected = value;
                 OnStaticPropertyChanged();
@@ -2232,7 +2232,8 @@ namespace GS.Server.SkyTelescope
                 if (returncode1 == 0 && returncode2 == 0)
                 {
                     // all is ok
-                    ResetHomePositions();
+                    //ResetHomePositions();
+                    ReSyncAxes();
                     Synthesizer.VoicePause = false;
                     Thread.Sleep(1500);
                     Synthesizer.Speak(Application.Current.Resources["btnAutoHomeComplete"].ToString());
@@ -3819,12 +3820,30 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Sets the mount to 0,90 for a home position sync.
+        /// Reset positions for the axes.
         /// </summary>
-        public static void ResetHomePositions()
+        /// <param name="parkPosition">ParkPosition or Null for home</param>
+        public static void ReSyncAxes(ParkPosition parkPosition = null)
         {
             if (!IsMountRunning) { return; }
+            if (Tracking) { Tracking = false; }
+            if (IsSlewing){
+                StopAxes();
+                return;
+            }
 
+            //set to home position
+            double[] position = { _homeAxes.X, _homeAxes.Y };
+            var name = "home";
+
+            //set to park position
+            if (parkPosition != null)
+            {
+                position = Axes.AxesAppToMount(new[] { parkPosition.X, parkPosition.Y});
+                name = parkPosition.Name;
+            }
+
+            //log
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
@@ -3833,26 +3852,34 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{_homeAxes.X}, {_homeAxes.Y}"
+                Message = $"{name},{position[0]},{position[1]}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
-            if (Tracking) { Tracking = false; }
-
-            switch (SkySettings.Mount)
+            switch (SkySettings.Mount) // mount type check
             {
                 case MountType.Simulator:
                     SimTasks(MountTaskName.StopAxes);
-                    SimTasks(MountTaskName.SetHomePositions);
+                    _ = new CmdAxisToDegrees(0, Axis.Axis1, position[0]);
+                    _ = new CmdAxisToDegrees(0, Axis.Axis2, position[1]);
                     break;
                 case MountType.SkyWatcher:
                     SkyTasks(MountTaskName.StopAxes);
-                    SkyTasks(MountTaskName.SetHomePositions);
+                    _ = new SkySetAxisPosition(0, AxisId.Axis1, position[0]);
+                    _ = new SkySetAxisPosition(0, AxisId.Axis2, position[1]);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
+            //all good, go ahead and set dropdown to the park position and park
+            if (parkPosition != null)
+            {
+                ParkSelected = parkPosition;
+                GoToPark();
+            }
+
+            //reset any hc moves
             HcResetPrevMove(MountAxis.Ra);
             HcResetPrevMove(MountAxis.Dec);
         }
@@ -4013,7 +4040,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{_trackingMode},{rateChange * 3600},{PecBinNow},{SkyTrackingOffset}"
+                Message = $"{_trackingMode},{rateChange * 3600},{PecBinNow},{SkyTrackingOffset[0]},{SkyTrackingOffset[1]}"
             };
             MonitorLog.LogToMonitor(monitorItem);
         }

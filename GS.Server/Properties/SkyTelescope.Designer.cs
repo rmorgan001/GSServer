@@ -1486,5 +1486,17 @@ namespace GS.Server.Properties {
                 this["CustomGearing"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool GlobalStopOn {
+            get {
+                return ((bool)(this["GlobalStopOn"]));
+            }
+            set {
+                this["GlobalStopOn"] = value;
+            }
+        }
     }
 }

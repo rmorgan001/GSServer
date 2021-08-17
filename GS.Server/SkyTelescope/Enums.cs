@@ -147,4 +147,10 @@ namespace GS.Server.SkyTelescope
         GSPecDebug = 2
     }
 
+    public enum ReSyncMode
+    {
+        Home = 0,
+        Park = 1
+    }
+
 }

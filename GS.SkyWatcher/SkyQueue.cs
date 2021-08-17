@@ -155,6 +155,8 @@ namespace GS.SkyWatcher
         /// Startup Queues
         /// </summary>
         /// <param name="serial"></param>
+        /// <param name="customMount360Steps"></param>
+        /// <param name="customRaWormSteps"></param>
         public static void Start(SerialPort serial, int[] customMount360Steps, double[] customRaWormSteps)
         {
             Stop();

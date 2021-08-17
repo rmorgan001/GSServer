@@ -224,7 +224,7 @@ namespace GS.Server.SkyTelescope
         public static bool CanSetPark
         {
             get => _canSetPark;
-            private set
+            set
             {
                 if (_canSetPark == value) return;
                 _canSetPark = value;
@@ -952,6 +952,19 @@ namespace GS.Server.SkyTelescope
                 Properties.SkyTelescope.Default.FocalLength = value;
                 LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
                 OnStaticPropertyChanged();
+            }
+        }
+
+        private static bool _globalStopOn;
+        public static bool GlobalStopOn
+        {
+            get => _globalStopOn;
+            set
+            {
+                if (_globalStopOn == value) return;
+                _globalStopOn = value;
+                Properties.SkyTelescope.Default.GlobalStopOn = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
             }
         }
 
@@ -1766,6 +1779,7 @@ namespace GS.Server.SkyTelescope
             FullCurrent = Properties.SkyTelescope.Default.FullCurrent;
             HcAntiDec = Properties.SkyTelescope.Default.HcAntiDec;
             HcAntiRa = Properties.SkyTelescope.Default.HcAntiRa;
+            GlobalStopOn = Properties.SkyTelescope.Default.GlobalStopOn;
             GotoPrecision = Properties.SkyTelescope.Default.GotoPrecision;
             GpsComPort = Properties.SkyTelescope.Default.GpsPort;
             GuideRateOffsetY = Properties.SkyTelescope.Default.GuideRateOffsetY;

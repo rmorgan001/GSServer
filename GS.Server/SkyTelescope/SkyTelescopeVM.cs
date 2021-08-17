@@ -37,16 +37,19 @@ using System.Management;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using Gma.System.MouseKeyHook;
 using GS.Server.Controls.Dialogs;
 using GS.Server.Windows;
 using GS.Shared.Command;
+using Application = System.Windows.Application;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 using Color = System.Windows.Media.Color;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using NativeMethods = GS.Server.Helpers.NativeMethods;
 using Point = System.Windows.Point;
 
@@ -62,6 +65,7 @@ namespace GS.Server.SkyTelescope
         public static SkyTelescopeVM _skyTelescopeVM;
         private CancellationTokenSource _ctsPark;
         private CancellationToken _ctPark;
+        private IKeyboardMouseEvents _GlobalHook;
         #endregion
 
         public SkyTelescopeVM()
@@ -88,7 +92,6 @@ namespace GS.Server.SkyTelescope
 
                     // Deals with applications trying to open the setup dialog more than once. 
                     OpenSetupDialog = SkyServer.OpenSetupDialog;
-                    //SkyServer.OpenSetupDialog = true;
                     SettingsGridEnabled = true;
 
                     // setup property events to monitor
@@ -99,6 +102,7 @@ namespace GS.Server.SkyTelescope
                     Shared.Settings.StaticPropertyChanged += PropertyChangedMonitorLog;
                     Synthesizer.StaticPropertyChanged += PropertyChangedSynthesizer;
                     Settings.Settings.StaticPropertyChanged += PropertyChangedSettings;
+                    GlobalStopOn = SkySettings.GlobalStopOn;
 
                     // dropdown lists
                     GuideRateOffsetList = new List<double>(Numbers.InclusiveRange(10, 100, 10));
@@ -122,8 +126,6 @@ namespace GS.Server.SkyTelescope
                     var extendedlist = new List<int>(Numbers.InclusiveIntRange(1000, 3000, 100));
                     RaBacklashList = RaBacklashList.Concat(extendedlist);
                     DecBacklashList = DecBacklashList.Concat(extendedlist);
-                    //SpiralHcSpeeds = new List<int>(Enumerable.Range(1, 8));
-                    //SpiralPauses = new List<int>(Enumerable.Range(0, 61));
 
                     // defaults
                     AtPark = SkyServer.AtPark;
@@ -260,6 +262,7 @@ namespace GS.Server.SkyTelescope
                          DebugVisibility = SkySettings.Diagnostics;
                          break;
                      case "ParkPositions":
+                         // ReSharper disable ExplicitCallerInfoArgument
                          OnPropertyChanged($"ParkPositions");
                          break;
                      case "DecBacklash":
@@ -623,6 +626,12 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private void GlobalHookKeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!SkyServer.IsMountRunning) {return;}
+            if (e.KeyChar == (char)27) {ClickStop();}
+        }
+
         /// <summary>
         /// Holds and shows reported error from the server
         /// </summary>
@@ -700,7 +709,6 @@ namespace GS.Server.SkyTelescope
                 }
             }
         }
-
         public IList<int> ComPorts
         {
             get
@@ -1140,6 +1148,26 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
+        public bool GlobalStopOn
+        {
+            get => SkySettings.GlobalStopOn;
+            set
+            {
+                if (value)
+                {
+                    SkySettings.GlobalStopOn = true;
+                    _GlobalHook = null;
+                    _GlobalHook = Hook.GlobalEvents();
+                    _GlobalHook.KeyPress += GlobalHookKeyPress;
+                }
+                else
+                {
+                    SkySettings.GlobalStopOn = false;
+                    _GlobalHook?.Dispose();
+                }
+                OnPropertyChanged();
+            }
+        }
         private void UpdateLongitude()
         {
             OnPropertyChanged($"Long0");
@@ -1397,7 +1425,6 @@ namespace GS.Server.SkyTelescope
         {
             KingRate = 15.0369;
         }
-
         #endregion
 
         #region Debug
@@ -1828,7 +1855,7 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    if (!SkyServer.IsMountRunning) return;
+                    if (!SkyServer.IsMountRunning) {return;}
                     SkyServer.StopAxes();
                 }
             }
@@ -4025,9 +4052,14 @@ namespace GS.Server.SkyTelescope
             if (SkyServer.AtPark) return;
             if (!SkySettings.HomeWarning) return;
 
+            string msg;
             switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
+                    msg = Application.Current.Resources["skyHome1"].ToString();
+                    msg += Environment.NewLine + Application.Current.Resources["skyHome2"];
+                    //msg += Environment.NewLine + Application.Current.Resources["skyHome3"];
+                    OpenDialog(msg);
                     break;
                 case MountType.SkyWatcher:
                     switch (SkySettings.AlignmentMode)
@@ -4037,9 +4069,9 @@ namespace GS.Server.SkyTelescope
                         case AlignmentModes.algPolar:
                             break;
                         case AlignmentModes.algGermanPolar:
-                            var msg = Application.Current.Resources["skyHome1"].ToString();
+                            msg = Application.Current.Resources["skyHome1"].ToString();
                             msg += Environment.NewLine + Application.Current.Resources["skyHome2"];
-                            msg += Environment.NewLine + Application.Current.Resources["skyHome3"];
+                            //msg += Environment.NewLine + Application.Current.Resources["skyHome3"];
                             OpenDialog(msg);
                             break;
                         default:
@@ -4567,6 +4599,112 @@ namespace GS.Server.SkyTelescope
 
         #endregion
 
+        #region Capabilities Dialog
+
+        public bool CanSetPark
+        {
+            get => SkySettings.CanSetPark;
+            set
+            {
+                if (value == SkySettings.CanSetPark) return;
+                SkySettings.CanSetPark = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openCapDialogCmd;
+        public ICommand OpenCapDialogCmd
+        {
+            get
+            {
+                var command = _openCapDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openCapDialogCmd = new RelayCommand(
+                    param => OpenCapDialog()
+                );
+            }
+        }
+        private void OpenCapDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    DialogContent = new CapabilitiesDialog();
+                    IsDialogOpen = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+
+        }
+
+        private ICommand _okCapDialogCmd;
+        public ICommand ClickOkCapDialogCmd
+        {
+            get
+            {
+                var command = _okCapDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _okCapDialogCmd = new RelayCommand(
+                    param => OkCapDialog()
+                );
+            }
+        }
+        private void OkCapDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message},{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
+
         #region PPEC Dialog
 
         private ICommand _openPPecDialogCommand;
@@ -4709,34 +4847,71 @@ namespace GS.Server.SkyTelescope
 
         #endregion
 
-        #region Home Reset Dialog
+        #region ReSync Dialog
 
-        private ICommand _openHomeResetDialogCommand;
-        public ICommand OpenHomeResetDialogCommand
+        private ReSyncMode _syncMode;
+        public ReSyncMode SyncMode
+        {
+            get => _syncMode;
+            set
+            {
+                if (_syncMode == value) { return; }
+                _syncMode = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ParkPosition _reSyncParkSelection;
+        public ParkPosition ReSyncParkSelection
+        {
+            get => _reSyncParkSelection;
+            set
+            {
+                if (_reSyncParkSelection == value) { return; }
+
+                var found = ParkPositions.Find(x => x.Name == value.Name && Math.Abs(x.X - value.X) <= 0 && Math.Abs(x.Y - value.Y) <= 0);
+                if (found == null) // did not find match in list
+                {
+                    ParkPositions.Add(value);
+                    _reSyncParkSelection = value;
+                }
+                else
+                {
+                    _reSyncParkSelection = found;
+                }
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openReSyncDialogCmd;
+        public ICommand OpenReSyncDialogCmd
         {
             get
             {
-                var command = _openHomeResetDialogCommand;
+                var command = _openReSyncDialogCmd;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _openHomeResetDialogCommand = new RelayCommand(
-                    param => OpenHomeResetDialog()
+                return _openReSyncDialogCmd = new RelayCommand(
+                    param => OpenReSyncDialog()
                 );
             }
         }
-        private void OpenHomeResetDialog()
+        private void OpenReSyncDialog()
         {
             try
             {
-                if (SkyServer.Tracking)
+                if (SkyServer.Tracking || SkyServer.IsSlewing)
                 {
                     OpenDialog(Application.Current.Resources["skyStopMount"].ToString());
                     return;
                 }
-                DialogContent = new HomeResetDialog();
+
+                SyncMode = ReSyncMode.Home;
+                ReSyncParkSelection = ParkSelection;
+                DialogContent = new ReSyncDialog();
                 IsDialogOpen = true;
             }
             catch (Exception ex)
@@ -4759,31 +4934,45 @@ namespace GS.Server.SkyTelescope
 
         }
 
-        private ICommand _acceptHomeResetDialogCommand;
-        public ICommand AcceptHomeResetDialogCommand
+        private ICommand _acceptReSyncDialogCmd;
+        public ICommand AcceptReSyncDialogCmd
         {
             get
             {
-                var command = _acceptHomeResetDialogCommand;
+                var command = _acceptReSyncDialogCmd;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _acceptHomeResetDialogCommand = new RelayCommand(
-                    param => AcceptHomeResetDialog()
+                return _acceptReSyncDialogCmd = new RelayCommand(
+                    param => AcceptReSyncDialog()
                 );
             }
         }
-        private void AcceptHomeResetDialog()
+        private void AcceptReSyncDialog()
         {
             try
             {
                 using (new WaitCursor())
                 {
-                    if (!SkyServer.IsMountRunning) return;
-                    SkyServer.ResetHomePositions();
-                    Synthesizer.Speak(Application.Current.Resources["vceHomeSet"].ToString());
+                    if (!SkyServer.IsMountRunning){ return; }
+
+                    switch (SyncMode)
+                    {
+                        case ReSyncMode.Home:
+                            SkyServer.ReSyncAxes();
+                            break;
+                        case ReSyncMode.Park:
+                            if (ReSyncParkSelection != null)
+                            {
+                               SkyServer.ReSyncAxes(ReSyncParkSelection);
+                            }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    Synthesizer.Speak(Application.Current.Resources["vceSync"].ToString());
                     IsDialogOpen = false;
                 }
             }
@@ -4806,23 +4995,23 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private ICommand _cancelHomeResetDialogCommand;
-        public ICommand CancelHomeResetDialogCommand
+        private ICommand _cancelReSyncDialogCmd;
+        public ICommand CancelReSyncDialogCmd
         {
             get
             {
-                var command = _cancelHomeResetDialogCommand;
+                var command = _cancelReSyncDialogCmd;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _cancelHomeResetDialogCommand = new RelayCommand(
-                    param => CancelHomeResetDialog()
+                return _cancelReSyncDialogCmd = new RelayCommand(
+                    param => CancelReSyncDialog()
                 );
             }
         }
-        private void CancelHomeResetDialog()
+        private void CancelReSyncDialog()
         {
             try
             {
@@ -7465,9 +7654,7 @@ namespace GS.Server.SkyTelescope
             Dispose(true);
             _ctsPark?.Cancel();
             _ctsPark?.Dispose();
-            //_ctsSpiral?.Cancel();
-            //_ctsSpiral?.Dispose();
-            // GC.SuppressFinalize(this);
+            _GlobalHook?.Dispose();
         }
         // NOTE: Leave out the finalizer altogether if this class doesn't
         // own unmanaged resources itself, but leave the other methods

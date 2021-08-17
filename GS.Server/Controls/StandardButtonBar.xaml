@@ -70,8 +70,7 @@
         <md:DialogHost VerticalAlignment="Bottom" CloseOnClickAway="True"
                        IsOpen="{Binding IsHomeResetDialogOpen}" DialogContent="{Binding HomeResetContent}">
             <Button Margin="5,6,0,0" Width="100" Height="25" HorizontalAlignment="Left" Padding="-5"
-                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipSetHome}"
-                    Command="{Binding OpenHomeResetDialogCommand}" Content="{StaticResource btnSetHome}">
+                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipSetHome}" Command="{Binding OpenReSyncDialogCmd}" Content="{StaticResource btnReSync}">
             </Button>
         </md:DialogHost>
         <md:DialogHost VerticalAlignment="Bottom" CloseOnClickAway="True" IsOpen="{Binding IsFlipDialogOpen}" DialogContent="{Binding FlipContent}">

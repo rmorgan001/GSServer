@@ -60,11 +60,11 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnTracking">Tracking</system:String>
     <system:String x:Key="btnTipTracking">Tracking on/off</system:String>
     <system:String x:Key="btnHintTracking">On</system:String>
-    <system:String x:Key="btnSetHome">Set Home</system:String>
+    <!--<system:String x:Key="btnSetHome">Set Home</system:String>-->
     <system:String x:Key="btnTipSetHome">Reset axis positions to home</system:String>
     <system:String x:Key="btnFlip">Flip SOP</system:String>
     <system:String x:Key="btnTipFlip">Flip Side of Pier</system:String>
-    <system:String x:Key="btnHomeReset">Accept to reset mount position to the Home position</system:String>
+    <!--<system:String x:Key="btnHomeReset">Accept to reset mount position to the Home position</system:String>-->
     <system:String x:Key="btnContinueFlip">Accept to flip mount</system:String>
     <system:String x:Key="btnTipParkPos">Park Positions</system:String>
     <system:String x:Key="btnAutoHome">AutoHome</system:String>
@@ -258,7 +258,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="vceSlewHome">Slewing Home</system:String>
     <system:String x:Key="vceSlewComplete">Slewing Complete</system:String>
     <system:String x:Key="vceHome">Home</system:String>
-    <system:String x:Key="vceHomeSet">Home Set</system:String>
+    <!--<system:String x:Key="vceHomeSet">Home Set</system:String>-->
     <system:String x:Key="vceSidereal">Sidereal</system:String>
     <system:String x:Key="vceSolar">Solar</system:String>
     <system:String x:Key="vceLunar">Lunar</system:String>
@@ -379,12 +379,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skySolarRate">Solar Rate</system:String>
     <system:String x:Key="skyLunarRate">Lunar Rate</system:String>
     <system:String x:Key="skyKingRate">King Rate</system:String>
-    <system:String x:Key="skyStopMount">Stop mount before setting home position</system:String>
     <system:String x:Key="skyConnect">Connect</system:String>
     <system:String x:Key="skyDisconnect">Disconnect</system:String>
     <system:String x:Key="skyHome1">When starting normally place the mount in the 'Home' position.</system:String>
     <system:String x:Key="skyHome2">Home Position is counterweight down and declination pointing towards the pole.</system:String>
-    <system:String x:Key="skyHome3">Click the 'Set Home' button before or after obtaining a polar alignment.</system:String>
     <system:String x:Key="skyParkNewName">Add new park position</system:String>
     <system:String x:Key="skyParkDelete">Delete park position?</system:String>
     <system:String x:Key="skyLat0">North or South</system:String>
@@ -631,5 +629,16 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="mntCustomOffsetDec">Custom Offset Dec:</system:String>
     <system:String x:Key="mntFreqRa">Frequency Ra:</system:String>
     <system:String x:Key="mntFreqDec">Frequency Dec:</system:String>
+
+    <!--1.0.3.4 -->
+    <system:String x:Key="btnReSyncEnc">ReSync Encoders</system:String>
+    <system:String x:Key="btnReSyncHome">Home Position</system:String>
+    <system:String x:Key="btnReSyncAccept">Accept to reset the mount position</system:String>
+    <system:String x:Key="btnReSync">ReSync</system:String>
+    <system:String x:Key="vceSync">Synced</system:String>
+    <system:String x:Key="skyGlobalStopOn">Global Stop (esc)</system:String>
+    <system:String x:Key="btnCap">External Capabilities</system:String>
+    <system:String x:Key="capCanSetPark">Can Set Park</system:String>
+    <system:String x:Key="skyStopMount">Mount must be stopped</system:String>
 </ResourceDictionary>
  
