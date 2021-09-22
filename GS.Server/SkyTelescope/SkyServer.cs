@@ -193,7 +193,7 @@ namespace GS.Server.SkyTelescope
         private static bool _spiralChanged;
         private static Vector _targetRaDec;
         private static TrackingMode _trackingMode;
-        private static bool _tracking;
+        private static bool _tracking; //off
         private static bool _canSnapPort1;
         private static bool _canSnapPort2;
         #endregion
@@ -839,6 +839,10 @@ namespace GS.Server.SkyTelescope
                 {
                     IsSlewing = false;
                     SlewState = SlewType.SlewNone;
+                    //if (Tracking) //off
+                    //{
+                    //    SetTracking();
+                    //}
                 }
 
                 object _;
@@ -1111,7 +1115,7 @@ namespace GS.Server.SkyTelescope
             get => _trackingMode != TrackingMode.Off;
             set
             {
-                if (value == _tracking){return;}
+               if (value == _tracking){return;} //off
 
                 var monitorItem = new MonitorEntry
                 {
@@ -1153,7 +1157,7 @@ namespace GS.Server.SkyTelescope
                     if (TrackingSpeak && _trackingMode != TrackingMode.Off) Synthesizer.Speak(Application.Current.Resources["vceTrackingOff"].ToString());
                     _trackingMode = TrackingMode.Off;
                 }
-                _tracking = value;
+                _tracking = value; //off
 
                 SetTracking();
                 OnStaticPropertyChanged();
@@ -2405,7 +2409,7 @@ namespace GS.Server.SkyTelescope
 
             if (limitHit && Tracking && SkySettings.LimitTracking) { Tracking = false; } // turn off tracking
 
-            if (limitHit && SkySettings.LimitPark)
+            if (limitHit && SkySettings.LimitPark && SlewState != SlewType.SlewPark) // only hit this once while in limit
             {
                 var found = SkySettings.ParkPositions.Find(x => x.Name == SkySettings.ParkLimitName);
                 if (found == null)
