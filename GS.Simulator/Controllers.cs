@@ -38,7 +38,7 @@ namespace GS.Simulator
         private const bool CanPPec = false;
         private const bool CanWifi = false;
         private const string MountName = "SimScope";
-        private const string MountVersion = "1.0";
+        private const string MountVersion = "0100";
         private bool _running;
         private DateTime _lastUpdateTime;
         private double _gotoX;

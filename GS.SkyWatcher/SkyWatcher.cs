@@ -826,17 +826,28 @@ namespace GS.SkyWatcher
         internal string GetMotorCardVersion(AxisId axis)
         {
             var result = _commands.GetMotorCardVersion(axis);
-            if (result.Length < 7) { return string.Empty; }
 
-            var a = Convert.ToInt32(result.Substring(5, 2), 16);
-            if (!Enum.IsDefined(typeof(McModel), a)){ a = 999;}
+            try
+            {
+                if (result.Length < 7) { return string.Empty; }
 
-            MountType = GetEnumDescription((McModel) a);
-            MountNum = a;
-            MountVersion = result.Substring(1, 2) + "." + result.Substring(3, 2);
+                var a = Convert.ToInt32(result.Substring(5, 2), 16);
+                if (!Enum.IsDefined(typeof(McModel), a)){ a = 999;}
 
+                MountType = GetEnumDescription((McModel) a);
+                MountNum = a;
+                
+                var first = int.Parse(result.Substring(1, 2), NumberStyles.HexNumber);
+                var second = int.Parse(result.Substring(3, 2), NumberStyles.HexNumber);
+                MountVersion = $"{first}.{second:D2}";
+            }
+            catch (Exception)
+            {
+                MountVersion = "99";
+            }
+            
             var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis},{MountType},{MountVersion},{MountNum}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{result},{MountType},{MountVersion},{MountNum}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             return result.Substring(1, 6);

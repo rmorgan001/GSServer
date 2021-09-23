@@ -17,6 +17,7 @@ using GS.Principles;
 using GS.Shared;
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Threading;
 
@@ -381,7 +382,11 @@ namespace GS.Simulator
         /// <returns></returns>
         internal string MountVersion()
         {
-            return _ioSerial.Send("mountversion");
+            var result = _ioSerial.Send("mountversion");
+
+            var first = int.Parse(result.Substring(0, 2), NumberStyles.HexNumber);
+            var second = int.Parse(result.Substring(2, 2), NumberStyles.HexNumber);
+            return $"{first}.{second:D2}";
         }
 
         internal void SnapPort(int port, bool on)

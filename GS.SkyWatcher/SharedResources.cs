@@ -205,6 +205,7 @@ namespace GS.SkyWatcher
         [Description("NEQ6 PRO(MC015)")] NEQ6PRO = 36,
         [Description("EQ7(MC015)")] EQ7 = 37,
         [Description("DOB 18(MC015)")] DOB18 = 183,
+        [Description("EQM35(MC019)")] EQM_35 = 50,
         [Description("Prototyping(MC019)")] Prototyping = 55,
         [Description("HEQ5(MC020)")] HEQ5a = 56,
         [Description("SynTrek hand control")] SynTrekHC = 127,
