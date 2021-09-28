@@ -1498,5 +1498,29 @@ namespace GS.Server.Properties {
                 this["GlobalStopOn"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool HcFlipEW {
+            get {
+                return ((bool)(this["HcFlipEW"]));
+            }
+            set {
+                this["HcFlipEW"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool HcFlipNS {
+            get {
+                return ((bool)(this["HcFlipNS"]));
+            }
+            set {
+                this["HcFlipNS"] = value;
+            }
+        }
     }
 }

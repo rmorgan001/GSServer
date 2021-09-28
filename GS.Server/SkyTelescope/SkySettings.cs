@@ -1039,6 +1039,36 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static bool _hcFlipEW;
+        public static bool HcFlipEW
+        {
+            get => _hcFlipEW;
+            set
+            {
+                if (_hcFlipEW == value) return;
+                _hcFlipEW = value;
+                Properties.SkyTelescope.Default.HcFlipEW = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static bool _hcFlipNS;
+        public static bool HcFlipNS
+        {
+            get => _hcFlipNS;
+            set
+            {
+                if (_hcFlipNS == value) return;
+                _hcFlipNS = value;
+                Properties.SkyTelescope.Default.HcFlipNS = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+
+
         private static double _homeAxisX;
         public static double HomeAxisX
         {
@@ -1779,6 +1809,8 @@ namespace GS.Server.SkyTelescope
             FullCurrent = Properties.SkyTelescope.Default.FullCurrent;
             HcAntiDec = Properties.SkyTelescope.Default.HcAntiDec;
             HcAntiRa = Properties.SkyTelescope.Default.HcAntiRa;
+            HcFlipEW = Properties.SkyTelescope.Default.HcFlipEW;
+            HcFlipNS = Properties.SkyTelescope.Default.HcFlipNS;
             GlobalStopOn = Properties.SkyTelescope.Default.GlobalStopOn;
             GotoPrecision = Properties.SkyTelescope.Default.GotoPrecision;
             GpsComPort = Properties.SkyTelescope.Default.GpsPort;

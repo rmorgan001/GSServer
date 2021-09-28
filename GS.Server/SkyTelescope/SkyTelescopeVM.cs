@@ -286,6 +286,18 @@ namespace GS.Server.SkyTelescope
                      case "ParkLimitName":
                          SetParkLimitSelection(SkySettings.ParkLimitName);
                          break;
+                     case "HcFlipEW":
+                         FlipEW = SkySettings.HcFlipEW;
+                         break;
+                     case "HcFlipNS":
+                         FlipNS = SkySettings.HcFlipNS;
+                         break;
+                     case "HcAntiRa":
+                         HcAntiRa = SkySettings.HcAntiRa;
+                         break;
+                     case "HcAntiDec":
+                         HcAntiDec = SkySettings.HcAntiDec;
+                         break;
                  }
              });
             }
@@ -2296,27 +2308,22 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
-        private bool _flipNS;
         public bool FlipNS
         {
-            get => _flipNS;
+            get => SkySettings.HcFlipNS;
             set
             {
-                if (_flipNS == value) return;
-                _flipNS = value;
+                SkySettings.HcFlipNS = value;
                 OnPropertyChanged();
             }
         }
 
-        private bool _flipEW;
         public bool FlipEW
         {
-            get => _flipEW;
+            get => SkySettings.HcFlipEW;
             set
             {
-                if (_flipEW == value) return;
-                _flipEW = value;
+                SkySettings.HcFlipEW = value;
                 OnPropertyChanged();
             }
         }
@@ -2350,7 +2357,6 @@ namespace GS.Server.SkyTelescope
             get => SkySettings.HcAntiRa;
             set
             {
-                if (SkySettings.HcAntiRa == value) return;
                 SkySettings.HcAntiRa = value;
                 OnPropertyChanged();
             }
@@ -2361,7 +2367,6 @@ namespace GS.Server.SkyTelescope
             get => SkySettings.HcAntiDec;
             set
             {
-                if (SkySettings.HcAntiDec == value) return;
                 SkySettings.HcAntiDec = value;
                 OnPropertyChanged();
             }
