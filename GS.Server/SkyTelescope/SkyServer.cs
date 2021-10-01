@@ -2101,7 +2101,7 @@ namespace GS.Server.SkyTelescope
             _rateRaDec = new Vector();
             SlewState = SlewType.SlewNone;
             var tracking = Tracking;
-            //Tracking = false;
+            Tracking = false; //added back in for ascom spec "Tracking is returned to its pre-slew state"
 
             switch (SkySettings.Mount)
             {
