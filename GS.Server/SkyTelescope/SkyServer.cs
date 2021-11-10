@@ -3551,7 +3551,7 @@ namespace GS.Server.SkyTelescope
                         _ = new SkySetAxisPosition(0, AxisId.Axis2, positions[1]);
 
                         monitorItem = new MonitorEntry
-                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"SetPosition:{positions[0]},{positions[1]}" };
+                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"UsePositions:{positions[0]},{positions[1]}" };
                         MonitorLog.LogToMonitor(monitorItem);
                     }
 

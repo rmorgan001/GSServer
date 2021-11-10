@@ -13,6 +13,7 @@
              Loaded="SkyTelescopeV_OnLoaded" mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <domain:InverseBooleanConverter x:Key="InvertBool" />
     </UserControl.Resources>
     <md:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" CloseOnClickAway="True"  >
         <Grid MinWidth="800">
@@ -668,10 +669,19 @@
                                 </Border>
                         </StackPanel>
                         </Grid>
-
                     <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center">
                         <controls:BottomStatusBar IsEnabled="{Binding ScreenEnabled}"/>
-                        <Button Margin="5,0,0,0" Width="120" Height="30" ToolTip="{StaticResource skyConnectDis}"
+                        <ComboBox md:HintAssist.Hint="{StaticResource skyMount}" IsEnabled="{Binding ScreenEnabled, Converter={StaticResource InvertBool}}" MinWidth="95" Height="38" Margin="5,0,0,0" ToolTip="{StaticResource skyMount}" ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type skyTelescope:MountType}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                            <ComboBox.Text>
+                                <Binding Path="Mount" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
+                            </ComboBox.Text>
+                        </ComboBox>
+                        <Button Margin="10,0,0,0" Width="110" Height="30" ToolTip="{StaticResource skyConnectDis}" 
                                 Command="{Binding ClickConnectCommand}" Content="{Binding ConnectButtonContent}" Style="{StaticResource MaterialDesignRaisedDarkButton}"/>
                     </StackPanel>
                 </Grid>

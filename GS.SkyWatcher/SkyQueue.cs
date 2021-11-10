@@ -53,7 +53,7 @@ namespace GS.SkyWatcher
         public static void AddCommand(ISkyCommand command)
         {
             if (!IsRunning || _cts.IsCancellationRequested || !_skyWatcher.IsConnected) return;
-            CleanResults(20, 120);
+            CleanResults(40, 180);
             if (_commandBlockingCollection.TryAdd(command) == false)
             {
                 throw new MountControlException(ErrorCode.ErrQueueFailed, $"Unable to Add Command {command.Id}, {command}");
@@ -105,7 +105,7 @@ namespace GS.SkyWatcher
                 return command;
             }
             var sw = Stopwatch.StartNew();
-            while (sw.Elapsed.TotalMilliseconds < 22000)
+            while (sw.Elapsed.TotalMilliseconds < 40000)
             {
                 if (_resultsDictionary == null) break;
                 var success = _resultsDictionary.TryRemove(command.Id, out var result);

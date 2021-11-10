@@ -4033,6 +4033,21 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
+                    //switch (SkySettings.Mount)
+                    //{
+                    //    case MountType.Simulator:
+                    //        break;
+                    //    case MountType.SkyWatcher:
+                    //        if (ComPort == 0)
+                    //        {
+                    //            OpenDialog($"Check Com Port");
+                    //            return;
+                    //        }
+                    //        break;
+                    //    default:
+                    //        throw new ArgumentOutOfRangeException();
+                    //}
+
                     if (SkyServer.IsAutoHomeRunning)
                     {
                         StopAutoHomeDialog();
