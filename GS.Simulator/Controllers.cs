@@ -168,13 +168,13 @@ namespace GS.Simulator
         /// <returns></returns>
         internal string Command(string command)
         {
-            var cmd = command.Split(',');
+            var cmd = command.Split('|');
             double a;
             switch (cmd[0].ToLower())
             {
                 case "capabilities":
                     return
-                        $"{CanAxisSlewsIndependent},{CanAzEq},{CanDualEncoders},{CanHalfTrack},{CanHomeSensors},{CanPolarLed},{CanPPec},{CanWifi},{MountName},{MountVersion}";
+                        $"{CanAxisSlewsIndependent}|{CanAzEq}|{CanDualEncoders}|{CanHalfTrack}|{CanHomeSensors}|{CanPolarLed}|{CanPPec}|{CanWifi}|{MountName}|{MountVersion}";
                 case "initialize":
                     return Start().ToString();
                 case "shutdown":
@@ -333,9 +333,9 @@ namespace GS.Simulator
                     switch (ParseAxis(cmd[1]))
                     {
                         case Axis.Axis1:
-                            return $"{_isSlewingX},{_isStoppedX},{_isTrackingX},{_isRateTrackingY}";
+                            return $"{_isSlewingX}|{_isStoppedX}|{_isTrackingX}|{_isRateTrackingY}";
                         case Axis.Axis2:
-                            return $"{_isSlewingY},{_isStoppedY},{_isTrackingY},{_isRateTrackingY}";
+                            return $"{_isSlewingY}|{_isStoppedY}|{_isTrackingY}|{_isRateTrackingY}";
                     }
 
                     break;

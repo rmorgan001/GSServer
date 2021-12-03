@@ -144,7 +144,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -435,7 +435,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Data,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{_rateRaDec.X},{SkyTrackingOffset[0]}"
+                    Message = $"{_rateRaDec.X}|{SkyTrackingOffset[0]}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -512,7 +512,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{value},{_mountAxes.Y},{_mountAxes.Y < 90 || _mountAxes.Y.IsEqualTo(90, 0.0000000001)},{_mountAxes.Y > -90 || _mountAxes.Y.IsEqualTo(-90, 0.0000000001)} "
+                    Message = $"{value}|{_mountAxes.Y}|{_mountAxes.Y < 90 || _mountAxes.Y.IsEqualTo(90, 0.0000000001)}|{_mountAxes.Y > -90 || _mountAxes.Y.IsEqualTo(-90, 0.0000000001)} "
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -631,7 +631,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Warning,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ActualAxisX},{ActualAxisY}"
+                    Message = $"{ActualAxisX}|{ActualAxisY}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OnStaticPropertyChanged();
@@ -815,7 +815,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Data,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{_rateAxes.Y},{SkyTrackingOffset[1]}"
+                    Message = $"{_rateAxes.Y}|{SkyTrackingOffset[1]}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -867,7 +867,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Data,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{_rateAxes.X},{SkyTrackingOffset[0]}"
+                    Message = $"{_rateAxes.X}|{SkyTrackingOffset[0]}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -976,7 +976,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{value},{SkySettings.HourAngleLimit},{b[0]},{b[1]}"
+                    Message = $"{value}|{SkySettings.HourAngleLimit}|{b[0]}|{b[1]}"
                 };
 
                 if (b[0] >= SkySettings.HourAngleLimit + 180 || b[0] <= -SkySettings.HourAngleLimit)
@@ -1227,7 +1227,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"Initial:{_targetAxes},{stopwatch.Elapsed.TotalSeconds},{simTarget[0]},{simTarget[1]}"
+                Message = $"Initial|{_targetAxes}|{stopwatch.Elapsed.TotalSeconds}|{simTarget[0]}|{simTarget[1]}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -1293,7 +1293,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Dec Precision:{targetDec},{deltaDegree}"
+                    Message = $"Dec Precision:{targetDec}|{deltaDegree}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -1337,7 +1337,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"RA Delta:{rate},{deltaTime},{deltaDegree}"
+                    Message = $"RA Delta:{rate}|{deltaTime}|{deltaDegree}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -1368,7 +1368,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"RA Precision:{target[0]},{deltaTime},{deltaDegree}"
+                    Message = $"RA Precision:{target[0]}|{deltaTime}|{deltaDegree}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -1564,7 +1564,7 @@ namespace GS.Server.SkyTelescope
             TrackingOffsetDecRate = _siderealRate - newRate;
 
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{TrackingOffsetRaRate},{TrackingOffsetDecRate}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{TrackingOffsetRaRate}|{TrackingOffsetDecRate}" };
             MonitorLog.LogToMonitor(monitorItem);
 
         }
@@ -1658,7 +1658,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"Initial:{_targetAxes},{stopwatch.Elapsed.TotalSeconds},{skyTarget[0]},{skyTarget[1]}"
+                Message = $"Initial|{_targetAxes}|Seconds|{stopwatch.Elapsed.TotalSeconds}|Target|{skyTarget[0]}|{skyTarget[1]}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -1722,7 +1722,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Dec Precision:{targetDec},{deltaDegree}"
+                    Message = $"Precision|Target|{targetDec}|Degree|{deltaDegree}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -1764,7 +1764,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"RA Delta:{rate},{deltaTime},{deltaDegree}"
+                    Message = $"Deltas|Rate|{rate}|Time|{deltaTime}|Degree|{deltaDegree}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -1794,7 +1794,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"RA Precision:{target[0]},{deltaTime},{deltaDegree}"
+                    Message = $"Precision|Target|{target[0]}|Time|{deltaTime}|Degree|{deltaDegree}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -1920,7 +1920,7 @@ namespace GS.Server.SkyTelescope
                             var sync = Axes.AxesAppToMount(new[] { _mountAxes.X, _mountAxes.Y });
                             _ = new SkySyncAxis(0, AxisId.Axis1, sync[0]);
                             _ = new SkySyncAxis(0, AxisId.Axis2, sync[1]);
-                            monitorItem.Message += $",{_mountAxes.X},{_mountAxes.Y},{sync[0]},{sync[1]}";
+                            monitorItem.Message += $",{_mountAxes.X}|{_mountAxes.Y}|{sync[0]}|{sync[1]}";
                             MonitorLog.LogToMonitor(monitorItem);
                             break;
                         case MountTaskName.SyncTarget:
@@ -1928,7 +1928,7 @@ namespace GS.Server.SkyTelescope
                             var targ = Axes.AxesAppToMount(new[] { xy[0], xy[1] });
                             _ = new SkySyncAxis(0, AxisId.Axis1, targ[0]);
                             _ = new SkySyncAxis(0, AxisId.Axis2, targ[1]);
-                            monitorItem.Message += $",{TargetRa},{TargetDec},{xy[0]},{xy[1]},{targ[0]},{targ[1]}";
+                            monitorItem.Message += $",{TargetRa}|{TargetDec}|{xy[0]}|{xy[1]}|{targ[0]}|{targ[1]}";
                             MonitorLog.LogToMonitor(monitorItem);
                             break;
                         case MountTaskName.SyncAltAz:
@@ -1936,7 +1936,7 @@ namespace GS.Server.SkyTelescope
                             var altaz = Axes.AxesAppToMount(new[] { yx[1], yx[0] });
                             _ = new SkySyncAxis(0, AxisId.Axis1, altaz[0]);
                             _ = new SkySyncAxis(0, AxisId.Axis2, altaz[1]);
-                            monitorItem.Message += $",{_altAzSync.X},{_altAzSync.Y},{yx[1]},{yx[0]},{altaz[0]},{altaz[1]}";
+                            monitorItem.Message += $",{_altAzSync.X}|{_altAzSync.Y}|{yx[1]}|{yx[0]}|{altaz[0]}|{altaz[1]}";
                             MonitorLog.LogToMonitor(monitorItem);
                             break;
                         case MountTaskName.GetAxisVersions:
@@ -1999,7 +1999,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Error,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{ex.Message},{ex.StackTrace}"
+                Message = $"{ex.Message}|{ex.StackTrace}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -2092,7 +2092,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{SlewState},{Tracking}"
+                Message = $"{SlewState}|{Tracking}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -2101,7 +2101,7 @@ namespace GS.Server.SkyTelescope
             _rateRaDec = new Vector();
             SlewState = SlewType.SlewNone;
             var tracking = Tracking;
-            Tracking = false; //added back in for ascom spec "Tracking is returned to its pre-slew state"
+            Tracking = false; //added back in for spec "Tracking is returned to its pre-slew state"
 
             switch (SkySettings.Mount)
             {
@@ -2229,7 +2229,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = "AutoHomeAsync",
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Complete: {returncode1},{returncode2}"
+                    Message = $"Complete: {returncode1}|{returncode2}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -2265,7 +2265,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = "AutoHomeAsync",
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 LastAutoHomeError = ex;
@@ -2531,7 +2531,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Data,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"change:{change.X},{change.Y}"
+                Message = $"change:{change.X}|{change.Y}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -2638,7 +2638,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{SkySettings.ParkAxisX}={positions[0]},{SkySettings.ParkAxisY}={positions[1]}"
+                    Message = $"Parked,{SkySettings.ParkName}|{SkySettings.ParkAxisX}|{SkySettings.ParkAxisY}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -2656,7 +2656,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{positions[0]},{positions[1]}"
+                Message = $"Load:{positions[0]}|{positions[1]}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -2932,7 +2932,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = "GoToAsync",
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Goto finished:{returncode},{SlewState}, {_util.HoursToHMS(RightAscension, "h ", ":", "", 2)}"
+                    Message = $"Goto finished|{returncode}|{SlewState}|{_util.HoursToHMS(RightAscension, "h ", ":", "", 2)}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -2945,7 +2945,7 @@ namespace GS.Server.SkyTelescope
             }
             Tracking = trackingState;
             AbortSlew(true);
-            MountError = new Exception($"GoTo Async Error: {returncode}");
+            MountError = new Exception($"GoTo Async Error|{returncode}");
         }
 
         /// <summary>
@@ -3008,7 +3008,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{ps.Name},{ps.X},{ps.Y}"
+                Message = $"{ps.Name}|{ps.X}|{ps.Y}"
             };
             MonitorLog.LogToMonitor(monitorItem);
             SlewMount(new Vector(ps.X, ps.Y), SlewType.SlewPark);
@@ -3187,7 +3187,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Data,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{SkySettings.HcSpeed},{direction},{change[0]},{change[1]}"
+                    Message = $"{SkySettings.HcSpeed}|{direction}|{change[0]}|{change[1]}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -3258,7 +3258,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{HcPrevMoveDec.Delta},{HcPrevMovesDec.Sum()},Anti-Lash,{stepsNeededDec} of {DecBacklash}"
+                    Message = $"{HcPrevMoveDec.Delta}|{HcPrevMovesDec.Sum()},Anti-Lash,{stepsNeededDec} of {DecBacklash}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -3272,7 +3272,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{HcPrevMoveRa.Direction},{HcPrevMoveRa.StepDiff},Anti-Lash,{stepsNeededRa} of {RaBacklash}"
+                    Message = $"{HcPrevMoveRa.Direction}|{HcPrevMoveRa.StepDiff},Anti-Lash,{stepsNeededRa} of {RaBacklash}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -3440,10 +3440,11 @@ namespace GS.Server.SkyTelescope
             var positions = GetDefaultPositions();
             double[] rawPositions = null;
             var counter = 0;
-
-            MonitorEntry monitorItem;
             int raWormTeeth;
             int decWormTeeth;
+            bool positionsSet = false;
+            MonitorEntry monitorItem;
+            string msg;
 
             switch (SkySettings.Mount)
             {
@@ -3468,18 +3469,41 @@ namespace GS.Server.SkyTelescope
                         {
                             _ = new CmdAxisToDegrees(0, Axis.Axis1, positions[0]);
                             _ = new CmdAxisToDegrees(0, Axis.Axis2, positions[1]);
+                            positionsSet = true;
+                            monitorItem = new MonitorEntry
+                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Counter exceeded:{positions[0]}|{positions[1]}" };
+                            MonitorLog.LogToMonitor(monitorItem);
                             break;
                         }
                         counter++;
+                        
                         rawPositions = GetRawDegrees();
+                        msg = rawPositions != null ? $"GetRawDegrees:{rawPositions[0]}|{rawPositions[1]}" : $"NULL";
+                        monitorItem = new MonitorEntry
+                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = msg };
+                        MonitorLog.LogToMonitor(monitorItem);
+
                         if (rawPositions == null || double.IsNaN(rawPositions[0]) || double.IsNaN(rawPositions[1]))
                         {
                             rawPositions = null;
                             continue;
                         }
+
+                        //is mount parked, if so set to the default position
+                        if (AtPark)
+                        {
+                            _ = new SkySetAxisPosition(0, AxisId.Axis1, positions[0]);
+                            _ = new SkySetAxisPosition(0, AxisId.Axis2, positions[1]);
+                            positionsSet = true;
+                            break;
+                        }
+
                         if (!rawPositions[0].IsBetween(-.1, .1) || !rawPositions[1].IsBetween(-.1, .1)) { continue; }
+
                         _ = new CmdAxisToDegrees(0, Axis.Axis1, positions[0]);
                         _ = new CmdAxisToDegrees(0, Axis.Axis2, positions[1]);
+                        positionsSet = true;
+
                     }
 
                     break;
@@ -3497,8 +3521,9 @@ namespace GS.Server.SkyTelescope
                     }
 
                     // defaults
-                    SkyTasks(MountTaskName.StopAxes);
+                    //SkyTasks(MountTaskName.InitialiseAxes);
                     SkyTasks(MountTaskName.LoadDefaults);
+                    SkyTasks(MountTaskName.StopAxes);
                     SkyTasks(MountTaskName.Encoders);
                     SkyTasks(MountTaskName.FullCurrent);
                     SkyTasks(MountTaskName.SetSt4Guiderate);
@@ -3508,7 +3533,6 @@ namespace GS.Server.SkyTelescope
                     SkyTasks(MountTaskName.StepsPerRevolution);
                     SkyTasks(MountTaskName.StepsWormPerRevolution);
                     SkyTasks(MountTaskName.StepTimeFreq);
-                    SkyTasks(MountTaskName.InitialiseAxes);
                     SkyTasks(MountTaskName.GetOneStepIndicators);
                     SkyTasks(MountTaskName.CanPpec);
                     SkyTasks(MountTaskName.CanHomeSensor);
@@ -3526,6 +3550,12 @@ namespace GS.Server.SkyTelescope
 
                     CalcCustomTrackingOffset();  //generates rates for the custom gearing offsets
 
+                    //log current positions
+                    var steps = GetRawSteps();
+                    monitorItem = new MonitorEntry
+                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GetSteps:{steps[0]}|{steps[1]}" };
+                    MonitorLog.LogToMonitor(monitorItem);
+
                     // checks if the mount is close enough to home position to set default position. If not use the positions from the mount
                     while (rawPositions == null)
                     {
@@ -3533,26 +3563,45 @@ namespace GS.Server.SkyTelescope
                         {
                             _ = new SkySetAxisPosition(0, AxisId.Axis1, positions[0]);
                             _ = new SkySetAxisPosition(0, AxisId.Axis2, positions[1]);
+                            positionsSet = true;
                             monitorItem = new MonitorEntry
-                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Counter exceeded:{positions[0]},{positions[1]}" };
+                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Counter exceeded:{positions[0]}|{positions[1]}" };
                             MonitorLog.LogToMonitor(monitorItem);
                             break;
                         }
                         counter++;
+                        
+                        //get positions and log them
                         rawPositions = GetRawDegrees();
+                        msg = rawPositions != null ? $"GetDegrees|{rawPositions[0]}|{rawPositions[1]}" : $"NULL";
+                        monitorItem = new MonitorEntry
+                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = msg };
+                        MonitorLog.LogToMonitor(monitorItem);
+
+                        //if an error getting positions then stay in while loop and try again
                         if (rawPositions == null || double.IsNaN(rawPositions[0]) || double.IsNaN(rawPositions[1]))
                         {
                             rawPositions = null;
                             continue;
                         }
 
+                        //is mount parked, if so set to the default position
+                        if (AtPark)
+                        {
+                            _ = new SkySetAxisPosition(0, AxisId.Axis1, positions[0]);
+                            _ = new SkySetAxisPosition(0, AxisId.Axis2, positions[1]);
+                            positionsSet = true;
+                            break;
+                        }
+
+                        //was mount powered and at 0,0  are both axes close to home?  if not then don't change current mount positions 
                         if (!rawPositions[0].IsBetween(-.1, .1) || !rawPositions[1].IsBetween(-.1, .1)) { continue; }
+                        
+                        //Mount is close to home 0,0 so set the default position
                         _ = new SkySetAxisPosition(0, AxisId.Axis1, positions[0]);
                         _ = new SkySetAxisPosition(0, AxisId.Axis2, positions[1]);
+                        positionsSet = true;
 
-                        monitorItem = new MonitorEntry
-                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"UsePositions:{positions[0]},{positions[1]}" };
-                        MonitorLog.LogToMonitor(monitorItem);
                     }
 
                     break;
@@ -3560,18 +3609,17 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
 
+            msg = positionsSet ? $"SetPositions|{positions[0]}|{positions[1]}" : $"PositionsNotSet";
             monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"MountAxes:{_mountAxes.X},{_mountAxes.Y} Actual:{ActualAxisX},{ActualAxisY}" };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            var x = GetRawDegrees();
-
-            monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Get Positions:{x[0]},{x[1]}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = msg };
             MonitorLog.LogToMonitor(monitorItem);
 
             monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"StepsPerRevolution:{StepsPerRevolution[0]},{StepsPerRevolution[1]}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"MountAxes|{_mountAxes.X}|{_mountAxes.Y}|Actual|{ActualAxisX}|{ActualAxisY}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"StepsPerRevolution|{StepsPerRevolution[0]}|{StepsPerRevolution[1]}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             //Load Pec Files
@@ -3594,7 +3642,7 @@ namespace GS.Server.SkyTelescope
             MonitorLog.LogToMonitor(monitorItem);
 
             // Update Alignment Model home position
-            AlignmentModel.SetHomePosition(_homeAxes.X, _homeAxes.Y);
+            AlignmentModel.SetHomePosition(_homeAxes.X, _homeAxes.Y); 
             return true;
         }
 
@@ -3731,7 +3779,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Data,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{direction},{duration},{rejected}"
+                Message = $"{direction}|{duration}|{rejected}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -3856,7 +3904,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{name},{position[0]},{position[1]}"
+                Message = $"{name}|{position[0]}|{position[1]}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -3905,7 +3953,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{_guideRate.X * 3600},{_guideRate.Y * 3600}"
+                Message = $"{_guideRate.X * 3600}|{_guideRate.Y * 3600}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -3933,7 +3981,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{name},{park[0]},{park[1]},{MountAxisX},{MountAxisY}"
+                Message = $"{name}|{park[0]}|{park[1]}|{MountAxisX}|{MountAxisY}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -3958,7 +4006,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{name},{x},{y}"
+                Message = $"{name}|{x}|{y}"
             };
             MonitorLog.LogToMonitor(monitorItem);
         }
@@ -3987,7 +4035,7 @@ namespace GS.Server.SkyTelescope
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message =
-                    $"{SlewSpeedOne},{SlewSpeedTwo},{SlewSpeedThree},{SlewSpeedFour},{SlewSpeedFive},{SlewSpeedSix},{SlewSpeedSeven},{SlewSpeedEight}"
+                    $"{SlewSpeedOne}|{SlewSpeedTwo}|{SlewSpeedThree}|{SlewSpeedFour}|{SlewSpeedFive}|{SlewSpeedSix}|{SlewSpeedSeven}|{SlewSpeedEight}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -4044,7 +4092,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{_trackingMode},{rateChange * 3600},{PecBinNow},{SkyTrackingOffset[0]},{SkyTrackingOffset[1]}"
+                Message = $"{_trackingMode}|{rateChange * 3600}|{PecBinNow}|{SkyTrackingOffset[0]}|{SkyTrackingOffset[1]}"
             };
             MonitorLog.LogToMonitor(monitorItem);
         }
@@ -4225,7 +4273,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{targetPosition.X},{targetPosition.Y},{slewState}"
+                Message = $"{targetPosition.X}|{targetPosition.Y}|{slewState}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -4299,7 +4347,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{targetAzimuth},{targetAltitude}"
+                Message = $"{targetAzimuth}|{targetAltitude}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -4344,7 +4392,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $" {TargetRa},{TargetDec}"
+                Message = $" {TargetRa}|{TargetDec}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -4421,7 +4469,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Warning,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{xy[0]},{xy[1]},{target[0]},{target[1]},{current[0]},{current[1]},{SkySettings.SyncLimit}"
+                Message = $"{xy[0]}|{xy[1]}|{target[0]}|{target[1]}|{current[0]}|{current[1]}|{SkySettings.SyncLimit}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -4463,7 +4511,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Warning,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{yx[1]},{yx[0]},{target[0]},{target[1]},{current[0]},{current[1]},{SkySettings.SyncLimit}"
+                Message = $"{yx[1]}|{yx[0]}|{target[0]}|{target[1]}|{current[0]}|{current[1]}|{SkySettings.SyncLimit}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -4561,7 +4609,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"Alignment applied to calculated axes: {calculatedAxes[0]},{calculatedAxes[1]} -> {alignedAxes[0]},{alignedAxes[1]}"
+                Message = $"Alignment applied to calculated axes: {calculatedAxes[0]}|{calculatedAxes[1]} -> {alignedAxes[0]}|{alignedAxes[1]}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -5120,7 +5168,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 MountError = ex;
@@ -5283,7 +5331,7 @@ namespace GS.Server.SkyTelescope
                         }
                         break;
                     default:
-                        var data = line.Split('~');
+                        var data = line.Split('|');
                         if (data.Length != 3) { break; }
                         var bin = new PecBinData();
                         if (int.TryParse(data[0].Trim(), out var binNumber))
@@ -5315,22 +5363,22 @@ namespace GS.Server.SkyTelescope
             if (def.BinCount != PecBinCount)
             {
                 paramError = true;
-                msg = $"BinCount {def.BinCount},{PecBinCount}";
+                msg = $"BinCount {def.BinCount}|{PecBinCount}";
             }
             if (Math.Abs(def.BinSteps - PecBinSteps) > 0.000000001)
             {
                 paramError = true;
-                msg = $"BinSteps {def.BinSteps},{PecBinSteps}";
+                msg = $"BinSteps {def.BinSteps}|{PecBinSteps}";
             }
             if (Math.Abs((long)def.StepsPerRev - StepsPerRevolution[0]) > 0.000000001)
             {
                 paramError = true;
-                msg = $"StepsPerRev{def.StepsPerRev},{StepsPerRevolution[0]}";
+                msg = $"StepsPerRev{def.StepsPerRev}|{StepsPerRevolution[0]}";
             }
             if (def.WormTeeth != WormTeethCount[0])
             {
                 paramError = true;
-                msg = $"WormTeeth {def.WormTeeth},{WormTeethCount[0]}";
+                msg = $"WormTeeth {def.WormTeeth}|{WormTeethCount[0]}";
             }
             switch (def.FileType)
             {

@@ -57,7 +57,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Add:{id},{notAlreadyPresent}"
+                    Message = $"Add|{id}|{notAlreadyPresent}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -73,7 +73,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Remove:{id},{successfullyRemoved}"
+                    Message = $"Remove|{id}|{successfullyRemoved}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -146,7 +146,7 @@ namespace GS.Server.SkyTelescope
                         Type = MonitorType.Warning,
                         Method = MethodBase.GetCurrentMethod().Name,
                         Thread = Thread.CurrentThread.ManagedThreadId,
-                        Message = $"{ex.Message},{ex.InnerException?.Message}"
+                        Message = $"{ex.Message}|{ex.InnerException?.Message}"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
 

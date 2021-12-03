@@ -28,17 +28,17 @@ namespace GS.Server.SkyTelescope
         {
         }
 
-        public SkyServerException(ErrorCode err) : base($"Shared: {err}")
+        public SkyServerException(ErrorCode err) : base($"Shared|{err}")
         {
             ErrorCode = err;
         }
 
-        public SkyServerException(ErrorCode err, string message) : base($"Shared: {err}, {message}")
+        public SkyServerException(ErrorCode err, string message) : base($"Shared|{err}|{message}")
         {
             ErrorCode = err;
         }
 
-        public SkyServerException(ErrorCode err, string message, Exception inner) : base($"Shared: {err}, {message}", inner)
+        public SkyServerException(ErrorCode err, string message, Exception inner) : base($"Shared|{err}|{message}", inner)
         {
             ErrorCode = err;
         }

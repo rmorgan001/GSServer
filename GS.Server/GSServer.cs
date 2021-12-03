@@ -259,7 +259,7 @@ namespace GS.Server
                             var a = (GssAttribute)gssAttrbutes[0];
 
                             var monitorItem = new MonitorEntry
-                            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{type.Assembly},{a.DisplayName}" };
+                            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{type.Assembly}|{a.DisplayName}" };
                             MonitorLog.LogToMonitor(monitorItem);
 
                             _comObjectTypes.Add(type); //PWGS - much simpler
@@ -556,7 +556,7 @@ namespace GS.Server
                 catch (Exception ex)
                 {
                     var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message},{ex.Source},{ex.StackTrace},{ex.InnerException}" };
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.Source}|{ex.StackTrace}|{ex.InnerException}" };
                     MonitorLog.LogToMonitor(monitorItem);
 
                 }
@@ -723,20 +723,20 @@ namespace GS.Server
             catch (Exception ex)
             {
                 monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message},{ex.Source},{ex.StackTrace},{ex.InnerException}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.Source}|{ex.StackTrace}|{ex.InnerException}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 var str = $"Fatal error in GS Server: {ex.Message}";
 
                 monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer: {str}, {ex.StackTrace}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer|{str}|{ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 var exi = ex.InnerException;
                 if (ex.InnerException != null)
                 {
                     monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer: {exi?.InnerException?.Message}, {exi?.InnerException?.StackTrace}" };
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer|{exi?.InnerException?.Message}|{exi?.InnerException?.StackTrace}" };
                     MonitorLog.LogToMonitor(monitorItem);
                 }
 

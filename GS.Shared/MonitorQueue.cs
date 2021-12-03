@@ -258,28 +258,28 @@ namespace GS.Shared
                 case "ReceiveResponse": // sky watcher
                     if (entry.Message.Contains(":j1"))
                     {
-                        var msg = entry.Message.Split(',');
+                        var msg = entry.Message.Split('|');
                         if (msg.Length < 2) return;
                         // make sure it a valid mount response
                         msg[1] = msg[1].Trim();
                         if (!msg[1].Contains("=")) return;
                         // convert response
                         var msgval = Strings.StringToLong(msg[1]);
-                        entry.Message = $"{msg[0].Trim()},{msg[1]},{msgval}";
+                        entry.Message = $"{msg[0].Trim()}|{msg[1]}|{msgval}";
                         //send to charting and log
                         CmdjSentEntry = entry;
                         //  WriteOutCmdj(entry);
                     }
                     if (entry.Message.Contains(":j2"))
                     {
-                        var msg = entry.Message.Split(',');
+                        var msg = entry.Message.Split('|');
                         if (msg.Length < 2) return;
                         // make sure it a valid mount response
                         msg[1] = msg[1].Trim();
                         if (!msg[1].Contains("=")) return;
                         // convert response
                         var msgval = Strings.StringToLong(msg[1]);
-                        entry.Message = $"{msg[0].Trim()},{msg[1]},{msgval}";
+                        entry.Message = $"{msg[0].Trim()}|{msg[1]}|{msgval}";
                         //send to charting and log
                         Cmdj2SentEntry = entry;
                         //  WriteOutCmdj(entry);
@@ -320,7 +320,7 @@ namespace GS.Shared
             {
                 if (!Settings.LogSession) return;
                 ++_sessionIndex;
-                FileWriteAsync(_sessionFile + _instanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{_sessionIndex.ToString(fmt)},{entry.Device},{entry.Category},{entry.Type},{entry.Thread},{entry.Method},{entry.Message}");
+                FileWriteAsync(_sessionFile + _instanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{_sessionIndex.ToString(fmt)}|{entry.Device}|{entry.Category}|{entry.Type}|{entry.Thread}|{entry.Method}|{entry.Message}");
             }
             catch (Exception e)
             {
@@ -338,7 +338,7 @@ namespace GS.Shared
             try
             {
                 ++_errIndex;
-                FileWriteAsync(_errorFile + _instanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{_errIndex.ToString(fmt)},{entry.Device},{entry.Category},{entry.Type},{entry.Thread},{entry.Method},{entry.Message}");
+                FileWriteAsync(_errorFile + _instanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{_errIndex.ToString(fmt)}|{entry.Device}|{entry.Category}|{entry.Type}|{entry.Thread}|{entry.Method}|{entry.Message}");
             }
             catch (Exception e)
             {
@@ -356,7 +356,7 @@ namespace GS.Shared
             try
             {
                 if (!Settings.LogMonitor) return;
-                FileWriteAsync(_monitorFile + _instanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{entry.Index.ToString(fmt)},{entry.Device},{entry.Category},{entry.Type},{entry.Thread},{entry.Method},{entry.Message}"); //YYYY-MM-DD HH:MM:SS.fff
+                FileWriteAsync(_monitorFile + _instanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{entry.Index.ToString(fmt)}|{entry.Device}|{entry.Category}|{entry.Type}|{entry.Thread}|{entry.Method}|{entry.Message}"); //YYYY-MM-DD HH:MM:SS.fff
             }
             catch (Exception e)
             {

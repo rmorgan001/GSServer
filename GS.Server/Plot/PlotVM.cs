@@ -59,7 +59,7 @@ namespace GS.Server.Plot
         public PlotVM()
         {
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading PlotVM" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Loading PlotVM" };
             MonitorLog.LogToMonitor(monitorItem);
 
             // setup property events to monitor
@@ -96,7 +96,7 @@ namespace GS.Server.Plot
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -121,7 +121,7 @@ namespace GS.Server.Plot
         {
             var date = entry.Datetime.ToLocalTime();
             var point = new PointModel {DateTime = date, Value = 0, Set = ChartValueSet.Values1};
-            var msg = entry.Message.Split(',');
+            var msg = entry.Message.Split('|');
             double.TryParse(msg[2], out var steps);
 
             if (IsZeroBased)
@@ -146,8 +146,6 @@ namespace GS.Server.Plot
             }
             if (IsLogging) ChartLogging.LogPoint(BaseLogName,ChartType.Plot, point);
 
-            CalcAxisYMinMax(point.Value);
-
             Values1.Add(point);
             if (Values1.Count > MaxPoints) Values1.RemoveAt(0);
 
@@ -164,7 +162,7 @@ namespace GS.Server.Plot
         {
             var date = entry.Datetime.ToLocalTime();
             var point = new PointModel { DateTime = date, Value = 0, Set = ChartValueSet.Values2};
-            var msg = entry.Message.Split(',');
+            var msg = entry.Message.Split('|');
             double.TryParse(msg[2], out var steps);
 
             if (IsZeroBased)
@@ -190,8 +188,6 @@ namespace GS.Server.Plot
 
             if (IsLogging) ChartLogging.LogPoint(BaseLogName,ChartType.Plot, point);
 
-            CalcAxisYMinMax(point.Value);
-
             Values2.Add(point);
             if (Values2.Count > MaxPoints) Values2.RemoveAt(0);
 
@@ -199,36 +195,6 @@ namespace GS.Server.Plot
             if (item == null) return;
             item.Value = point.Value;
         }
-
-        private void CalcAxisYMinMax(double value)
-        {
-            if (!DoYMinMaxCalc){ return; }
-
-            if (value > AxisYMax || double.IsNaN(AxisYMax))
-            {
-                AxisYMax = value;
-            }
-
-            if (value < AxisYMin || double.IsNaN(AxisYMin))
-            {
-                AxisYMin = value;
-            }
-
-            var dist = Math.Abs(AxisYMax - AxisYMin) * 1.0;
-            var per = Math.Abs(dist) / 100 * 10.0;
-
-            if (value + per > AxisYMax)
-            {
-                AxisYMax = value + per;
-            }
-
-            if (value - per < AxisYMin)
-            {
-                AxisYMin = value - per;
-            }
-        }
-
-        private bool DoYMinMaxCalc { get; set; }
 
         /// <summary>
         /// default data
@@ -268,7 +234,7 @@ namespace GS.Server.Plot
             AxisYMin = -3;
             AxisXSeconds = 40;
             SetXAxisLimits(HiResDateTime.UtcNow.ToLocalTime());
-            Zoom = "Y";
+            Zoom = "Xy";
 
             Scale = ChartScale.Steps;
 
@@ -705,9 +671,8 @@ namespace GS.Server.Plot
         }
         private void ResizeAxes()
         {
-            AxisYMax = double.NaN;
-            AxisYMin = double.NaN;
-            DoYMinMaxCalc = true;
+            AxisYMax -= double.NaN;
+            AxisYMin += double.NaN;
         }
         private void ClearValues()
         {
@@ -914,7 +879,7 @@ namespace GS.Server.Plot
             {
 
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}, {ex.StackTrace}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -948,7 +913,7 @@ namespace GS.Server.Plot
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}, {ex.StackTrace}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -979,7 +944,7 @@ namespace GS.Server.Plot
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -1020,7 +985,7 @@ namespace GS.Server.Plot
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -1051,7 +1016,7 @@ namespace GS.Server.Plot
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -1106,155 +1071,13 @@ namespace GS.Server.Plot
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
             }
         }
 
-        private ICommand _clickUpZoomCmd;
-        public ICommand ClickUpZoomCmd
-        {
-            get
-            {
-                var cmd = _clickUpZoomCmd;
-                if (cmd != null)
-                {
-                    return cmd;
-                }
-
-                return _clickUpZoomCmd = new RelayCommand(param => UpZoomCmd());
-            }
-            set => _clickUpZoomCmd = value;
-        }
-        private void UpZoomCmd()
-        {
-            try
-            {
-                DoYMinMaxCalc = false;
-                double step;
-                switch (Zoom)
-                {
-                    case "X":
-                        step = Math.Abs(AxisXMax - AxisXMin) / 100 * 10.0;
-                        AxisXMax -= step;
-                        AxisXMin += step;
-
-                        break;
-                    case "Y":
-                        step = Math.Abs(AxisYMax - AxisYMin) /100 * 10.0;
-                        AxisYMax -= step;
-                        AxisYMin += step;
-                        break;
-                    case "Xy":
-                        //X
-                        step = Math.Abs(AxisXMax - AxisXMin) / 100 * 10.0;
-                        AxisXMax -= step;
-                        AxisXMin += step;
-                        //Y
-                        step = Math.Abs(AxisYMax - AxisYMin) / 100 * 10.0;
-                        AxisYMax -= step;
-                        AxisYMin += step;
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                OpenDialog(ex.Message);
-            }
-        }
-
-        private ICommand _clickDownZoomCmd;
-        public ICommand ClickDownZoomCmd
-        {
-            get
-            {
-                var cmd = _clickDownZoomCmd;
-                if (cmd != null)
-                {
-                    return cmd;
-                }
-
-                return _clickDownZoomCmd = new RelayCommand(param => DownZoomCmd());
-            }
-            set => _clickDownZoomCmd = value;
-        }
-        private void DownZoomCmd()
-        {
-            try
-            {
-                DoYMinMaxCalc = false;
-                double step;
-                switch (Zoom)
-                {
-                    case "X":
-                        step = Math.Abs(AxisXMax - AxisXMin) / 100 * 10.0;
-                        AxisXMax += step;
-                        AxisXMin -= step;
-                        break;
-                    case "Y":
-                        step = Math.Abs(AxisYMax - AxisYMin) / 100 * 10.0;
-                        AxisYMax += step;
-                        AxisYMin -= step;
-                        break;
-                    case "Xy":
-                        //X
-                        step = Math.Abs(AxisXMax - AxisXMin) / 100 * 10.0;
-                        AxisXMax += step;
-                        AxisXMin -= step;
-                        //Y
-                        step = Math.Abs(AxisYMax - AxisYMin) / 100 * 10.0;
-                        AxisYMax += step;
-                        AxisYMin -= step;
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                OpenDialog(ex.Message);
-            }
-        }
-
-        private ICommand _rangeChangedCmd;
-        public ICommand RangeChangedCmd
-        {
-            get
-            {
-                var cmd = _rangeChangedCmd;
-                if (cmd != null)
-                {
-                    return cmd;
-                }
-
-                return _rangeChangedCmd = new RelayCommand(RangeChanged);
-            }
-            set => _rangeChangedCmd = value;
-        }
-        private void RangeChanged(object param)
-        {
-            try
-            {
-                DoYMinMaxCalc = false;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                OpenDialog(ex.Message);
-            }
-        }
-        
         #endregion
 
         #region Logging
@@ -1280,28 +1103,28 @@ namespace GS.Server.Plot
         {
             if (!IsLogging) return;
             if (series == null) return;
-            var str = $"{set},{series.Title},{series.Stroke},{series.StrokeThickness},{series.Fill},{series.MinWidth},{series.ScalesYAt},{series.MaxColumnWidth},";
+            var str = $"{set}|{series.Title}|{series.Stroke}|{series.StrokeThickness}|{series.Fill}|{series.MinWidth}|{series.ScalesYAt}|{series.MaxColumnWidth},";
             if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(BaseLogName, ChartType.Plot, "GColumnSeries", str);
         }
         private void LogGLineSeries(LineSeries series, ChartValueSet set)
         {
             if (!IsLogging) return;
             if (series == null) return;
-            var str = $"{set},{series.Title},{series.Stroke},{series.StrokeThickness},{series.Fill},{series.MinWidth},{series.ScalesYAt},{series.PointGeometrySize},{series.LineSmoothness}";
+            var str = $"{set}|{series.Title}|{series.Stroke}|{series.StrokeThickness}|{series.Fill}|{series.MinWidth}|{series.ScalesYAt}|{series.PointGeometrySize}|{series.LineSmoothness}";
             if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(BaseLogName, ChartType.Plot, "GLineSeries", str);
         }
         private void LogGStepLineSeries(GStepLineSeries series, ChartValueSet set)
         {
             if (!IsLogging) return;
             if (series == null) return;
-            var str = $"{set},{series.Title},{series.Stroke},{series.StrokeThickness},{series.Fill},{series.MinWidth},{series.ScalesYAt},{series.PointGeometrySize}";
+            var str = $"{set}|{series.Title}|{series.Stroke}|{series.StrokeThickness}|{series.Fill}|{series.MinWidth}|{series.ScalesYAt}|{series.PointGeometrySize}";
             if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(BaseLogName, ChartType.Plot, "GStepLineSeries", str);
         }
         private void LogGScatterSeries(Series series, ChartValueSet set)
         {
             if (!IsLogging) return;
             if (series == null) return;
-            var str = $"{set},{series.Title},{series.Stroke},{series.StrokeThickness},{series.Fill},{series.MinWidth},{series.ScalesYAt}";
+            var str = $"{set}|{series.Title}|{series.Stroke}|{series.StrokeThickness}|{series.Fill}|{series.MinWidth}|{series.ScalesYAt}";
             if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(BaseLogName, ChartType.Plot, "GScatterSeries", str);
         }
 

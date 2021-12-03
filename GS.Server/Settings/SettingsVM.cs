@@ -215,7 +215,7 @@ namespace GS.Server.Settings
                         switch (e.PropertyName)
                         {
                             case "UTCDateOffset":
-                                OnPropertyChanged($"UTCDateOffset");
+                                OnPropertyChanged("UTCDateOffset");
                                 OnPropertyChanged($"UTCTime");
                                 break;
                             case "SleepMode":
@@ -1047,7 +1047,7 @@ namespace GS.Server.Settings
                     foreach (var item in MonitorEntries)
                     {
                         stream.WriteLine(
-                            $"{item.Index},{item.Datetime.ToLocalTime():dd/MM/yyyy HH:mm:ss.fff},{item.Device},{item.Category},{item.Type},{item.Thread},{item.Method},{item.Message}");
+                            $"{item.Index}|{item.Datetime.ToLocalTime():dd/MM/yyyy HH:mm:ss.fff}|{item.Device}|{item.Category}|{item.Type}|{item.Thread}|{item.Method}|{item.Message}");
                     }
 
                     stream.Close();
@@ -1103,7 +1103,7 @@ namespace GS.Server.Settings
                         foreach (var item in MonitorEntries)
                         {
                             sw.Write(
-                                $"{item.Index},{item.Datetime.ToLocalTime():dd/MM/yyyy HH:mm:ss.fff},{item.Device},{item.Category},{item.Type},{item.Thread},{item.Method},{item.Message}{Environment.NewLine}");
+                                $"{item.Index}|{item.Datetime.ToLocalTime():dd/MM/yyyy HH:mm:ss.fff}|{item.Device}|{item.Category}|{item.Type}|{item.Thread}|{item.Method}|{item.Message}{Environment.NewLine}");
                             sw.Flush();
                         }
 

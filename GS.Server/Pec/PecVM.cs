@@ -50,7 +50,7 @@ namespace GS.Server.Pec
 
         private const double _siderealDaySeconds = 86164.1;
         private const double _secondsOfArc = 1296000.0;
-        private const string _tab = "~"; //"\t";
+        private const string _tab = "|"; //"\t";
 
         private readonly SkyTelescopeVM _skyTelescopeVM;
         private Timer _timer;
@@ -112,7 +112,7 @@ namespace GS.Server.Pec
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -150,7 +150,7 @@ namespace GS.Server.Pec
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -195,7 +195,7 @@ namespace GS.Server.Pec
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 

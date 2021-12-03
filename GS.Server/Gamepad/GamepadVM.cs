@@ -78,7 +78,7 @@ namespace GS.Server.GamePad
                     Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server,
                     Category = MonitorCategory.Interface, Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = " Loading GamePadVM"
+                    Message = "Loading GamePadVM"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -670,7 +670,7 @@ namespace GS.Server.GamePad
                                 else
                                 {
                                     var id = DoGamePadCommand(1, true, cmd);
-                                    zaxistocheck = id == -1 ? new AxisPair(-1, String.Empty) : newaxis;
+                                    zaxistocheck = id == -1 ? new AxisPair(-1, string.Empty) : newaxis;
                                 }
                             }
                         }
@@ -714,7 +714,7 @@ namespace GS.Server.GamePad
             {
                 Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server,
                 Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name,
-                Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{id},{value},{command}"
+                Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{id}|{value}|{command}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 

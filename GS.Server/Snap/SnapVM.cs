@@ -124,7 +124,7 @@ namespace GS.Server.Snap
                 OnPropertyChanged();
 
                var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Snap: {value}, {SkyServer.CanSnapPort1},{SkyServer.CanSnapPort2}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Snap|{value}|{SkyServer.CanSnapPort1}|{SkyServer.CanSnapPort2}" };
                 MonitorLog.LogToMonitor(monitorItem);
             }
         }
@@ -184,7 +184,7 @@ namespace GS.Server.Snap
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -338,7 +338,7 @@ namespace GS.Server.Snap
                             Type = MonitorType.Information,
                             Method = MethodBase.GetCurrentMethod().Name,
                             Thread = Thread.CurrentThread.ManagedThreadId,
-                            Message = $"Snap 1: {SkyServer.CanSnapPort1},{Snap1Timer}, {Snap1Loops}, {Snap1Delay}"
+                            Message = $"Snap 1|{SkyServer.CanSnapPort1}|{Snap1Timer}|{Snap1Loops}|{Snap1Delay}"
                         };
                         MonitorLog.LogToMonitor(monitorItem);
                         Snap1LoopAsync();
@@ -355,7 +355,7 @@ namespace GS.Server.Snap
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -406,7 +406,7 @@ namespace GS.Server.Snap
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -705,7 +705,7 @@ namespace GS.Server.Snap
                             Type = MonitorType.Information,
                             Method = MethodBase.GetCurrentMethod().Name,
                             Thread = Thread.CurrentThread.ManagedThreadId,
-                            Message = $"Snap 2: {SkyServer.CanSnapPort2},{Snap2Timer}, {Snap2Loops}, {Snap2Delay}"
+                            Message = $"Snap 2|{SkyServer.CanSnapPort2}|{Snap2Timer}|{Snap2Loops}|{Snap2Delay}"
                         };
                         MonitorLog.LogToMonitor(monitorItem);
                         Snap2LoopAsync();
@@ -722,7 +722,7 @@ namespace GS.Server.Snap
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -773,7 +773,7 @@ namespace GS.Server.Snap
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
