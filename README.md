@@ -8,7 +8,7 @@ Download the GSServer installer program at ## http://www.greenswamp.org/
 
 ![Alt text](Docs/gsserver3.jpg?raw=true "GS Server")
 
-## ScreenShots here http://www.greenswamp.org/screenshots
+## ScreenShots here https://sites.google.com/view/greenswamp/gsserver/screenshots
 
 ## Features
 
@@ -84,7 +84,7 @@ Can be found at [Groups.io](https://groups.io/g/GSS)
 ## License
 
 /* 
-    Copyright(C) 2019  Rob Morgan (robert.morgan.e@gmail.com)
+    Copyright(C) 2019-2022  Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
