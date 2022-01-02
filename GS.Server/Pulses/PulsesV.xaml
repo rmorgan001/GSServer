@@ -525,18 +525,24 @@
                     <Button Margin="15,0,0,0" Height="30" ToolTip="{StaticResource pulClear}"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesClearCmd}"
                             Content="{StaticResource pulClear}"/>
                     <md:Badged Badge="{Binding PauseBadgeContent}" VerticalAlignment="Center">
-                        <Button Margin="10,0,0,0" Height="30" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesPauseCmd}"
+                            <Button Margin="10,0,0,0" Height="30" ToolTip="{StaticResource pulPause}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesPauseCmd}"
                                 Content="{StaticResource pulPause}"/>
                     </md:Badged>
-                    <Button Margin="10,0,0,0" Height="30" ToolTip="Fit Chart" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesSizeCmd}"
+                        <Button Margin="10,0,0,0" Height="30" ToolTip="{StaticResource pulSize}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickPulsesSizeCmd}"
                             Content="{StaticResource pulSize}"/>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock VerticalAlignment="Center" Margin="10,0,0,0" Text="Zoom:"/>
-                        <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="X" Command="{Binding Path=ClickPulsesZoomCmd}" CommandParameter="X"/>
-                        <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Y" Command="{Binding Path=ClickPulsesZoomCmd}" CommandParameter="Y"/>
-                        <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Xy" Command="{Binding Path=ClickPulsesZoomCmd}" CommandParameter="Xy" IsChecked="True" />
+                        <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="X" ToolTip="X" Command="{Binding Path=ClickPulsesZoomCmd}" CommandParameter="X"/>
+                            <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Y" ToolTip="Y" Command="{Binding Path=ClickPulsesZoomCmd}" CommandParameter="Y" IsChecked="True"/>
+                            <RadioButton GroupName="zoom" Margin="5,0,0,0" Content="Xy" ToolTip="Xy" Command="{Binding Path=ClickPulsesZoomCmd}" CommandParameter="Xy" />
                     </StackPanel>
-                    <Label Margin="10,0,0,0" VerticalAlignment="Center" Content="{StaticResource bacDecLash}" />
+                    <Button Margin="10,0,0,0" Height="30" Width="30" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickUpZoomCmd}">
+                        <md:PackIcon Kind="ArrowUp" Margin="-10" HorizontalAlignment="Center" VerticalAlignment="Center" Height="20" Width="20" />
+                    </Button>
+                    <Button Margin="10,0,0,0" Height="30" Width="30" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickDownZoomCmd}">
+                        <md:PackIcon Kind="ArrowDown" Margin="-10" HorizontalAlignment="Center" VerticalAlignment="Center" Height="20" Width="20" />
+                    </Button>
+                        <Label Margin="10,0,0,0" VerticalAlignment="Center" Content="{StaticResource bacDecLash}" />
                     <ComboBox Width="45" HorizontalContentAlignment="Right" ToolTip="{StaticResource bacDecLash}" ItemsSource="{Binding DecBacklashList}">
                         <ComboBox.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -558,7 +564,8 @@
                         <wpf:Axis FontSize="18" LabelFormatter="{Binding FormatterX, Mode=TwoWay}" DisableAnimations="True" Foreground="DarkGray" MaxValue="{Binding AxisXMax, Mode=TwoWay}" MinValue="{Binding AxisXMin, Mode=TwoWay}" Unit="{Binding AxisXUnit, Mode=TwoWay}"/>
                     </wpf:CartesianChart.AxisX>
                     <wpf:CartesianChart.AxisY>
-                        <wpf:Axis Title="{Binding Scale, Mode=TwoWay}" FontSize="15" Position="LeftBottom" Foreground="DarkGray" ShowLabels="True" DisableAnimations="True" LabelFormatter="{Binding FormatterY, Mode=OneTime}" MaxValue="{Binding AxisYMax, Mode=TwoWay}" MinValue="{Binding AxisYMin, Mode=TwoWay}" Unit="{Binding AxisYUnit, Mode=TwoWay}">
+                            <wpf:Axis Title="{Binding Scale, Mode=TwoWay}" FontSize="15" Position="LeftBottom" Foreground="DarkGray" ShowLabels="True" DisableAnimations="True" LabelFormatter="{Binding FormatterY, Mode=TwoWay}" 
+                                      MaxValue="{Binding AxisYMax, Mode=TwoWay}" MinValue="{Binding AxisYMin, Mode=TwoWay}" Unit="{Binding AxisYUnit, Mode=TwoWay}" RangeChangedCommand="{Binding RangeChangedCmd}">
                             <wpf:Axis.Sections >
                                 <wpf:AxisSection Value="0" StrokeThickness=".5" Stroke="DarkGray" DisableAnimations="True"></wpf:AxisSection>
                             </wpf:Axis.Sections>

@@ -329,7 +329,7 @@ namespace GS.ChartViewer.Main
                         {
                             if (readline.Length <= 0) continue;
 
-                            var line = readline.Split(',');
+                            var line = readline.Split('|');
                             if (line.Length < 2) continue;
                             endTime = line[2].Trim();
                             var result = Enum.TryParse(line[0].Trim(), out ChartType type);
@@ -404,8 +404,8 @@ namespace GS.ChartViewer.Main
             }
             else
             {
-                chartlog?.Add($"{chartType},{ChartLogCode.Data},{endTime},LineCount,{LineCount}");
-                chartlog?.Add($"{chartType},{ChartLogCode.Data},{endTime},BadLineCount,{BadLineCount}");
+                chartlog?.Add($"{chartType}|{ChartLogCode.Data}|{endTime}|LineCount|{LineCount}");
+                chartlog?.Add($"{chartType}|{ChartLogCode.Data}|{endTime}|BadLineCount|{BadLineCount}");
                 loaded = true;
                 Logs = loadedLogs;
                 IndexItems = null;
@@ -422,12 +422,12 @@ namespace GS.ChartViewer.Main
             {
                 try
                 {
-                    var firstline = list.First().Split(',');
+                    var firstline = list.First().Split('|');
                     if (firstline.Length < 4) continue;
                     var type = firstline[4];
                     var result =  Enum.TryParse(firstline[0].Trim(), out ChartType ctype);
                     if (!result) continue;
-                    var lastline = list.Last().Split(',');
+                    var lastline = list.Last().Split('|');
                     if (firstline.Length < 2) continue;
                     var pass = DateTime.TryParseExact(firstline[2].Trim(), "yyyy-MM-dd HH:mm:ss.fff", null, System.Globalization.DateTimeStyles.None, out var startTime);
                     if (!pass) continue;
@@ -513,7 +513,7 @@ namespace GS.ChartViewer.Main
                 ClearChart();
                 ChartsQuality(ChartQuality);
 
-                foreach (var linearray in log.Select(line => line.Split(',')))
+                foreach (var linearray in log.Select(line => line.Split('|')))
                 {
                     var result = Enum.TryParse<ChartLogCode>(linearray[1], true, out var code);
                     if (!result) continue;
@@ -521,7 +521,7 @@ namespace GS.ChartViewer.Main
                     if (!result1) continue;
                     if (indexItem.ChartType != type) continue;
                     LoadLogLine(code, linearray);
-                    LogText.Add(string.Join(",", linearray));
+                    LogText.Add(string.Join("|", linearray));
                 }
 
                 StartDateTicks = indexItem.StartTime.Ticks;

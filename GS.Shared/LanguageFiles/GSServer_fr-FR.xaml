@@ -57,11 +57,11 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnTracking">Suivi</system:String>
     <system:String x:Key="btnTipTracking">Suivi on/off</system:String>
     <system:String x:Key="btnHintTracking">On</system:String>
-    <system:String x:Key="btnSetHome">Définir Home</system:String>
+    <!--<system:String x:Key="btnSetHome">Définir Home</system:String>-->
     <system:String x:Key="btnTipSetHome">Faire de la position actuelle, la position Home</system:String>
     <system:String x:Key="btnFlip">Retournement</system:String>
     <system:String x:Key="btnTipFlip">Retournement méridien vers l'autre côté du pied</system:String>
-    <system:String x:Key="btnHomeReset">Valider la réinitialisation de la position actuelle de la monture comme position Home?</system:String>
+    <!--<system:String x:Key="btnHomeReset">Valider la réinitialisation de la position actuelle de la monture comme position Home?</system:String>-->
     <system:String x:Key="btnContinueFlip">Valider le retournement?</system:String>
     <system:String x:Key="btnTipParkPos">Positions de parking</system:String>
     <system:String x:Key="btnAutoHome">AutoHome</system:String>
@@ -255,7 +255,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="vceSlewHome">Déplacement vers Home</system:String>
     <system:String x:Key="vceSlewComplete">Déplacement terminé</system:String>
     <system:String x:Key="vceHome">Home</system:String>
-    <system:String x:Key="vceHomeSet">Home</system:String>
+    <!--<system:String x:Key="vceHomeSet">Home</system:String>-->
     <system:String x:Key="vceSidereal">Sidéral</system:String>
     <system:String x:Key="vceSolar">Solaire</system:String>
     <system:String x:Key="vceLunar">Lunaire</system:String>
@@ -376,12 +376,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skySolarRate">Vitesse Solaire</system:String>
     <system:String x:Key="skyLunarRate">Vitesse Lunaire</system:String>
     <system:String x:Key="skyKingRate">Vitesse King</system:String>
-    <system:String x:Key="skyStopMount">Arrêter la monture avant de définir la position Home</system:String>
     <system:String x:Key="skyConnect">Connecter</system:String>
     <system:String x:Key="skyDisconnect">Déconnecter</system:String>
     <system:String x:Key="skyHome1">Au démarrage, placez la monture en position "Home".</system:String>
     <system:String x:Key="skyHome2">La Position AutoHome est définie contrepoids vers le bas et l'axe de déclinaison pointe vers le pôle.</system:String>
-    <system:String x:Key="skyHome3">Cliquez sur le bouton "Définir Home" avant ou après avoir obtenu un alignement polaire.</system:String>
     <system:String x:Key="skyParkNewName">Ajouter une nouvelle position de parking</system:String>
     <system:String x:Key="skyParkDelete">Supprimer la position de parking?</system:String>
     <system:String x:Key="skyLat0">Nord ou Sud</system:String>
@@ -591,7 +589,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="msgKey">Clé introuvable</system:String>
 
 
-	<!-- 1.0.2.5> -->
+	<!-- 1.0.2.5 -->
     <!-- Alignment -->
     <system:String x:Key="aliOpenTooltip">Ouvrir</system:String>
     <system:String x:Key="aliCloseTooltip">Fermer</system:String>
@@ -613,5 +611,31 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="optSampleSize">Taille de l'échantillon</system:String>
     <system:String x:Key="optNearbyLimit">Limite à proximité</system:String>
 
+    <!--1.0.3.2 -->
+    <system:String x:Key="customGears">Engrenages personnalisés</system:String>
+    <system:String x:Key="raTotalSteps">RA Nombre total de pas</system:String>
+    <system:String x:Key="decTotalSteps">Dec Nombre total de pas</system:String>
+    <system:String x:Key="raWormTeeth">RA Worm Teeth</system:String>
+    <system:String x:Key="decWormTeeth">Dec Worm Teeth</system:String>
+    <system:String x:Key="raTrackingOffset">RA Décalage de suivi</system:String>
+    <system:String x:Key="decTrackingOffset">Dec Décalage de suivi</system:String>
+    <system:String x:Key="gearingConnect">Reconnectez-vous pour que les modifications prennent effet</system:String>
+    <system:String x:Key="applyGearing">Appliquer un engrenage personnalisé ?</system:String>
+    <system:String x:Key="mntWormStepsRa">Worm Steps Ra:</system:String>
+    <system:String x:Key="mntWormStepsDec">Worm Steps Dec:</system:String>
+    <system:String x:Key="mntCustomOffsetRa">Décalage personnalisé Ra:</system:String>
+    <system:String x:Key="mntCustomOffsetDec">Décalage personnalisé Dec:</system:String>
+    <system:String x:Key="mntFreqRa">La fréquence Ra:</system:String>
+    <system:String x:Key="mntFreqDec">La fréquence Dec:</system:String>
 
+    <!--1.0.3.4 -->
+    <system:String x:Key="btnReSyncEnc">Encodeurs ReSync</system:String>
+    <system:String x:Key="btnReSyncHome">Poste à domicile</system:String>
+    <system:String x:Key="btnReSyncAccept">Accepter pour réinitialiser la position de montage</system:String>
+    <system:String x:Key="btnReSync">ReSync</system:String>
+    <system:String x:Key="vceSync">Synchronisé</system:String>
+    <system:String x:Key="skyGlobalStopOn">Arrêt global (esc)</system:String>
+    <system:String x:Key="btnCap">Capacités externes</system:String>
+    <system:String x:Key="capCanSetPark">Peut définir le parc</system:String>
+    <system:String x:Key="skyStopMount">La monture doit être arrêtée</system:String>
 </ResourceDictionary>

@@ -27,7 +27,7 @@
             <ColumnDefinition />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <TextBlock Grid.Column="0" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource botTipHome}" Text="{StaticResource botHome}" FontSize="15">
+        <TextBlock Grid.Column="0" Margin="3 0" VerticalAlignment="Center" ToolTip="{StaticResource botTipHome}" Text="{StaticResource botHome}" FontSize="15">
             <TextBlock.Style>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock }">
                         <Style.Triggers>
@@ -44,7 +44,7 @@
                     </Style>
                 </TextBlock.Style>
         </TextBlock>
-        <TextBlock Grid.Column="1" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource botTipParked}" Text="{StaticResource botParked}" FontSize="15">
+        <TextBlock Grid.Column="1" Margin="3 0" VerticalAlignment="Center" ToolTip="{StaticResource botTipParked}" Text="{StaticResource botParked}" FontSize="15">
             <TextBlock.Style>
                 <!--<Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">-->
                 <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
@@ -73,7 +73,7 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <TextBlock Grid.Column="2" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource botTipSlewing}" Text="{StaticResource botSlewing}" FontSize="15">
+        <TextBlock Grid.Column="2" Margin="3 0" VerticalAlignment="Center" ToolTip="{StaticResource botTipSlewing}" Text="{StaticResource botSlewing}" FontSize="15">
             <TextBlock.Style>
                 <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
                     <Style.Triggers>
@@ -90,7 +90,7 @@
                 </Style>
             </TextBlock.Style>
             </TextBlock>
-        <TextBlock Grid.Column="3" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource botTipTracking}" Text="{StaticResource botTracking}" FontSize="15">
+        <TextBlock Grid.Column="3" Margin="3 0" VerticalAlignment="Center" ToolTip="{StaticResource botTipTracking}" Text="{StaticResource botTracking}" FontSize="15">
             <TextBlock.Style>
                 <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
                     <Style.Triggers>
@@ -107,7 +107,7 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <TextBlock Grid.Column="4" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource botTipSOP}" Text="{Binding IsSideOfPier}" Foreground="DimGray" FontSize="15">
+        <TextBlock Grid.Column="4" Margin="3 0" VerticalAlignment="Center" ToolTip="{StaticResource botTipSOP}" Text="{Binding IsSideOfPier}" Foreground="DimGray" FontSize="15">
             <TextBlock.Style>
                 <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
                     <Style.Triggers>
@@ -133,7 +133,7 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <Path Grid.Column="5" Data="{StaticResource PecVector}" ToolTip="{StaticResource PecStatus}" Stretch="Fill" Margin="5" Width="25" Height="25" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding PecShow, Converter={StaticResource BoolToClap}}">
+        <Path Grid.Column="5" Data="{StaticResource PecVector}" ToolTip="{StaticResource PecStatus}" Stretch="Fill" Margin="3" Width="25" Height="25" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding PecShow, Converter={StaticResource BoolToClap}}">
             <Path.Style>
                 <Style TargetType="Path">
                     <Style.Triggers>
@@ -209,7 +209,7 @@
                 </md:PackIcon.Style>
             </md:PackIcon>
         </Button>
-        <Button Grid.Column="9" Command="{Binding ClickMountInfoDialogCommand}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource botTipConnected}" Padding="9">
+        <Button Grid.Column="9" Command="{Binding OpenMountInfoDialogCmd}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource botTipConnected}" Padding="9">
             <md:PackIcon Kind="Usb" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-5" ToolTip="{StaticResource botTipConnected}">
                 <md:PackIcon.Style>
                     <Style TargetType="md:PackIcon">
@@ -228,7 +228,7 @@
                 </md:PackIcon.Style>
             </md:PackIcon>
         </Button>
-        <md:PackIcon Grid.Column="10" Kind="{Binding TrackingRateIcon}" Foreground="{StaticResource SecondaryAccentBrush}" Margin="5 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="{Binding TrackingRate}">
+        <md:PackIcon Grid.Column="10" Kind="{Binding TrackingRateIcon}" Foreground="{StaticResource SecondaryAccentBrush}" Margin="3 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="{Binding TrackingRate}">
             <md:PackIcon.Style>
                 <Style TargetType="md:PackIcon">
                     <Style.Triggers>
@@ -239,7 +239,7 @@
                 </Style>
             </md:PackIcon.Style>
         </md:PackIcon>
-        <md:PackIcon Grid.Column="11" Kind="SpeakerWireless" Margin="5 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="{StaticResource botTipVoice}">
+        <md:PackIcon Grid.Column="11" Kind="SpeakerWireless" Margin="3 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="{StaticResource botTipVoice}">
             <md:PackIcon.Style>
                 <Style TargetType="md:PackIcon">
                     <Style.Triggers>
@@ -253,7 +253,7 @@
                 </Style>
             </md:PackIcon.Style>
         </md:PackIcon>
-        <md:PackIcon Grid.Column="12" Kind="Monitor" Margin="5 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="{StaticResource botTipMonitor}">
+        <md:PackIcon Grid.Column="12" Kind="Monitor" Margin="3 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="{StaticResource botTipMonitor}">
             <md:PackIcon.Style>
                 <Style TargetType="md:PackIcon">
                     <Style.Triggers>

@@ -110,6 +110,7 @@ namespace GS.Server.SkyTelescope
         MountVersion,
         StepsPerRevolution,
         StepsWormPerRevolution,
+        StepTimeFreq,
         GetFactorStep
     }
 
@@ -144,6 +145,12 @@ namespace GS.Server.SkyTelescope
         GSPecWorm = 0,
         GSPec360 = 1,
         GSPecDebug = 2
+    }
+
+    public enum ReSyncMode
+    {
+        Home = 0,
+        Park = 1
     }
 
 }

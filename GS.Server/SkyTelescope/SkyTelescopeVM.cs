@@ -30,22 +30,26 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Management;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using Gma.System.MouseKeyHook;
 using GS.Server.Controls.Dialogs;
 using GS.Server.Windows;
 using GS.Shared.Command;
+using Application = System.Windows.Application;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 using Color = System.Windows.Media.Color;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using NativeMethods = GS.Server.Helpers.NativeMethods;
 using Point = System.Windows.Point;
 
@@ -61,6 +65,7 @@ namespace GS.Server.SkyTelescope
         public static SkyTelescopeVM _skyTelescopeVM;
         private CancellationTokenSource _ctsPark;
         private CancellationToken _ctPark;
+        private IKeyboardMouseEvents _GlobalHook;
         #endregion
 
         public SkyTelescopeVM()
@@ -87,7 +92,6 @@ namespace GS.Server.SkyTelescope
 
                     // Deals with applications trying to open the setup dialog more than once. 
                     OpenSetupDialog = SkyServer.OpenSetupDialog;
-                    //SkyServer.OpenSetupDialog = true;
                     SettingsGridEnabled = true;
 
                     // setup property events to monitor
@@ -98,6 +102,7 @@ namespace GS.Server.SkyTelescope
                     Shared.Settings.StaticPropertyChanged += PropertyChangedMonitorLog;
                     Synthesizer.StaticPropertyChanged += PropertyChangedSynthesizer;
                     Settings.Settings.StaticPropertyChanged += PropertyChangedSettings;
+                    GlobalStopOn = SkySettings.GlobalStopOn;
 
                     // dropdown lists
                     GuideRateOffsetList = new List<double>(Numbers.InclusiveRange(10, 100, 10));
@@ -108,6 +113,7 @@ namespace GS.Server.SkyTelescope
                     LatitudeRangeNS = new List<string>() { "N", "S" };
                     LongitudeRangeEW = new List<string>() { "E", "W" };
                     DecRange = new List<int>(Enumerable.Range(-90, 181));
+                    CustomMountOffset = new List<int>(Enumerable.Range(-5, 11));
                     Hours = new List<int>(Enumerable.Range(0, 24));
                     Range60 = new List<int>(Enumerable.Range(0, 60));
                     St4GuideRates = new List<double> { 1.0, 0.75, 0.50, 0.25, 0.125 };
@@ -120,8 +126,6 @@ namespace GS.Server.SkyTelescope
                     var extendedlist = new List<int>(Numbers.InclusiveIntRange(1000, 3000, 100));
                     RaBacklashList = RaBacklashList.Concat(extendedlist);
                     DecBacklashList = DecBacklashList.Concat(extendedlist);
-                    //SpiralHcSpeeds = new List<int>(Enumerable.Range(1, 8));
-                    //SpiralPauses = new List<int>(Enumerable.Range(0, 61));
 
                     // defaults
                     AtPark = SkyServer.AtPark;
@@ -146,6 +150,7 @@ namespace GS.Server.SkyTelescope
                     DebugVisibility = SkySettings.Diagnostics;
                     PecShow = SkyServer.PecShow;
                     SchedulerShow = true;
+                    CustomGearing = SkySettings.CustomGearing;
                 }
 
                 // check to make sure window is visible then connect if requested.
@@ -161,7 +166,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -257,6 +262,7 @@ namespace GS.Server.SkyTelescope
                          DebugVisibility = SkySettings.Diagnostics;
                          break;
                      case "ParkPositions":
+                         // ReSharper disable ExplicitCallerInfoArgument
                          OnPropertyChanged($"ParkPositions");
                          break;
                      case "DecBacklash":
@@ -280,6 +286,18 @@ namespace GS.Server.SkyTelescope
                      case "ParkLimitName":
                          SetParkLimitSelection(SkySettings.ParkLimitName);
                          break;
+                     case "HcFlipEW":
+                         FlipEW = SkySettings.HcFlipEW;
+                         break;
+                     case "HcFlipNS":
+                         FlipNS = SkySettings.HcFlipNS;
+                         break;
+                     case "HcAntiRa":
+                         HcAntiRa = SkySettings.HcAntiRa;
+                         break;
+                     case "HcAntiDec":
+                         HcAntiDec = SkySettings.HcAntiDec;
+                         break;
                  }
              });
             }
@@ -293,7 +311,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -420,7 +438,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -455,7 +473,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -490,7 +508,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -529,7 +547,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -571,7 +589,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -611,13 +629,19 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
+        }
+
+        private void GlobalHookKeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!SkyServer.IsMountRunning) {return;}
+            if (e.KeyChar == (char)27) {ClickStop();}
         }
 
         /// <summary>
@@ -631,6 +655,7 @@ namespace GS.Server.SkyTelescope
             {
                 _mountError = value;
                 if (value == null) return;
+               // ScreenEnabled = true;
                 OpenDialog(value.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
@@ -656,6 +681,10 @@ namespace GS.Server.SkyTelescope
             ImageFile = "../Resources/" + ImageFiles[random.Next(ImageFiles.Count)];
         }
 
+        /// <summary>
+        /// Used to close any open dialogs
+        /// </summary>
+        /// <param name="screen"></param>
         public void CloseDialogs(bool screen)
         {
             if (screen)
@@ -663,22 +692,7 @@ namespace GS.Server.SkyTelescope
                 ScreenEnabled = false;
                 return;
             }
-
-            //IsDialogOpen = false;
-            IsAutoHomeDialogOpen = false;
-            IsFlipDialogOpen = false;
-            IsHomeResetDialogOpen = false;
-            IsRaGoToDialogOpen = false;
-            IsRaGoToSyncDialogOpen = false;
-            IsSchedulerDialogOpen = false;
-            IsLimitDialogOpen = false;
-            IsPPecDialogOpen = false;
-            IsParkAddDialogOpen = false;
-            IsParkDeleteDialogOpen = false;
-            IsGpsDialogOpen = false;
-            IsCdcDialogOpen = false;
-            //IsHcSettingsDialogOpen = false;
-
+            IsDialogOpen = false;
             ScreenEnabled = SkyServer.IsMountRunning;
         }
 
@@ -707,7 +721,6 @@ namespace GS.Server.SkyTelescope
                 }
             }
         }
-
         public IList<int> ComPorts
         {
             get
@@ -874,7 +887,7 @@ namespace GS.Server.SkyTelescope
             get => _trackingRate;
             set
             {
-                if (_trackingRate == value) return;
+                if (_trackingRate == value){return;}
                 _trackingRate = value;
                 SkySettings.TrackingRate = value;
                 SetTrackingIcon(value);
@@ -1147,6 +1160,26 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
+        public bool GlobalStopOn
+        {
+            get => SkySettings.GlobalStopOn;
+            set
+            {
+                if (value)
+                {
+                    SkySettings.GlobalStopOn = true;
+                    _GlobalHook = null;
+                    _GlobalHook = Hook.GlobalEvents();
+                    _GlobalHook.KeyPress += GlobalHookKeyPress;
+                }
+                else
+                {
+                    SkySettings.GlobalStopOn = false;
+                    _GlobalHook?.Dispose();
+                }
+                OnPropertyChanged();
+            }
+        }
         private void UpdateLongitude()
         {
             OnPropertyChanged($"Long0");
@@ -1222,7 +1255,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 SkyServer.AlertState = true;
@@ -1266,7 +1299,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -1312,7 +1345,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -1404,7 +1437,6 @@ namespace GS.Server.SkyTelescope
         {
             KingRate = 15.0369;
         }
-
         #endregion
 
         #region Debug
@@ -1634,56 +1666,7 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
-        private string _parkNewName;
-        public string ParkNewName
-        {
-            get => _parkNewName;
-            set
-            {
-                if (_parkNewName == value) return;
-                _parkNewName = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private string _parkName;
-        public string ParkName
-        {
-            get => SkySettings.ParkName;
-            set
-            {
-                if (_parkName == value) return;
-                _parkName = value;
-                SkySettings.ParkName = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _isParkAddDialogOpen;
-        public bool IsParkAddDialogOpen
-        {
-            get => _isParkAddDialogOpen;
-            set
-            {
-                if (_isParkAddDialogOpen == value) return;
-                _isParkAddDialogOpen = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private object _parkAddContent;
-        public object ParkAddContent
-        {
-            get => _parkAddContent;
-            set
-            {
-                if (_parkAddContent == value) return;
-                _parkAddContent = value;
-                OnPropertyChanged();
-            }
-        }
-
+        
         private bool _pecOn;
         public bool PecOn
         {
@@ -1694,295 +1677,6 @@ namespace GS.Server.SkyTelescope
                if (SkyServer.PecOn) { PecState = true; }
                if (!SkyServer.PPecOn && !SkyServer.PecOn) { PecState = false; }
                PecBadgeContent = SkyServer.PecOn ? Application.Current.Resources["PecBadge"].ToString() : "";
-            }
-        }
-
-        private ICommand _openParkAddDialogCommand;
-        public ICommand OpenParkAddDialogCommand
-        {
-            get
-            {
-                var command = _openParkAddDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _openParkAddDialogCommand = new RelayCommand(
-                    param => OpenParkAddDialog()
-                );
-            }
-        }
-        private void OpenParkAddDialog()
-        {
-            try
-            {
-                ParkNewName = null;
-                ParkAddContent = new ParkAddDialog();
-                IsParkAddDialogOpen = true;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-
-        }
-
-        private ICommand _acceptParkAddDialogCommand;
-        public ICommand AcceptParkAddDialogCommand
-        {
-            get
-            {
-                var command = _acceptParkAddDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _acceptParkAddDialogCommand = new RelayCommand(
-                    param => AcceptParkAddDialog()
-                );
-            }
-        }
-        private void AcceptParkAddDialog()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    if (string.IsNullOrEmpty(ParkNewName)) return;
-                    var pp = new ParkPosition { Name = ParkNewName.Trim() };
-                    ParkPositions.Add(pp);
-                    SkySettings.ParkPositions = ParkPositions;
-                    ParkSelectionSetting = pp;
-                    ParkSelection = ParkPositions.FirstOrDefault();
-                    IsParkAddDialogOpen = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _cancelParkAddDialogCommand;
-        public ICommand CancelParkAddDialogCommand
-        {
-            get
-            {
-                var command = _cancelParkAddDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _cancelParkAddDialogCommand = new RelayCommand(
-                    param => CancelParkAddDialog()
-                );
-            }
-        }
-        private void CancelParkAddDialog()
-        {
-            try
-            {
-                IsParkAddDialogOpen = false;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private bool _isParkDeleteDialogOpen;
-        public bool IsParkDeleteDialogOpen
-        {
-            get => _isParkDeleteDialogOpen;
-            set
-            {
-                if (_isParkDeleteDialogOpen == value) return;
-                _isParkDeleteDialogOpen = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private object _parkDeleteContent;
-        public object ParkDeleteContent
-        {
-            get => _parkDeleteContent;
-            set
-            {
-                if (_parkDeleteContent == value) return;
-                _parkDeleteContent = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private ICommand _openParkDeleteDialogCommand;
-        public ICommand OpenParkDeleteDialogCommand
-        {
-            get
-            {
-                var command = _openParkDeleteDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _openParkDeleteDialogCommand = new RelayCommand(
-                    param => OpenParkDeleteDialog()
-                );
-            }
-        }
-        private void OpenParkDeleteDialog()
-        {
-            try
-            {
-                ParkDeleteContent = new ParkDeleteDialog();
-                IsParkDeleteDialogOpen = true;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-
-        }
-
-        private ICommand _acceptParkDeleteDialogCommand;
-        public ICommand AcceptParkDeleteDialogCommand
-        {
-            get
-            {
-                var command = _acceptParkDeleteDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _acceptParkDeleteDialogCommand = new RelayCommand(
-                    param => AcceptParkDeleteDialog()
-                );
-            }
-        }
-        private void AcceptParkDeleteDialog()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    if (ParkSelectionSetting == null) return;
-                    //if (ParkPositions.Count == 1) return;
-                    ParkPositions.Remove(ParkSelectionSetting);
-                    SkySettings.ParkPositions = ParkPositions;
-                    ParkSelectionSetting = ParkPositions.FirstOrDefault();
-                    ParkSelection = ParkPositions.FirstOrDefault();
-                    IsParkDeleteDialogOpen = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _cancelParkDeleteDialogCommand;
-        public ICommand CancelParkDeleteDialogCommand
-        {
-            get
-            {
-                var command = _cancelParkDeleteDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _cancelParkDeleteDialogCommand = new RelayCommand(
-                    param => CancelParkDeleteDialog()
-                );
-            }
-        }
-        private void CancelParkDeleteDialog()
-        {
-            try
-            {
-                IsParkDeleteDialogOpen = false;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -2043,7 +1737,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -2142,7 +1836,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -2173,7 +1867,7 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    if (!SkyServer.IsMountRunning) return;
+                    if (!SkyServer.IsMountRunning) {return;}
                     SkyServer.StopAxes();
                 }
             }
@@ -2187,7 +1881,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -2236,322 +1930,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private bool _isHomeResetDialogOpen;
-        public bool IsHomeResetDialogOpen
-        {
-            get => _isHomeResetDialogOpen;
-            set
-            {
-                if (_isHomeResetDialogOpen == value) return;
-                _isHomeResetDialogOpen = value;
-                CloseDialogs(value);
-                OnPropertyChanged();
-            }
-        }
-
-        private object _homeResetContent;
-        public object HomeResetContent
-        {
-            get => _homeResetContent;
-            set
-            {
-                if (_homeResetContent == value) return;
-                _homeResetContent = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private ICommand _openHomeResetDialogCommand;
-        public ICommand OpenHomeResetDialogCommand
-        {
-            get
-            {
-                var command = _openHomeResetDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _openHomeResetDialogCommand = new RelayCommand(
-                    param => OpenHomeResetDialog()
-                );
-            }
-        }
-        private void OpenHomeResetDialog()
-        {
-            try
-            {
-                if (SkyServer.Tracking)
-                {
-                    OpenDialog(Application.Current.Resources["skyStopMount"].ToString());
-                    return;
-                }
-                HomeResetContent = new HomeResetDialog();
-                IsHomeResetDialogOpen = true;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-
-        }
-
-        private ICommand _acceptHomeResetDialogCommand;
-        public ICommand AcceptHomeResetDialogCommand
-        {
-            get
-            {
-                var command = _acceptHomeResetDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _acceptHomeResetDialogCommand = new RelayCommand(
-                    param => AcceptHomeResetDialog()
-                );
-            }
-        }
-        private void AcceptHomeResetDialog()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    if (!SkyServer.IsMountRunning) return;
-                    SkyServer.ResetHomePositions();
-                    Synthesizer.Speak(Application.Current.Resources["vceHomeSet"].ToString());
-                    IsHomeResetDialogOpen = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _cancelHomeResetDialogCommand;
-        public ICommand CancelHomeResetDialogCommand
-        {
-            get
-            {
-                var command = _cancelHomeResetDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _cancelHomeResetDialogCommand = new RelayCommand(
-                    param => CancelHomeResetDialog()
-                );
-            }
-        }
-        private void CancelHomeResetDialog()
-        {
-            try
-            {
-                IsHomeResetDialogOpen = false;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private bool _isFlipDialogOpen;
-        public bool IsFlipDialogOpen
-        {
-            get => _isFlipDialogOpen;
-            set
-            {
-                if (_isFlipDialogOpen == value) return;
-                _isFlipDialogOpen = value;
-                CloseDialogs(value);
-                OnPropertyChanged();
-            }
-        }
-
-        private object _flipContent;
-        public object FlipContent
-        {
-            get => _flipContent;
-            set
-            {
-                if (_flipContent == value) return;
-                _flipContent = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private ICommand _openFlipDialogCommand;
-        public ICommand OpenFlipDialogCommand
-        {
-            get
-            {
-                var command = _openFlipDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _openFlipDialogCommand = new RelayCommand(
-                    param => OpenFlipDialog()
-                );
-            }
-        }
-        private void OpenFlipDialog()
-        {
-            try
-            {
-                FlipContent = new FlipDialog();
-                IsFlipDialogOpen = true;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-
-        }
-
-        private ICommand _acceptFlipDialogCommand;
-        public ICommand AcceptFlipDialogCommand
-        {
-            get
-            {
-                var command = _acceptFlipDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _acceptFlipDialogCommand = new RelayCommand(
-                    param => AcceptFlipDialog()
-                );
-            }
-        }
-        private void AcceptFlipDialog()
-        {
-            try
-            {
-                if (!SkyServer.IsMountRunning) return;
-                var sop = SkyServer.SideOfPier;
-                switch (sop)
-                {
-                    case PierSide.pierEast:
-                        SkyServer.SideOfPier = PierSide.pierWest;
-                        break;
-                    case PierSide.pierUnknown:
-                        OpenDialog($"PierSide: {PierSide.pierUnknown}");
-                        break;
-                    case PierSide.pierWest:
-                        SkyServer.SideOfPier = PierSide.pierEast;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-                IsFlipDialogOpen = false;
-            }
-            catch (Exception ex)
-            {
-                IsFlipDialogOpen = false;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _cancelFlipDialogCommand;
-        public ICommand CancelFlipDialogCommand
-        {
-            get
-            {
-                var command = _cancelFlipDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _cancelFlipDialogCommand = new RelayCommand(
-                    param => CancelFlipDialog()
-                );
-            }
-        }
-        private void CancelFlipDialog()
-        {
-            try
-            {
-                IsFlipDialogOpen = false;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -2570,306 +1949,6 @@ namespace GS.Server.SkyTelescope
                 _schedulerBadgeContent = value;
                 OnPropertyChanged();
             }
-        }
-
-        private bool _isSchedulerDialogOpen;
-        public bool IsSchedulerDialogOpen
-        {
-            get => _isSchedulerDialogOpen;
-            set
-            {
-                if (_isSchedulerDialogOpen == value) return;
-                _isSchedulerDialogOpen = value;
-                CloseDialogs(value);
-                OnPropertyChanged();
-            }
-        }
-
-        private object _schedulerContent;
-        public object SchedulerContent
-        {
-            get => _schedulerContent;
-            set
-            {
-                if (_schedulerContent == value) return;
-                _schedulerContent = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private ICommand _openSchedulerDialogCmd;
-        public ICommand OpenSchedulerDialogCmd
-        {
-            get
-            {
-                var cmd = _openSchedulerDialogCmd;
-                if (cmd != null)
-                {
-                    return cmd;
-                }
-
-                return _openSchedulerDialogCmd = new RelayCommand(
-                    param => OpenSchedulerDialog()
-                );
-            }
-        }
-        private void OpenSchedulerDialog()
-        {
-            try
-            {
-                SchedulerContent = new SchedulerDialog();
-                IsSchedulerDialogOpen = true;
-                if (ScheduleParkOn) return;
-                FutureParkDate = DateTime.Now + TimeSpan.FromSeconds(60);
-                FutureParkTime = $"{DateTime.Now + TimeSpan.FromSeconds(60):HH:mm}";
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-
-        }
-
-        private ICommand _acceptSchedulerDialogCmd;
-        public ICommand AcceptSchedulerDialogCmd
-        {
-            get
-            {
-                var cmd = _acceptSchedulerDialogCmd;
-                if (cmd != null)
-                {
-                    return cmd;
-                }
-
-                return _acceptSchedulerDialogCmd = new RelayCommand(
-                    param => AcceptSchedulerDialog()
-                );
-            }
-        }
-        private void AcceptSchedulerDialog()
-        {
-            try
-            {
-                IsSchedulerDialogOpen = false;
-
-            }
-            catch (Exception ex)
-            {
-                IsSchedulerDialogOpen = false;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _cancelSchedulerDialogCmd;
-        public ICommand CancelSchedulerDialogCmd
-        {
-            get
-            {
-                var cmd = _cancelSchedulerDialogCmd;
-                if (cmd != null)
-                {
-                    return cmd;
-                }
-
-                return _cancelSchedulerDialogCmd = new RelayCommand(
-                    param => CancelSchedulerDialog()
-                );
-            }
-        }
-        private void CancelSchedulerDialog()
-        {
-            try
-            {
-                IsSchedulerDialogOpen = false;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private bool _scheduleParkOn;
-        public bool ScheduleParkOn
-        {
-            get => _scheduleParkOn;
-            set
-            {
-                if (_scheduleParkOn == value) return;
-                if (value)
-                {
-                    if (!ValidParkEvent()) { return; }
-                    _ctsPark = new CancellationTokenSource();
-                    _ctPark = _ctsPark.Token;
-                    var oktime = TimeSpan.TryParse(FutureParkTime, out var ftime);
-                    var okdate = DateTime.TryParse(FutureParkDate.ToString(), out var fdate);
-                    if (okdate && oktime)
-                    {
-                        var fdatetime = fdate.Date + ftime;
-                        ScheduleAction(ClickPark, fdatetime, _ctPark);
-
-                        var monitorItem = new MonitorEntry
-                        {
-                            Datetime = HiResDateTime.UtcNow,
-                            Device = MonitorDevice.Telescope,
-                            Category = MonitorCategory.Interface,
-                            Type = MonitorType.Information,
-                            Method = MethodBase.GetCurrentMethod().Name,
-                            Thread = Thread.CurrentThread.ManagedThreadId,
-                            Message = $"Park:{fdatetime}"
-                        };
-                        MonitorLog.LogToMonitor(monitorItem);
-                    }
-                }
-                else
-                {
-                    if (_ctsPark != null)
-                    {
-                        if (!_ctsPark.IsCancellationRequested)
-                        {
-                            _ctsPark?.Cancel();
-                        }
-                        _ctsPark?.Dispose();
-                        SchedulerBadgeContent = string.Empty;
-                    }
-                }
-                _scheduleParkOn = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private string _futureParkTime;
-        public string FutureParkTime
-        {
-            get => _futureParkTime;
-            set
-            {
-                if (_futureParkTime == value) return;
-                ScheduleParkOn = false;
-                _futureParkTime = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private DateTime? _futureParkDate;
-        public DateTime? FutureParkDate
-        {
-            get => _futureParkDate;
-            set
-            {
-                if (_futureParkDate == value) return;
-                ScheduleParkOn = false;
-                _futureParkDate = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool ValidParkEvent()
-        {
-            var oktime = TimeSpan.TryParse(FutureParkTime, out var ftime);
-            if (!oktime)
-            {
-                OpenDialog($"{Application.Current.Resources["skyParkEvent1"]}", $"{Application.Current.Resources["exError"]}");
-                return false;
-            }
-            var okdate = DateTime.TryParse(FutureParkDate.ToString(), out var fdate);
-            if (!okdate)
-            {
-                OpenDialog($"{Application.Current.Resources["skyParkEvent2"]}", $"{Application.Current.Resources["exError"]}");
-                return false;
-            }
-            var fdatetime = fdate.Date + ftime;
-            if (fdatetime < DateTime.Now)
-            {
-                OpenDialog($"{Application.Current.Resources["skyParkEvent3"]}", $"{Application.Current.Resources["exError"]}");
-                return false;
-            }
-
-            return true;
-        }
-
-        public async void ScheduleAction(Action action, DateTime ExecutionTime, CancellationToken token)
-        {
-            try
-            {
-                SchedulerBadgeContent = "On";
-                await Task.Delay((int)ExecutionTime.Subtract(DateTime.Now).TotalMilliseconds, token);
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Information,
-                    Method = "ScheduleAction",
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{action.Method}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                if (!SkyServer.AtPark)
-                {
-                    action();
-                }
-                ScheduleParkOn = false;
-                SchedulerBadgeContent = string.Empty;
-            }
-            catch (TaskCanceledException ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Information,
-                    Method = "ScheduleAction",
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Information,
-                    Method = "ScheduleAction",
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-
-            }
-
         }
 
         private ICommand _clickPecOnCmd;
@@ -2937,7 +2016,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -2946,7 +2025,6 @@ namespace GS.Server.SkyTelescope
         #endregion
 
         #region RA Coord GoTo Control
-
         public IList<int> Hours { get; }
 
         private double _raHours;
@@ -3022,10 +2100,6 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-        public double GoToDec => Principles.Units.Deg2Dou(DecDegrees, DecMinutes, DecSeconds);
-        public double GoToRa => Principles.Units.Ra2Dou(RaHours, RaMinutes, RaSeconds);
-        public string GoToDecString => _util.DegreesToDMS(GoToDec, "° ", "m ", "s", 3);
-        public string GoToRaString => _util.HoursToHMS(GoToRa, "h ", "m ", "s", 3);
 
         private ICommand _populateGoToRaDec;
         public ICommand PopulateGoToRaDecCommand
@@ -3072,7 +2146,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -3150,367 +2224,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        // goto dialog
-        private bool _isRaGoToDialogOpen;
-        public bool IsRaGoToDialogOpen
-        {
-            get => _isRaGoToDialogOpen;
-            set
-            {
-                if (_isRaGoToDialogOpen == value) return;
-                _isRaGoToDialogOpen = value;
-                CloseDialogs(value);
-                OnPropertyChanged();
-            }
-        }
-
-        private object _raGoToContent;
-        public object RaGoToContent
-        {
-            get => _raGoToContent;
-            set
-            {
-                if (_raGoToContent == value) return;
-                _raGoToContent = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private ICommand _openRaGoToDialogCommand;
-        public ICommand OpenRaGoToDialogCommand
-        {
-            get
-            {
-                var command = _openRaGoToDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _openRaGoToDialogCommand = new RelayCommand(
-                    param => OpenRaGoToDialog()
-                );
-            }
-        }
-        private void OpenRaGoToDialog()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    var AltAz = Coordinate.RaDec2AltAz(GoToRa, GoToDec, SkyServer.SiderealTime,
-                        SkySettings.Latitude);
-                    if (AltAz[0] < 0)
-                    {
-                        OpenDialog($"{Application.Current.Resources["goTargetBelow"]}: {AltAz[1]} Alt: {AltAz[0]}");
-                        return;
-                    }
-
-                    RaGoToContent = new RaGoToDialog();
-                    IsRaGoToDialogOpen = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _acceptRaGoToDialogCommand;
-        public ICommand AcceptRaGoToDialogCommand
-        {
-            get
-            {
-                var command = _acceptRaGoToDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _acceptRaGoToDialogCommand = new RelayCommand(
-                    param => AcceptRaGoToDialog()
-                );
-            }
-        }
-        private void AcceptRaGoToDialog()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    if (!SkySettings.CanSlewAsync) return;
-                    if (AtPark)
-                    {
-                        BlinkParked();
-                        return;
-                    }
-
-                    var radec = Transforms.CoordTypeToInternal(GoToRa, GoToDec);
-                    SkyServer.SlewRaDec(radec.X, radec.Y);
-                    IsRaGoToDialogOpen = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _cancelRaGoToDialogCommand;
-        public ICommand CancelRaGoToDialogCommand
-        {
-            get
-            {
-                var command = _cancelRaGoToDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _cancelRaGoToDialogCommand = new RelayCommand(
-                    param => CancelRaGoToDialog()
-                );
-            }
-        }
-        private void CancelRaGoToDialog()
-        {
-            try
-            {
-                IsRaGoToDialogOpen = false;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        // Sync dialog
-        private bool _isRaGoToSyncDialogOpen;
-        public bool IsRaGoToSyncDialogOpen
-        {
-            get => _isRaGoToSyncDialogOpen;
-            set
-            {
-                if (_isRaGoToSyncDialogOpen == value) return;
-                _isRaGoToSyncDialogOpen = value;
-                CloseDialogs(value);
-                OnPropertyChanged();
-            }
-        }
-
-        private object _raGoToSyncContent;
-        public object RaGoToSyncContent
-        {
-            get => _raGoToSyncContent;
-            set
-            {
-                if (_raGoToSyncContent == value) return;
-                _raGoToSyncContent = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private ICommand _openRaGoToSyncDialogCmd;
-        public ICommand OpenRaGoToSyncDialogCmd
-        {
-            get
-            {
-                var cmd = _openRaGoToSyncDialogCmd;
-                if (cmd != null)
-                {
-                    return cmd;
-                }
-
-                return _openRaGoToSyncDialogCmd = new RelayCommand(
-                    param => OpenRaGoToSyncDialog()
-                );
-            }
-        }
-        private void OpenRaGoToSyncDialog()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    var AltAz = Coordinate.RaDec2AltAz(GoToRa, GoToDec, SkyServer.SiderealTime,
-                        SkySettings.Latitude);
-                    if (AltAz[0] < 0)
-                    {
-                        OpenDialog($"{Application.Current.Resources["goTargetBelow"]}: {AltAz[1]} Alt: {AltAz[0]}");
-                        return;
-                    }
-
-                    RaGoToSyncContent = new RaGoToSyncDialog();
-                    IsRaGoToSyncDialogOpen = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _acceptRaGoToSyncDialogCmd;
-        public ICommand AcceptRaGoToSyncDialogCmd
-        {
-            get
-            {
-                var cmd = _acceptRaGoToSyncDialogCmd;
-                if (cmd != null)
-                {
-                    return cmd;
-                }
-
-                return _acceptRaGoToSyncDialogCmd = new RelayCommand(
-                    param => AcceptRaGoToSyncDialog()
-                );
-            }
-        }
-        private void AcceptRaGoToSyncDialog()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    if (!SkySettings.CanSlewAsync) return;
-                    if (SkyServer.IsSlewing)
-                    {
-                        OpenDialog($"{Application.Current.Resources["goSlewing"]}", $"{Application.Current.Resources["exError"]}");
-                        return;
-                    }
-                    if (AtPark)
-                    {
-                        BlinkParked();
-                        return;
-                    }
-
-                    var radec = Transforms.CoordTypeToInternal(GoToRa, GoToDec);
-                    var result = SkyServer.CheckRaDecSyncLimit(radec.X, radec.Y);
-
-                    if (!result)
-                    {
-                        OpenDialog($"{Application.Current.Resources["goOutLimits"]}", $"{Application.Current.Resources["exError"]}");
-                        return;
-                    }
-                    SkyServer.TargetDec = radec.Y;
-                    SkyServer.TargetRa = radec.X;
-                    SkyServer.SyncToTargetRaDec();
-                    IsRaGoToSyncDialogOpen = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _cancelRaGoToSyncDialogCmd;
-        public ICommand CancelRaGoToSyncDialogCmd
-        {
-            get
-            {
-                var cmd = _cancelRaGoToSyncDialogCmd;
-                if (cmd != null)
-                {
-                    return cmd;
-                }
-
-                return _cancelRaGoToSyncDialogCmd = new RelayCommand(
-                    param => CancelRaGoToSyncDialog()
-                );
-            }
-        }
-        private void CancelRaGoToSyncDialog()
-        {
-            try
-            {
-                IsRaGoToSyncDialogOpen = false;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -3572,169 +2286,6 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private bool _isPPecDialogOpen;
-        public bool IsPPecDialogOpen
-        {
-            get => _isPPecDialogOpen;
-            set
-            {
-                if (_isPPecDialogOpen == value) return;
-                _isPPecDialogOpen = value;
-                CloseDialogs(value);
-                OnPropertyChanged();
-            }
-        }
-
-        private object _pPecContent;
-        public object PPecContent
-        {
-            get => _pPecContent;
-            set
-            {
-                if (_pPecContent == value) return;
-                _pPecContent = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private ICommand _openPPecDialogCommand;
-        public ICommand OpenPPecDialogCommand
-        {
-            get
-            {
-                var command = _openPPecDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _openPPecDialogCommand = new RelayCommand(
-                    param => OpenPPecDialog()
-                );
-            }
-        }
-        private void OpenPPecDialog()
-        {
-            try
-            {
-                if (SkyServer.Tracking || SkyServer.PecTrainInProgress)
-                {
-                    PPecContent = new PpecDialog();
-                    IsPPecDialogOpen = true;
-                }
-                else
-                {
-                    PecTrainOn = false;
-                    OpenDialog(Application.Current.Resources["ppTrackingOn"].ToString());
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-
-        }
-
-        private ICommand _acceptPPecDialogCommand;
-        public ICommand AcceptPPecDialogCommand
-        {
-            get
-            {
-                var command = _acceptPPecDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _acceptPPecDialogCommand = new RelayCommand(
-                    param => AcceptPPecDialog()
-                );
-            }
-        }
-        private void AcceptPPecDialog()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    SkyServer.PecTraining = !SkyServer.PecTraining;
-                    IsPPecDialogOpen = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _cancelPPecDialogCommand;
-        public ICommand CancelPPecDialogCommand
-        {
-            get
-            {
-                var command = _cancelPPecDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _cancelPPecDialogCommand = new RelayCommand(
-                    param => CancelPPecDialog()
-                );
-            }
-        }
-        private void CancelPPecDialog()
-        {
-            try
-            {
-                PecTrainOn = !PecTrainOn;
-                IsPPecDialogOpen = false;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
         #endregion
 
         #region Hand Controller
@@ -3757,27 +2308,22 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
-        private bool _flipNS;
         public bool FlipNS
         {
-            get => _flipNS;
+            get => SkySettings.HcFlipNS;
             set
             {
-                if (_flipNS == value) return;
-                _flipNS = value;
+                SkySettings.HcFlipNS = value;
                 OnPropertyChanged();
             }
         }
 
-        private bool _flipEW;
         public bool FlipEW
         {
-            get => _flipEW;
+            get => SkySettings.HcFlipEW;
             set
             {
-                if (_flipEW == value) return;
-                _flipEW = value;
+                SkySettings.HcFlipEW = value;
                 OnPropertyChanged();
             }
         }
@@ -3811,7 +2357,6 @@ namespace GS.Server.SkyTelescope
             get => SkySettings.HcAntiRa;
             set
             {
-                if (SkySettings.HcAntiRa == value) return;
                 SkySettings.HcAntiRa = value;
                 OnPropertyChanged();
             }
@@ -3822,7 +2367,6 @@ namespace GS.Server.SkyTelescope
             get => SkySettings.HcAntiDec;
             set
             {
-                if (SkySettings.HcAntiDec == value) return;
                 SkySettings.HcAntiDec = value;
                 OnPropertyChanged();
             }
@@ -3908,7 +2452,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -3951,7 +2495,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -3995,7 +2539,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -4035,7 +2579,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -4081,7 +2625,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -4121,7 +2665,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -4167,7 +2711,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -4207,7 +2751,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -4253,7 +2797,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -4293,7 +2837,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 SkyServer.AlertState = true;
@@ -4333,7 +2877,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 SkyServer.AlertState = true;
@@ -4374,7 +2918,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -4493,7 +3037,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -4577,7 +3121,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -4648,7 +3192,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -4702,7 +3246,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -4746,7 +3290,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -4792,7 +3336,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -4839,7 +3383,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -4883,7 +3427,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -4927,7 +3471,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -4971,7 +3515,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -5096,17 +3640,17 @@ namespace GS.Server.SkyTelescope
 
             if (!SkyServer.SpiralCollection.Exists(x => x.Index == index))
             {
-                LogSpiral($"{amt}, Index not Exists", MonitorType.Warning);
+                LogSpiral($"{amt}|Index not Exists", MonitorType.Warning);
                 return;
             }
             var newpoint = SkyServer.SpiralCollection.Find(x => x.Index == index);
             if (newpoint?.RaDec == null)
             {
-                LogSpiral($"{amt}, Index not Found", MonitorType.Warning);
+                LogSpiral($"{amt}|Index not Found", MonitorType.Warning);
                 return;
             }
 
-            LogSpiral($"Spiral Move: {_util.HoursToHMS(newpoint.RaDec.X, "h ", "m ", "s", 2)}, {_util.DegreesToDMS(newpoint.RaDec.Y, "° ", "m ", "s", 2)}, {amt}", MonitorType.Information);
+            LogSpiral($"Spiral Move: {_util.HoursToHMS(newpoint.RaDec.X, "h ", "m ", "s", 2)}|{_util.DegreesToDMS(newpoint.RaDec.Y, "° ", "m ", "s", 2)}|{amt}", MonitorType.Information);
 
             var radec = Transforms.CoordTypeToInternal(newpoint.RaDec.X, newpoint.RaDec.Y);
 
@@ -5146,7 +3690,6 @@ namespace GS.Server.SkyTelescope
         #endregion
 
         #region Backlash
-
         public IEnumerable<int> RaBacklashList { get; }
 
         public IEnumerable<int> DecBacklashList { get; }
@@ -5299,54 +3842,6 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private bool _limitTracking;
-        public bool LimitTracking
-        {
-            get => _limitTracking;
-            set
-            {
-                _limitTracking = value;
-                SkySettings.LimitTracking = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _limitPark;
-        public bool LimitPark
-        {
-            get => _limitPark;
-            set
-            {
-                _limitPark = value;
-                SkySettings.LimitPark = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _limitNothing;
-        public bool LimitNothing
-        {
-            get => _limitNothing;
-            set
-            {
-                _limitNothing = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private ParkPosition _parkLimitSelection;
-        public ParkPosition ParkLimitSelection
-        {
-            get => _parkLimitSelection;
-            set
-            {
-                if (_parkLimitSelection == value) return;
-                _parkLimitSelection = value;
-                SkySettings.ParkLimitName = value.Name;
-                OnPropertyChanged();
-            }
-        }
-
         private bool _warningState;
         public bool WarningState
         {
@@ -5416,9 +3911,9 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        public bool MountState
+        private bool MountState
         {
-            get => SkyServer.IsMountRunning;
+            //get => SkyServer.IsMountRunning;
             set
             {
                 ScreenEnabled = value;
@@ -5471,136 +3966,6 @@ namespace GS.Server.SkyTelescope
             for (var i = 0; i < 4; i++)
             {
                 SopBlinker = !SopBlinker;
-            }
-        }
-
-        private bool _isLimitDialogOpen;
-        public bool IsLimitDialogOpen
-        {
-            get => _isLimitDialogOpen;
-            set
-            {
-                if (_isLimitDialogOpen == value) return;
-                _isLimitDialogOpen = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private object _limitContent;
-        public object LimitContent
-        {
-            get => _limitContent;
-            set
-            {
-                if (_limitContent == value) return;
-                _limitContent = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private void SetParkLimitSelection(string name)
-        {
-            var found = ParkPositions.Find(x => x.Name == name);
-            if (found != null) // did not find match in list
-            {
-                ParkLimitSelection = found;
-            }
-            else
-            {
-                ParkLimitSelection = ParkPositions.FirstOrDefault();
-            }
-        }
-
-        private ICommand _openLimitDialogCommand;
-        public ICommand OpenLimitDialogCommand
-        {
-            get
-            {
-                var command = _openLimitDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _openLimitDialogCommand = new RelayCommand(
-                    param => OpenLimitDialog()
-                );
-            }
-        }
-        private void OpenLimitDialog()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    LimitTracking = SkySettings.LimitTracking;
-                    LimitPark = SkySettings.LimitPark;
-                    SetParkLimitSelection(SkySettings.ParkLimitName);
-                    if (!LimitPark && !LimitTracking) { LimitNothing = true; }
-                    if (LimitPark || LimitTracking) { LimitNothing = false; }
-                    LimitContent = new LimitDialog();
-                    IsLimitDialogOpen = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _okLimitDialogCommand;
-        public ICommand OkLimitDialogCommand
-        {
-            get
-            {
-                var command = _okLimitDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _okLimitDialogCommand = new RelayCommand(
-                    param => OkLimitDialog()
-                );
-            }
-        }
-        private void OkLimitDialog()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    IsLimitDialogOpen = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -5668,6 +4033,21 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
+                    //switch (SkySettings.Mount)
+                    //{
+                    //    case MountType.Simulator:
+                    //        break;
+                    //    case MountType.SkyWatcher:
+                    //        if (ComPort == 0)
+                    //        {
+                    //            OpenDialog($"Check Com Port");
+                    //            return;
+                    //        }
+                    //        break;
+                    //    default:
+                    //        throw new ArgumentOutOfRangeException();
+                    //}
+
                     if (SkyServer.IsAutoHomeRunning)
                     {
                         StopAutoHomeDialog();
@@ -5676,16 +4056,10 @@ namespace GS.Server.SkyTelescope
                     SkyServer.IsMountRunning = !SkyServer.IsMountRunning;
                 }
 
-                if (SkyServer.IsMountRunning)
-                {
-                    WarningState = false;
-                    AlertState = false;
-                    HomePositionCheck();
-                }
-                else
-                {
-                    CloseDialogs(false);
-                }
+                if (!SkyServer.IsMountRunning) return;
+                WarningState = false;
+                AlertState = false;
+                HomePositionCheck();
             }
             catch (Exception ex)
             {
@@ -5698,9 +4072,14 @@ namespace GS.Server.SkyTelescope
             if (SkyServer.AtPark) return;
             if (!SkySettings.HomeWarning) return;
 
+            string msg;
             switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
+                    msg = Application.Current.Resources["skyHome1"].ToString();
+                    msg += Environment.NewLine + Application.Current.Resources["skyHome2"];
+                    //msg += Environment.NewLine + Application.Current.Resources["skyHome3"];
+                    OpenDialog(msg);
                     break;
                 case MountType.SkyWatcher:
                     switch (SkySettings.AlignmentMode)
@@ -5710,9 +4089,9 @@ namespace GS.Server.SkyTelescope
                         case AlignmentModes.algPolar:
                             break;
                         case AlignmentModes.algGermanPolar:
-                            var msg = Application.Current.Resources["skyHome1"].ToString();
+                            msg = Application.Current.Resources["skyHome1"].ToString();
                             msg += Environment.NewLine + Application.Current.Resources["skyHome2"];
-                            msg += Environment.NewLine + Application.Current.Resources["skyHome3"];
+                            //msg += Environment.NewLine + Application.Current.Resources["skyHome3"];
                             OpenDialog(msg);
                             break;
                         default:
@@ -5721,1084 +4100,6 @@ namespace GS.Server.SkyTelescope
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        private ICommand _clickMountInfoDialogCommand;
-        public ICommand ClickMountInfoDialogCommand
-        {
-            get
-            {
-                var command = _clickMountInfoDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _clickMountInfoDialogCommand = new RelayCommand(
-                    param => ClickMountInfoDialog()
-                );
-            }
-        }
-        private void ClickMountInfoDialog()
-        {
-            try
-            {
-                var canppec = SkyServer.CanPPec ? $"{Application.Current.Resources["mntSupported"]}" : $"{Application.Current.Resources["mntNotSupported"]}";
-                var canhome = SkyServer.CanHomeSensor ? $"{Application.Current.Resources["mntSupported"]}" : $"{Application.Current.Resources["mntNotSupported"]}";
-                var msg = $"{Application.Current.Resources["mntMount"]} {SkyServer.MountName}" + Environment.NewLine;
-                msg += $"{Application.Current.Resources["mntVersion"]} {SkyServer.MountVersion}" + Environment.NewLine;
-                msg += $"{Application.Current.Resources["mntStepsRa"]} {SkyServer.StepsPerRevolution[0]}" + Environment.NewLine;
-                msg += $"{Application.Current.Resources["mntStepsDec"]} {SkyServer.StepsPerRevolution[1]}" + Environment.NewLine;
-                msg += $"{Application.Current.Resources["mntPEC"]} {canppec}" + Environment.NewLine;
-                msg += $"{Application.Current.Resources["mntHomeSensor"]} {canhome}" + Environment.NewLine;
-                msg += $"{Application.Current.Resources["mntRaSteps"]} {Math.Round(SkyServer.StepsPerRevolution[0] / 360.0 / 3600, 2)}" + Environment.NewLine;
-                msg += $"{Application.Current.Resources["mntDecSteps"]} {Math.Round(SkyServer.StepsPerRevolution[1] / 360.0 / 3600, 2)}" + Environment.NewLine;
-
-                OpenDialog(msg, $"{Application.Current.Resources["mntInfo"]}");
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        #endregion
-
-        #region Dialog
-
-        private string _dialogMsg;
-        public string DialogMsg
-        {
-            get => _dialogMsg;
-            set
-            {
-                if (_dialogMsg == value) return;
-                _dialogMsg = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private string _dialogCaption;
-        public string DialogCaption
-        {
-            get => _dialogCaption;
-            set
-            {
-                if (_dialogCaption == value) return;
-                _dialogCaption = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _isDialogOpen;
-        public bool IsDialogOpen
-        {
-            get => _isDialogOpen;
-            set
-            {
-                if (_isDialogOpen == value) return;
-                _isDialogOpen = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private object _dialogContent;
-        public object DialogContent
-        {
-            get => _dialogContent;
-            set
-            {
-                if (_dialogContent == value) return;
-                _dialogContent = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private ICommand _openDialogCommand;
-        public ICommand OpenDialogCommand
-        {
-            get
-            {
-                var command = _openDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _openDialogCommand = new RelayCommand(
-                    param => OpenDialog(null)
-                );
-            }
-        }
-        private void OpenDialog(string msg, string caption = null)
-        {
-            if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
-            DialogContent = new DialogOK();
-            IsDialogOpen = true;
-
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Telescope,
-                Category = MonitorCategory.Interface,
-                Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{msg}"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
-
-        }
-
-        private ICommand _clickOkDialogCommand;
-        public ICommand ClickOkDialogCommand
-        {
-            get
-            {
-                var command = _clickOkDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _clickOkDialogCommand = new RelayCommand(
-                    param => ClickOkDialog()
-                );
-            }
-        }
-        private void ClickOkDialog()
-        {
-            IsDialogOpen = false;
-            LockOn = false;
-        }
-
-        private ICommand _clickCancelDialogCommand;
-        public ICommand ClickCancelDialogCommand
-        {
-            get
-            {
-                var command = _clickCancelDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _clickCancelDialogCommand = new RelayCommand(
-                    param => ClickCancelDialog()
-                );
-            }
-        }
-        private void ClickCancelDialog()
-        {
-            IsDialogOpen = false;
-        }
-
-        private ICommand _runMessageDialog;
-        public ICommand RunMessageDialogCommand
-        {
-            get
-            {
-                var dialog = _runMessageDialog;
-                if (dialog != null)
-                {
-                    return dialog;
-                }
-
-                return _runMessageDialog = new RelayCommand(
-                    param => ExecuteMessageDialog()
-                );
-            }
-        }
-        private async void ExecuteMessageDialog()
-        {
-            var view = new ErrorMessageDialog
-            {
-                DataContext = new ErrorMessageDialogVM()
-            };
-
-            //show the dialog
-            await DialogHost.Show(view, "RootDialog", ClosingMessageEventHandler);
-        }
-        private static void ClosingMessageEventHandler(object sender, DialogClosingEventArgs eventArgs)
-        {
-            Console.WriteLine(@"You can intercept the closing event, and cancel here.");
-        }
-
-        #endregion
-
-        #region GPS Dialog
-
-        private bool _allowTimeChange;
-        public bool AllowTimeChange
-        {
-            get => _allowTimeChange;
-            set
-            {
-                if (_allowTimeChange == value) return;
-                _allowTimeChange = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _allowTimeVis;
-        public bool AllowTimeVis
-        {
-            get => _allowTimeVis;
-            set
-            {
-                if (_allowTimeVis == value) return;
-                _allowTimeVis = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _gpsGga;
-        public bool GpsGga
-        {
-            get => _gpsGga;
-            set
-            {
-                if (_gpsGga == value) return;
-                _gpsGga = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _gpsRmc;
-        public bool GpsRmc
-        {
-            get => _gpsRmc;
-            set
-            {
-                if (_gpsRmc == value) return;
-                _gpsRmc = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private DateTime _gpsPcTime;
-        public DateTime GpsPcTime
-        {
-            get => _gpsPcTime;
-            set
-            {
-                if (_gpsPcTime == value) return;
-                _gpsPcTime = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private DateTime _gpsTime;
-        public DateTime GpsTime
-        {
-            get => _gpsTime;
-            set
-            {
-                if (_gpsTime == value) return;
-                _gpsTime = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private TimeSpan _gpsSpan;
-        public TimeSpan GpsSpan
-        {
-            get => _gpsSpan;
-            set
-            {
-                if (_gpsSpan == value) return;
-                _gpsSpan = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private string _nmeaTag;
-        public string NmeaTag
-        {
-            get => _nmeaTag;
-            set
-            {
-                if (_nmeaTag == value) return;
-                _nmeaTag = value;
-                OnPropertyChanged();
-            }
-        }
-        private string NmeaSentence { get; set; }
-        private bool _hasGpsData;
-        public bool HasGSPData
-        {
-            get => _hasGpsData;
-            set
-            {
-                if (_hasGpsData == value) return;
-                _hasGpsData = value;
-                OnPropertyChanged();
-            }
-        }
-        public double GpsLat { get; set; }
-        private string _gpsLatString;
-        public string GpsLatString
-        {
-            get => _gpsLatString;
-            set
-            {
-                if (value == _gpsLatString) return;
-                _gpsLatString = value;
-                OnPropertyChanged();
-            }
-        }
-        public double GpsLong { get; set; }
-        private string _gpsLongString;
-        public string GpsLongString
-        {
-            get => _gpsLongString;
-            set
-            {
-                if (value == _gpsLongString) return;
-                _gpsLongString = value;
-                OnPropertyChanged();
-            }
-        }
-        private double _gpsElevation;
-        public double GpsElevation
-        {
-            get => _gpsElevation;
-            set
-            {
-                if (Math.Abs(value - _gpsElevation) < 0.00001) return;
-                _gpsElevation = value;
-                OnPropertyChanged();
-            }
-        }
-        public int GpsComPort
-        {
-            get => SkySettings.GpsComPort;
-            set
-            {
-                if (value == SkySettings.GpsComPort) return;
-                SkySettings.GpsComPort = value;
-                OnPropertyChanged();
-            }
-        }
-        public bool IsGpsRunning { get; set; }
-        public SerialSpeed GpsBaudRate
-        {
-            get => SkySettings.GpsBaudRate;
-            set
-            {
-                if (value == SkySettings.GpsBaudRate) return;
-                SkySettings.GpsBaudRate = value;
-                OnPropertyChanged();
-            }
-        }
-        private ICommand _populateGps;
-        public ICommand PopulateGpsCommand
-        {
-            get
-            {
-                var gps = _populateGps;
-                if (gps != null)
-                {
-                    return gps;
-                }
-
-                return _populateGps = new RelayCommand(
-                    param => PopulateGps()
-                );
-            }
-        }
-        private void PopulateGps()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    //var ra = _util.HoursToHMS(SkyServer.RightAscension, ":", ":", ":", 3);
-                    //var ras = ra.Split(':');
-                    //RaHours = Convert.ToDouble(ras[0]);
-                    //RaMinutes = Convert.ToDouble(ras[1]);
-                    //RaSeconds = Convert.ToDouble(ras[2]);
-
-                    //var dec = _util.HoursToHMS(SkyServer.Declination, ":", ":", ":", 3);
-                    //var decs = dec.Split(':');
-                    //DecDegrees = Convert.ToDouble(decs[0]);
-                    //DecMinutes = Convert.ToDouble(decs[1]);
-                    //DecSeconds = Convert.ToDouble(decs[2]);
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-        private bool _isGpsDialogOpen;
-        public bool IsGpsDialogOpen
-        {
-            get => _isGpsDialogOpen;
-            set
-            {
-                if (_isGpsDialogOpen == value) return;
-                _isGpsDialogOpen = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private object _gpsContent;
-        public object GpsContent
-        {
-            get => _gpsContent;
-            set
-            {
-                if (_gpsContent == value) return;
-                _gpsContent = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private ICommand _openGpsDialogCommand;
-        public ICommand OpenGpsDialogCommand
-        {
-            get
-            {
-                var command = _openGpsDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _openGpsDialogCommand = new RelayCommand(
-                    param => OpenGpsDialog()
-                );
-            }
-        }
-        private void OpenGpsDialog()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    HasGSPData = false;
-                    NmeaTag = "N/A";
-                    GpsLong = 0.0;
-                    GpsLongString = $"{GpsLong}";
-                    GpsLat = 0.0;
-                    GpsLatString = $"{GpsLat}";
-                    GpsElevation = 0.0;
-                    GpsSpan = new TimeSpan(0);
-                    GpsPcTime = new DateTime();
-                    GpsTime = new DateTime();
-                    GpsGga = true;
-                    GpsRmc = false;
-                    AllowTimeChange = false;
-                    AllowTimeVis = SystemInfo.IsAdministrator();
-
-                    GpsContent = new GpsDialog();
-                    IsGpsDialogOpen = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _acceptGpsDialogCommand;
-        public ICommand AcceptGpsDialogCommand
-        {
-            get
-            {
-                var command = _acceptGpsDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _acceptGpsDialogCommand = new RelayCommand(
-                    param => AcceptGpsDialog()
-                );
-            }
-        }
-        private void AcceptGpsDialog()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    if (Math.Abs(GpsLat) > 0.0 && Math.Abs(GpsLong) > 0.0)
-                    {
-                        SkySettings.Latitude = GpsLat;
-                        SkySettings.Longitude = GpsLong;
-                        SkySettings.Elevation = GpsElevation;
-                    }
-
-                    if (AllowTimeChange && AllowTimeVis)
-                    {
-                        if (Math.Abs(GpsSpan.TotalSeconds) > 300)
-                        {
-                            OpenDialog(Application.Current.Resources["gpsTimeLimit"].ToString());
-                        }
-                        else
-                        {
-                            var msg = Time.SetSystemUTCTime(HiResDateTime.UtcNow.ToLocalTime().Add(GpsSpan));
-                            if (msg != string.Empty) OpenDialog($"{Application.Current.Resources["gpsTimeError"]}: {msg}");
-                        }
-                    }
-
-                    var monitorItem = new MonitorEntry
-                    {
-                        Datetime = HiResDateTime.UtcNow,
-                        Device = MonitorDevice.Telescope,
-                        Category = MonitorCategory.Interface,
-                        Type = MonitorType.Information,
-                        Method = MethodBase.GetCurrentMethod().Name,
-                        Thread = Thread.CurrentThread.ManagedThreadId,
-                        Message = $"{NmeaSentence}"
-                    };
-                    MonitorLog.LogToMonitor(monitorItem);
-
-                    IsGpsDialogOpen = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _retrieveGpsDialogCommand;
-        public ICommand RetrieveGpsDialogCommand
-        {
-            get
-            {
-                var command = _retrieveGpsDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _retrieveGpsDialogCommand = new RelayCommand(
-                    param => RetrieveGpsDialog()
-                );
-            }
-        }
-        private void RetrieveGpsDialog()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    if (!GpsGga && !GpsRmc) return;
-                    if (IsGpsRunning) return;
-                    IsGpsRunning = true;
-                    HasGSPData = false;
-                    var gpsHardware = new GpsHardware(GpsComPort, GpsBaudRate) { Gga = GpsGga, Rmc = GpsRmc };
-                    gpsHardware.GpsOn();
-                    var stopwatch = Stopwatch.StartNew();
-                    while (gpsHardware.GpsRunning && stopwatch.Elapsed.TotalSeconds < 30)
-                    {
-                        if (gpsHardware.HasData) break;
-                    }
-
-
-                    if (gpsHardware.HasData)
-                    {
-                        GpsLong = gpsHardware.Longitude;
-                        GpsLongString = _util.DegreesToDMS(GpsLong, "° ", ":", "", 2);
-                        GpsLat = gpsHardware.Latitude;
-                        GpsLatString = _util.DegreesToDMS(GpsLat, "° ", ":", "", 2);
-                        GpsElevation = gpsHardware.Altitude;
-                        NmeaTag = gpsHardware.NmEaTag;
-                        GpsPcTime = gpsHardware.PcUtcNow.ToLocalTime();
-                        GpsTime = gpsHardware.TimeStamp.ToLocalTime();
-                        GpsSpan = gpsHardware.TimeSpan;
-                        NmeaSentence = gpsHardware.NmEaSentence;
-                        HasGSPData = true;
-                        gpsHardware.GpsOff();
-                    }
-                    else
-                    {
-                        gpsHardware.GpsOff();
-                        OpenDialog($"{Application.Current.Resources["gpsNoData"]}{GpsComPort}{Environment.NewLine}{gpsHardware.NmEaSentence}");
-                    }
-
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-                IsGpsDialogOpen = false;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-            finally
-            {
-                IsGpsRunning = false;
-            }
-        }
-
-        private ICommand _cancelGpsDialogCommand;
-        public ICommand CancelGpsDialogCommand
-        {
-            get
-            {
-                var command = _cancelGpsDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _cancelGpsDialogCommand = new RelayCommand(
-                    param => CancelGpsDialog()
-                );
-            }
-        }
-        private void CancelGpsDialog()
-        {
-            try
-            {
-                IsGpsDialogOpen = false;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        #endregion
-
-        #region CdC Dialog
-        public double CdcLat { get; set; }
-        private string _cdcLatString;
-        public string CdcLatString
-        {
-            get => Math.Abs(CdcLat) <= 0 ? "0" : _cdcLatString;
-            set
-            {
-                if (value == _cdcLatString) return;
-                _cdcLatString = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public double CdcLong { get; set; }
-        private string _cdcLongString;
-        public string CdcLongString
-        {
-            get => Math.Abs(CdcLong) <= 0 ? "0" : _cdcLongString;
-            set
-            {
-                if (value == _cdcLongString) return;
-                _cdcLongString = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private double _cdcElevation;
-        public double CdcElevation
-        {
-            get => _cdcElevation;
-            set
-            {
-                if (Math.Abs(value - _cdcElevation) < 0.00001) return;
-                _cdcElevation = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private int _cdcPortNumber;
-        public int CdcPortNumber
-        {
-            get => Properties.SkyTelescope.Default.CdCport;
-            set
-            {
-                if (value == _cdcPortNumber) return;
-                _cdcPortNumber = value;
-                Properties.SkyTelescope.Default.CdCport = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private string _cdcIpAddress;
-        public string CdcIpAddress
-        {
-            get => Properties.SkyTelescope.Default.CdCip;
-            set
-            {
-                if (value == _cdcIpAddress) return;
-                _cdcIpAddress = value;
-                Properties.SkyTelescope.Default.CdCip = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private ICommand _populateCdc;
-        public ICommand PopulateCdcCommand
-        {
-            get
-            {
-                var cdc = _populateCdc;
-                if (cdc != null)
-                {
-                    return cdc;
-                }
-
-                return _populateCdc = new RelayCommand(
-                    param => PopulateCdc()
-                );
-            }
-        }
-        private void PopulateCdc()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    CdcElevation = SkySettings.Elevation;
-                    CdcLong = SkySettings.Longitude;
-                    CdcLongString = _util.DegreesToDMS(CdcLong, "° ", ":", "", 2);
-                    CdcLat = SkySettings.Latitude;
-                    CdcLatString = _util.DegreesToDMS(CdcLat, "° ", ":", "", 2);
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private bool _isCdcDialogOpen;
-        public bool IsCdcDialogOpen
-        {
-            get => _isCdcDialogOpen;
-            set
-            {
-                if (_isCdcDialogOpen == value) return;
-                _isCdcDialogOpen = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private object _cdcContent;
-        public object CdcContent
-        {
-            get => _cdcContent;
-            set
-            {
-                if (_cdcContent == value) return;
-                _cdcContent = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private ICommand _openCdcDialogCommand;
-        public ICommand OpenCdcDialogCommand
-        {
-            get
-            {
-                var command = _openCdcDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _openCdcDialogCommand = new RelayCommand(
-                    param => OpenCdcDialog()
-                );
-            }
-        }
-        private void OpenCdcDialog()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    CdcContent = new CdcDialog();
-                    PopulateCdc();
-                    IsCdcDialogOpen = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _acceptCdcDialogCommand;
-        public ICommand AcceptCdcDialogCommand
-        {
-            get
-            {
-                var command = _acceptCdcDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _acceptCdcDialogCommand = new RelayCommand(
-                    param => AcceptCdcDialog()
-                );
-            }
-        }
-        private void AcceptCdcDialog()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    SkySettings.Latitude = CdcLat;
-                    SkySettings.Longitude = CdcLong;
-                    SkySettings.Elevation = CdcElevation;
-                    IsCdcDialogOpen = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _retrieveCdcDialogCommand;
-        public ICommand RetrieveCdcDialogCommand
-        {
-            get
-            {
-                var command = _retrieveCdcDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _retrieveCdcDialogCommand = new RelayCommand(
-                    param => RetrieveCdcDialog()
-                );
-            }
-        }
-        private void RetrieveCdcDialog()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    var cdcServer = new CdcServer(CdcIpAddress, CdcPortNumber);
-                    var darray = cdcServer.GetObs();
-                    CdcLat = darray[0];
-                    CdcLatString = _util.DegreesToDMS(CdcLat, "° ", ":", "", 2);
-                    CdcLong = darray[1];
-                    CdcLongString = _util.DegreesToDMS(CdcLong, "° ", ":", "", 2);
-                    CdcElevation = darray[2];
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _sendObsCdcDialogCommand;
-        public ICommand SendObsCdcDialogCommand
-        {
-            get
-            {
-                var command = _sendObsCdcDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _sendObsCdcDialogCommand = new RelayCommand(
-                    param => SendObsCdcDialog()
-                );
-            }
-        }
-        private void SendObsCdcDialog()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    var cdcServer = new CdcServer(CdcIpAddress, CdcPortNumber);
-                    cdcServer.SetObs(SkySettings.Latitude, SkySettings.Longitude, SkySettings.Elevation);
-                    IsCdcDialogOpen = false;
-                    OpenDialog("Data sent: Open CdC and save the observatory location");
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _cancelCdcDialogCommand;
-        public ICommand CancelCdcDialogCommand
-        {
-            get
-            {
-                var command = _cancelCdcDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _cancelCdcDialogCommand = new RelayCommand(
-                    param => CancelCdcDialog()
-                );
-            }
-        }
-        private void CancelCdcDialog()
-        {
-            try
-            {
-                IsCdcDialogOpen = false;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -7035,7 +4336,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -7093,7 +4394,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -7133,9 +4434,2825 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
+
+        #region Dialog
+
+        private string _dialogMsg;
+        public string DialogMsg
+        {
+            get => _dialogMsg;
+            set
+            {
+                if (_dialogMsg == value) return;
+                _dialogMsg = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _dialogCaption;
+        public string DialogCaption
+        {
+            get => _dialogCaption;
+            set
+            {
+                if (_dialogCaption == value) return;
+                _dialogCaption = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isDialogOpen;
+        public bool IsDialogOpen
+        {
+            get => _isDialogOpen;
+            set
+            {
+                if (_isDialogOpen == value) return;
+                _isDialogOpen = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private object _dialogContent;
+        public object DialogContent
+        {
+            get => _dialogContent;
+            set
+            {
+                if (_dialogContent == value) return;
+                _dialogContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openDialogCommand;
+        public ICommand OpenDialogCommand
+        {
+            get
+            {
+                var command = _openDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openDialogCommand = new RelayCommand(
+                    param => OpenDialog(null)
+                );
+            }
+        }
+        private void OpenDialog(string msg, string caption = null)
+        {
+            if (IsDialogOpen)
+            {
+                OpenDialogWin(msg, caption);
+            }
+            else
+            {
+                if (msg != null) DialogMsg = msg;
+                DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
+                DialogContent = new DialogOK();
+                IsDialogOpen = true;
+            }
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Interface,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod().Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{msg}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+        }
+
+        private static void OpenDialogWin(string msg, string caption = null)
+        {
+            //Open as new window
+            var bWin = new MessageControlV(caption, msg) { Owner = Application.Current.MainWindow };
+            bWin.Show();
+        }
+
+        private ICommand _clickOkDialogCommand;
+        public ICommand ClickOkDialogCommand
+        {
+            get
+            {
+                var command = _clickOkDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickOkDialogCommand = new RelayCommand(
+                    param => ClickOkDialog()
+                );
+            }
+        }
+        private void ClickOkDialog()
+        {
+            IsDialogOpen = false;
+            LockOn = false;
+        }
+
+        private ICommand _clickCancelDialogCommand;
+        public ICommand ClickCancelDialogCommand
+        {
+            get
+            {
+                var command = _clickCancelDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickCancelDialogCommand = new RelayCommand(
+                    param => ClickCancelDialog()
+                );
+            }
+        }
+        private void ClickCancelDialog()
+        {
+            IsDialogOpen = false;
+        }
+
+        private ICommand _runMessageDialog;
+        public ICommand RunMessageDialogCommand
+        {
+            get
+            {
+                var dialog = _runMessageDialog;
+                if (dialog != null)
+                {
+                    return dialog;
+                }
+
+                return _runMessageDialog = new RelayCommand(
+                    param => ExecuteMessageDialog()
+                );
+            }
+        }
+        private async void ExecuteMessageDialog()
+        {
+            var view = new ErrorMessageDialog
+            {
+                DataContext = new ErrorMessageDialogVM()
+            };
+
+            //show the dialog
+            await DialogHost.Show(view, "RootDialog", ClosingMessageEventHandler);
+        }
+        private static void ClosingMessageEventHandler(object sender, DialogClosingEventArgs eventArgs)
+        {
+            Console.WriteLine(@"You can intercept the closing event, and cancel here.");
+        }
+
+        #endregion
+
+        #region Capabilities Dialog
+
+        public bool CanSetPark
+        {
+            get => SkySettings.CanSetPark;
+            set
+            {
+                if (value == SkySettings.CanSetPark) return;
+                SkySettings.CanSetPark = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openCapDialogCmd;
+        public ICommand OpenCapDialogCmd
+        {
+            get
+            {
+                var command = _openCapDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openCapDialogCmd = new RelayCommand(
+                    param => OpenCapDialog()
+                );
+            }
+        }
+        private void OpenCapDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    DialogContent = new CapabilitiesDialog();
+                    IsDialogOpen = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+
+        }
+
+        private ICommand _okCapDialogCmd;
+        public ICommand ClickOkCapDialogCmd
+        {
+            get
+            {
+                var command = _okCapDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _okCapDialogCmd = new RelayCommand(
+                    param => OkCapDialog()
+                );
+            }
+        }
+        private void OkCapDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
+
+        #region PPEC Dialog
+
+        private ICommand _openPPecDialogCommand;
+        public ICommand OpenPPecDialogCommand
+        {
+            get
+            {
+                var command = _openPPecDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openPPecDialogCommand = new RelayCommand(
+                    param => OpenPPecDialog()
+                );
+            }
+        }
+        private void OpenPPecDialog()
+        {
+            try
+            {
+                if (SkyServer.Tracking || SkyServer.PecTrainInProgress)
+                {
+                    DialogContent = new PpecDialog();
+                    IsDialogOpen = true;
+                }
+                else
+                {
+                    PecTrainOn = false;
+                    OpenDialog(Application.Current.Resources["ppTrackingOn"].ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+
+        }
+
+        private ICommand _acceptPPecDialogCommand;
+        public ICommand AcceptPPecDialogCommand
+        {
+            get
+            {
+                var command = _acceptPPecDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptPPecDialogCommand = new RelayCommand(
+                    param => AcceptPPecDialog()
+                );
+            }
+        }
+        private void AcceptPPecDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    SkyServer.PecTraining = !SkyServer.PecTraining;
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelPPecDialogCommand;
+        public ICommand CancelPPecDialogCommand
+        {
+            get
+            {
+                var command = _cancelPPecDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelPPecDialogCommand = new RelayCommand(
+                    param => CancelPPecDialog()
+                );
+            }
+        }
+        private void CancelPPecDialog()
+        {
+            try
+            {
+                PecTrainOn = !PecTrainOn;
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
+
+        #region ReSync Dialog
+
+        private ReSyncMode _syncMode;
+        public ReSyncMode SyncMode
+        {
+            get => _syncMode;
+            set
+            {
+                if (_syncMode == value) { return; }
+                _syncMode = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ParkPosition _reSyncParkSelection;
+        public ParkPosition ReSyncParkSelection
+        {
+            get => _reSyncParkSelection;
+            set
+            {
+                if (_reSyncParkSelection == value) { return; }
+
+                var found = ParkPositions.Find(x => x.Name == value.Name && Math.Abs(x.X - value.X) <= 0 && Math.Abs(x.Y - value.Y) <= 0);
+                if (found == null) // did not find match in list
+                {
+                    ParkPositions.Add(value);
+                    _reSyncParkSelection = value;
+                }
+                else
+                {
+                    _reSyncParkSelection = found;
+                }
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openReSyncDialogCmd;
+        public ICommand OpenReSyncDialogCmd
+        {
+            get
+            {
+                var command = _openReSyncDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openReSyncDialogCmd = new RelayCommand(
+                    param => OpenReSyncDialog()
+                );
+            }
+        }
+        private void OpenReSyncDialog()
+        {
+            try
+            {
+                if (SkyServer.Tracking || SkyServer.IsSlewing)
+                {
+                    OpenDialog(Application.Current.Resources["skyStopMount"].ToString());
+                    return;
+                }
+
+                SyncMode = ReSyncMode.Home;
+                ReSyncParkSelection = ParkSelection;
+                DialogContent = new ReSyncDialog();
+                IsDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+
+        }
+
+        private ICommand _acceptReSyncDialogCmd;
+        public ICommand AcceptReSyncDialogCmd
+        {
+            get
+            {
+                var command = _acceptReSyncDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptReSyncDialogCmd = new RelayCommand(
+                    param => AcceptReSyncDialog()
+                );
+            }
+        }
+        private void AcceptReSyncDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (!SkyServer.IsMountRunning){ return; }
+
+                    switch (SyncMode)
+                    {
+                        case ReSyncMode.Home:
+                            SkyServer.ReSyncAxes();
+                            break;
+                        case ReSyncMode.Park:
+                            if (ReSyncParkSelection != null)
+                            {
+                               SkyServer.ReSyncAxes(ReSyncParkSelection);
+                            }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    Synthesizer.Speak(Application.Current.Resources["vceSync"].ToString());
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelReSyncDialogCmd;
+        public ICommand CancelReSyncDialogCmd
+        {
+            get
+            {
+                var command = _cancelReSyncDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelReSyncDialogCmd = new RelayCommand(
+                    param => CancelReSyncDialog()
+                );
+            }
+        }
+        private void CancelReSyncDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
+
+        #region Park Delete Dialog
+
+        private ICommand _openParkDeleteDialogCommand;
+        public ICommand OpenParkDeleteDialogCommand
+        {
+            get
+            {
+                var command = _openParkDeleteDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openParkDeleteDialogCommand = new RelayCommand(
+                    param => OpenParkDeleteDialog()
+                );
+            }
+        }
+        private void OpenParkDeleteDialog()
+        {
+            try
+            {
+                DialogContent = new ParkDeleteDialog();
+                IsDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+
+        }
+
+        private ICommand _acceptParkDeleteDialogCommand;
+        public ICommand AcceptParkDeleteDialogCommand
+        {
+            get
+            {
+                var command = _acceptParkDeleteDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptParkDeleteDialogCommand = new RelayCommand(
+                    param => AcceptParkDeleteDialog()
+                );
+            }
+        }
+        private void AcceptParkDeleteDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (ParkSelectionSetting == null) return;
+                    //if (ParkPositions.Count == 1) return;
+                    ParkPositions.Remove(ParkSelectionSetting);
+                    SkySettings.ParkPositions = ParkPositions;
+                    ParkSelectionSetting = ParkPositions.FirstOrDefault();
+                    ParkSelection = ParkPositions.FirstOrDefault();
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelParkDeleteDialogCommand;
+        public ICommand CancelParkDeleteDialogCommand
+        {
+            get
+            {
+                var command = _cancelParkDeleteDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelParkDeleteDialogCommand = new RelayCommand(
+                    param => CancelParkDeleteDialog()
+                );
+            }
+        }
+        private void CancelParkDeleteDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
+
+        #region Park Add Dialog
+
+        private string _parkNewName;
+        public string ParkNewName
+        {
+            get => _parkNewName;
+            set
+            {
+                if (_parkNewName == value) return;
+                _parkNewName = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openParkAddDialogCommand;
+        public ICommand OpenParkAddDialogCommand
+        {
+            get
+            {
+                var command = _openParkAddDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openParkAddDialogCommand = new RelayCommand(
+                    param => OpenParkAddDialog()
+                );
+            }
+        }
+        private void OpenParkAddDialog()
+        {
+            try
+            {
+                ParkNewName = null;
+                DialogContent = new ParkAddDialog();
+                IsDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+
+        }
+
+        private ICommand _acceptParkAddDialogCommand;
+        public ICommand AcceptParkAddDialogCommand
+        {
+            get
+            {
+                var command = _acceptParkAddDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptParkAddDialogCommand = new RelayCommand(
+                    param => AcceptParkAddDialog()
+                );
+            }
+        }
+        private void AcceptParkAddDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (string.IsNullOrEmpty(ParkNewName)) return;
+                    var pp = new ParkPosition { Name = ParkNewName.Trim() };
+                    ParkPositions.Add(pp);
+                    SkySettings.ParkPositions = ParkPositions;
+                    ParkSelectionSetting = pp;
+                    ParkSelection = ParkPositions.FirstOrDefault();
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelParkAddDialogCommand;
+        public ICommand CancelParkAddDialogCommand
+        {
+            get
+            {
+                var command = _cancelParkAddDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelParkAddDialogCommand = new RelayCommand(
+                    param => CancelParkAddDialog()
+                );
+            }
+        }
+        private void CancelParkAddDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
+
+        #region Schedule Dialog
+
+        public async void ScheduleAction(Action action, DateTime ExecutionTime, CancellationToken token)
+        {
+            try
+            {
+                SchedulerBadgeContent = "On";
+                await Task.Delay((int)ExecutionTime.Subtract(DateTime.Now).TotalMilliseconds, token);
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Information,
+                    Method = "ScheduleAction",
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{action.Method}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                if (!SkyServer.AtPark)
+                {
+                    action();
+                }
+                ScheduleParkOn = false;
+                SchedulerBadgeContent = string.Empty;
+            }
+            catch (TaskCanceledException ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Information,
+                    Method = "ScheduleAction",
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Information,
+                    Method = "ScheduleAction",
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+
+            }
+
+        }
+
+        private bool ValidParkEvent()
+        {
+            var oktime = TimeSpan.TryParse(FutureParkTime, out var ftime);
+            if (!oktime)
+            {
+                OpenDialog($"{Application.Current.Resources["skyParkEvent1"]}", $"{Application.Current.Resources["exError"]}");
+                return false;
+            }
+            var okdate = DateTime.TryParse(FutureParkDate.ToString(), out var fdate);
+            if (!okdate)
+            {
+                OpenDialog($"{Application.Current.Resources["skyParkEvent2"]}", $"{Application.Current.Resources["exError"]}");
+                return false;
+            }
+            var fdatetime = fdate.Date + ftime;
+            if (fdatetime < DateTime.Now)
+            {
+                OpenDialog($"{Application.Current.Resources["skyParkEvent3"]}", $"{Application.Current.Resources["exError"]}");
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool _scheduleParkOn;
+        public bool ScheduleParkOn
+        {
+            get => _scheduleParkOn;
+            set
+            {
+                if (_scheduleParkOn == value) return;
+                if (value)
+                {
+                    if (!ValidParkEvent()) { return; }
+                    _ctsPark = new CancellationTokenSource();
+                    _ctPark = _ctsPark.Token;
+                    var oktime = TimeSpan.TryParse(FutureParkTime, out var ftime);
+                    var okdate = DateTime.TryParse(FutureParkDate.ToString(), out var fdate);
+                    if (okdate && oktime)
+                    {
+                        var fdatetime = fdate.Date + ftime;
+                        ScheduleAction(ClickPark, fdatetime, _ctPark);
+
+                        var monitorItem = new MonitorEntry
+                        {
+                            Datetime = HiResDateTime.UtcNow,
+                            Device = MonitorDevice.Telescope,
+                            Category = MonitorCategory.Interface,
+                            Type = MonitorType.Information,
+                            Method = MethodBase.GetCurrentMethod().Name,
+                            Thread = Thread.CurrentThread.ManagedThreadId,
+                            Message = $"Park:{fdatetime}"
+                        };
+                        MonitorLog.LogToMonitor(monitorItem);
+                    }
+                }
+                else
+                {
+                    if (_ctsPark != null)
+                    {
+                        if (!_ctsPark.IsCancellationRequested)
+                        {
+                            _ctsPark?.Cancel();
+                        }
+                        _ctsPark?.Dispose();
+                        SchedulerBadgeContent = string.Empty;
+                    }
+                }
+                _scheduleParkOn = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _futureParkTime;
+        public string FutureParkTime
+        {
+            get => _futureParkTime;
+            set
+            {
+                if (_futureParkTime == value) return;
+                ScheduleParkOn = false;
+                _futureParkTime = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private DateTime? _futureParkDate;
+        public DateTime? FutureParkDate
+        {
+            get => _futureParkDate;
+            set
+            {
+                if (_futureParkDate == value) return;
+                ScheduleParkOn = false;
+                _futureParkDate = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openSchedulerDialogCmd;
+        public ICommand OpenSchedulerDialogCmd
+        {
+            get
+            {
+                var cmd = _openSchedulerDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openSchedulerDialogCmd = new RelayCommand(
+                    param => OpenSchedulerDialog()
+                );
+            }
+        }
+        private void OpenSchedulerDialog()
+        {
+            try
+            {
+                DialogContent = new SchedulerDialog();
+                IsDialogOpen = true;
+                if (ScheduleParkOn) return;
+                FutureParkDate = DateTime.Now + TimeSpan.FromSeconds(60);
+                FutureParkTime = $"{DateTime.Now + TimeSpan.FromSeconds(60):HH:mm}";
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+
+        }
+
+        private ICommand _acceptSchedulerDialogCmd;
+        public ICommand AcceptSchedulerDialogCmd
+        {
+            get
+            {
+                var cmd = _acceptSchedulerDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _acceptSchedulerDialogCmd = new RelayCommand(
+                    param => AcceptSchedulerDialog()
+                );
+            }
+        }
+        private void AcceptSchedulerDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+
+            }
+            catch (Exception ex)
+            {
+                IsDialogOpen = false;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+        
+        #endregion
+
+        #region Flip Dialog
+
+        private ICommand _openFlipDialogCommand;
+        public ICommand OpenFlipDialogCommand
+        {
+            get
+            {
+                var command = _openFlipDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openFlipDialogCommand = new RelayCommand(
+                    param => OpenFlipDialog()
+                );
+            }
+        }
+        private void OpenFlipDialog()
+        {
+            try
+            {
+                DialogContent = new FlipDialog();
+                IsDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+
+        }
+
+        private ICommand _acceptFlipDialogCommand;
+        public ICommand AcceptFlipDialogCommand
+        {
+            get
+            {
+                var command = _acceptFlipDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptFlipDialogCommand = new RelayCommand(
+                    param => AcceptFlipDialog()
+                );
+            }
+        }
+        private void AcceptFlipDialog()
+        {
+            try
+            {
+                if (!SkyServer.IsMountRunning) return;
+                var sop = SkyServer.SideOfPier;
+                switch (sop)
+                {
+                    case PierSide.pierEast:
+                        SkyServer.SideOfPier = PierSide.pierWest;
+                        break;
+                    case PierSide.pierUnknown:
+                        OpenDialog($"PierSide: {PierSide.pierUnknown}");
+                        break;
+                    case PierSide.pierWest:
+                        SkyServer.SideOfPier = PierSide.pierEast;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                IsDialogOpen = false;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelFlipDialogCommand;
+        public ICommand CancelFlipDialogCommand
+        {
+            get
+            {
+                var command = _cancelFlipDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelFlipDialogCommand = new RelayCommand(
+                    param => CancelFlipDialog()
+                );
+            }
+        }
+        private void CancelFlipDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion  
+
+        #region Sync Dialog
+
+        private ICommand _openRaGoToSyncDialogCmd;
+        public ICommand OpenRaGoToSyncDialogCmd
+        {
+            get
+            {
+                var cmd = _openRaGoToSyncDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openRaGoToSyncDialogCmd = new RelayCommand(
+                    param => OpenRaGoToSyncDialog()
+                );
+            }
+        }
+        private void OpenRaGoToSyncDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    var AltAz = Coordinate.RaDec2AltAz(GoToRa, GoToDec, SkyServer.SiderealTime,
+                        SkySettings.Latitude);
+                    if (AltAz[0] < 0)
+                    {
+                        OpenDialog($"{Application.Current.Resources["goTargetBelow"]}: {AltAz[1]} Alt: {AltAz[0]}");
+                        return;
+                    }
+
+                    DialogContent = new RaGoToSyncDialog();
+                    IsDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _acceptRaGoToSyncDialogCmd;
+        public ICommand AcceptRaGoToSyncDialogCmd
+        {
+            get
+            {
+                var cmd = _acceptRaGoToSyncDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _acceptRaGoToSyncDialogCmd = new RelayCommand(
+                    param => AcceptRaGoToSyncDialog()
+                );
+            }
+        }
+        private void AcceptRaGoToSyncDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (!SkySettings.CanSlewAsync) return;
+                    if (SkyServer.IsSlewing)
+                    {
+                        OpenDialog($"{Application.Current.Resources["goSlewing"]}", $"{Application.Current.Resources["exError"]}");
+                        return;
+                    }
+                    if (AtPark)
+                    {
+                        BlinkParked();
+                        return;
+                    }
+
+                    var radec = Transforms.CoordTypeToInternal(GoToRa, GoToDec);
+                    var result = SkyServer.CheckRaDecSyncLimit(radec.X, radec.Y);
+
+                    if (!result)
+                    {
+                        OpenDialog($"{Application.Current.Resources["goOutLimits"]}", $"{Application.Current.Resources["exError"]}");
+                        return;
+                    }
+                    SkyServer.TargetDec = radec.Y;
+                    SkyServer.TargetRa = radec.X;
+                    SkyServer.SyncToTargetRaDec();
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelRaGoToSyncDialogCmd;
+        public ICommand CancelRaGoToSyncDialogCmd
+        {
+            get
+            {
+                var cmd = _cancelRaGoToSyncDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _cancelRaGoToSyncDialogCmd = new RelayCommand(
+                    param => CancelRaGoToSyncDialog()
+                );
+            }
+        }
+        private void CancelRaGoToSyncDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
+
+        #region GoTo Dialog
+
+        public double GoToDec => Principles.Units.Deg2Dou(DecDegrees, DecMinutes, DecSeconds);
+        public double GoToRa => Principles.Units.Ra2Dou(RaHours, RaMinutes, RaSeconds);
+        public string GoToDecString => _util.DegreesToDMS(GoToDec, "° ", "m ", "s", 3);
+        public string GoToRaString => _util.HoursToHMS(GoToRa, "h ", "m ", "s", 3);
+
+        private ICommand _openRaGoToDialogCommand;
+        public ICommand OpenRaGoToDialogCommand
+        {
+            get
+            {
+                var command = _openRaGoToDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openRaGoToDialogCommand = new RelayCommand(
+                    param => OpenRaGoToDialog()
+                );
+            }
+        }
+        private void OpenRaGoToDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    var AltAz = Coordinate.RaDec2AltAz(GoToRa, GoToDec, SkyServer.SiderealTime,
+                        SkySettings.Latitude);
+                    if (AltAz[0] < 0)
+                    {
+                        OpenDialog($"{Application.Current.Resources["goTargetBelow"]}: {AltAz[1]} Alt: {AltAz[0]}");
+                        return;
+                    }
+
+                    DialogContent = new RaGoToDialog();
+                    IsDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _acceptRaGoToDialogCommand;
+        public ICommand AcceptRaGoToDialogCommand
+        {
+            get
+            {
+                var command = _acceptRaGoToDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptRaGoToDialogCommand = new RelayCommand(
+                    param => AcceptRaGoToDialog()
+                );
+            }
+        }
+        private void AcceptRaGoToDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (!SkySettings.CanSlewAsync) return;
+                    if (AtPark)
+                    {
+                        BlinkParked();
+                        return;
+                    }
+
+                    var radec = Transforms.CoordTypeToInternal(GoToRa, GoToDec);
+                    SkyServer.SlewRaDec(radec.X, radec.Y);
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelRaGoToDialogCommand;
+        public ICommand CancelRaGoToDialogCommand
+        {
+            get
+            {
+                var command = _cancelRaGoToDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelRaGoToDialogCommand = new RelayCommand(
+                    param => CancelRaGoToDialog()
+                );
+            }
+        }
+        private void CancelRaGoToDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
+
+        #region Limit Dialog
+        private void SetParkLimitSelection(string name)
+        {
+            var found = ParkPositions.Find(x => x.Name == name);
+            if (found != null) // did not find match in list
+            {
+                ParkLimitSelection = found;
+            }
+            else
+            {
+                ParkLimitSelection = ParkPositions.FirstOrDefault();
+            }
+        }
+
+        private bool _limitTracking;
+        public bool LimitTracking
+        {
+            get => _limitTracking;
+            set
+            {
+                _limitTracking = value;
+                SkySettings.LimitTracking = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _limitPark;
+        public bool LimitPark
+        {
+            get => _limitPark;
+            set
+            {
+                _limitPark = value;
+                SkySettings.LimitPark = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ParkPosition _parkLimitSelection;
+        public ParkPosition ParkLimitSelection
+        {
+            get => _parkLimitSelection;
+            set
+            {
+                if (_parkLimitSelection == value) return;
+                _parkLimitSelection = value;
+                SkySettings.ParkLimitName = value.Name;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _limitNothing;
+        public bool LimitNothing
+        {
+            get => _limitNothing;
+            set
+            {
+                _limitNothing = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openLimitDialogCommand;
+        public ICommand OpenLimitDialogCommand
+        {
+            get
+            {
+                var command = _openLimitDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openLimitDialogCommand = new RelayCommand(
+                    param => OpenLimitDialog()
+                );
+            }
+        }
+        private void OpenLimitDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    LimitTracking = SkySettings.LimitTracking;
+                    LimitPark = SkySettings.LimitPark;
+                    SetParkLimitSelection(SkySettings.ParkLimitName);
+                    if (!LimitPark && !LimitTracking) { LimitNothing = true; }
+                    if (LimitPark || LimitTracking) { LimitNothing = false; }
+                    DialogContent = new LimitDialog();
+                    IsDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _okLimitDialogCommand;
+        public ICommand OkLimitDialogCommand
+        {
+            get
+            {
+                var command = _okLimitDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _okLimitDialogCommand = new RelayCommand(
+                    param => OkLimitDialog()
+                );
+            }
+        }
+        private void OkLimitDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
+
+        #region GPS Dialog
+
+        private bool _allowTimeChange;
+        public bool AllowTimeChange
+        {
+            get => _allowTimeChange;
+            set
+            {
+                if (_allowTimeChange == value) return;
+                _allowTimeChange = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _allowTimeVis;
+        public bool AllowTimeVis
+        {
+            get => _allowTimeVis;
+            set
+            {
+                if (_allowTimeVis == value) return;
+                _allowTimeVis = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _gpsGga;
+        public bool GpsGga
+        {
+            get => _gpsGga;
+            set
+            {
+                if (_gpsGga == value) return;
+                _gpsGga = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _gpsRmc;
+        public bool GpsRmc
+        {
+            get => _gpsRmc;
+            set
+            {
+                if (_gpsRmc == value) return;
+                _gpsRmc = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private DateTime _gpsPcTime;
+        public DateTime GpsPcTime
+        {
+            get => _gpsPcTime;
+            set
+            {
+                if (_gpsPcTime == value) return;
+                _gpsPcTime = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private DateTime _gpsTime;
+        public DateTime GpsTime
+        {
+            get => _gpsTime;
+            set
+            {
+                if (_gpsTime == value) return;
+                _gpsTime = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private TimeSpan _gpsSpan;
+        public TimeSpan GpsSpan
+        {
+            get => _gpsSpan;
+            set
+            {
+                if (_gpsSpan == value) return;
+                _gpsSpan = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _nmeaTag;
+        public string NmeaTag
+        {
+            get => _nmeaTag;
+            set
+            {
+                if (_nmeaTag == value) return;
+                _nmeaTag = value;
+                OnPropertyChanged();
+            }
+        }
+        private string NmeaSentence { get; set; }
+        private bool _hasGpsData;
+        public bool HasGSPData
+        {
+            get => _hasGpsData;
+            set
+            {
+                if (_hasGpsData == value) return;
+                _hasGpsData = value;
+                OnPropertyChanged();
+            }
+        }
+        public double GpsLat { get; set; }
+        private string _gpsLatString;
+        public string GpsLatString
+        {
+            get => _gpsLatString;
+            set
+            {
+                if (value == _gpsLatString) return;
+                _gpsLatString = value;
+                OnPropertyChanged();
+            }
+        }
+        public double GpsLong { get; set; }
+        private string _gpsLongString;
+        public string GpsLongString
+        {
+            get => _gpsLongString;
+            set
+            {
+                if (value == _gpsLongString) return;
+                _gpsLongString = value;
+                OnPropertyChanged();
+            }
+        }
+        private double _gpsElevation;
+        public double GpsElevation
+        {
+            get => _gpsElevation;
+            set
+            {
+                if (Math.Abs(value - _gpsElevation) < 0.00001) return;
+                _gpsElevation = value;
+                OnPropertyChanged();
+            }
+        }
+        public int GpsComPort
+        {
+            get => SkySettings.GpsComPort;
+            set
+            {
+                if (value == SkySettings.GpsComPort) return;
+                SkySettings.GpsComPort = value;
+                OnPropertyChanged();
+            }
+        }
+        public bool IsGpsRunning { get; set; }
+        public SerialSpeed GpsBaudRate
+        {
+            get => SkySettings.GpsBaudRate;
+            set
+            {
+                if (value == SkySettings.GpsBaudRate) return;
+                SkySettings.GpsBaudRate = value;
+                OnPropertyChanged();
+            }
+        }
+        private ICommand _populateGps;
+        public ICommand PopulateGpsCommand
+        {
+            get
+            {
+                var gps = _populateGps;
+                if (gps != null)
+                {
+                    return gps;
+                }
+
+                return _populateGps = new RelayCommand(
+                    param => PopulateGps()
+                );
+            }
+        }
+        private void PopulateGps()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    //var ra = _util.HoursToHMS(SkyServer.RightAscension, ":", ":", ":", 3);
+                    //var ras = ra.Split(':');
+                    //RaHours = Convert.ToDouble(ras[0]);
+                    //RaMinutes = Convert.ToDouble(ras[1]);
+                    //RaSeconds = Convert.ToDouble(ras[2]);
+
+                    //var dec = _util.HoursToHMS(SkyServer.Declination, ":", ":", ":", 3);
+                    //var decs = dec.Split(':');
+                    //DecDegrees = Convert.ToDouble(decs[0]);
+                    //DecMinutes = Convert.ToDouble(decs[1]);
+                    //DecSeconds = Convert.ToDouble(decs[2]);
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private object _gpsContent;
+        public object GpsContent
+        {
+            get => _gpsContent;
+            set
+            {
+                if (_gpsContent == value) return;
+                _gpsContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openGpsDialogCommand;
+        public ICommand OpenGpsDialogCommand
+        {
+            get
+            {
+                var command = _openGpsDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openGpsDialogCommand = new RelayCommand(
+                    param => OpenGpsDialog()
+                );
+            }
+        }
+        private void OpenGpsDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    HasGSPData = false;
+                    NmeaTag = "N/A";
+                    GpsLong = 0.0;
+                    GpsLongString = $"{GpsLong}";
+                    GpsLat = 0.0;
+                    GpsLatString = $"{GpsLat}";
+                    GpsElevation = 0.0;
+                    GpsSpan = new TimeSpan(0);
+                    GpsPcTime = new DateTime();
+                    GpsTime = new DateTime();
+                    GpsGga = true;
+                    GpsRmc = false;
+                    AllowTimeChange = false;
+                    AllowTimeVis = SystemInfo.IsAdministrator();
+
+                    DialogContent = new GpsDialog();
+                    IsDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _acceptGpsDialogCommand;
+        public ICommand AcceptGpsDialogCommand
+        {
+            get
+            {
+                var command = _acceptGpsDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptGpsDialogCommand = new RelayCommand(
+                    param => AcceptGpsDialog()
+                );
+            }
+        }
+        private void AcceptGpsDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (Math.Abs(GpsLat) > 0.0 && Math.Abs(GpsLong) > 0.0)
+                    {
+                        SkySettings.Latitude = GpsLat;
+                        SkySettings.Longitude = GpsLong;
+                        SkySettings.Elevation = GpsElevation;
+                    }
+
+                    if (AllowTimeChange && AllowTimeVis)
+                    {
+                        if (Math.Abs(GpsSpan.TotalSeconds) > 300)
+                        {
+                            OpenDialog(Application.Current.Resources["gpsTimeLimit"].ToString());
+                        }
+                        else
+                        {
+                            var msg = Time.SetSystemUTCTime(HiResDateTime.UtcNow.ToLocalTime().Add(GpsSpan));
+                            if (msg != string.Empty) OpenDialog($"{Application.Current.Resources["gpsTimeError"]}: {msg}");
+                        }
+                    }
+
+                    var monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Telescope,
+                        Category = MonitorCategory.Interface,
+                        Type = MonitorType.Information,
+                        Method = MethodBase.GetCurrentMethod().Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"{NmeaSentence}"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
+
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _retrieveGpsDialogCommand;
+        public ICommand RetrieveGpsDialogCommand
+        {
+            get
+            {
+                var command = _retrieveGpsDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _retrieveGpsDialogCommand = new RelayCommand(
+                    param => RetrieveGpsDialog()
+                );
+            }
+        }
+        private void RetrieveGpsDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (!GpsGga && !GpsRmc) return;
+                    if (IsGpsRunning) return;
+                    IsGpsRunning = true;
+                    HasGSPData = false;
+                    var gpsHardware = new GpsHardware(GpsComPort, GpsBaudRate) { Gga = GpsGga, Rmc = GpsRmc };
+                    gpsHardware.GpsOn();
+                    var stopwatch = Stopwatch.StartNew();
+                    while (gpsHardware.GpsRunning && stopwatch.Elapsed.TotalSeconds < 30)
+                    {
+                        if (gpsHardware.HasData) break;
+                    }
+
+
+                    if (gpsHardware.HasData)
+                    {
+                        GpsLong = gpsHardware.Longitude;
+                        GpsLongString = _util.DegreesToDMS(GpsLong, "° ", ":", "", 2);
+                        GpsLat = gpsHardware.Latitude;
+                        GpsLatString = _util.DegreesToDMS(GpsLat, "° ", ":", "", 2);
+                        GpsElevation = gpsHardware.Altitude;
+                        NmeaTag = gpsHardware.NmEaTag;
+                        GpsPcTime = gpsHardware.PcUtcNow.ToLocalTime();
+                        GpsTime = gpsHardware.TimeStamp.ToLocalTime();
+                        GpsSpan = gpsHardware.TimeSpan;
+                        NmeaSentence = gpsHardware.NmEaSentence;
+                        HasGSPData = true;
+                        gpsHardware.GpsOff();
+                    }
+                    else
+                    {
+                        gpsHardware.GpsOff();
+                        OpenDialog($"{Application.Current.Resources["gpsNoData"]}{GpsComPort}{Environment.NewLine}{gpsHardware.NmEaSentence}");
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                IsDialogOpen = false;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+            finally
+            {
+                IsGpsRunning = false;
+            }
+        }
+
+        private ICommand _cancelGpsDialogCommand;
+        public ICommand CancelGpsDialogCommand
+        {
+            get
+            {
+                var command = _cancelGpsDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelGpsDialogCommand = new RelayCommand(
+                    param => CancelGpsDialog()
+                );
+            }
+        }
+        private void CancelGpsDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
+
+        #region CdC Dialog
+        public double CdcLat { get; set; }
+        private string _cdcLatString;
+        public string CdcLatString
+        {
+            get => Math.Abs(CdcLat) <= 0 ? "0" : _cdcLatString;
+            set
+            {
+                if (value == _cdcLatString) return;
+                _cdcLatString = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double CdcLong { get; set; }
+        private string _cdcLongString;
+        public string CdcLongString
+        {
+            get => Math.Abs(CdcLong) <= 0 ? "0" : _cdcLongString;
+            set
+            {
+                if (value == _cdcLongString) return;
+                _cdcLongString = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _cdcElevation;
+        public double CdcElevation
+        {
+            get => _cdcElevation;
+            set
+            {
+                if (Math.Abs(value - _cdcElevation) < 0.00001) return;
+                _cdcElevation = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _cdcPortNumber;
+        public int CdcPortNumber
+        {
+            get => Properties.SkyTelescope.Default.CdCport;
+            set
+            {
+                if (value == _cdcPortNumber) return;
+                _cdcPortNumber = value;
+                Properties.SkyTelescope.Default.CdCport = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _cdcIpAddress;
+        public string CdcIpAddress
+        {
+            get => Properties.SkyTelescope.Default.CdCip;
+            set
+            {
+                if (value == _cdcIpAddress) return;
+                _cdcIpAddress = value;
+                Properties.SkyTelescope.Default.CdCip = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _populateCdc;
+        public ICommand PopulateCdcCommand
+        {
+            get
+            {
+                var cdc = _populateCdc;
+                if (cdc != null)
+                {
+                    return cdc;
+                }
+
+                return _populateCdc = new RelayCommand(
+                    param => PopulateCdc()
+                );
+            }
+        }
+        private void PopulateCdc()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    CdcElevation = SkySettings.Elevation;
+                    CdcLong = SkySettings.Longitude;
+                    CdcLongString = _util.DegreesToDMS(CdcLong, "° ", ":", "", 2);
+                    CdcLat = SkySettings.Latitude;
+                    CdcLatString = _util.DegreesToDMS(CdcLat, "° ", ":", "", 2);
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _openCdcDialogCommand;
+        public ICommand OpenCdcDialogCommand
+        {
+            get
+            {
+                var command = _openCdcDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openCdcDialogCommand = new RelayCommand(
+                    param => OpenCdcDialog()
+                );
+            }
+        }
+        private void OpenCdcDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    DialogContent = new CdcDialog();
+                    PopulateCdc();
+                    IsDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _acceptCdcDialogCommand;
+        public ICommand AcceptCdcDialogCommand
+        {
+            get
+            {
+                var command = _acceptCdcDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptCdcDialogCommand = new RelayCommand(
+                    param => AcceptCdcDialog()
+                );
+            }
+        }
+        private void AcceptCdcDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    SkySettings.Latitude = CdcLat;
+                    SkySettings.Longitude = CdcLong;
+                    SkySettings.Elevation = CdcElevation;
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _retrieveCdcDialogCommand;
+        public ICommand RetrieveCdcDialogCommand
+        {
+            get
+            {
+                var command = _retrieveCdcDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _retrieveCdcDialogCommand = new RelayCommand(
+                    param => RetrieveCdcDialog()
+                );
+            }
+        }
+        private void RetrieveCdcDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    var cdcServer = new CdcServer(CdcIpAddress, CdcPortNumber);
+                    var darray = cdcServer.GetObs();
+                    CdcLat = darray[0];
+                    CdcLatString = _util.DegreesToDMS(CdcLat, "° ", ":", "", 2);
+                    CdcLong = darray[1];
+                    CdcLongString = _util.DegreesToDMS(CdcLong, "° ", ":", "", 2);
+                    CdcElevation = darray[2];
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _sendObsCdcDialogCommand;
+        public ICommand SendObsCdcDialogCommand
+        {
+            get
+            {
+                var command = _sendObsCdcDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _sendObsCdcDialogCommand = new RelayCommand(
+                    param => SendObsCdcDialog()
+                );
+            }
+        }
+        private void SendObsCdcDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    var cdcServer = new CdcServer(CdcIpAddress, CdcPortNumber);
+                    cdcServer.SetObs(SkySettings.Latitude, SkySettings.Longitude, SkySettings.Elevation);
+                    IsDialogOpen = false;
+                    OpenDialog("Data sent: Open CdC and save the observatory location");
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelCdcDialogCommand;
+        public ICommand CancelCdcDialogCommand
+        {
+            get
+            {
+                var command = _cancelCdcDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelCdcDialogCommand = new RelayCommand(
+                    param => CancelCdcDialog()
+                );
+            }
+        }
+        private void CancelCdcDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
+
+        #region Gearing Dialog
+        public IList<int> CustomMountOffset { get; }
+
+        private bool _customGearing;
+        public bool CustomGearing
+        {
+            get => _customGearing;
+            set
+            {
+                if (_customGearing == value) { return; }
+                _customGearing = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _customDec360Steps;
+        public int CustomDec360Steps
+        {
+            get => _customDec360Steps;
+            set
+            {
+                if (_customDec360Steps == value) {return;}
+                _customDec360Steps = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _customDecTrackingOffset;
+        public int CustomDecTrackingOffset
+        {
+            get => _customDecTrackingOffset;
+            set
+            {
+                if (_customDecTrackingOffset == value)
+                {
+                    return;
+                }
+
+                _customDecTrackingOffset = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _customDecWormTeet;
+        public int CustomDecWormTeeth
+        {
+            get => _customDecWormTeet;
+            set
+            {
+                if (_customDecWormTeet == value) {return;}
+                _customDecWormTeet = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _customRa360Steps;
+        public int CustomRa360Steps
+        {
+            get => _customRa360Steps;
+            set
+            {
+                if (_customRa360Steps == value) { return; }
+                _customRa360Steps = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _customRaTrackingOffset;
+        public int CustomRaTrackingOffset
+        {
+            get => _customRaTrackingOffset;
+            set
+            {
+                if (_customRaTrackingOffset == value)
+                {
+                    return;
+                }
+
+                _customRaTrackingOffset = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _customRaWormTeeth;
+        public int CustomRaWormTeeth
+        {
+            get => _customRaWormTeeth;
+            set
+            {
+                if (_customRaWormTeeth == value) { return; }
+                _customRaWormTeeth = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openGearDialogCommand;
+        public ICommand OpenGearDialogCommand
+        {
+            get
+            {
+                var command = _openGearDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openGearDialogCommand = new RelayCommand(
+                    param => OpenGearDialog()
+                );
+            }
+        }
+        private void OpenGearDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    DialogContent = new CustomGearingDialog();
+                    CustomDec360Steps = SkySettings.CustomDec360Steps;
+                    CustomDecWormTeeth = SkySettings.CustomDecWormTeeth;
+                    CustomDecTrackingOffset = SkySettings.CustomDecTrackingOffset;
+                    CustomRa360Steps = SkySettings.CustomRa360Steps;
+                    CustomRaWormTeeth= SkySettings.CustomRaWormTeeth;
+                    CustomRaTrackingOffset = SkySettings.CustomRaTrackingOffset;
+                    CustomGearing = SkySettings.CustomGearing;
+                    IsDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _acceptGearDialogCommand;
+        public ICommand AcceptGearDialogCommand
+        {
+            get
+            {
+                var command = _acceptGearDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptGearDialogCommand = new RelayCommand(
+                    param => AcceptGearDialog()
+                );
+            }
+        }
+        private void AcceptGearDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    SkySettings.CustomDec360Steps = CustomDec360Steps;
+                    SkySettings.CustomDecWormTeeth = CustomDecWormTeeth;
+                    SkySettings.CustomDecTrackingOffset = CustomDecTrackingOffset;
+                    SkySettings.CustomRa360Steps = CustomRa360Steps;
+                    SkySettings.CustomRaWormTeeth = CustomRaWormTeeth;
+                    SkySettings.CustomRaTrackingOffset = CustomRaTrackingOffset;
+                    SkySettings.CustomGearing = CustomGearing;
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelGearDialogCommand;
+        public ICommand CancelGearDialogCommand
+        {
+            get
+            {
+                var command = _cancelGearDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelGearDialogCommand = new RelayCommand(
+                    param => CancelGearDialog()
+                );
+            }
+        }
+        private void CancelGearDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
@@ -7178,7 +7295,7 @@ namespace GS.Server.SkyTelescope
                 _autoHomeProgressBar = value;
                 if (value > 99)
                 {
-                    IsAutoHomeDialogOpen = false;
+                    IsDialogOpen = false;
                     SkyServer.AutoHomeProgressBar = 0;
                 }
                 OnPropertyChanged();
@@ -7212,31 +7329,6 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private bool _isAutoHomeDialogOpen;
-        public bool IsAutoHomeDialogOpen
-        {
-            get => _isAutoHomeDialogOpen;
-            set
-            {
-                if (_isAutoHomeDialogOpen == value) return;
-                _isAutoHomeDialogOpen = value;
-                CloseDialogs(value);
-                OnPropertyChanged();
-            }
-        }
-
-        private object _autoHomeContent;
-        public object AutoHomeContent
-        {
-            get => _autoHomeContent;
-            set
-            {
-                if (_autoHomeContent == value) return;
-                _autoHomeContent = value;
-                OnPropertyChanged();
-            }
-        }
-
         private ICommand _openAutoHomeDialogCommand;
         public ICommand OpenAutoHomeDialogCommand
         {
@@ -7264,11 +7356,11 @@ namespace GS.Server.SkyTelescope
                         OpenDialog($"{Application.Current.Resources["1021NoHomeSensor"]}");
                         return;
                     }
-                    AutoHomeContent = new AutoHomeDialog();
+                    DialogContent = new AutoHomeDialog();
                     StartEnabled = true;
                     SkyServer.AutoHomeProgressBar = 0;
                     AutoHomeLimit = 100;
-                    IsAutoHomeDialogOpen = true;
+                    IsDialogOpen = true;
                 }
             }
             catch (Exception ex)
@@ -7281,7 +7373,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -7329,7 +7421,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -7376,7 +7468,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -7409,7 +7501,7 @@ namespace GS.Server.SkyTelescope
                 {
                     // cancel auto home
                     SkyServer.AutoHomeStop = true;
-                    IsAutoHomeDialogOpen = false;
+                    IsDialogOpen = false;
 
                 }
             }
@@ -7423,7 +7515,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -7434,15 +7526,155 @@ namespace GS.Server.SkyTelescope
 
         #endregion
 
+        #region Mount Info Dialog
+        
+        public string MountName { get; private set; }
+        public string MountVersion { get; private set; }
+        public string RaSteps { get; private set; }
+        public string DecSteps { get; private set; }
+        public string RaWormSteps{ get; private set; }
+        public string DecWormSteps { get; private set; }
+        public string RaFreq { get; private set; }
+        public string DecFreq{ get; private set; }
+        public string RaCustomOffset { get; private set; }
+        public string DecCustomOffset { get; private set; }
+        public string CanPec { get; private set; }
+        public string CanHome { get; private set; }
+        public string RaArcSec { get; private set; }
+        public string DecArcSec { get; private set; }
+
+        private static string SupportedBol(bool supported)
+        {
+            return supported ? $"{Application.Current.Resources["mntSupported"]}" : $"{Application.Current.Resources["mntNotSupported"]}";
+        }
+
+        private ICommand _openMountInfoDialogCmd;
+        public ICommand OpenMountInfoDialogCmd
+        {
+            get
+            {
+                var command = _openMountInfoDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openMountInfoDialogCmd = new RelayCommand(
+                    param => OpenMountInfoDialog()
+                );
+            }
+        }
+        private void OpenMountInfoDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    DialogContent = new MountInfoDialog();
+                    MountName = SkyServer.MountName;
+                    MountVersion = SkyServer.MountVersion;
+                    RaSteps = SkyServer.StepsPerRevolution[0].ToString();
+                    DecSteps = SkyServer.StepsPerRevolution[1].ToString();
+                    RaWormSteps = SkyServer.StepsWormPerRevolution[0].ToString(CultureInfo.InvariantCulture);
+                    DecWormSteps = SkyServer.StepsWormPerRevolution[1].ToString(CultureInfo.InvariantCulture);
+                    RaFreq = SkyServer.StepsTimeFreq[0].ToString(CultureInfo.InvariantCulture);
+                    DecFreq = SkyServer.StepsTimeFreq[1].ToString(CultureInfo.InvariantCulture);
+                    RaCustomOffset = SkyServer.TrackingOffsetRaRate.ToString(CultureInfo.InvariantCulture);
+                    DecCustomOffset = SkyServer.TrackingOffsetDecRate.ToString(CultureInfo.InvariantCulture);
+                    CanPec = SupportedBol(SkyServer.CanPPec);
+                    CanHome = SupportedBol(SkyServer.CanHomeSensor);
+                    RaArcSec = Math.Round(SkyServer.StepsPerRevolution[0] / 360.0 / 3600, 2).ToString(CultureInfo.InvariantCulture);
+                    DecArcSec = Math.Round(SkyServer.StepsPerRevolution[1] / 360.0 / 3600, 2).ToString(CultureInfo.InvariantCulture);
+                    
+                    OnPropertyChanged($"MountName");
+                    OnPropertyChanged($"MountVersion");
+                    OnPropertyChanged($"RaSteps");
+                    OnPropertyChanged($"DecSteps");
+                    OnPropertyChanged($"RaWormSteps");
+                    OnPropertyChanged($"DecWormSteps");
+                    OnPropertyChanged($"RaFreq");
+                    OnPropertyChanged($"DecFreq");
+                    OnPropertyChanged($"RaCustomOffset");
+                    OnPropertyChanged($"DecCustomOffset");
+                    OnPropertyChanged($"CanPec");
+                    OnPropertyChanged($"CanHome");
+                    OnPropertyChanged($"RaArcSec");
+                    OnPropertyChanged($"DecArcSec");
+
+                    IsDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _okMountInfoDialogCmd;
+        public ICommand OkMountInfoDialogCmd
+        {
+            get
+            {
+                var command = _okMountInfoDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _okMountInfoDialogCmd = new RelayCommand(
+                    param => OkMountInfoDialog()
+                );
+            }
+        }
+        private void OkMountInfoDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+        
+        #endregion
+
         #region Dispose
         public void Dispose()
         {
             Dispose(true);
             _ctsPark?.Cancel();
             _ctsPark?.Dispose();
-            //_ctsSpiral?.Cancel();
-            //_ctsSpiral?.Dispose();
-            // GC.SuppressFinalize(this);
+            _GlobalHook?.Dispose();
         }
         // NOTE: Leave out the finalizer altogether if this class doesn't
         // own unmanaged resources itself, but leave the other methods

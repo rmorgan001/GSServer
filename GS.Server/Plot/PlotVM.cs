@@ -29,6 +29,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using GS.Server.Controls.Dialogs;
 using GS.Server.SkyTelescope;
+using GS.Server.Windows;
 using GS.Shared.Command;
 using LiveCharts;
 using LiveCharts.Configurations;
@@ -58,7 +59,7 @@ namespace GS.Server.Plot
         public PlotVM()
         {
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading PlotVM" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Loading PlotVM" };
             MonitorLog.LogToMonitor(monitorItem);
 
             // setup property events to monitor
@@ -95,7 +96,7 @@ namespace GS.Server.Plot
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -120,7 +121,7 @@ namespace GS.Server.Plot
         {
             var date = entry.Datetime.ToLocalTime();
             var point = new PointModel {DateTime = date, Value = 0, Set = ChartValueSet.Values1};
-            var msg = entry.Message.Split(',');
+            var msg = entry.Message.Split('|');
             double.TryParse(msg[2], out var steps);
 
             if (IsZeroBased)
@@ -161,7 +162,7 @@ namespace GS.Server.Plot
         {
             var date = entry.Datetime.ToLocalTime();
             var point = new PointModel { DateTime = date, Value = 0, Set = ChartValueSet.Values2};
-            var msg = entry.Message.Split(',');
+            var msg = entry.Message.Split('|');
             double.TryParse(msg[2], out var steps);
 
             if (IsZeroBased)
@@ -878,7 +879,7 @@ namespace GS.Server.Plot
             {
 
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}, {ex.StackTrace}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -912,7 +913,7 @@ namespace GS.Server.Plot
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}, {ex.StackTrace}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -943,7 +944,7 @@ namespace GS.Server.Plot
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -984,7 +985,7 @@ namespace GS.Server.Plot
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -1015,7 +1016,7 @@ namespace GS.Server.Plot
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -1070,7 +1071,7 @@ namespace GS.Server.Plot
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -1102,28 +1103,28 @@ namespace GS.Server.Plot
         {
             if (!IsLogging) return;
             if (series == null) return;
-            var str = $"{set},{series.Title},{series.Stroke},{series.StrokeThickness},{series.Fill},{series.MinWidth},{series.ScalesYAt},{series.MaxColumnWidth},";
+            var str = $"{set}|{series.Title}|{series.Stroke}|{series.StrokeThickness}|{series.Fill}|{series.MinWidth}|{series.ScalesYAt}|{series.MaxColumnWidth},";
             if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(BaseLogName, ChartType.Plot, "GColumnSeries", str);
         }
         private void LogGLineSeries(LineSeries series, ChartValueSet set)
         {
             if (!IsLogging) return;
             if (series == null) return;
-            var str = $"{set},{series.Title},{series.Stroke},{series.StrokeThickness},{series.Fill},{series.MinWidth},{series.ScalesYAt},{series.PointGeometrySize},{series.LineSmoothness}";
+            var str = $"{set}|{series.Title}|{series.Stroke}|{series.StrokeThickness}|{series.Fill}|{series.MinWidth}|{series.ScalesYAt}|{series.PointGeometrySize}|{series.LineSmoothness}";
             if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(BaseLogName, ChartType.Plot, "GLineSeries", str);
         }
         private void LogGStepLineSeries(GStepLineSeries series, ChartValueSet set)
         {
             if (!IsLogging) return;
             if (series == null) return;
-            var str = $"{set},{series.Title},{series.Stroke},{series.StrokeThickness},{series.Fill},{series.MinWidth},{series.ScalesYAt},{series.PointGeometrySize}";
+            var str = $"{set}|{series.Title}|{series.Stroke}|{series.StrokeThickness}|{series.Fill}|{series.MinWidth}|{series.ScalesYAt}|{series.PointGeometrySize}";
             if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(BaseLogName, ChartType.Plot, "GStepLineSeries", str);
         }
         private void LogGScatterSeries(Series series, ChartValueSet set)
         {
             if (!IsLogging) return;
             if (series == null) return;
-            var str = $"{set},{series.Title},{series.Stroke},{series.StrokeThickness},{series.Fill},{series.MinWidth},{series.ScalesYAt}";
+            var str = $"{set}|{series.Title}|{series.Stroke}|{series.StrokeThickness}|{series.Fill}|{series.MinWidth}|{series.ScalesYAt}";
             if (!string.IsNullOrEmpty(str)) ChartLogging.LogSeries(BaseLogName, ChartType.Plot, "GScatterSeries", str);
         }
 
@@ -1197,10 +1198,17 @@ namespace GS.Server.Plot
         }
         private void OpenDialog(string msg, string caption = null)
         {
-            if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
-            DialogContent = new DialogOK();
-            IsDialogOpen = true;
+            if (IsDialogOpen)
+            {
+                OpenDialogWin(msg, caption);
+            }
+            else
+            {
+                if (msg != null) DialogMsg = msg;
+                DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
+                DialogContent = new DialogOK();
+                IsDialogOpen = true;
+            }
 
             var monitorItem = new MonitorEntry
             {
@@ -1213,7 +1221,13 @@ namespace GS.Server.Plot
                 Message = $"{msg}"
             };
             MonitorLog.LogToMonitor(monitorItem);
+        }
 
+        private void OpenDialogWin(string msg, string caption = null)
+        {
+            //Open as new window
+            var bWin = new MessageControlV(caption, msg) { Owner = Application.Current.MainWindow };
+            bWin.Show();
         }
 
         private ICommand _clickOkDialogCommand;

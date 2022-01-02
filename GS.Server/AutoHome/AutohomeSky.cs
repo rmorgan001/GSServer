@@ -156,7 +156,7 @@ namespace GS.Server.AutoHome
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{reset.Successful},{axis}"
+                Message = $"{reset.Successful}|{axis}"
             };
             MonitorLog.LogToMonitor(monitorItem);
         }
@@ -407,7 +407,7 @@ namespace GS.Server.AutoHome
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{positions[0]},{positions[1]},{degrees},{axis},{direction}"
+                Message = $"{positions[0]}|{positions[1]}|{degrees}|{axis}|{direction}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 

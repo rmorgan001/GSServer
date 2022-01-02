@@ -143,7 +143,7 @@ namespace GS.Server.AutoHome
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod().Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{reset.Successful},{axis}"
+                Message = $"{reset.Successful}|{axis}"
             };
             MonitorLog.LogToMonitor(monitorItem);
         }

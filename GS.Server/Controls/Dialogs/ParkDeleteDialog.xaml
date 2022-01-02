@@ -9,8 +9,8 @@
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
             <TextBlock HorizontalAlignment="Center" Text="{Binding Path=ParkSelectionSetting.Name, StringFormat='&quot; {0} &quot;'}" />
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5">
-            <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaAccept}" Command="{Binding AcceptParkDeleteDialogCommand}"/>
-            <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaCancel}" Command="{Binding CancelParkDeleteDialogCommand}"/>
+                <Button IsDefault="False"  Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaAccept}" Command="{Binding AcceptParkDeleteDialogCommand}"/>
+                <Button IsCancel="True" IsDefault="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaCancel}" Command="{Binding CancelParkDeleteDialogCommand}"/>
             </StackPanel>
         </StackPanel>
     </GroupBox>

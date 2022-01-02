@@ -99,7 +99,7 @@ namespace GS.Shared
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $" {ex.Message}"
+                    Message = $"{ex.Message}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 IsRunning = false;
@@ -137,7 +137,7 @@ namespace GS.Shared
                 using (var stream = new FileStream(filePath, append ? FileMode.Append : FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
                 using (var sw = new StreamWriter(stream))
                 {
-                    var str = $"{(int)logItem.ChartType},{(int)logItem.LogCode},{logItem.Message}";
+                    var str = $"{(int)logItem.ChartType}|{(int)logItem.LogCode}|{logItem.Message}";
                     await sw.WriteLineAsync(str);
                 }
             }
@@ -164,7 +164,7 @@ namespace GS.Shared
         public static void LogStart(string basename, ChartType type)
         {
             if (!IsRunning) return;
-            var str = $"{HiResDateTime.UtcNow.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{ChartLogCode.Start},{type}";
+            var str = $"{HiResDateTime.UtcNow.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{ChartLogCode.Start}|{type}";
             var chartsLogItem = new ChartLogItem { LogBaseName = basename, ChartType = type , LogCode = ChartLogCode.Start, Message = str };
             AddEntry(chartsLogItem);
         }
@@ -172,7 +172,7 @@ namespace GS.Shared
         //public static void LogInfo(string basename, ChartType type, string value)
         //{
         //    if (!IsRunning) return;
-        //    var str = $"{HiResDateTime.UtcNow.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{value}";
+        //    var str = $"{HiResDateTime.UtcNow.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{value}";
         //    var chartsLogItem = new ChartLogItem { LogBaseName = basename, ChartType = type, LogCode = ChartLogCode.Info, Message = str };
         //    AddEntry(chartsLogItem);
         //}
@@ -180,7 +180,7 @@ namespace GS.Shared
         public static void LogData(string basename, ChartType type, string key, string value)
         {
             if (!IsRunning) return;
-            var str = $"{HiResDateTime.UtcNow.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{key},{value}";
+            var str = $"{HiResDateTime.UtcNow.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{key}|{value}";
             var chartsLogItem = new ChartLogItem { LogBaseName = basename, ChartType = type, LogCode = ChartLogCode.Data, Message = str };
             AddEntry(chartsLogItem);
         }
@@ -188,7 +188,7 @@ namespace GS.Shared
         public static void LogPoint(string basename, ChartType type, PointModel point)
         {
             if (!IsRunning) return;
-            var str = $"{point.DateTime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{point.Value},{point.Set}";
+            var str = $"{point.DateTime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{point.Value}|{point.Set}";
             var chartsLogItem = new ChartLogItem { LogBaseName = basename, ChartType = type, LogCode = ChartLogCode.Point, Message = str };
             AddEntry(chartsLogItem);
         }
@@ -196,7 +196,7 @@ namespace GS.Shared
         public static void LogSeries(string basename, ChartType type, string series, string message)
         {
             if (!IsRunning) return;
-            var str = $"{HiResDateTime.UtcNow.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff},{series},{message}";
+            var str = $"{HiResDateTime.UtcNow.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{series}|{message}";
             var chartsLogItem = new ChartLogItem { LogBaseName = basename, ChartType = type, LogCode = ChartLogCode.Series, Message = str };
             AddEntry(chartsLogItem);
         }

@@ -8,8 +8,8 @@
         <StackPanel Orientation="Vertical">
             <TextBlock VerticalAlignment="Center" Margin="5" xml:space="preserve" Text="{StaticResource titleCloseApps}"/>
             <StackPanel Orientation="Horizontal" Margin="5" HorizontalAlignment="Center">
-                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptCloseDialogCommand}" Content="{StaticResource diaAccept}"/>
-                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelCloseDialogCommand}" Content="{StaticResource diaCancel}"/>
+                <Button IsDefault="False" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptCloseDialogCommand}" Content="{StaticResource diaAccept}"/>
+                <Button IsCancel="True" IsDefault="True"  Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelCloseDialogCommand}" Content="{StaticResource diaCancel}"/>
             </StackPanel>
         </StackPanel>
     </GroupBox>

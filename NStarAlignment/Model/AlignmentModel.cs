@@ -336,7 +336,7 @@ namespace NStarAlignment.Model
             if (allowDuplicates || !_exceptionMessages.Contains(ex.Message))
             {
                 _exceptionMessages.Add(ex.Message);
-                string message = $"{ex.Message}, {ex.StackTrace}";
+                string message = $"{ex.Message}|{ex.StackTrace}";
                 RaiseNotification(NotificationType.Error, MethodBase.GetCurrentMethod().Name, message);
             }
         }

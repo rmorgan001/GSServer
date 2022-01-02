@@ -35,6 +35,7 @@ using System.Windows;
 using System.Windows.Input;
 using GS.Principles;
 using GS.Server.Controls.Dialogs;
+using GS.Server.Windows;
 using GS.Shared.Command;
 
 namespace GS.Server.Settings
@@ -214,7 +215,7 @@ namespace GS.Server.Settings
                         switch (e.PropertyName)
                         {
                             case "UTCDateOffset":
-                                OnPropertyChanged($"UTCDateOffset");
+                                OnPropertyChanged("UTCDateOffset");
                                 OnPropertyChanged($"UTCTime");
                                 break;
                             case "SleepMode":
@@ -629,500 +630,9 @@ namespace GS.Server.Settings
 
         #endregion
 
-        #region Reset Settings
+        #region Utilities
 
-        private bool _skyTelescopeSettings;
-
-        public bool SkyTelescopeSettings
-        {
-            get => _skyTelescopeSettings;
-            set
-            {
-                _skyTelescopeSettings = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _serverSettings;
-
-        public bool ServerSettings
-        {
-            get => _serverSettings;
-            set
-            {
-                _serverSettings = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _gamePadSettings;
-
-        public bool GamePadSettings
-        {
-            get => _gamePadSettings;
-            set
-            {
-                _gamePadSettings = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _monitorSettings;
-
-        public bool MonitorSettings
-        {
-            get => _monitorSettings;
-            set
-            {
-                _monitorSettings = value;
-                OnPropertyChanged();
-            }
-
-        }
-
-        private void ClearSettings()
-        {
-            SkyTelescopeSettings = false;
-            ServerSettings = false;
-            GamePadSettings = false;
-            MonitorSettings = false;
-        }
-
-        private bool _isSettingsResetDialogOpen;
-
-        public bool IsSettingsResetDialogOpen
-        {
-            get => _isSettingsResetDialogOpen;
-            set
-            {
-                if (_isSettingsResetDialogOpen == value) return;
-                _isSettingsResetDialogOpen = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private object _settingsResetContent;
-
-        public object SettingsResetContent
-        {
-            get => _settingsResetContent;
-            set
-            {
-                if (_settingsResetContent == value) return;
-                _settingsResetContent = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private ICommand _openSettingsResetDialogCommand;
-
-        public ICommand OpenSettingsResetDialogCommand
-        {
-            get
-            {
-                var command = _openSettingsResetDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _openSettingsResetDialogCommand = new RelayCommand(
-                    param => OpenSettingsResetDialog()
-                );
-            }
-        }
-
-        private void OpenSettingsResetDialog()
-        {
-            try
-            {
-                if (!SkyTelescopeSettings && !ServerSettings && !GamePadSettings && !MonitorSettings)
-                {
-                    OpenDialog(Application.Current.Resources["optNoResetSettings"].ToString());
-                    return;
-                }
-
-                SettingsResetContent = new ResetSettingsDialog();
-                IsSettingsResetDialogOpen = true;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message);
-            }
-
-        }
-
-        private ICommand _acceptSettingsResetDialogCommand;
-
-        public ICommand AcceptResetDialogCommand
-        {
-            get
-            {
-                var command = _acceptSettingsResetDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _acceptSettingsResetDialogCommand = new RelayCommand(
-                    param => AcceptSettingsResetDialog()
-                );
-            }
-        }
-
-        private void AcceptSettingsResetDialog()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    if (SkyTelescopeSettings)
-                    {
-                        Properties.SkyTelescope.Default.Reset();
-                        Properties.SkyTelescope.Default.Save();
-                        Properties.SkyTelescope.Default.Reload();
-                    }
-
-                    if (ServerSettings)
-                    {
-                        Properties.Server.Default.Reset();
-                        Properties.Server.Default.Save();
-                        Properties.Server.Default.Reload();
-                    }
-
-                    if (GamePadSettings)
-                    {
-                        Properties.Gamepad.Default.Reset();
-                        Properties.Gamepad.Default.Save();
-                        Properties.Gamepad.Default.Reload();
-                    }
-
-                    if (MonitorSettings)
-                    {
-                        Shared.Properties.Monitor.Default.Reset();
-                        Shared.Properties.Monitor.Default.Save();
-                        Shared.Properties.Monitor.Default.Reload();
-                    }
-
-                    IsSettingsResetDialogOpen = false;
-                    OpenDialog(Application.Current.Resources["optRestart"].ToString());
-                    ClearSettings();
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message);
-            }
-        }
-
-        private ICommand _cancelSettingsResetDialogCommand;
-
-        public ICommand CancelResetDialogCommand
-        {
-            get
-            {
-                var command = _cancelSettingsResetDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _cancelSettingsResetDialogCommand = new RelayCommand(
-                    param => CancelSettingsResetDialog()
-                );
-            }
-        }
-
-        private void CancelSettingsResetDialog()
-        {
-            try
-            {
-                ClearSettings();
-                IsSettingsResetDialogOpen = false;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message);
-            }
-        }
-
-        #endregion
-
-        #region Updates
-
-        private bool _updateEnabled;
-
-        public bool UpdateEnabled
-        {
-            get => _updateEnabled;
-            set
-            {
-                _updateEnabled = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private string UpdateLink { get; set; }
-
-        private string _currentVersion;
-
-        public string CurrentVersion
-        {
-            get => _currentVersion;
-            set
-            {
-                _currentVersion = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private string _updateVersion;
-
-        public string UpdateVersion
-        {
-            get => _updateVersion;
-            set
-            {
-                _updateVersion = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _isUpdateDialogOpen;
-
-        public bool IsUpdateDialogOpen
-        {
-            get => _isUpdateDialogOpen;
-            set
-            {
-                if (_isUpdateDialogOpen == value) return;
-                _isUpdateDialogOpen = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private object _updateDialogContent;
-
-        public object UpdateDialogContent
-        {
-            get => _updateDialogContent;
-            set
-            {
-                if (_updateDialogContent == value) return;
-                _updateDialogContent = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private ICommand _openUpdateDialogCmd;
-
-        public ICommand OpenUpdateDialogCmd
-        {
-            get
-            {
-                var cmd = _openUpdateDialogCmd;
-                if (cmd != null)
-                {
-                    return cmd;
-                }
-
-                return _openUpdateDialogCmd = new RelayCommand(
-                    param => OpenUpdateDialog()
-                );
-            }
-        }
-
-        private void OpenUpdateDialog()
-        {
-            try
-            {
-                if (SkySettings.Mount == MountType.SkyWatcher && SkyServer.IsMountRunning || GSServer.AppCount > 0)
-                {
-                    OpenDialog(Application.Current.Resources["optDisconnects"].ToString());
-                    return;
-                }
-                using (new WaitCursor())
-                {
-                    UpdateEnabled = false;
-                    UpdateDialogContent = new DownloadUpdateDialog();
-                    // get html page
-                    var w = new WebClient();
-                    var s = w.DownloadString(GsUrl);
-
-                    var html = new HTML();
-                    var linklist = html.FindLinks(s);
-                    foreach (var i in linklist)
-                    {
-                        if (i.Text.IndexOf("GS Server Version:", StringComparison.OrdinalIgnoreCase) < 0) continue;
-                        var ver = i.Text.Split();
-                        // valid array
-                        if (ver.Length < 3)
-                        {
-                            OpenDialog(Application.Current.Resources["optNotFound"].ToString());
-                            return;
-                        }
-                        // valid URL?
-                        if (!html.IsValidUri(i.Href))
-                        {
-                            OpenDialog(Application.Current.Resources["optNotFound"].ToString());
-                            return;
-                        }
-                        UpdateVersion = ver[3];
-                        UpdateLink = i.Href;
-
-                        //check version numbers
-                        UpdateEnabled = true;
-                        IsUpdateDialogOpen = true;
-
-                        return;
-                    }
-                    OpenDialog(Application.Current.Resources["optNotAvail"].ToString());
-                }
-            }
-            catch (Exception ex)
-            {
-                OpenDialog(ex.Message);
-            }
-
-        }
-
-        private ICommand _clickDownloadUpdateCmd;
-
-        public ICommand ClickDownloadUpdateCmd
-        {
-            get
-            {
-                var cmd = _clickDownloadUpdateCmd;
-                if (cmd != null)
-                {
-                    return cmd;
-                }
-
-                return _clickDownloadUpdateCmd = new RelayCommand(
-                    param => ClickDownloadUpdate()
-                );
-            }
-        }
-
-        private void ClickDownloadUpdate()
-        {
-            try
-            {
-                var html = new HTML();
-                if (!html.IsValidUri(UpdateLink))
-                {
-                    OpenDialog(Application.Current.Resources["optNotFound"].ToString());
-                    return;
-                }
-                html.OpenUri(UpdateLink);
-                IsUpdateDialogOpen = false;
-
-                SkyServer.IsMountRunning = false;
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Downloading Update, Closing Window" };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                if (Application.Current.MainWindow != null) Application.Current.MainWindow.Close();
-            }
-            catch (Exception ex)
-            {
-                OpenDialog(ex.Message);
-            }
-        }
-
-        private ICommand _cancelUpdateDialogCmd;
-
-        public ICommand CancelUpdateDialogCmd
-        {
-            get
-            {
-                var cmd = _cancelUpdateDialogCmd;
-                if (cmd != null)
-                {
-                    return cmd;
-                }
-
-                return _cancelUpdateDialogCmd = new RelayCommand(
-                    param => CancelUpdateDialog()
-                );
-            }
-        }
-
-        private void CancelUpdateDialog()
-        {
-            IsUpdateDialogOpen = false;
-        }
-
-        private ICommand _clickDonateCmd;
-
-        public ICommand ClickDonateCmd
-        {
-            get
-            {
-                var cmd = _clickDonateCmd;
-                if (cmd != null)
-                {
-                    return cmd;
-                }
-
-                return _clickDonateCmd = new RelayCommand(
-                    param => ClickDonate()
-                );
-            }
-        }
-
-        private void ClickDonate()
-        {
-            try
-            {
-                Process.Start(new ProcessStartInfo("https://www.greenswamp.org/donate"));
-            }
-            catch (Exception ex)
-            {
-                OpenDialog(ex.Message);
-            }
-        }
-
+        
         private ICommand _clickUtilCmd;
 
         public ICommand ClickUtilCmd
@@ -1537,7 +1047,7 @@ namespace GS.Server.Settings
                     foreach (var item in MonitorEntries)
                     {
                         stream.WriteLine(
-                            $"{item.Index},{item.Datetime.ToLocalTime():dd/MM/yyyy HH:mm:ss.fff},{item.Device},{item.Category},{item.Type},{item.Thread},{item.Method},{item.Message}");
+                            $"{item.Index}|{item.Datetime.ToLocalTime():dd/MM/yyyy HH:mm:ss.fff}|{item.Device}|{item.Category}|{item.Type}|{item.Thread}|{item.Method}|{item.Message}");
                     }
 
                     stream.Close();
@@ -1593,7 +1103,7 @@ namespace GS.Server.Settings
                         foreach (var item in MonitorEntries)
                         {
                             sw.Write(
-                                $"{item.Index},{item.Datetime.ToLocalTime():dd/MM/yyyy HH:mm:ss.fff},{item.Device},{item.Category},{item.Type},{item.Thread},{item.Method},{item.Message}{Environment.NewLine}");
+                                $"{item.Index}|{item.Datetime.ToLocalTime():dd/MM/yyyy HH:mm:ss.fff}|{item.Device}|{item.Category}|{item.Type}|{item.Thread}|{item.Method}|{item.Message}{Environment.NewLine}");
                             sw.Flush();
                         }
 
@@ -1741,18 +1251,36 @@ namespace GS.Server.Settings
 
         private void OpenDialog(string msg, string caption = null)
         {
-            if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
-            DialogContent = new DialogOK();
-            IsDialogOpen = true;
+            if (IsDialogOpen)
+            {
+                OpenDialogWin(msg, caption);
+            }
+            else
+            {
+                if (msg != null) DialogMsg = msg;
+                DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
+                DialogContent = new DialogOK();
+                IsDialogOpen = true;
+            }
 
             var monitorItem = new MonitorEntry
             {
-                Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface,
-                Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name,
-                Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}"
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Interface,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod().Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{msg}"
             };
             MonitorLog.LogToMonitor(monitorItem);
+        }
+
+        private void OpenDialogWin(string msg, string caption = null)
+        {
+            //Open as new window
+            var bWin = new MessageControlV(caption, msg) { Owner = Application.Current.MainWindow };
+            bWin.Show();
         }
 
         private ICommand _clickOkDialogCommand;
@@ -1827,6 +1355,452 @@ namespace GS.Server.Settings
         {
             Console.WriteLine(@"You can intercept the closing event, and cancel here.");
         }
+
+        #endregion
+
+        #region Reset Settings Dialog
+
+        private bool _skyTelescopeSettings;
+
+        public bool SkyTelescopeSettings
+        {
+            get => _skyTelescopeSettings;
+            set
+            {
+                _skyTelescopeSettings = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _serverSettings;
+
+        public bool ServerSettings
+        {
+            get => _serverSettings;
+            set
+            {
+                _serverSettings = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _gamePadSettings;
+
+        public bool GamePadSettings
+        {
+            get => _gamePadSettings;
+            set
+            {
+                _gamePadSettings = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _monitorSettings;
+
+        public bool MonitorSettings
+        {
+            get => _monitorSettings;
+            set
+            {
+                _monitorSettings = value;
+                OnPropertyChanged();
+            }
+
+        }
+
+        private void ClearSettings()
+        {
+            SkyTelescopeSettings = false;
+            ServerSettings = false;
+            GamePadSettings = false;
+            MonitorSettings = false;
+        }
+
+
+        private ICommand _openSettingsResetDialogCommand;
+
+        public ICommand OpenSettingsResetDialogCommand
+        {
+            get
+            {
+                var command = _openSettingsResetDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openSettingsResetDialogCommand = new RelayCommand(
+                    param => OpenSettingsResetDialog()
+                );
+            }
+        }
+
+        private void OpenSettingsResetDialog()
+        {
+            try
+            {
+                if (!SkyTelescopeSettings && !ServerSettings && !GamePadSettings && !MonitorSettings)
+                {
+                    OpenDialog(Application.Current.Resources["optNoResetSettings"].ToString());
+                    return;
+                }
+
+                DialogContent = new ResetSettingsDialog();
+                IsDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+
+        }
+
+        private ICommand _acceptSettingsResetDialogCommand;
+
+        public ICommand AcceptResetDialogCommand
+        {
+            get
+            {
+                var command = _acceptSettingsResetDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptSettingsResetDialogCommand = new RelayCommand(
+                    param => AcceptSettingsResetDialog()
+                );
+            }
+        }
+
+        private void AcceptSettingsResetDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (SkyTelescopeSettings)
+                    {
+                        Properties.SkyTelescope.Default.Reset();
+                        Properties.SkyTelescope.Default.Save();
+                        Properties.SkyTelescope.Default.Reload();
+                    }
+
+                    if (ServerSettings)
+                    {
+                        Properties.Server.Default.Reset();
+                        Properties.Server.Default.Save();
+                        Properties.Server.Default.Reload();
+                    }
+
+                    if (GamePadSettings)
+                    {
+                        Properties.Gamepad.Default.Reset();
+                        Properties.Gamepad.Default.Save();
+                        Properties.Gamepad.Default.Reload();
+                    }
+
+                    if (MonitorSettings)
+                    {
+                        Shared.Properties.Monitor.Default.Reset();
+                        Shared.Properties.Monitor.Default.Save();
+                        Shared.Properties.Monitor.Default.Reload();
+                    }
+
+                    IsDialogOpen = false;
+                    OpenDialog(Application.Current.Resources["optRestart"].ToString());
+                    ClearSettings();
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private ICommand _cancelSettingsResetDialogCommand;
+
+        public ICommand CancelResetDialogCommand
+        {
+            get
+            {
+                var command = _cancelSettingsResetDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelSettingsResetDialogCommand = new RelayCommand(
+                    param => CancelSettingsResetDialog()
+                );
+            }
+        }
+
+        private void CancelSettingsResetDialog()
+        {
+            try
+            {
+                ClearSettings();
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message);
+            }
+        }
+
+        #endregion
+
+        #region Update Dialog
+
+        private bool _updateEnabled;
+
+        public bool UpdateEnabled
+        {
+            get => _updateEnabled;
+            set
+            {
+                _updateEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string UpdateLink { get; set; }
+
+        private string _currentVersion;
+
+        public string CurrentVersion
+        {
+            get => _currentVersion;
+            set
+            {
+                _currentVersion = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _updateVersion;
+
+        public string UpdateVersion
+        {
+            get => _updateVersion;
+            set
+            {
+                _updateVersion = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openUpdateDialogCmd;
+
+        public ICommand OpenUpdateDialogCmd
+        {
+            get
+            {
+                var cmd = _openUpdateDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openUpdateDialogCmd = new RelayCommand(
+                    param => OpenUpdateDialog()
+                );
+            }
+        }
+
+        private void OpenUpdateDialog()
+        {
+            try
+            {
+                if (SkySettings.Mount == MountType.SkyWatcher && SkyServer.IsMountRunning || GSServer.AppCount > 0)
+                {
+                    OpenDialog(Application.Current.Resources["optDisconnects"].ToString());
+                    return;
+                }
+                using (new WaitCursor())
+                {
+                    UpdateEnabled = false;
+                    DialogContent = new DownloadUpdateDialog();
+                    // get html page
+                    var w = new WebClient();
+                    var s = w.DownloadString(GsUrl);
+
+                    var html = new HTML();
+                    var linklist = html.FindLinks(s);
+                    foreach (var i in linklist)
+                    {
+                        if (i.Text.IndexOf("GS Server Version:", StringComparison.OrdinalIgnoreCase) < 0) continue;
+                        var ver = i.Text.Split();
+                        // valid array
+                        if (ver.Length < 3)
+                        {
+                            OpenDialog(Application.Current.Resources["optNotFound"].ToString());
+                            return;
+                        }
+                        // valid URL?
+                        if (!html.IsValidUri(i.Href))
+                        {
+                            OpenDialog(Application.Current.Resources["optNotFound"].ToString());
+                            return;
+                        }
+                        UpdateVersion = ver[3];
+                        UpdateLink = i.Href;
+
+                        //check version numbers
+                        UpdateEnabled = true;
+                        IsDialogOpen = true;
+
+                        return;
+                    }
+                    OpenDialog(Application.Current.Resources["optNotAvail"].ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                OpenDialog(ex.Message);
+            }
+
+        }
+
+        private ICommand _clickDownloadUpdateCmd;
+
+        public ICommand ClickDownloadUpdateCmd
+        {
+            get
+            {
+                var cmd = _clickDownloadUpdateCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _clickDownloadUpdateCmd = new RelayCommand(
+                    param => ClickDownloadUpdate()
+                );
+            }
+        }
+
+        private void ClickDownloadUpdate()
+        {
+            try
+            {
+                var html = new HTML();
+                if (!html.IsValidUri(UpdateLink))
+                {
+                    OpenDialog(Application.Current.Resources["optNotFound"].ToString());
+                    return;
+                }
+                html.OpenUri(UpdateLink);
+                IsDialogOpen = false;
+
+                SkyServer.IsMountRunning = false;
+
+                var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Downloading Update, Closing Window" };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                if (Application.Current.MainWindow != null) Application.Current.MainWindow.Close();
+            }
+            catch (Exception ex)
+            {
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private ICommand _cancelUpdateDialogCmd;
+
+        public ICommand CancelUpdateDialogCmd
+        {
+            get
+            {
+                var cmd = _cancelUpdateDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _cancelUpdateDialogCmd = new RelayCommand(
+                    param => CancelUpdateDialog()
+                );
+            }
+        }
+
+        private void CancelUpdateDialog()
+        {
+            IsDialogOpen = false;
+        }
+
+        private ICommand _clickDonateCmd;
+
+        public ICommand ClickDonateCmd
+        {
+            get
+            {
+                var cmd = _clickDonateCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _clickDonateCmd = new RelayCommand(
+                    param => ClickDonate()
+                );
+            }
+        }
+
+        private void ClickDonate()
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo("https://www.greenswamp.org/donate"));
+            }
+            catch (Exception ex)
+            {
+                OpenDialog(ex.Message);
+            }
+        }
+
 
         #endregion
 

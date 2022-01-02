@@ -41,7 +41,7 @@ namespace GS.SkyWatcher
         private readonly double[] _factorRadToStep = { 0, 0 };          // steps per radian based on gear ratio
         private readonly long[] _breakSteps = new long[2];
         private readonly long[] _stepTimerFreq = new long[2];
-        private readonly long[] _peSteps = new long[2];
+        private readonly double[] _peSteps = new double[2];
         private readonly string[] _axisStringVersion = new string[2];   // Readable string version format
         private readonly long[] _axisGearRatios = new long[2];
         private readonly double[] _factorRadRateToInt = { 0, 0 };
@@ -51,7 +51,11 @@ namespace GS.SkyWatcher
         private const int _threadLockTimeout = 50;                      // milliseconds
         private readonly object _syncObject = new object();
         private int _conErrCnt;                                         // Number of continuous errors
-        private const int ConErrMax = 100;                              // Max number of allowed continuous errors                                  
+        private const int ConErrMax = 30;                              // Max number of allowed continuous errors
+        private readonly int[] _customMount360Steps;                    // Custom Mount :a replacement
+        private readonly double[] _customRaWormSteps;                      // Custom Mount :s replacement
+        private readonly int[] _mount360Steps = { 0, 0 };               // From mount :a
+
         #endregion
 
         #region Properties
@@ -77,9 +81,11 @@ namespace GS.SkyWatcher
 
         #region Methods
 
-        public Commands(SerialPort serial)
+        public Commands(SerialPort serial, int[] customMount360Steps, double[] customRaWormSteps)
         {
             Serial = serial;
+            _customMount360Steps = customMount360Steps;
+            _customRaWormSteps = customRaWormSteps;
             if (serial.IsOpen)
             {
                 //Serial.DataReceived += DataReceived;
@@ -255,6 +261,8 @@ namespace GS.SkyWatcher
                 {
                     gearRatio = 0x205318; // for 114GT mount
                 }
+                _mount360Steps[0] = (int)gearRatio;
+                if (_customMount360Steps[0] > 0){ gearRatio = _customMount360Steps[0];} //Setup for custom :a
                 _axisGearRatios[0] = gearRatio;
             }
             else
@@ -267,6 +275,8 @@ namespace GS.SkyWatcher
                 {
                     gearRatio = 0x205318; // for 114GT mount
                 }
+                _mount360Steps[1] = (int)gearRatio;
+                if (_customMount360Steps[1] > 0) { gearRatio = _customMount360Steps[1]; } //Setup for custom :a
                 _axisGearRatios[1] = gearRatio;
             }
             _factorRadToStep[(int)axis] = gearRatio / (2 * Math.PI);
@@ -436,7 +446,7 @@ namespace GS.SkyWatcher
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 return double.NaN;
             }
@@ -460,7 +470,7 @@ namespace GS.SkyWatcher
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 return double.NaN;
             }
@@ -527,9 +537,10 @@ namespace GS.SkyWatcher
         internal double GetPecPeriod(AxisId axis)
         {
             var response = CmdToAxis(axis, 's', null);
-
-            var pecPeriod = StringToLong(response);
-            _peSteps[(int)axis] = pecPeriod;
+            var pecPeriod = (double) StringToLong(response);
+            var ax = (int)axis;
+            if (_customRaWormSteps[ax] > 0) { pecPeriod = _customRaWormSteps[ax]; } // Setup custom mount worm steps
+            _peSteps[ax] = pecPeriod;
             return pecPeriod;
         }
 
@@ -830,7 +841,7 @@ namespace GS.SkyWatcher
                                     Method = MethodBase.GetCurrentMethod().Name,
                                     Thread = Thread.CurrentThread.ManagedThreadId,
                                     Message =
-                                        $"Serial Retry:{_conErrCnt},{cmdData},{ignoreWarnings}"
+                                        $"Serial Retry:{_conErrCnt}|{cmdData}|{ignoreWarnings}"
                                 };
                                 MonitorLog.LogToMonitor(monitorItem);
                                 if (_conErrCnt > ConErrMax)
@@ -868,7 +879,7 @@ namespace GS.SkyWatcher
                         {
                             MountConnected = false;
                             monitorItem = new MonitorEntry
-                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
+                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
                             MonitorLog.LogToMonitor(monitorItem);
 
                             throw new MountControlException(ErrorCode.ErrNotConnected, "IO Error", ex);
@@ -877,7 +888,7 @@ namespace GS.SkyWatcher
                         {
                             MountConnected = false;
                             monitorItem = new MonitorEntry
-                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}, {ex.StackTrace}" };
+                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
                             MonitorLog.LogToMonitor(monitorItem);
                             throw;
                         }
@@ -1002,7 +1013,7 @@ namespace GS.SkyWatcher
         //    {
         //        Trace.TraceInformation("Retry {0}", ex.Message);
         //        var monitorItem = new MonitorEntry
-        //            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{cmdDataStr}, {ex.Message}" };
+        //            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{cmdDataStr}|{ex.Message}" };
         //        MonitorLog.LogToMonitor(monitorItem);
         //        throw;
         //    }
@@ -1065,7 +1076,7 @@ namespace GS.SkyWatcher
             var receivedData = ReceiveResponse();
 
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{cmdDataStr},{receivedData}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{cmdDataStr}|{receivedData}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             // process incoming data string
@@ -1134,7 +1145,7 @@ namespace GS.SkyWatcher
                     }
 
                     monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" Abnormal Response: Axis:{axis}, Command:{command}, Received:{receivedData}, CommandStr:{cmdDataStr}, Message: {errormsg}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Abnormal Response|Axis|{axis}|Command|{command}|Received|{receivedData}|CommandStr|{cmdDataStr}|Message|{errormsg}" };
                     MonitorLog.LogToMonitor(monitorItem);
                     if(!string.IsNullOrEmpty(subdata)) return subdata;
                     receivedData = null;

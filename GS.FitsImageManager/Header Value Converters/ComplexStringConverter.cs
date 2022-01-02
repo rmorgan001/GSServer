@@ -69,7 +69,7 @@ namespace GS.FitsImageManager.Header_Value_Converters
 
             var parts = value.Split( ',' );
 
-            if (parts.Length != 2 || String.IsNullOrEmpty(parts[0]) || String.IsNullOrEmpty(parts[1])) return false;
+            if (parts.Length != 2 || string.IsNullOrEmpty(parts[0]) || string.IsNullOrEmpty(parts[1])) return false;
             var fCvt = new FloatStringConverter();
             var dCvt = new DoubleStringConverter();
 

@@ -47,8 +47,8 @@
                 </ComboBox>
             </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0 10 0 0" HorizontalAlignment="Center">
-                    <Button IsEnabled="{Binding StartEnabled}" IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding StartAutoHomeDialogCommand}" Content="{StaticResource diaStart}"/>
-                    <Button IsCancel="True"  Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelAutoHomeDialogCommand}" Content="{StaticResource diaCancel}"/>
+                    <Button IsEnabled="{Binding StartEnabled}" IsDefault="False" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding StartAutoHomeDialogCommand}" Content="{StaticResource diaStart}"/>
+                    <Button IsCancel="True" IsDefault="True"  Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelAutoHomeDialogCommand}" Content="{StaticResource diaCancel}"/>
                 </StackPanel>
             </StackPanel>
     </GroupBox>

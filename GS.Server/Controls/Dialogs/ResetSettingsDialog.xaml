@@ -9,8 +9,8 @@
         <StackPanel Orientation="Vertical">
             <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10" Text="{StaticResource optAcceptResetSettings}"/>
             <StackPanel Orientation="Horizontal"  HorizontalAlignment="Center">
-                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptResetDialogCommand}" Content="{StaticResource diaAccept}"/>
-                <Button IsCancel="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelResetDialogCommand}" Content="{StaticResource diaCancel}"/>
+                <Button IsDefault="False" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptResetDialogCommand}" Content="{StaticResource diaAccept}"/>
+                <Button IsCancel="True" IsDefault="True"  Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelResetDialogCommand}" Content="{StaticResource diaCancel}"/>
             </StackPanel>
         </StackPanel>
     </GroupBox>

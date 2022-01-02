@@ -2,7 +2,7 @@
   "profiles": {
     "GS.Server": {
       "commandName": "Project",
-      "commandLineArgs": "/showalignment"
+      "commandLineArgs": "/pec /showalignment"
     }
   }
 }

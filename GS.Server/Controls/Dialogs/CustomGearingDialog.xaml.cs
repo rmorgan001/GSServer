@@ -6,9 +6,9 @@ namespace GS.Server.Controls.Dialogs
     /// Interaction logic for Window1.xaml
     /// </summary>
     [ComVisible(false)]
-    public partial class HomeResetDialog
+    public partial class CustomGearingDialog
     {
-        public HomeResetDialog()
+        public CustomGearingDialog()
         {
             InitializeComponent();
         }
