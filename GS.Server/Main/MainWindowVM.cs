@@ -66,8 +66,8 @@ namespace GS.Server.Main
         private double _tempHeight = 510;
         private double _tempWidth = 850;
         private WindowState _tempWindowState = WindowState.Normal;
-        private double MinHeight = 100;
-        private double MinWidth = 200;
+        private readonly double MinHeight = 100;
+        private readonly double MinWidth = 200;
 
         #endregion
 
@@ -1007,7 +1007,7 @@ namespace GS.Server.Main
         }
         #endregion
 
-        #region Close 
+        #region Close Dialog
         private void CloseServer()
         {
             SkyServer.ShutdownServer();

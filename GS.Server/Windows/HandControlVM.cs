@@ -128,7 +128,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -149,6 +149,18 @@ namespace GS.Server.Windows
                      case "HcSpeed":
                          HcSpeed = (double)SkySettings.HcSpeed;
                          break;
+                     case "HcFlipEW":
+                         FlipEW = SkySettings.HcFlipEW;
+                         break;
+                     case "HcFlipNS":
+                         FlipNS = SkySettings.HcFlipNS;
+                         break;
+                     case "HcAntiRa":
+                         HcAntiRa = SkySettings.HcAntiRa;
+                         break;
+                     case "HcAntiDec":
+                         HcAntiDec = SkySettings.HcAntiDec;
+                         break;
                  }
              });
             }
@@ -162,7 +174,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -194,26 +206,22 @@ namespace GS.Server.Windows
             }
         }
 
-        private bool _flipNs;
         public bool FlipNS
         {
-            get => _flipNs;
+            get => SkySettings.HcFlipNS;
             set
             {
-                if (_flipNs == value) return;
-                _flipNs = value;
+                SkySettings.HcFlipNS = value;
                 OnPropertyChanged();
             }
         }
 
-        private bool _flipEw;
         public bool FlipEW
         {
-            get => _flipEw;
+            get => SkySettings.HcFlipEW;
             set
             {
-                if (_flipEw == value) return;
-                _flipEw = value;
+                SkySettings.HcFlipEW = value;
                 OnPropertyChanged();
             }
         }
@@ -247,7 +255,6 @@ namespace GS.Server.Windows
             get => SkySettings.HcAntiRa;
             set
             {
-                if (SkySettings.HcAntiRa == value) return;
                 SkySettings.HcAntiRa = value;
                 OnPropertyChanged();
             }
@@ -258,7 +265,6 @@ namespace GS.Server.Windows
             get => SkySettings.HcAntiDec;
             set
             {
-                if (SkySettings.HcAntiDec == value) return;
                 SkySettings.HcAntiDec = value;
                 OnPropertyChanged();
             }
@@ -328,7 +334,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -371,7 +377,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -415,7 +421,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -455,7 +461,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -501,7 +507,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -541,7 +547,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -587,7 +593,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -627,7 +633,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -673,7 +679,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -713,7 +719,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 SkyServer.AlertState = true;
@@ -753,7 +759,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 SkyServer.AlertState = true;
@@ -791,7 +797,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -1029,7 +1035,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -1113,7 +1119,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -1184,7 +1190,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -1238,7 +1244,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -1282,7 +1288,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -1359,10 +1365,17 @@ namespace GS.Server.Windows
         }
         private void OpenDialog(string msg, string caption = null)
         {
-            if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
-            DialogContent = new DialogOK();
-            IsDialogOpen = true;
+            if (IsDialogOpen)
+            {
+                OpenDialogWin(msg, caption);
+            }
+            else
+            {
+                if (msg != null) DialogMsg = msg;
+                DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
+                DialogContent = new DialogOK();
+                IsDialogOpen = true;
+            }
 
             var monitorItem = new MonitorEntry
             {
@@ -1375,7 +1388,13 @@ namespace GS.Server.Windows
                 Message = $"{msg}"
             };
             MonitorLog.LogToMonitor(monitorItem);
+        }
 
+        private void OpenDialogWin(string msg, string caption = null)
+        {
+            //Open as new window
+            var bWin = new MessageControlV(caption, msg) { Owner = Application.Current.MainWindow };
+            bWin.Show();
         }
 
         private ICommand _clickOkDialogCommand;

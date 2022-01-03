@@ -70,7 +70,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -86,7 +86,7 @@ namespace GS.Server.SkyTelescope
             if (add) return;
             ResetGuiding(entry.Axis, false);
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Add Failed: {entry.Axis},{entry.Duration}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Add Failed{entry.Axis}|{entry.Duration}" };
             MonitorLog.LogToMonitor(monitorItem);
         }
 
@@ -142,7 +142,7 @@ namespace GS.Server.SkyTelescope
                 var processtime = (int)(curtime - entry.ProcessDateTime).TotalMilliseconds;
                 var alltime = (int)(curtime - entry.CreateDateTime).TotalMilliseconds;
                 var monitorItem = new MonitorEntry
-                { Datetime = curtime, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Complete,{alltime},{processtime}-{entry.Duration}={processtime - entry.Duration}" };
+                { Datetime = curtime, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Complete|{alltime}|{processtime}-{entry.Duration}={processtime - entry.Duration}" };
                 MonitorLog.LogToMonitor(monitorItem);
             }
             catch (Exception ex)

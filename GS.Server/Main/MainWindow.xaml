@@ -16,7 +16,8 @@
         xmlns:plot="clr-namespace:GS.Server.Plot" 
         xmlns:pec="clr-namespace:GS.Server.Pec" 
         xmlns:snap="clr-namespace:GS.Server.Snap" 
-        xmlns:alignment="clr-namespace:GS.Server.Alignment" 
+        xmlns:alignment="clr-namespace:GS.Server.Alignment"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanResizeWithGrip" WindowStyle="None" TextOptions.TextFormattingMode="Display" FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" 
         ContentRendered="MainWindow_OnContentRendered" Closed="MainWindow_OnClosed" Topmost="{Binding TopMost}" 
         d:DataContext="{d:DesignInstance main:MainWindowVM, IsDesignTimeCreatable=True}" 
@@ -77,7 +78,7 @@
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo x:Name="taskBarItemInfo" Description="{StaticResource titleDescription}" />
     </Window.TaskbarItemInfo>
-    <Grid Background="{DynamicResource MaterialDesignBody}">
+        <Grid Background="{DynamicResource MaterialDesignBody}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>

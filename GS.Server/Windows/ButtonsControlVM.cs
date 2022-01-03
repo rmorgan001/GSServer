@@ -152,7 +152,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -189,7 +189,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -596,7 +596,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -647,7 +647,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -686,7 +686,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -752,7 +752,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -803,7 +803,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
@@ -842,7 +842,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -908,7 +908,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -1007,7 +1007,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -1052,7 +1052,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -1101,7 +1101,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -1110,168 +1110,7 @@ namespace GS.Server.Windows
             }
         }
 
-        private bool _isHomeResetDialogOpen;
-        public bool IsHomeResetDialogOpen
-        {
-            get => _isHomeResetDialogOpen;
-            set
-            {
-                if (_isHomeResetDialogOpen == value) return;
-                _isHomeResetDialogOpen = value;
-                _skyTelescopeVM.CloseDialogs(value);
-                CloseDialogs(value);
-                OnPropertyChanged();
-            }
-        }
-
-        private object _homeResetContent;
-        public object HomeResetContent
-        {
-            get => _homeResetContent;
-            set
-            {
-                if (_homeResetContent == value) return;
-                _homeResetContent = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private ICommand _openHomeResetDialogCommand;
-        public ICommand OpenHomeResetDialogCommand
-        {
-            get
-            {
-                var command = _openHomeResetDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _openHomeResetDialogCommand = new RelayCommand(
-                    param => OpenHomeResetDialog()
-                );
-            }
-        }
-        private void OpenHomeResetDialog()
-        {
-            try
-            {
-                if (SkyServer.Tracking)
-                {
-                    OpenDialog(Application.Current.Resources["skyStopMount"].ToString());
-                    return;
-                }
-                HomeResetContent = new HomeResetDialog();
-                IsHomeResetDialogOpen = true;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-
-        }
-
-        private ICommand _acceptHomeResetDialogCommand;
-        public ICommand AcceptHomeResetDialogCommand
-        {
-            get
-            {
-                var command = _acceptHomeResetDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _acceptHomeResetDialogCommand = new RelayCommand(
-                    param => AcceptHomeResetDialog()
-                );
-            }
-        }
-        private void AcceptHomeResetDialog()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    if (!SkyServer.IsMountRunning) return;
-                    SkyServer.ResetHomePositions();
-                    Synthesizer.Speak(Application.Current.Resources["vceHomeSet"].ToString());
-                    IsHomeResetDialogOpen = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _cancelHomeResetDialogCommand;
-        public ICommand CancelHomeResetDialogCommand
-        {
-            get
-            {
-                var command = _cancelHomeResetDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _cancelHomeResetDialogCommand = new RelayCommand(
-                    param => CancelHomeResetDialog()
-                );
-            }
-        }
-        private void CancelHomeResetDialog()
-        {
-            try
-            {
-                IsHomeResetDialogOpen = false;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
+       
         private bool _isFlipDialogOpen;
         public bool IsFlipDialogOpen
         {
@@ -1331,7 +1170,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -1418,7 +1257,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -1512,7 +1351,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -1584,7 +1423,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -1706,12 +1545,367 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
+        #endregion
+
+        #region ReSync Dialog
+
+        private ReSyncMode _syncMode;
+        public ReSyncMode SyncMode
+        {
+            get => _syncMode;
+            set
+            {
+                if (_syncMode == value) { return; }
+                _syncMode = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ParkPosition _reSyncParkSelection;
+        public ParkPosition ReSyncParkSelection
+        {
+            get => _reSyncParkSelection;
+            set
+            {
+                if (_reSyncParkSelection == value) { return; }
+
+                var found = ParkPositions.Find(x => x.Name == value.Name && Math.Abs(x.X - value.X) <= 0 && Math.Abs(x.Y - value.Y) <= 0);
+                if (found == null) // did not find match in list
+                {
+                    ParkPositions.Add(value);
+                    _reSyncParkSelection = value;
+                }
+                else
+                {
+                    _reSyncParkSelection = found;
+                }
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openReSyncDialogCmd;
+        public ICommand OpenReSyncDialogCmd
+        {
+            get
+            {
+                var command = _openReSyncDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openReSyncDialogCmd = new RelayCommand(
+                    param => OpenReSyncDialog()
+                );
+            }
+        }
+        private void OpenReSyncDialog()
+        {
+            try
+            {
+                if (SkyServer.Tracking || SkyServer.IsSlewing)
+                {
+                    OpenDialog(Application.Current.Resources["skyStopMount"].ToString());
+                    return;
+                }
+
+                SyncMode = ReSyncMode.Home;
+                ReSyncParkSelection = ParkSelection;
+                HomeResetContent = new ReSyncDialog();
+                IsHomeResetDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+
+        }
+
+        private ICommand _acceptReSyncDialogCmd;
+        public ICommand AcceptReSyncDialogCmd
+        {
+            get
+            {
+                var command = _acceptReSyncDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptReSyncDialogCmd = new RelayCommand(
+                    param => AcceptReSyncDialog()
+                );
+            }
+        }
+        private void AcceptReSyncDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (!SkyServer.IsMountRunning) { return; }
+
+                    switch (SyncMode)
+                    {
+                        case ReSyncMode.Home:
+                            SkyServer.ReSyncAxes();
+                            break;
+                        case ReSyncMode.Park:
+                            if (ReSyncParkSelection != null)
+                            {
+                                SkyServer.ReSyncAxes(ReSyncParkSelection);
+                            }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    Synthesizer.Speak(Application.Current.Resources["vceSync"].ToString());
+                    IsHomeResetDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelReSyncDialogCmd;
+        public ICommand CancelReSyncDialogCmd
+        {
+            get
+            {
+                var command = _cancelReSyncDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelReSyncDialogCmd = new RelayCommand(
+                    param => CancelReSyncDialog()
+                );
+            }
+        }
+        private void CancelReSyncDialog()
+        {
+            try
+            {
+                IsHomeResetDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+        
+
+        private bool _isHomeResetDialogOpen;
+        public bool IsHomeResetDialogOpen
+        {
+            get => _isHomeResetDialogOpen;
+            set
+            {
+                if (_isHomeResetDialogOpen == value) return;
+                _isHomeResetDialogOpen = value;
+                _skyTelescopeVM.CloseDialogs(value);
+                CloseDialogs(value);
+                OnPropertyChanged();
+            }
+        }
+
+        private object _homeResetContent;
+        public object HomeResetContent
+        {
+            get => _homeResetContent;
+            set
+            {
+                if (_homeResetContent == value) return;
+                _homeResetContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        //private ICommand _openHomeResetDialogCommand;
+        //public ICommand OpenHomeResetDialogCommand
+        //{
+        //    get
+        //    {
+        //        var command = _openHomeResetDialogCommand;
+        //        if (command != null)
+        //        {
+        //            return command;
+        //        }
+
+        //        return _openHomeResetDialogCommand = new RelayCommand(
+        //            param => OpenHomeResetDialog()
+        //        );
+        //    }
+        //}
+        //private void OpenHomeResetDialog()
+        //{
+        //    try
+        //    {
+        //        if (SkyServer.Tracking)
+        //        {
+        //            OpenDialog(Application.Current.Resources["skyStopMount"].ToString());
+        //            return;
+        //        }
+        //        HomeResetContent = new HomeResetDialog();
+        //        IsHomeResetDialogOpen = true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var monitorItem = new MonitorEntry
+        //        {
+        //            Datetime = HiResDateTime.UtcNow,
+        //            Device = MonitorDevice.Telescope,
+        //            Category = MonitorCategory.Interface,
+        //            Type = MonitorType.Error,
+        //            Method = MethodBase.GetCurrentMethod().Name,
+        //            Thread = Thread.CurrentThread.ManagedThreadId,
+        //            Message = $"{ex.Message}|{ex.StackTrace}"
+        //        };
+        //        MonitorLog.LogToMonitor(monitorItem);
+
+        //        SkyServer.AlertState = true;
+        //        OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+        //    }
+
+        //}
+
+        //private ICommand _acceptHomeResetDialogCommand;
+        //public ICommand AcceptHomeResetDialogCommand
+        //{
+        //    get
+        //    {
+        //        var command = _acceptHomeResetDialogCommand;
+        //        if (command != null)
+        //        {
+        //            return command;
+        //        }
+
+        //        return _acceptHomeResetDialogCommand = new RelayCommand(
+        //            param => AcceptHomeResetDialog()
+        //        );
+        //    }
+        //}
+        //private void AcceptHomeResetDialog()
+        //{
+        //    try
+        //    {
+        //        using (new WaitCursor())
+        //        {
+        //            if (!SkyServer.IsMountRunning) return;
+        //            SkyServer.ResetHomePositions();
+        //            Synthesizer.Speak(Application.Current.Resources["vceHomeSet"].ToString());
+        //            IsHomeResetDialogOpen = false;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var monitorItem = new MonitorEntry
+        //        {
+        //            Datetime = HiResDateTime.UtcNow,
+        //            Device = MonitorDevice.Telescope,
+        //            Category = MonitorCategory.Interface,
+        //            Type = MonitorType.Error,
+        //            Method = MethodBase.GetCurrentMethod().Name,
+        //            Thread = Thread.CurrentThread.ManagedThreadId,
+        //            Message = $"{ex.Message}|{ex.StackTrace}"
+        //        };
+        //        MonitorLog.LogToMonitor(monitorItem);
+
+        //        SkyServer.AlertState = true;
+        //        OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+        //    }
+        //}
+
+        //private ICommand _cancelHomeResetDialogCommand;
+        //public ICommand CancelHomeResetDialogCommand
+        //{
+        //    get
+        //    {
+        //        var command = _cancelHomeResetDialogCommand;
+        //        if (command != null)
+        //        {
+        //            return command;
+        //        }
+
+        //        return _cancelHomeResetDialogCommand = new RelayCommand(
+        //            param => CancelHomeResetDialog()
+        //        );
+        //    }
+        //}
+        //private void CancelHomeResetDialog()
+        //{
+        //    try
+        //    {
+        //        IsHomeResetDialogOpen = false;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var monitorItem = new MonitorEntry
+        //        {
+        //            Datetime = HiResDateTime.UtcNow,
+        //            Device = MonitorDevice.Telescope,
+        //            Category = MonitorCategory.Interface,
+        //            Type = MonitorType.Error,
+        //            Method = MethodBase.GetCurrentMethod().Name,
+        //            Thread = Thread.CurrentThread.ManagedThreadId,
+        //            Message = $"{ex.Message}|{ex.StackTrace}"
+        //        };
+        //        MonitorLog.LogToMonitor(monitorItem);
+
+        //        SkyServer.AlertState = true;
+        //        OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+        //    }
+        //}
+
+
         #endregion
 
         #region Dialog
@@ -1782,10 +1976,17 @@ namespace GS.Server.Windows
         }
         private void OpenDialog(string msg, string caption = null)
         {
-            if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
-            DialogContent = new DialogOK();
-            IsDialogOpen = true;
+            if (IsDialogOpen)
+            {
+                OpenDialogWin(msg, caption);
+            }
+            else
+            {
+                if (msg != null) DialogMsg = msg;
+                DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
+                DialogContent = new DialogOK();
+                IsDialogOpen = true;
+            }
 
             var monitorItem = new MonitorEntry
             {
@@ -1798,7 +1999,13 @@ namespace GS.Server.Windows
                 Message = $"{msg}"
             };
             MonitorLog.LogToMonitor(monitorItem);
+        }
 
+        private void OpenDialogWin(string msg, string caption = null)
+        {
+            //Open as new window
+            var bWin = new MessageControlV(caption, msg) { Owner = Application.Current.MainWindow };
+            bWin.Show();
         }
 
         private ICommand _clickOkDialogCommand;
@@ -2017,7 +2224,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -2065,7 +2272,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -2112,7 +2319,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -2159,7 +2366,7 @@ namespace GS.Server.Windows
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 

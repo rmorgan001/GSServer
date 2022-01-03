@@ -1,0 +1,46 @@
+﻿<UserControl x:Class="GS.Server.Controls.Dialogs.ReSyncDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+        xmlns:domain="clr-namespace:GS.Server.Domain"
+        xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+    <UserControl.Resources>
+        <domain:EnumBooleanConverter x:Key="EnumBoolean" />
+    </UserControl.Resources>
+    <GroupBox Header="{StaticResource btnReSyncEnc}" Margin="5">
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal" Margin="5,0,0,0">
+                <RadioButton Style="{StaticResource MaterialDesignActionLightToggleButton}" Width="25" Height="25" IsChecked="{Binding SyncMode, Converter={StaticResource EnumBoolean}, ConverterParameter={x:Static skyTelescope:ReSyncMode.Home}}" />
+                <Label Margin="5,0,0,0" Content="{StaticResource btnReSyncHome}" />
+                </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <RadioButton Style="{StaticResource MaterialDesignActionLightToggleButton}" Width="25" Height="25" IsChecked="{Binding SyncMode, Converter={StaticResource EnumBoolean}, ConverterParameter={x:Static skyTelescope:ReSyncMode.Park}}" />
+                <ComboBox Margin="10,0,0,0" materialDesign:HintAssist.Hint="{StaticResource btnTipParkPos}" ToolTip="{StaticResource btnTipParkPos}" MaxWidth="120" Width="120" ItemsSource="{Binding ParkPositions}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEditable="False">
+                    <ComboBox.SelectedItem>
+                        <Binding Path="ReSyncParkSelection" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </ComboBox.SelectedItem>
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="skyTelescope:ParkPosition">
+                            <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Margin="5">
+                <TextBlock Margin="10,10,0,0" VerticalAlignment="Center" Text="{StaticResource btnReSyncAccept}" />
+                <StackPanel Margin="0,10,0,0" Orientation="Horizontal"  HorizontalAlignment="Center">
+                    <Button IsDefault="False" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptReSyncDialogCmd}" Content="{StaticResource diaAccept}" />
+                    <Button IsCancel="True" IsDefault="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelReSyncDialogCmd}" Content="{StaticResource diaCancel}" />
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </GroupBox>
+    </UserControl>

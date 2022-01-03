@@ -1,0 +1,13 @@
+﻿<UserControl x:Class="GS.Server.Controls.Dialogs.CapabilitiesDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <GroupBox Header="{StaticResource btnCap}" Margin="5">
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10">
+                <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource capCanSetPark}" IsChecked="{Binding CanSetPark, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource capCanSetPark}" />
+             </StackPanel>
+            <Button Margin="10" IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding ClickOkCapDialogCmd}" Content="{StaticResource diaOk}"/>
+        </StackPanel>
+    </GroupBox>
+    </UserControl>

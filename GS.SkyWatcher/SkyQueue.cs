@@ -53,7 +53,7 @@ namespace GS.SkyWatcher
         public static void AddCommand(ISkyCommand command)
         {
             if (!IsRunning || _cts.IsCancellationRequested || !_skyWatcher.IsConnected) return;
-            CleanResults(20, 120);
+            CleanResults(40, 180);
             if (_commandBlockingCollection.TryAdd(command) == false)
             {
                 throw new MountControlException(ErrorCode.ErrQueueFailed, $"Unable to Add Command {command.Id}, {command}");
@@ -105,7 +105,7 @@ namespace GS.SkyWatcher
                 return command;
             }
             var sw = Stopwatch.StartNew();
-            while (sw.Elapsed.TotalMilliseconds < 22000)
+            while (sw.Elapsed.TotalMilliseconds < 40000)
             {
                 if (_resultsDictionary == null) break;
                 var success = _resultsDictionary.TryRemove(command.Id, out var result);
@@ -131,7 +131,7 @@ namespace GS.SkyWatcher
                 if (command.Exception != null)
                 {
                     var monitorItem = new MonitorEntry
-                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{command.Exception.Message}, {command.Exception.StackTrace}" };
+                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{command.Exception.Message}|{command.Exception.StackTrace}" };
                     MonitorLog.LogToMonitor(monitorItem);
                 }
                 if (command.Id <= 0) return;
@@ -143,7 +143,7 @@ namespace GS.SkyWatcher
             catch (Exception e)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{command.Id},{e.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{command.Id}|{e.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 command.Exception = e;
@@ -155,13 +155,15 @@ namespace GS.SkyWatcher
         /// Startup Queues
         /// </summary>
         /// <param name="serial"></param>
-        public static void Start(SerialPort serial)
+        /// <param name="customMount360Steps"></param>
+        /// <param name="customRaWormSteps"></param>
+        public static void Start(SerialPort serial, int[] customMount360Steps, double[] customRaWormSteps)
         {
             Stop();
             if (_cts == null) _cts = new CancellationTokenSource();
             var ct = _cts.Token;
 
-            _skyWatcher = new SkyWatcher(serial);
+            _skyWatcher = new SkyWatcher(serial, customMount360Steps,  customRaWormSteps);
             _resultsDictionary = new ConcurrentDictionary<long, ISkyCommand>();
             _commandBlockingCollection = new BlockingCollection<ISkyCommand>();
 

@@ -72,7 +72,7 @@ namespace NStarAlignment.DataTypes
 
         public AxisPosition(string axisPositions)
         {
-            var positions = axisPositions.Split(',');
+            var positions = axisPositions.Split('|');
             try
             {
                 _raAxis = double.Parse(positions[0]);

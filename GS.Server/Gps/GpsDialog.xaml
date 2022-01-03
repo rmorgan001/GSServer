@@ -90,8 +90,8 @@
             </StackPanel>
             <TextBlock Margin="0,15,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{StaticResource gpsAccept}"/>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,5">
-                <Button IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaAccept}" Command="{Binding AcceptGpsDialogCommand}" IsEnabled="{Binding HasGSPData}"/>
-                <Button IsCancel="True" Margin="8,0,0,0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaCancel}" Command="{Binding CancelGpsDialogCommand}"/>
+                <Button IsDefault="False" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaAccept}" Command="{Binding AcceptGpsDialogCommand}" IsEnabled="{Binding HasGSPData}"/>
+                <Button IsCancel="True" IsDefault="True" Margin="8,0,0,0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaCancel}" Command="{Binding CancelGpsDialogCommand}"/>
             </StackPanel>
         </StackPanel>
         </GroupBox>

@@ -35,6 +35,7 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using GS.Server.Windows;
 using GS.Shared.Command;
 using Timer = System.Timers.Timer;
 
@@ -49,7 +50,7 @@ namespace GS.Server.Pec
 
         private const double _siderealDaySeconds = 86164.1;
         private const double _secondsOfArc = 1296000.0;
-        private const string _tab = "~"; //"\t";
+        private const string _tab = "|"; //"\t";
 
         private readonly SkyTelescopeVM _skyTelescopeVM;
         private Timer _timer;
@@ -111,7 +112,7 @@ namespace GS.Server.Pec
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -149,7 +150,7 @@ namespace GS.Server.Pec
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -194,7 +195,7 @@ namespace GS.Server.Pec
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod().Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message},{ex.StackTrace}"
+                    Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -1280,10 +1281,17 @@ namespace GS.Server.Pec
         }
         private void OpenDialog(string msg, string caption = null)
         {
-            if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
-            DialogContent = new DialogOK();
-            IsDialogOpen = true;
+            if (IsDialogOpen)
+            {
+                OpenDialogWin(msg, caption);
+            }
+            else
+            {
+                if (msg != null) DialogMsg = msg;
+                DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
+                DialogContent = new DialogOK();
+                IsDialogOpen = true;
+            }
 
             var monitorItem = new MonitorEntry
             {
@@ -1296,7 +1304,13 @@ namespace GS.Server.Pec
                 Message = $"{msg}"
             };
             MonitorLog.LogToMonitor(monitorItem);
+        }
 
+        private void OpenDialogWin(string msg, string caption = null)
+        {
+            //Open as new window
+            var bWin = new MessageControlV(caption, msg) { Owner = Application.Current.MainWindow };
+            bWin.Show();
         }
 
         private ICommand _clickOkDialogCommand;

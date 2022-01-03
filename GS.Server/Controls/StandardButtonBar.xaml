@@ -50,13 +50,13 @@
                 Command="{Binding ClickStopCommand}" Content="{StaticResource btnStop}">
         </Button>
         <StackPanel Orientation="Horizontal">
-            <md:PopupBox Margin="-10,5,-10,0" >
+            <md:PopupBox Margin="-10,5,-10,0" StaysOpen="False">
                     <GroupBox Header="Tracking Rate" Margin="5,0,5,0">
                         <StackPanel Orientation="Vertical">
-                        <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="tr" IsChecked="{Binding Path=TrackingRate, Converter={StaticResource Compare}, ConverterParameter={x:Static deviceInterface:DriveRates.driveSidereal}}" Content="{StaticResource skySidereal}" />
-                        <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="tr" IsChecked="{Binding Path=TrackingRate, Converter={StaticResource Compare}, ConverterParameter={x:Static deviceInterface:DriveRates.driveLunar}}" Content="{StaticResource skyLunar}" />
-                        <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="tr" IsChecked="{Binding Path=TrackingRate, Converter={StaticResource Compare}, ConverterParameter={x:Static deviceInterface:DriveRates.driveSolar}}" Content="{StaticResource skySolar}"/>
-                        <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="tr" IsChecked="{Binding Path=TrackingRate, Converter={StaticResource Compare}, ConverterParameter={x:Static deviceInterface:DriveRates.driveKing}}" Content="{StaticResource skyKing}"/>
+                            <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="tr" IsChecked="{Binding Path=TrackingRate, Converter={StaticResource Compare}, ConverterParameter={x:Static deviceInterface:DriveRates.driveSidereal}}" Content="{StaticResource skySidereal}" />
+                            <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="tr" IsChecked="{Binding Path=TrackingRate, Converter={StaticResource Compare}, ConverterParameter={x:Static deviceInterface:DriveRates.driveLunar}}" Content="{StaticResource skyLunar}" />
+                            <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="tr" IsChecked="{Binding Path=TrackingRate, Converter={StaticResource Compare}, ConverterParameter={x:Static deviceInterface:DriveRates.driveSolar}}" Content="{StaticResource skySolar}"/>
+                            <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="tr" IsChecked="{Binding Path=TrackingRate, Converter={StaticResource Compare}, ConverterParameter={x:Static deviceInterface:DriveRates.driveKing}}" Content="{StaticResource skyKing}"/>
                         </StackPanel>
                     </GroupBox>
             </md:PopupBox>
@@ -70,8 +70,7 @@
         <md:DialogHost VerticalAlignment="Bottom" CloseOnClickAway="True"
                        IsOpen="{Binding IsHomeResetDialogOpen}" DialogContent="{Binding HomeResetContent}">
             <Button Margin="5,6,0,0" Width="100" Height="25" HorizontalAlignment="Left" Padding="-5"
-                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipSetHome}"
-                    Command="{Binding OpenHomeResetDialogCommand}" Content="{StaticResource btnSetHome}">
+                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipSetHome}" Command="{Binding OpenReSyncDialogCmd}" Content="{StaticResource btnReSync}">
             </Button>
         </md:DialogHost>
         <md:DialogHost VerticalAlignment="Bottom" CloseOnClickAway="True" IsOpen="{Binding IsFlipDialogOpen}" DialogContent="{Binding FlipContent}">

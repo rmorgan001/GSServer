@@ -30,7 +30,7 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
             </StackPanel>
-            <Button Margin="0,10,0,0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding OkLimitDialogCommand}" Content="{StaticResource diaOk}"/>
+            <Button IsCancel="True" IsDefault="True"  Margin="0,10,0,0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding OkLimitDialogCommand}" Content="{StaticResource diaOk}"/>
         </StackPanel>
     </GroupBox>
     </UserControl>
