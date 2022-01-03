@@ -85,4 +85,9 @@
   <ItemGroup>
     <Resource Include="greenswamp1.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Page Update="Controls\Dialogs\TwoButtonMessageDialog.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
+  </ItemGroup>
 </Project>
