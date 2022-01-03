@@ -89,6 +89,7 @@
     <ProjectReference Include="..\GS.SkyWatcher\GS.SkyWatcher.csproj">
       <Private>false</Private>
     </ProjectReference>
+    <ProjectReference Include="..\GS.Utilities\GS.Utilities.csproj" />
     <ProjectReference Include="..\NStarAlignment\NStarAlignment.csproj" />
     <ProjectReference Include="..\XInputDotNetPure\XInputDotNetPure.csproj" />
   </ItemGroup>

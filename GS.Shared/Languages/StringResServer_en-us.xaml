@@ -630,6 +630,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="mntFreqRa">Frequency Ra:</system:String>
     <system:String x:Key="mntFreqDec">Frequency Dec:</system:String>
 
+
     <!--1.0.3.4 -->
     <system:String x:Key="btnReSyncEnc">ReSync Encoders</system:String>
     <system:String x:Key="btnReSyncHome">Home Position</system:String>
@@ -640,5 +641,21 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnCap">External Capabilities</system:String>
     <system:String x:Key="capCanSetPark">Can Set Park</system:String>
     <system:String x:Key="skyStopMount">Mount must be stopped</system:String>
+    
+    <!-- 1.0.3.8 -->
+    <system:String x:Key="aliExport">Export</system:String>
+    <system:String x:Key="aliExportTooltip">Click this button to export the current point model.</system:String>
+    <system:String x:Key="aliImport">Import</system:String>
+    <system:String x:Key="aliImportTooltip">Click this button import a point model that was previously exported.</system:String>
+    <system:String x:Key="aliConfirmClearAllCaption">Clear Alignment Points</system:String>
+    <system:String x:Key="aliConfirmClearAllMessage">Accept to clear all alignment points.</system:String>
+    <system:String x:Key="aliConfirmDeleteCaption">Delete Alignment Point</system:String>
+    <system:String x:Key="aliConfirmDeleteMessage">Accept to delete the selected alignment points.</system:String>
+    <system:String x:Key="aliConfirmImportCaption">Import Alignment Points</system:String>
+    <system:String x:Key="aliConfirmImportMessage">Accept to import previously saved alignment points. This will clear any existing alignment points.</system:String>
+    <system:String x:Key="aliAcceptButtonCaption">Accept</system:String>
+    <system:String x:Key="aliCancelButtonCaption">Cancel</system:String>
+    <system:String x:Key="aliPointModelFileFilter">Point model files (*.GssPointModel)|*.GssPointModel|All files (*.*)|*.*</system:String>
+
 </ResourceDictionary>
  

@@ -211,6 +211,12 @@ namespace NStarAlignment.Model
             }
         }
 
+
+        public void SaveAlignmentPoints(string filename)
+        {
+            File.WriteAllText(filename, JsonConvert.SerializeObject(AlignmentPoints, Formatting.Indented));
+        }
+
         private void SaveAlignmentPoints()
         {
             var dir = Path.GetDirectoryName(_configFile);
@@ -218,8 +224,36 @@ namespace NStarAlignment.Model
             {
                 Directory.CreateDirectory(dir);
             }
-            File.WriteAllText(_configFile, JsonConvert.SerializeObject(AlignmentPoints, Formatting.Indented));
+            SaveAlignmentPoints(_configFile);
             ReportAlignmentPoints();
+        }
+
+
+        public void LoadAlignmentPoints(string filename)
+        {
+            AlignmentPoints.Clear();
+            using (var file = File.OpenText(filename))
+            {
+                var serializer = new JsonSerializer();
+                try
+                {
+                    var loaded =
+                        (AlignmentPointCollection) serializer.Deserialize(file, typeof(AlignmentPointCollection));
+                    if (loaded != null)
+                    {
+                        foreach (var alignmentPoint in loaded)
+                        {
+                            AlignmentPoints.Add(alignmentPoint);
+                        }
+                        SaveAlignmentPoints();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogException(ex);
+                }
+            }
+
         }
 
         private void LoadAlignmentPoints()
@@ -231,19 +265,7 @@ namespace NStarAlignment.Model
             }
             if (File.Exists(_configFile))
             {
-                AlignmentPoints.Clear();
-                using (var file = File.OpenText(_configFile))
-                {
-                    var serializer = new JsonSerializer();
-                    var loaded = (AlignmentPointCollection)serializer.Deserialize(file, typeof(AlignmentPointCollection));
-                    if (loaded != null)
-                    {
-                        foreach (var alignmentPoint in loaded)
-                        {
-                            AlignmentPoints.Add(alignmentPoint);
-                        }
-                    }
-                }
+                LoadAlignmentPoints(_configFile);
             }
             ReportAlignmentPoints();
         }

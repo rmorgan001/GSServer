@@ -6,7 +6,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="ProximityLimit" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">2</Value>
+      <Value Profile="(Default)">0.27777777</Value>
     </Setting>
     <Setting Name="SampleSize" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">3</Value>
@@ -18,7 +18,7 @@
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="NearbyLimit" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">90</Value>
+      <Value Profile="(Default)">45</Value>
     </Setting>
   </Settings>
 </SettingsFile>
