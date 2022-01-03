@@ -553,7 +553,6 @@ namespace GS.Server.SkyTelescope
             }
             set
             {
-                if (value == _mountRunning) return;
                 _mountRunning = value;
                 if (value)
                 {
@@ -3714,29 +3713,20 @@ namespace GS.Server.SkyTelescope
         private static void MountStop()
         {
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{SkySettings.Mount}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{SkySettings.Mount}" };
             MonitorLog.LogToMonitor(monitorItem);
 
-            if (MountQueue.IsRunning)
-            {
-                AxesStopValidate();
-                if (_mediaTimer != null) { _mediaTimer.Tick -= UpdateServerEvent; }
-                _mediaTimer?.Stop();
-                _mediaTimer?.Dispose();
-                MountQueue.Stop();
-            }
-
-            if (!SkyQueue.IsRunning) return;
             AxesStopValidate();
             if (_mediaTimer != null) { _mediaTimer.Tick -= UpdateServerEvent; }
             _mediaTimer?.Stop();
             _mediaTimer?.Dispose();
             var sw = Stopwatch.StartNew();
-            while (sw.Elapsed.TotalMilliseconds < 1000)
-            {
-            }
-
+            while (sw.Elapsed.TotalMilliseconds < 1000) { } //change
             sw.Stop();
+
+            if (MountQueue.IsRunning) { MountQueue.Stop(); }
+
+            if (!SkyQueue.IsRunning) return;
             SkyQueue.Stop();
             SkySystem.ConnectSerial = false;
         }
