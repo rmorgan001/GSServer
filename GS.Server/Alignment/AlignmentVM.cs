@@ -21,6 +21,7 @@ using GS.Server.Main;
 using GS.Server.SkyTelescope;
 using GS.Shared;
 using GS.Shared.Command;
+using GS.Utilities.Controls.Dialogs;
 using MaterialDesignThemes.Wpf;
 using NStarAlignment.DataTypes;
 using System;
@@ -32,7 +33,12 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Forms;
 using System.Windows.Input;
+using Application = System.Windows.Application;
+using MessageBox = System.Windows.MessageBox;
+using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace GS.Server.Alignment
 {
@@ -77,7 +83,7 @@ namespace GS.Server.Alignment
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                SelectedAlignmentPoint = AlignmentPoints[e.NewStartingIndex + e.NewItems.Count-1];
+                SelectedAlignmentPoint = AlignmentPoints[e.NewStartingIndex + e.NewItems.Count - 1];
             }
             else
             {
@@ -110,8 +116,8 @@ namespace GS.Server.Alignment
             }
         }
 
-        public bool IsAlignmentOn 
-        { 
+        public bool IsAlignmentOn
+        {
             get => AlignmentSettings.IsAlignmentOn;
             set
             {
@@ -174,13 +180,84 @@ namespace GS.Server.Alignment
             {
                 return _clearAllPointsCommand
                        ?? (_clearAllPointsCommand = new RelayCommand(
-                           param => {
-                               SkyServer.AlignmentModel.ClearAlignmentPoints();
-                           },
+                           param => ClearAllAlignmentPoints(),
                            param => AlignmentPoints.Count > 0)
                        );
             }
         }
+
+
+        private void ClearAllAlignmentPoints()
+        {
+            TwoButtonMessageDialogVM messageVm = new TwoButtonMessageDialogVM()
+            {
+                Caption = $"{Application.Current.Resources["aliConfirmClearAllCaption"]}",
+                Message = $"{Application.Current.Resources["aliConfirmClearAllMessage"]}",
+                ButtonOneCaption = $"{Application.Current.Resources["aliAcceptButtonCaption"]}",
+                ButtonTwoCaption = $"{Application.Current.Resources["aliCancelButtonCaption"]}",
+                OnButtonOneClicked = () =>
+                {
+                    SkyServer.AlignmentModel.ClearAlignmentPoints();
+                    IsDialogOpen = false;
+                },
+                OnButtonTwoClicked = () =>
+                {
+                    IsDialogOpen = false;
+                }
+            };
+            DialogContent = new TwoButtonMessageDialog(messageVm);
+            IsDialogOpen = true;
+
+        }
+
+        private RelayCommand _resetProximityLimit;
+
+        public RelayCommand ResetProximityLimit
+        {
+            get
+            {
+                return _resetProximityLimit
+                       ?? (_resetProximityLimit = new RelayCommand(
+                           param =>
+                           {
+                               ProximityLimitArcSeconds = 1000;
+                           })
+                       );
+            }
+        }
+
+        private RelayCommand _resetNearbyLimit;
+
+        public RelayCommand ResetNearbyLimit
+        {
+            get
+            {
+                return _resetNearbyLimit
+                       ?? (_resetNearbyLimit = new RelayCommand(
+                           param =>
+                           {
+                               NearbyLimit = 45.0;
+                           })
+                       );
+            }
+        }
+
+        private RelayCommand _resetSampleSize;
+
+        public RelayCommand ResetSampleSize
+        {
+            get
+            {
+                return _resetSampleSize
+                       ?? (_resetSampleSize = new RelayCommand(
+                           param =>
+                           {
+                               SampleSize = 3;
+                           })
+                       );
+            }
+        }
+
 
         private RelayCommand _deleteSelectedPointCommand;
 
@@ -190,42 +267,125 @@ namespace GS.Server.Alignment
             {
                 return _deleteSelectedPointCommand
                        ?? (_deleteSelectedPointCommand = new RelayCommand(
-                           param =>
-                           {
-                               SkyServer.AlignmentModel.RemoveAlignmentPoint(SelectedAlignmentPoint);
-                           },
+                           param => DeleteSelectedPoint(),
                            param => SelectedAlignmentPoint != null)
                        );
             }
         }
+
+        private void DeleteSelectedPoint()
+        {
+            TwoButtonMessageDialogVM messageVm = new TwoButtonMessageDialogVM()
+            {
+                Caption = $"{Application.Current.Resources["aliConfirmDeleteCaption"]}",
+                Message = $"{Application.Current.Resources["aliConfirmDeleteMessage"]}",
+                ButtonOneCaption = $"{Application.Current.Resources["aliAcceptButtonCaption"]}",
+                ButtonTwoCaption = $"{Application.Current.Resources["aliCancelButtonCaption"]}",
+                OnButtonOneClicked = () =>
+                {
+                    SkyServer.AlignmentModel.RemoveAlignmentPoint(SelectedAlignmentPoint);
+                    IsDialogOpen = false;
+                },
+                OnButtonTwoClicked = () =>
+                {
+                    IsDialogOpen = false;
+                }
+            };
+            DialogContent = new TwoButtonMessageDialog(messageVm);
+            IsDialogOpen = true;
+
+        }
+
+        private RelayCommand _exportCommand;
+
+        public RelayCommand ExportCommand
+        {
+            get
+            {
+                return _exportCommand
+                       ?? (_exportCommand = new RelayCommand(
+                           param =>
+                           {
+                               ExportPointModel();
+                           },
+                           param => AlignmentPoints.Count > 0)
+                       );
+            }
+        }
+
+        private void ExportPointModel()
+        {
+            var dlg = new SaveFileDialog { Filter = $"{Application.Current.Resources["aliPointModelFileFilter"]}" };
+            if (dlg.ShowDialog() != true) return;
+            SkyServer.AlignmentModel.SaveAlignmentPoints(dlg.FileName);
+        }
+
+        private RelayCommand _importCommand;
+
+        public RelayCommand ImportCommand
+        {
+            get
+            {
+                return _importCommand
+                       ?? (_importCommand = new RelayCommand(
+                           param =>
+                           {
+                               if (AlignmentPoints.Count > 0)
+                               {
+                                   ConfirmImport();
+                               }
+                               else
+                               {
+                                   ImportPointModel();
+                               }
+                           })
+                       );
+            }
+        }
+
+        private void ConfirmImport()
+        {
+            TwoButtonMessageDialogVM messageVm = new TwoButtonMessageDialogVM()
+            {
+                Caption = $"{Application.Current.Resources["aliConfirmImportCaption"]}",
+                Message = $"{Application.Current.Resources["aliConfirmImportMessage"]}",
+                ButtonOneCaption = $"{Application.Current.Resources["aliAcceptButtonCaption"]}",
+                ButtonTwoCaption = $"{Application.Current.Resources["aliCancelButtonCaption"]}",
+                OnButtonOneClicked = () =>
+                {
+                    ImportPointModel();
+                    IsDialogOpen = false;
+                },
+                OnButtonTwoClicked = () =>
+                {
+                    IsDialogOpen = false;
+                }
+            };
+            DialogContent = new TwoButtonMessageDialog(messageVm);
+            IsDialogOpen = true;
+        }
+
+
+
+        private void ImportPointModel()
+        {
+            var fileDialog = new OpenFileDialog()
+            {
+                FileName = "*.GssPointModel",
+                Filter = $"{Application.Current.Resources["aliPointModelFileFilter"]}",
+                Multiselect = false,
+            };
+            string filename = fileDialog.ShowDialog() != true ? null : fileDialog.FileName;
+            if (filename != null)
+            {
+                SkyServer.AlignmentModel.LoadAlignmentPoints(filename);
+            }
+
+        }
+
         #endregion
 
         #region Dialog 
-
-        private string _dialogMsg;
-        public string DialogMsg
-        {
-            get => _dialogMsg;
-            set
-            {
-                if (_dialogMsg == value) return;
-                _dialogMsg = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private string _dialogCaption;
-        public string DialogCaption
-        {
-            get => _dialogCaption;
-            set
-            {
-                if (_dialogCaption == value) return;
-                _dialogCaption = value;
-                OnPropertyChanged();
-            }
-        }
-
         private bool _isDialogOpen;
         public bool IsDialogOpen
         {
@@ -262,104 +422,35 @@ namespace GS.Server.Alignment
                 }
 
                 return _openDialogCommand = new RelayCommand(
-                    param => OpenDialog(null)
+                    param => OpenDialog("My test message", "My test caption")
                 );
             }
         }
         private void OpenDialog(string msg, string caption = null)
         {
-            if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["msgDialog"].ToString();
-            DialogContent = new DialogOK();
+            TwoButtonMessageDialogVM messageVm = new TwoButtonMessageDialogVM()
+            {
+                Caption = caption,
+                Message = msg,
+                ButtonOneCaption = "Accept",
+                ButtonTwoCaption = "Cancel",
+                OnButtonOneClicked = () =>
+                {
+                    System.Diagnostics.Debug.WriteLine("Accept clicked!");
+                    IsDialogOpen = false;
+                },
+                OnButtonTwoClicked = () =>
+                {
+                    System.Diagnostics.Debug.WriteLine("Cancel clicked!");
+                    IsDialogOpen = false;
+                }
+            };
+            DialogContent = new TwoButtonMessageDialog(messageVm);
             IsDialogOpen = true;
-
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Telescope,
-                Category = MonitorCategory.Interface,
-                Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{msg}"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
-
         }
 
-        private ICommand _clickOkDialogCommand;
-        public ICommand ClickOkDialogCommand
-        {
-            get
-            {
-                var command = _clickOkDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
 
-                return _clickOkDialogCommand = new RelayCommand(
-                    param => ClickOkDialog()
-                );
-            }
-        }
-        private void ClickOkDialog()
-        {
-            IsDialogOpen = false;
-        }
 
-        private ICommand _clickCancelDialogCommand;
-        public ICommand ClickCancelDialogCommand
-        {
-            get
-            {
-                var command = _clickCancelDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _clickCancelDialogCommand = new RelayCommand(
-                    param => ClickCancelDialog()
-                );
-            }
-        }
-        private void ClickCancelDialog()
-        {
-            IsDialogOpen = false;
-        }
-
-        private ICommand _runMessageDialog;
-        public ICommand RunMessageDialogCommand
-        {
-            get
-            {
-                var dialog = _runMessageDialog;
-                if (dialog != null)
-                {
-                    return dialog;
-                }
-
-                return _runMessageDialog = new RelayCommand(
-                    param => ExecuteMessageDialog()
-                );
-            }
-        }
-        private async void ExecuteMessageDialog()
-        {
-            //let's set up a little MVVM, cos that's what the cool kids are doing:
-            var view = new ErrorMessageDialog
-            {
-                DataContext = new ErrorMessageDialogVM()
-            };
-
-            //show the dialog
-            await DialogHost.Show(view, "RootDialog", ClosingMessageEventHandler);
-        }
-        private void ClosingMessageEventHandler(object sender, DialogClosingEventArgs eventArgs)
-        {
-            Console.WriteLine(@"You can intercept the closing event, and cancel here.");
-        }
 
         #endregion
 

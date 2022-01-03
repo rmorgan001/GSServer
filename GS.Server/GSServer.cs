@@ -211,7 +211,7 @@ namespace GS.Server
             var driverpath = dir + "\\" + _driverName;
             if (File.Exists(driverpath)) { files.Add(new FileInfo(driverpath)); }
 
-            var apipath = dir +  "\\" + _apiName;
+            var apipath = dir + "\\" + _apiName;
             if (File.Exists(apipath)) { files.Add(new FileInfo(apipath)); }
 
             var dllfiles = files.ToArray();
@@ -607,47 +607,51 @@ namespace GS.Server
             var bRet = true;
             if (args.Count > 0)
             {
-                // should the profile be removed?
-                if (args.Count > 1)
-                    if (args[1].ToLower() == "-unprofile" || args[1].ToLower() == @"/unprofile")
-                        _removeProfile = true;
-
-                switch (args[0].ToLower())
+                foreach (string arg in args)
                 {
-                    case "-embedding":
-                        StartedByCom = true; // Indicate COM started us
-                        break;
-                    case "-register":
-                    case @"/register":
-                    case "-regserver": // Emulate VB6
-                    case @"/regserver":
-                        RegisterObjects(); // Register each served object
-                        bRet = false;
-                        break;
-                    case "-unregister":
-                    case @"/unregister":
-                    case "-unregserver": // Emulate VB6
-                    case @"/unregserver":
-                        UnRegisterObjects(); //Un-register each served object
-                        bRet = false;
-                        break;
-                    case @"/pec":
-                        SkyServer.PecShow = true;
-                        break;
-                    case @"/showalignment":
-                        SkyServer.AlignmentShow = true;
-                        break;
-                    case @"/en":
-                        Shared.Settings.Language = "en-US";
-                        break;
-                    case @"/fr":
-                        Shared.Settings.Language = "fr-FR";
-                        break;
-                    default:
-                        MessageBox.Show(
-                            @"Unknown argument: " + args[0] + @"Valid are : -register, -unregister and -embedding",
-                            @"GSServer", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                        break;
+                    switch (arg.ToLower())
+                    {
+                        // should the profile be removed?
+                        case "-unprofile":
+                        case @"/unprofile":
+                            _removeProfile = true;
+                            break;
+
+                        case "-embedding":
+                            StartedByCom = true; // Indicate COM started us
+                            break;
+                        case "-register":
+                        case @"/register":
+                        case "-regserver": // Emulate VB6
+                        case @"/regserver":
+                            RegisterObjects(); // Register each served object
+                            bRet = false;
+                            break;
+                        case "-unregister":
+                        case @"/unregister":
+                        case "-unregserver": // Emulate VB6
+                        case @"/unregserver":
+                            UnRegisterObjects(); //Un-register each served object
+                            bRet = false;
+                            break;
+                        case @"/pec":
+                            SkyServer.PecShow = true;
+                            break;
+                        case @"/showalignment":
+                            SkyServer.AlignmentShow = true;
+                            break;
+                        case @"/en":
+                            Shared.Settings.Language = "en-US";
+                            break;
+                        case @"/fr":
+                            Shared.Settings.Language = "fr-FR";
+                            break;
+                        default:
+                            MessageBox.Show(
+                                @"Unknown argument: " + args[0] + @"Valid are : -register, -unregister, -embedding, /pec, /showalignment, /en and /fr",
+                                @"GSServer", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                            break;
+                    }
                 }
             }
             else
@@ -716,7 +720,7 @@ namespace GS.Server
                 app.Run();
 
                 monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer: Shutdown" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer: Shutdown" };
                 MonitorLog.LogToMonitor(monitorItem);
 
             }

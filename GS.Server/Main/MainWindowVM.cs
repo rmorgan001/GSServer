@@ -347,7 +347,7 @@ namespace GS.Server.Main
                     break;
                 case "Pec":
                     //if (Settings.Settings.Pec)
-                    if (SkyServer.PecShow)
+                    if (SkyServer.PecShow && Settings.Settings.Pec)
                     {
                         if (!PageViewModels.Contains(_pecVM))
                         {
