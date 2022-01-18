@@ -316,7 +316,8 @@ namespace GS.Shared
     public enum MonitorDevice
     {
         Server,
-        Telescope
+        Telescope,
+        Focuser
     }
 
     /// <summary>

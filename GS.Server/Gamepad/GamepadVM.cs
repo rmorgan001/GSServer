@@ -31,6 +31,7 @@ using System.Windows.Input;
 using GS.Server.Controls.Dialogs;
 using GS.Server.Windows;
 using GS.Shared.Command;
+using GS.Server.Focuser;
 
 namespace GS.Server.GamePad
 {
@@ -41,6 +42,7 @@ namespace GS.Server.GamePad
         public int Uid => 3;
 
         private SkyTelescopeVM _skyTelescopeVM;
+        private FocuserVM _focuserVM;
         private SettingsVM _settingsVM;
         private CancellationTokenSource ctsGamePad;
         private string _focusTextBox;
@@ -64,6 +66,8 @@ namespace GS.Server.GamePad
         private int _spiralInCount;
         private int _spiralOutCount;
         private int _newSpiralCount;
+        private int _focusInCount;
+        private int _focusOutCount;
 
         private const float _vibrateLeft = 0.0f;
         private float _vibrateRight;
@@ -398,6 +402,30 @@ namespace GS.Server.GamePad
             }
         }
 
+        private string _focusIn;
+
+        public string FocusIn
+        {
+            get => _focusIn;
+            set
+            {
+                _focusIn = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _focusOut;
+
+        public string FocusOut
+        {
+            get => _focusOut;
+            set
+            {
+                _focusOut = value;
+                OnPropertyChanged();
+            }
+        }
+
         private int _delay;
 
         public int Delay
@@ -432,6 +460,16 @@ namespace GS.Server.GamePad
         {
             if (_skyTelescopeVM == null) _skyTelescopeVM = SkyTelescopeVM._skyTelescopeVM;
             return _skyTelescopeVM != null;
+        }
+
+        /// <summary>
+        /// Sets up a reference back to run any Focuser commands
+        /// </summary>
+        /// <returns></returns>
+        private bool Focuser()
+        {
+            if (_focuserVM == null) _focuserVM = FocuserVM._focuserVM;
+            return _focuserVM != null;
         }
 
         /// <summary>
@@ -474,6 +512,8 @@ namespace GS.Server.GamePad
                     var xaxistocheck = new AxisPair(-1, String.Empty);
                     var yaxistocheck = new AxisPair(-1, String.Empty);
                     var zaxistocheck = new AxisPair(-1, String.Empty);
+                    var xrotationtocheck = new AxisPair(-1, String.Empty);
+                    var yrotationtocheck = new AxisPair(-1, String.Empty);
                     var KeepRunning = true;
                     while (KeepRunning)
                     {
@@ -559,7 +599,7 @@ namespace GS.Server.GamePad
                                         DoGamePadSetKey(key, val);
                                         break;
                                     }
-
+                                    
                                     var id = DoGamePadCommand(newhit.Key, true, cmd);
                                     povtocheck = id == -1 ? new PovPair(-1, 0) : newhit;
                                     break;
@@ -675,6 +715,78 @@ namespace GS.Server.GamePad
                             }
                         }
 
+                        // Check X Rotation
+                        if (xrotationtocheck.Key > -1)
+                        {
+                            var xDirection = AxisDirection(_gamePad.XRotation);
+                            var pushed = xrotationtocheck.Value == xDirection;
+                            //if (!pushed)
+                            //{
+                                if (String.IsNullOrEmpty(key))
+                                {
+                                    var cmd = _gamePad.Get_KeyByValue("xrotation" + " " + xrotationtocheck.Value);
+                                    var id = DoGamePadCommand(xrotationtocheck.Key, pushed, cmd);
+                                    if (id == -1) xrotationtocheck = new AxisPair(-1, String.Empty);
+                                }
+                            //}
+                        }
+                        else
+                        {
+                            var xDirection = AxisDirection(_gamePad.XRotation);
+                            if (xDirection != "normal")
+                            {
+                                var newaxis = new AxisPair(1, xDirection);
+                                var val = "xrotation" + " " + xDirection;
+                                var cmd = _gamePad.Get_KeyByValue(val);
+
+                                if (key != null)
+                                {
+                                    DoGamePadSetKey(key, val);
+                                }
+                                else
+                                {
+                                    var id = DoGamePadCommand(1, true, cmd);
+                                    xrotationtocheck = id == -1 ? new AxisPair(-1, string.Empty) : newaxis;
+                                }
+                            }
+                        }
+
+                        // Check Y Rotation
+                        if (yrotationtocheck.Key > -1)
+                        {
+                            var yDirection = AxisDirection(_gamePad.YRotation);
+                            var pushed = yrotationtocheck.Value == yDirection;
+                            //if (!pushed)
+                            //{
+                                if (String.IsNullOrEmpty(key))
+                                {
+                                    var cmd = _gamePad.Get_KeyByValue("yrotation" + " " + yrotationtocheck.Value);
+                                    var id = DoGamePadCommand(yrotationtocheck.Key, pushed, cmd);
+                                    if (id == -1) yrotationtocheck = new AxisPair(-1, String.Empty);
+                                }
+                            //}
+                        }
+                        else
+                        {
+                            var yDirection = AxisDirection(_gamePad.YRotation);
+                            if (yDirection != "normal")
+                            {
+                                var newaxis = new AxisPair(1, yDirection);
+                                var val = "yrotation" + " " + yDirection;
+                                var cmd = _gamePad.Get_KeyByValue(val);
+
+                                if (key != null)
+                                {
+                                    DoGamePadSetKey(key, val);
+                                }
+                                else
+                                {
+                                    var id = DoGamePadCommand(1, true, cmd);
+                                    yrotationtocheck = id == -1 ? new AxisPair(-1, string.Empty) : newaxis;
+                                }
+                            }
+                        }
+
                         Thread.Sleep(Delay);
                     }
                 }, ct);
@@ -719,8 +831,24 @@ namespace GS.Server.GamePad
             MonitorLog.LogToMonitor(monitorItem);
 
             var returnId = -1;
-            if (!SkyServer.IsMountRunning) return returnId;
             if (command == null) return returnId;
+            switch (command)
+            {
+                case "volumeup":
+                case "volumedown":
+                    if (!Settings()) return returnId;
+                    break;
+
+                case "focusin":
+                case "focusout":
+                    if (!Focuser()) return returnId;
+                    break;
+                default:
+                    if (!SkyTelescope()) return returnId;
+                    if (!SkyServer.IsMountRunning) return returnId;
+                    break;
+
+            }
             if (ctsGamePad.IsCancellationRequested) return returnId;
             ThreadContext.InvokeOnUiThread(delegate
             {
@@ -736,7 +864,6 @@ namespace GS.Server.GamePad
                     case "home":
                         if (value)
                         {
-                            if (!SkyTelescope()) return;
                             if (_homeCount == 0)
                             {
                                 if (_skyTelescopeVM.ClickHomeCommand.CanExecute(null))
@@ -755,7 +882,6 @@ namespace GS.Server.GamePad
                     case "park":
                         if (value)
                         {
-                            if (!SkyTelescope()) return;
                             if (_parkCount == 0)
                             {
                                 if (_skyTelescopeVM.ClickParkCommand.CanExecute(null))
@@ -774,7 +900,6 @@ namespace GS.Server.GamePad
                     case "stop":
                         if (value)
                         {
-                            if (!SkyTelescope()) return;
                             if (_stopCount == 0)
                             {
                                 if (_skyTelescopeVM.ClickStopCommand.CanExecute(null))
@@ -793,7 +918,6 @@ namespace GS.Server.GamePad
                     case "up":
                         if (value)
                         {
-                            if (!SkyTelescope()) return;
                             if (_skyTelescopeVM.HcMouseDownUpCommand.CanExecute(null))
                                 _skyTelescopeVM.HcMouseDownUpCommand.Execute(null);
                             returnId = id;
@@ -801,7 +925,6 @@ namespace GS.Server.GamePad
                         }
                         else
                         {
-                            if (!SkyTelescope()) return;
                             if (_skyTelescopeVM.HcMouseUpUpCommand.CanExecute(null))
                                 _skyTelescopeVM.HcMouseUpUpCommand.Execute(null);
                             break;
@@ -809,7 +932,6 @@ namespace GS.Server.GamePad
                     case "down":
                         if (value)
                         {
-                            if (!SkyTelescope()) return;
                             if (_skyTelescopeVM.HcMouseDownDownCommand.CanExecute(null))
                                 _skyTelescopeVM.HcMouseDownDownCommand.Execute(null);
                             returnId = id;
@@ -817,7 +939,6 @@ namespace GS.Server.GamePad
                         }
                         else
                         {
-                            if (!SkyTelescope()) return;
                             if (_skyTelescopeVM.HcMouseUpDownCommand.CanExecute(null))
                                 _skyTelescopeVM.HcMouseUpDownCommand.Execute(null);
                             break;
@@ -825,7 +946,6 @@ namespace GS.Server.GamePad
                     case "left":
                         if (value)
                         {
-                            if (!SkyTelescope()) return;
                             if (_skyTelescopeVM.HcMouseDownLeftCommand.CanExecute(null))
                                 _skyTelescopeVM.HcMouseDownLeftCommand.Execute(null);
                             returnId = id;
@@ -833,7 +953,6 @@ namespace GS.Server.GamePad
                         }
                         else
                         {
-                            if (!SkyTelescope()) return;
                             if (_skyTelescopeVM.HcMouseUpLeftCommand.CanExecute(null))
                                 _skyTelescopeVM.HcMouseUpLeftCommand.Execute(null);
                             break;
@@ -841,7 +960,6 @@ namespace GS.Server.GamePad
                     case "right":
                         if (value)
                         {
-                            if (!SkyTelescope()) return;
                             if (_skyTelescopeVM.HcMouseDownRightCommand.CanExecute(null))
                                 _skyTelescopeVM.HcMouseDownRightCommand.Execute(null);
                             returnId = id;
@@ -849,7 +967,6 @@ namespace GS.Server.GamePad
                         }
                         else
                         {
-                            if (!SkyTelescope()) return;
                             if (_skyTelescopeVM.HcMouseUpRightCommand.CanExecute(null))
                                 _skyTelescopeVM.HcMouseUpRightCommand.Execute(null);
                             break;
@@ -857,7 +974,6 @@ namespace GS.Server.GamePad
                     case "speedup":
                         if (value)
                         {
-                            if (!SkyTelescope()) return;
                             if (_speedupCount == 0)
                             {
                                 if (_skyTelescopeVM.HcSpeedupCommand.CanExecute(null))
@@ -876,7 +992,6 @@ namespace GS.Server.GamePad
                     case "speeddown":
                         if (value)
                         {
-                            if (!SkyTelescope()) return;
                             if (_speedDownCount == 0)
                             {
                                 if (_skyTelescopeVM.HcSpeedDownCommand.CanExecute(null))
@@ -895,7 +1010,6 @@ namespace GS.Server.GamePad
                     case "volumeup":
                         if (value)
                         {
-                            if (!Settings()) return;
                             if (_volumeUpCount == 0)
                             {
                                 if (_settingsVM.VolumeUpCommand.CanExecute(null))
@@ -915,7 +1029,6 @@ namespace GS.Server.GamePad
                     case "volumedown":
                         if (value)
                         {
-                            if (!Settings()) return;
                             if (_volumeDownCount == 0)
                             {
                                 if (_settingsVM.VolumeDownCommand.CanExecute(null))
@@ -935,7 +1048,6 @@ namespace GS.Server.GamePad
                     case "tracking":
                         if (value)
                         {
-                            if (!SkyTelescope()) return;
                             if (_trackingCount == 0)
                             {
                                 if (_skyTelescopeVM.ClickTrackingCommand.CanExecute(null))
@@ -954,7 +1066,6 @@ namespace GS.Server.GamePad
                     case "ratesidereal":
                         if (value)
                         {
-                            if (!SkyTelescope()) return;
                             if (_rateSiderealCount == 0)
                             {
                                 _skyTelescopeVM.TrackingRate = DriveRates.driveSidereal;
@@ -973,7 +1084,6 @@ namespace GS.Server.GamePad
                     case "ratelunar":
                         if (value)
                         {
-                            if (!SkyTelescope()) return;
                             if (_rateLunarCount == 0)
                             {
                                 _skyTelescopeVM.TrackingRate = DriveRates.driveLunar;
@@ -992,7 +1102,6 @@ namespace GS.Server.GamePad
                     case "ratesolar":
                         if (value)
                         {
-                            if (!SkyTelescope()) return;
                             if (_rateSolarCount == 0)
                             {
                                 _skyTelescopeVM.TrackingRate = DriveRates.driveSolar;
@@ -1011,7 +1120,6 @@ namespace GS.Server.GamePad
                     case "rateking":
                         if (value)
                         {
-                            if (!SkyTelescope()) return;
                             if (_rateKingCount == 0)
                             {
                                 _skyTelescopeVM.TrackingRate = DriveRates.driveKing;
@@ -1030,7 +1138,6 @@ namespace GS.Server.GamePad
                     case "abort":
                         if (value)
                         {
-                            if (!SkyTelescope()) return;
                             if (_abortCount == 0)
                             {
                                 if (_skyTelescopeVM.AbortCmd.CanExecute(null))
@@ -1049,7 +1156,6 @@ namespace GS.Server.GamePad
                     case "sync":
                         if (value)
                         {
-                            if (!SkyTelescope()) return;
                             if (_syncCount == 0) // Required a double click (for confirmation)
                             {
                                 if (_syncClickTimer.IsRunning)
@@ -1096,7 +1202,6 @@ namespace GS.Server.GamePad
                     case "spiralin":
                         if (value)
                         {
-                            if (!SkyTelescope()) return;
                             if (_spiralInCount == 0)
                             {
                                 if (_skyTelescopeVM.SpiralInCmd.CanExecute(null))
@@ -1115,7 +1220,6 @@ namespace GS.Server.GamePad
                     case "spiralout":
                         if (value)
                         {
-                            if (!SkyTelescope()) return;
                             if (_spiralOutCount == 0)
                             {
                                 if (_skyTelescopeVM.SpiralOutCmd.CanExecute(null))
@@ -1134,7 +1238,6 @@ namespace GS.Server.GamePad
                     case "newspiral":
                         if (value)
                         {
-                            if (!SkyTelescope()) return;
                             if (_newSpiralCount == 0)
                             {
                                 if (_skyTelescopeVM.SpiralGenerateCmd.CanExecute(null))
@@ -1150,6 +1253,36 @@ namespace GS.Server.GamePad
                             ResetCounts();
                             break;
                         }
+                    case "focusin":
+                        if (value)
+                        {
+                            if (_focuserVM.MoveFocuserInCommand.CanExecute(null))
+                                _focuserVM.MoveFocuserInCommand.Execute(null);
+                            _focusInCount++;
+                            System.Diagnostics.Debug.WriteLine($"Focus in count = {_focusInCount}");
+                            returnId = id;
+                            break;
+                        }
+                        else
+                        {
+                            ResetCounts();
+                            break;
+                        }
+                    case "focusout":
+                        if (value)
+                        {
+                            if (_focuserVM.MoveFocuserOutCommand.CanExecute(null))
+                                _focuserVM.MoveFocuserOutCommand.Execute(null);
+                            _focusOutCount++;
+                            returnId = id;
+                            break;
+                        }
+                        else
+                        {
+                            ResetCounts();
+                            break;
+                        }
+
                     default:
                         ResetCounts();
                         returnId = -1;
@@ -1232,6 +1365,12 @@ namespace GS.Server.GamePad
                     break;
                 case "newspiral":
                     NewSpiral = val;
+                    break;
+                case "focusin":
+                    FocusIn = val;
+                    break;
+                case "focusout":
+                    FocusOut = val;
                     break;
             }
 
@@ -1318,6 +1457,12 @@ namespace GS.Server.GamePad
                         case "newspiral":
                             NewSpiral = val;
                             break;
+                        case "focusin":
+                            FocusIn = val;
+                            break;
+                        case "focusout":
+                            FocusOut = val;
+                            break;
                     }
                 }
             }
@@ -1357,6 +1502,8 @@ namespace GS.Server.GamePad
             _spiralInCount = 0;
             _spiralOutCount = 0;
             _newSpiralCount = 0;
+            _focusInCount = 0;
+            _focusOutCount = 0;
         }
 
         private ICommand _clickTextBoxGotFocusCommand;
@@ -1489,6 +1636,12 @@ namespace GS.Server.GamePad
                         break;
                     case "newspiral":
                         NewSpiral = null;
+                        break;
+                    case "focusin":
+                        FocusIn = null;
+                        break;
+                    case "focusout":
+                        FocusOut = null;
                         break;
                     default:
                         update = false;

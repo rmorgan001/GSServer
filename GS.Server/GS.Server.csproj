@@ -90,6 +90,7 @@
       <Private>false</Private>
     </ProjectReference>
     <ProjectReference Include="..\GS.Utilities\GS.Utilities.csproj" />
+    <ProjectReference Include="..\NINA\NINA.csproj" />
     <ProjectReference Include="..\NStarAlignment\NStarAlignment.csproj" />
     <ProjectReference Include="..\XInputDotNetPure\XInputDotNetPure.csproj" />
   </ItemGroup>
@@ -150,6 +151,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Alignment.settings</DependentUpon>
     </Compile>
+    <Compile Update="Properties\Focuser.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Focuser.settings</DependentUpon>
+    </Compile>
     <Compile Update="Properties\Gamepad.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
@@ -188,6 +194,10 @@
     <None Update="Properties\Alignment.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Alignment.Designer.cs</LastGenOutput>
+    </None>
+    <None Update="Properties\Focuser.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Focuser.Designer.cs</LastGenOutput>
     </None>
     <None Update="Properties\Gamepad.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

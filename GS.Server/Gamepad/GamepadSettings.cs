@@ -247,6 +247,14 @@ namespace GS.Server.GamePad
                         Properties.Gamepad.Default.newspiral = setting.Value;
                         LogSetting(MethodBase.GetCurrentMethod().Name, $"newspiral {setting.Value}");
                         break;
+                    case "focusin":
+                        Properties.Gamepad.Default.focusin = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"focusin {setting.Value}");
+                        break;
+                    case "focusout":
+                        Properties.Gamepad.Default.focusout = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod().Name, $"focusout {setting.Value}");
+                        break;
                 }
             }
             Save();

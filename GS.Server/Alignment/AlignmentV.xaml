@@ -215,7 +215,5 @@
 
             </Grid>
         </md:DrawerHost>
-        <Grid >
-        </Grid>
     </Grid>
 </UserControl>
