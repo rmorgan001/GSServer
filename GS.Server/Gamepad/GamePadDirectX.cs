@@ -134,6 +134,8 @@ namespace GS.Server.GamePad
                 XAxis = State.X;
                 YAxis = State.Y;
                 ZAxis = State.Z;
+                XRotation = State.RotationX;
+                YRotation = State.RotationY;
                 // Data = joystick.GetBufferedData();
             }
             catch (Exception ex)

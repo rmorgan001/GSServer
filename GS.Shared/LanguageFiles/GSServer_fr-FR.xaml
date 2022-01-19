@@ -654,4 +654,24 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliCancelButtonCaption">Annuler</system:String>
     <system:String x:Key="aliPointModelFileFilter">Fichiers de modèle de point (*.GssPointModel)|*.GssPointModel|Tous les fichiers (*.*)|*.*</system:String>
 
+    <system:String x:Key="tabFocuserTooltip">Afficher le panneau de mise au point</system:String>
+    <system:String x:Key="focuserSettings">Paramètres de mise au point</system:String>
+    <system:String x:Key="focuserCloseTooltip">Fermer le panneau des paramètres de mise au point</system:String>
+    <system:String x:Key="focuserIn">Dans</system:String>
+    <system:String x:Key="focuserOut">En dehors</system:String>
+    <system:String x:Key="focuserConnected">Lié</system:String>
+    <system:String x:Key="focuserPosition">Position actuelle</system:String>
+    <system:String x:Key="focuserRefresh">Rafraîchir</system:String>
+    <system:String x:Key="focuserRefreshTooltip">Actualiser la liste des focus disponibles</system:String>
+    <system:String x:Key="focuserSetup">Installer</system:String>
+    <system:String x:Key="focuserSetupTooltip">Ouvrir la boîte de dialogue de configuration ASCOM pour le porte-oculaire sélectionné</system:String>
+    <system:String x:Key="focuserConnect">Relier</system:String>
+    <system:String x:Key="focuserConnectTooltip">Connectez-vous au porte-oculaire sélectionné</system:String>
+    <system:String x:Key="focuserDisconnect">Déconnecter</system:String>
+    <system:String x:Key="focuserDisconnectTooltip">Déconnectez-vous du porte-oculaire</system:String>
+    <system:String x:Key="focuserStepSizeHint">Taille de pas</system:String>
+    <system:String x:Key="focuserStepSizeTooltip">L'incrément de position de mise au point pour chaque pression sur le bouton</system:String>
+    <system:String x:Key="focuserSelectTooltip">Taille de pas de mise au pointSélectionnez la mise au point à laquelle vous connecter</system:String>
+    <system:String x:Key="focuserSelectHint">Mise au point</system:String>
+
 </ResourceDictionary>

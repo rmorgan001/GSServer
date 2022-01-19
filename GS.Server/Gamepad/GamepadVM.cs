@@ -79,9 +79,12 @@ namespace GS.Server.GamePad
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server,
-                    Category = MonitorCategory.Interface, Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId,
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod().Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = "Loading GamePadVM"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
@@ -599,7 +602,7 @@ namespace GS.Server.GamePad
                                         DoGamePadSetKey(key, val);
                                         break;
                                     }
-                                    
+
                                     var id = DoGamePadCommand(newhit.Key, true, cmd);
                                     povtocheck = id == -1 ? new PovPair(-1, 0) : newhit;
                                     break;
@@ -612,14 +615,11 @@ namespace GS.Server.GamePad
                         {
                             var xDirection = AxisDirection(_gamePad.XAxis);
                             var pushed = xaxistocheck.Value == xDirection;
-                            if (!pushed)
+                            if (String.IsNullOrEmpty(key))
                             {
-                                if (String.IsNullOrEmpty(key))
-                                {
-                                    var cmd = _gamePad.Get_KeyByValue("xaxis" + " " + xaxistocheck.Value);
-                                    var id = DoGamePadCommand(xaxistocheck.Key, false, cmd);
-                                    if (id == -1) xaxistocheck = new AxisPair(-1, String.Empty);
-                                }
+                                var cmd = _gamePad.Get_KeyByValue("xaxis" + " " + xaxistocheck.Value);
+                                var id = DoGamePadCommand(xaxistocheck.Key, pushed, cmd);
+                                if (id == -1) xaxistocheck = new AxisPair(-1, String.Empty);
                             }
                         }
                         else
@@ -648,14 +648,11 @@ namespace GS.Server.GamePad
                         {
                             var yDirection = AxisDirection(_gamePad.YAxis);
                             var pushed = yaxistocheck.Value == yDirection;
-                            if (!pushed)
+                            if (String.IsNullOrEmpty(key))
                             {
-                                if (String.IsNullOrEmpty(key))
-                                {
-                                    var cmd = _gamePad.Get_KeyByValue("yaxis" + " " + yaxistocheck.Value);
-                                    var id = DoGamePadCommand(yaxistocheck.Key, false, cmd);
-                                    if (id == -1) yaxistocheck = new AxisPair(-1, String.Empty);
-                                }
+                                var cmd = _gamePad.Get_KeyByValue("yaxis" + " " + yaxistocheck.Value);
+                                var id = DoGamePadCommand(yaxistocheck.Key, pushed, cmd);
+                                if (id == -1) yaxistocheck = new AxisPair(-1, String.Empty);
                             }
                         }
                         else
@@ -684,14 +681,11 @@ namespace GS.Server.GamePad
                         {
                             var zDirection = AxisDirection(_gamePad.ZAxis);
                             var pushed = zaxistocheck.Value == zDirection;
-                            if (!pushed)
+                            if (String.IsNullOrEmpty(key))
                             {
-                                if (String.IsNullOrEmpty(key))
-                                {
-                                    var cmd = _gamePad.Get_KeyByValue("zaxis" + " " + zaxistocheck.Value);
-                                    var id = DoGamePadCommand(zaxistocheck.Key, false, cmd);
-                                    if (id == -1) zaxistocheck = new AxisPair(-1, String.Empty);
-                                }
+                                var cmd = _gamePad.Get_KeyByValue("zaxis" + " " + zaxistocheck.Value);
+                                var id = DoGamePadCommand(zaxistocheck.Key, pushed, cmd);
+                                if (id == -1) zaxistocheck = new AxisPair(-1, String.Empty);
                             }
                         }
                         else
@@ -720,15 +714,12 @@ namespace GS.Server.GamePad
                         {
                             var xDirection = AxisDirection(_gamePad.XRotation);
                             var pushed = xrotationtocheck.Value == xDirection;
-                            //if (!pushed)
-                            //{
-                                if (String.IsNullOrEmpty(key))
-                                {
-                                    var cmd = _gamePad.Get_KeyByValue("xrotation" + " " + xrotationtocheck.Value);
-                                    var id = DoGamePadCommand(xrotationtocheck.Key, pushed, cmd);
-                                    if (id == -1) xrotationtocheck = new AxisPair(-1, String.Empty);
-                                }
-                            //}
+                            if (String.IsNullOrEmpty(key))
+                            {
+                                var cmd = _gamePad.Get_KeyByValue("xrotation" + " " + xrotationtocheck.Value);
+                                var id = DoGamePadCommand(xrotationtocheck.Key, pushed, cmd);
+                                if (id == -1) xrotationtocheck = new AxisPair(-1, String.Empty);
+                            }
                         }
                         else
                         {
@@ -756,15 +747,12 @@ namespace GS.Server.GamePad
                         {
                             var yDirection = AxisDirection(_gamePad.YRotation);
                             var pushed = yrotationtocheck.Value == yDirection;
-                            //if (!pushed)
-                            //{
-                                if (String.IsNullOrEmpty(key))
-                                {
-                                    var cmd = _gamePad.Get_KeyByValue("yrotation" + " " + yrotationtocheck.Value);
-                                    var id = DoGamePadCommand(yrotationtocheck.Key, pushed, cmd);
-                                    if (id == -1) yrotationtocheck = new AxisPair(-1, String.Empty);
-                                }
-                            //}
+                            if (String.IsNullOrEmpty(key))
+                            {
+                                var cmd = _gamePad.Get_KeyByValue("yrotation" + " " + yrotationtocheck.Value);
+                                var id = DoGamePadCommand(yrotationtocheck.Key, pushed, cmd);
+                                if (id == -1) yrotationtocheck = new AxisPair(-1, String.Empty);
+                            }
                         }
                         else
                         {
@@ -824,9 +812,13 @@ namespace GS.Server.GamePad
         {
             var monitorItem = new MonitorEntry
             {
-                Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server,
-                Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name,
-                Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{id}|{value}|{command}"
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod().Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{id}|{value}|{command}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -1259,7 +1251,6 @@ namespace GS.Server.GamePad
                             if (_focuserVM.MoveFocuserInCommand.CanExecute(null))
                                 _focuserVM.MoveFocuserInCommand.Execute(null);
                             _focusInCount++;
-                            System.Diagnostics.Debug.WriteLine($"Focus in count = {_focusInCount}");
                             returnId = id;
                             break;
                         }

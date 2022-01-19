@@ -25,8 +25,8 @@
                         <ColumnDefinition Width="5"/>
                         <ColumnDefinition Width="150" />
                     </Grid.ColumnDefinitions>
-                    <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" Content="Focuser Settings"/>
-                    <ToggleButton Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" Margin="5" ToolTip="{StaticResource aliCloseTooltip}"
+                    <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" Content="{StaticResource focuserSettings}"/>
+                    <ToggleButton Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" Margin="5" ToolTip="{StaticResource focuserCloseTooltip}"
                                   Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
                                   Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
                                   CommandParameter="{x:Static Dock.Left}"
@@ -38,13 +38,13 @@
                                     <RowDefinition Height="30" />
                                     <RowDefinition Height="40" />
                                 </Grid.RowDefinitions>
-                                <Label Grid.Row="0" HorizontalAlignment="Center" Content="Step Size"/>
+                                <Label Grid.Row="0" HorizontalAlignment="Center" Content="{StaticResource SkyResetDef}"/>
                                 <Button Grid.Row="1" HorizontalAlignment="Center" Content="{StaticResource diaAccept}" 
                                         Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ResetStepSize}"/>
                             </Grid>
                         </md:PopupBox>
-                        <TextBox   md:HintAssist.Hint="Focuser step size" Width="110" HorizontalAlignment="Left" VerticalAlignment="Bottom" IsReadOnly="True"
-                                 ToolTip="{StaticResource aliNearbyLimitTooltip}" 
+                        <TextBox   md:HintAssist.Hint="{StaticResource focuserStepSizeHint}" Width="110" HorizontalAlignment="Left" VerticalAlignment="Bottom" IsReadOnly="True"
+                                 ToolTip="{StaticResource focuserStepSizeTooltip}" 
                                  Text="{Binding StepSize}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" domain:TextBoxMaskBehaviour.Mask="Integer"/>
 
                     </StackPanel>
@@ -53,7 +53,7 @@
             <Grid Margin="5,5" >
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40" />
-                    <RowDefinition Height="40" />
+                    <RowDefinition Height="60" />
                     <RowDefinition Height="40" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -67,10 +67,10 @@
                                   Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" IsHitTestVisible="True" 
                                   Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
                 <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal">
-                    <ComboBox md:HintAssist.Hint="Focuser" Width="300" HorizontalAlignment="Left" 
+                    <ComboBox md:HintAssist.Hint="{StaticResource focuserSelectHint}" Width="300" HorizontalAlignment="Left" 
                               ItemsSource="{Binding FocuserChooserVM.Devices}"
                               SelectedItem="{Binding FocuserChooserVM.SelectedDevice, Mode=TwoWay}"
-                              Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="Select the focuser to use.">
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource focuserSelectTooltip}">
                         <ComboBox.ItemsPanel >
                             <ItemsPanelTemplate >
                                 <VirtualizingStackPanel  />
@@ -83,30 +83,30 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                     <Button Margin="10,0,0,0" Height="30" 
-                            ToolTip="{StaticResource aliDeleteTooltip}" Style="{StaticResource MaterialDesignRaisedDarkButton}" 
+                            ToolTip="{StaticResource focuserRefreshTooltip}" Style="{StaticResource MaterialDesignRaisedDarkButton}" 
                             Command="{Binding RefreshFocuserListCommand}"
-                            Content="Refresh"/>
+                            Content="{StaticResource focuserRefresh}"/>
 
                     <Button Margin="10,0,0,0" Height="30" 
-                            ToolTip="{StaticResource aliClearAllTooltip}"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" 
+                            ToolTip="{StaticResource focuserSetupTooltip}"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" 
                             Command="{Binding FocuserChooserVM.SetupDialogCommand}"
-                            Content="Setup"
+                            Content="{StaticResource focuserSetup}"
                             Visibility="{Binding ShowSetup, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
                     <Button Margin="10,0,0,0" Height="30" 
-                            ToolTip="{StaticResource aliDeleteTooltip}" Style="{StaticResource MaterialDesignRaisedDarkButton}" 
+                            ToolTip="{StaticResource focuserConnectTooltip}" Style="{StaticResource MaterialDesignRaisedDarkButton}" 
                             Command="{Binding ChooseFocuserCommand}"
-                            Content="Connect"
+                            Content="{StaticResource focuserConnect}"
                             Visibility="{Binding ShowConnect, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                     <Button Margin="10,0,0,0" Height="30" 
-                            ToolTip="{StaticResource aliDeleteTooltip}" Style="{StaticResource MaterialDesignRaisedDarkButton}" 
+                            ToolTip="{StaticResource focuserDisconnectTooltip}" Style="{StaticResource MaterialDesignRaisedDarkButton}" 
                             Command="{Binding DisconnectCommand}"
-                            Content="Disconnect"
+                            Content="{StaticResource focuserDisconnect}"
                             Visibility="{Binding ShowDisconnect, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                 </StackPanel>
 
-                <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal">
-                    <TextBlock Text="Connected" VerticalAlignment="Center"/>
+                <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" Margin="0,20,0,0">
+                    <TextBlock Text="{StaticResource focuserConnected}" VerticalAlignment="Center"/>
                     <ToggleButton Margin="10 0" Style="{StaticResource MaterialDesignActionLightToggleButton}"
                                   HorizontalAlignment="Center" Width="25" Height="25"  IsHitTestVisible="True"
                                   IsChecked="{Binding Connected, Mode=OneWay}"
@@ -114,10 +114,10 @@
 
                 </StackPanel>
                 <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal">
-                    <TextBlock Text="Current position" VerticalAlignment="Center"/>
+                    <TextBlock Text="{StaticResource focuserPosition}" VerticalAlignment="Center"/>
                     <TextBlock Margin="10,0,0,0" MinWidth=" 50" Text="{Binding Position}" VerticalAlignment="Center"/>
                 </StackPanel>
-                <StackPanel Grid.Row="3" Grid.Column="2" Orientation="Horizontal">
+                <StackPanel Grid.Row="3" Grid.Column="2" Orientation="Horizontal" Margin="0,20,0,0">
                     <Button Margin="10,0,0,0" MinWidth="100" Height="30" 
                             ToolTip="{StaticResource aliClearAllTooltip}"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" 
                             Command="{Binding MoveFocuserInCommand}"

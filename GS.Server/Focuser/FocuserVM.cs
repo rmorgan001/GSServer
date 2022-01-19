@@ -112,7 +112,11 @@ namespace GS.Server.Focuser
         public int StepSize
         {
             get => Properties.Focuser.Default.StepSize;
-            set => Properties.Focuser.Default.StepSize = value;
+            set
+            {
+                Properties.Focuser.Default.StepSize = value;
+                OnPropertyChanged();
+            }
         }
 
         #endregion
@@ -447,6 +451,23 @@ namespace GS.Server.Focuser
 
         public ICommand MoveFocuserInCommand { get; private set; }
         public ICommand MoveFocuserOutCommand { get; private set; }
+
+
+        private RelayCommand _resetStepSize;
+
+        public RelayCommand ResetStepSize
+        {
+            get
+            {
+                return _resetStepSize
+                       ?? (_resetStepSize = new RelayCommand(
+                           param =>
+                           {
+                               StepSize = 10;
+                           })
+                       );
+            }
+        }
         #endregion
 
 

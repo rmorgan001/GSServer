@@ -658,6 +658,24 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliPointModelFileFilter">Point model files (*.GssPointModel)|*.GssPointModel|All files (*.*)|*.*</system:String>
 
     <system:String x:Key="tabFocuserTooltip">Display focuser panel</system:String>
+    <system:String x:Key="focuserSettings">Focuser Settings</system:String>
+    <system:String x:Key="focuserCloseTooltip">Close focuser settings panel</system:String>
+    <system:String x:Key="focuserIn">In</system:String>
+    <system:String x:Key="focuserOut">Out</system:String>
+    <system:String x:Key="focuserConnected">Connected</system:String>
+    <system:String x:Key="focuserPosition">Current position</system:String>
+    <system:String x:Key="focuserRefresh">Refresh</system:String>
+    <system:String x:Key="focuserRefreshTooltip">Refresh the list of available focusers</system:String>
+    <system:String x:Key="focuserSetup">Setup</system:String>
+    <system:String x:Key="focuserSetupTooltip">Open the ASCOM setup dialog box for the selected focuser</system:String>
+    <system:String x:Key="focuserConnect">Connect</system:String>
+    <system:String x:Key="focuserConnectTooltip">Connect to the selected focuser</system:String>
+    <system:String x:Key="focuserDisconnect">Disconnect</system:String>
+    <system:String x:Key="focuserDisconnectTooltip">Disconnect from the focuser</system:String>
+    <system:String x:Key="focuserStepSizeHint">Step size</system:String>
+    <system:String x:Key="focuserStepSizeTooltip">The focuser position increment for each button press</system:String>
+    <system:String x:Key="focuserSelectTooltip">Select the focuser to connect to</system:String>
+    <system:String x:Key="focuserSelectHint">Focuser</system:String>
 
 </ResourceDictionary>
  
