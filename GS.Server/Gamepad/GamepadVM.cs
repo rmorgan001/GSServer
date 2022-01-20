@@ -602,7 +602,7 @@ namespace GS.Server.GamePad
                                         DoGamePadSetKey(key, val);
                                         break;
                                     }
-
+                                    
                                     var id = DoGamePadCommand(newhit.Key, true, cmd);
                                     povtocheck = id == -1 ? new PovPair(-1, 0) : newhit;
                                     break;
@@ -1251,6 +1251,7 @@ namespace GS.Server.GamePad
                             if (_focuserVM.MoveFocuserInCommand.CanExecute(null))
                                 _focuserVM.MoveFocuserInCommand.Execute(null);
                             _focusInCount++;
+
                             returnId = id;
                             break;
                         }

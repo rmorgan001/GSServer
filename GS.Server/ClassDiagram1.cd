@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="GS.Server.SkyTelescope.SkyServer" Collapsed="true">
+    <Position X="6" Y="4.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>x6UvEcP02srN+qcdS86w/VWBmRb/RzuyXJdIPPyj3bk=</HashCode>
+      <FileName>SkyTelescope\SkyServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

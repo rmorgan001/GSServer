@@ -444,7 +444,6 @@ namespace GS.Server.Focuser
         // private IProgress<FocuserStatus> progress;
 
         public ICommand RefreshFocuserListCommand { get; private set; }
-
         public IAsyncCommand ChooseFocuserCommand { get; private set; }
         public ICommand CancelChooseFocuserCommand { get; private set; }
         public ICommand DisconnectCommand { get; private set; }
@@ -518,9 +517,6 @@ namespace GS.Server.Focuser
             DialogContent = new TwoButtonMessageDialog(messageVm);
             IsDialogOpen = true;
         }
-
-
-
 
         #endregion
 
