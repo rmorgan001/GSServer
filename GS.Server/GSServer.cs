@@ -641,14 +641,16 @@ namespace GS.Server
                             SkyServer.AlignmentShow = true;
                             break;
                         case @"/en":
+                        case @"/english":
                             Shared.Settings.Language = "en-US";
                             break;
                         case @"/fr":
+                        case @"/french":
                             Shared.Settings.Language = "fr-FR";
                             break;
                         default:
                             MessageBox.Show(
-                                @"Unknown argument: " + args[0] + @"Valid are : -register, -unregister, -embedding, /pec, /showalignment, /en and /fr",
+                                @"Unknown argument: '" + arg.ToLower() + @"' Valid are : -register, -unregister, -embedding, /pec, /showalignment, /en, /english, /fr and /french",
                                 @"GSServer", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                             break;
                     }

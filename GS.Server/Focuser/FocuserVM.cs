@@ -112,7 +112,11 @@ namespace GS.Server.Focuser
         public int StepSize
         {
             get => Properties.Focuser.Default.StepSize;
-            set => Properties.Focuser.Default.StepSize = value;
+            set
+            {
+                Properties.Focuser.Default.StepSize = value;
+                OnPropertyChanged();
+            }
         }
 
         #endregion
@@ -440,13 +444,29 @@ namespace GS.Server.Focuser
         // private IProgress<FocuserStatus> progress;
 
         public ICommand RefreshFocuserListCommand { get; private set; }
-
         public IAsyncCommand ChooseFocuserCommand { get; private set; }
         public ICommand CancelChooseFocuserCommand { get; private set; }
         public ICommand DisconnectCommand { get; private set; }
 
         public ICommand MoveFocuserInCommand { get; private set; }
         public ICommand MoveFocuserOutCommand { get; private set; }
+
+
+        private RelayCommand _resetStepSize;
+
+        public RelayCommand ResetStepSize
+        {
+            get
+            {
+                return _resetStepSize
+                       ?? (_resetStepSize = new RelayCommand(
+                           param =>
+                           {
+                               StepSize = 10;
+                           })
+                       );
+            }
+        }
         #endregion
 
 
@@ -497,9 +517,6 @@ namespace GS.Server.Focuser
             DialogContent = new TwoButtonMessageDialog(messageVm);
             IsDialogOpen = true;
         }
-
-
-
 
         #endregion
 

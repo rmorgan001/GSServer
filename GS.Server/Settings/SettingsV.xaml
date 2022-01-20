@@ -212,10 +212,10 @@
                                     <CheckBox Height="25" Width="25" IsChecked="{Binding Snap}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource tabSnap}" />
                                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource tabSnap}" />
                                 </StackPanel>
-                                <!--<StackPanel Orientation="Horizontal" Width="Auto" Visibility="{Binding FocuserShow, Converter={StaticResource BoolToClap}}">
+                                <StackPanel Orientation="Horizontal" Width="Auto" Visibility="{Binding FocuserShow, Converter={StaticResource BoolToClap}}">
                                     <CheckBox Height="25" Width="25" IsChecked="{Binding Focuser}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource tabFocuserTooltip}"/>
                                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource tabFocuser}"/>
-                                </StackPanel>-->
+                                </StackPanel>
                                 <StackPanel Orientation="Horizontal" Width="Auto" Visibility="{Binding AlignmentShow, Converter={StaticResource BoolToClap}}">
                                     <CheckBox Height="25" Width="25" IsChecked="{Binding AlignmentTabVisible}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource aliAlignment}"/>
                                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource aliAlignment}"/>
