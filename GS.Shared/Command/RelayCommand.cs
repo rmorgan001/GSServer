@@ -50,7 +50,7 @@ namespace GS.Shared.Command
             _canExecute = canExecute;
         }
 
-        public RelayCommand()
+        public RelayCommand(object disconnectDiag)
         {
         }
 

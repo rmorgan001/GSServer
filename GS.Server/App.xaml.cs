@@ -7,7 +7,8 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using GS.Shared;
-
+using System.Text;
+using System.IO;
 
 namespace GS.Server
 {
@@ -15,7 +16,7 @@ namespace GS.Server
     /// Interaction logic for App.xaml
     /// </summary>
     [ComVisible(false)]
-    public partial class App: IDisposable
+    public partial class App : IDisposable
     {
         // give the mutex a  unique name
         private const string MutexName = "Green Swamp Server";
@@ -54,6 +55,9 @@ namespace GS.Server
         protected override void OnStartup(StartupEventArgs e)
         {
             if (!createdNew) return;
+
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
             if (Server.Properties.Server.Default.DisableHardwareAcceleration)
             {
                 RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
@@ -65,6 +69,77 @@ namespace GS.Server
             app.DataContext = context;
             app.Show();
         }
+
+        #region Application exception handling ...
+        /// <summary>
+        /// Application level exception handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            this.DispatcherUnhandledException -= new System.Windows.Threading.DispatcherUnhandledExceptionEventHandler(this.Application_DispatcherUnhandledException);
+            writeException(e.Exception);
+            MessageBox.Show("An unexpected error has occurred within GSS. Error details have been logged and Gems will now close.", "Application Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            e.Handled = true;
+            this.Shutdown();
+        }
+
+        void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            AppDomain.CurrentDomain.UnhandledException -= CurrentDomain_UnhandledException;
+            writeException((Exception)e.ExceptionObject);
+            MessageBox.Show("An unexpected error has occurred within GSS. Error details have been logged and Gems will now close.", "Application Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            this.Shutdown();
+        }
+
+
+        private void writeException(Exception e)
+        {
+            string logPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string fileLocation = Path.Combine(logPath, "GSServer\\");
+
+            string logFileName = Path.Combine(fileLocation, Path.GetRandomFileName() + ".err");
+            StringBuilder sb = new StringBuilder();
+            writeException(sb, e);
+            using (TextWriter logWriter = new StreamWriter(logFileName))
+            {
+                logWriter.Write(sb.ToString());
+                logWriter.Close();
+            }
+
+
+        }
+
+        /// <summary>
+        /// Pushes exception details into a StringBuilder recursively as long as InnerExceptions exist.
+        /// </summary>
+        /// <param name="sb"></param>
+        /// <param name="e"></param>
+        private void writeException(StringBuilder sb, Exception e)
+        {
+            sb.AppendLine(e.GetType().Name);
+            if (!string.IsNullOrWhiteSpace(e.Message))
+            {
+                sb.AppendLine("Exception: " + e.Message);
+            }
+            if (!string.IsNullOrWhiteSpace(e.Source))
+            {
+                sb.AppendLine("Source: " + e.Source);
+            }
+            if (!string.IsNullOrWhiteSpace(e.StackTrace))
+            {
+                sb.AppendLine("Stack Trace");
+                sb.AppendLine(e.StackTrace);
+            }
+            if (e.InnerException != null)
+            {
+                sb.AppendLine("Inner Exception");
+                writeException(sb, e.InnerException);
+            }
+        }
+
+        #endregion
 
 
         #region Dispose

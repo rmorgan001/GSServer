@@ -40,6 +40,7 @@ using GS.Server.Pec;
 using GS.Server.Snap;
 using GS.Server.Alignment;
 using MaterialDesignColors;
+using System.Threading.Tasks;
 
 namespace GS.Server.Main
 {
@@ -1010,6 +1011,7 @@ namespace GS.Server.Main
         #region Close Dialog
         private void CloseServer()
         {
+            Task.Run(()=> _focuserVM?.Disconnect());
             SkyServer.ShutdownServer();
         }
 

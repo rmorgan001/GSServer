@@ -16,94 +16,441 @@
 using GS.Principles;
 using GS.Server.Helpers;
 using GS.Server.Main;
-using GS.Server.SkyTelescope;
 using GS.Shared;
-using MaterialDesignThemes.Wpf;
+using GS.Shared.Command;
+using GS.Utilities.Controls.Dialogs;
+using NINA.Model.MyFocuser;
+using NINA.Utility;
+using NINA.ViewModel.Equipment.Focuser;
+using NStarAlignment.Utilities;
 using System;
+using System.ComponentModel;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using GS.Server.Controls.Dialogs;
-using GS.Shared.Command;
+using System.Windows.Threading;
 
 namespace GS.Server.Focuser
 {
-    public class FocuserVM : ObservableObject, IPageVM, IDisposable
+    public sealed class FocuserVM : ObservableObject, IPageVM, IDisposable
     {
-        public string TopName => "SkyWatcher";
+        #region Fields ...
+        public string TopName => "Focuser";
         public string BottomName => "Focuser";
-        public int Uid => 2;
+        public int Uid => 11;
 
-        private SkyTelescopeVM _skyTelescopeVM;
+        DispatcherTimer _focuserTimer;
+
+        public static FocuserVM _focuserVM;
+        #endregion
+
+        #region Properties ...
+
+        private bool _connected;
+        public bool Connected
+        {
+            get => _connected;
+            set
+            {
+                _connected = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _position;
+        public int Position
+        {
+            get => _position;
+            set
+            {
+                _position = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isMoving;
+        public bool IsMoving
+        {
+            get => _isMoving;
+            set
+            {
+                _isMoving = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool ShowConnect
+        {
+            get
+            {
+                return FocuserChooserVM.SelectedDevice != null
+                    && (FocuserChooserVM.SelectedDevice is IFocuser)
+                    && (this.Focuser == null);
+            }
+        }
+
+        public bool ShowDisconnect
+        {
+            get
+            {
+                return (Focuser?.Connected == true);
+            }
+        }
+
+        public bool ShowSetup
+        {
+            get
+            {
+                return (FocuserChooserVM.SelectedDevice != null
+                    && FocuserChooserVM.SelectedDevice is IFocuser);
+            }
+        }
+
+
+        public int StepSize
+        {
+            get => Properties.Focuser.Default.StepSize;
+            set => Properties.Focuser.Default.StepSize = value;
+        }
+
+        #endregion
+
+
+        private FocuserChooserVM _focuserChooserVM;
+
+        public FocuserChooserVM FocuserChooserVM
+        {
+            get
+            {
+                if (_focuserChooserVM == null)
+                {
+                    _focuserChooserVM = new FocuserChooserVM();
+                    _focuserChooserVM.PropertyChanged += _focuserChooserVM_PropertyChanged;
+                }
+                return _focuserChooserVM;
+            }
+            set
+            {
+                _focuserChooserVM = value;
+            }
+        }
+
+        private void _focuserChooserVM_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "SelectedDevice")
+            {
+                RefreshButtonVisibilities();
+                Properties.Focuser.Default.DeviceId = FocuserChooserVM.SelectedDevice?.Id ?? "";
+            }
+        }
+
+        private void RefreshButtonVisibilities()
+        {
+            OnPropertyChanged("ShowSetup");
+            OnPropertyChanged("ShowConnect");
+            OnPropertyChanged("ShowDisconnect");
+        }
 
         public FocuserVM()
         {
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading FocuserVM" };
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Interface,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()
+                    .Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = " Loading FocuserVM"
+            };
             MonitorLog.LogToMonitor(monitorItem);
 
-            SkyTelescope();
+            _focuserVM = this;
+
+            FocuserSettings.Load();
+
+            FocuserChooserVM.GetEquipment(Properties.Focuser.Default.DeviceId);
+
+            ChooseFocuserCommand = new AsyncCommand<bool>(() => ChooseFocuser());
+            CancelChooseFocuserCommand = new RelayCommand(CancelChooseFocuser);
+            DisconnectCommand = new RelayCommand(DisconnectDiag);
+            RefreshFocuserListCommand = new RelayCommand(RefreshFocuserList, o => !(Focuser?.Connected == true));
+            MoveFocuserInCommand = new AsyncCommand<int>(() => MoveFocuserRelativeInternal(-1 * StepSize), (p) => Connected && !IsMoving);
+            MoveFocuserOutCommand = new AsyncCommand<int>(() => MoveFocuserRelativeInternal(StepSize), (p) => Connected && !IsMoving);
+
+            _focuserTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Properties.Focuser.Default.DevicePollingInterval) };
+            _focuserTimer.Tick += _focuserTimer_Tick;
         }
 
-        private bool SkyTelescope()
+        private void _focuserTimer_Tick(object sender, EventArgs e)
         {
-            if (_skyTelescopeVM == null) _skyTelescopeVM = SkyTelescopeVM._skyTelescopeVM;
-            return _skyTelescopeVM != null;
+            if (_focuser != null && _focuser.Connected)
+            {
+                UpdateFocuserValues();
+            }
+        }
+
+        private void HaltFocuser()
+        {
+            var monitorItem = new MonitorEntry
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Focuser, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Halting focuser" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            if (Focuser?.Connected == true)
+            {
+                try
+                {
+                    Focuser.Halt();
+                }
+                catch (Exception ex)
+                {
+                    monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Focuser, Category = MonitorCategory.Driver, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                    MonitorLog.LogToMonitor(monitorItem);
+                }
+            }
+        }
+
+        private CancellationTokenSource _cancelMove;
+
+        private Task<int> MoveFocuserInternal(int position)
+        {
+            _cancelMove?.Dispose();
+            _cancelMove = new CancellationTokenSource();
+            return MoveFocuser(position, _cancelMove.Token);
+        }
+
+        private Task<int> MoveFocuserRelativeInternal(int position)
+        {
+            _cancelMove?.Dispose();
+            _cancelMove = new CancellationTokenSource();
+            return MoveFocuserRelative(position, _cancelMove.Token);
+        }
+
+        public async Task<int> MoveFocuser(int position, CancellationToken ct)
+        {
+            int pos = -1;
+
+            await Task.Run(async () =>
+            {
+                try
+                {
+                    using (ct.Register(() => HaltFocuser()))
+                    {
+                        var tempComp = false;
+
+                        var monitorItem = new MonitorEntry
+                        {
+                            Datetime = Principles.HiResDateTime.UtcNow,
+                            Device = MonitorDevice.Focuser,
+                            Category = MonitorCategory.Driver,
+                            Type = MonitorType.Information,
+                            Method = MethodBase.GetCurrentMethod().Name,
+                            Thread = Thread.CurrentThread.ManagedThreadId,
+                            Message = $"Moving Focuser to position { position }"
+                        };
+                        MonitorLog.LogToMonitor(monitorItem);
+                        while (Focuser.Position != position)
+                        {
+                            this.IsMoving = true;
+                            ct.ThrowIfCancellationRequested();
+                            await Focuser.Move(position, ct);
+                        }
+
+                        this.Position = Focuser?.Position ?? 0;
+                        pos = this.Position;
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                }
+                finally
+                {
+                    IsMoving = false;
+                    // progress.Report(new FocuserStatus() { Status = string.Empty });
+                }
+            });
+            return pos;
+        }
+
+        public async Task<int> MoveFocuserRelative(int offset, CancellationToken ct)
+        {
+            int pos = -1;
+            if (Focuser?.Connected == true)
+            {
+                pos = this.Position + offset;
+                pos = await MoveFocuser(pos, ct);
+            }
+            return pos;
+        }
+
+        private CancellationTokenSource _cancelChooseFocuserSource;
+
+        private readonly SemaphoreSlim ss = new SemaphoreSlim(1, 1);
+
+        private async Task<bool> ChooseFocuser()
+        {
+            await ss.WaitAsync();
+            try
+            {
+                _focuserTimer.Stop();
+                Disconnect();
+                if (FocuserChooserVM.SelectedDevice.Id == "No_Device")
+                {
+                    Properties.Focuser.Default.DeviceId = FocuserChooserVM.SelectedDevice.Id;
+                    return false;
+                }
+
+                var focuser = (IFocuser)FocuserChooserVM.SelectedDevice;
+                _cancelChooseFocuserSource?.Dispose();
+                _cancelChooseFocuserSource = new CancellationTokenSource();
+                if (focuser != null)
+                {
+                    try
+                    {
+                        var connected = await focuser?.Connect(_cancelChooseFocuserSource.Token);
+                        _cancelChooseFocuserSource.Token.ThrowIfCancellationRequested();
+                        if (connected)
+                        {
+                            this.Focuser = focuser;
+                            UpdateFocuserValues();
+                            _focuserTimer.Start();
+
+                            TargetPosition = this.Position;
+                            Properties.Focuser.Default.DeviceId = Focuser.Id;
+
+                            // Logger.Info($"Successfully connected Focuser. Id: {Focuser.Id} Name: {Focuser.Name} Driver Version: {Focuser.DriverVersion}");
+                            RefreshButtonVisibilities();
+                            return true;
+                        }
+                        else
+                        {
+                            this.Focuser = null;
+                            return false;
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        if (this.Connected) { Disconnect(); }
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            finally
+            {
+                ss.Release();
+            }
+        }
+
+        private void CancelChooseFocuser(object o)
+        {
+            _cancelChooseFocuserSource?.Cancel();
+        }
+
+        private void UpdateFocuserValues()
+        {
+            if (Application.Current.Dispatcher != null)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    this.Connected = _focuser?.Connected ?? false;
+                    this.Position = _focuser?.Position ?? 0;
+                    this.IsMoving = _focuser?.IsMoving ?? false;
+                });
+            }
         }
 
 
-        private ICommand _clickConnectCmd;
-        public ICommand ClickConnectCommand
+        private int _targetPosition;
+
+        public int TargetPosition
         {
             get
             {
-                return _clickConnectCmd ?? (_clickConnectCmd = new RelayCommand(
-                           param => ClickConnect()
-                       ));
+                return _targetPosition;
             }
-        }
-        private void ClickConnect()
-        {
-            try
-            {
-                if (!SkyTelescope()) return;
-                if (_skyTelescopeVM.ClickConnectCommand.CanExecute(null))
-                    _skyTelescopeVM.ClickConnectCommand.Execute(null);
-
-            }
-            catch (Exception ex)
-            {
-                OpenDialog(ex.Message);
-            }
-        }
-
-        #region Dialog
-
-        private string _dialogMsg;
-        public string DialogMsg
-        {
-            get => _dialogMsg;
             set
             {
-                if (_dialogMsg == value) return;
-                _dialogMsg = value;
+                _targetPosition = value;
                 OnPropertyChanged();
             }
         }
 
-        private string _dialogCaption;
-        public string DialogCaption
+        public void DisconnectDiag(object o)
         {
-            get => _dialogCaption;
-            set
+            TwoButtonMessageDialogVM messageVm = new TwoButtonMessageDialogVM()
             {
-                if (_dialogCaption == value) return;
-                _dialogCaption = value;
+                Caption = "Disconnect Focuser",
+                Message = "Click <Accept> to disconnect the focuser",
+                ButtonOneCaption = "Accept",
+                ButtonTwoCaption = "Cancel",
+                OnButtonOneClicked = async () =>
+                {
+                    await Task.Run(() => Disconnect());
+                    IsDialogOpen = false;
+                },
+                OnButtonTwoClicked = () =>
+                {
+                    IsDialogOpen = false;
+                }
+            };
+            DialogContent = new TwoButtonMessageDialog(messageVm);
+            IsDialogOpen = true;
+        }
+
+        public void Disconnect()
+        {
+            _focuserTimer.Stop();
+            Focuser?.Disconnect();
+            Focuser = null;
+            OnPropertyChanged(nameof(Focuser));
+            UpdateFocuserValues();
+            RefreshButtonVisibilities();
+            // Logger.Info("Disconnected Focuser");
+        }
+
+        public void RefreshFocuserList(object obj)
+        {
+            FocuserChooserVM.GetEquipment(Properties.Focuser.Default.DeviceId);
+        }
+
+        private IFocuser _focuser;
+
+        public IFocuser Focuser
+        {
+            get
+            {
+                return _focuser;
+            }
+            private set
+            {
+                _focuser = value;
                 OnPropertyChanged();
             }
         }
 
+        #region Commands ...
+        // private IProgress<FocuserStatus> progress;
+
+        public ICommand RefreshFocuserListCommand { get; private set; }
+
+        public IAsyncCommand ChooseFocuserCommand { get; private set; }
+        public ICommand CancelChooseFocuserCommand { get; private set; }
+        public ICommand DisconnectCommand { get; private set; }
+
+        public ICommand MoveFocuserInCommand { get; private set; }
+        public ICommand MoveFocuserOutCommand { get; private set; }
+        #endregion
+
+
+        #region Dialog 
         private bool _isDialogOpen;
         public bool IsDialogOpen
         {
@@ -128,93 +475,34 @@ namespace GS.Server.Focuser
             }
         }
 
-        private ICommand _openDialogCommand;
-        public ICommand OpenDialogCommand
-        {
-            get
-            {
-                return _openDialogCommand ?? (_openDialogCommand = new RelayCommand(
-                           param => OpenDialog(null)
-                       ));
-            }
-        }
         private void OpenDialog(string msg, string caption = null)
         {
-            if (msg != null) DialogMsg = msg;
-            DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
-            DialogContent = new DialogOK();
+            TwoButtonMessageDialogVM messageVm = new TwoButtonMessageDialogVM()
+            {
+                Caption = caption,
+                Message = msg,
+                ButtonOneCaption = "Accept",
+                ButtonTwoCaption = "Cancel",
+                OnButtonOneClicked = () =>
+                {
+                    System.Diagnostics.Debug.WriteLine("Accept clicked!");
+                    IsDialogOpen = false;
+                },
+                OnButtonTwoClicked = () =>
+                {
+                    System.Diagnostics.Debug.WriteLine("Cancel clicked!");
+                    IsDialogOpen = false;
+                }
+            };
+            DialogContent = new TwoButtonMessageDialog(messageVm);
             IsDialogOpen = true;
-
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Telescope,
-                Category = MonitorCategory.Interface,
-                Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{msg}"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
-
         }
 
-        private ICommand _clickOkDialogCommand;
-        public ICommand ClickOkDialogCommand
-        {
-            get
-            {
-                return _clickOkDialogCommand ?? (_clickOkDialogCommand = new RelayCommand(
-                           param => ClickOkDialog()
-                       ));
-            }
-        }
-        private void ClickOkDialog()
-        {
-            IsDialogOpen = false;
-        }
 
-        private ICommand _clickCancelDialogCommand;
-        public ICommand ClickCancelDialogCommand
-        {
-            get
-            {
-                return _clickCancelDialogCommand ?? (_clickCancelDialogCommand = new RelayCommand(
-                           param => ClickCancelDialog()
-                       ));
-            }
-        }
-        private void ClickCancelDialog()
-        {
-            IsDialogOpen = false;
-        }
 
-        private ICommand _runMessageDialog;
-        public ICommand RunMessageDialogCommand
-        {
-            get
-            {
-                return _runMessageDialog ?? (_runMessageDialog = new RelayCommand(
-                           param => ExecuteMessageDialog()
-                       ));
-            }
-        }
-        private async void ExecuteMessageDialog()
-        {
-            var view = new ErrorMessageDialog
-            {
-                DataContext = new ErrorMessageDialogVM()
-            };
-
-            //show the dialog
-            await DialogHost.Show(view, "RootDialog", ClosingMessageEventHandler);
-        }
-        private void ClosingMessageEventHandler(object sender, DialogClosingEventArgs eventArgs)
-        {
-            Console.WriteLine(@"You can intercept the closing event, and cancel here.");
-        }
 
         #endregion
+
 
         #region Dispose
         public void Dispose()
@@ -233,16 +521,11 @@ namespace GS.Server.Focuser
         // The bulk of the clean-up code is implemented in Dispose(bool)
         private void Dispose(bool disposing)
         {
+            FocuserSettings.Save();
             if (disposing)
             {
 
             }
-            // free native resources if there are any.
-            //if (nativeResource != IntPtr.Zero)
-            //{
-            //    Marshal.FreeHGlobal(nativeResource);
-            //    nativeResource = IntPtr.Zero;
-            //}
         }
         #endregion
     }

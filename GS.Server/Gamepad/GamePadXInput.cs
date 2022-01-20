@@ -52,8 +52,6 @@ namespace GS.Server.GamePad
 
         public override bool IsAvailable => _IsAvailable;
 
-        //static PlayerIndex[] playerIndices = new PlayerIndex[] { PlayerIndex.One, PlayerIndex.Two, PlayerIndex.Three, PlayerIndex.Four };
-
         private GamePadState gamePadState;
         private uint lastPacketNumber;
 
@@ -223,30 +221,6 @@ namespace GS.Server.GamePad
             XRotation = RangeForDirectX(gamePadState.ThumbSticks.Right.X);
             YRotation = RangeForDirectX(gamePadState.ThumbSticks.Right.Y);
 
-            //if (reporterState.LastActiveState.Buttons.Start == XInputDotNetPure.ButtonState.Pressed)
-            //{
-            //    timerStart.Start();
-            //}
-            //else
-            //{
-            //    timerStart.Stop();
-            //}
-            //if (reporterState.LastActiveState.Buttons.Back == XInputDotNetPure.ButtonState.Pressed)
-            //{
-            //    timerBack.Start();
-            //}
-            //else
-            //{
-            //    timerBack.Stop();
-            //}
-
-            //for (int i = 0; i < 4; i++)
-            //{
-            //    controllerControls[i].Visible = i == reporterState.LastActiveIndex && reporterState.LastActiveState.IsConnected;
-            //}
-
-            //PositionStickControl(stickControls[0], stickControlPositions[0], reporterState.LastActiveState.ThumbSticks.Left);
-            //PositionStickControl(stickControls[1], stickControlPositions[1], reporterState.LastActiveState.ThumbSticks.Right);
         }
 
         /// <summary>

@@ -12,7 +12,7 @@ namespace GS.Server.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.8.1.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.0.3.0")]
     internal sealed partial class Gamepad : global::System.Configuration.ApplicationSettingsBase {
         
         private static Gamepad defaultInstance = ((Gamepad)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Gamepad())));
@@ -320,6 +320,30 @@ namespace GS.Server.Properties {
             }
             set {
                 this["DoubleClickSpeed"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string focusin {
+            get {
+                return ((string)(this["focusin"]));
+            }
+            set {
+                this["focusin"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string focusout {
+            get {
+                return ((string)(this["focusout"]));
+            }
+            set {
+                this["focusout"] = value;
             }
         }
     }

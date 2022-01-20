@@ -50,7 +50,7 @@ namespace GS.Server.Alignment
 
         public string BottomName => "Align";
 
-        public int Uid => 9;
+        public int Uid => 10;
 
         private readonly SkyTelescopeVM _skyTelescopeVM;
 
@@ -436,12 +436,10 @@ namespace GS.Server.Alignment
                 ButtonTwoCaption = "Cancel",
                 OnButtonOneClicked = () =>
                 {
-                    System.Diagnostics.Debug.WriteLine("Accept clicked!");
                     IsDialogOpen = false;
                 },
                 OnButtonTwoClicked = () =>
                 {
-                    System.Diagnostics.Debug.WriteLine("Cancel clicked!");
                     IsDialogOpen = false;
                 }
             };

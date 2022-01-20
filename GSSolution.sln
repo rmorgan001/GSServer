@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29709.97
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GS.Shared", "GS.Shared\GS.Shared.csproj", "{63E824C8-585D-45FC-88E4-7E119F0C7773}"
 EndProject
@@ -40,6 +40,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NStarAlignment", "NStarAlignment\NStarAlignment.csproj", "{1D17F8BA-F10F-493E-A7B5-941510A59679}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GS.FitsImageManager", "GS.FitsImageManager\GS.FitsImageManager.csproj", "{74B0434D-F37A-4B53-967C-85881529D45C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NINA", "NINA\NINA.csproj", "{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -306,6 +308,24 @@ Global
 		{74B0434D-F37A-4B53-967C-85881529D45C}.Release|x64.Build.0 = Release|Any CPU
 		{74B0434D-F37A-4B53-967C-85881529D45C}.Release|x86.ActiveCfg = Release|Any CPU
 		{74B0434D-F37A-4B53-967C-85881529D45C}.Release|x86.Build.0 = Release|Any CPU
+		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.AppVeyor|Any CPU.ActiveCfg = Debug|Any CPU
+		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.AppVeyor|Any CPU.Build.0 = Debug|Any CPU
+		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.AppVeyor|x64.ActiveCfg = Debug|Any CPU
+		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.AppVeyor|x64.Build.0 = Debug|Any CPU
+		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.AppVeyor|x86.ActiveCfg = Debug|Any CPU
+		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.AppVeyor|x86.Build.0 = Debug|Any CPU
+		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.Debug|x64.Build.0 = Debug|Any CPU
+		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.Debug|x86.Build.0 = Debug|Any CPU
+		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.Release|x64.ActiveCfg = Release|Any CPU
+		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.Release|x64.Build.0 = Release|Any CPU
+		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.Release|x86.ActiveCfg = Release|Any CPU
+		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

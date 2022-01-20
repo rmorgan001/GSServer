@@ -651,5 +651,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliAcceptButtonCaption">Accept</system:String>
     <system:String x:Key="aliCancelButtonCaption">Cancel</system:String>
     <system:String x:Key="aliPointModelFileFilter">Point model files (*.GssPointModel)|*.GssPointModel|All files (*.*)|*.*</system:String>
+
+    <system:String x:Key="tabFocuserTooltip">Display focuser panel</system:String>
+
 </ResourceDictionary>
  

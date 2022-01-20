@@ -4,46 +4,130 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              xmlns:focuser="clr-namespace:GS.Server.Focuser"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance focuser:FocuserVM}">
-    <Grid Width="800">
-        <md:DialogHost HorizontalAlignment="Center" CloseOnClickAway="True"
-                       IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
-        <md:DrawerHost  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="2" 
-            IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" 
-            BorderBrush="{StaticResource MaterialDesignDivider}">
-        <md:DrawerHost.LeftDrawerContent>
-            <Grid Width="700">
+    <Grid MinWidth="750">
+        <md:DialogHost HorizontalAlignment="Center" CloseOnClickAway="True" 
+                       IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" />
+
+        <md:DrawerHost HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0" 
+                       IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" 
+                       BorderBrush="{StaticResource MaterialDesignDivider}">
+            <md:DrawerHost.LeftDrawerContent>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="150" />
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" Content="Focuser Settings"/>
+                    <ToggleButton Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" Margin="5" ToolTip="{StaticResource aliCloseTooltip}"
+                                  Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
+                                  Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
+                                  CommandParameter="{x:Static Dock.Left}"
+                                  IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"/>
+                    <StackPanel Grid.Row="1" Grid.Column="0"  Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="20,0,5,20">
+                        <md:PopupBox  StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{StaticResource skyReset}">
+                            <Grid Width="150">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30" />
+                                    <RowDefinition Height="40" />
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" HorizontalAlignment="Center" Content="Step Size"/>
+                                <Button Grid.Row="1" HorizontalAlignment="Center" Content="{StaticResource diaAccept}" 
+                                        Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ResetStepSize}"/>
+                            </Grid>
+                        </md:PopupBox>
+                        <TextBox   md:HintAssist.Hint="Focuser step size" Width="110" HorizontalAlignment="Left" VerticalAlignment="Bottom" IsReadOnly="True"
+                                 ToolTip="{StaticResource aliNearbyLimitTooltip}" 
+                                 Text="{Binding StepSize}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" domain:TextBoxMaskBehaviour.Mask="Integer"/>
+
+                    </StackPanel>
+                </Grid>
+            </md:DrawerHost.LeftDrawerContent>
+            <Grid Margin="5,5" >
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40" />
-                    <RowDefinition />
-                    <RowDefinition />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <Grid Grid.Row="0" Grid.Column="0" >
-                    <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18">Settings</Label>
-                    <ToggleButton DockPanel.Dock="Top" HorizontalAlignment="Right" Margin="5" 
-                        Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
-                        Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
-                        CommandParameter="{x:Static Dock.Left}"
-                        IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"/>
-                </Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False" x:Name="MenuToggleButton" ToolTip="{StaticResource aliOpenTooltip}" 
+                                  Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" IsHitTestVisible="True" 
+                                  Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
+                <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal">
+                    <ComboBox md:HintAssist.Hint="Focuser" Width="300" HorizontalAlignment="Left" 
+                              ItemsSource="{Binding FocuserChooserVM.Devices}"
+                              SelectedItem="{Binding FocuserChooserVM.SelectedDevice, Mode=TwoWay}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="Select the focuser to use.">
+                        <ComboBox.ItemsPanel >
+                            <ItemsPanelTemplate >
+                                <VirtualizingStackPanel  />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Button Margin="10,0,0,0" Height="30" 
+                            ToolTip="{StaticResource aliDeleteTooltip}" Style="{StaticResource MaterialDesignRaisedDarkButton}" 
+                            Command="{Binding RefreshFocuserListCommand}"
+                            Content="Refresh"/>
+
+                    <Button Margin="10,0,0,0" Height="30" 
+                            ToolTip="{StaticResource aliClearAllTooltip}"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" 
+                            Command="{Binding FocuserChooserVM.SetupDialogCommand}"
+                            Content="Setup"
+                            Visibility="{Binding ShowSetup, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                    <Button Margin="10,0,0,0" Height="30" 
+                            ToolTip="{StaticResource aliDeleteTooltip}" Style="{StaticResource MaterialDesignRaisedDarkButton}" 
+                            Command="{Binding ChooseFocuserCommand}"
+                            Content="Connect"
+                            Visibility="{Binding ShowConnect, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <Button Margin="10,0,0,0" Height="30" 
+                            ToolTip="{StaticResource aliDeleteTooltip}" Style="{StaticResource MaterialDesignRaisedDarkButton}" 
+                            Command="{Binding DisconnectCommand}"
+                            Content="Disconnect"
+                            Visibility="{Binding ShowDisconnect, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal">
+                    <TextBlock Text="Connected" VerticalAlignment="Center"/>
+                    <ToggleButton Margin="10 0" Style="{StaticResource MaterialDesignActionLightToggleButton}"
+                                  HorizontalAlignment="Center" Width="25" Height="25"  IsHitTestVisible="True"
+                                  IsChecked="{Binding Connected, Mode=OneWay}"
+                                  IsEnabled="False"/>
+
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal">
+                    <TextBlock Text="Current position" VerticalAlignment="Center"/>
+                    <TextBlock Margin="10,0,0,0" MinWidth=" 50" Text="{Binding Position}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Grid.Row="3" Grid.Column="2" Orientation="Horizontal">
+                    <Button Margin="10,0,0,0" MinWidth="100" Height="30" 
+                            ToolTip="{StaticResource aliClearAllTooltip}"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" 
+                            Command="{Binding MoveFocuserInCommand}"
+                            Content="In"/>
+                    <Button Margin="10,0,0,0" MinWidth="100" Height="30" 
+                            ToolTip="{StaticResource aliDeleteTooltip}" Style="{StaticResource MaterialDesignRaisedDarkButton}" 
+                            Command="{Binding MoveFocuserOutCommand}"
+                            Content="Out"/>
+                </StackPanel>
             </Grid>
-        </md:DrawerHost.LeftDrawerContent>
-        <Grid Width="800">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <ToggleButton Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top"
-                Command="{x:Static md:DrawerHost.OpenDrawerCommand}"
-                CommandParameter="{x:Static Dock.Left}"
-                Style="{StaticResource MaterialDesignHamburgerToggleButton}" IsChecked="False"
-                              x:Name="MenuToggleButton"/>
-                <TextBlock Grid.Row="1" Text="Not Installed" 
-                           FontWeight="Bold" FontSize="18"
-                           HorizontalAlignment="Center" VerticalAlignment="Center" />
-            </Grid>
-    </md:DrawerHost>
+        </md:DrawerHost>
     </Grid>
 </UserControl>

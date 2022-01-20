@@ -388,6 +388,38 @@
                             </b:EventTrigger>
                         </b:Interaction.Triggers>
                     </TextBox>
+                    <TextBox Grid.Row="2" Grid.Column="5" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="Focus In" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox.Text>
+                            <Binding Path="FocusIn" Mode="OneWay" />
+                        </TextBox.Text>
+                        <b:Interaction.Triggers>
+                            <b:EventTrigger EventName="GotFocus">
+                                <b:InvokeCommandAction Command="{Binding ClickTextBoxGotFocusCommand}" CommandParameter="focusin" />
+                            </b:EventTrigger>
+                            <b:EventTrigger EventName="LostFocus">
+                                <b:InvokeCommandAction Command="{Binding ClickTextBoxLostFocusCommand}" />
+                            </b:EventTrigger>
+                            <b:EventTrigger EventName="PreviewMouseDoubleClick">
+                                <b:InvokeCommandAction Command="{Binding ClickPreviewMouseDoubleClickCommand}" CommandParameter="focusin" />
+                            </b:EventTrigger>
+                        </b:Interaction.Triggers>
+                    </TextBox>
+                    <TextBox Grid.Row="3" Grid.Column="5" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="Focus Out" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox.Text>
+                            <Binding Path="FocusOut" Mode="OneWay" />
+                        </TextBox.Text>
+                        <b:Interaction.Triggers>
+                            <b:EventTrigger EventName="GotFocus">
+                                <b:InvokeCommandAction Command="{Binding ClickTextBoxGotFocusCommand}" CommandParameter="focusout" />
+                            </b:EventTrigger>
+                            <b:EventTrigger EventName="LostFocus">
+                                <b:InvokeCommandAction Command="{Binding ClickTextBoxLostFocusCommand}" />
+                            </b:EventTrigger>
+                            <b:EventTrigger EventName="PreviewMouseDoubleClick">
+                                <b:InvokeCommandAction Command="{Binding ClickPreviewMouseDoubleClickCommand}" CommandParameter="focusout" />
+                            </b:EventTrigger>
+                        </b:Interaction.Triggers>
+                    </TextBox>
 
                     <Button Grid.Row="4" Grid.ColumnSpan="6" Grid.Column="0" HorizontalAlignment="Center" Content="{StaticResource gpSave}" IsEnabled="{Binding EnableTextBoxes}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSaveCommand}" />
                     </Grid>
