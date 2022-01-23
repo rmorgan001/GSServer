@@ -245,7 +245,7 @@ namespace GS.SkyWatcher
                     var lashduration = backlashSteps / _stepsPerSecond[0] / 3600 / Math.Abs(guideRate) * 1000;
                     duration += (int)lashduration;
                 }
-
+                 
                 if (duration < MinPulseDurationRa)
                 {
                     PulseRaRunning = false;
@@ -257,7 +257,13 @@ namespace GS.SkyWatcher
 
                 var rate = SouthernHemisphere ? -Math.Abs(_trackingRates[0]) : Math.Abs(_trackingRates[0]);
 
-                var speedInt = CalculateSpeed(AxisId.Axis1, rate + BasicMath.DegToRad(guideRate)); // Calculate mount speed
+                var radRate = BasicMath.DegToRad(guideRate);
+                var aplyRate = rate + radRate;
+                if (Math.Abs(aplyRate) < 0.000001)               // When guide rate is 100% check to avoid possible zero                        
+                {                                                // small numbers will mess up the CalculateSpeed.
+                    aplyRate = Constant.SiderealRate / 1000.0;   // assign a number so mount looks like it's stopped
+                }
+                var speedInt = CalculateSpeed(AxisId.Axis1, aplyRate);  // Calculate mount speed  
                 
                 if (_pPecOn && AlternatingPPec){SetPPec(AxisId.Axis1, false);} // implements the alternating pPEC 
 
@@ -1270,7 +1276,9 @@ namespace GS.SkyWatcher
                 speedInt -= 3;
             }
 
-            if (speedInt < 6) { speedInt = 6; }
+            if (speedInt < 6) { 
+                speedInt = 6; 
+            }
 
             return speedInt;
         }

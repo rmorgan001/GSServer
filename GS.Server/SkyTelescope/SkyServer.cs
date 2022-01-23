@@ -1155,6 +1155,8 @@ namespace GS.Server.SkyTelescope
                 {
                     if (TrackingSpeak && _trackingMode != TrackingMode.Off) Synthesizer.Speak(Application.Current.Resources["vceTrackingOff"].ToString());
                     _trackingMode = TrackingMode.Off;
+                    _isPulseGuidingDec = false; // turn off any pulses that maight get stuck
+                    _isPulseGuidingRa = false;
                 }
                 _tracking = value; //off
 
