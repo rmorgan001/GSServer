@@ -220,7 +220,7 @@ namespace GS.Server.GamePad
             //labelStickRightY.Text = FormatFloat(reporterState.LastActiveState.ThumbSticks.Right.Y);
             XRotation = RangeForDirectX(gamePadState.ThumbSticks.Right.X);
             YRotation = RangeForDirectX(gamePadState.ThumbSticks.Right.Y);
-
+            ZRotation = null;
         }
 
         /// <summary>

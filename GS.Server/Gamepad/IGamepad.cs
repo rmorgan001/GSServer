@@ -50,11 +50,12 @@ namespace GS.Server.GamePad
         bool[] Buttons { get; }
         
         int[] POVs { get; }
-        int YAxis { get;  }
-        int XAxis { get; }
-        int ZAxis { get; }
-        int YRotation { get; }
-        int XRotation { get; }
+        int? YAxis { get;  }
+        int? XAxis { get; }
+        int? ZAxis { get; }
+        int? XRotation { get; }
+        int? YRotation { get; }
+        int? ZRotation { get; }
 
         void Find();
         void Poll(float vibrateLeft, float vibrateRight);

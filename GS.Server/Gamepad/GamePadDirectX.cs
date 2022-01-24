@@ -18,6 +18,7 @@ using SharpDX.DirectInput;
 using GS.Shared;
 using System.Reflection;
 using System.Threading;
+using System.Linq;
 
 namespace GS.Server.GamePad
 {
@@ -30,7 +31,15 @@ namespace GS.Server.GamePad
         private readonly DirectInput directInput;
         private JoystickState State { get; set; }
         private Guid joystickGuid;
-
+        private bool[] axisAvailable = new bool[]
+        {
+            false,      // X-axis
+            false,      // Y-axis
+            false,      // Z-axis
+            false,      // X-rotation
+            false,      // Y-rotation
+            false       // Z-rotation
+        };
 
         private readonly IntPtr hWnd;
 
@@ -74,13 +83,20 @@ namespace GS.Server.GamePad
                 joystick.SetCooperativeLevel(hWnd, CooperativeLevel.Background | CooperativeLevel.Exclusive);
 
                 // Query supported info
-                // AllEffects = joystick.GetEffects();
-                // DeviceObjects = joystick.GetObjects();
-                // DeviceInfo = joystick.Information;
-                // var cps = joystick.Capabilities;
-                // AxisCount = cps.AxeCount;
-                // PovCount = cps.PovCount;
-                // DeviceFlags = cps.Flags;
+                //var allEffects = joystick.GetEffects();
+                var deviceObjects = joystick.GetObjects();
+                axisAvailable[0] = deviceObjects.Any(o => o.Name == "X Axis");
+                axisAvailable[1] = deviceObjects.Any(o => o.Name == "Y Axis");
+                axisAvailable[2] = deviceObjects.Any(o => o.Name == "Z Axis");
+                axisAvailable[3] = deviceObjects.Any(o => o.Name == "X Rotation");
+                axisAvailable[4] = deviceObjects.Any(o => o.Name == "Y Rotation");
+                axisAvailable[5] = deviceObjects.Any(o => o.Name == "Z Rotation");
+
+                //var deviceInfo = joystick.Information;
+                //var cps = joystick.Capabilities;
+                //var axisCount = cps.AxeCount;
+                //var povCount = cps.PovCount;
+                //var deviceFlags = cps.Flags;
 
                 // Set BufferSize in order to use buffered data.
                 joystick.Properties.BufferSize = 128;
@@ -131,11 +147,12 @@ namespace GS.Server.GamePad
                 State = joystick.GetCurrentState();
                 Buttons = State.Buttons;
                 POVs = State.PointOfViewControllers;
-                XAxis = State.X;
-                YAxis = State.Y;
-                ZAxis = State.Z;
-                XRotation = State.RotationX;
-                YRotation = State.RotationY;
+                XAxis = axisAvailable[0] ? (int?)State.X: null;
+                YAxis = axisAvailable[1] ? (int?)State.Y : null;
+                ZAxis = axisAvailable[2] ? (int?)State.Z : null;
+                XRotation = axisAvailable[3] ? (int?)State.RotationX : null;
+                YRotation = axisAvailable[4] ? (int?)State.RotationY : null;
+                ZRotation = axisAvailable[5] ? (int?)State.RotationZ : null;
                 // Data = joystick.GetBufferedData();
             }
             catch (Exception ex)

@@ -517,6 +517,7 @@ namespace GS.Server.GamePad
                     var zaxistocheck = new AxisPair(-1, String.Empty);
                     var xrotationtocheck = new AxisPair(-1, String.Empty);
                     var yrotationtocheck = new AxisPair(-1, String.Empty);
+                    var zrotationtocheck = new AxisPair(-1, String.Empty);
                     var KeepRunning = true;
                     while (KeepRunning)
                     {
@@ -602,175 +603,226 @@ namespace GS.Server.GamePad
                                         DoGamePadSetKey(key, val);
                                         break;
                                     }
-                                    
+
                                     var id = DoGamePadCommand(newhit.Key, true, cmd);
                                     povtocheck = id == -1 ? new PovPair(-1, 0) : newhit;
                                     break;
                                 }
                             }
                         }
-
                         // Check X Axis
-                        if (xaxistocheck.Key > -1)
+                        if (_gamePad.XAxis.HasValue)
                         {
-                            var xDirection = AxisDirection(_gamePad.XAxis);
-                            var pushed = xaxistocheck.Value == xDirection;
-                            if (String.IsNullOrEmpty(key))
+                            if (xaxistocheck.Key > -1)
                             {
-                                var cmd = _gamePad.Get_KeyByValue("xaxis" + " " + xaxistocheck.Value);
-                                var id = DoGamePadCommand(xaxistocheck.Key, pushed, cmd);
-                                if (id == -1) xaxistocheck = new AxisPair(-1, String.Empty);
-                            }
-                        }
-                        else
-                        {
-                            var xDirection = AxisDirection(_gamePad.XAxis);
-                            if (xDirection != "normal")
-                            {
-                                var newaxis = new AxisPair(1, xDirection);
-                                var val = "xaxis" + " " + xDirection;
-                                var cmd = _gamePad.Get_KeyByValue(val);
-
-                                if (key != null)
+                                var xDirection = AxisDirection(_gamePad.XAxis.Value);
+                                var pushed = xaxistocheck.Value == xDirection;
+                                if (String.IsNullOrEmpty(key))
                                 {
-                                    DoGamePadSetKey(key, val);
-                                }
-                                else
-                                {
-                                    var id = DoGamePadCommand(1, true, cmd);
-                                    xaxistocheck = id == -1 ? new AxisPair(-1, String.Empty) : newaxis;
+                                    var cmd = _gamePad.Get_KeyByValue("xaxis" + " " + xaxistocheck.Value);
+                                    var id = DoGamePadCommand(xaxistocheck.Key, pushed, cmd);
+                                    if (id == -1) xaxistocheck = new AxisPair(-1, String.Empty);
                                 }
                             }
-                        }
+                            else
+                            {
+                                var xDirection = AxisDirection(_gamePad.XAxis.Value);
+                                if (xDirection != "normal")
+                                {
+                                    var newaxis = new AxisPair(1, xDirection);
+                                    var val = "xaxis" + " " + xDirection;
+                                    var cmd = _gamePad.Get_KeyByValue(val);
 
+                                    if (key != null)
+                                    {
+                                        DoGamePadSetKey(key, val);
+                                    }
+                                    else
+                                    {
+                                        var id = DoGamePadCommand(1, true, cmd);
+                                        xaxistocheck = id == -1 ? new AxisPair(-1, String.Empty) : newaxis;
+                                    }
+                                }
+                            }
+                        }
                         // Check Y Axis
-                        if (yaxistocheck.Key > -1)
+                        if (_gamePad.YAxis.HasValue)
                         {
-                            var yDirection = AxisDirection(_gamePad.YAxis);
-                            var pushed = yaxistocheck.Value == yDirection;
-                            if (String.IsNullOrEmpty(key))
+                            if (yaxistocheck.Key > -1)
                             {
-                                var cmd = _gamePad.Get_KeyByValue("yaxis" + " " + yaxistocheck.Value);
-                                var id = DoGamePadCommand(yaxistocheck.Key, pushed, cmd);
-                                if (id == -1) yaxistocheck = new AxisPair(-1, String.Empty);
-                            }
-                        }
-                        else
-                        {
-                            var yDirection = AxisDirection(_gamePad.YAxis);
-                            if (yDirection != "normal")
-                            {
-                                var newaxis = new AxisPair(1, yDirection);
-                                var val = "yaxis" + " " + yDirection;
-                                var cmd = _gamePad.Get_KeyByValue(val);
-
-                                if (key != null)
+                                var yDirection = AxisDirection(_gamePad.YAxis.Value);
+                                var pushed = yaxistocheck.Value == yDirection;
+                                if (String.IsNullOrEmpty(key))
                                 {
-                                    DoGamePadSetKey(key, val);
+                                    var cmd = _gamePad.Get_KeyByValue("yaxis" + " " + yaxistocheck.Value);
+                                    var id = DoGamePadCommand(yaxistocheck.Key, pushed, cmd);
+                                    if (id == -1) yaxistocheck = new AxisPair(-1, String.Empty);
                                 }
-                                else
+                            }
+                            else
+                            {
+                                var yDirection = AxisDirection(_gamePad.YAxis.Value);
+                                if (yDirection != "normal")
                                 {
-                                    var id = DoGamePadCommand(1, true, cmd);
-                                    yaxistocheck = id == -1 ? new AxisPair(-1, String.Empty) : newaxis;
+                                    var newaxis = new AxisPair(1, yDirection);
+                                    var val = "yaxis" + " " + yDirection;
+                                    var cmd = _gamePad.Get_KeyByValue(val);
+
+                                    if (key != null)
+                                    {
+                                        DoGamePadSetKey(key, val);
+                                    }
+                                    else
+                                    {
+                                        var id = DoGamePadCommand(1, true, cmd);
+                                        yaxistocheck = id == -1 ? new AxisPair(-1, String.Empty) : newaxis;
+                                    }
                                 }
                             }
                         }
 
                         // Check Z Axis
-                        if (zaxistocheck.Key > -1)
+                        if (_gamePad.ZAxis.HasValue)
                         {
-                            var zDirection = AxisDirection(_gamePad.ZAxis);
-                            var pushed = zaxistocheck.Value == zDirection;
-                            if (String.IsNullOrEmpty(key))
+                            if (zaxistocheck.Key > -1)
                             {
-                                var cmd = _gamePad.Get_KeyByValue("zaxis" + " " + zaxistocheck.Value);
-                                var id = DoGamePadCommand(zaxistocheck.Key, pushed, cmd);
-                                if (id == -1) zaxistocheck = new AxisPair(-1, String.Empty);
-                            }
-                        }
-                        else
-                        {
-                            var zDirection = AxisDirection(_gamePad.ZAxis);
-                            if (zDirection != "normal")
-                            {
-                                var newaxis = new AxisPair(1, zDirection);
-                                var val = "zaxis" + " " + zDirection;
-                                var cmd = _gamePad.Get_KeyByValue(val);
-
-                                if (key != null)
+                                var zDirection = AxisDirection(_gamePad.ZAxis.Value);
+                                var pushed = zaxistocheck.Value == zDirection;
+                                if (String.IsNullOrEmpty(key))
                                 {
-                                    DoGamePadSetKey(key, val);
+                                    var cmd = _gamePad.Get_KeyByValue("zaxis" + " " + zaxistocheck.Value);
+                                    var id = DoGamePadCommand(zaxistocheck.Key, pushed, cmd);
+                                    if (id == -1) zaxistocheck = new AxisPair(-1, String.Empty);
                                 }
-                                else
+                            }
+                            else
+                            {
+                                var zDirection = AxisDirection(_gamePad.ZAxis.Value);
+                                if (zDirection != "normal")
                                 {
-                                    var id = DoGamePadCommand(1, true, cmd);
-                                    zaxistocheck = id == -1 ? new AxisPair(-1, string.Empty) : newaxis;
+                                    var newaxis = new AxisPair(1, zDirection);
+                                    var val = "zaxis" + " " + zDirection;
+                                    var cmd = _gamePad.Get_KeyByValue(val);
+
+                                    if (key != null)
+                                    {
+                                        DoGamePadSetKey(key, val);
+                                    }
+                                    else
+                                    {
+                                        var id = DoGamePadCommand(1, true, cmd);
+                                        zaxistocheck = id == -1 ? new AxisPair(-1, string.Empty) : newaxis;
+                                    }
                                 }
                             }
                         }
 
                         // Check X Rotation
-                        if (xrotationtocheck.Key > -1)
+                        if (_gamePad.XRotation.HasValue)
                         {
-                            var xDirection = AxisDirection(_gamePad.XRotation);
-                            var pushed = xrotationtocheck.Value == xDirection;
-                            if (String.IsNullOrEmpty(key))
+                            if (xrotationtocheck.Key > -1)
                             {
-                                var cmd = _gamePad.Get_KeyByValue("xrotation" + " " + xrotationtocheck.Value);
-                                var id = DoGamePadCommand(xrotationtocheck.Key, pushed, cmd);
-                                if (id == -1) xrotationtocheck = new AxisPair(-1, String.Empty);
-                            }
-                        }
-                        else
-                        {
-                            var xDirection = AxisDirection(_gamePad.XRotation);
-                            if (xDirection != "normal")
-                            {
-                                var newaxis = new AxisPair(1, xDirection);
-                                var val = "xrotation" + " " + xDirection;
-                                var cmd = _gamePad.Get_KeyByValue(val);
-
-                                if (key != null)
+                                var xDirection = AxisDirection(_gamePad.XRotation.Value);
+                                var pushed = xrotationtocheck.Value == xDirection;
+                                if (!pushed)
                                 {
-                                    DoGamePadSetKey(key, val);
-                                }
-                                else
-                                {
-                                    var id = DoGamePadCommand(1, true, cmd);
-                                    xrotationtocheck = id == -1 ? new AxisPair(-1, string.Empty) : newaxis;
+                                    if (String.IsNullOrEmpty(key))
+                                    {
+                                        var cmd = _gamePad.Get_KeyByValue("xrotation" + " " + xrotationtocheck.Value);
+                                        var id = DoGamePadCommand(xrotationtocheck.Key, pushed, cmd);
+                                        if (id == -1) xrotationtocheck = new AxisPair(-1, String.Empty);
+                                    }
                                 }
                             }
-                        }
+                            else
+                            {
+                                var xDirection = AxisDirection(_gamePad.XRotation.Value);
+                                if (xDirection != "normal")
+                                {
+                                    var newaxis = new AxisPair(1, xDirection);
+                                    var val = "xrotation" + " " + xDirection;
+                                    var cmd = _gamePad.Get_KeyByValue(val);
 
+                                    if (key != null)
+                                    {
+                                        DoGamePadSetKey(key, val);
+                                    }
+                                    else
+                                    {
+                                        var id = DoGamePadCommand(1, true, cmd);
+                                        xrotationtocheck = id == -1 ? new AxisPair(-1, string.Empty) : newaxis;
+                                    }
+                                }
+                            }
+                        }
                         // Check Y Rotation
-                        if (yrotationtocheck.Key > -1)
+                        if (_gamePad.YRotation.HasValue)
                         {
-                            var yDirection = AxisDirection(_gamePad.YRotation);
-                            var pushed = yrotationtocheck.Value == yDirection;
-                            if (String.IsNullOrEmpty(key))
+                            if (yrotationtocheck.Key > -1)
                             {
-                                var cmd = _gamePad.Get_KeyByValue("yrotation" + " " + yrotationtocheck.Value);
-                                var id = DoGamePadCommand(yrotationtocheck.Key, pushed, cmd);
-                                if (id == -1) yrotationtocheck = new AxisPair(-1, String.Empty);
+                                var yDirection = AxisDirection(_gamePad.YRotation.Value);
+                                var pushed = yrotationtocheck.Value == yDirection;
+                                if (String.IsNullOrEmpty(key))
+                                {
+                                    var cmd = _gamePad.Get_KeyByValue("yrotation" + " " + yrotationtocheck.Value);
+                                    var id = DoGamePadCommand(yrotationtocheck.Key, pushed, cmd);
+                                    if (id == -1) yrotationtocheck = new AxisPair(-1, String.Empty);
+                                }
+                            }
+                            else
+                            {
+                                var yDirection = AxisDirection(_gamePad.YRotation.Value);
+                                if (yDirection != "normal")
+                                {
+                                    var newaxis = new AxisPair(1, yDirection);
+                                    var val = "yrotation" + " " + yDirection;
+                                    var cmd = _gamePad.Get_KeyByValue(val);
+
+                                    if (key != null)
+                                    {
+                                        DoGamePadSetKey(key, val);
+                                    }
+                                    else
+                                    {
+                                        var id = DoGamePadCommand(1, true, cmd);
+                                        yrotationtocheck = id == -1 ? new AxisPair(-1, string.Empty) : newaxis;
+                                    }
+                                }
                             }
                         }
-                        else
-                        {
-                            var yDirection = AxisDirection(_gamePad.YRotation);
-                            if (yDirection != "normal")
-                            {
-                                var newaxis = new AxisPair(1, yDirection);
-                                var val = "yrotation" + " " + yDirection;
-                                var cmd = _gamePad.Get_KeyByValue(val);
 
-                                if (key != null)
+                        // Check Z Rotation
+                        if (_gamePad.ZRotation.HasValue)
+                        {
+                            if (yrotationtocheck.Key > -1)
+                            {
+                                var zDirection = AxisDirection(_gamePad.ZRotation.Value);
+                                var pushed = zrotationtocheck.Value == zDirection;
+                                if (String.IsNullOrEmpty(key))
                                 {
-                                    DoGamePadSetKey(key, val);
+                                    var cmd = _gamePad.Get_KeyByValue("zrotation" + " " + zrotationtocheck.Value);
+                                    var id = DoGamePadCommand(zrotationtocheck.Key, pushed, cmd);
+                                    if (id == -1) zrotationtocheck = new AxisPair(-1, String.Empty);
                                 }
-                                else
+                            }
+                            else
+                            {
+                                var zDirection = AxisDirection(_gamePad.ZRotation.Value);
+                                if (zDirection != "normal")
                                 {
-                                    var id = DoGamePadCommand(1, true, cmd);
-                                    yrotationtocheck = id == -1 ? new AxisPair(-1, string.Empty) : newaxis;
+                                    var newaxis = new AxisPair(1, zDirection);
+                                    var val = "zrotation" + " " + zDirection;
+                                    var cmd = _gamePad.Get_KeyByValue(val);
+
+                                    if (key != null)
+                                    {
+                                        DoGamePadSetKey(key, val);
+                                    }
+                                    else
+                                    {
+                                        var id = DoGamePadCommand(1, true, cmd);
+                                        zrotationtocheck = id == -1 ? new AxisPair(-1, string.Empty) : newaxis;
+                                    }
                                 }
                             }
                         }

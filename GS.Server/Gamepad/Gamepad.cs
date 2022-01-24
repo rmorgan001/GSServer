@@ -25,11 +25,12 @@ namespace GS.Server.GamePad
         public abstract bool IsAvailable { get; }
         public bool[] Buttons { get; protected set; }
         public int[] POVs { get; protected set; }
-        public int YAxis { get; protected set; }
-        public int XAxis { get; protected set; }
-        public int ZAxis { get; protected set; }
-        public int YRotation { get; protected set; }
-        public int XRotation { get; protected set; }
+        public int? XAxis { get; protected set; }
+        public int? YAxis { get; protected set; }
+        public int? ZAxis { get; protected set; }
+        public int? YRotation { get; protected set; }
+        public int? XRotation { get; protected set; }
+        public int? ZRotation { get; protected set; }
 
         /// <summary>
         /// Constructor sets up and find a joystick
