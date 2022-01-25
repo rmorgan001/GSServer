@@ -1432,8 +1432,6 @@ namespace GS.Server.SkyTelescope
                             _ = new CmdAxisStop(0, Axis.Axis1);
                             _ = new CmdAxisStop(0, Axis.Axis2);
                             break;
-                        case MountTaskName.InitialiseAxes:
-                            break;
                         case MountTaskName.InstantStopAxes:
                             break;
                         case MountTaskName.SetSouthernHemisphere:
@@ -1869,9 +1867,6 @@ namespace GS.Server.SkyTelescope
                             break;
                         case MountTaskName.LoadDefaults:
                             _ = new SkyLoadDefaultMountSettings(0);
-                            break;
-                        case MountTaskName.InitialiseAxes:
-                            _ = new SkyInitializeAxes(0);
                             break;
                         case MountTaskName.InstantStopAxes:
                             _ = new SkyAxisStopInstant(0, AxisId.Axis1);
@@ -3522,8 +3517,9 @@ namespace GS.Server.SkyTelescope
                     }
 
                     // defaults
-                    //SkyTasks(MountTaskName.InitialiseAxes);
                     SkyTasks(MountTaskName.LoadDefaults);
+                    SkyTasks(MountTaskName.StepsPerRevolution);
+                    SkyTasks(MountTaskName.StepsWormPerRevolution);
                     SkyTasks(MountTaskName.StopAxes);
                     SkyTasks(MountTaskName.Encoders);
                     SkyTasks(MountTaskName.FullCurrent);
@@ -3531,8 +3527,6 @@ namespace GS.Server.SkyTelescope
                     SkyTasks(MountTaskName.SetSouthernHemisphere);
                     SkyTasks(MountTaskName.MountName);
                     SkyTasks(MountTaskName.MountVersion);
-                    SkyTasks(MountTaskName.StepsPerRevolution);
-                    SkyTasks(MountTaskName.StepsWormPerRevolution);
                     SkyTasks(MountTaskName.StepTimeFreq);
                     SkyTasks(MountTaskName.GetOneStepIndicators);
                     SkyTasks(MountTaskName.CanPpec);

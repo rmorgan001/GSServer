@@ -867,6 +867,7 @@ namespace GS.SkyWatcher
         internal void InitializeAxes()
         {
             _commands.InitializeAxes();
+
         }
 
         /// <summary>
