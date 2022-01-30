@@ -2066,6 +2066,20 @@ namespace GS.Server.SkyTelescope
         /// <returns>true for errors found and not successful</returns>
         private static bool CheckSkyErrors(ISkyCommand command)
         {
+            if (command.Exception != null) { 
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Warning,
+                Method = MethodBase.GetCurrentMethod().Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{command.Exception.Message}|{command.Exception.StackTrace}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+            }
+
             return !command.Successful && command.Exception != null;
         }
 
@@ -2725,7 +2739,7 @@ namespace GS.Server.SkyTelescope
                 case MountType.SkyWatcher:
                     var skySteps = new SkyGetSteps(SkyQueue.NewId);
                     steps = (double[])SkyQueue.GetCommandResult(skySteps).Result;
-                    return CheckSkyErrors(skySteps) ? throw skySteps.Exception : steps;
+                    return CheckSkyErrors(skySteps) ? new[] { double.NaN, double.NaN } : steps;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
