@@ -32,6 +32,7 @@ using GS.Server.Controls.Dialogs;
 using GS.Server.Windows;
 using GS.Shared.Command;
 using GS.Server.Focuser;
+using System.Collections.Generic;
 
 namespace GS.Server.GamePad
 {
@@ -794,7 +795,7 @@ namespace GS.Server.GamePad
                         // Check Z Rotation
                         if (_gamePad.ZRotation.HasValue)
                         {
-                            if (yrotationtocheck.Key > -1)
+                            if (zrotationtocheck.Key > -1)
                             {
                                 var zDirection = AxisDirection(_gamePad.ZRotation.Value);
                                 var pushed = zrotationtocheck.Value == zDirection;
@@ -853,6 +854,29 @@ namespace GS.Server.GamePad
             }
         }
 
+        private Dictionary<string, bool> pressedState = new Dictionary<string, bool>();
+
+        private bool GetPressedState(string command)
+        {
+            bool pressed = false;
+            if (!pressedState.TryGetValue(command, out pressed)){
+                pressedState.Add(command, false);
+            }
+            return pressed;
+        }
+
+        private void SetPressedState(string command, bool pressed)
+        {
+            if (pressedState.ContainsKey(command)){
+                pressedState[command] = pressed;
+            }
+            else
+            {
+                pressedState.Add(command, pressed);
+            }
+        }
+
+
         /// <summary>
         /// Execute relay commands from a game pad
         /// </summary>
@@ -881,6 +905,7 @@ namespace GS.Server.GamePad
                 case "volumeup":
                 case "volumedown":
                     if (!Settings()) return returnId;
+                    if (value == GetPressedState(command)) return id; // All but the focus commands should ignore repeated presses.
                     break;
 
                 case "focusin":
@@ -890,9 +915,13 @@ namespace GS.Server.GamePad
                 default:
                     if (!SkyTelescope()) return returnId;
                     if (!SkyServer.IsMountRunning) return returnId;
+                    if (value == GetPressedState(command)) return id; // All but the focus commands should ignore repeated presses.
                     break;
 
             }
+
+            SetPressedState(command, value);    // Record current value.
+
             if (ctsGamePad.IsCancellationRequested) return returnId;
             ThreadContext.InvokeOnUiThread(delegate
             {
