@@ -88,7 +88,6 @@ namespace GS.Server.SkyTelescope
         GetOneStepIndicators,
         LoadDefaults,
         StopAxes,
-        InitialiseAxes,
         InstantStopAxes,
         MinPulseRa,
         MinPulseDec,

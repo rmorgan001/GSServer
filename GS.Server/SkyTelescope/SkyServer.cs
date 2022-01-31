@@ -1432,8 +1432,6 @@ namespace GS.Server.SkyTelescope
                             _ = new CmdAxisStop(0, Axis.Axis1);
                             _ = new CmdAxisStop(0, Axis.Axis2);
                             break;
-                        case MountTaskName.InitialiseAxes:
-                            break;
                         case MountTaskName.InstantStopAxes:
                             break;
                         case MountTaskName.SetSouthernHemisphere:
@@ -1870,9 +1868,6 @@ namespace GS.Server.SkyTelescope
                         case MountTaskName.LoadDefaults:
                             _ = new SkyLoadDefaultMountSettings(0);
                             break;
-                        case MountTaskName.InitialiseAxes:
-                            _ = new SkyInitializeAxes(0);
-                            break;
                         case MountTaskName.InstantStopAxes:
                             _ = new SkyAxisStopInstant(0, AxisId.Axis1);
                             _ = new SkyAxisStopInstant(0, AxisId.Axis2);
@@ -2071,7 +2066,21 @@ namespace GS.Server.SkyTelescope
         /// <returns>true for errors found and not successful</returns>
         private static bool CheckSkyErrors(ISkyCommand command)
         {
-            return !command.Successful && command.Exception != null;
+            if (command.Exception != null) { 
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Warning,
+                Method = MethodBase.GetCurrentMethod().Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{command.Successful},{command.Exception.Message},{command.Exception.StackTrace}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+            }
+
+            return !command.Successful || command.Exception != null;
         }
 
         #endregion
@@ -2730,7 +2739,7 @@ namespace GS.Server.SkyTelescope
                 case MountType.SkyWatcher:
                     var skySteps = new SkyGetSteps(SkyQueue.NewId);
                     steps = (double[])SkyQueue.GetCommandResult(skySteps).Result;
-                    return CheckSkyErrors(skySteps) ? throw skySteps.Exception : steps;
+                    return CheckSkyErrors(skySteps) ? new[] { double.NaN, double.NaN } : steps;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -3522,8 +3531,9 @@ namespace GS.Server.SkyTelescope
                     }
 
                     // defaults
-                    //SkyTasks(MountTaskName.InitialiseAxes);
                     SkyTasks(MountTaskName.LoadDefaults);
+                    SkyTasks(MountTaskName.StepsPerRevolution);
+                    SkyTasks(MountTaskName.StepsWormPerRevolution);
                     SkyTasks(MountTaskName.StopAxes);
                     SkyTasks(MountTaskName.Encoders);
                     SkyTasks(MountTaskName.FullCurrent);
@@ -3531,8 +3541,6 @@ namespace GS.Server.SkyTelescope
                     SkyTasks(MountTaskName.SetSouthernHemisphere);
                     SkyTasks(MountTaskName.MountName);
                     SkyTasks(MountTaskName.MountVersion);
-                    SkyTasks(MountTaskName.StepsPerRevolution);
-                    SkyTasks(MountTaskName.StepsWormPerRevolution);
                     SkyTasks(MountTaskName.StepTimeFreq);
                     SkyTasks(MountTaskName.GetOneStepIndicators);
                     SkyTasks(MountTaskName.CanPpec);

@@ -867,6 +867,7 @@ namespace GS.SkyWatcher
         internal void InitializeAxes()
         {
             _commands.InitializeAxes();
+
         }
 
         /// <summary>
@@ -1276,8 +1277,8 @@ namespace GS.SkyWatcher
                 speedInt -= 3;
             }
 
-            if (speedInt < 6) { 
-                speedInt = 6; 
+            if (speedInt < 3) { 
+                speedInt = 3; 
             }
 
             return speedInt;

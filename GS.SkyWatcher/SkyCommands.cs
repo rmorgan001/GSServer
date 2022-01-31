@@ -1771,7 +1771,7 @@ namespace GS.SkyWatcher
                 Exception = e;
             }
         }
-    }
+    }    
 
     public class SkyGetAxisVersions : ISkyCommand
     {

@@ -101,7 +101,6 @@ namespace GS.SkyWatcher
         internal void LoadMountDefaults()
         {
             MountConnected = true;
-            InitializeAxes();
             GetAxisVersion(AxisId.Axis1);
             GetAxisVersion(AxisId.Axis2);
             // Inquire Gear Rate
@@ -113,6 +112,8 @@ namespace GS.SkyWatcher
             // Inquire motor high speed ratio
             GetHighSpeedRatio(AxisId.Axis1);
             GetHighSpeedRatio(AxisId.Axis2);
+            //
+            InitializeAxes();
             // Inquire Axis Position
             _positions[(int)AxisId.Axis1] = GetAxisPosition(AxisId.Axis1);
             _positions[(int)AxisId.Axis2] = GetAxisPosition(AxisId.Axis2);
@@ -375,7 +376,7 @@ namespace GS.SkyWatcher
             }
             _axesStatus[(int)axis].SlewingForward = (response[1] & 0x02) == 0;
             _axesStatus[(int)axis].HighSpeed = (response[1] & 0x04) != 0;
-            _axesStatus[(int)axis].NotInitialized = (response[3] & 1) == 0;
+            _axesStatus[(int)axis].Initialized = (response[3] & 1) == 1;
             //_axesStatus[(int)axis].StepSpeed = GetLastSlewSpeed(axis).ToString();
             return _axesStatus[(int)axis];
         }
@@ -575,8 +576,11 @@ namespace GS.SkyWatcher
         /// </summary>
         internal void InitializeAxes()
         {
-            CmdToAxis(AxisId.Axis1, 'F', null);
-            CmdToAxis(AxisId.Axis2, 'F', null);
+            GetAxisStatus(AxisId.Axis1);
+            GetAxisStatus(AxisId.Axis2);
+
+            if (_axesStatus[0].Initialized == false) { CmdToAxis(AxisId.Axis1, 'F', null); }
+            if (_axesStatus[1].Initialized == false) { CmdToAxis(AxisId.Axis2, 'F', null); }
         }
 
         /// <summary>
