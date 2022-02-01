@@ -399,7 +399,7 @@ namespace GS.Server.Gps
                     Longitude = ConvertLatLong(lon, ew);
                 }
 
-                double.TryParse(gpsDataArr[9], out var d);
+                double.TryParse(gpsDataArr[9], NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var d);
                 Altitude = d;
 
                 string timeformat;
