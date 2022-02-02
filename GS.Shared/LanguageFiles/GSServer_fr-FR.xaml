@@ -674,4 +674,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="focuserSelectTooltip">Taille de pas de mise au pointSélectionnez la mise au point à laquelle vous connecter</system:String>
     <system:String x:Key="focuserSelectHint">Mise au point</system:String>
 
+    <system:String x:Key="focuserReverseDirectionTooltip">Cochez cette case pour inverser la direction de la mise au point lorsque les boutons sont enfoncés.</system:String>
+    <system:String x:Key="focuserReverseDirection">Direction inverse</system:String>
+
+
 </ResourceDictionary>

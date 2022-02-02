@@ -19,6 +19,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="40" />
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -48,6 +49,12 @@
                                  Text="{Binding StepSize}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" domain:TextBoxMaskBehaviour.Mask="Integer"/>
 
                     </StackPanel>
+                    <StackPanel Grid.Row="2" Grid.ColumnSpan="3" Grid.Column="0" Orientation="Horizontal" Margin="20,0,5,20">
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center"  Margin="12,0,0,0"  Width="25" Height="25" ToolTip="{StaticResource focuserReverseDirectionTooltip}"
+                                      IsChecked="{Binding ReverseDirection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource focuserReverseDirection}"/>
+                    </StackPanel>
+
                 </Grid>
             </md:DrawerHost.LeftDrawerContent>
             <Grid Margin="5,5" >
