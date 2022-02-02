@@ -119,6 +119,15 @@ namespace GS.Server.Focuser
             }
         }
 
+        public bool ReverseDirection
+        {
+            get => Properties.Focuser.Default.ReverseDirection;
+            set
+            {
+                Properties.Focuser.Default.ReverseDirection = value;
+                OnPropertyChanged();
+            }
+        }
         #endregion
 
 
@@ -182,8 +191,8 @@ namespace GS.Server.Focuser
             CancelChooseFocuserCommand = new RelayCommand(CancelChooseFocuser);
             DisconnectCommand = new RelayCommand(DisconnectDiag);
             RefreshFocuserListCommand = new RelayCommand(RefreshFocuserList, o => !(Focuser?.Connected == true));
-            MoveFocuserInCommand = new AsyncCommand<int>(() => MoveFocuserRelativeInternal(-1 * StepSize), (p) => Connected && !IsMoving);
-            MoveFocuserOutCommand = new AsyncCommand<int>(() => MoveFocuserRelativeInternal(StepSize), (p) => Connected && !IsMoving);
+            MoveFocuserInCommand = new AsyncCommand<int>(() => MoveFocuserRelativeInternal((ReverseDirection ? 1: -1) * StepSize), (p) => Connected && !IsMoving);
+            MoveFocuserOutCommand = new AsyncCommand<int>(() => MoveFocuserRelativeInternal((ReverseDirection ? -1 : 1)* StepSize), (p) => Connected && !IsMoving);
 
             _focuserTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Properties.Focuser.Default.DevicePollingInterval) };
             _focuserTimer.Tick += _focuserTimer_Tick;

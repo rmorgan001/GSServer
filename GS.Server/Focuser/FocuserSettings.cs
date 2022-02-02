@@ -66,6 +66,21 @@ namespace GS.Server.Focuser
         }
 
 
+        private static bool _reverseDirection;
+        public static bool ReverseDirection
+        {
+            get => _reverseDirection;
+            set
+            {
+                if (_reverseDirection == value) return;
+                _reverseDirection = value;
+                Properties.Focuser.Default.ReverseDirection = value;
+                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
+                OnStaticPropertyChanged();
+            }
+
+        }
+
         #endregion
 
         #region Methods

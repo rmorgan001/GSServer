@@ -672,5 +672,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="focuserSelectTooltip">Select the focuser to connect to</system:String>
     <system:String x:Key="focuserSelectHint">Focuser</system:String>
 
+    <system:String x:Key="focuserReverseDirectionTooltip">Check this box to reverse the direction of the focuser when the buttons are pressed.</system:String>
+    <system:String x:Key="focuserReverseDirection">Reverse Direction</system:String>
+
+
 </ResourceDictionary>
  

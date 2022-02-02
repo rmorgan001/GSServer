@@ -70,5 +70,17 @@ namespace GS.Server.Properties {
                 this["Version"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ReverseDirection {
+            get {
+                return ((bool)(this["ReverseDirection"]));
+            }
+            set {
+                this["ReverseDirection"] = value;
+            }
+        }
     }
 }
