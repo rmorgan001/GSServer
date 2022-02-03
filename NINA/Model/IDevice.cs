@@ -13,6 +13,7 @@
 #endregion "copyright"
 
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -45,13 +46,7 @@ namespace NINA.Model
             Name = name;
         }
 
-        public bool HasSetupDialog
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool HasSetupDialog => false;
 
         public string Category { get; } = string.Empty;
 
@@ -67,53 +62,27 @@ namespace NINA.Model
 
         public string Name
         {
-            get
-            {
-                return _name;
-            }
-            private set
-            {
-                _name = value;
-            }
+            get => _name;
+            private set => _name = value;
         }
 
-        public bool Connected
+        public bool Connected => false;
+
+        public string Description => string.Empty;
+
+        public string DriverInfo => string.Empty;
+
+        public string DriverVersion => string.Empty;
+
+        public event PropertyChangedEventHandler PropertyChanged
         {
-            get
-            {
-                return false;
-            }
+            add { }
+            remove { }
         }
-
-        public string Description
-        {
-            get
-            {
-                return string.Empty;
-            }
-        }
-
-        public string DriverInfo
-        {
-            get
-            {
-                return string.Empty;
-            }
-        }
-
-        public string DriverVersion
-        {
-            get
-            {
-                return string.Empty;
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public async Task<bool> Connect(CancellationToken token)
         {
-            return await Task<bool>.Run(() => false);
+            return await Task.Run(() => false);
         }
 
         public void Disconnect()

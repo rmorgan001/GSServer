@@ -41,7 +41,7 @@ namespace GS.Server.Focuser
         public string BottomName => "Focuser";
         public int Uid => 11;
 
-        DispatcherTimer _focuserTimer;
+        readonly DispatcherTimer _focuserTimer;
 
         public static FocuserVM _focuserVM;
         #endregion
@@ -140,7 +140,7 @@ namespace GS.Server.Focuser
                 if (_focuserChooserVM == null)
                 {
                     _focuserChooserVM = new FocuserChooserVM();
-                    _focuserChooserVM.PropertyChanged += _focuserChooserVM_PropertyChanged;
+                    _focuserChooserVM.PropertyChanged += FocuserChooserVM_PropertyChanged;
                 }
                 return _focuserChooserVM;
             }
@@ -150,7 +150,7 @@ namespace GS.Server.Focuser
             }
         }
 
-        private void _focuserChooserVM_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void FocuserChooserVM_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "SelectedDevice")
             {
@@ -195,10 +195,10 @@ namespace GS.Server.Focuser
             MoveFocuserOutCommand = new AsyncCommand<int>(() => MoveFocuserRelativeInternal((ReverseDirection ? -1 : 1)* StepSize), (p) => Connected && !IsMoving);
 
             _focuserTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Properties.Focuser.Default.DevicePollingInterval) };
-            _focuserTimer.Tick += _focuserTimer_Tick;
+            _focuserTimer.Tick += FocuserTimer_Tick;
         }
 
-        private void _focuserTimer_Tick(object sender, EventArgs e)
+        private void FocuserTimer_Tick(object sender, EventArgs e)
         {
             if (_focuser != null && _focuser.Connected)
             {
@@ -229,13 +229,6 @@ namespace GS.Server.Focuser
 
         private CancellationTokenSource _cancelMove;
 
-        private Task<int> MoveFocuserInternal(int position)
-        {
-            _cancelMove?.Dispose();
-            _cancelMove = new CancellationTokenSource();
-            return MoveFocuser(position, _cancelMove.Token);
-        }
-
         private Task<int> MoveFocuserRelativeInternal(int position)
         {
             _cancelMove?.Dispose();
@@ -253,15 +246,13 @@ namespace GS.Server.Focuser
                 {
                     using (ct.Register(() => HaltFocuser()))
                     {
-                        var tempComp = false;
-
                         var monitorItem = new MonitorEntry
                         {
                             Datetime = Principles.HiResDateTime.UtcNow,
                             Device = MonitorDevice.Focuser,
                             Category = MonitorCategory.Driver,
                             Type = MonitorType.Information,
-                            Method = MethodBase.GetCurrentMethod().Name,
+                            Method = MethodBase.GetCurrentMethod()?.Name,
                             Thread = Thread.CurrentThread.ManagedThreadId,
                             Message = $"Moving Focuser to position { position }"
                         };
@@ -502,29 +493,6 @@ namespace GS.Server.Focuser
                 _dialogContent = value;
                 OnPropertyChanged();
             }
-        }
-
-        private void OpenDialog(string msg, string caption = null)
-        {
-            TwoButtonMessageDialogVM messageVm = new TwoButtonMessageDialogVM()
-            {
-                Caption = caption,
-                Message = msg,
-                ButtonOneCaption = "Accept",
-                ButtonTwoCaption = "Cancel",
-                OnButtonOneClicked = () =>
-                {
-                    System.Diagnostics.Debug.WriteLine("Accept clicked!");
-                    IsDialogOpen = false;
-                },
-                OnButtonTwoClicked = () =>
-                {
-                    System.Diagnostics.Debug.WriteLine("Cancel clicked!");
-                    IsDialogOpen = false;
-                }
-            };
-            DialogContent = new TwoButtonMessageDialog(messageVm);
-            IsDialogOpen = true;
         }
 
         #endregion
