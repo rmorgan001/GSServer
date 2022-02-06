@@ -123,7 +123,7 @@
     <Resource Include="Resources\Horsehead.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ASCOM.Platform" Version="6.5.0">
+    <PackageReference Include="ASCOM.Platform" Version="6.5.2">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="DarkSkyApi" Version="3.3.0" />

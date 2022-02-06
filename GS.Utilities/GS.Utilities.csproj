@@ -72,7 +72,7 @@
     <Resource Include="Resources\GSS Cleaner.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ASCOM.Platform" Version="6.5.0">
+    <PackageReference Include="ASCOM.Platform" Version="6.5.2">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="MaterialDesignColors" Version="1.2.6" />
