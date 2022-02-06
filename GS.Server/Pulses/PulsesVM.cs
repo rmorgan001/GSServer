@@ -77,7 +77,7 @@ namespace GS.Server.Pulses
                         Device = MonitorDevice.Server,
                         Category = MonitorCategory.Interface,
                         Type = MonitorType.Information,
-                        Method = MethodBase.GetCurrentMethod().Name,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
                         Thread = Thread.CurrentThread.ManagedThreadId,
                         Message = "Loading PulsesVM"
                     };
@@ -100,7 +100,7 @@ namespace GS.Server.Pulses
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -457,7 +457,7 @@ namespace GS.Server.Pulses
                 PhdClose();
                 IsPulsing = false;
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -491,7 +491,7 @@ namespace GS.Server.Pulses
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -522,7 +522,7 @@ namespace GS.Server.Pulses
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -563,7 +563,7 @@ namespace GS.Server.Pulses
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -618,7 +618,7 @@ namespace GS.Server.Pulses
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -671,7 +671,7 @@ namespace GS.Server.Pulses
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}|{ex.StackTrace}"
                 };
@@ -709,7 +709,7 @@ namespace GS.Server.Pulses
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -765,7 +765,7 @@ namespace GS.Server.Pulses
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -820,7 +820,7 @@ namespace GS.Server.Pulses
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -851,7 +851,7 @@ namespace GS.Server.Pulses
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -881,7 +881,7 @@ namespace GS.Server.Pulses
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -905,7 +905,7 @@ namespace GS.Server.Pulses
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -940,7 +940,7 @@ namespace GS.Server.Pulses
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}|{ex.StackTrace}"
                 };
@@ -1502,7 +1502,7 @@ namespace GS.Server.Pulses
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $" {ex.Message}"
                 };
@@ -1948,7 +1948,7 @@ namespace GS.Server.Pulses
             catch (GuiderException ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 switch (ex.ErrorCode)
@@ -1965,7 +1965,7 @@ namespace GS.Server.Pulses
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message);
             }
@@ -2072,7 +2072,7 @@ namespace GS.Server.Pulses
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OpenDialog(ex.Message);
@@ -2212,7 +2212,7 @@ namespace GS.Server.Pulses
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Interface,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{msg}"
             };

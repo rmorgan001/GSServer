@@ -43,7 +43,7 @@ namespace GS.Server.GamePad
                 if (_startup == value) return;
                 _startup = value;
                 Properties.Gamepad.Default.Startup = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -57,7 +57,7 @@ namespace GS.Server.GamePad
                 if (_delay == value) return;
                 _delay = value;
                 Properties.Gamepad.Default.Delay = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -71,7 +71,7 @@ namespace GS.Server.GamePad
                 if (_doubleClickSpeed == value) return;
                 _doubleClickSpeed = value;
                 Properties.Gamepad.Default.DoubleClickSpeed = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -165,95 +165,95 @@ namespace GS.Server.GamePad
                 {
                     case "tracking":
                         Properties.Gamepad.Default.tracking = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"tracking {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"tracking {setting.Value}");
                         break;
                     case "stop":
                         Properties.Gamepad.Default.stop = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"stop {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"stop {setting.Value}");
                         break;
                     case "park":
                         Properties.Gamepad.Default.park = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"park {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"park {setting.Value}");
                         break;
                     case "home":
                         Properties.Gamepad.Default.home = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"home {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"home {setting.Value}");
                         break;
                     case "speeddown":
                         Properties.Gamepad.Default.speeddown = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"speeddown {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"speeddown {setting.Value}");
                         break;
                     case "speedup":
                         Properties.Gamepad.Default.speedup = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"speedup {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"speedup {setting.Value}");
                         break;
                     case "up":
                         Properties.Gamepad.Default.up = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"up {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"up {setting.Value}");
                         break;
                     case "down":
                         Properties.Gamepad.Default.down = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"down {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"down {setting.Value}");
                         break;
                     case "left":
                         Properties.Gamepad.Default.left = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"left {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"left {setting.Value}");
                         break;
                     case "right":
                         Properties.Gamepad.Default.right = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"right {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"right {setting.Value}");
                         break;
                     case "volumedown":
                         Properties.Gamepad.Default.volumedown = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"volumedown {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"volumedown {setting.Value}");
                         break;
                     case "volumeup":
                         Properties.Gamepad.Default.volumeup = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"volumeup {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"volumeup {setting.Value}");
                         break;
                     case "ratesidereal":
                         Properties.Gamepad.Default.ratesidereal = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"ratesidereal {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"ratesidereal {setting.Value}");
                         break;
                     case "ratelunar":
                         Properties.Gamepad.Default.ratelunar = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"ratelunar {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"ratelunar {setting.Value}");
                         break;
                     case "ratesolar":
                         Properties.Gamepad.Default.ratesolar = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"ratesolar {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"ratesolar {setting.Value}");
                         break;
                     case "rateking":
                         Properties.Gamepad.Default.rateking = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"rateking {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"rateking {setting.Value}");
                         break;
                     case "abort":
                         Properties.Gamepad.Default.abort = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"abort {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"abort {setting.Value}");
                         break;
                     case "sync":
                         Properties.Gamepad.Default.sync = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"sync {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"sync {setting.Value}");
                         break;
                     case "spiralin":
                         Properties.Gamepad.Default.spiralin = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"spiralin {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"spiralin {setting.Value}");
                         break;
                     case "spiralout":
                         Properties.Gamepad.Default.spiralout = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"spiralout {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"spiralout {setting.Value}");
                         break;
                     case "newspiral":
                         Properties.Gamepad.Default.newspiral = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"newspiral {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"newspiral {setting.Value}");
                         break;
                     case "focusin":
                         Properties.Gamepad.Default.focusin = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"focusin {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"focusin {setting.Value}");
                         break;
                     case "focusout":
                         Properties.Gamepad.Default.focusout = setting.Value;
-                        LogSetting(MethodBase.GetCurrentMethod().Name, $"focusout {setting.Value}");
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"focusout {setting.Value}");
                         break;
                 }
             }

@@ -96,7 +96,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = "Loading SkyServer"
                 };
@@ -142,7 +142,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}|{ex.StackTrace}"
                 };
@@ -302,7 +302,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Data,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{value}"
                 };
@@ -352,7 +352,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{value}"
                 };
@@ -433,7 +433,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Data,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{_rateRaDec.X}|{SkyTrackingOffset[0]}"
                 };
@@ -510,7 +510,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{value}|{_mountAxes.Y}|{_mountAxes.Y < 90 || _mountAxes.Y.IsEqualTo(90, 0.0000000001)}|{_mountAxes.Y > -90 || _mountAxes.Y.IsEqualTo(-90, 0.0000000001)} "
                 };
@@ -628,7 +628,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Warning,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ActualAxisX}|{ActualAxisY}"
                 };
@@ -654,7 +654,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{value}"
                 };
@@ -812,7 +812,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Data,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{_rateAxes.Y}|{SkyTrackingOffset[1]}"
                 };
@@ -864,7 +864,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Data,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{_rateAxes.X}|{SkyTrackingOffset[0]}"
                 };
@@ -901,7 +901,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Data,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{_rateRaDec.Y}"
                 };
@@ -973,7 +973,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{value}|{SkySettings.HourAngleLimit}|{b[0]}|{b[1]}"
                 };
@@ -1122,7 +1122,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{value}"
                 };
@@ -1226,7 +1226,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"Initial|{_targetAxes}|{stopwatch.Elapsed.TotalSeconds}|{simTarget[0]}|{simTarget[1]}"
             };
@@ -1292,7 +1292,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"Dec Precision:{targetDec}|{deltaDegree}"
                 };
@@ -1336,7 +1336,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"RA Delta:{rate}|{deltaTime}|{deltaDegree}"
                 };
@@ -1367,7 +1367,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"RA Precision:{target[0]}|{deltaTime}|{deltaDegree}"
                 };
@@ -1393,7 +1393,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Data,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{taskName}"
             };
@@ -1563,7 +1563,7 @@ namespace GS.Server.SkyTelescope
             TrackingOffsetDecRate = _siderealRate - newRate;
 
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{TrackingOffsetRaRate}|{TrackingOffsetDecRate}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{TrackingOffsetRaRate}|{TrackingOffsetDecRate}" };
             MonitorLog.LogToMonitor(monitorItem);
 
         }
@@ -1601,7 +1601,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Data,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{change}"
             };
@@ -1655,7 +1655,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"Initial|{_targetAxes}|Seconds|{stopwatch.Elapsed.TotalSeconds}|Target|{skyTarget[0]}|{skyTarget[1]}"
             };
@@ -1719,7 +1719,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"Precision|Target|{targetDec}|Degree|{deltaDegree}"
                 };
@@ -1761,7 +1761,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"Deltas|Rate|{rate}|Time|{deltaTime}|Degree|{deltaDegree}"
                 };
@@ -1791,7 +1791,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"Precision|Target|{target[0]}|Time|{deltaTime}|Degree|{deltaDegree}"
                 };
@@ -1817,7 +1817,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{taskName}"
             };
@@ -1993,7 +1993,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Error,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{ex.Message}|{ex.StackTrace}"
             };
@@ -2073,7 +2073,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Server,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Warning,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{command.Successful},{command.Exception.Message},{command.Exception.StackTrace}"
             };
@@ -2100,7 +2100,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{SlewState}|{Tracking}"
             };
@@ -2539,7 +2539,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Data,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"change:{change.X}|{change.Y}"
             };
@@ -2646,7 +2646,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"Parked,{SkySettings.ParkName}|{SkySettings.ParkAxisX}|{SkySettings.ParkAxisY}"
                 };
@@ -2664,7 +2664,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"Load:{positions[0]}|{positions[1]}"
             };
@@ -2977,7 +2977,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = "Slew to Home"
             };
@@ -3016,7 +3016,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{ps.Name}|{ps.X}|{ps.Y}"
             };
@@ -3195,7 +3195,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Data,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{SkySettings.HcSpeed}|{direction}|{change[0]}|{change[1]}"
                 };
@@ -3266,7 +3266,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{HcPrevMoveDec.Delta}|{HcPrevMovesDec.Sum()},Anti-Lash,{stepsNeededDec} of {DecBacklash}"
                 };
@@ -3280,7 +3280,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{HcPrevMoveRa.Direction}|{HcPrevMoveRa.StepDiff},Anti-Lash,{stepsNeededRa} of {RaBacklash}"
                 };
@@ -3481,7 +3481,7 @@ namespace GS.Server.SkyTelescope
                             _ = new CmdAxisToDegrees(0, Axis.Axis2, positions[1]);
                             positionsSet = true;
                             monitorItem = new MonitorEntry
-                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Counter exceeded:{positions[0]}|{positions[1]}" };
+                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Counter exceeded:{positions[0]}|{positions[1]}" };
                             MonitorLog.LogToMonitor(monitorItem);
                             break;
                         }
@@ -3490,7 +3490,7 @@ namespace GS.Server.SkyTelescope
                         rawPositions = GetRawDegrees();
                         msg = rawPositions != null ? $"GetRawDegrees:{rawPositions[0]}|{rawPositions[1]}" : $"NULL";
                         monitorItem = new MonitorEntry
-                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = msg };
+                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = msg };
                         MonitorLog.LogToMonitor(monitorItem);
 
                         if (rawPositions == null || double.IsNaN(rawPositions[0]) || double.IsNaN(rawPositions[1]))
@@ -3562,7 +3562,7 @@ namespace GS.Server.SkyTelescope
                     //log current positions
                     var steps = GetRawSteps();
                     monitorItem = new MonitorEntry
-                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GetSteps:{steps[0]}|{steps[1]}" };
+                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GetSteps:{steps[0]}|{steps[1]}" };
                     MonitorLog.LogToMonitor(monitorItem);
 
                     // checks if the mount is close enough to home position to set default position. If not use the positions from the mount
@@ -3574,7 +3574,7 @@ namespace GS.Server.SkyTelescope
                             _ = new SkySetAxisPosition(0, AxisId.Axis2, positions[1]);
                             positionsSet = true;
                             monitorItem = new MonitorEntry
-                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Counter exceeded:{positions[0]}|{positions[1]}" };
+                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Counter exceeded:{positions[0]}|{positions[1]}" };
                             MonitorLog.LogToMonitor(monitorItem);
                             break;
                         }
@@ -3584,7 +3584,7 @@ namespace GS.Server.SkyTelescope
                         rawPositions = GetRawDegrees();
                         msg = rawPositions != null ? $"GetDegrees|{rawPositions[0]}|{rawPositions[1]}" : $"NULL";
                         monitorItem = new MonitorEntry
-                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = msg };
+                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = msg };
                         MonitorLog.LogToMonitor(monitorItem);
 
                         //if an error getting positions then stay in while loop and try again
@@ -3620,15 +3620,15 @@ namespace GS.Server.SkyTelescope
 
             msg = positionsSet ? $"SetPositions|{positions[0]}|{positions[1]}" : $"PositionsNotSet";
             monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = msg };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = msg };
             MonitorLog.LogToMonitor(monitorItem);
 
             monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"MountAxes|{_mountAxes.X}|{_mountAxes.Y}|Actual|{ActualAxisX}|{ActualAxisY}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"MountAxes|{_mountAxes.X}|{_mountAxes.Y}|Actual|{ActualAxisX}|{ActualAxisY}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"StepsPerRevolution|{StepsPerRevolution[0]}|{StepsPerRevolution[1]}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"StepsPerRevolution|{StepsPerRevolution[0]}|{StepsPerRevolution[1]}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             //Load Pec Files
@@ -3647,7 +3647,7 @@ namespace GS.Server.SkyTelescope
             }
 
             monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Pec: {pecmsg}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Pec: {pecmsg}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             // Update Alignment Model home position
@@ -3661,7 +3661,7 @@ namespace GS.Server.SkyTelescope
         private static void MountStart()
         {
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{SkySettings.Mount}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{SkySettings.Mount}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             // setup server defaults, connect serial port, start queues
@@ -3723,7 +3723,7 @@ namespace GS.Server.SkyTelescope
         private static void MountStop()
         {
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{SkySettings.Mount}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{SkySettings.Mount}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             AxesStopValidate();
@@ -3777,7 +3777,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Mount,
                 Type = MonitorType.Data,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{direction}|{duration}|{rejected}"
             };
@@ -3902,7 +3902,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{name}|{position[0]}|{position[1]}"
             };
@@ -3951,7 +3951,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{_guideRate.X * 3600}|{_guideRate.Y * 3600}"
             };
@@ -3979,7 +3979,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{name}|{park[0]}|{park[1]}|{MountAxisX}|{MountAxisY}"
             };
@@ -4004,7 +4004,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{name}|{x}|{y}"
             };
@@ -4032,7 +4032,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message =
                     $"{SlewSpeedOne}|{SlewSpeedTwo}|{SlewSpeedThree}|{SlewSpeedFour}|{SlewSpeedFive}|{SlewSpeedSix}|{SlewSpeedSeven}|{SlewSpeedEight}"
@@ -4090,7 +4090,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{_trackingMode}|{rateChange * 3600}|{PecBinNow}|{SkyTrackingOffset[0]}|{SkyTrackingOffset[1]}"
             };
@@ -4105,7 +4105,7 @@ namespace GS.Server.SkyTelescope
             IsMountRunning = false;
 
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "MainWindow Closing" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "MainWindow Closing" };
             MonitorLog.LogToMonitor(monitorItem);
 
             for (var intCounter = Application.Current.Windows.Count - 1; intCounter >= 0; intCounter--)
@@ -4271,7 +4271,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{targetPosition.X}|{targetPosition.Y}|{slewState}"
             };
@@ -4301,7 +4301,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{SlewState}"
             };
@@ -4345,7 +4345,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{targetAzimuth}|{targetAltitude}"
             };
@@ -4390,7 +4390,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $" {TargetRa}|{TargetDec}"
             };
@@ -4467,7 +4467,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Warning,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{xy[0]}|{xy[1]}|{target[0]}|{target[1]}|{current[0]}|{current[1]}|{SkySettings.SyncLimit}"
             };
@@ -4509,7 +4509,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Warning,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{yx[1]}|{yx[0]}|{target[0]}|{target[1]}|{current[0]}|{current[1]}|{SkySettings.SyncLimit}"
             };
@@ -4581,7 +4581,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Alignment,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"Alignment point added: Mount axis = {mountAxes[0]}/{mountAxes[1]}, observed axis = {observedAxes[0]}/{observedAxes[1]}"
             };
@@ -4607,7 +4607,7 @@ namespace GS.Server.SkyTelescope
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Alignment,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"Alignment applied to calculated axes: {calculatedAxes[0]}|{calculatedAxes[1]} -> {alignedAxes[0]}|{alignedAxes[1]}"
             };
@@ -4961,7 +4961,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{value}"
                 };
@@ -4990,7 +4990,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{value}"
                 };
@@ -5166,7 +5166,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Mount,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}|{ex.StackTrace}"
                 };

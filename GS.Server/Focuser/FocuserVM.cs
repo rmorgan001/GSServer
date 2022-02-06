@@ -209,7 +209,7 @@ namespace GS.Server.Focuser
         private void HaltFocuser()
         {
             var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Focuser, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Halting focuser" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Focuser, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Halting focuser" };
             MonitorLog.LogToMonitor(monitorItem);
 
             if (Focuser?.Connected == true)
@@ -221,7 +221,7 @@ namespace GS.Server.Focuser
                 catch (Exception ex)
                 {
                     monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Focuser, Category = MonitorCategory.Driver, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Focuser, Category = MonitorCategory.Driver, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                     MonitorLog.LogToMonitor(monitorItem);
                 }
             }
@@ -261,7 +261,7 @@ namespace GS.Server.Focuser
                             Device = MonitorDevice.Focuser,
                             Category = MonitorCategory.Driver,
                             Type = MonitorType.Information,
-                            Method = MethodBase.GetCurrentMethod().Name,
+                            Method = MethodBase.GetCurrentMethod()?.Name,
                             Thread = Thread.CurrentThread.ManagedThreadId,
                             Message = $"Moving Focuser to position { position }"
                         };

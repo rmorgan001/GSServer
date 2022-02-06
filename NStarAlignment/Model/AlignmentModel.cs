@@ -349,7 +349,7 @@ namespace NStarAlignment.Model
                 _stringBuilder.AppendLine(
                     $"{pt.Id:D3}\t{pt.AltAz[0]}/{pt.AltAz[1]}\t{pt.MountAxes.RaAxis}/{pt.MountAxes.DecAxis}\t{pt.ObservedAxes.RaAxis}/{pt.ObservedAxes.DecAxis}");
             }
-            RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name, _stringBuilder.ToString());
+            RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod()?.Name, _stringBuilder.ToString());
             _stringBuilder.Clear();
         }
 
@@ -359,7 +359,7 @@ namespace NStarAlignment.Model
             {
                 _exceptionMessages.Add(ex.Message);
                 string message = $"{ex.Message}|{ex.StackTrace}";
-                RaiseNotification(NotificationType.Error, MethodBase.GetCurrentMethod().Name, message);
+                RaiseNotification(NotificationType.Error, MethodBase.GetCurrentMethod()?.Name, message);
             }
         }
 

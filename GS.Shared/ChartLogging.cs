@@ -60,7 +60,7 @@ namespace GS.Shared
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $" {ex.Message}"
                 };
@@ -97,7 +97,7 @@ namespace GS.Shared
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
@@ -149,7 +149,7 @@ namespace GS.Shared
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $" {ex.Message}"
                 };

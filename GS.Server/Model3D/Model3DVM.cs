@@ -50,7 +50,7 @@ namespace GS.Server.Model3D
         public Model3DVM()
         {
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading Model3D" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading Model3D" };
             MonitorLog.LogToMonitor(monitorItem);
 
             SkyServer.StaticPropertyChanged += PropertyChangedSkyServer;
@@ -139,7 +139,7 @@ namespace GS.Server.Model3D
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
@@ -180,7 +180,7 @@ namespace GS.Server.Model3D
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
@@ -257,7 +257,7 @@ namespace GS.Server.Model3D
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}|{ex.StackTrace}"
                 };
@@ -297,7 +297,7 @@ namespace GS.Server.Model3D
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}|{ex.StackTrace}"
                 };
@@ -667,7 +667,7 @@ namespace GS.Server.Model3D
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}|{ex.StackTrace}"
                 };
@@ -845,7 +845,7 @@ namespace GS.Server.Model3D
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Interface,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{msg}"
             };

@@ -39,7 +39,7 @@ namespace GS.Server.AutoHome
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = "Start"
             };
@@ -141,7 +141,7 @@ namespace GS.Server.AutoHome
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{reset.Successful}|{axis}"
             };

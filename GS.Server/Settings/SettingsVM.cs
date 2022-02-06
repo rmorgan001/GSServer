@@ -66,7 +66,7 @@ namespace GS.Server.Settings
                     {
                         Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server,
                         Category = MonitorCategory.Interface, Type = MonitorType.Information,
-                        Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId,
+                        Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                         Message = "Loading SettingsVM"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
@@ -124,7 +124,7 @@ namespace GS.Server.Settings
                 {
                     Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId,
+                    Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
@@ -197,7 +197,7 @@ namespace GS.Server.Settings
                 {
                     Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId,
+                    Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
@@ -230,7 +230,7 @@ namespace GS.Server.Settings
                 {
                     Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId,
+                    Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
@@ -690,7 +690,7 @@ namespace GS.Server.Settings
                 {
                     Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId,
+                    Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
@@ -718,7 +718,7 @@ namespace GS.Server.Settings
                 {
                     Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId,
+                    Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
@@ -851,7 +851,7 @@ namespace GS.Server.Settings
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
@@ -896,7 +896,7 @@ namespace GS.Server.Settings
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
@@ -952,7 +952,7 @@ namespace GS.Server.Settings
                 {
                     Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId,
+                    Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
@@ -995,7 +995,7 @@ namespace GS.Server.Settings
                 {
                     Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId,
+                    Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
@@ -1060,7 +1060,7 @@ namespace GS.Server.Settings
                 {
                     Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId,
+                    Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
@@ -1125,7 +1125,7 @@ namespace GS.Server.Settings
                 {
                     Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId,
+                    Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
@@ -1170,7 +1170,7 @@ namespace GS.Server.Settings
                 {
                     Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId,
+                    Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
@@ -1269,7 +1269,7 @@ namespace GS.Server.Settings
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Interface,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{msg}"
             };
@@ -1457,7 +1457,7 @@ namespace GS.Server.Settings
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
@@ -1534,7 +1534,7 @@ namespace GS.Server.Settings
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
@@ -1578,7 +1578,7 @@ namespace GS.Server.Settings
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
@@ -1737,7 +1737,7 @@ namespace GS.Server.Settings
                 SkyServer.IsMountRunning = false;
 
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Downloading Update, Closing Window" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Downloading Update, Closing Window" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 if (Application.Current.MainWindow != null) Application.Current.MainWindow.Close();

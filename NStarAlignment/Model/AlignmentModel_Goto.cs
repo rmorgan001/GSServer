@@ -67,7 +67,7 @@ namespace NStarAlignment.Model
                     AxisPosition mAxes = new AxisPosition(mountAxes);
                     if (mAxes.IncludedAngleTo(_homePosition) < ProximityLimit)
                         return mountAxes; // Fast exist if we are going home.
-                    RaiseNotification(NotificationType.Information, MethodBase.GetCurrentMethod().Name,
+                    RaiseNotification(NotificationType.Information, MethodBase.GetCurrentMethod()?.Name,
                         $"GetObservedAxes for {mountAxes[0]}/{mountAxes[1]}");
                     PierSide pSide = (PierSide)pierSide;
                     WriteLastAccessTime();
@@ -80,7 +80,7 @@ namespace NStarAlignment.Model
                             offsets[0, 1] = AlignmentPoints[0].ObservedAxes[1] - AlignmentPoints[0].MountAxes[1];
                             AlignmentPoints[0].SelectedForGoto = true;
                             _selectedGotoPoints.Add(AlignmentPoints[0]);
-                            RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
+                            RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod()?.Name,
                                 $"Single alignment point selected {AlignmentPoints[0].Id:D3}, Mount axes: {AlignmentPoints[0].MountAxes.RaAxis}/{AlignmentPoints[0].MountAxes.RaAxis}, Observed axes: {AlignmentPoints[0].ObservedAxes.RaAxis}/{AlignmentPoints[0].ObservedAxes.RaAxis}");
                         }
                     }
@@ -136,7 +136,7 @@ namespace NStarAlignment.Model
                             _stringBuilder.AppendLine(target.ToString());
                             _stringBuilder.AppendLine("Offsets");
                             _stringBuilder.AppendLine(offsets.ToString());
-                            RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name, _stringBuilder.ToString());
+                            RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod()?.Name, _stringBuilder.ToString());
                             _stringBuilder.Clear();
                         }
                         else if (rows > 0)
@@ -146,7 +146,7 @@ namespace NStarAlignment.Model
                             offsets[0, 1] = alignmentPoints[0].ObservedAxes[1] - alignmentPoints[0].MountAxes[1];
                             AlignmentPoints[0].SelectedForGoto = true;
                             _selectedGotoPoints.Add(AlignmentPoints[0]);
-                            RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
+                            RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod()?.Name,
                                 $"Using nearest point of two {alignmentPoints[0].Id:D3}, Mount axes: {alignmentPoints[0].MountAxes.RaAxis}/{alignmentPoints[0].MountAxes.RaAxis}, Observed axes: {alignmentPoints[0].ObservedAxes.RaAxis}/{alignmentPoints[0].ObservedAxes.RaAxis}");
 
                         }
@@ -160,12 +160,12 @@ namespace NStarAlignment.Model
                                 offsets[0, 1] = alignmentPoint.ObservedAxes[1] - alignmentPoint.MountAxes[1];
                                 alignmentPoint.SelectedForGoto = true;
                                 _selectedGotoPoints.Add(alignmentPoint);
-                                RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
+                                RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod()?.Name,
                                     $"Using nearest point in whole sky {alignmentPoint.Id:D3}, Mount axes: {alignmentPoint.MountAxes.RaAxis}/{alignmentPoint.MountAxes.RaAxis}, Observed axes: {alignmentPoint.ObservedAxes.RaAxis}/{alignmentPoint.ObservedAxes.RaAxis}");
                             }
                             else
                             {
-                                RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
+                                RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod()?.Name,
                                     $"No alignment points selected, Observed axes: {mountAxes[0]}/{mountAxes[1]}, pier side: {pierSide}");
 
                             }
@@ -177,9 +177,9 @@ namespace NStarAlignment.Model
                         mountAxes[0] + offsets[0, 0],
                         mountAxes[1] + offsets[0, 1]
                     };
-                    RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
+                    RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod()?.Name,
                         $"Correction -> Observer = {offsets[0, 0]}/{offsets[0, 1]}");
-                    RaiseNotification(NotificationType.Information, MethodBase.GetCurrentMethod().Name,
+                    RaiseNotification(NotificationType.Information, MethodBase.GetCurrentMethod()?.Name,
                         $"Mount axes: {mountAxes[0]}/{mountAxes[1]} -> Observed axes: {observedAxes[0]}/{observedAxes[1]}");
 
                     return observedAxes;
@@ -233,7 +233,7 @@ namespace NStarAlignment.Model
                         {
                             if (AlignmentPoints[0].PierSide == pSide)
                             {
-                                RaiseNotification(NotificationType.Information, MethodBase.GetCurrentMethod().Name,
+                                RaiseNotification(NotificationType.Information, MethodBase.GetCurrentMethod()?.Name,
                                     $"GetMountAxes for {observedAxes[0]}/{observedAxes[1]}");
                                 ClearSelectedPoints();
                                 offsets[0, 0] = AlignmentPoints[0].MountAxes[0] - AlignmentPoints[0].ObservedAxes[0];
@@ -243,7 +243,7 @@ namespace NStarAlignment.Model
                                 // Cache the offsets and checksum
                                 _lastOffsets = offsets;
                                 _currentChecksum = checksum;
-                                RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
+                                RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod()?.Name,
                                     $"Single alignment point selected {AlignmentPoints[0].Id:D3}, Mount axes: {AlignmentPoints[0].MountAxes.RaAxis}/{AlignmentPoints[0].MountAxes.RaAxis}, Observed axes: {AlignmentPoints[0].ObservedAxes.RaAxis}/{AlignmentPoints[0].ObservedAxes.RaAxis}");
                                 postLogMessages = true;
                             }
@@ -264,7 +264,7 @@ namespace NStarAlignment.Model
                             int rows = alignmentPoints.Length;
                             if (rows > 2)
                             {
-                                RaiseNotification(NotificationType.Information, MethodBase.GetCurrentMethod().Name,
+                                RaiseNotification(NotificationType.Information, MethodBase.GetCurrentMethod()?.Name,
                                     $"GetMountAxes for {observedAxes[0]}/{observedAxes[1]}");
                                 ClearSelectedPoints();
                                 // Build features and values from registered points
@@ -309,7 +309,7 @@ namespace NStarAlignment.Model
                                 _stringBuilder.AppendLine(target.ToString());
                                 _stringBuilder.AppendLine("Offsets");
                                 _stringBuilder.AppendLine(offsets.ToString());
-                                RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name, _stringBuilder.ToString());
+                                RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod()?.Name, _stringBuilder.ToString());
                                 _stringBuilder.Clear();
 
                                 // Cache the offsets and the checksum
@@ -327,7 +327,7 @@ namespace NStarAlignment.Model
                                 }
                                 else
                                 {
-                                    RaiseNotification(NotificationType.Information, MethodBase.GetCurrentMethod().Name,
+                                    RaiseNotification(NotificationType.Information, MethodBase.GetCurrentMethod()?.Name,
                                         $"GetMountAxes for {observedAxes[0]}/{observedAxes[1]}");
 
                                     ClearSelectedPoints();
@@ -342,7 +342,7 @@ namespace NStarAlignment.Model
                                     _lastOffsets = offsets;
                                     _currentChecksum = checksum;
                                     postLogMessages = true;
-                                    RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
+                                    RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod()?.Name,
                                         $"Using nearest point of two {alignmentPoints[0].Id:D3}, Mount axes: {alignmentPoints[0].MountAxes.RaAxis}/{alignmentPoints[0].MountAxes.RaAxis}, Observed axes: {alignmentPoints[0].ObservedAxes.RaAxis}/{alignmentPoints[0].ObservedAxes.RaAxis}");
                                 }
                             }
@@ -361,7 +361,7 @@ namespace NStarAlignment.Model
                                     _lastOffsets = offsets;
                                     _currentChecksum = checksum;
                                     postLogMessages = true;
-                                    RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
+                                    RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod()?.Name,
                                             $"Using nearest point in whole sky {alignmentPoint.Id:D3}, Mount axes: {alignmentPoint.MountAxes.RaAxis}/{alignmentPoint.MountAxes.RaAxis}, Observed axes: {alignmentPoint.ObservedAxes.RaAxis}/{alignmentPoint.ObservedAxes.RaAxis}");
                                 }
                                 else
@@ -369,7 +369,7 @@ namespace NStarAlignment.Model
                                     if (_currentChecksum != int.MinValue)
                                     {
                                         _currentChecksum = int.MinValue;
-                                        RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
+                                        RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod()?.Name,
                                             $"No alignment points selected, Observed axes: {observedAxes[0]}/{observedAxes[1]}, pier side: {pierSide}");
                                     }
                                 }
@@ -386,9 +386,9 @@ namespace NStarAlignment.Model
                     };
                     if (postLogMessages)
                     {
-                        RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod().Name,
+                        RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod()?.Name,
                             $"Correction -> Mount = {offsets[0, 0]}/{offsets[0, 1]}");
-                        RaiseNotification(NotificationType.Information, MethodBase.GetCurrentMethod().Name,
+                        RaiseNotification(NotificationType.Information, MethodBase.GetCurrentMethod()?.Name,
                             $"Observed axes: {observedAxes[0]}/{observedAxes[1]} -> Mount axes: {mountAxes[0]}/{mountAxes[1]}");
                     }
 

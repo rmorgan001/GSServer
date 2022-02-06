@@ -45,7 +45,7 @@ namespace GS.Server.Settings
                 if (_charting == value) return;
                 _charting = value;
                 Properties.Server.Default.Charting = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -59,7 +59,7 @@ namespace GS.Server.Settings
                 if (_disableHardwareAcceleration == value) return;
                 _disableHardwareAcceleration = value;
                 Properties.Server.Default.DisableHardwareAcceleration = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -73,7 +73,7 @@ namespace GS.Server.Settings
                 if (_focuser == value) return;
                 _focuser = value;
                 Properties.Server.Default.Focuser = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -87,7 +87,7 @@ namespace GS.Server.Settings
                 if (_gamePad == value) return;
                 _gamePad = value;
                 Properties.Server.Default.Gamepad = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -101,7 +101,7 @@ namespace GS.Server.Settings
                 if (_notes == value) return;
                 _notes = value;
                 Properties.Server.Default.Notes = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -115,7 +115,7 @@ namespace GS.Server.Settings
                 if (_skyWatcher == value) return;
                 _skyWatcher = value;
                 Properties.Server.Default.SkyWatcher = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -129,7 +129,7 @@ namespace GS.Server.Settings
                 if (_modelType == value) return;
                 _modelType = value;
                 Properties.Server.Default.ModelType = value.ToString();
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -143,7 +143,7 @@ namespace GS.Server.Settings
                 if (_model3d == value) return;
                 _model3d = value;
                 Properties.Server.Default.Model3D = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -156,7 +156,7 @@ namespace GS.Server.Settings
             {
                 _modelLookDirection1 = value;
                 Properties.Server.Default.ModelLookDirection1 = value.ToString(CultureInfo.InvariantCulture);
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
             }
         }
 
@@ -168,7 +168,7 @@ namespace GS.Server.Settings
             {
                 _modelPosition1 = value;
                 Properties.Server.Default.ModelPosition1 = value.ToString(CultureInfo.InvariantCulture);
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
             }
         }
 
@@ -180,7 +180,7 @@ namespace GS.Server.Settings
             {
                 _modelUpDirection1 = value;
                 Properties.Server.Default.ModelUpDirection1 = value.ToString(CultureInfo.InvariantCulture);
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
             }
         }
 
@@ -192,7 +192,7 @@ namespace GS.Server.Settings
             {
                 _modelLookDirection2 = value;
                 Properties.Server.Default.ModelLookDirection2 = value.ToString(CultureInfo.InvariantCulture);
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
             }
         }
 
@@ -204,7 +204,7 @@ namespace GS.Server.Settings
             {
                 _modelPosition2 = value;
                 Properties.Server.Default.ModelPosition2 = value.ToString(CultureInfo.InvariantCulture);
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
             }
         }
 
@@ -216,7 +216,7 @@ namespace GS.Server.Settings
             {
                 _modelUpDirection2 = value;
                 Properties.Server.Default.ModelUpDirection2 = value.ToString(CultureInfo.InvariantCulture);
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
             }
         }
 
@@ -229,7 +229,7 @@ namespace GS.Server.Settings
                 if (_pec == value) return;
                 _pec = value;
                 Properties.Server.Default.Pec = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -243,7 +243,7 @@ namespace GS.Server.Settings
                 if (_plot == value) return;
                 _plot = value;
                 Properties.Server.Default.Plot = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -257,7 +257,7 @@ namespace GS.Server.Settings
                 if (_poleLocator == value) return;
                 _poleLocator = value;
                 Properties.Server.Default.PoleLocator = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -271,7 +271,7 @@ namespace GS.Server.Settings
                 if (_pulses == value) return;
                 _pulses = value;
                 Properties.Server.Default.Pulses = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -285,7 +285,7 @@ namespace GS.Server.Settings
                 if (_sleepMode == value) return;
                 _sleepMode = value;
                 Properties.Server.Default.SleepMode = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -299,7 +299,7 @@ namespace GS.Server.Settings
                 if (_snap == value) return;
                 _snap = value;
                 Properties.Server.Default.Snap = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -313,7 +313,7 @@ namespace GS.Server.Settings
                 if (_alignmentTabVisible == value) return;
                 _alignmentTabVisible = value;
                 Properties.Server.Default.AlignmentTabVisible = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -327,7 +327,7 @@ namespace GS.Server.Settings
                 if (_startMinimized == value) return;
                 _startMinimized = value;
                 Properties.Server.Default.StartMinimized = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -341,7 +341,7 @@ namespace GS.Server.Settings
                 if (_startOnTop == value) return;
                 _startOnTop = value;
                 Properties.Server.Default.StartOnTop = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -355,7 +355,7 @@ namespace GS.Server.Settings
                 if (_voiceActive == value) return;
                 _voiceActive = value;
                 Properties.Server.Default.VoiceActive = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -369,7 +369,7 @@ namespace GS.Server.Settings
                 if (_voiceName == value) return;
                 _voiceName = value;
                 Properties.Server.Default.VoiceName = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -383,7 +383,7 @@ namespace GS.Server.Settings
                 if (_voiceVolume == value) return;
                 _voiceVolume = value;
                 Properties.Server.Default.VoiceVolume = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -397,7 +397,7 @@ namespace GS.Server.Settings
                 if (_darkSkyKey == value) return;
                 _darkSkyKey = value;
                 Properties.Server.Default.DarkSkyKey = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -411,7 +411,7 @@ namespace GS.Server.Settings
                 if (_darkTheme == value) return;
                 _darkTheme = value;
                 Properties.Server.Default.DarkTheme = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -425,7 +425,7 @@ namespace GS.Server.Settings
                 if (_primaryColor == value) return;
                 _primaryColor = value;
                 Properties.Server.Default.PrimaryColor = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -439,7 +439,7 @@ namespace GS.Server.Settings
                 if (_accentColor == value) return;
                 _accentColor = value;
                 Properties.Server.Default.AccentColor = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -452,7 +452,7 @@ namespace GS.Server.Settings
             {
                 _windowState = value;
                 Properties.Server.Default.WindowState = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
                 OnStaticPropertyChanged();
             }
         }
@@ -466,7 +466,7 @@ namespace GS.Server.Settings
                 if (Math.Abs(_windowHeight - value) < 0.1) return;
                 _windowHeight = value;
                 Properties.Server.Default.WindowHeight = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -480,7 +480,7 @@ namespace GS.Server.Settings
                 if (Math.Abs(_windowWidth - value) < 0.1) return;
                 _windowWidth = value;
                 Properties.Server.Default.WindowWidth = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -494,7 +494,7 @@ namespace GS.Server.Settings
                 if (Math.Abs(_windowLeft - value) < 0.1) return;
                 _windowLeft = value;
                 Properties.Server.Default.WindowLeft = value;
-                //  LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                //  LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -508,7 +508,7 @@ namespace GS.Server.Settings
                 if (Math.Abs(_windowTop - value) < 0.1) return;
                 _windowTop = value;
                 Properties.Server.Default.WindowTop = value;
-                // LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                // LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }

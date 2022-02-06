@@ -40,7 +40,7 @@ namespace GS.Shared
                 if (_serverDevice == value) return;
                 _serverDevice = value;
                 Properties.Monitor.Default.ServerDevice = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -54,7 +54,7 @@ namespace GS.Shared
                 if (_telescope == value) return;
                 _telescope = value;
                 Properties.Monitor.Default.Telescope = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -68,7 +68,7 @@ namespace GS.Shared
                 if (_information == value) return;
                 _information = value;
                 Properties.Monitor.Default.Information = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -82,7 +82,7 @@ namespace GS.Shared
                 if (_data == value) return;
                 _data = value;
                 Properties.Monitor.Default.Data = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -96,7 +96,7 @@ namespace GS.Shared
                 if (_warning == value) return;
                 _warning = value;
                 Properties.Monitor.Default.Warning = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -110,7 +110,7 @@ namespace GS.Shared
                 if (_error == value) return;
                 _error = value;
                 Properties.Monitor.Default.Error = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -124,7 +124,7 @@ namespace GS.Shared
                 if (_other == value) return;
                 _other = value;
                 Properties.Monitor.Default.Other = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -138,7 +138,7 @@ namespace GS.Shared
                 if (_driver == value) return;
                 _driver = value;
                 Properties.Monitor.Default.Driver = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -152,7 +152,7 @@ namespace GS.Shared
                 if (_interface == value) return;
                 _interface = value;
                 Properties.Monitor.Default.Interface = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -166,7 +166,7 @@ namespace GS.Shared
                 if (_server == value) return;
                 _server = value;
                 Properties.Monitor.Default.Server = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -180,7 +180,7 @@ namespace GS.Shared
                 if (_mount == value) return;
                 _mount = value;
                 Properties.Monitor.Default.Mount = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -194,7 +194,7 @@ namespace GS.Shared
                 if (_alignment == value) return;
                 _alignment = value;
                 Properties.Monitor.Default.Alignment = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -208,7 +208,7 @@ namespace GS.Shared
                 if (_language == value) return;
                 _language = value;
                 Properties.Monitor.Default.Language = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -222,7 +222,7 @@ namespace GS.Shared
                 if (_logMonitor == value) return;
                 _logMonitor = value;
                 Properties.Monitor.Default.LogMonitor = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -236,7 +236,7 @@ namespace GS.Shared
                 if (_logCharting == value) return;
                 _logCharting = value;
                 Properties.Monitor.Default.LogCharting = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
@@ -254,7 +254,7 @@ namespace GS.Shared
                 if (_logSession == value) return;
                 _logSession = value;
                 Properties.Monitor.Default.LogSession = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
             }
         }
 
@@ -267,7 +267,7 @@ namespace GS.Shared
                 if (_startMonitor == value) return;
                 _startMonitor = value;
                 Properties.Monitor.Default.StartMonitor = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }

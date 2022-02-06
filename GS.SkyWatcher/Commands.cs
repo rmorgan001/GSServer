@@ -447,7 +447,7 @@ namespace GS.SkyWatcher
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 return double.NaN;
             }
@@ -471,7 +471,7 @@ namespace GS.SkyWatcher
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 return double.NaN;
             }
@@ -842,7 +842,7 @@ namespace GS.SkyWatcher
                                     Device = MonitorDevice.Telescope,
                                     Category = MonitorCategory.Mount,
                                     Type = MonitorType.Warning,
-                                    Method = MethodBase.GetCurrentMethod().Name,
+                                    Method = MethodBase.GetCurrentMethod()?.Name,
                                     Thread = Thread.CurrentThread.ManagedThreadId,
                                     Message =
                                         $"Serial Retry:{_conErrCnt}|{cmdData}|{ignoreWarnings}"
@@ -883,7 +883,7 @@ namespace GS.SkyWatcher
                         {
                             MountConnected = false;
                             monitorItem = new MonitorEntry
-                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
+                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
                             MonitorLog.LogToMonitor(monitorItem);
 
                             throw new MountControlException(ErrorCode.ErrNotConnected, "IO Error", ex);
@@ -892,7 +892,7 @@ namespace GS.SkyWatcher
                         {
                             MountConnected = false;
                             monitorItem = new MonitorEntry
-                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
+                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
                             MonitorLog.LogToMonitor(monitorItem);
                             throw;
                         }
@@ -901,7 +901,7 @@ namespace GS.SkyWatcher
                     {
                         // deal with the fact that the lock was not acquired.
                         monitorItem = new MonitorEntry
-                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Lock not acquired #{i} Command:{command} String:{cmdDataStr}" };
+                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Lock not acquired #{i} Command:{command} String:{cmdDataStr}" };
                         MonitorLog.LogToMonitor(monitorItem);
                     }
                 }
@@ -913,7 +913,7 @@ namespace GS.SkyWatcher
             }
             // deal with the fact that the lock was not acquired.
             monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Thread Lock Timeout" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Thread Lock Timeout" };
             MonitorLog.LogToMonitor(monitorItem);
             return null;
         }
@@ -940,7 +940,7 @@ namespace GS.SkyWatcher
 
             var dt = HiResDateTime.UtcNow;
             var monitorItem = new MonitorEntry
-            { Datetime = dt, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{commandStr.ToString().Trim()}" };
+            { Datetime = dt, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{commandStr.ToString().Trim()}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             switch (command)
@@ -984,7 +984,7 @@ namespace GS.SkyWatcher
         //private static void ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
         //{
         //    var monitorItem = new MonitorEntry
-        //        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{e}" };
+        //        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{e}" };
         //    MonitorLog.LogToMonitor(monitorItem);
         //}
 
@@ -1017,7 +1017,7 @@ namespace GS.SkyWatcher
         //    {
         //        Trace.TraceInformation("Retry {0}", ex.Message);
         //        var monitorItem = new MonitorEntry
-        //            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{cmdDataStr}|{ex.Message}" };
+        //            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{cmdDataStr}|{ex.Message}" };
         //        MonitorLog.LogToMonitor(monitorItem);
         //        throw;
         //    }
@@ -1080,7 +1080,7 @@ namespace GS.SkyWatcher
             var receivedData = ReceiveResponse();
 
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{cmdDataStr}|{receivedData}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{cmdDataStr}|{receivedData}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             // process incoming data string
@@ -1149,7 +1149,7 @@ namespace GS.SkyWatcher
                     }
 
                     monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Abnormal Response|Axis|{axis}|Command|{command}|Received|{receivedData}|CommandStr|{cmdDataStr}|Message|{errormsg}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Abnormal Response|Axis|{axis}|Command|{command}|Received|{receivedData}|CommandStr|{cmdDataStr}|Message|{errormsg}" };
                     MonitorLog.LogToMonitor(monitorItem);
                     if(!string.IsNullOrEmpty(subdata)) return subdata;
                     receivedData = null;
@@ -1204,7 +1204,7 @@ namespace GS.SkyWatcher
         //    }
 
         //    var monitorItem = new MonitorEntry
-        //        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" Response:{responseString}"};
+        //        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" Response:{responseString}"};
         //    MonitorLog.LogToMonitor(monitorItem);
 
         //    if (!isError) return;

@@ -219,7 +219,7 @@ namespace GS.Server.Phd
         //    catch (GuiderException ex)
         //    {
         //        var monitorItem = new MonitorEntry
-        //        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+        //        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
         //        MonitorLog.LogToMonitor(monitorItem);
 
         //        switch (ex.ErrorCode)
@@ -251,7 +251,7 @@ namespace GS.Server.Phd
         //    catch (Exception ex)
         //    {
         //        var monitorItem = new MonitorEntry
-        //        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+        //        { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
         //        MonitorLog.LogToMonitor(monitorItem);
 
         //        Close();

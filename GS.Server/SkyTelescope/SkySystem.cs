@@ -55,7 +55,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"Add|{id}|{notAlreadyPresent}"
                 };
@@ -71,7 +71,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"Remove|{id}|{successfullyRemoved}"
                 };
@@ -144,7 +144,7 @@ namespace GS.Server.SkyTelescope
                         Device = MonitorDevice.Telescope,
                         Category = MonitorCategory.Server,
                         Type = MonitorType.Warning,
-                        Method = MethodBase.GetCurrentMethod().Name,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
                         Thread = Thread.CurrentThread.ManagedThreadId,
                         Message = $"{ex.Message}|{ex.InnerException?.Message}"
                     };

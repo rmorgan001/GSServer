@@ -44,7 +44,7 @@ namespace GS.Server.Focuser
                 if (_deviceId == value) return;
                 _deviceId = value;
                 Properties.Focuser.Default.DeviceId = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
                 OnStaticPropertyChanged();
             }
 
@@ -59,7 +59,7 @@ namespace GS.Server.Focuser
                 if (_stepSize == value) return;
                 _stepSize = value;
                 Properties.Focuser.Default.StepSize = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
                 OnStaticPropertyChanged();
             }
 
@@ -75,7 +75,7 @@ namespace GS.Server.Focuser
                 if (_reverseDirection == value) return;
                 _reverseDirection = value;
                 Properties.Focuser.Default.ReverseDirection = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
                 OnStaticPropertyChanged();
             }
 

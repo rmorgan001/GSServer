@@ -84,7 +84,7 @@ namespace GS.Server.GamePad
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = "Loading GamePadVM"
                 };
@@ -103,7 +103,7 @@ namespace GS.Server.GamePad
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
@@ -843,7 +843,7 @@ namespace GS.Server.GamePad
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
@@ -892,7 +892,7 @@ namespace GS.Server.GamePad
                 Device = MonitorDevice.Server,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{id}|{value}|{command}"
             };
@@ -1547,7 +1547,7 @@ namespace GS.Server.GamePad
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
@@ -1611,7 +1611,7 @@ namespace GS.Server.GamePad
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
@@ -1733,7 +1733,7 @@ namespace GS.Server.GamePad
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
@@ -1774,7 +1774,7 @@ namespace GS.Server.GamePad
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
@@ -1815,7 +1815,7 @@ namespace GS.Server.GamePad
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod().Name,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
                 };
@@ -1915,7 +1915,7 @@ namespace GS.Server.GamePad
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Interface,
                 Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod().Name,
+                Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"{msg}"
             };

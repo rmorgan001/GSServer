@@ -46,7 +46,7 @@ namespace NINA.Utility
                 { Datetime = GS.Principles.HiResDateTime.UtcNow, 
                     Device = MonitorDevice.Focuser, 
                     Category = MonitorCategory.Driver, 
-                    Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod().Name, 
+                    Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, 
                     Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
             }

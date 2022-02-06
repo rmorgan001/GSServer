@@ -43,7 +43,7 @@ namespace GS.Server.Alignment
                 if (_isAlignmentOn == value) return;
                 _isAlignmentOn = value;
                 Properties.Alignment.Default.IsAlignmentOn = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, value.ToString());
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
                 OnStaticPropertyChanged();
             }
 
@@ -58,7 +58,7 @@ namespace GS.Server.Alignment
                 if (Math.Abs(_proximityLimit - value) < 0.0000000000001) return;
                 _proximityLimit = value;
                 Properties.Alignment.Default.ProximityLimit = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
 
@@ -73,7 +73,7 @@ namespace GS.Server.Alignment
                 if (Math.Abs(_nearbyLimit - value) < 0.0000000000001) return;
                 _nearbyLimit = value;
                 Properties.Alignment.Default.NearbyLimit = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
 
@@ -88,7 +88,7 @@ namespace GS.Server.Alignment
                 if (_sampleSize == value) return;
                 _sampleSize = value;
                 Properties.Alignment.Default.SampleSize = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
 
@@ -103,7 +103,7 @@ namespace GS.Server.Alignment
                 if (_clearModelOnStartup == value) return;
                 _clearModelOnStartup = value;
                 Properties.Alignment.Default.ClearModelOnStartup = value;
-                LogSetting(MethodBase.GetCurrentMethod().Name, $"{value}");
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
 
