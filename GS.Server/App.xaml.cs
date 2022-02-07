@@ -78,8 +78,8 @@ namespace GS.Server
         /// <param name="e"></param>
         private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            this.DispatcherUnhandledException -= new System.Windows.Threading.DispatcherUnhandledExceptionEventHandler(this.Application_DispatcherUnhandledException);
-            writeException(e.Exception);
+            DispatcherUnhandledException -= Application_DispatcherUnhandledException;
+            WriteException(e.Exception);
             MessageBox.Show("An unexpected error has occurred within GSS. Error details have been logged and Gems will now close.", "Application Error", MessageBoxButton.OK, MessageBoxImage.Error);
             e.Handled = true;
             this.Shutdown();
@@ -88,20 +88,20 @@ namespace GS.Server
         void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             AppDomain.CurrentDomain.UnhandledException -= CurrentDomain_UnhandledException;
-            writeException((Exception)e.ExceptionObject);
+            WriteException((Exception)e.ExceptionObject);
             MessageBox.Show("An unexpected error has occurred within GSS. Error details have been logged and Gems will now close.", "Application Error", MessageBoxButton.OK, MessageBoxImage.Error);
             this.Shutdown();
         }
 
 
-        private void writeException(Exception e)
+        private void WriteException(Exception e)
         {
             string logPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string fileLocation = Path.Combine(logPath, "GSServer\\");
 
             string logFileName = Path.Combine(fileLocation, Path.GetRandomFileName() + ".err");
             StringBuilder sb = new StringBuilder();
-            writeException(sb, e);
+            WriteException(sb, e);
             using (TextWriter logWriter = new StreamWriter(logFileName))
             {
                 logWriter.Write(sb.ToString());
@@ -116,7 +116,7 @@ namespace GS.Server
         /// </summary>
         /// <param name="sb"></param>
         /// <param name="e"></param>
-        private void writeException(StringBuilder sb, Exception e)
+        private void WriteException(StringBuilder sb, Exception e)
         {
             sb.AppendLine(e.GetType().Name);
             if (!string.IsNullOrWhiteSpace(e.Message))
@@ -135,7 +135,7 @@ namespace GS.Server
             if (e.InnerException != null)
             {
                 sb.AppendLine("Inner Exception");
-                writeException(sb, e.InnerException);
+                WriteException(sb, e.InnerException);
             }
         }
 
