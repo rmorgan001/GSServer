@@ -122,15 +122,14 @@
             <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Orientation="Vertical" VerticalAlignment="Center">
                     <Button Margin="0,0,0,0" Height="20" Padding="-5" Width="85" ToolTip="{StaticResource goTipCopy}" 
                     Command="{Binding PopulateGoToRaDecCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource goCopy}"/>
-                <md:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsRaGoToDialogOpen}" DialogContent="{Binding RaGoToContent}">
+
                     <Button Margin="0,2,0,0" Height="20" Padding="-5" Width="85" ToolTip="{StaticResource goTipGoTo}" 
                         Command="{Binding OpenRaGoToDialogCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource goGoTo}"/>
-                </md:DialogHost>
-                <md:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsRaGoToSyncDialogOpen}" DialogContent="{Binding RaGoToSyncContent}">
+
+
                     <Button Margin="0,2,0,0" Height="20" Padding="-5" Width="85" ToolTip="{StaticResource goSync}" 
                             Command="{Binding OpenRaGoToSyncDialogCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource goSync}"/>
-                </md:DialogHost>
-                <Button Margin="0,2,0,0" Height="20" Padding="-5" Width="85" ToolTip="{StaticResource diaImport}" Command="{Binding ImportGoToRaDecCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource diaImport}" />
+                    <Button Margin="0,2,0,0" Height="20" Padding="-5" Width="85" ToolTip="{StaticResource diaImport}" Command="{Binding ImportGoToRaDecCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource diaImport}" />
             </StackPanel>
             </Grid>
     </Border>

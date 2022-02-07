@@ -21,11 +21,9 @@
         </StackPanel.Style>
         <ToggleButton Width="20" Height="20" ToolTip="{StaticResource ppOnOff}" Style="{StaticResource MaterialDesignActionLightToggleButton}" IsChecked="{Binding PPecOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Label Content="{StaticResource ppPec}"/>
-        <md:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsPPecDialogOpen}" DialogContent="{Binding PPecContent}">
-            <ToggleButton  HorizontalAlignment="Center" Width="20" Height="20" ToolTip="{StaticResource ppStartTrainingMode}"
-                          IsChecked="{Binding PecTrainOn}" Style="{StaticResource MaterialDesignActionLightToggleButton}"
-                          Command="{Binding OpenPPecDialogCommand}"/>
-        </md:DialogHost>
+        <ToggleButton  HorizontalAlignment="Center" Width="20" Height="20" ToolTip="{StaticResource ppStartTrainingMode}"
+                       IsChecked="{Binding PecTrainOn}" Style="{StaticResource MaterialDesignActionLightToggleButton}"
+                       Command="{Binding OpenPPecDialogCommand}"/>
         <Label Content="{StaticResource ppTraining}"/>
         <md:PackIcon Kind="Timer" Width="20" Height="20" ToolTip="{StaticResource ppTipPecTimer}" VerticalAlignment="Center">
             <md:PackIcon.Style>
