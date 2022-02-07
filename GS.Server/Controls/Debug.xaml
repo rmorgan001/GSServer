@@ -14,23 +14,23 @@
     <StackPanel Orientation="Vertical" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="5,30,0,0">
         <StackPanel Orientation="Horizontal" >
             <TextBlock Text="{StaticResource goRa}" />
-            <TextBlock Margin="5,0,0,0" Text="{Binding ActualAxisX, StringFormat={}{0}°}" Foreground="{StaticResource SecondaryAccentBrush}"/>
+            <TextBlock Margin="5,0,0,0" Text="{Binding ActualAxisX, StringFormat={}{0}°}" Foreground="{StaticResource SecondaryHueMidBrush}"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <TextBlock Text="{StaticResource goDec}" />
-            <TextBlock Margin="5,0,0,0" Text="{Binding ActualAxisY, StringFormat={}{0}°}" Foreground="{StaticResource SecondaryAccentBrush}"/>
+            <TextBlock Margin="5,0,0,0" Text="{Binding ActualAxisY, StringFormat={}{0}°}" Foreground="{StaticResource SecondaryHueMidBrush}"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
             <TextBlock Text="{StaticResource bugSiderealTime}" />
-            <TextBlock Margin="5,0,0,0" Text="{Binding SiderealTime}" Foreground="{StaticResource SecondaryAccentBrush}" />
+            <TextBlock Margin="5,0,0,0" Text="{Binding SiderealTime}" Foreground="{StaticResource SecondaryHueMidBrush}" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" Visibility="{Binding PecShow, Converter={StaticResource BoolToClap}}">
             <TextBlock Text="Rate:" />
-            <TextBlock Margin="5,0,0,0" Text="{Binding CurTrackingRate, StringFormat={}{0}°}" Foreground="{StaticResource SecondaryAccentBrush}" />
+            <TextBlock Margin="5,0,0,0" Text="{Binding CurTrackingRate, StringFormat={}{0}°}" Foreground="{StaticResource SecondaryHueMidBrush}" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" Visibility="{Binding PecShow, Converter={StaticResource BoolToClap}}">
             <TextBlock Text="Pec:" />
-            <TextBlock Margin="5,0,0,0" Text="{Binding PecBinNow}" Foreground="{StaticResource SecondaryAccentBrush}" />
+            <TextBlock Margin="5,0,0,0" Text="{Binding PecBinNow}" Foreground="{StaticResource SecondaryHueMidBrush}" />
         </StackPanel>
     </StackPanel>
 </UserControl>

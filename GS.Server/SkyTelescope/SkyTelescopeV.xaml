@@ -225,7 +225,7 @@
                                                 <Style TargetType="md:PackIcon" >
                                             <Style.Triggers>
                                                         <DataTrigger Binding="{Binding CustomGearing}" Value="True">
-                                                            <Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource SecondaryHueMidBrush}" />
                                                     </DataTrigger>
                                                         <DataTrigger Binding="{Binding CustomGearing}" Value="False">
                                                         <Setter Property="Foreground" Value="{StaticResource PrimaryHueMidBrush}" />

@@ -9,7 +9,7 @@
         mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
     <GroupBox Header="{StaticResource btnAutoHome}" Margin="5" >
             <StackPanel Orientation="Vertical">
-                <ProgressBar Value="{Binding AutoHomeProgressBar}" md:TransitionAssist.DisableTransitions="True" Height="10" Width="200" Foreground="{StaticResource SecondaryAccentBrush}" />
+                <ProgressBar Value="{Binding AutoHomeProgressBar}" md:TransitionAssist.DisableTransitions="True" Height="10" Width="200" Foreground="{StaticResource SecondaryHueMidBrush}" />
                 <StackPanel Orientation="Horizontal" Margin="0,5,0,0" IsEnabled="{Binding StartEnabled}">
                 <Label Content="{StaticResource btnAutoHomeLimit}" VerticalAlignment="Bottom"/>
                 <ComboBox md:HintAssist.Hint="{StaticResource btnHintAutoHomeLimit}" MinWidth="10" ToolTip="{StaticResource btnTipAutoHomeLimit}"  

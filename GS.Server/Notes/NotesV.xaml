@@ -85,7 +85,7 @@
                                             <md:PackIcon Kind="FormatAlignLeft" />
                                         </ToggleButton.Content>
                                         <md:ToggleButtonAssist.OnContent>
-                                            <md:PackIcon Kind="FormatAlignLeft" Background="{StaticResource SecondaryAccentBrush}" />
+                                            <md:PackIcon Kind="FormatAlignLeft" Background="{StaticResource SecondaryHueMidBrush}" />
                                         </md:ToggleButtonAssist.OnContent>
                                     </ToggleButton>
                         <ToggleButton Name="tbCenter" Command="EditingCommands.AlignCenter" Padding="2" ToolTip="{StaticResource notCenterAlign}" ToolBar.OverflowMode="AsNeeded" Height="20" Width="20" Margin="2"
@@ -94,7 +94,7 @@
                                             <md:PackIcon Kind="FormatAlignCenter" />
                                         </ToggleButton.Content>
                                         <md:ToggleButtonAssist.OnContent>
-                                            <md:PackIcon Kind="FormatAlignCenter" Background="{StaticResource SecondaryAccentBrush}" />
+                                            <md:PackIcon Kind="FormatAlignCenter" Background="{StaticResource SecondaryHueMidBrush}" />
                                         </md:ToggleButtonAssist.OnContent>
                                     </ToggleButton>
                         <ToggleButton Name="tbRight" Command="EditingCommands.AlignRight" Padding="2" ToolTip="{StaticResource notRightAlign}" ToolBar.OverflowMode="AsNeeded" Height="20" Width="20" Margin="2"
@@ -103,14 +103,14 @@
                                             <md:PackIcon Kind="FormatAlignRight" />
                                         </ToggleButton.Content>
                                         <md:ToggleButtonAssist.OnContent>
-                                            <md:PackIcon Kind="FormatAlignRight" Background="{StaticResource SecondaryAccentBrush}" />
+                                            <md:PackIcon Kind="FormatAlignRight" Background="{StaticResource SecondaryHueMidBrush}" />
                                         </md:ToggleButtonAssist.OnContent>
                                     </ToggleButton>
                         <ToggleButton Name="tbBold" Command="ToggleBold" Padding="2" ToolTip="{StaticResource notBold}" ToolBar.OverflowMode="AsNeeded" Height="20" Width="20" Margin="2"
                                                   Style="{StaticResource MaterialDesignActionToggleButton}">
                                         <ToggleButton.Content><md:PackIcon Kind="FormatBold" /></ToggleButton.Content>
                                         <md:ToggleButtonAssist.OnContent>
-                                            <md:PackIcon Kind="FormatBold" Background="{StaticResource SecondaryAccentBrush}" /></md:ToggleButtonAssist.OnContent>
+                                            <md:PackIcon Kind="FormatBold" Background="{StaticResource SecondaryHueMidBrush}" /></md:ToggleButtonAssist.OnContent>
                                     </ToggleButton>
                         <ToggleButton Name="tbItalic" Command="ToggleItalic" ToolTip="{StaticResource notInItalic}" ToolBar.OverflowMode="AsNeeded" Height="20" Width="20" Margin="2"
                                                   Style="{StaticResource MaterialDesignActionToggleButton}">
@@ -118,7 +118,7 @@
                                             <md:PackIcon Kind="FormatItalic" />
                                         </ToggleButton.Content>
                                         <md:ToggleButtonAssist.OnContent>
-                                            <md:PackIcon Kind="FormatItalic" Background="{StaticResource SecondaryAccentBrush}" />
+                                            <md:PackIcon Kind="FormatItalic" Background="{StaticResource SecondaryHueMidBrush}" />
                                         </md:ToggleButtonAssist.OnContent>
                                     </ToggleButton>
                         <ToggleButton Name="tbUnderline" Command="EditingCommands.ToggleUnderline" ToolBar.OverflowMode="AsNeeded" ToolTip="{StaticResource notUnderline}" Height="20" Width="20" Margin="2"
@@ -127,7 +127,7 @@
                                             <md:PackIcon Kind="FormatUnderline" />
                                         </ToggleButton.Content>
                                         <md:ToggleButtonAssist.OnContent>
-                                            <md:PackIcon Kind="FormatUnderline" Background="{StaticResource SecondaryAccentBrush}" />
+                                            <md:PackIcon Kind="FormatUnderline" Background="{StaticResource SecondaryHueMidBrush}" />
                                         </md:ToggleButtonAssist.OnContent>
                                     </ToggleButton>
                         <ComboBox Name="cbFontFamily" ToolTip="{StaticResource notFont}" Width="100" DropDownClosed="CbFontFamily_DropDownClosed" />
@@ -144,7 +144,7 @@
                                     <md:PackIcon Kind="Spellcheck" />
                                         </ToggleButton.Content>
                                         <md:ToggleButtonAssist.OnContent>
-                                    <md:PackIcon Kind="Spellcheck" Background="{StaticResource SecondaryAccentBrush}" />
+                                    <md:PackIcon Kind="Spellcheck" Background="{StaticResource SecondaryHueMidBrush}" />
                                         </md:ToggleButtonAssist.OnContent>
                                     </ToggleButton>
                         </ToolBar>

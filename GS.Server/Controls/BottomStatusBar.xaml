@@ -32,7 +32,7 @@
                     <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock }">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsHome}" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}"/>
+                            <Setter Property="Foreground" Value="{StaticResource SecondaryHueMidBrush}"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding IsHome}" Value="False">
                                 <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />
@@ -51,7 +51,7 @@
                     <Setter Property="Background" Value="Transparent"></Setter>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding AtPark}" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}"/>
+                            <Setter Property="Foreground" Value="{StaticResource SecondaryHueMidBrush}"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding AtPark}" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />
@@ -78,7 +78,7 @@
                 <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsSlewing}" Value="True">
-                        <Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}"/>
+                        <Setter Property="Foreground" Value="{StaticResource SecondaryHueMidBrush}"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding IsSlewing}" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />
@@ -95,7 +95,7 @@
                 <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsTracking}" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}"/>
+                            <Setter Property="Foreground" Value="{StaticResource SecondaryHueMidBrush}"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding IsTracking}" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />
@@ -138,7 +138,7 @@
                 <Style TargetType="Path">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding PecState}" Value="True">
-                            <Setter Property="Fill" Value="{StaticResource SecondaryAccentBrush}"/>
+                            <Setter Property="Fill" Value="{StaticResource SecondaryHueMidBrush}"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding PecState}" Value="False">
                         <Setter Property="Fill" Value="{StaticResource PrimaryHueDarkBrush}" />
@@ -213,7 +213,7 @@
                     <Style TargetType="md:PackIcon">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsConnected}" Value="True">
-                                <Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}"/>
+                                <Setter Property="Foreground" Value="{StaticResource SecondaryHueMidBrush}"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding IsConnected}" Value="False">
                                 <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />
@@ -226,7 +226,7 @@
                 </md:PackIcon.Style>
             </md:PackIcon>
         </Button>
-        <md:PackIcon Grid.Column="10" Kind="{Binding TrackingRateIcon}" Foreground="{StaticResource SecondaryAccentBrush}" Margin="3 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="{Binding TrackingRate}">
+        <md:PackIcon Grid.Column="10" Kind="{Binding TrackingRateIcon}" Foreground="{StaticResource SecondaryHueMidBrush}" Margin="3 0" Width="29" Height="29" VerticalAlignment="Center" ToolTip="{Binding TrackingRate}">
             <md:PackIcon.Style>
                 <Style TargetType="md:PackIcon">
                     <Style.Triggers>
@@ -242,7 +242,7 @@
                 <Style TargetType="md:PackIcon">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding VoiceState}" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}"/>
+                            <Setter Property="Foreground" Value="{StaticResource SecondaryHueMidBrush}"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding VoiceState}" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />
@@ -256,7 +256,7 @@
                 <Style TargetType="md:PackIcon">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding MonitorState}" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}"/>
+                            <Setter Property="Foreground" Value="{StaticResource SecondaryHueMidBrush}"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding MonitorState}" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />

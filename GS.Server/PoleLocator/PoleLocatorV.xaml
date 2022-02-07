@@ -42,37 +42,37 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" >
                             <TextBlock Text="{StaticResource polLat}" Margin="5"/>
-                            <TextBlock Text="{Binding Lat}" Margin="5" Foreground="{StaticResource SecondaryAccentBrush}"/>
+                            <TextBlock Text="{Binding Lat}" Margin="5" Foreground="{StaticResource SecondaryHueMidBrush}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{StaticResource polLong}" Margin="5"/>
-                            <TextBlock Text="{Binding Long}" Margin="5" Foreground="{StaticResource SecondaryAccentBrush}"/>
+                            <TextBlock Text="{Binding Long}" Margin="5" Foreground="{StaticResource SecondaryHueMidBrush}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{StaticResource polLDate}" Margin="5"/>
-                            <TextBlock Text="{Binding UTCNow, Converter={StaticResource UTCtoLocal}, StringFormat={}{0:d}}" Margin="5" Foreground="{StaticResource SecondaryAccentBrush}"/>
+                            <TextBlock Text="{Binding UTCNow, Converter={StaticResource UTCtoLocal}, StringFormat={}{0:d}}" Margin="5" Foreground="{StaticResource SecondaryHueMidBrush}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{StaticResource polLTime}" Margin="5"/>
-                            <TextBlock Text="{Binding UTCNow, Converter={StaticResource UTCtoLocal}, StringFormat={}{0:t}}" Margin="5" Foreground="{StaticResource SecondaryAccentBrush}"/>
+                            <TextBlock Text="{Binding UTCNow, Converter={StaticResource UTCtoLocal}, StringFormat={}{0:t}}" Margin="5" Foreground="{StaticResource SecondaryHueMidBrush}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{StaticResource polLST}" Margin="5"/>
-                        <TextBlock Text="{Binding LST}" Margin="5" Foreground="{StaticResource SecondaryAccentBrush}"/>
+                        <TextBlock Text="{Binding LST}" Margin="5" Foreground="{StaticResource SecondaryHueMidBrush}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{StaticResource polHADeg}" Margin="5"/>
-                            <TextBlock Text="{Binding Ha12Str, StringFormat={}{0:0}}" Margin="5" Foreground="{StaticResource SecondaryAccentBrush}"/>
-                            <TextBlock Text="{Binding HaDeg, StringFormat={}{0:(0.#°)}}" Margin="5" Foreground="{StaticResource SecondaryAccentBrush}"/>
+                            <TextBlock Text="{Binding Ha12Str, StringFormat={}{0:0}}" Margin="5" Foreground="{StaticResource SecondaryHueMidBrush}"/>
+                            <TextBlock Text="{Binding HaDeg, StringFormat={}{0:(0.#°)}}" Margin="5" Foreground="{StaticResource SecondaryHueMidBrush}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{StaticResource polHAFlipDeg}" Margin="5"/>
-                        <TextBlock Text="{Binding HaFlipDeg, StringFormat={}{0:0.#°}}" Margin="5" Foreground="{StaticResource SecondaryAccentBrush}"/>
+                        <TextBlock Text="{Binding HaFlipDeg, StringFormat={}{0:0.#°}}" Margin="5" Foreground="{StaticResource SecondaryHueMidBrush}"/>
                     </StackPanel>
                 </StackPanel>
                 <!--Slider-->
                 <StackPanel Orientation="Vertical" Grid.Column="1" Margin="0,30,0,0" Visibility="{Binding NorthernHemisphere, Converter={StaticResource BoolToVis}}" Width="50">
-                    <TextBlock Margin="5" HorizontalAlignment="Center" Text="{Binding GridAngle, StringFormat={}{0:0.#°}}" Foreground="{StaticResource SecondaryAccentBrush}"/>
+                    <TextBlock Margin="5" HorizontalAlignment="Center" Text="{Binding GridAngle, StringFormat={}{0:0.#°}}" Foreground="{StaticResource SecondaryHueMidBrush}"/>
                     <Slider Interval="1" MinHeight="250" HorizontalAlignment="Center" TickPlacement="Both" TickFrequency="20" Orientation="Vertical" Minimum="0" Maximum="359" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" Value="{Binding GridAngle}" />
                 </StackPanel>
                 <!--North Hemi-->
@@ -83,7 +83,7 @@
                         </Grid.RenderTransform>
 
                         <!--3 circles-->
-                        <Path Stroke="{StaticResource SecondaryAccentBrush}" StrokeThickness="1">
+                        <Path Stroke="{StaticResource SecondaryHueMidBrush}" StrokeThickness="1">
                             <Path.Data>
                                 <GeometryGroup>
                                     <EllipseGeometry Center="{Binding CenterXY}" RadiusX="164" RadiusY="164" />
@@ -91,7 +91,7 @@
                                 </GeometryGroup>
                             </Path.Data>
                             </Path>
-                        <Path Stroke="{StaticResource SecondaryAccentBrush}" StrokeThickness="1" StrokeDashArray="8">
+                        <Path Stroke="{StaticResource SecondaryHueMidBrush}" StrokeThickness="1" StrokeDashArray="8">
                             <Path.Data><EllipseGeometry Center="{Binding CenterXY}" RadiusX="172" RadiusY="172" /></Path.Data>
                         </Path>
 
@@ -100,7 +100,7 @@
                         <TextBlock Margin="391,191,0,0">3</TextBlock>
                         <TextBlock Margin="197,385,0,0">6</TextBlock>
                         <TextBlock Margin="5,191,0,0">9</TextBlock>
-                        <Path Stroke="{StaticResource SecondaryAccentBrush}" StrokeThickness="1">
+                        <Path Stroke="{StaticResource SecondaryHueMidBrush}" StrokeThickness="1">
                             <Path.Data>
                                 <GeometryGroup>
                                     <LineGeometry StartPoint="{Binding CenterXY}" EndPoint="200,15"/>
@@ -110,7 +110,7 @@
                                 </GeometryGroup>
                             </Path.Data>
                         </Path>
-                        <Path Stroke="{StaticResource SecondaryAccentBrush}" StrokeThickness=".3">
+                        <Path Stroke="{StaticResource SecondaryHueMidBrush}" StrokeThickness=".3">
                             <Path.Data>
                                 <GeometryGroup>
                                     <LineGeometry StartPoint="{Binding CenterXY}" EndPoint="200,0" >
@@ -189,7 +189,7 @@
                         </Grid.RenderTransform>
 
                         <!--3 circles-->
-                        <Path Stroke="{StaticResource SecondaryAccentBrush}" StrokeThickness="1">
+                        <Path Stroke="{StaticResource SecondaryHueMidBrush}" StrokeThickness="1">
                             <Path.Data>
                                 <GeometryGroup>
                                     <EllipseGeometry Center="{Binding CenterXY}" RadiusX="62" RadiusY="62" />
@@ -197,7 +197,7 @@
                                 </GeometryGroup>
                             </Path.Data>
                         </Path>
-                        <Path Stroke="{StaticResource SecondaryAccentBrush}" StrokeThickness="1" StrokeDashArray="8">
+                        <Path Stroke="{StaticResource SecondaryHueMidBrush}" StrokeThickness="1" StrokeDashArray="8">
                             <Path.Data>
                                 <EllipseGeometry Center="{Binding CenterXY}" RadiusX="66"  RadiusY="66" />
                             </Path.Data>
@@ -208,7 +208,7 @@
                         <TextBlock Margin="385,193,0,0">3</TextBlock>
                         <TextBlock Margin="196,385,0,0">6</TextBlock>
                         <TextBlock Margin="5,193,0,0">9</TextBlock>
-                        <Path Stroke="{StaticResource SecondaryAccentBrush}" StrokeThickness="1">
+                        <Path Stroke="{StaticResource SecondaryHueMidBrush}" StrokeThickness="1">
                             <Path.Data>
                                 <GeometryGroup>
                                     <LineGeometry StartPoint="{Binding CenterXY}" EndPoint="200,20" />
@@ -218,7 +218,7 @@
                                 </GeometryGroup>
                             </Path.Data>
                         </Path>
-                        <Path Stroke="{StaticResource SecondaryAccentBrush}" StrokeThickness=".3">
+                        <Path Stroke="{StaticResource SecondaryHueMidBrush}" StrokeThickness=".3">
                             <Path.Data>
                                 <GeometryGroup>
                                     <LineGeometry StartPoint="{Binding CenterXY}" EndPoint="200,120">

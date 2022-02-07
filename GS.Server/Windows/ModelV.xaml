@@ -42,9 +42,9 @@
                 <controls:HelixViewport3D Margin="3" IsEnabled="{Binding ScreenEnabled, Mode=OneWay}" Background="{DynamicResource MaterialDesignPaper}"/>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom"  HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignPaper}">
                 <Label Content="{StaticResource topRaShort}" />
-                <Label Foreground="{StaticResource SecondaryAccentBrush}" Content="{Binding RightAscension}" />
+                <Label Foreground="{StaticResource SecondaryHueMidBrush}" Content="{Binding RightAscension}" />
                 <Label Content="{StaticResource topDecShort}" />
-                <Label Foreground="{StaticResource SecondaryAccentBrush}" Content="{Binding Declination}" />
+                <Label Foreground="{StaticResource SecondaryHueMidBrush}" Content="{Binding Declination}" />
             </StackPanel>
             </Grid>
         </Border>

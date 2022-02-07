@@ -46,7 +46,7 @@
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <!--Column 0-->
-                        <TextBox Grid.Row="0" Grid.Column="0" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpTracking}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="0" Grid.Column="0" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpTracking}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="Tracking" Mode="OneWay" />
                             </TextBox.Text>
@@ -62,7 +62,7 @@
                                 </b:EventTrigger>
                             </b:Interaction.Triggers>
                         </TextBox>
-                        <TextBox Grid.Row="1" Grid.Column="0" Width="125" Margin="0,10,0,0" IsReadOnly=" True" md:HintAssist.Hint="{StaticResource gpStop}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="1" Grid.Column="0" Width="125" Margin="0,10,0,0" IsReadOnly=" True" md:HintAssist.Hint="{StaticResource gpStop}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="Stop" Mode="OneWay" />
                             </TextBox.Text>
@@ -78,7 +78,7 @@
                                 </b:EventTrigger>
                             </b:Interaction.Triggers>
                         </TextBox>
-                        <TextBox Grid.Row="2" Grid.Column="0" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpPark}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="2" Grid.Column="0" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpPark}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="Park" Mode="OneWay" />
                             </TextBox.Text>
@@ -94,7 +94,7 @@
                                 </b:EventTrigger>
                             </b:Interaction.Triggers>
                         </TextBox>
-                        <TextBox Grid.Row="3" Grid.Column="0" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpHome}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="3" Grid.Column="0" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpHome}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="Home" Mode="OneWay" />
                             </TextBox.Text>
@@ -112,7 +112,7 @@
                         </TextBox>
 
                         <!--Column 1-->
-                        <TextBox Grid.Row="0" Grid.Column="1" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSpeedUp}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="0" Grid.Column="1" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSpeedUp}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="SpeedUp" Mode="OneWay" />
                             </TextBox.Text>
@@ -128,7 +128,7 @@
                                 </b:EventTrigger>
                             </b:Interaction.Triggers>
                         </TextBox>
-                        <TextBox Grid.Row="1" Grid.Column="1" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSpeedDown}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="1" Grid.Column="1" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSpeedDown}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="SpeedDown" Mode="OneWay" />
                             </TextBox.Text>
@@ -144,7 +144,7 @@
                                 </b:EventTrigger>
                             </b:Interaction.Triggers>
                         </TextBox>
-                        <TextBox Grid.Row="2" Grid.Column="1" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpVolumeUp}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="2" Grid.Column="1" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpVolumeUp}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="VolumeUp" Mode="OneWay" />
                             </TextBox.Text>
@@ -160,7 +160,7 @@
                                 </b:EventTrigger>
                             </b:Interaction.Triggers>
                         </TextBox>
-                        <TextBox Grid.Row="3" Grid.Column="1" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpVolumeDown}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="3" Grid.Column="1" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpVolumeDown}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="VolumeDown" Mode="OneWay" />
                             </TextBox.Text>
@@ -177,7 +177,7 @@
                             </b:Interaction.Triggers>
                         </TextBox>
                         <!--Column 2-->
-                        <TextBox Grid.Row="0" Grid.Column="2" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSlewUp}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="0" Grid.Column="2" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSlewUp}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="Up" Mode="OneWay" />
                             </TextBox.Text>
@@ -193,7 +193,7 @@
                                 </b:EventTrigger>
                             </b:Interaction.Triggers>
                         </TextBox>
-                        <TextBox Grid.Row="1" Grid.Column="2" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSlewDown}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="1" Grid.Column="2" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSlewDown}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="Down" Mode="OneWay" />
                             </TextBox.Text>
@@ -209,7 +209,7 @@
                                 </b:EventTrigger>
                             </b:Interaction.Triggers>
                         </TextBox>
-                        <TextBox Grid.Row="2" Grid.Column="2" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSlewLeft}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="2" Grid.Column="2" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSlewLeft}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="Left" Mode="OneWay" />
                             </TextBox.Text>
@@ -225,7 +225,7 @@
                                 </b:EventTrigger>
                             </b:Interaction.Triggers>
                         </TextBox>
-                        <TextBox Grid.Row="3" Grid.Column="2" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSlewRight}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="3" Grid.Column="2" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSlewRight}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="Right" Mode="OneWay" />
                             </TextBox.Text>
@@ -242,7 +242,7 @@
                             </b:Interaction.Triggers>
                         </TextBox>
                         <!--Column 3-->
-                        <TextBox Grid.Row="0" Grid.Column="3" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSidereal}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="0" Grid.Column="3" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSidereal}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="RateSidereal" Mode="OneWay" />
                             </TextBox.Text>
@@ -258,7 +258,7 @@
                                 </b:EventTrigger>
                             </b:Interaction.Triggers>
                         </TextBox>
-                        <TextBox Grid.Row="1" Grid.Column="3" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpLunar}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="1" Grid.Column="3" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpLunar}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="RateLunar" Mode="OneWay" />
                             </TextBox.Text>
@@ -274,7 +274,7 @@
                                 </b:EventTrigger>
                             </b:Interaction.Triggers>
                         </TextBox>
-                        <TextBox Grid.Row="2" Grid.Column="3" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSolar}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="2" Grid.Column="3" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSolar}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="RateSolar" Mode="OneWay" />
                             </TextBox.Text>
@@ -290,7 +290,7 @@
                                 </b:EventTrigger>
                             </b:Interaction.Triggers>
                         </TextBox>
-                        <TextBox Grid.Row="3" Grid.Column="3" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpKing}" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="3" Grid.Column="3" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpKing}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="RateKing" Mode="OneWay" />
                             </TextBox.Text>
@@ -307,7 +307,7 @@
                             </b:Interaction.Triggers>
                         </TextBox>
                         <!--Column 4-->
-                        <TextBox Grid.Row="0" Grid.Column="4" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="Abort" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="0" Grid.Column="4" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="Abort" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="Abort" Mode="OneWay" />
                             </TextBox.Text>
@@ -323,7 +323,7 @@
                                 </b:EventTrigger>
                             </b:Interaction.Triggers>
                         </TextBox>
-                        <TextBox Grid.Row="1" Grid.Column="4" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="Spiral In" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="1" Grid.Column="4" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="Spiral In" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="SpiralIn" Mode="OneWay" />
                             </TextBox.Text>
@@ -339,7 +339,7 @@
                                 </b:EventTrigger>
                             </b:Interaction.Triggers>
                         </TextBox>
-                        <TextBox Grid.Row="2" Grid.Column="4" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="Spiral Out" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="2" Grid.Column="4" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="Spiral Out" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="SpiralOut" Mode="OneWay" />
                             </TextBox.Text>
@@ -355,7 +355,7 @@
                                 </b:EventTrigger>
                             </b:Interaction.Triggers>
                         </TextBox>
-                        <TextBox Grid.Row="3" Grid.Column="4" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="Spiral New" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                        <TextBox Grid.Row="3" Grid.Column="4" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="Spiral New" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                             <TextBox.Text>
                                 <Binding Path="NewSpiral" Mode="OneWay" />
                             </TextBox.Text>
@@ -372,7 +372,7 @@
                             </b:Interaction.Triggers>
                         </TextBox>
                     <!--Column 5-->
-                    <TextBox Grid.Row="0" Grid.Column="5" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="Sync (Dbl Click)" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                    <TextBox Grid.Row="0" Grid.Column="5" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="Sync (Dbl Click)" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                         <TextBox.Text>
                             <Binding Path="Sync" Mode="OneWay" />
                         </TextBox.Text>
@@ -388,7 +388,7 @@
                             </b:EventTrigger>
                         </b:Interaction.Triggers>
                     </TextBox>
-                    <TextBox Grid.Row="2" Grid.Column="5" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="Focus In" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                    <TextBox Grid.Row="2" Grid.Column="5" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="Focus In" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                         <TextBox.Text>
                             <Binding Path="FocusIn" Mode="OneWay" />
                         </TextBox.Text>
@@ -404,7 +404,7 @@
                             </b:EventTrigger>
                         </b:Interaction.Triggers>
                     </TextBox>
-                    <TextBox Grid.Row="3" Grid.Column="5" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="Focus Out" Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                    <TextBox Grid.Row="3" Grid.Column="5" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="Focus Out" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
                         <TextBox.Text>
                             <Binding Path="FocusOut" Mode="OneWay" />
                         </TextBox.Text>

@@ -54,7 +54,7 @@
                             <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,5,0,0">
                             <StackPanel Orientation="Horizontal">
                                 <Button Command="{Binding ClickPecImportCmd}" CommandParameter="Worm" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="Import PEC Worm" Width="40" Padding="0" VerticalAlignment="Bottom">
-                                    <md:PackIcon Kind="FileFind" Foreground="{StaticResource SecondaryAccentBrush}" Height="25" Width="25">
+                                    <md:PackIcon Kind="FileFind" Foreground="{StaticResource SecondaryHueMidBrush}" Height="25" Width="25">
                                         <md:PackIcon.Style>
                                             <Style TargetType="md:PackIcon">
                                                 <Style.Triggers>
@@ -70,7 +70,7 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Button Command="{Binding ClickPecImportCmd}" CommandParameter="360"  Style="{StaticResource MaterialDesignFlatButton}" ToolTip="Import PEC 360" Width="40" Padding="0" >
-                                    <md:PackIcon Kind="FileFind" Foreground="{StaticResource SecondaryAccentBrush}" Height="25" Width="25">
+                                    <md:PackIcon Kind="FileFind" Foreground="{StaticResource SecondaryHueMidBrush}" Height="25" Width="25">
                                         <md:PackIcon.Style>
                                             <Style TargetType="md:PackIcon">
                                                 <Style.Triggers>
@@ -169,8 +169,8 @@
                                     </Style.Triggers>
                                 </Style>
                                 </DockPanel.Style>
-                            <TextBlock Margin="20,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Right" ToolTip="Timer" Text="{Binding IndexTimeSpan}" Foreground="{StaticResource SecondaryAccentBrush}" />
-                            <ProgressBar Margin="10,0,12,0" HorizontalAlignment="Stretch" ToolTip="{Binding ProgressBarValue}" Value="{Binding ProgressBarValue}" Height="2" Width="Auto" Foreground="{StaticResource SecondaryAccentBrush}" IsEnabled="{Binding ProgressBarEnabled, Converter={StaticResource BoolToVis}}" />
+                            <TextBlock Margin="20,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Right" ToolTip="Timer" Text="{Binding IndexTimeSpan}" Foreground="{StaticResource SecondaryHueMidBrush}" />
+                            <ProgressBar Margin="10,0,12,0" HorizontalAlignment="Stretch" ToolTip="{Binding ProgressBarValue}" Value="{Binding ProgressBarValue}" Height="2" Width="Auto" Foreground="{StaticResource SecondaryHueMidBrush}" IsEnabled="{Binding ProgressBarEnabled, Converter={StaticResource BoolToVis}}" />
                         </DockPanel>
                         <wpf:CartesianChart Margin="0,10,0,0" Height="300" Foreground="DarkGray" Hoverable="False" Zoom="None" LegendLocation="None" DisableAnimations="True" Series="{Binding ValuesCollection, Mode=OneWay}">
                             <wpf:CartesianChart.DataTooltip>

@@ -193,7 +193,7 @@
                         <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource MaterialDesignDataGridCell}">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding SelectedForGoto}" Value="true">
-                                    <Setter Property="Foreground" Value="{DynamicResource SecondaryAccentBrush}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource SecondaryHueMidBrush}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>

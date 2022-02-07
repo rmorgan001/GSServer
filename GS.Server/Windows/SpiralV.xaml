@@ -41,7 +41,7 @@
                     <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsSlewing}" Value="True">
-                                <Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}"></Setter>
+                                <Setter Property="Foreground" Value="{StaticResource SecondaryHueMidBrush}"></Setter>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding IsSlewing}" Value="False">
                                 <Setter Property="Foreground" Value="Transparent" />
@@ -115,7 +115,7 @@
                     <TextBlock Grid.Row="0" Grid.Column="6" Grid.RowSpan="7" HorizontalAlignment="Right"  VerticalAlignment="Center" Text="E" />
                     <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="7" HorizontalAlignment="Center"  VerticalAlignment="Top"  Text="N" />
                     <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="7" HorizontalAlignment="Center" VerticalAlignment="Bottom"  Text="S" />
-                    <Polyline x:Name="SpiralLine" Grid.Row="0" Grid.RowSpan="7" Grid.ColumnSpan="7" Grid.Column="0" Stroke="{StaticResource SecondaryAccentBrush}" StrokeThickness="2" />
+                    <Polyline x:Name="SpiralLine" Grid.Row="0" Grid.RowSpan="7" Grid.ColumnSpan="7" Grid.Column="0" Stroke="{StaticResource SecondaryHueMidBrush}" StrokeThickness="2" />
                     <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" Orientation="Horizontal" VerticalAlignment="Top" Opacity=".4">
                         <TextBlock Text="{StaticResource 1021Distance}" />
                         <TextBlock Text="{Binding Distance}" />

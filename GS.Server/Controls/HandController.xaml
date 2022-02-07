@@ -92,7 +92,7 @@
                     <Canvas.RenderTransform>
                         <TranslateTransform X="-365" Y="-7879" />
                     </Canvas.RenderTransform>
-                    <Polygon Points="383 7879 383 7893.105 383 7895 369 7895 369 7883 379 7883 379 7891 373 7891 373 7887 375 7887 375 7889 377 7889 377 7885 371 7885 371 7893 381 7893 381 7881 367 7881 367 7897 383 7897 383 7899 365 7899 365 7879" Fill="{StaticResource SecondaryAccentBrush}" />
+                    <Polygon Points="383 7879 383 7893.105 383 7895 369 7895 369 7883 379 7883 379 7891 373 7891 373 7887 375 7887 375 7889 377 7889 377 7885 371 7885 371 7893 381 7893 381 7881 367 7881 367 7897 383 7897 383 7899 365 7899 365 7879" Fill="{StaticResource SecondaryHueMidBrush}" />
                 </Canvas>
             </Button>
             <!--<md:DialogHost Grid.Row="2" Grid.Column="2" CloseOnClickAway="True" IsOpen="{Binding IsHcSettingsDialogOpen}" DialogContent="{Binding HcSettingsContent}">
@@ -112,14 +112,14 @@
                             <Canvas.RenderTransform>
                                 <TranslateTransform X="-365" Y="-7879" />
                             </Canvas.RenderTransform>
-                            <Polygon Points="383 7879 383 7893.105 383 7895 369 7895 369 7883 379 7883 379 7891 373 7891 373 7887 375 7887 375 7889 377 7889 377 7885 371 7885 371 7893 381 7893 381 7881 367 7881 367 7897 383 7897 383 7899 365 7899 365 7879" Fill="{StaticResource SecondaryAccentBrush}" />
+                            <Polygon Points="383 7879 383 7893.105 383 7895 369 7895 369 7883 379 7883 379 7891 373 7891 373 7887 375 7887 375 7889 377 7889 377 7885 371 7885 371 7893 381 7893 381 7881 367 7881 367 7897 383 7897 383 7899 365 7899 365 7879" Fill="{StaticResource SecondaryHueMidBrush}" />
                     </Canvas>
                 </Button>
             </md:DialogHost>-->
 
             <!--Mouse Lock-->
             <Button Grid.Row="2" Grid.Column="0" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource 1018LockMouse}" Width="40" Padding="0">
-                <md:PackIcon Kind="MouseVariant" Foreground="{StaticResource SecondaryAccentBrush}" Height="25" Width="25" >
+                <md:PackIcon Kind="MouseVariant" Foreground="{StaticResource SecondaryHueMidBrush}" Height="25" Width="25" >
                     <md:PackIcon.Style>
                         <Style TargetType="md:PackIcon">
                             <Style.Triggers>

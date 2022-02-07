@@ -19,14 +19,14 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <Label Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource topRa}"/>
-        <Label Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{StaticResource SecondaryAccentBrush}" Content="{Binding RightAscension, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{StaticResource SecondaryHueDarkBrush}" Content="{Binding RightAscension, UpdateSourceTrigger=PropertyChanged}"/>
         <Label Grid.Column="2" VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource topDec}"/>
-        <Label Grid.Column="3" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{StaticResource SecondaryAccentBrush}" Content="{Binding Declination, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label Grid.Column="3" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{StaticResource SecondaryHueMidBrush}" Content="{Binding Declination, UpdateSourceTrigger=PropertyChanged}"/>
         <Label Grid.Column="4" VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource topAz}"/>
-        <Label Grid.Column="5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{StaticResource SecondaryAccentBrush}" Content="{Binding Azimuth, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label Grid.Column="5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{StaticResource SecondaryHueMidBrush}" Content="{Binding Azimuth, UpdateSourceTrigger=PropertyChanged}"/>
         <Label Grid.Column="6" VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource topAlt}"/>
-        <Label Grid.Column="7" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{StaticResource SecondaryAccentBrush}" Content="{Binding Altitude, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label Grid.Column="7" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{StaticResource SecondaryHueMidBrush}" Content="{Binding Altitude, UpdateSourceTrigger=PropertyChanged}"/>
         <Label Grid.Column="8" VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource topLHA}" />
-        <Label Grid.Column="9" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{StaticResource SecondaryAccentBrush}" Content="{Binding Lha, UpdateSourceTrigger=PropertyChanged}" />
+        <Label Grid.Column="9" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{StaticResource SecondaryHueMidBrush}" Content="{Binding Lha, UpdateSourceTrigger=PropertyChanged}" />
     </Grid>
 </UserControl>
