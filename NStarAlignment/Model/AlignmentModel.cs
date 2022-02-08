@@ -245,7 +245,6 @@ namespace NStarAlignment.Model
                         {
                             AlignmentPoints.Add(alignmentPoint);
                         }
-                        SaveAlignmentPoints();
                     }
                 }
                 catch (Exception ex)
