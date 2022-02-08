@@ -801,15 +801,31 @@ namespace GS.Server.Main
             }
         }
 
+
         private MountType _mountType;
         public MountType MountType
         {
             get => _mountType;
             set
             {
+                if (_mountType == value)
+                {
+                    return;
+                }
+
                 _mountType = value;
+                OnPropertyChanged();
+                OnPropertyChanged("MountTypeColor");
+            }
+        }
+
+
+        public Brush MountTypeColor
+        {
+            get
+            {
                 var accentbrush = new SolidColorBrush(Colors.Transparent);
-                if (value == MountType.Simulator)
+                if (MountType == MountType.Simulator)
                 {
                     if (!string.IsNullOrEmpty(Settings.Settings.AccentColor))
                     {
@@ -823,21 +839,11 @@ namespace GS.Server.Main
                     }
 
                 }
-                MountTypeColor = accentbrush;
-                OnPropertyChanged();
+
+                return accentbrush;
             }
         }
 
-        private Brush _mountTypeColor;
-        public Brush MountTypeColor
-        {
-            get => _mountTypeColor;
-            set
-            {
-                _mountTypeColor = value;
-                OnPropertyChanged();
-            }
-        }
 
         private bool _topMost;
         public bool TopMost
