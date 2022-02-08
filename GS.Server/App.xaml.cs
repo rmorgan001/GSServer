@@ -80,7 +80,7 @@ namespace GS.Server
         {
             DispatcherUnhandledException -= Application_DispatcherUnhandledException;
             WriteException(e.Exception);
-            MessageBox.Show("An unexpected error has occurred within GSS. Error details have been logged and Gems will now close.", "Application Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("An unexpected error has occurred within GSS. Error details have been logged and GSS will now close.", "Application Error", MessageBoxButton.OK, MessageBoxImage.Error);
             e.Handled = true;
             this.Shutdown();
         }
@@ -89,7 +89,7 @@ namespace GS.Server
         {
             AppDomain.CurrentDomain.UnhandledException -= CurrentDomain_UnhandledException;
             WriteException((Exception)e.ExceptionObject);
-            MessageBox.Show("An unexpected error has occurred within GSS. Error details have been logged and Gems will now close.", "Application Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("An unexpected error has occurred within GSS. Error details have been logged and GSS will now close.", "Application Error", MessageBoxButton.OK, MessageBoxImage.Error);
             this.Shutdown();
         }
 
