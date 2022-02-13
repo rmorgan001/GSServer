@@ -692,6 +692,7 @@ namespace GS.Server
         [STAThread]
         private static void Main(string[] args)
         {
+            LogSystemInfo(args);
 
             var monitorItem = new MonitorEntry
             { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer: Starting Main Thread" };
@@ -760,5 +761,56 @@ namespace GS.Server
         }
 
         #endregion
+
+        private static void LogSystemInfo(string[] args)
+        {
+            try
+            {
+                var msg = new System.Text.StringBuilder();
+
+                var HKLMWinNTCurrent = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion";
+                
+                msg.AppendFormat("{0}{1}", ", ProductName:", Registry.GetValue(HKLMWinNTCurrent, "productName", ""));
+                msg.AppendFormat("{0}{1}", ", ReleaseId:", Registry.GetValue(HKLMWinNTCurrent, "ReleaseId", ""));
+                msg.AppendFormat("{0}{1}", ", Platform:", Environment.OSVersion.Platform);
+                msg.AppendFormat("{0}{1}", ", Version:", Environment.OSVersion.VersionString);
+                msg.AppendFormat("{0}{1}", ", ServicePack:", Environment.OSVersion.ServicePack);
+                msg.AppendFormat("{0}{1}", ", .NetVersion:", Environment.Version);
+                msg.AppendFormat("{0}{1}", ", UserName:", Environment.UserName);
+                msg.AppendFormat("{0}{1}", ", Is64:", Environment.Is64BitProcess);
+                msg.AppendFormat("{0}{1}", ", UserInteractive:", Environment.UserInteractive);
+                msg.AppendFormat("{0}{1}", ", CommandLineArgs:", string.Join(" ", args));
+                msg.AppendFormat("{0}{1}", ", CurrentDirectory:", Environment.CurrentDirectory);
+                msg.AppendFormat("{0}{1}", ", Ascom:", GetAscomInfo());
+
+                var monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
+                MonitorLog.LogToMonitor(monitorItem); 
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer|{ex.InnerException?.Message}|{ex.InnerException?.StackTrace}" };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+        }
+        private static string GetAscomInfo()
+        {
+            try
+            {
+                using (var util = new ASCOM.Utilities.Util())
+                {
+                    return $"{util.PlatformVersion}";
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer|{ex.InnerException?.Message}|{ex.InnerException?.StackTrace}" };
+                MonitorLog.LogToMonitor(monitorItem);
+                return string.Empty;
+            }
+        }
+
     }
 }
