@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019-2021  Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2022 Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -27,12 +27,12 @@ namespace GS.Server.Helpers
 {
     internal static class Synthesizer
     {
-        private static readonly SpeechSynthesizer _synthesizer;
+        private static SpeechSynthesizer _synthesizer;
         public static event PropertyChangedEventHandler StaticPropertyChanged;
 
         private static IList<string> VoiceNames;
         private static string VoiceName => Settings.Settings.VoiceName;
-        private static int Rate { get; }
+        private static int Rate { get; set; }
         private static int Volume => Settings.Settings.VoiceVolume;
         internal static bool VoiceActive
         {
@@ -40,6 +40,25 @@ namespace GS.Server.Helpers
             set
             {
                 Settings.Settings.VoiceActive = value;
+                if (value)
+                {
+                    if (!VoiceValid)
+                    {
+                        LoadSpeechSynthesizer();
+                    }
+                    else
+                    {
+                        var monitorItem = new MonitorEntry
+                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Invalid voice name" };
+                        MonitorLog.LogToMonitor(monitorItem);
+                    }
+                }
+                else
+                {
+                    UnLoadSpeechSynthesizer();
+                }
+
+
                 OnStaticPropertyChanged();
             }
         }
@@ -59,8 +78,9 @@ namespace GS.Server.Helpers
             get
             {
                 if (VoiceName != null && VoiceName.ToLower() != "none" && VoiceNames != null)
+                {
                     return VoiceNames.Contains(VoiceName);
-                VoiceActive = false;
+                }
                 return false;
             }
         }
@@ -91,16 +111,52 @@ namespace GS.Server.Helpers
 
         static Synthesizer()
         {
-            Rate = 0;
-            _synthesizer = new SpeechSynthesizer();
-            _synthesizer.StateChanged += Synthesizer_StateChanged;
-            _synthesizer.SpeakStarted += Synthesizer_SpeakStarted;
-            _synthesizer.SpeakProgress += Synthesizer_SpeakProgress;
-            _synthesizer.SpeakCompleted += Synthesizer_SpeakCompleted;
-            GetVoices();
-            if (!VoiceValid) VoiceActive = false;
-            VoicePause = false;
+            LoadSpeechSynthesizer();
         }
+
+        private static void LoadSpeechSynthesizer()
+        {
+            try
+            {
+                if (_synthesizer != null) return;
+
+                Rate = 0;
+                _synthesizer = new SpeechSynthesizer();
+                _synthesizer.StateChanged += Synthesizer_StateChanged;
+                _synthesizer.SpeakStarted += Synthesizer_SpeakStarted;
+                _synthesizer.SpeakProgress += Synthesizer_SpeakProgress;
+                _synthesizer.SpeakCompleted += Synthesizer_SpeakCompleted;
+                GetVoices();
+                VoicePause = false;
+            }
+            catch (Exception e)
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{e.Message}|{e.StackTrace}" };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+        }
+
+        private static void UnLoadSpeechSynthesizer()
+        {
+            try
+            {
+                if (_synthesizer == null) return;
+                _synthesizer.StateChanged -= Synthesizer_StateChanged;
+                _synthesizer.SpeakStarted -= Synthesizer_SpeakStarted;
+                _synthesizer.SpeakProgress -= Synthesizer_SpeakProgress;
+                _synthesizer.SpeakCompleted -= Synthesizer_SpeakCompleted;
+            }
+            catch (Exception e)
+            {
+                _synthesizer = null;
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{e.Message}|{e.StackTrace}" };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+
+        }
+
         public static void Speak(string text)
         {
             try
@@ -118,7 +174,7 @@ namespace GS.Server.Helpers
             {
                 VoiceActive = false;
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{text}|{e.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{text}|{e.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
             }
         }
@@ -148,12 +204,12 @@ namespace GS.Server.Helpers
         public static IList<string> GetVoices()
         {
             VoiceNames = new List<string>();
+            if (_synthesizer == null) return VoiceNames;
             var voices = _synthesizer.GetInstalledVoices();
             foreach (var voice in voices)
             {
                 VoiceNames.Add(voice.VoiceInfo.Name);
             }
-
             return VoiceNames;
         }
         /// <summary>
