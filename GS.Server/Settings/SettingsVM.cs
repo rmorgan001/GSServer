@@ -89,6 +89,9 @@ namespace GS.Server.Settings
 
                     _mainWindowVm = MainWindowVM._mainWindowVm;
                     SleepMode = Settings.SleepMode;
+                    Synthesizer.VoicePause = true;
+                    VoiceActive = Settings.VoiceActive;
+                    Synthesizer.VoicePause = false;
 
                     // Theme Colors
                     PrimaryColors = (IList<Swatch>) new SwatchesProvider().Swatches;
@@ -499,16 +502,25 @@ namespace GS.Server.Settings
             }
         }
 
+        private bool _voiceActive;
         public bool VoiceActive
         {
-            get => Settings.VoiceActive;
+            get => _voiceActive;
             set
             {
+                if ( _voiceActive == value){return;}
+                _voiceActive = value;
                 Settings.VoiceActive = value;
-                Synthesizer.VoiceActive = value;
-                Synthesizer.Speak(Application.Current.Resources["vceActive"].ToString());
+                if (Synthesizer.LastError != null)
+                {
+                    OpenDialog(Synthesizer.LastError.Message);
+                    Synthesizer.LastError = null;
+                }
+                else
+                {
+                    if (value) { Synthesizer.Speak(Application.Current.Resources["vceActive"].ToString()); }
+                }
                 OnPropertyChanged();
-                RaisePropertyChanged("VoiceActive");
             }
         }
 

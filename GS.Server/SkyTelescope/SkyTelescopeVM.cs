@@ -100,7 +100,7 @@ namespace GS.Server.SkyTelescope
                     SkySystem.StaticPropertyChanged += PropertyChangedSkySystem;
                     SkySettings.StaticPropertyChanged += PropertyChangedSkySettings;
                     Shared.Settings.StaticPropertyChanged += PropertyChangedMonitorLog;
-                    Synthesizer.StaticPropertyChanged += PropertyChangedSynthesizer;
+                    //Synthesizer.StaticPropertyChanged += PropertyChangedSynthesizer;
                     Settings.Settings.StaticPropertyChanged += PropertyChangedSettings;
                     GlobalStopOn = SkySettings.GlobalStopOn;
 
@@ -130,8 +130,8 @@ namespace GS.Server.SkyTelescope
                     // defaults
                     AtPark = SkyServer.AtPark;
                     ConnectButtonContent = Application.Current.Resources["skyConnect"].ToString();
-                    VoiceState = Synthesizer.VoiceActive;
-                    ParkSelection = ParkPositions.FirstOrDefault();
+                    VoiceState = Settings.Settings.VoiceActive;
+                    ParkSelection = AtPark ? SkyServer.GetStoredParkPosition() : ParkPositions.FirstOrDefault();
                     ParkSelectionSetting = ParkPositions.FirstOrDefault();
                     SetHCFlipsVisibility();
                     RightAscension = "00h 00m 00s";
@@ -482,40 +482,40 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        /// <summary>
-        /// Used in the bottom bar to show the monitor is running
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void PropertyChangedSynthesizer(object sender, PropertyChangedEventArgs e)
-        {
-            try
-            {
-                switch (e.PropertyName)
-                {
-                    case "VoiceActive":
-                        VoiceState = Synthesizer.VoiceActive;
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}|{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
+        ///// <summary>
+        ///// Used in the bottom bar to show the monitor is running
+        ///// </summary>
+        ///// <param name="sender"></param>
+        ///// <param name="e"></param>
+        //private void PropertyChangedSynthesizer(object sender, PropertyChangedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        switch (e.PropertyName)
+        //        {
+        //            case "VoiceActive":
+        //                VoiceState = Synthesizer.VoiceActive;
+        //                break;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var monitorItem = new MonitorEntry
+        //        {
+        //            Datetime = HiResDateTime.UtcNow,
+        //            Device = MonitorDevice.Telescope,
+        //            Category = MonitorCategory.Interface,
+        //            Type = MonitorType.Error,
+        //            Method = MethodBase.GetCurrentMethod()?.Name,
+        //            Thread = Thread.CurrentThread.ManagedThreadId,
+        //            Message = $"{ex.Message}|{ex.StackTrace}"
+        //        };
+        //        MonitorLog.LogToMonitor(monitorItem);
 
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
+        //        SkyServer.AlertState = true;
+        //        OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+        //    }
+        //}
 
         /// <summary>
         /// Property changes from system
@@ -615,6 +615,9 @@ namespace GS.Server.SkyTelescope
                             case "AccentColor":
                             case "ModelType":
                                 LoadGEM();
+                                break;
+                            case "VoiceActive":
+                                VoiceState = Settings.Settings.VoiceActive;
                                 break;
                         }
                     });
@@ -4033,21 +4036,6 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    //switch (SkySettings.Mount)
-                    //{
-                    //    case MountType.Simulator:
-                    //        break;
-                    //    case MountType.SkyWatcher:
-                    //        if (ComPort == 0)
-                    //        {
-                    //            OpenDialog($"Check Com Port");
-                    //            return;
-                    //        }
-                    //        break;
-                    //    default:
-                    //        throw new ArgumentOutOfRangeException();
-                    //}
-
                     if (SkyServer.IsAutoHomeRunning)
                     {
                         StopAutoHomeDialog();
@@ -4069,8 +4057,12 @@ namespace GS.Server.SkyTelescope
 
         private void HomePositionCheck()
         {
-            if (SkyServer.AtPark) return;
-            if (!SkySettings.HomeWarning) return;
+            if (SkyServer.AtPark)
+            {
+                ParkSelection = SkyServer.ParkSelected;
+                return;
+            }
+            if (!SkySettings.HomeWarning){return;}
 
             string msg;
             switch (SkySettings.Mount)

@@ -47,7 +47,7 @@ namespace GS.Server.SkyTelescope
             {
                 var notAlreadyPresent = ConnectStates.TryAdd(id, true);
 
-                if (Connected) if (!SkyServer.IsMountRunning) SkyServer.IsMountRunning = true;
+                if (Connected){ if (!SkyServer.IsMountRunning) {SkyServer.IsMountRunning = true;}}
 
                 var monitorItem = new MonitorEntry
                 {

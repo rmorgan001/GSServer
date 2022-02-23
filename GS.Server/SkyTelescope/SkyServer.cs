@@ -2595,6 +2595,12 @@ namespace GS.Server.SkyTelescope
             return rate;
         }
 
+        public static ParkPosition GetStoredParkPosition()
+        {
+            var p = new ParkPosition { Name = SkySettings.ParkName, X = SkySettings.ParkAxisX, Y = SkySettings.ParkAxisY };
+            return p;
+        }
+
         /// <summary>
         /// Used when the mount is first turned on and the instance is created
         /// </summary>
@@ -2637,8 +2643,7 @@ namespace GS.Server.SkyTelescope
                 }
 
                 positions = Axes.AxesAppToMount(new[] { SkySettings.ParkAxisX, SkySettings.ParkAxisY });
-                var p = new ParkPosition { Name = SkySettings.ParkName, X = SkySettings.ParkAxisX, Y = SkySettings.ParkAxisY };
-                ParkSelected = p;
+                ParkSelected = GetStoredParkPosition();
 
                 monitorItem = new MonitorEntry
                 {
@@ -3502,8 +3507,8 @@ namespace GS.Server.SkyTelescope
                         //is mount parked, if so set to the default position
                         if (AtPark)
                         {
-                            _ = new SkySetAxisPosition(0, AxisId.Axis1, positions[0]);
-                            _ = new SkySetAxisPosition(0, AxisId.Axis2, positions[1]);
+                            _ = new CmdAxisToDegrees(0, Axis.Axis1, positions[0]);
+                            _ = new CmdAxisToDegrees(0, Axis.Axis2, positions[1]);
                             positionsSet = true;
                             break;
                         }

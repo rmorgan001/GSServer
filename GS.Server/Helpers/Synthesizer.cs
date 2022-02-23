@@ -11,16 +11,15 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+    along with this program.  If not, see <https://www.gnu.org/licenses/>. 
  */
 using GS.Principles;
 using GS.Shared;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Speech.Synthesis;
+//using Microsoft.Speech.Synthesis;
 using System.Threading;
 
 namespace GS.Server.Helpers
@@ -28,197 +27,186 @@ namespace GS.Server.Helpers
     internal static class Synthesizer
     {
         private static SpeechSynthesizer _synthesizer;
-        public static event PropertyChangedEventHandler StaticPropertyChanged;
+        //public static event PropertyChangedEventHandler StaticPropertyChanged;
 
+        public static Exception LastError { get; set; }
         private static IList<string> VoiceNames;
         private static string VoiceName => Settings.Settings.VoiceName;
         private static int Rate { get; set; }
         private static int Volume => Settings.Settings.VoiceVolume;
-        internal static bool VoiceActive
+        private static bool VoiceActive
         {
             get => Settings.Settings.VoiceActive;
-            set
-            {
-                Settings.Settings.VoiceActive = value;
-                if (value)
-                {
-                    if (!VoiceValid)
-                    {
-                        LoadSpeechSynthesizer();
-                    }
-                    else
-                    {
-                        var monitorItem = new MonitorEntry
-                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Invalid voice name" };
-                        MonitorLog.LogToMonitor(monitorItem);
-                    }
-                }
-                else
-                {
-                    UnLoadSpeechSynthesizer();
-                }
-
-
-                OnStaticPropertyChanged();
-            }
+            set => Settings.Settings.VoiceActive = value;
         }
-        private static bool _voicePause;
-        internal static bool VoicePause
-        {
-            get => _voicePause;
-            set
-            {
-                if (_voicePause == value) return;
-                _voicePause = value;
-                OnStaticPropertyChanged();
-            }
-        }
-        private static bool VoiceValid
-        {
-            get
-            {
-                if (VoiceName != null && VoiceName.ToLower() != "none" && VoiceNames != null)
-                {
-                    return VoiceNames.Contains(VoiceName);
-                }
-                return false;
-            }
-        }
+        public static bool VoicePause { get; set; }
+        //private static bool VoiceValid
+        //{
+        //    get
+        //    {
+        //        if (VoiceName != null && VoiceName.ToLower() != "none" && VoiceNames != null)
+        //        {
+        //            return VoiceNames.Contains(VoiceName);
+        //        }
+        //        return false;
+        //    }
+        //}
 
-        #region Synthesizer events
+        //#region Synthesizer events
 
-        private static void Synthesizer_StateChanged(object sender, StateChangedEventArgs e)
-        {
+        //private static void Synthesizer_StateChanged(object sender, StateChangedEventArgs e)
+        //{
+        //}
 
-        }
+        //private static void Synthesizer_SpeakStarted(object sender, SpeakStartedEventArgs e)
+        //{
+        //}
 
-        private static void Synthesizer_SpeakStarted(object sender, SpeakStartedEventArgs e)
-        {
+        //private static void Synthesizer_SpeakProgress(object sender, SpeakProgressEventArgs e)
+        //{
+        //}
 
-        }
+        //private static void Synthesizer_SpeakCompleted(object sender, SpeakCompletedEventArgs e)
+        //{
+        //}
 
-        private static void Synthesizer_SpeakProgress(object sender, SpeakProgressEventArgs e)
-        {
-
-        }
-
-        private static void Synthesizer_SpeakCompleted(object sender, SpeakCompletedEventArgs e)
-        {
-
-        }
-
-        #endregion
+        //#endregion
 
         static Synthesizer()
         {
-            LoadSpeechSynthesizer();
+            try
+            {
+                LastError = null;
+                LoadSpeechSynthesizer();
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
+                MonitorLog.LogToMonitor(monitorItem);
+                LastError = ex;
+                VoiceActive = false;
+            }
         }
-
         private static void LoadSpeechSynthesizer()
         {
-            try
+            if (_synthesizer == null)
             {
-                if (_synthesizer != null) return;
-
-                Rate = 0;
                 _synthesizer = new SpeechSynthesizer();
-                _synthesizer.StateChanged += Synthesizer_StateChanged;
-                _synthesizer.SpeakStarted += Synthesizer_SpeakStarted;
-                _synthesizer.SpeakProgress += Synthesizer_SpeakProgress;
-                _synthesizer.SpeakCompleted += Synthesizer_SpeakCompleted;
-                GetVoices();
-                VoicePause = false;
             }
-            catch (Exception e)
-            {
-                var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{e.Message}|{e.StackTrace}" };
-                MonitorLog.LogToMonitor(monitorItem);
-            }
+
+            Rate = 0;
+            //_synthesizer.StateChanged += Synthesizer_StateChanged;
+            //_synthesizer.SpeakStarted += Synthesizer_SpeakStarted;
+            //_synthesizer.SpeakProgress += Synthesizer_SpeakProgress;
+            //_synthesizer.SpeakCompleted += Synthesizer_SpeakCompleted;
+            GetVoices();
+            VoicePause = false;
         }
-
-        private static void UnLoadSpeechSynthesizer()
-        {
-            try
-            {
-                if (_synthesizer == null) return;
-                _synthesizer.StateChanged -= Synthesizer_StateChanged;
-                _synthesizer.SpeakStarted -= Synthesizer_SpeakStarted;
-                _synthesizer.SpeakProgress -= Synthesizer_SpeakProgress;
-                _synthesizer.SpeakCompleted -= Synthesizer_SpeakCompleted;
-            }
-            catch (Exception e)
-            {
-                _synthesizer = null;
-                var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{e.Message}|{e.StackTrace}" };
-                MonitorLog.LogToMonitor(monitorItem);
-            }
-
-        }
-
         public static void Speak(string text)
         {
             try
             {
-                if (!VoiceValid) return;
-                if (!VoiceActive) return;
-                if (VoicePause) return;
+                LastError = null;
+                //if (!VoiceValid){return;}
+                if (!VoiceActive){return;}
+                if (VoicePause){return;}
                 _synthesizer.SelectVoice(VoiceName);
                 _synthesizer.Rate = Rate;
                 _synthesizer.Volume = Volume;
                 _synthesizer.SpeakAsyncCancelAll();
                 _synthesizer.SpeakAsync(text);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                VoiceActive = false;
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{text}|{e.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{text}| {ex.Message}| {ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
-            }
-        }
-        public static void SpeakBool(string text, bool bol)
-        {
-            try
-            {
-                if (!VoiceValid) return;
-                if (!VoiceActive) return;
-                if (VoicePause) return;
-                _synthesizer.SelectVoice(VoiceName);
-                _synthesizer.Rate = Rate;
-                _synthesizer.Volume = Volume;
-                var b = bol ? " On" : " Off";
-                _synthesizer.SpeakAsyncCancelAll();
-                _synthesizer.SpeakAsync(text + b);
-            }
-            catch (Exception e)
-            {
+                LastError = ex;
                 VoiceActive = false;
-                var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{text}|{bol}|{e.Message}" };
-                MonitorLog.LogToMonitor(monitorItem);
             }
-
         }
         public static IList<string> GetVoices()
         {
-            VoiceNames = new List<string>();
-            if (_synthesizer == null) return VoiceNames;
-            var voices = _synthesizer.GetInstalledVoices();
-            foreach (var voice in voices)
+            try
             {
-                VoiceNames.Add(voice.VoiceInfo.Name);
+                VoiceNames = new List<string>();
+                if (_synthesizer == null) { _synthesizer = new SpeechSynthesizer(); }
+                var voices = _synthesizer.GetInstalledVoices();
+                foreach (var voice in voices)
+                {
+                    if (voice.Enabled)
+                    {
+                        VoiceNames.Add(voice.VoiceInfo.Name);
+                    }
+                }
+                if (voices.Count == 0) { VoiceActive = false; }
+                return VoiceNames;
             }
-            return VoiceNames;
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}| {ex.StackTrace}" };
+                MonitorLog.LogToMonitor(monitorItem);
+                //LastError = ex;
+                //VoiceActive = false;
+                return null;
+            }
         }
-        /// <summary>
-        /// called from the setter property.  Used to update UI elements.  property name is not required
-        /// </summary>
-        /// <param name="propertyName"></param>
-        private static void OnStaticPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));
-        }
+
+        //private static void UnLoadSpeechSynthesizer()
+        //{
+        //    try
+        //    {
+        //        if (_synthesizer == null) return;
+        //        // _synthesizer.StateChanged -= Synthesizer_StateChanged;
+        //        // _synthesizer.SpeakStarted -= Synthesizer_SpeakStarted;
+        //        // _synthesizer.SpeakProgress -= Synthesizer_SpeakProgress;
+        //        // _synthesizer.SpeakCompleted -= Synthesizer_SpeakCompleted;
+        //        _synthesizer.Dispose();
+        //        _synthesizer = null;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        _synthesizer = null;
+        //        var monitorItem = new MonitorEntry
+        //            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{e.Message}|{e.StackTrace}" };
+        //        MonitorLog.LogToMonitor(monitorItem);
+        //    }
+
+        //}
+
+        //public static void SpeakBool(string text, bool bol)
+        //{
+        //    try
+        //    {
+        //        if (!VoiceValid) return;
+        //        if (!VoiceActive) return;
+        //        if (VoicePause) return;
+        //        _synthesizer.SelectVoice(VoiceName);
+        //        _synthesizer.Rate = Rate;
+        //        _synthesizer.Volume = Volume;
+        //        var b = bol ? " On" : " Off";
+        //        _synthesizer.SpeakAsyncCancelAll();
+        //        _synthesizer.SpeakAsync(text + b);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        VoiceActive = false;
+        //        var monitorItem = new MonitorEntry
+        //        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{text}|{bol}|{e.Message}" };
+        //        MonitorLog.LogToMonitor(monitorItem);
+        //    }
+
+        //}
+
+        ///// <summary>
+        ///// called from the setter property.  Used to update UI elements.  property name is not required
+        ///// </summary>
+        ///// <param name="propertyName"></param>
+        //private static void OnStaticPropertyChanged([CallerMemberName] string propertyName = null)
+        //{
+        //    StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));
+        //}
     }
 }
