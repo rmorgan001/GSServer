@@ -23,6 +23,7 @@
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
+                <RowDefinition />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
@@ -40,9 +41,10 @@
             <Label Margin="-3" Grid.Row="8" Grid.Column="0" Content="{StaticResource mntCustomOffsetRa}" HorizontalAlignment="Right" />
             <Label Margin="-3" Grid.Row="9" Grid.Column="0" Content="{StaticResource mntCustomOffsetDec}" HorizontalAlignment="Right" />
             <Label Margin="-3" Grid.Row="10" Grid.Column="0" Content="{StaticResource mntPEC}" HorizontalAlignment="Right" />
-            <Label Margin="-3" Grid.Row="11" Grid.Column="0" Content="{StaticResource mntHomeSensor}" HorizontalAlignment="Right" />
-            <Label Margin="-3" Grid.Row="12" Grid.Column="0" Content="{StaticResource mntRaSteps}" HorizontalAlignment="Right" />
-            <Label Margin="-3" Grid.Row="13" Grid.Column="0" Content="{StaticResource mntDecSteps}" HorizontalAlignment="Right" />
+            <Label Margin="-3" Grid.Row="11" Grid.Column="0" Content="{StaticResource mntPolarLed}" HorizontalAlignment="Right" />
+            <Label Margin="-3" Grid.Row="12" Grid.Column="0" Content="{StaticResource mntHomeSensor}" HorizontalAlignment="Right" />
+            <Label Margin="-3" Grid.Row="13" Grid.Column="0" Content="{StaticResource mntRaSteps}" HorizontalAlignment="Right" />
+            <Label Margin="-3" Grid.Row="14" Grid.Column="0" Content="{StaticResource mntDecSteps}" HorizontalAlignment="Right" />
             <Label Margin="-3" Grid.Row="0" Grid.Column="2" Content="{Binding MountName}" HorizontalAlignment="Left" />
             <Label Margin="-3" Grid.Row="1" Grid.Column="2" Content="{Binding MountVersion}" HorizontalAlignment="Left" />
             <Label Margin="-3" Grid.Row="2" Grid.Column="2" Content="{Binding RaSteps}" HorizontalAlignment="Left" />
@@ -54,10 +56,11 @@
             <Label Margin="-3" Grid.Row="8" Grid.Column="2" Content="{Binding RaCustomOffset}" HorizontalAlignment="Left" />
             <Label Margin="-3" Grid.Row="9" Grid.Column="2" Content="{Binding DecCustomOffset}" HorizontalAlignment="Left" />
             <Label Margin="-3" Grid.Row="10" Grid.Column="2" Content="{Binding CanPec}" HorizontalAlignment="Left" />
-            <Label Margin="-3" Grid.Row="11" Grid.Column="2" Content="{Binding CanHome}" HorizontalAlignment="Left" />
-            <Label Margin="-3" Grid.Row="12" Grid.Column="2" Content="{Binding RaArcSec}" HorizontalAlignment="Left" />
-            <Label Margin="-3" Grid.Row="13" Grid.Column="2" Content="{Binding DecArcSec}" HorizontalAlignment="Left" />
-            <Button IsDefault="True" IsCancel="True" Grid.Row="14" Grid.Column="0" Grid.ColumnSpan="3"  Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding OkMountInfoDialogCmd}" Content="{StaticResource diaOk}" />
+            <Label Margin="-3" Grid.Row="11" Grid.Column="2" Content="{Binding CanPolarLed}" HorizontalAlignment="Left" />
+            <Label Margin="-3" Grid.Row="12" Grid.Column="2" Content="{Binding CanHome}" HorizontalAlignment="Left" />
+            <Label Margin="-3" Grid.Row="13" Grid.Column="2" Content="{Binding RaArcSec}" HorizontalAlignment="Left" />
+            <Label Margin="-3" Grid.Row="14" Grid.Column="2" Content="{Binding DecArcSec}" HorizontalAlignment="Left" />
+            <Button IsDefault="True" IsCancel="True" Grid.Row="15" Grid.Column="0" Grid.ColumnSpan="3"  Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding OkMountInfoDialogCmd}" Content="{StaticResource diaOk}" />
         </Grid>
     </GroupBox>
     </UserControl>

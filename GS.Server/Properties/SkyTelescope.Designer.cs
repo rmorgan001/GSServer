@@ -1522,5 +1522,17 @@ namespace GS.Server.Properties {
                 this["HcFlipNS"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("255")]
+        public int PolarLedLevel {
+            get {
+                return ((int)(this["PolarLedLevel"]));
+            }
+            set {
+                this["PolarLedLevel"] = value;
+            }
+        }
     }
 }

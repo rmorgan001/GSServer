@@ -1395,6 +1395,20 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static int _polarLedLevel;
+        public static int PolarLedLevel
+        {
+            get => _polarLedLevel;
+            set
+            {
+                if (PolarLedLevel == value) return;
+                _polarLedLevel = value;
+                Properties.SkyTelescope.Default.PolarLedLevel = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+        
         private static int _raBacklash;
         public static int RaBacklash
         {
@@ -1841,6 +1855,7 @@ namespace GS.Server.SkyTelescope
             PPecOn = Properties.SkyTelescope.Default.PpecOn;
             PecWormFile = Properties.SkyTelescope.Default.PecWormFile;
             Pec360File = Properties.SkyTelescope.Default.Pec360File;
+            PolarLedLevel = Properties.SkyTelescope.Default.PolarLedLevel;
             RaBacklash = Properties.SkyTelescope.Default.RaBacklash;
             ReadTimeout = Properties.SkyTelescope.Default.ReadTimeout;
             Refraction = Properties.SkyTelescope.Default.Refraction;

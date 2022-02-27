@@ -81,6 +81,7 @@ namespace GS.Server.SkyTelescope
     {
         AlternatingPpec,
         CanPpec,
+        CanPolarLed,
         CanHomeSensor,
         DecPulseToGoTo,
         Encoders,
@@ -98,6 +99,7 @@ namespace GS.Server.SkyTelescope
         MonitorPulse,
         Pec,
         PecTraining,
+        PolarLedLevel,
         Capabilities,
         SetHomePositions,
         SetSt4Guiderate,

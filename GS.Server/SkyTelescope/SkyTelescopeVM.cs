@@ -116,6 +116,7 @@ namespace GS.Server.SkyTelescope
                     CustomMountOffset = new List<int>(Enumerable.Range(-5, 11));
                     Hours = new List<int>(Enumerable.Range(0, 24));
                     Range60 = new List<int>(Enumerable.Range(0, 60));
+                    PolarLedLevels = new List<int>(Enumerable.Range(0, 256));
                     St4GuideRates = new List<double> { 1.0, 0.75, 0.50, 0.25, 0.125 };
                     Temperatures = new List<double>(Numbers.InclusiveRange(-50, 60, 1.0));
                     AutoHomeLimits = new List<int>(Enumerable.Range(20, 160));
@@ -143,6 +144,7 @@ namespace GS.Server.SkyTelescope
                     SetTrackingIcon(SkySettings.TrackingRate);
                     SetParkLimitSelection(SkySettings.ParkLimitName);
                     TrackingRate = SkySettings.TrackingRate;
+                    PolarLedLevel = SkySettings.PolarLedLevel;
 
                     HcWinVisibility = true;
                     ModelWinVisibility = true;
@@ -151,6 +153,7 @@ namespace GS.Server.SkyTelescope
                     PecShow = SkyServer.PecShow;
                     SchedulerShow = true;
                     CustomGearing = SkySettings.CustomGearing;
+                    PolarLedLevelEnabled = true;
                 }
 
                 // check to make sure window is visible then connect if requested.
@@ -1203,6 +1206,41 @@ namespace GS.Server.SkyTelescope
             set
             {
                 SkySettings.Elevation = value;
+                OnPropertyChanged();
+            }
+        }
+        public IList<int> PolarLedLevels { get; }
+        public int PolarLedLevel
+        {
+            get => SkySettings.PolarLedLevel;
+            set
+            {
+                SkySettings.PolarLedLevel = value;
+                if (SkyServer.IsMountRunning)
+                {
+                    switch (SkySettings.Mount)
+                    {
+                        case MountType.Simulator:
+                            break;
+                        case MountType.SkyWatcher:
+                            SkyServer.SkyTasks(MountTaskName.PolarLedLevel);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _polarLedLevelEnabled;
+        public bool PolarLedLevelEnabled
+        {
+            get => _polarLedLevelEnabled;
+            set
+            {
+                if (_polarLedLevelEnabled == value){return;}
+                _polarLedLevelEnabled = value;
                 OnPropertyChanged();
             }
         }
@@ -4044,10 +4082,15 @@ namespace GS.Server.SkyTelescope
                     SkyServer.IsMountRunning = !SkyServer.IsMountRunning;
                 }
 
-                if (!SkyServer.IsMountRunning) return;
+                if (!SkyServer.IsMountRunning)
+                {
+                    PolarLedLevelEnabled = true;
+                    return;
+                }
                 WarningState = false;
                 AlertState = false;
                 HomePositionCheck();
+                PolarLedLevelEnabled = SkyServer.CanPolarLed;
             }
             catch (Exception ex)
             {
@@ -7531,6 +7574,7 @@ namespace GS.Server.SkyTelescope
         public string RaCustomOffset { get; private set; }
         public string DecCustomOffset { get; private set; }
         public string CanPec { get; private set; }
+        public string CanPolarLed { get; private set; }
         public string CanHome { get; private set; }
         public string RaArcSec { get; private set; }
         public string DecArcSec { get; private set; }
@@ -7574,6 +7618,7 @@ namespace GS.Server.SkyTelescope
                     RaCustomOffset = SkyServer.TrackingOffsetRaRate.ToString(CultureInfo.InvariantCulture);
                     DecCustomOffset = SkyServer.TrackingOffsetDecRate.ToString(CultureInfo.InvariantCulture);
                     CanPec = SupportedBol(SkyServer.CanPPec);
+                    CanPolarLed = SupportedBol(SkyServer.CanPolarLed);
                     CanHome = SupportedBol(SkyServer.CanHomeSensor);
                     RaArcSec = Math.Round(SkyServer.StepsPerRevolution[0] / 360.0 / 3600, 2).ToString(CultureInfo.InvariantCulture);
                     DecArcSec = Math.Round(SkyServer.StepsPerRevolution[1] / 360.0 / 3600, 2).ToString(CultureInfo.InvariantCulture);
@@ -7588,11 +7633,11 @@ namespace GS.Server.SkyTelescope
                     OnPropertyChanged($"DecFreq");
                     OnPropertyChanged($"RaCustomOffset");
                     OnPropertyChanged($"DecCustomOffset");
+                    OnPropertyChanged($"CanPolarLed");
                     OnPropertyChanged($"CanPec");
                     OnPropertyChanged($"CanHome");
                     OnPropertyChanged($"RaArcSec");
                     OnPropertyChanged($"DecArcSec");
-
                     IsDialogOpen = true;
                 }
             }

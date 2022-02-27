@@ -677,5 +677,6 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="focuserReverseDirectionTooltip">Cochez cette case pour inverser la direction de la mise au point lorsque les boutons sont enfoncés.</system:String>
     <system:String x:Key="focuserReverseDirection">Direction inverse</system:String>
 
-
+    <system:String x:Key="mntPolarLed">LED Polaire ::</system:String>
+    <system:String x:Key="skyPolarLedLevel">Niveau LED Polaire</system:String>
 </ResourceDictionary>

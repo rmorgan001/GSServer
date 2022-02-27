@@ -714,6 +714,17 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
+        /// V Set Polar LED brightness
+        /// </summary>
+        /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
+        /// <param name="level">x00 to xFF</param>
+        internal void SetPolarLedLevel(AxisId axis, int level)
+        {
+            var szCmd = LongToHex(level);
+            CmdToAxis(axis,'V', szCmd);
+        }
+
+        /// <summary>
         /// Wx01 on/off pPEC train
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>

@@ -183,6 +183,7 @@ namespace GS.Server.SkyTelescope
         private static bool _openSetupDialog;
         private static ParkPosition _parkSelected;
         private static bool _canPPec;
+        private static bool _canPolarLed;
         private static Vector _raDec;
         private static Vector _rateAxes;
         private static Vector _rateRaDec;
@@ -1413,6 +1414,9 @@ namespace GS.Server.SkyTelescope
                         case MountTaskName.CanPpec:
                             CanPPec = false;
                             break;
+                        case MountTaskName.CanPolarLed:
+                            CanPolarLed = false;
+                            break;
                         case MountTaskName.CanHomeSensor:
                             var canHomeCmda = new CmdCapabilities(MountQueue.NewId);
                             var mountinfo = (MountInfo)MountQueue.GetCommandResult(canHomeCmda).Result;
@@ -1841,6 +1845,10 @@ namespace GS.Server.SkyTelescope
                             var SkyMountCanPpec = new SkyCanPPec(SkyQueue.NewId);
                             CanPPec = (bool)SkyQueue.GetCommandResult(SkyMountCanPpec).Result;
                             break;
+                        case MountTaskName.CanPolarLed:
+                            var SkyCanPolarLed = new SkyCanPolarLed(SkyQueue.NewId);
+                            CanPolarLed = (bool)SkyQueue.GetCommandResult(SkyCanPolarLed).Result;
+                            break;
                         case MountTaskName.CanHomeSensor:
                             var canHomeSky = new SkyCanHomeSensors(SkyQueue.NewId);
                             CanHomeSensor = (bool)SkyQueue.GetCommandResult(canHomeSky).Result;
@@ -1893,6 +1901,10 @@ namespace GS.Server.SkyTelescope
                                 break;
                             }
                             if (ppeconstr.Contains("!")){SkySettings.PPecOn = false; }
+                            break;
+                        case MountTaskName.PolarLedLevel:
+                            if (SkySettings.PolarLedLevel < 0 || SkySettings.PolarLedLevel > 255){return;}
+                            _ = new SkySetPolarLedLevel(0, AxisId.Axis1, SkySettings.PolarLedLevel);
                             break;
                         case MountTaskName.StopAxes:
                             _ = new SkyAxisStop(0, AxisId.Axis1);
@@ -3549,6 +3561,8 @@ namespace GS.Server.SkyTelescope
                     SkyTasks(MountTaskName.StepTimeFreq);
                     SkyTasks(MountTaskName.GetOneStepIndicators);
                     SkyTasks(MountTaskName.CanPpec);
+                    SkyTasks(MountTaskName.CanPolarLed);
+                    SkyTasks(MountTaskName.PolarLedLevel);
                     SkyTasks(MountTaskName.CanHomeSensor);
                     SkyTasks(MountTaskName.DecPulseToGoTo);
                     SkyTasks(MountTaskName.AlternatingPpec);
@@ -4929,6 +4943,17 @@ namespace GS.Server.SkyTelescope
             {
                 if (_canPPec == value) return;
                 _canPPec = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
+        public static bool CanPolarLed
+        {
+            get => _canPolarLed;
+            private set
+            {
+                if (_canPolarLed == value) return;
+                _canPolarLed = value;
                 OnStaticPropertyChanged();
             }
         }

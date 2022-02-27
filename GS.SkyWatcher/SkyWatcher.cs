@@ -964,6 +964,11 @@ namespace GS.SkyWatcher
             _commands.SetTargetPosition(axis, position);
         }
 
+        internal void SetPolarLedLevel(AxisId axis, int  level)
+        {
+            if (CanPolarLed){_commands.SetPolarLedLevel(axis, level);}
+        }
+
         /// <summary>
         /// Store the rates to use later 
         /// </summary>

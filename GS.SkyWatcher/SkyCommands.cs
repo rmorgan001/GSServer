@@ -2080,6 +2080,42 @@ namespace GS.SkyWatcher
         }
     }
 
+    public class SkySetPolarLedLevel : ISkyCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; }
+        private readonly AxisId _axis;
+        private readonly int _level;
+
+        public SkySetPolarLedLevel(long id, AxisId axis, int level)
+        {
+            Id = id;
+            _axis = axis;
+            _level = level;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            Successful = false;
+            Result = null;
+            SkyQueue.AddCommand(this);
+        }
+
+        public void Execute(SkyWatcher skyWatcher)
+        {
+            try
+            {
+                skyWatcher.SetPolarLedLevel(_axis, _level);
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
     public class SkySetFullCurrent : ISkyCommand
     {
         public long Id { get; }

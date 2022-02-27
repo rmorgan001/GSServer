@@ -680,5 +680,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="focuserReverseDirectionTooltip">Check this box to reverse the direction of the focuser when the buttons are pressed.</system:String>
     <system:String x:Key="focuserReverseDirection">Reverse Direction</system:String>
 
+    <system:String x:Key="mntPolarLed">Polar LED:</system:String>
+    <system:String x:Key="skyPolarLedLevel">Polar LED Level</system:String>
+
 </ResourceDictionary>
  
