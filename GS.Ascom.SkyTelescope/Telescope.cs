@@ -45,6 +45,7 @@ namespace ASCOM.GS.Sky.Telescope
         private TrackingRates _mTrackingRates;
         private TrackingRatesSimple _mTrackingRatesSimple;
         private Util _util;
+        private CommandStrings _mCommandStrings;
         private readonly long _objectId;
 
         /// <summary>
@@ -535,7 +536,32 @@ namespace ASCOM.GS.Sky.Telescope
 
         public string CommandString(string Command, bool Raw)
         {
-            throw new MethodNotImplementedException("CommandString");
+            try
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{Command},{Raw}") };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                if (string.IsNullOrWhiteSpace(Command)) { throw new MethodNotImplementedException("CommandString"); }
+
+                if (_mCommandStrings == null) { _mCommandStrings = new CommandStrings(); }
+                return CommandStrings.ProcessCommand(Command, Raw);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Driver,
+                    Type = MonitorType.Warning,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = FormattableString.Invariant($"{ex.Message},{ex.StackTrace}")
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                throw;
+            }
         }
 
         public bool Connected
@@ -1567,8 +1593,7 @@ namespace ASCOM.GS.Sky.Telescope
 
             throw new InvalidValueException("TrackingRate invalid");
         }
-
-
+        
         private void CheckRate(TelescopeAxes axis, double rate)
         {
             var monitorItem = new MonitorEntry

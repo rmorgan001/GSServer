@@ -103,7 +103,7 @@ namespace GS.Server.Snap
                         Snap2Trigger(false);
                     }
 
-                    if (!SkyServer.CanSnapPort1 && !SkyServer.CanSnapPort2)
+                    if (!SkyServer.SnapPort1Result && !SkyServer.SnapPort2Result)
                     {
                         OpenDialog($"{Application.Current.Resources["snapSupport"]}", $"{Application.Current.Resources["exError"]}");
                         _snapEnabled = false;
@@ -116,23 +116,23 @@ namespace GS.Server.Snap
                     ctsSnap1?.Cancel();
                     ctsSnap2?.Cancel();
                     Thread.Sleep(500);
-                    SkyServer.CanSnapPort1 = false;
-                    SkyServer.CanSnapPort2 = false;
+                    SkyServer.SnapPort1Result = false;
+                    SkyServer.SnapPort2Result = false;
                 }
                 SetDefaults();
                 _snapEnabled = value;
                 OnPropertyChanged();
 
                var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Snap|{value}|{SkyServer.CanSnapPort1}|{SkyServer.CanSnapPort2}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Snap|{value}|{SkyServer.SnapPort1Result}|{SkyServer.SnapPort2Result}" };
                 MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
         private void SetDefaults()
         {
-            Snap1Enabled = SkyServer.CanSnapPort1;
-            Snap2Enabled = SkyServer.CanSnapPort2;
+            Snap1Enabled = SkyServer.SnapPort1Result;
+            Snap2Enabled = SkyServer.SnapPort2Result;
 
             Snap1Loops = 1;
             Snap2Loops = 1;
@@ -165,11 +165,11 @@ namespace GS.Server.Snap
                              SnapEnabled = false;
                          }
                          break;
-                     case "CanSnapPort1":
-                         Snap1Enabled = SkyServer.CanSnapPort1;
+                     case "SnapPort1Result":
+                         Snap1Enabled = SkyServer.SnapPort1Result;
                          break;
-                     case "CanSnapPort2":
-                         Snap2Enabled = SkyServer.CanSnapPort2;
+                     case "SnapPort2Result":
+                         Snap2Enabled = SkyServer.SnapPort2Result;
                          break;
                  }
              });
@@ -338,7 +338,7 @@ namespace GS.Server.Snap
                             Type = MonitorType.Information,
                             Method = MethodBase.GetCurrentMethod()?.Name,
                             Thread = Thread.CurrentThread.ManagedThreadId,
-                            Message = $"Snap 1|{SkyServer.CanSnapPort1}|{Snap1Timer}|{Snap1Loops}|{Snap1Delay}"
+                            Message = $"Snap 1|{SkyServer.SnapPort1Result}|{Snap1Timer}|{Snap1Loops}|{Snap1Delay}"
                         };
                         MonitorLog.LogToMonitor(monitorItem);
                         Snap1LoopAsync();
@@ -705,7 +705,7 @@ namespace GS.Server.Snap
                             Type = MonitorType.Information,
                             Method = MethodBase.GetCurrentMethod()?.Name,
                             Thread = Thread.CurrentThread.ManagedThreadId,
-                            Message = $"Snap 2|{SkyServer.CanSnapPort2}|{Snap2Timer}|{Snap2Loops}|{Snap2Delay}"
+                            Message = $"Snap 2|{SkyServer.SnapPort2Result}|{Snap2Timer}|{Snap2Loops}|{Snap2Delay}"
                         };
                         MonitorLog.LogToMonitor(monitorItem);
                         Snap2LoopAsync();

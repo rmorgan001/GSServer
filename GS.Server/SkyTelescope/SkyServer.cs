@@ -195,8 +195,8 @@ namespace GS.Server.SkyTelescope
         private static Vector _targetRaDec;
         private static TrackingMode _trackingMode;
         private static bool _tracking; //off
-        private static bool _canSnapPort1;
-        private static bool _canSnapPort2;
+        private static bool _snapPort1Result;
+        private static bool _snapPort2Result;
         #endregion
 
         /// <summary>
@@ -1038,24 +1038,24 @@ namespace GS.Server.SkyTelescope
 
         public static bool SnapPort2 { get; set; }
 
-        public static bool CanSnapPort1
+        public static bool SnapPort1Result
         {
-            get => _canSnapPort1;
+            get => _snapPort1Result;
             set
             {
-                if (_canSnapPort1 == value) { return; }
-                _canSnapPort1 = value;
+                if (_snapPort1Result == value) { return; }
+                _snapPort1Result = value;
                 OnStaticPropertyChanged();
             }
         }
 
-        public static bool CanSnapPort2
+        public static bool SnapPort2Result
         {
-            get => _canSnapPort2;
+            get => _snapPort2Result;
             set
             {
-                if (_canSnapPort2 == value) { return; }
-                _canSnapPort2 = value;
+                if (_snapPort2Result == value) { return; }
+                _snapPort2Result = value;
                 OnStaticPropertyChanged();
             }
         }
@@ -1470,11 +1470,11 @@ namespace GS.Server.SkyTelescope
                             break;
                         case MountTaskName.SetSnapPort1:
                             _ = new CmdSnapPort(0, 1, SnapPort1);
-                            CanSnapPort1 = false;
+                            SnapPort1Result = false;
                             break;
                         case MountTaskName.SetSnapPort2:
                             _ = new CmdSnapPort(0, 2, SnapPort2);
-                            CanSnapPort2 = true;
+                            SnapPort2Result = true;
                             break;
                         case MountTaskName.MountName:
                             var mountName = new CmdMountName(MountQueue.NewId);
@@ -1811,7 +1811,7 @@ namespace GS.Server.SkyTelescope
         /// Creates tasks that are put in the SkyQueue
         /// </summary>
         /// <param name="taskName"></param>
-        internal static void SkyTasks(MountTaskName taskName)
+        public static void SkyTasks(MountTaskName taskName)
         {
             if (!IsMountRunning) { return; }
 
@@ -1918,11 +1918,11 @@ namespace GS.Server.SkyTelescope
                             break;
                         case MountTaskName.SetSnapPort1:
                             var sp1 = new SkySetSnapPort(SkyQueue.NewId, 1, SnapPort1);
-                            CanSnapPort1 = (bool)SkyQueue.GetCommandResult(sp1).Result;
+                            SnapPort1Result = (bool)SkyQueue.GetCommandResult(sp1).Result;
                             break;
                         case MountTaskName.SetSnapPort2:
                             var sp2 = new SkySetSnapPort(SkyQueue.NewId, 2, SnapPort2);
-                            CanSnapPort2 = (bool)SkyQueue.GetCommandResult(sp2).Result;
+                            SnapPort2Result = (bool)SkyQueue.GetCommandResult(sp2).Result;
                             break;
                         case MountTaskName.SyncAxes:
                             var sync = Axes.AxesAppToMount(new[] { _mountAxes.X, _mountAxes.Y });
@@ -4695,8 +4695,8 @@ namespace GS.Server.SkyTelescope
             // default snap port
             SnapPort1 = false;
             SnapPort2 = false;
-            CanSnapPort1 = false;
-            CanSnapPort2 = false;
+            SnapPort1Result = false;
+            SnapPort2Result = false;
 
             FactorStep = new[] { 0.0, 0.0 };
             StepsPerRevolution = new long[] { 12960000, 12960000 };

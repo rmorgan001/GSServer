@@ -51,7 +51,7 @@ namespace GS.SkyWatcher
         private const int _threadLockTimeout = 50;                      // milliseconds
         private readonly object _syncObject = new object();
         private int _conErrCnt;                                         // Number of continuous errors
-        private const int ConErrMax = 30;                              // Max number of allowed continuous errors
+        private const int ConErrMax = 50;                              // Max number of allowed continuous errors
         private readonly int[] _customMount360Steps;                    // Custom Mount :a replacement
         private readonly double[] _customRaWormSteps;                      // Custom Mount :s replacement
         private readonly int[] _mount360Steps = { 0, 0 };               // From mount :a
