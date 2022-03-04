@@ -2079,17 +2079,17 @@ namespace GS.Server.SkyTelescope
         private static bool CheckSkyErrors(ISkyCommand command)
         {
             if (command.Exception != null) { 
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Server,
-                Category = MonitorCategory.Server,
-                Type = MonitorType.Warning,
-                Method = MethodBase.GetCurrentMethod()?.Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{command.Successful},{command.Exception.Message},{command.Exception.StackTrace}"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Warning,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{command.Successful},{command.Exception.Message},{command.Exception.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
             }
 
             return !command.Successful || command.Exception != null;
@@ -5102,12 +5102,15 @@ namespace GS.Server.SkyTelescope
                     }
 
                     var ppectrain = new SkyIsPPecInTrainingOn(SkyQueue.NewId);
-                    PecTraining = (bool)SkyQueue.GetCommandResult(ppectrain).Result;
-                    PecTrainInProgress = PecTraining;
-                    if (!PecTraining && PPecOn) //restart pec
+                    if (bool.TryParse(SkyQueue.GetCommandResult(ppectrain).Result, out bool bTrain))
                     {
-                        PPecOn = false;
-                        PPecOn = true;
+                        PecTraining = bTrain;
+                        PecTrainInProgress = bTrain;
+                        if (!bTrain && PPecOn) //restart pec
+                        {
+                            PPecOn = false;
+                            PPecOn = true;
+                        }
                     }
                     break;
                 default:
