@@ -1843,15 +1843,18 @@ namespace GS.Server.SkyTelescope
                             break;
                         case MountTaskName.CanPpec:
                             var SkyMountCanPpec = new SkyCanPPec(SkyQueue.NewId);
-                            CanPPec = (bool)SkyQueue.GetCommandResult(SkyMountCanPpec).Result;
+                            bool.TryParse(Convert.ToString(SkyQueue.GetCommandResult(SkyMountCanPpec).Result), out bool pPecResult);
+                            CanPPec = pPecResult;
                             break;
                         case MountTaskName.CanPolarLed:
                             var SkyCanPolarLed = new SkyCanPolarLed(SkyQueue.NewId);
-                            CanPolarLed = (bool)SkyQueue.GetCommandResult(SkyCanPolarLed).Result;
+                            bool.TryParse(Convert.ToString(SkyQueue.GetCommandResult(SkyCanPolarLed).Result), out bool polarLedResult);
+                            CanPolarLed = polarLedResult;
                             break;
                         case MountTaskName.CanHomeSensor:
                             var canHomeSky = new SkyCanHomeSensors(SkyQueue.NewId);
-                            CanHomeSensor = (bool)SkyQueue.GetCommandResult(canHomeSky).Result;
+                            bool.TryParse(Convert.ToString(SkyQueue.GetCommandResult(canHomeSky).Result), out bool homeSensoResult);
+                            CanHomeSensor = homeSensoResult;
                             break;
                         case MountTaskName.Capabilities:
                             // populates driver with mount capabilities
@@ -1918,11 +1921,13 @@ namespace GS.Server.SkyTelescope
                             break;
                         case MountTaskName.SetSnapPort1:
                             var sp1 = new SkySetSnapPort(SkyQueue.NewId, 1, SnapPort1);
-                            SnapPort1Result = (bool)SkyQueue.GetCommandResult(sp1).Result;
+                            bool.TryParse(Convert.ToString(SkyQueue.GetCommandResult(sp1).Result), out bool port1Result);
+                            SnapPort1Result = port1Result;
                             break;
                         case MountTaskName.SetSnapPort2:
                             var sp2 = new SkySetSnapPort(SkyQueue.NewId, 2, SnapPort2);
-                            SnapPort2Result = (bool)SkyQueue.GetCommandResult(sp2).Result;
+                            bool.TryParse(Convert.ToString(SkyQueue.GetCommandResult(sp2).Result), out bool port2Result);
+                            SnapPort2Result = port2Result;
                             break;
                         case MountTaskName.SyncAxes:
                             var sync = Axes.AxesAppToMount(new[] { _mountAxes.X, _mountAxes.Y });
@@ -5102,7 +5107,7 @@ namespace GS.Server.SkyTelescope
                     }
 
                     var ppectrain = new SkyIsPPecInTrainingOn(SkyQueue.NewId);
-                    if (bool.TryParse(SkyQueue.GetCommandResult(ppectrain).Result, out bool bTrain))
+                    if (bool.TryParse(Convert.ToString(SkyQueue.GetCommandResult(ppectrain).Result), out bool bTrain))
                     {
                         PecTraining = bTrain;
                         PecTrainInProgress = bTrain;

@@ -116,7 +116,7 @@ namespace GS.Server.SkyTelescope
                     CustomMountOffset = new List<int>(Enumerable.Range(-5, 11));
                     Hours = new List<int>(Enumerable.Range(0, 24));
                     Range60 = new List<int>(Enumerable.Range(0, 60));
-                    PolarLedLevels = new List<int>(Enumerable.Range(0, 256));
+                    PolarLedLevels = new List<int>(Enumerable.Range(-1, 256));
                     St4GuideRates = new List<double> { 1.0, 0.75, 0.50, 0.25, 0.125 };
                     Temperatures = new List<double>(Numbers.InclusiveRange(-50, 60, 1.0));
                     AutoHomeLimits = new List<int>(Enumerable.Range(20, 160));

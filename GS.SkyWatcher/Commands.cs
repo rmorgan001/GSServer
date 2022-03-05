@@ -720,7 +720,8 @@ namespace GS.SkyWatcher
         /// <param name="level">x00 to xFF</param>
         internal void SetPolarLedLevel(AxisId axis, int level)
         {
-            var szCmd = LongToHex(level);
+            if (level < 0 || level > 255){return;}
+            var szCmd = level.ToString("X2");
             CmdToAxis(axis,'V', szCmd);
         }
 
