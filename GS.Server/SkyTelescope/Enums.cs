@@ -154,4 +154,11 @@ namespace GS.Server.SkyTelescope
         Park = 1
     }
 
+    public enum BeepType
+    {
+        WinDefault,
+        Default,
+        SlewComplete
+    }
+
 }

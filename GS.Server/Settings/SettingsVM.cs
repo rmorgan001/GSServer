@@ -254,7 +254,7 @@ namespace GS.Server.Settings
             set
             {
                 Settings.AllowBeeps = value;
-                if(value){Synthesizer.Beep();}
+                if(value){Synthesizer.Beep(BeepType.Default);}
                 OnPropertyChanged();
             }
         }
@@ -266,7 +266,7 @@ namespace GS.Server.Settings
             set
             {
                 Settings.BeepFreq = value;
-                Synthesizer.Beep(0); 
+                Synthesizer.Beep(BeepType.Default); 
                 OnPropertyChanged();
             }
         }
@@ -278,7 +278,7 @@ namespace GS.Server.Settings
             set
             {
                 Settings.BeepDur = value;
-                Synthesizer.Beep(0);
+                Synthesizer.Beep(BeepType.Default);
                 OnPropertyChanged();
             }
         }

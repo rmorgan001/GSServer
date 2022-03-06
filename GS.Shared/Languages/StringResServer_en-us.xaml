@@ -683,7 +683,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--1.0.4.2 -->
     <system:String x:Key="mntPolarLed">Polar LED:</system:String>
     <system:String x:Key="skyPolarLedLevel">Polar LED Level</system:String>
-    <system:String x:Key="optAllowBeeps">Beeps</system:String>
+    <system:String x:Key="optAllowBeeps">Beep</system:String>
     <system:String x:Key="optFreq">Frequency</system:String>
     <system:String x:Key="optDur">Duration</system:String>
 

@@ -21,6 +21,7 @@ using System.Reflection;
 using System.Speech.Synthesis;
 //using Microsoft.Speech.Synthesis;
 using System.Threading;
+using GS.Server.SkyTelescope;
 
 namespace GS.Server.Helpers
 {
@@ -209,24 +210,30 @@ namespace GS.Server.Helpers
         //    StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));
         //}
 
-        public static void Beep(int item = 0, int frequency = 0, int duration = 0)
+        public static void Beep(BeepType item)
         {
             try
             {
                 if (!Settings.Settings.AllowBeeps){return;}
 
-                var freq = 800;
-                var dur = 200;
-                if(frequency == 0){ freq = Settings.Settings.BeepFreq; }
-                if(duration == 0){ dur = Settings.Settings.BeepDur;}
+                var freq = Settings.Settings.BeepFreq; 
+                var dur = Settings.Settings.BeepDur; 
 
-                if (freq < 37 || freq > 32767){return;}
-                if (dur < 0 || dur > 5000) { return; }
+                if (freq < 37 || freq > 32767){ Settings.Settings.BeepFreq = 800; }
+                if (dur < 0 || dur > 5000) { Settings.Settings.BeepDur = 200; }
 
                 switch (item)
                 {
-                    case 1: // Slew complete
+                    case BeepType.SlewComplete: // Slew complete
                         break;
+                    case BeepType.Default:
+                        break;
+                    case BeepType.WinDefault:
+                        freq = 800;
+                        dur = 200;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(item), item, null);
                 }
                 new Thread(() => Console.Beep(freq, dur)).Start();
             }
