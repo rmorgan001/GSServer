@@ -4797,23 +4797,29 @@ namespace GS.Server.SkyTelescope
                     break;
                 case SlewType.SlewMoveAxis:
                     Synthesizer.Speak(Application.Current.Resources["vceSlewComplete"].ToString());
+                    Synthesizer.Beep(1);
                     break;
                 case SlewType.SlewRaDec:
                     Synthesizer.Speak(Application.Current.Resources["vceSlewComplete"].ToString());
+                    Synthesizer.Beep(1);
                     break;
                 case SlewType.SlewAltAz:
                     Synthesizer.Speak(Application.Current.Resources["vceSlewComplete"].ToString());
+                    Synthesizer.Beep(1);
                     break;
                 case SlewType.SlewPark:
                     Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
+                    Synthesizer.Beep(1);
                     break;
                 case SlewType.SlewHome:
                     Synthesizer.Speak(Application.Current.Resources["vceHome"].ToString());
+                    Synthesizer.Beep(1);
                     break;
                 case SlewType.SlewHandpad:
                     break;
                 case SlewType.SlewComplete:
                     Synthesizer.Speak(Application.Current.Resources["vceSlewComplete"].ToString());
+                    Synthesizer.Beep(0);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(slewType), slewType, null);

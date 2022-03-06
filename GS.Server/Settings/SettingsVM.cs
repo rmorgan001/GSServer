@@ -110,6 +110,8 @@ namespace GS.Server.Settings
                     IntervalList = new List<int>(Numbers.InclusiveIntRange(100, 500, 10));
                     //Volume Range
                     VolumeList = new List<int>(Numbers.InclusiveIntRange(0, 100));
+                    DurationList = new List<int>(Numbers.InclusiveIntRange(100, 2000, 100));
+                    FrequencyList = new List<int>(Numbers.InclusiveIntRange(200, 9000, 200));
 
                     ClearSettings();
 
@@ -245,6 +247,41 @@ namespace GS.Server.Settings
         #endregion
 
         #region Bindings
+
+        public bool AllowBeeps
+        {
+            get => Settings.AllowBeeps;
+            set
+            {
+                Settings.AllowBeeps = value;
+                if(value){Synthesizer.Beep();}
+                OnPropertyChanged();
+            }
+        }
+
+        public IList<int> FrequencyList { get; }
+        public int BeepFreq
+        {
+            get => Settings.BeepFreq;
+            set
+            {
+                Settings.BeepFreq = value;
+                Synthesizer.Beep(0); 
+                OnPropertyChanged();
+            }
+        }
+
+        public IList<int> DurationList { get; }
+        public int BeepDur
+        {
+            get => Settings.BeepDur;
+            set
+            {
+                Settings.BeepDur = value;
+                Synthesizer.Beep(0);
+                OnPropertyChanged();
+            }
+        }
 
         private static bool _pecShow;
         /// <summary>

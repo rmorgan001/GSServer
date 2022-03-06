@@ -208,5 +208,35 @@ namespace GS.Server.Helpers
         //{
         //    StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));
         //}
+
+        public static void Beep(int item = 0, int frequency = 0, int duration = 0)
+        {
+            try
+            {
+                if (!Settings.Settings.AllowBeeps){return;}
+
+                var freq = 800;
+                var dur = 200;
+                if(frequency == 0){ freq = Settings.Settings.BeepFreq; }
+                if(duration == 0){ dur = Settings.Settings.BeepDur;}
+
+                if (freq < 37 || freq > 32767){return;}
+                if (dur < 0 || dur > 5000) { return; }
+
+                switch (item)
+                {
+                    case 1: // Slew complete
+                        break;
+                }
+                new Thread(() => Console.Beep(freq, dur)).Start();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+        }
     }
 }

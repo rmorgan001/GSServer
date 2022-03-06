@@ -12,7 +12,7 @@ namespace GS.Server.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.8.1.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.10.0.0")]
     internal sealed partial class Server : global::System.Configuration.ApplicationSettingsBase {
         
         private static Server defaultInstance = ((Server)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Server())));
@@ -464,6 +464,42 @@ namespace GS.Server.Properties {
             }
             set {
                 this["AlignmentTabVisible"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AllowBeeps {
+            get {
+                return ((bool)(this["AllowBeeps"]));
+            }
+            set {
+                this["AllowBeeps"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("800")]
+        public int BeepFreq {
+            get {
+                return ((int)(this["BeepFreq"]));
+            }
+            set {
+                this["BeepFreq"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("200")]
+        public int BeepDur {
+            get {
+                return ((int)(this["BeepDur"]));
+            }
+            set {
+                this["BeepDur"] = value;
             }
         }
     }

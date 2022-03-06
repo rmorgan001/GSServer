@@ -242,11 +242,21 @@
                             </StackPanel>
                             <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Left">
                                 <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optVoice}"/>
-                                <StackPanel Orientation="Horizontal">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
                                     <CheckBox Height="25" Width="25" IsChecked="{Binding VoiceActive}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optVoiceSpeech}"/>
                                     <TextBlock Margin="10 10" VerticalAlignment="Center" Text="{StaticResource optVoiceSpeech}"/>
+                                    <ComboBox Margin="5,0,0,0" md:HintAssist.Hint="{StaticResource optVolumeLevel}" MinWidth="10" HorizontalAlignment="Left"  ItemsSource="{Binding VolumeList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource optVolumeLevel}">
+                                        <ComboBox.SelectedValue>
+                                            <Binding Path="VoiceVolume" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
+                                        </ComboBox.SelectedValue>
+                                        <ComboBox.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <VirtualizingStackPanel />
+                                            </ItemsPanelTemplate>
+                                        </ComboBox.ItemsPanel>
+                                    </ComboBox>
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal"  Margin="0,0,0,0">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
                                     <ComboBox md:HintAssist.Hint="{StaticResource optVoiceName}" MinWidth="10" HorizontalAlignment="Left" ItemsSource="{Binding VoiceNames}"
                                     Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource optVoiceName}">
                                         <ComboBox.Text>
@@ -259,19 +269,30 @@
                                         </ComboBox.ItemsPanel>
                                     </ComboBox>
                                 </StackPanel>
-                                <StackPanel Orientation="Vertical" Margin="0,5,0,0" HorizontalAlignment="Left" >
-                                    <ComboBox md:HintAssist.Hint="{StaticResource optVolumeLevel}" MinWidth="10" HorizontalAlignment="Left" ItemsSource="{Binding VolumeList}"
-                                          Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource optVolumeLevel}">
-                                        <ComboBox.SelectedValue >
-                                            <Binding Path="VoiceVolume" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding AllowBeeps}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optAllowBeeps}" />
+                                    <TextBlock Margin="10 10" VerticalAlignment="Center" Text="{StaticResource optAllowBeeps}" />
+                                    <ComboBox Margin="5,0,0,0" md:HintAssist.Hint="{StaticResource optDur}" MinWidth="10" HorizontalAlignment="Left" ItemsSource="{Binding DurationList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource optDur}">
+                                        <ComboBox.SelectedValue>
+                                            <Binding Path="BeepDur" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
                                         </ComboBox.SelectedValue>
-                                        <ComboBox.ItemsPanel >
-                                            <ItemsPanelTemplate >
-                                                <VirtualizingStackPanel  />
+                                        <ComboBox.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <VirtualizingStackPanel />
                                             </ItemsPanelTemplate>
                                         </ComboBox.ItemsPanel>
                                     </ComboBox>
                                 </StackPanel>
+                                <ComboBox Margin="0,0,0,0" md:HintAssist.Hint="{StaticResource optFreq}" MinWidth="10" HorizontalAlignment="Left" ItemsSource="{Binding FrequencyList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource optFreq}">
+                                    <ComboBox.SelectedValue>
+                                        <Binding Path="BeepFreq" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
+                                    </ComboBox.SelectedValue>
+                                    <ComboBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <VirtualizingStackPanel />
+                                        </ItemsPanelTemplate>
+                                    </ComboBox.ItemsPanel>
+                                </ComboBox>
                             </StackPanel>
                             <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Vertical" HorizontalAlignment="Left">
                                 <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optColors}"/>
@@ -327,7 +348,7 @@
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
                         </StackPanel>
-                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" >
+                            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" >
                             <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optSettings}"/>
                             <StackPanel Orientation="Horizontal">
                                 <CheckBox Height="25" Width="25" IsChecked="{Binding ServerSettings}" ToolTip="{StaticResource optServerSettings}" Style="{StaticResource MaterialDesignActionLightToggleButton}"/>
@@ -353,7 +374,7 @@
                                 </md:DialogHost>
                             </StackPanel>
                             <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Left" >
-                                <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optLanguage}"/>
+                                <TextBlock Margin="0,10,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optLanguage}"/>
                                 <ComboBox md:HintAssist.Hint="{StaticResource optLanguage}" MinWidth="10" HorizontalAlignment="Left" ItemsSource="{Binding Languages}"
                                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource optLanguage}">
                                     <ComboBox.Text>

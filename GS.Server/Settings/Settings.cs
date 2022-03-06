@@ -36,6 +36,51 @@ namespace GS.Server.Settings
 
         #region Settings
 
+        private static bool _allowBeeps;
+        public static bool AllowBeeps
+        {
+            get => _allowBeeps;
+            set
+            {
+                if (_allowBeeps == value) return;
+                _allowBeeps = value;
+                Properties.Server.Default.AllowBeeps = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static int _beepDur;
+        public static int BeepDur
+        {
+            get => _beepDur;
+            set
+            {
+                if (value < 0 || value > 5000){return;}
+                if (_beepDur == value){return;}
+
+                _beepDur = value;
+                Properties.Server.Default.BeepDur = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static int _beepFreq;
+        public static int BeepFreq
+        {
+            get => _beepFreq;
+            set
+            {
+                if (value < 37 || value > 32767) { return; }
+                if (_beepFreq == value){return;}
+                _beepFreq = value;
+                Properties.Server.Default.BeepFreq = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static bool _charting;
         public static bool Charting
         {
@@ -524,6 +569,9 @@ namespace GS.Server.Settings
         {
             Upgrade();
 
+            AllowBeeps = Properties.Server.Default.AllowBeeps;
+            BeepDur = Properties.Server.Default.BeepDur;
+            BeepFreq= Properties.Server.Default.BeepFreq;
             Charting = Properties.Server.Default.Charting;
             Focuser = Properties.Server.Default.Focuser;
             DisableHardwareAcceleration = Properties.Server.Default.DisableHardwareAcceleration;
