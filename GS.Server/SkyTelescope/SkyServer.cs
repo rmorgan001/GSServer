@@ -631,7 +631,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Warning,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ActualAxisX}|{ActualAxisY}"
+                    Message = $"{value}|{ActualAxisX}|{ActualAxisY}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OnStaticPropertyChanged();
