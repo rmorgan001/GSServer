@@ -36,7 +36,7 @@ namespace GS.Server.AutoHome
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Telescope,
+                Device = MonitorDevice.Server,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,
@@ -138,7 +138,7 @@ namespace GS.Server.AutoHome
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Telescope,
+                Device = MonitorDevice.Server,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,

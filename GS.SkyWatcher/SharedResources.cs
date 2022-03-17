@@ -116,6 +116,7 @@ namespace GS.SkyWatcher
         public bool HighSpeed;
         public bool Initialized;
         public string StepSpeed;
+        public string Response;
 
         public void SetFullStop()
         {

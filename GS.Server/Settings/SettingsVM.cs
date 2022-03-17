@@ -784,8 +784,8 @@ namespace GS.Server.Settings
 
         public bool Telescope
         {
-            get => MonitorLog.InDevices(MonitorDevice.Telescope);
-            set => MonitorLog.DevicesToMonitor(MonitorDevice.Telescope, value);
+            get => MonitorLog.InDevices(MonitorDevice.Server);
+            set => MonitorLog.DevicesToMonitor(MonitorDevice.Server, value);
         }
 
         public bool Driver
@@ -897,7 +897,7 @@ namespace GS.Server.Settings
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
+                    Device = MonitorDevice.Server,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -942,7 +942,7 @@ namespace GS.Server.Settings
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
+                    Device = MonitorDevice.Server,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1315,7 +1315,7 @@ namespace GS.Server.Settings
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Telescope,
+                Device = MonitorDevice.Server,
                 Category = MonitorCategory.Interface,
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1503,7 +1503,7 @@ namespace GS.Server.Settings
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
+                    Device = MonitorDevice.Server,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1580,7 +1580,7 @@ namespace GS.Server.Settings
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
+                    Device = MonitorDevice.Server,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1624,7 +1624,7 @@ namespace GS.Server.Settings
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
+                    Device = MonitorDevice.Server,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,

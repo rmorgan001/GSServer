@@ -1912,7 +1912,7 @@ namespace GS.Server.GamePad
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Telescope,
+                Device = MonitorDevice.Server,
                 Category = MonitorCategory.Interface,
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,

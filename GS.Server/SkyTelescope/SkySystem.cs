@@ -52,7 +52,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = Principles.HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
+                    Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -68,7 +68,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = Principles.HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
+                    Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -141,7 +141,7 @@ namespace GS.Server.SkyTelescope
                     var monitorItem = new MonitorEntry
                     {
                         Datetime = Principles.HiResDateTime.UtcNow,
-                        Device = MonitorDevice.Telescope,
+                        Device = MonitorDevice.Server,
                         Category = MonitorCategory.Server,
                         Type = MonitorType.Warning,
                         Method = MethodBase.GetCurrentMethod()?.Name,

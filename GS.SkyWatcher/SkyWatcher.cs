@@ -705,10 +705,6 @@ namespace GS.SkyWatcher
         /// <param name="on">on=true,off=false</param>
         internal void SetEncoder(AxisId axis, bool on)
         {
-            var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {axis}|{on}" };
-            MonitorLog.LogToMonitor(monitorItem);
-
             if (!CanDualEncoders) { return; }
             _commands.SetEncoders(axis, on);
         }
@@ -907,10 +903,6 @@ namespace GS.SkyWatcher
         /// <param name="rate"> 0..4 (1.0, 0.75, 0.50, 0.25, 0.125)</param>
         internal void SetSt4GuideRate(int rate)
         {
-            var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{rate}" };
-            MonitorLog.LogToMonitor(monitorItem);
-
             int cmd;
             switch (rate)
             {
