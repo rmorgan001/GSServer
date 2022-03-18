@@ -171,7 +171,7 @@ namespace GS.Server.Focuser
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Server,
+                Device = MonitorDevice.UI,
                 Category = MonitorCategory.Interface,
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()

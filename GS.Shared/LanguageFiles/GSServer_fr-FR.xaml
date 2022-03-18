@@ -684,4 +684,6 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="optFreq">La Fréquence</system:String>
     <system:String x:Key="optDur">Durée</system:String>
 
+    <!--1.0.4.3 -->
+    <system:String x:Key="optUI">UI</system:String>
 </ResourceDictionary>

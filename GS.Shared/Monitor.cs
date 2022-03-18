@@ -75,6 +75,9 @@ namespace GS.Shared
                 case MonitorDevice.Telescope:
                     Settings.Telescope = value;
                     break;
+                case MonitorDevice.UI:
+                    Settings.Telescope = value;
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(monitorDevice), monitorDevice, null);
             }
@@ -317,7 +320,8 @@ namespace GS.Shared
     {
         Server,
         Telescope,
-        Focuser
+        Focuser,
+        UI
     }
 
     /// <summary>

@@ -81,7 +81,7 @@ namespace GS.Server.GamePad
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
+                    Device = MonitorDevice.UI,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -100,7 +100,7 @@ namespace GS.Server.GamePad
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
+                    Device = MonitorDevice.UI,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -840,7 +840,7 @@ namespace GS.Server.GamePad
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
+                    Device = MonitorDevice.UI,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -889,7 +889,7 @@ namespace GS.Server.GamePad
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Server,
+                Device = MonitorDevice.UI,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1544,7 +1544,7 @@ namespace GS.Server.GamePad
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
+                    Device = MonitorDevice.UI,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1608,7 +1608,7 @@ namespace GS.Server.GamePad
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
+                    Device = MonitorDevice.UI,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1730,7 +1730,7 @@ namespace GS.Server.GamePad
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
+                    Device = MonitorDevice.UI,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1771,7 +1771,7 @@ namespace GS.Server.GamePad
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
+                    Device = MonitorDevice.UI,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1812,7 +1812,7 @@ namespace GS.Server.GamePad
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
+                    Device = MonitorDevice.UI,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1912,7 +1912,7 @@ namespace GS.Server.GamePad
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Server,
+                Device = MonitorDevice.UI,
                 Category = MonitorCategory.Interface,
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,

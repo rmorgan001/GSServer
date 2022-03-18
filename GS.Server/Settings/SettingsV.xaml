@@ -85,6 +85,10 @@
                                 <CheckBox IsChecked="{Binding Telescope}" Style="{StaticResource MaterialDesignCheckBox}"/>
                                 <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optTelescope}"/>
                             </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding UI}" Style="{StaticResource MaterialDesignCheckBox}" />
+                                <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optUI}" />
+                            </StackPanel>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="20 0">
                             <Label Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Content="{StaticResource optCategory}"/>
