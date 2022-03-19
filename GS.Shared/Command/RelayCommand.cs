@@ -91,7 +91,7 @@ namespace GS.Shared.Command
             if (str.Contains("<get_")) str = Strings.GetTxtBetween(str, "<get_", ">");
 
             var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{str}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.UI, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{str}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             _execute(parameter);

@@ -36,7 +36,7 @@ namespace GS.Server.AutoHome
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Server,
+                Device = MonitorDevice.UI,
                 Category = MonitorCategory.Server,
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,
@@ -53,10 +53,28 @@ namespace GS.Server.AutoHome
         /// </summary>
         private void Initialize()
         {
-            var canHomeSky = new SkyCanHomeSensors(SkyQueue.NewId);
-            var hasHome = (bool)SkyQueue.GetCommandResult(canHomeSky).Result;
-            if (!canHomeSky.Successful && canHomeSky.Exception != null) throw canHomeSky.Exception;
-            if (!hasHome) throw new Exception("Home sensor not supported");
+            try
+            {
+                var canHomeSky = new SkyCanHomeSensors(SkyQueue.NewId);
+                var hasHome = (bool)SkyQueue.GetCommandResult(canHomeSky).Result;
+                if (!canHomeSky.Successful && canHomeSky.Exception != null) throw canHomeSky.Exception;
+                if (!hasHome) throw new Exception("Home sensor not supported");
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+
         }
 
         ///// <summary>
