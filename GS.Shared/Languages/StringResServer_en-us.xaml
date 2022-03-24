@@ -689,5 +689,16 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!--1.0.4.3 -->
     <system:String x:Key="optUI">UI</system:String>
+    <system:String x:Key="lbEast">East</system:String>
+    <system:String x:Key="lbWest">West</system:String>
+    <system:String x:Key="lbNorth">North</system:String>
+    <system:String x:Key="lbSouth">South</system:String>
+    <system:String x:Key="lbOptics">Optics</system:String>
+    <system:String x:Key="RbNone">None</system:String>
+    <system:String x:Key="RbAltAz">AltAz</system:String>
+    <system:String x:Key="RbRaDec">RaDec</system:String>
+    <system:String x:Key="Rb3D">3D</system:String>
+    <system:String x:Key="lbAz">Az</system:String>
+    <system:String x:Key="lbAlt">Alt</system:String>
 </ResourceDictionary>
  

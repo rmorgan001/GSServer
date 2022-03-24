@@ -632,6 +632,24 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static FrontGraphic _frontGraphic;
+        public static FrontGraphic FrontGraphic
+        {
+            get => _frontGraphic;
+            set
+            {
+                if (_frontGraphic == value) return;
+                _frontGraphic = value;
+                Properties.SkyTelescope.Default.FrontGraphic = value.ToString();
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
+                OnStaticPropertyChanged();
+
+                var monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+        }
+
         private static SlewSpeed _hcSpeed;
         public static SlewSpeed HcSpeed
         {
@@ -854,20 +872,6 @@ namespace GS.Server.SkyTelescope
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
                 SkyServer.SkyTasks(MountTaskName.DecPulseToGoTo);
-            }
-        }
-
-        private static bool _diagnostics;
-        public static bool Diagnostics
-        {
-            get => _diagnostics;
-            set
-            {
-                if (_diagnostics == value) return;
-                _diagnostics = value;
-                Properties.SkyTelescope.Default.Diagnostics = value;
-                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
-                OnStaticPropertyChanged();
             }
         }
 
@@ -1283,20 +1287,6 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static bool _modelOn;
-        public static bool ModelOn
-        {
-            get => _modelOn;
-            set
-            {
-                if (_modelOn == value) return;
-                _modelOn = value;
-                Properties.SkyTelescope.Default.ModelOn = value;
-                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
-                OnStaticPropertyChanged();
-            }
-        }
-
         private static double _parkAxisX;
         public static double ParkAxisX
         {
@@ -1446,6 +1436,20 @@ namespace GS.Server.SkyTelescope
                 if (_refraction == value) return;
                 _refraction = value;
                 Properties.SkyTelescope.Default.Refraction = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static bool _raGaugeFlip;
+        public static bool RaGaugeFlip
+        {
+            get => _raGaugeFlip;
+            set
+            {
+                if (_raGaugeFlip == value) return;
+                _raGaugeFlip = value;
+                Properties.SkyTelescope.Default.RaGaugeFlip = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
@@ -1778,6 +1782,8 @@ namespace GS.Server.SkyTelescope
             EquatorialCoordinateType = eparse;
             Enum.TryParse<AlignmentModes>(Properties.SkyTelescope.Default.AlignmentMode, true, out var aparse);
             AlignmentMode = aparse;
+            Enum.TryParse<FrontGraphic>(Properties.SkyTelescope.Default.FrontGraphic, true, out var fparse);
+            FrontGraphic = fparse;
             Enum.TryParse<DriveRates>(Properties.SkyTelescope.Default.TrackingRate, true, out var dparse);
             TrackingRate = dparse;
             Enum.TryParse<SlewSpeed>(Properties.SkyTelescope.Default.HcSpeed, true, out var hparse);
@@ -1814,7 +1820,6 @@ namespace GS.Server.SkyTelescope
             DataBits = Properties.SkyTelescope.Default.DataBits;
             DecBacklash = Properties.SkyTelescope.Default.DecBacklash;
             DecPulseToGoTo = Properties.SkyTelescope.Default.DecPulseToGoTo;
-            Diagnostics = Properties.SkyTelescope.Default.Diagnostics;
             DtrEnable = Properties.SkyTelescope.Default.DTREnable;
             Elevation = Properties.SkyTelescope.Default.Elevation;
             Encoders = Properties.SkyTelescope.Default.EncodersOn;
@@ -1845,7 +1850,6 @@ namespace GS.Server.SkyTelescope
             MaxSlewRate = Properties.SkyTelescope.Default.MaximumSlewRate;
             MinPulseDec = Properties.SkyTelescope.Default.MinPulseDec;
             MinPulseRa = Properties.SkyTelescope.Default.MinPulseRa;
-            ModelOn = Properties.SkyTelescope.Default.ModelOn;
             ParkAxisX = Properties.SkyTelescope.Default.ParkAxisX;
             ParkAxisY = Properties.SkyTelescope.Default.ParkAxisY;
             ParkName = Properties.SkyTelescope.Default.ParkName;
@@ -1857,6 +1861,7 @@ namespace GS.Server.SkyTelescope
             Pec360File = Properties.SkyTelescope.Default.Pec360File;
             PolarLedLevel = Properties.SkyTelescope.Default.PolarLedLevel;
             RaBacklash = Properties.SkyTelescope.Default.RaBacklash;
+            RaGaugeFlip = Properties.SkyTelescope.Default.RaGaugeFlip;
             ReadTimeout = Properties.SkyTelescope.Default.ReadTimeout;
             Refraction = Properties.SkyTelescope.Default.Refraction;
             RaTrackingOffset = Properties.SkyTelescope.Default.RATrackingOffset;

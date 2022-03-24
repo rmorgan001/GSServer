@@ -1069,18 +1069,6 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool ModelOn {
-            get {
-                return ((bool)(this["ModelOn"]));
-            }
-            set {
-                this["ModelOn"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("20")]
         public int MinPulseRa {
             get {
@@ -1292,18 +1280,6 @@ namespace GS.Server.Properties {
             }
             set {
                 this["PpecOn"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool Diagnostics {
-            get {
-                return ((bool)(this["Diagnostics"]));
-            }
-            set {
-                this["Diagnostics"] = value;
             }
         }
         
@@ -1532,6 +1508,30 @@ namespace GS.Server.Properties {
             }
             set {
                 this["PolarLedLevel"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool RaGaugeFlip {
+            get {
+                return ((bool)(this["RaGaugeFlip"]));
+            }
+            set {
+                this["RaGaugeFlip"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("None")]
+        public string FrontGraphic {
+            get {
+                return ((string)(this["FrontGraphic"]));
+            }
+            set {
+                this["FrontGraphic"] = value;
             }
         }
     }

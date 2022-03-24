@@ -263,9 +263,6 @@
     <Setting Name="LimitTracking" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="ModelOn" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="MinPulseRa" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">20</Value>
     </Setting>
@@ -318,9 +315,6 @@
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="PpecOn" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="Diagnostics" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="PecOn" Type="System.Boolean" Scope="User">
@@ -379,6 +373,12 @@
     </Setting>
     <Setting Name="PolarLedLevel" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">-1</Value>
+    </Setting>
+    <Setting Name="RaGaugeFlip" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="FrontGraphic" Type="System.String" Scope="User">
+      <Value Profile="(Default)">None</Value>
     </Setting>
   </Settings>
 </SettingsFile>

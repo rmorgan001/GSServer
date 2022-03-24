@@ -932,7 +932,7 @@ namespace GS.SkyWatcher
                         try
                         {
                             string responseString = null;
-                            for (var c = 0; c < 4; c++)
+                            for (var c = 0; c < 5; c++)
                             {
                                 Serial.DiscardInBuffer();
                                 Serial.DiscardOutBuffer();

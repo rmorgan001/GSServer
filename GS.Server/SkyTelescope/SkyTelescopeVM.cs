@@ -140,7 +140,7 @@ namespace GS.Server.SkyTelescope
                     Azimuth = "00° 00m 00s";
                     Altitude = "00° 00m 00s";
                     Lha = "00h 00m 00s";
-                    ModelOn = SkySettings.ModelOn;
+                    Graphic = SkySettings.FrontGraphic;
                     SetTrackingIcon(SkySettings.TrackingRate);
                     SetParkLimitSelection(SkySettings.ParkLimitName);
                     TrackingRate = SkySettings.TrackingRate;
@@ -149,7 +149,7 @@ namespace GS.Server.SkyTelescope
                     HcWinVisibility = true;
                     ModelWinVisibility = true;
                     ButtonsWinVisibility = true;
-                    DebugVisibility = SkySettings.Diagnostics;
+                    //DebugVisibility = SkySettings.Diagnostics;
                     PecShow = SkyServer.PecShow;
                     SchedulerShow = true;
                     CustomGearing = SkySettings.CustomGearing;
@@ -180,6 +180,34 @@ namespace GS.Server.SkyTelescope
         }
 
         #region View Model Items
+
+        private FrontGraphic _graphic;
+        public FrontGraphic Graphic
+        {
+            get => _graphic;
+            set
+            {
+                if (_graphic == value) { return; }
+                _graphic = value;
+                switch (value)
+                {
+                    case FrontGraphic.None:
+                        break;
+                    case FrontGraphic.AltAz:
+                        break;
+                    case FrontGraphic.RaDec:
+                        break;
+                    case FrontGraphic.Model3D:
+                        Rotate();
+                        OpenResetView();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(value), value, null);
+                }
+                SkySettings.FrontGraphic = value;
+                OnPropertyChanged();
+            }
+        }
 
         private bool _pecShow;
         /// <summary>
@@ -261,9 +289,6 @@ namespace GS.Server.SkyTelescope
                      case "Elevation":
                          Elevation = SkySettings.Elevation;
                          break;
-                     case "Diagnostics":
-                         DebugVisibility = SkySettings.Diagnostics;
-                         break;
                      case "ParkPositions":
                          // ReSharper disable ExplicitCallerInfoArgument
                          OnPropertyChanged($"ParkPositions");
@@ -280,8 +305,8 @@ namespace GS.Server.SkyTelescope
                      case "MinPulseRa":
                          MinPulseRa = SkySettings.MinPulseRa;
                          break;
-                     case "ModelOn":
-                         ModelOn = SkySettings.ModelOn;
+                     case "FrontGraphic":
+                         Graphic = SkySettings.FrontGraphic;
                          break;
                      case "TrackingRate":
                          TrackingRate = SkySettings.TrackingRate;
@@ -300,6 +325,9 @@ namespace GS.Server.SkyTelescope
                          break;
                      case "HcAntiDec":
                          HcAntiDec = SkySettings.HcAntiDec;
+                         break;
+                     case "RaGaugeFlip":
+                         RaGaugeFlip = SkySettings.RaGaugeFlip;
                          break;
                  }
              });
@@ -339,9 +367,11 @@ namespace GS.Server.SkyTelescope
                             {
                                 case "Altitude":
                                     Altitude = _util.DegreesToDMS(SkyServer.Altitude, "° ", ":", "", 2);
+                                    if (Graphic != FrontGraphic.None) {Alt = SkyServer.Altitude;}
                                     break;
                                 case "Azimuth":
                                     Azimuth = _util.DegreesToDMS(SkyServer.Azimuth, "° ", ":", "", 2);
+                                    if (Graphic != FrontGraphic.None) {Az = SkyServer.Azimuth;}
                                     break;
                                 case "CanPPec":
                                     PPecEnabled = SkyServer.CanPPec;
@@ -361,7 +391,7 @@ namespace GS.Server.SkyTelescope
                                 case "RightAscensionXForm":
                                     RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
                                     Rotate();
-                                    GetDebugProperties();
+                                    SetGraphics();
                                     break;
                                 case "IsHome":
                                     IsHome = SkyServer.IsHome;
@@ -415,7 +445,6 @@ namespace GS.Server.SkyTelescope
                                     ParkSelection = SkyServer.ParkSelected;
                                     break;
                                 case "TrackingRate":
-                                    CurTrackingRate = $"{SkyServer.TrackingRate}";
                                     break;
                                 case "PecBinNow":
                                     PecBinNow = SkyServer.PecBinNow.Item1;
@@ -484,42 +513,7 @@ namespace GS.Server.SkyTelescope
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
-
-        ///// <summary>
-        ///// Used in the bottom bar to show the monitor is running
-        ///// </summary>
-        ///// <param name="sender"></param>
-        ///// <param name="e"></param>
-        //private void PropertyChangedSynthesizer(object sender, PropertyChangedEventArgs e)
-        //{
-        //    try
-        //    {
-        //        switch (e.PropertyName)
-        //        {
-        //            case "VoiceActive":
-        //                VoiceState = Synthesizer.VoiceActive;
-        //                break;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var monitorItem = new MonitorEntry
-        //        {
-        //            Datetime = HiResDateTime.UtcNow,
-        //            Device = MonitorDevice.UI,
-        //            Category = MonitorCategory.Interface,
-        //            Type = MonitorType.Error,
-        //            Method = MethodBase.GetCurrentMethod()?.Name,
-        //            Thread = Thread.CurrentThread.ManagedThreadId,
-        //            Message = $"{ex.Message}|{ex.StackTrace}"
-        //        };
-        //        MonitorLog.LogToMonitor(monitorItem);
-
-        //        SkyServer.AlertState = true;
-        //        OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-        //    }
-        //}
-
+        
         /// <summary>
         /// Property changes from system
         /// </summary>
@@ -683,7 +677,7 @@ namespace GS.Server.SkyTelescope
         {
             if (!string.IsNullOrEmpty(ImageFile)) return;
             var random = new Random();
-            ImageFiles = new List<string> { "M33.png", "Horsehead.png", "NGC6992.png", "Orion.png" };
+            ImageFiles = new List<string> { "M33.png", "Horsehead.png", "NGC6992.png", "Orion.png", "IC1396.png" };
             ImageFile = "../Resources/" + ImageFiles[random.Next(ImageFiles.Count)];
         }
 
@@ -1059,8 +1053,8 @@ namespace GS.Server.SkyTelescope
             set
             {
                 var l = Math.Abs(Principles.Units.Deg2Dou(value, Lat2, Lat3));
-                if (Lat0 == "S") l = -l;
-                if (Math.Abs(l - SkySettings.Latitude) < 0.0000000000001) return;
+                if (Lat0 == "S"){l = -l;}
+                if (Math.Abs(l - SkySettings.Latitude) < 0.0000000000001){return;}
                 SkySettings.Latitude = l;
                 OnPropertyChanged();
             }
@@ -1480,63 +1474,157 @@ namespace GS.Server.SkyTelescope
         }
         #endregion
 
-        #region Debug
-        private void GetDebugProperties()
+        #region RaDec Gauge
+        private void SetGraphics()
         {
-            if (!DebugVisibility) return;
-            ActualAxisX = $"{Numbers.TruncateD(SkyServer.ActualAxisX, 2)}";
-            ActualAxisY = $"{Numbers.TruncateD(SkyServer.ActualAxisY, 2)}";
-            SiderealTime = _util.HoursToHMS(SkyServer.SiderealTime);
+            switch (Graphic)
+            {
+                case FrontGraphic.None:
+                    break;
+                case FrontGraphic.AltAz:
+                    if (SkyServer.SouthernHemisphere)
+                    {
+                        DecLabelRight = $"{Application.Current.Resources["lbNorth"]}";
+                        DecLabelLeft = $"{Application.Current.Resources["lbSouth"]}";
+                    }
+                    else
+                    {
+                        RaLabelRight = $"{Application.Current.Resources["lbEast"]}";
+                        RaLabelLeft = $"{Application.Current.Resources["lbWest"]}";
+                    }
+                    break;
+                case FrontGraphic.RaDec:
+                    ActualAxisX = Math.Round(SkyServer.ActualAxisX, 2);
+                    ActualAxisY = Math.Round(SkyServer.ActualAxisY, 2);
+                    if (SkyServer.SouthernHemisphere)
+                    {
+                        RaLabelRight = $"{Application.Current.Resources["lbWest"]}";
+                        RaLabelLeft = $"{Application.Current.Resources["lbEast"]}";
+
+                        DecLabelRight = $"{Application.Current.Resources["lbNorth"]}";
+                        DecLabelLeft = $"{Application.Current.Resources["lbSouth"]}";
+                    }
+                    else
+                    {
+                        RaLabelRight = $"{Application.Current.Resources["lbEast"]}";
+                        RaLabelLeft = $"{Application.Current.Resources["lbWest"]}";
+
+                        DecLabelRight = $"{Application.Current.Resources["lbSouth"]}";
+                        DecLabelLeft = $"{Application.Current.Resources["lbNorth"]}";
+                    }
+                    break;
+                case FrontGraphic.Model3D:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
-        private string _actualAxisX;
-        public string ActualAxisX
+        private string _raLabelRight;
+        public string RaLabelRight
+        {
+            get => _raLabelRight;
+            private set
+            {
+                if (_raLabelRight == value){return;}
+                _raLabelRight = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _raLabelLeft;
+        public string RaLabelLeft
+        {
+            get => _raLabelLeft;
+            private set
+            {
+                if (_raLabelLeft == value){return;}
+                _raLabelLeft = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _decLabelRight;
+        public string DecLabelRight
+        {
+            get => _decLabelRight;
+            private set
+            {
+                if (_decLabelRight == value){return;}
+                _decLabelRight = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _decLabelLeft;
+        public string DecLabelLeft
+        {
+            get => _decLabelLeft;
+            private set
+            {
+                if (_decLabelLeft == value){return;}
+                _decLabelLeft = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _actualAxisX;
+        public double ActualAxisX
         {
             get => _actualAxisX;
             private set
             {
-                if (_actualAxisX == value) return;
+                if (Math.Abs(_actualAxisX - value) < 0.01){return;}
                 _actualAxisX = value;
+                RaGauge = value;
                 OnPropertyChanged();
             }
         }
 
-        private string _actualAxisY;
-        public string ActualAxisY
+        private double _actualAxisY;
+        public double ActualAxisY
         {
             get => _actualAxisY;
             private set
             {
-                if (_actualAxisY == value) return;
+                if (Math.Abs(_actualAxisY - value) < 0.01){return;}
                 _actualAxisY = value;
+                DecGauge = value;
                 OnPropertyChanged();
             }
         }
 
-        private string _curTrackingRate;
-        public string CurTrackingRate
+        private double _raGauge;
+        public double RaGauge
         {
-            get => _curTrackingRate;
+            get => _raGauge;
             private set
             {
-                if (_curTrackingRate == value) return;
-                _curTrackingRate = value;
+                _raGauge = RaGaugeFlip ? value - 180 : value;
+                OnPropertyChanged();
+            }
+        }
+        
+        private double _decGauge;
+        public double DecGauge
+        {
+            get => _decGauge;
+            private set
+            {
+                _decGauge = value;
                 OnPropertyChanged();
             }
         }
 
-        private bool _debugVisibility;
-        public bool DebugVisibility
+        public bool RaGaugeFlip
         {
-            get => _debugVisibility;
+            get => SkySettings.RaGaugeFlip;
             set
             {
-                if (value == _debugVisibility) return;
-                _debugVisibility = value;
-                SkySettings.Diagnostics = value;
+                if (value == SkySettings.RaGaugeFlip) return;
+                SkySettings.RaGaugeFlip = value;
                 OnPropertyChanged();
-                if (!value) return;
-                GetDebugProperties();
+                RaGauge = ActualAxisX;
             }
         }
 
@@ -1549,6 +1637,369 @@ namespace GS.Server.SkyTelescope
                 if (_pecBinNow == value) return;
                 _pecBinNow = value;
                 OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
+        #region AltAz Gauge
+        private double _az;
+        public double Az
+        {
+            get => _az;
+            private set
+            {
+                if (Math.Abs(_az - value) < 0.01) { return; }
+                _az = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _alt;
+        public double Alt
+        {
+            get => _alt;
+            private set
+            {
+                if (Math.Abs(_alt - value) < 0.01) { return; }
+                _alt = value;
+                AltGauge = SkyServer.Lha < 0 ? 270 - value : 90 + value; 
+                OnPropertyChanged();
+            }
+        }
+
+        private double _altGauge;
+        public double AltGauge
+        {
+            get => _altGauge;
+            private set
+            {
+                if (Math.Abs(_altGauge - value) < 0.01) { return; }
+                _altGauge = value;
+                OnPropertyChanged();
+            }
+        }
+        #endregion
+
+        #region Viewport3D
+
+        private double xAxisOffset;
+        private double yAxisOffset;
+        private double zAxisOffset;
+
+        private bool _modelWinVisibility;
+        public bool ModelWinVisibility
+        {
+            get => _modelWinVisibility;
+            set
+            {
+                if (_modelWinVisibility == value) return;
+                _modelWinVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _cameraVis;
+        public bool CameraVis
+        {
+            get => _cameraVis;
+            set
+            {
+                if (_cameraVis == value) return;
+                _cameraVis = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Point3D _position;
+        public Point3D Position
+        {
+            get => _position;
+            set
+            {
+                if (_position == value) return;
+                _position = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Vector3D _lookDirection;
+        public Vector3D LookDirection
+        {
+            get => _lookDirection;
+            set
+            {
+                if (_lookDirection == value) return;
+                _lookDirection = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Vector3D _upDirection;
+        public Vector3D UpDirection
+        {
+            get => _upDirection;
+            set
+            {
+                if (_upDirection == value) return;
+                _upDirection = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private System.Windows.Media.Media3D.Model3D _model;
+        public System.Windows.Media.Media3D.Model3D Model
+        {
+            get => _model;
+            set
+            {
+                if (_model == value) return;
+                _model = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _xAxis;
+        public double XAxis
+        {
+            get => _xAxis;
+            set
+            {
+                _xAxis = value;
+                XAxisOffset = value + xAxisOffset;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _yAxis;
+        public double YAxis
+        {
+            get => _yAxis;
+            set
+            {
+                _yAxis = value;
+                YAxisOffset = value + yAxisOffset;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _zAxis;
+        public double ZAxis
+        {
+            get => _zAxis;
+            set
+            {
+                _zAxis = value;
+                ZAxisOffset = zAxisOffset - value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _xAxisOffset;
+        public double XAxisOffset
+        {
+            get => _xAxisOffset;
+            set
+            {
+                _xAxisOffset = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _yAxisOffset;
+        public double YAxisOffset
+        {
+            get => _yAxisOffset;
+            set
+            {
+                _yAxisOffset = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _zAxisOffset;
+        public double ZAxisOffset
+        {
+            get => _zAxisOffset;
+            set
+            {
+                _zAxisOffset = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Material _compass;
+        public Material Compass
+        {
+            get => _compass;
+            set
+            {
+                _compass = value;
+                OnPropertyChanged();
+            }
+        }
+        private void LoadGEM()
+        {
+            try
+            {
+                CameraVis = false;
+
+                //camera direction
+                LookDirection = Settings.Settings.ModelLookDirection2;
+                UpDirection = Settings.Settings.ModelUpDirection2;
+                Position = Settings.Settings.ModelPosition2;
+
+                //offset for model to match start position
+                xAxisOffset = 90;
+                yAxisOffset = -90;
+                zAxisOffset = 0;
+
+                //start position
+                XAxis = -90;
+                YAxis = 90;
+                ZAxis = Math.Round(Math.Abs(SkySettings.Latitude), 2);
+
+                //load model and compass
+                var import = new ModelImporter();
+                var model = import.Load(Shared.Model3D.GetModelFile(Settings.Settings.ModelType));
+                Compass = MaterialHelper.CreateImageMaterial(Shared.Model3D.GetCompassFile(SkyServer.SouthernHemisphere), 100);
+
+                //color OTA
+                var accentColor = Settings.Settings.AccentColor;
+                if (!string.IsNullOrEmpty(accentColor))
+                {
+                    var swatches = new SwatchesProvider().Swatches;
+                    foreach (var swatch in swatches)
+                    {
+                        if (swatch.Name != Settings.Settings.AccentColor) continue;
+                        var converter = new BrushConverter();
+                        var accentbrush = (Brush)converter.ConvertFromString(swatch.ExemplarHue.Color.ToString());
+
+                        var materialota = MaterialHelper.CreateMaterial(accentbrush);
+                        if (model.Children[0] is GeometryModel3D ota) ota.Material = materialota;
+                    }
+                }
+                //color weights
+                var materialweights = MaterialHelper.CreateMaterial(new SolidColorBrush(Color.FromRgb(64, 64, 64)));
+                if (model.Children[1] is GeometryModel3D weights) weights.Material = materialweights;
+                //color bar
+                var materialbar = MaterialHelper.CreateMaterial(Brushes.Gainsboro);
+                if (model.Children[2] is GeometryModel3D bar) bar.Material = materialbar;
+
+                Model = model;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+        private void Rotate()
+        {
+            if (Graphic != FrontGraphic.Model3D) { return; }
+
+            var axes = Shared.Model3D.RotateModel(SkySettings.Mount.ToString(), SkyServer.ActualAxisX,
+               SkyServer.ActualAxisY, SkyServer.SouthernHemisphere);
+
+            YAxis = axes[0];
+            XAxis = axes[1];
+        }
+
+        private ICommand _openModelWindowCmd;
+        public ICommand OpenModelWindowCmd
+        {
+            get
+            {
+                var cmd = _openModelWindowCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openModelWindowCmd = new RelayCommand(param => OpenModelWindow());
+            }
+        }
+        private void OpenModelWindow()
+        {
+            try
+            {
+                var win = Application.Current.Windows.OfType<ModelV>().FirstOrDefault();
+                if (win != null) return;
+                var bWin = new ModelV();
+                var _modelVM = ModelVM._modelVM;
+                _modelVM.WinHeight = 320;
+                _modelVM.WinWidth = 250;
+                _modelVM.Position = Position;
+                _modelVM.LookDirection = LookDirection;
+                _modelVM.UpDirection = UpDirection;
+                _modelVM.ImageFile = ImageFile;
+                _modelVM.CameraIndex = 2;
+                bWin.Show();
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _openResetViewCmd;
+        public ICommand OpenResetViewCmd
+        {
+            get
+            {
+                var cmd = _openResetViewCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openResetViewCmd = new RelayCommand(param => OpenResetView());
+            }
+        }
+        private void OpenResetView()
+        {
+            try
+            {
+                Settings.Settings.ModelLookDirection2 = new Vector3D(-900, -1100, -400);
+                Settings.Settings.ModelUpDirection2 = new Vector3D(.35, .43, .82);
+                Settings.Settings.ModelPosition2 = new Point3D(900, 1100, 800);
+                LoadGEM();
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -2061,6 +2512,105 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private bool _isHomeResetDialogOpen;
+        public bool IsHomeResetDialogOpen
+        {
+            get => _isHomeResetDialogOpen;
+            set
+            {
+                if (_isHomeResetDialogOpen == value){return;}
+                _isHomeResetDialogOpen = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isSchedulerDialogOpen;
+        public bool IsSchedulerDialogOpen
+        {
+            get => _isSchedulerDialogOpen;
+            set
+            {
+                if (_isSchedulerDialogOpen == value) return;
+                _isSchedulerDialogOpen = value;
+                CloseDialogs(value);
+                OnPropertyChanged();
+            }
+        }
+
+        private object _schedulerContent;
+        public object SchedulerContent
+        {
+            get => _schedulerContent;
+            set
+            {
+                if (_schedulerContent == value) return;
+                _schedulerContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isAutoHomeDialogOpen;
+        public bool IsAutoHomeDialogOpen
+        {
+            get => _isAutoHomeDialogOpen;
+            set
+            {
+                if (_isAutoHomeDialogOpen == value) return;
+                _isAutoHomeDialogOpen = value;
+                CloseDialogs(value);
+                OnPropertyChanged();
+            }
+        }
+
+        private object _autoHomeContent;
+        public object AutoHomeContent
+        {
+            get => _autoHomeContent;
+            set
+            {
+                if (_autoHomeContent == value) return;
+                _autoHomeContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isFlipDialogOpen;
+        public bool IsFlipDialogOpen
+        {
+            get => _isFlipDialogOpen;
+            set
+            {
+                if (_isFlipDialogOpen == value) return;
+                _isFlipDialogOpen = value;
+                CloseDialogs(value);
+                OnPropertyChanged();
+            }
+        }
+
+        private object _flipContent;
+        public object FlipContent
+        {
+            get => _flipContent;
+            set
+            {
+                if (_flipContent == value) return;
+                _flipContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private object _homeResetContent;
+        public object HomeResetContent
+        {
+            get => _homeResetContent;
+            set
+            {
+                if (_homeResetContent == value) return;
+                _homeResetContent = value;
+                OnPropertyChanged();
             }
         }
         #endregion
@@ -4135,344 +4685,6 @@ namespace GS.Server.SkyTelescope
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        #endregion
-
-        #region Viewport3D
-
-        private double xAxisOffset;
-        private double yAxisOffset;
-        private double zAxisOffset;
-
-        private bool _modelWinVisibility;
-        public bool ModelWinVisibility
-        {
-            get => _modelWinVisibility;
-            set
-            {
-                if (_modelWinVisibility == value) return;
-                _modelWinVisibility = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _cameraVis;
-        public bool CameraVis
-        {
-            get => _cameraVis;
-            set
-            {
-                if (_cameraVis == value) return;
-                _cameraVis = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private Point3D _position;
-        public Point3D Position
-        {
-            get => _position;
-            set
-            {
-                if (_position == value) return;
-                _position = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private Vector3D _lookDirection;
-        public Vector3D LookDirection
-        {
-            get => _lookDirection;
-            set
-            {
-                if (_lookDirection == value) return;
-                _lookDirection = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private Vector3D _upDirection;
-        public Vector3D UpDirection
-        {
-            get => _upDirection;
-            set
-            {
-                if (_upDirection == value) return;
-                _upDirection = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private System.Windows.Media.Media3D.Model3D _model;
-        public System.Windows.Media.Media3D.Model3D Model
-        {
-            get => _model;
-            set
-            {
-                if (_model == value) return;
-                _model = value;
-                OnPropertyChanged();
-            }
-        }
-        public bool ModelOn
-        {
-            get => SkySettings.ModelOn;
-            set
-            {
-                SkySettings.ModelOn = value;
-                if (value)
-                {
-                    Rotate();
-                    OpenResetView();
-                }
-                OnPropertyChanged();
-            }
-        }
-
-        private double _xAxis;
-        public double XAxis
-        {
-            get => _xAxis;
-            set
-            {
-                _xAxis = value;
-                XAxisOffset = value + xAxisOffset;
-                OnPropertyChanged();
-            }
-        }
-
-        private double _yAxis;
-        public double YAxis
-        {
-            get => _yAxis;
-            set
-            {
-                _yAxis = value;
-                YAxisOffset = value + yAxisOffset;
-                OnPropertyChanged();
-            }
-        }
-
-        private double _zAxis;
-        public double ZAxis
-        {
-            get => _zAxis;
-            set
-            {
-                _zAxis = value;
-                ZAxisOffset = zAxisOffset - value;
-                OnPropertyChanged();
-            }
-        }
-
-        private double _xAxisOffset;
-        public double XAxisOffset
-        {
-            get => _xAxisOffset;
-            set
-            {
-                _xAxisOffset = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private double _yAxisOffset;
-        public double YAxisOffset
-        {
-            get => _yAxisOffset;
-            set
-            {
-                _yAxisOffset = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private double _zAxisOffset;
-        public double ZAxisOffset
-        {
-            get => _zAxisOffset;
-            set
-            {
-                _zAxisOffset = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private Material _compass;
-        public Material Compass
-        {
-            get => _compass;
-            set
-            {
-                _compass = value;
-                OnPropertyChanged();
-            }
-        }
-        private void LoadGEM()
-        {
-            try
-            {
-                CameraVis = false;
-
-                //camera direction
-                LookDirection = Settings.Settings.ModelLookDirection2;
-                UpDirection = Settings.Settings.ModelUpDirection2;
-                Position = Settings.Settings.ModelPosition2;
-
-                //offset for model to match start position
-                xAxisOffset = 90;
-                yAxisOffset = -90;
-                zAxisOffset = 0;
-
-                //start position
-                XAxis = -90;
-                YAxis = 90;
-                ZAxis = Math.Round(Math.Abs(SkySettings.Latitude), 2);
-
-                //load model and compass
-                var import = new ModelImporter();
-                var model = import.Load(Shared.Model3D.GetModelFile(Settings.Settings.ModelType));
-                Compass = MaterialHelper.CreateImageMaterial(Shared.Model3D.GetCompassFile(SkyServer.SouthernHemisphere), 100);
-
-                //color OTA
-                var accentColor = Settings.Settings.AccentColor;
-                if (!string.IsNullOrEmpty(accentColor))
-                {
-                    var swatches = new SwatchesProvider().Swatches;
-                    foreach (var swatch in swatches)
-                    {
-                        if (swatch.Name != Settings.Settings.AccentColor) continue;
-                        var converter = new BrushConverter();
-                        var accentbrush = (Brush)converter.ConvertFromString(swatch.ExemplarHue.Color.ToString());
-
-                        var materialota = MaterialHelper.CreateMaterial(accentbrush);
-                        if (model.Children[0] is GeometryModel3D ota) ota.Material = materialota;
-                    }
-                }
-                //color weights
-                var materialweights = MaterialHelper.CreateMaterial(new SolidColorBrush(Color.FromRgb(64, 64, 64)));
-                if (model.Children[1] is GeometryModel3D weights) weights.Material = materialweights;
-                //color bar
-                var materialbar = MaterialHelper.CreateMaterial(Brushes.Gainsboro);
-                if (model.Children[2] is GeometryModel3D bar) bar.Material = materialbar;
-
-                Model = model;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}|{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-        private void Rotate()
-        {
-            if (!ModelOn) return;
-
-            var axes = Shared.Model3D.RotateModel(SkySettings.Mount.ToString(), SkyServer.ActualAxisX,
-                SkyServer.ActualAxisY, SkyServer.SouthernHemisphere);
-
-            YAxis = axes[0];
-            XAxis = axes[1];
-        }
-
-        private ICommand _openModelWindowCmd;
-        public ICommand OpenModelWindowCmd
-        {
-            get
-            {
-                var cmd = _openModelWindowCmd;
-                if (cmd != null)
-                {
-                    return cmd;
-                }
-
-                return _openModelWindowCmd = new RelayCommand(param => OpenModelWindow());
-            }
-        }
-        private void OpenModelWindow()
-        {
-            try
-            {
-                var win = Application.Current.Windows.OfType<ModelV>().FirstOrDefault();
-                if (win != null) return;
-                var bWin = new ModelV();
-                var _modelVM = ModelVM._modelVM;
-                _modelVM.WinHeight = 320;
-                _modelVM.WinWidth = 250;
-                _modelVM.Position = Position;
-                _modelVM.LookDirection = LookDirection;
-                _modelVM.UpDirection = UpDirection;
-                _modelVM.ImageFile = ImageFile;
-                _modelVM.CameraIndex = 2;
-                bWin.Show();
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}|{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _openResetViewCmd;
-        public ICommand OpenResetViewCmd
-        {
-            get
-            {
-                var cmd = _openResetViewCmd;
-                if (cmd != null)
-                {
-                    return cmd;
-                }
-
-                return _openResetViewCmd = new RelayCommand(param => OpenResetView());
-            }
-        }
-        private void OpenResetView()
-        {
-            try
-            {
-                Settings.Settings.ModelLookDirection2 = new Vector3D(-900, -1100, -400);
-                Settings.Settings.ModelUpDirection2 = new Vector3D(.35, .43, .82);
-                Settings.Settings.ModelPosition2 = new Point3D(900, 1100, 800);
-                LoadGEM();
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}|{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -7702,7 +7914,7 @@ namespace GS.Server.SkyTelescope
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
-        
+
         #endregion
 
         #region Dispose

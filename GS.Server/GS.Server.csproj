@@ -55,6 +55,9 @@
     <Prefer32Bit>true</Prefer32Bit>
     <WarningLevel>5</WarningLevel>
   </PropertyGroup>
+ <ItemGroup>
+   <None Remove="Resources\IC1396.png" />
+ </ItemGroup>
   <ItemGroup>
     <Reference Include="ReachFramework" />
     <Reference Include="System.Speech" />
@@ -69,9 +72,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Resources\ASCOM.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\scope3.jpg" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ColorPicker\ColorPicker.csproj">
@@ -96,6 +96,9 @@
     <ProjectReference Include="..\XInputDotNetPure\XInputDotNetPure.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\IC1396.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\M33.png" />
   </ItemGroup>
   <ItemGroup>
@@ -214,6 +217,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Controls\AltAzGauges.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
     <Page Update="Controls\Dialogs\CapabilitiesDialog.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>

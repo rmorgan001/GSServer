@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="GS.Server.Controls.AltAzGauges"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+             xmlns:wpf="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf" mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}" d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Background="{DynamicResource MaterialDesignToolBarBackground}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5" >
+            <TextBlock Text=" " />
+        </StackPanel>
+        <Path Grid.Row="1" Stroke="{StaticResource  PrimaryHueLightBrush }" StrokeThickness=".5" Stretch="Fill" Width="150">
+            <Path.Data>
+                <LineGeometry StartPoint="0,1" EndPoint="1,1"  />
+            </Path.Data>
+        </Path>
+        <Path Grid.Row="2" Stroke="{StaticResource  PrimaryHueLightBrush }" StrokeThickness=".5" Stretch="Fill" Width="150">
+            <Path.Data>
+                <LineGeometry StartPoint="0,1" EndPoint="1,1" />
+            </Path.Data>
+        </Path>
+        <wpf:AngularGauge Grid.Row="1" Value="{Binding Az}" TicksStrokeThickness="0" FontSize="1" FromValue="0" ToValue="360" Wedge="360" Margin="5" NeedleFill="{StaticResource SecondaryHueMidBrush}"  Foreground="{StaticResource  MaterialDesignTextFieldBoxHoverBackground}" SectionsInnerRadius=".6">
+            <wpf:AngularGauge.Sections>
+                <wpf:AngularSection FromValue="0" ToValue="360" Fill="{StaticResource MaterialDesignTextFieldBoxHoverBackground}" />
+            </wpf:AngularGauge.Sections>
+            <wpf:AngularGauge.RenderTransform>
+                <RotateTransform CenterX="120" CenterY="73" Angle="180"></RotateTransform>
+            </wpf:AngularGauge.RenderTransform>
+        </wpf:AngularGauge>
+        <TextBlock Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0" Text="{Binding Az, StringFormat=N2}"/>
+        <TextBlock Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10" Text="{StaticResource lbAz}"/>
+        <wpf:AngularGauge Grid.Row="2" Value="{Binding AltGauge}" TicksStrokeThickness="0" FontSize="1" FromValue="0" ToValue="360" Wedge="360" Margin="5" NeedleFill="{StaticResource SecondaryHueMidBrush}" Foreground="{StaticResource  MaterialDesignTextFieldBoxHoverBackground}" SectionsInnerRadius=".6">
+            <wpf:AngularGauge.Sections>
+                <wpf:AngularSection FromValue="90" ToValue="270" Fill="{StaticResource MaterialDesignTextFieldBoxHoverBackground}" />
+            </wpf:AngularGauge.Sections>
+        </wpf:AngularGauge>
+        <TextBlock Grid.Row="2" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0" Text="{Binding Alt, StringFormat=N}"/>
+        <TextBlock Grid.Row="2" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10" Text="{StaticResource lbAlt}"/>
+        <TextBlock Grid.Row="2" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0" Text="{Binding RaLabelRight}"/>
+        <TextBlock Grid.Row="2" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding RaLabelLeft}"/>
+    </Grid>
+</UserControl>

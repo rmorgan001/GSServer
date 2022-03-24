@@ -312,20 +312,6 @@ namespace GS.Server.Windows
                 OnPropertyChanged();
             }
         }
-        public bool ModelOn
-        {
-            get => SkySettings.ModelOn;
-            set
-            {
-                SkySettings.ModelOn = value;
-                if (value)
-                {
-                    Rotate();
-                    LoadGEM();
-                }
-                OnPropertyChanged();
-            }
-        }
 
         private double _xAxis;
         public double XAxis

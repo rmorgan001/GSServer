@@ -7,7 +7,7 @@
              xmlns:domain="clr-namespace:GS.Server.Domain"
              xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
              xmlns:deviceInterface="clr-namespace:ASCOM.DeviceInterface;assembly=ASCOM.DeviceInterfaces"
-             xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared" mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+             xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared" mc:Ignorable="d">
     <UserControl.Resources>
         <domain:ComparisonConverter x:Key="Compare" />
         <domain:BoolToVisConverter x:Key="BoolToVis" />

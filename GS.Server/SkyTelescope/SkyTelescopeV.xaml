@@ -12,8 +12,9 @@
              xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              Loaded="SkyTelescopeV_OnLoaded" mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
     <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <domain:ComparisonConverter x:Key="Compare" />
         <domain:InverseBooleanConverter x:Key="InvertBool" />
+        <domain:EnumToVisibilityConverter x:Key="EnumToVis" />
     </UserControl.Resources>
     <md:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" CloseOnClickAway="True"  >
         <Grid MinWidth="800">
@@ -387,11 +388,11 @@
                                               IsChecked="{Binding FullCurrent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyFullCurrent}"/>
                             </StackPanel>
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,10,0,0">
+                                <!--obsolete <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,10,0,0">
                                 <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skyDiagnostics}"
-                                              IsChecked="{Binding DebugVisibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    IsChecked="{Binding DebugVisibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skyDiagnostics}"/>
-                            </StackPanel>
+                                </StackPanel>-->
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
                                             <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource skySyncLimitOn}" IsChecked="{Binding SyncLimitOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                             <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource skySyncLimitOn}" />
@@ -632,7 +633,6 @@
                                       Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
                     </StackPanel>
                     <controls:TopCoordsBar Grid.Row="0" Grid.Column="0" IsEnabled="{Binding ScreenEnabled}" HorizontalAlignment="Center"/>
-
                     <Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" IsEnabled="{Binding ScreenEnabled}">
                             <Grid.Style>
                                 <Style TargetType="Grid">
@@ -671,17 +671,24 @@
                                         <Grid.Background>
                                             <ImageBrush ImageSource="{Binding ImageFile}" Stretch="UniformToFill" />
                                         </Grid.Background>
-                                        <controls:HelixViewport3D Visibility="{Binding ModelOn, Converter={StaticResource BoolToVis}}"/>
-                                        <StackPanel>
-                                            <controls:Debug Visibility="{Binding DebugVisibility, Converter={StaticResource BoolToVis}}"/>
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="5">
-                                            <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="3DView" IsChecked="{Binding ModelOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                            <Label Content="3D" />
-                                        </StackPanel>
-                                    </Grid>
+                                        <controls:HelixViewport3D Visibility="{Binding Graphic, Converter={StaticResource EnumToVis}, ConverterParameter='Model3D'}"/>
+                                        <controls:RaDecGauges Visibility="{Binding Graphic, Converter={StaticResource EnumToVis}, ConverterParameter='RaDec'}"/>
+                                        <controls:AltAzGauges Visibility="{Binding Graphic, Converter={StaticResource EnumToVis}, ConverterParameter='AltAz'}"/>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="5">
+                                        <md:PopupBox Margin="-10,-5,0,0" StaysOpen="False">
+                                            <GroupBox Margin="5,0,5,0">
+                                                <StackPanel Orientation="Vertical">
+                                                    <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="fg" IsChecked="{Binding Path=Graphic, Converter={StaticResource Compare}, ConverterParameter={x:Static skyTelescope:FrontGraphic.None}}" Content="{StaticResource RbNone}" />
+                                                    <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="fg" IsChecked="{Binding Path=Graphic, Converter={StaticResource Compare}, ConverterParameter={x:Static skyTelescope:FrontGraphic.AltAz}}" Content="{StaticResource RbAltAz}" />
+                                                    <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="fg" IsChecked="{Binding Path=Graphic, Converter={StaticResource Compare}, ConverterParameter={x:Static skyTelescope:FrontGraphic.RaDec}}" Content="{StaticResource RbRaDec}" />
+                                                    <RadioButton Margin="5" Style="{StaticResource MaterialDesignRadioButton}" GroupName="fg" IsChecked="{Binding Path=Graphic, Converter={StaticResource Compare}, ConverterParameter={x:Static skyTelescope:FrontGraphic.Model3D}}" Content="{StaticResource Rb3D}" />
+                                                </StackPanel>
+                                            </GroupBox>
+                                        </md:PopupBox>
+                                    </StackPanel>
+                                </Grid>
                                 </Border>
-                        </StackPanel>
+                            </StackPanel>
                         </Grid>
                     <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center">
                         <controls:BottomStatusBar IsEnabled="{Binding ScreenEnabled}"/>

@@ -615,8 +615,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="customGears">Engrenages personnalisés</system:String>
     <system:String x:Key="raTotalSteps">RA Nombre total de pas</system:String>
     <system:String x:Key="decTotalSteps">Dec Nombre total de pas</system:String>
-    <system:String x:Key="raWormTeeth">RA Worm Teeth</system:String>
-    <system:String x:Key="decWormTeeth">Dec Worm Teeth</system:String>
+    <system:String x:Key="raWormTeeth">RA Worm Dents</system:String>
+    <system:String x:Key="decWormTeeth">Dec Worm Dents</system:String>
     <system:String x:Key="raTrackingOffset">RA Décalage de suivi</system:String>
     <system:String x:Key="decTrackingOffset">Dec Décalage de suivi</system:String>
     <system:String x:Key="gearingConnect">Reconnectez-vous pour que les modifications prennent effet</system:String>
@@ -686,4 +686,15 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!--1.0.4.3 -->
     <system:String x:Key="optUI">UI</system:String>
+    <system:String x:Key="lbEast">Est</system:String>
+    <system:String x:Key="lbWest">Ouest</system:String>
+    <system:String x:Key="lbNorth">Nord</system:String>
+    <system:String x:Key="lbSouth">Sud</system:String>
+    <system:String x:Key="lbOptics">Optique</system:String>
+    <system:String x:Key="RbNone">Vide</system:String>
+    <system:String x:Key="RbAltAz">AltAz</system:String>
+    <system:String x:Key="RbRaDec">RaDec</system:String>
+    <system:String x:Key="Rb3D">3D</system:String>
+    <system:String x:Key="lbAz">Az</system:String>
+    <system:String x:Key="lbAlt">Alt</system:String>
 </ResourceDictionary>

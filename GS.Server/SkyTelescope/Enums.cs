@@ -161,4 +161,12 @@ namespace GS.Server.SkyTelescope
         SlewComplete
     }
 
+    public enum FrontGraphic
+    {
+        None,
+        AltAz,
+        RaDec,
+        Model3D
+    }
+
 }
