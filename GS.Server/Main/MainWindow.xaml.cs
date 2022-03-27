@@ -34,15 +34,15 @@ namespace GS.Server.Main
             //  Topmost = Properties.Server.Default.StartOnTop;
             Memory.FlushMemory();
             SetOnScreen(this);
+            MouseLeftButtonDown += delegate { DragMove(); };
         }
 
         protected override void OnStateChanged(EventArgs e)
         {
             base.OnStateChanged(e);
-
             InvalidateMeasure();
-
         }
+
 
         /// <summary>
         /// Make sure startup window is within the visible screen area

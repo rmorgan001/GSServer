@@ -27,15 +27,7 @@
         Width="{Binding WindowWidth, Mode=TwoWay}" 
         Left="{Binding WindowLeft, Mode=TwoWay}" 
         Top="{Binding WindowTop, Mode=TwoWay}" 
-        MinHeight="100" MinWidth="200">
-    <WindowChrome.WindowChrome>
-        <WindowChrome
-            ResizeBorderThickness="6"
-            CaptionHeight="30"
-            CornerRadius="5,5,5,5"
-            GlassFrameThickness="1">
-        </WindowChrome>
-    </WindowChrome.WindowChrome>
+        MinHeight="100" MinWidth="200" AllowsTransparency="True">
     <Window.Resources>
         <DataTemplate DataType="{x:Type skyTelescope:SkyTelescopeVM}">
             <skyTelescope:SkyTelescopeV />
@@ -79,13 +71,13 @@
     </Window.TaskbarItemInfo>
         <Grid Background="{DynamicResource MaterialDesignBody}">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-        <controls:WindowTitleBar Grid.Row="0"/>
+            <controls:WindowTitleBar Grid.Row="0"/>
             <controls:TabBar Grid.Row="1"/>
-        <Grid Grid.Row="2" Background="{DynamicResource MaterialDesignPaper}">
+            <Grid Grid.Row="2" Background="{DynamicResource MaterialDesignPaper}">
             <ContentControl Content="{Binding CurrentPageViewModel}"/>
         </Grid>
     </Grid>
