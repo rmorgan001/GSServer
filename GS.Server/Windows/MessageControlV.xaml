@@ -4,17 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:GS.Server.Controls"
-        xmlns:windows="clr-namespace:GS.Server.Windows"
-        mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="NoResize" 
-        WindowStyle="None" TextOptions.TextFormattingMode="Display" 
+        xmlns:windows="clr-namespace:GS.Server.Windows" mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanResizeWithGrip" WindowStyle="None" TextOptions.TextFormattingMode="Display" 
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" 
         Title="{StaticResource hcHc}" FontStretch="Normal" Topmost="{Binding TopMost}"
         d:DataContext="{d:DesignInstance windows:MessageControlVM, IsDesignTimeCreatable=True}" TextElement.Foreground="{DynamicResource MaterialDesignBody}" 
         SizeToContent="WidthAndHeight"  MinHeight="100" MinWidth="300"
-        WindowState="{Binding WindowStates}" WindowStartupLocation="CenterOwner">
-    <WindowChrome.WindowChrome>
-        <WindowChrome ResizeBorderThickness="6" CaptionHeight="30" CornerRadius="3" GlassFrameThickness="2"/>
-    </WindowChrome.WindowChrome>
+        WindowState="{Binding WindowStates}" WindowStartupLocation="CenterOwner" AllowsTransparency="True" ContentRendered="MainWindow_OnContentRendered">
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo Description="{StaticResource titleName}" />
     </Window.TaskbarItemInfo>

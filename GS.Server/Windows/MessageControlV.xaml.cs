@@ -1,4 +1,6 @@
-﻿namespace GS.Server.Windows
+﻿using System;
+
+namespace GS.Server.Windows
 {
     /// <summary>
     /// Interaction logic for Window1.xaml
@@ -9,6 +11,11 @@
         {
             DataContext = new MessageControlVM(caption, msg); 
             InitializeComponent();
+        }
+
+        private void MainWindow_OnContentRendered(object sender, EventArgs e)
+        {
+            MouseLeftButtonDown += delegate { DragMove(); };
         }
     }
 }

@@ -130,28 +130,50 @@ namespace GS.Server.Plot
                 steps -= zero;
             }
 
+            TitleItem item;
             switch (Scale)
             {
                 case ChartScale.Degrees:
                     point.Value = Conversions.ArcSec2Deg(steps / raStepsPerSecond);
+                    Values1.Add(point);
+                    item = TitleItems.FirstOrDefault(x => x.TitleName == Values1Title);
+                    if (item != null)
+                    {
+                        item.Value = Numbers.TruncateD(point.Value, 2);
+                    }
                     break;
                 case ChartScale.Arcsecs:
-                    point.Value = steps / raStepsPerSecond;
+                    point.Value = steps;
+                    Values1.Add(point);
+                    item = TitleItems.FirstOrDefault(x => x.TitleName == Values1Title);
+                    if (item != null)
+                    {
+                        item.Value = point.Value;
+                        var fpoint = Values1.FirstOrDefault();
+                        var lpoint = Values1.LastOrDefault();
+                        if (fpoint != null && lpoint != null)
+                        {
+                            var tspan = lpoint.DateTime - fpoint.DateTime;
+                            var vspan = Math.Abs(lpoint.Value - fpoint.Value);
+                            var rate = vspan / raStepsPerSecond / Math.Abs(tspan.TotalSeconds);
+                            item.Value = Numbers.TruncateD(rate, 3);  
+                        }
+                    }
                     break;
                 case ChartScale.Steps:
                     point.Value = steps;
+                    Values1.Add(point);
+                    item = TitleItems.FirstOrDefault(x => x.TitleName == Values1Title);
+                    if (item != null)
+                    {
+                        item.Value = Numbers.TruncateD(point.Value, 0);
+                    }
                     break;
                 default:
                     return;
             }
-            if (IsLogging) ChartLogging.LogPoint(BaseLogName,ChartType.Plot, point);
-
-            Values1.Add(point);
-            if (Values1.Count > MaxPoints) Values1.RemoveAt(0);
-
-            var item = TitleItems.FirstOrDefault(x => x.TitleName == Values1Title);
-            if (item == null) return;
-            item.Value = point.Value;
+            if (IsLogging){ChartLogging.LogPoint(BaseLogName,ChartType.Plot, point);}
+            if (Values1.Count > MaxPoints){Values1.RemoveAt(0);}
         }
 
         /// <summary>
@@ -170,30 +192,51 @@ namespace GS.Server.Plot
                 var zero = Conversions.Deg2ArcSec(90) * decStepsPerSecond;
                 steps -= zero;
             }
-
+            TitleItem item;
             switch (Scale)
             {
                 case ChartScale.Degrees:
                     point.Value = Conversions.ArcSec2Deg(steps / decStepsPerSecond);
+                    Values2.Add(point);
+                    item = TitleItems.FirstOrDefault(x => x.TitleName == Values2Title);
+                    if (item != null)
+                    {
+                        item.Value = Numbers.TruncateD(point.Value, 2);
+                    }
                     break;
                 case ChartScale.Arcsecs:
-                    point.Value = steps / decStepsPerSecond;
+                    point.Value = steps;
+                    Values2.Add(point);
+                    item = TitleItems.FirstOrDefault(x => x.TitleName == Values2Title);
+                    if (item != null)
+                    {
+                        item.Value = point.Value;
+                        var fpoint = Values2.FirstOrDefault();
+                        var lpoint = Values2.LastOrDefault();
+                        if (fpoint != null && lpoint != null)
+                        {
+                            var tspan = lpoint.DateTime - fpoint.DateTime;
+                            var vspan = Math.Abs(lpoint.Value - fpoint.Value);
+                            var rate = vspan / decStepsPerSecond / Math.Abs(tspan.TotalSeconds);
+                            item.Value = Numbers.TruncateD(rate, 3);
+                        }
+                    }
                     break;
                 case ChartScale.Steps:
                     point.Value = steps;
+                    Values2.Add(point);
+                    item = TitleItems.FirstOrDefault(x => x.TitleName == Values2Title);
+                    if (item != null)
+                    {
+                        item.Value = Numbers.TruncateD(point.Value, 2);
+                    }
                     break;
                 default:
                     return;
             }
 
-            if (IsLogging) ChartLogging.LogPoint(BaseLogName,ChartType.Plot, point);
-
-            Values2.Add(point);
-            if (Values2.Count > MaxPoints) Values2.RemoveAt(0);
-
-            var item = TitleItems.FirstOrDefault(x => x.TitleName == Values2Title);
-            if (item == null) return;
-            item.Value = point.Value;
+            if (IsLogging){ChartLogging.LogPoint(BaseLogName,ChartType.Plot, point);}
+            if (Values2.Count > MaxPoints){Values2.RemoveAt(0);}
         }
 
         /// <summary>
@@ -222,11 +265,11 @@ namespace GS.Server.Plot
             _xAxisTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _xAxisTimer.Tick += XAxisTimer_Tick;
 
-            MaxPointsRange = new List<double>(Numbers.InclusiveRange(1000, 50000, 1000));
+            MaxPointsRange = new List<double>(Numbers.InclusiveRange(500, 50000, 500));
             MaxPoints = 5000;
 
             FormatterX = value => new DateTime((long)value).ToString("HH:mm:ss");
-            FormatterY = value => value.ToString("N2");
+            FormatterY = value => value.ToString("N0");
 
             AxisXUnit = TimeSpan.FromSeconds(1).Ticks; //AxisXUnit = 10000000
             AxisYUnit = .5;
@@ -536,6 +579,7 @@ namespace GS.Server.Plot
             ResizeAxes();
             ChartsQuality(ChartQuality);
             TitleItems.Clear();
+            SetScale(Scale);
 
             raStepsPerSecond = Conversions.StepPerArcSec(SkyServer.StepsPerRevolution[0]);
             decStepsPerSecond = Conversions.StepPerArcSec(SkyServer.StepsPerRevolution[1]);
@@ -556,19 +600,34 @@ namespace GS.Server.Plot
                 if (titleItem != null) TitleItems.Add(titleItem);
             }
         }
-
         private void ChartsQuality(Quality chartQuality)
         {
             Values1.WithQuality(chartQuality);
             Values2.WithQuality(chartQuality);
         }
-
+        private void SetScale(ChartScale scale)
+        {
+            switch (scale)
+            {
+                case ChartScale.Arcsecs:
+                    FormatterY = value => value.ToString("N0");
+                    break;
+                case ChartScale.Degrees:
+                    FormatterY = value => value.ToString("N2");
+                    break;
+                case ChartScale.Steps:
+                    FormatterY = value => value.ToString("N0");
+                    break;
+                default:
+                    FormatterY = value => value.ToString("N0");
+                    break;
+            }
+        }
         private void SetXAxisLimits(DateTime now)
         {
             AxisXMax = now.Ticks + AxisXUnit * 2;
             AxisXMin = now.Ticks - AxisXUnit * AxisXSeconds;
         }
-
         private GColumnSeries NewGColumnSeries(string title, IChartValues values, ChartValueSet set, double pointSize, Brush color, int scaleAt)
         {
             var series = new GColumnSeries

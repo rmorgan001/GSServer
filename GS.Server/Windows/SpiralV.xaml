@@ -14,10 +14,7 @@
         d:DataContext="{d:DesignInstance windows:SpiralVM, IsDesignTimeCreatable=True}" 
         TextElement.Foreground="{DynamicResource MaterialDesignBody}" 
         Height="400" Width="430" Loaded="SpiralV_OnLoaded" SizeChanged="SpiralV_OnSizeChanged" 
-        WindowState="{Binding WindowState}" WindowStartupLocation="CenterOwner">
-    <WindowChrome.WindowChrome>
-        <WindowChrome ResizeBorderThickness="6" CaptionHeight="30" CornerRadius="5" GlassFrameThickness="1"/>
-    </WindowChrome.WindowChrome>
+        WindowState="{Binding WindowState}" WindowStartupLocation="CenterOwner" AllowsTransparency="True" ContentRendered="MainWindow_OnContentRendered">
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo Description="{StaticResource 1021SpiralSearch}"/>
     </Window.TaskbarItemInfo>

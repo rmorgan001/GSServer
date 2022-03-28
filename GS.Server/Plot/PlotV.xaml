@@ -131,7 +131,7 @@
                     </wpf:CartesianChart.AxisX>
                     <wpf:CartesianChart.AxisY>
                         <wpf:Axis Title="{Binding Scale, Mode=TwoWay}" FontSize="15" Foreground="DarkGray" ShowLabels="True" DisableAnimations="True" 
-                                  LabelFormatter="{Binding FormatterY, Mode=OneTime}" MaxValue="{Binding AxisYMax, Mode=TwoWay}" MinValue="{Binding AxisYMin, Mode=TwoWay}"
+                                  LabelFormatter="{Binding FormatterY}" MaxValue="{Binding AxisYMax, Mode=TwoWay}" MinValue="{Binding AxisYMin, Mode=TwoWay}"
                                   Unit="{Binding AxisYUnit, Mode=TwoWay}">
                             <wpf:Axis.Sections>
                                 <wpf:AxisSection Value="0" StrokeThickness="1" Stroke="DarkGray" DisableAnimations="True"/>
@@ -152,7 +152,7 @@
                         <DataTemplate DataType="plot:TitleItem">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{Binding Path=TitleName}" Foreground="{Binding Path=Fill}" FontSize="18" />
-                                <TextBlock Text="{Binding Path=Value, StringFormat=N2}"  Foreground="{Binding Path=Fill}" FontSize="18" Margin="5,0,0,0" />
+                                <TextBlock Text="{Binding Path=Value}"  Foreground="{Binding Path=Fill}" FontSize="18" Margin="5,0,0,0" />
                             </StackPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>

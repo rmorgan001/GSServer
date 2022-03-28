@@ -5,17 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:GS.Server.Controls"
         xmlns:windows="clr-namespace:GS.Server.Windows"
-        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-        mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="NoResize" 
-        WindowStyle="None" TextOptions.TextFormattingMode="Display" Height="307" Width="145" 
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes" mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanResizeWithGrip" WindowStyle="None" TextOptions.TextFormattingMode="Display" Height="307" Width="145" 
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" 
         Title="{StaticResource hcHc}" FontStretch="Normal" Topmost="{Binding TopMost}"
         d:DataContext="{d:DesignInstance windows:ButtonsControlVM, IsDesignTimeCreatable=True}" 
         TextElement.Foreground="{DynamicResource MaterialDesignBody}" 
-        WindowState="{Binding WindowStates}" WindowStartupLocation="CenterOwner">
-    <WindowChrome.WindowChrome>
-        <WindowChrome ResizeBorderThickness="6" CaptionHeight="30" CornerRadius="3" GlassFrameThickness="2"/>
-    </WindowChrome.WindowChrome>
+        WindowState="{Binding WindowStates}" ContentRendered="MainWindow_OnContentRendered" WindowStartupLocation="CenterOwner" AllowsTransparency="True" >
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo Description="{StaticResource titleName}" />
     </Window.TaskbarItemInfo>

@@ -19,6 +19,11 @@ namespace GS.Server.Windows
             InitializeComponent();
         }
 
+        private void MainWindow_OnContentRendered(object sender, EventArgs e)
+        {
+            MouseLeftButtonDown += delegate { DragMove(); };
+        }
+
         private void LoadPoints()
         {
             var icons = new List<PackIcon>
