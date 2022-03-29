@@ -24,5 +24,10 @@ namespace GS.Utilities.Main
             // var vm = (MainWindowVM)DataContext;
 
         }
+
+        private void MainWindow_OnContentRendered(object sender, EventArgs e)
+        {
+            MouseLeftButtonDown += delegate { DragMove(); };
+        }
     }
 }

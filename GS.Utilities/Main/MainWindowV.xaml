@@ -8,23 +8,13 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:controls="clr-namespace:GS.Utilities.Controls"
         xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
-        xmlns:main="clr-namespace:GS.Utilities.Main"
-        Closed="MainWindow_OnClosed"  TextOptions.TextFormattingMode="Display"
-        WindowState="{Binding WindowState, Source={x:Static properties:Utilities.Default}, Mode=TwoWay}"
+        xmlns:main="clr-namespace:GS.Utilities.Main" Closed="MainWindow_OnClosed" TextOptions.TextFormattingMode="Display" ContentRendered="MainWindow_OnContentRendered" WindowState="{Binding WindowState, Source={x:Static properties:Utilities.Default}, Mode=TwoWay}"
         Height="{Binding WindowHeight, Source={x:Static properties:Utilities.Default}, Mode=TwoWay}" 
         Width="{Binding WindowWidth, Source={x:Static properties:Utilities.Default}, Mode=TwoWay}"
         Left="{Binding WindowLeft, Source={x:Static properties:Utilities.Default}, Mode=TwoWay}"
         Top="{Binding WindowTop, Source={x:Static properties:Utilities.Default}, Mode=TwoWay}"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}" Title="GS Utilities" FontSize="13" d:DataContext="{d:DesignInstance main:MainWindowVM}">
-    <WindowChrome.WindowChrome>
-        <WindowChrome
-            ResizeBorderThickness="6"
-            CaptionHeight="30"
-            CornerRadius="5,5,5,5"
-            GlassFrameThickness="0">
-        </WindowChrome>
-    </WindowChrome.WindowChrome>
     <Window.Resources>
     </Window.Resources>
     <Grid>

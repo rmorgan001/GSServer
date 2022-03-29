@@ -142,7 +142,7 @@
                         </wpf:Axis>
                     </wpf:CartesianChart.AxisY>
                 </wpf:CartesianChart>
-                <ListView Grid.Row="1" BorderThickness="0" Opacity="1" HorizontalAlignment="Left" Margin="130,30,0,0" Name="ListView1" VerticalAlignment="Top" ItemsSource="{Binding TitleItems}">
+                <ListView Grid.Row="1" BorderThickness="0" Opacity="1" HorizontalAlignment="Left" Margin="110,10,0,0" Name="ListView1" VerticalAlignment="Top" ItemsSource="{Binding TitleItems}">
                     <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
                             <b:InvokeCommandAction Command="{Binding ClickPlotSeriesCmd}" CommandParameter="{Binding ElementName=ListView1, Path=SelectedItem}" />
@@ -151,8 +151,8 @@
                     <ListView.ItemTemplate>
                         <DataTemplate DataType="plot:TitleItem">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Path=TitleName}" Foreground="{Binding Path=Fill}" FontSize="18" />
-                                <TextBlock Text="{Binding Path=Value}"  Foreground="{Binding Path=Fill}" FontSize="18" Margin="5,0,0,0" />
+                                <TextBlock Text="{Binding Path=TitleName}" Foreground="{Binding Path=Fill}" FontSize="25" Opacity=".5" />
+                                    <TextBlock Text="{Binding Path=Value}" Foreground="{Binding Path=Fill}" FontSize="25" Opacity=".5" Margin="10,0,0,0" />
                             </StackPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>

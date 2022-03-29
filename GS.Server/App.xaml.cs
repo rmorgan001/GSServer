@@ -28,8 +28,7 @@ namespace GS.Server
         {
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
 
-            // overloaded mutex constructor which outs a boolean
-            // telling if the mutex is new or not.
+            // overloaded mutex constructor which outs a boolean telling if the mutex is new or not.
             // see http://msdn.microsoft.com/en-us/library/System.Threading.Mutex.aspx
             _mutex = new Mutex(true, MutexName, out createdNew);
             if (createdNew) return;
@@ -80,7 +79,7 @@ namespace GS.Server
         {
             DispatcherUnhandledException -= Application_DispatcherUnhandledException;
             WriteException(e.Exception);
-            MessageBox.Show("An unexpected error has occurred within GSS. Error details have been logged and GSS will now close.", "Application Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("An unexpected error has occurred within GSS. Error details have been logged and GSS will now close. " + e.Exception.Message , "Application Error", MessageBoxButton.OK, MessageBoxImage.Error);
             e.Handled = true;
             this.Shutdown();
         }
@@ -88,8 +87,9 @@ namespace GS.Server
         void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             AppDomain.CurrentDomain.UnhandledException -= CurrentDomain_UnhandledException;
-            WriteException((Exception)e.ExceptionObject);
-            MessageBox.Show("An unexpected error has occurred within GSS. Error details have been logged and GSS will now close.", "Application Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            var ex = (Exception)e.ExceptionObject;
+            WriteException(ex);
+            MessageBox.Show("An unexpected error has occurred within GSS. Error details have been logged and GSS will now close." + ex.Message, "Application Error", MessageBoxButton.OK, MessageBoxImage.Error);
             this.Shutdown();
         }
 

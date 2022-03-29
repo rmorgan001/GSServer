@@ -76,7 +76,7 @@
             </Grid.RowDefinitions>
             <controls:WindowTitleBar Grid.Row="0"/>
             <controls:TabBar Grid.Row="1"/>
-            <Grid Grid.Row="2" Background="{DynamicResource MaterialDesignPaper}">
+        <Grid Grid.Row="2" Background="{DynamicResource MaterialDesignPaper}">
             <ContentControl Content="{Binding CurrentPageViewModel}"/>
         </Grid>
     </Grid>

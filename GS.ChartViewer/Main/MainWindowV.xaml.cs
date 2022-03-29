@@ -91,5 +91,10 @@ namespace GS.ChartViewer.Main
             //}
         }
         #endregion
+
+        private void MainWindow_OnContentRendered(object sender, EventArgs e)
+        {
+            MouseLeftButtonDown += delegate { DragMove(); };
+        }
     }
 }

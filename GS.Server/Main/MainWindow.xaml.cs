@@ -31,7 +31,6 @@ namespace GS.Server.Main
 
         private void MainWindow_OnContentRendered(object sender, EventArgs e)
         {
-            //  Topmost = Properties.Server.Default.StartOnTop;
             Memory.FlushMemory();
             SetOnScreen(this);
             MouseLeftButtonDown += delegate { DragMove(); };

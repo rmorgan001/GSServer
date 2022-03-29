@@ -13,7 +13,7 @@
             </Grid.ColumnDefinitions>
             <DockPanel Grid.Column="0" Dock="Left" Background="{Binding MountTypeColor}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="5,0,0,0">
-                    <CheckBox WindowChrome.IsHitTestVisibleInChrome="True" IsChecked="{Binding TopMost}" >
+                    <CheckBox IsChecked="{Binding TopMost}" >
                         <CheckBox.Resources>
                             <!-- ReSharper disable once Xaml.RedundantResource Unchecked state-->
                             <SolidColorBrush x:Key="MaterialDesignCheckBoxOff" Color="{StaticResource Primary900Foreground}" />
@@ -30,14 +30,14 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Text="{StaticResource titleApps}" Foreground="{StaticResource PrimaryHueLightBrush}"/>
                     <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Text="{Binding AppCount}" Foreground="{StaticResource PrimaryHueLightBrush}"/>
-                <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding MinimizeWindowCommand}"  WindowChrome.IsHitTestVisibleInChrome="True">
+                <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding MinimizeWindowCommand}">
                         <md:PackIcon Kind="WindowMinimize" VerticalAlignment="Center" Width="25" Height="25" Foreground="{StaticResource PrimaryHueLightBrush}" />
                 </Button>
-                <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding MaximizeWindowCommand}"  WindowChrome.IsHitTestVisibleInChrome="True">
+                <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding MaximizeWindowCommand}">
                         <md:PackIcon Kind="WindowMaximize" VerticalAlignment="Center" Width="25" Height="25" Foreground="{StaticResource PrimaryHueLightBrush}" />
                 </Button>
                 <md:DialogHost HorizontalAlignment="Left" VerticalAlignment="Bottom" CloseOnClickAway="True" IsOpen="{Binding IsCloseDialogOpen}" DialogContent="{Binding CloseContent}">
-                        <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{StaticResource PrimaryHueLightBrush}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding OpenCloseDialogCommand}" WindowChrome.IsHitTestVisibleInChrome="True">
+                        <Button Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{StaticResource PrimaryHueLightBrush}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding OpenCloseDialogCommand}">
                             <md:PackIcon Kind="Power" VerticalAlignment="Center" Width="25" Height="25" Foreground="{StaticResource PrimaryHueLightBrush}" />
                     </Button>
                 </md:DialogHost>

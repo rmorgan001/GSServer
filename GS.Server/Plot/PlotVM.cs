@@ -156,7 +156,7 @@ namespace GS.Server.Plot
                             var tspan = lpoint.DateTime - fpoint.DateTime;
                             var vspan = Math.Abs(lpoint.Value - fpoint.Value);
                             var rate = vspan / raStepsPerSecond / Math.Abs(tspan.TotalSeconds);
-                            item.Value = Numbers.TruncateD(rate, 3);  
+                            item.Value = Numbers.TruncateD(rate, 4);  
                         }
                     }
                     break;
@@ -218,7 +218,7 @@ namespace GS.Server.Plot
                             var tspan = lpoint.DateTime - fpoint.DateTime;
                             var vspan = Math.Abs(lpoint.Value - fpoint.Value);
                             var rate = vspan / decStepsPerSecond / Math.Abs(tspan.TotalSeconds);
-                            item.Value = Numbers.TruncateD(rate, 3);
+                            item.Value = Numbers.TruncateD(rate, 4);
                         }
                     }
                     break;
@@ -737,6 +737,11 @@ namespace GS.Server.Plot
         {
             Values1?.Clear();
             Values2?.Clear();
+
+            foreach (var item in TitleItems)
+            {
+                item.Value = double.NaN;
+            }
         }
 
         #endregion
