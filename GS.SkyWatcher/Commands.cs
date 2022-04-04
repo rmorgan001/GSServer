@@ -331,6 +331,10 @@ namespace GS.SkyWatcher
             return responseString;
         }
 
+        /// <summary>
+        /// d Get Current Encoder count and log it to monitor
+        /// </summary>
+        /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         private void LogEncoderCount(AxisId axis)
         {
             var response = CmdToAxis(axis, 'd', null);
@@ -486,8 +490,7 @@ namespace GS.SkyWatcher
                 MonitorLog.LogToMonitor(monitorItem);
             }
         }
-
-
+        
         /// <summary>
         /// j Gets radians position of an axis or returns NaN
         /// </summary>
@@ -1197,7 +1200,7 @@ namespace GS.SkyWatcher
             // process incoming data string
             receivedData = receivedData?.Trim();
             receivedData = receivedData?.Replace("\0", string.Empty);
-            if (string.IsNullOrEmpty(receivedData)) return null;
+            if (string.IsNullOrEmpty(receivedData)){return null;}
 
             switch (receivedData[0].ToString())
             {
@@ -1262,7 +1265,7 @@ namespace GS.SkyWatcher
                     monitorItem = new MonitorEntry
                     { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Abnormal Response|Axis|{axis}|Command|{command}|Received|{receivedData}|CommandStr|{cmdDataStr}|Message|{errormsg}" };
                     MonitorLog.LogToMonitor(monitorItem);
-                    if(!string.IsNullOrEmpty(subdata)) return subdata;
+                    if(!string.IsNullOrEmpty(subdata)){return subdata;}
                     receivedData = null;
                     break;
                 default:
@@ -1327,7 +1330,7 @@ namespace GS.SkyWatcher
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        private long StringToLong(string str)
+        private static long StringToLong(string str)
         {
             try
             {
@@ -1340,8 +1343,6 @@ namespace GS.SkyWatcher
             }
             catch (FormatException e)
             {
-                AxisStop(AxisId.Axis1);
-                AxisStop(AxisId.Axis2);
                 throw new MountControlException(ErrorCode.ErrInvalidData, "Response Parse Error: " + str, e);
             }
         }
@@ -1358,12 +1359,9 @@ namespace GS.SkyWatcher
             var b = (((int)number & 0xFF00) / 256).ToString("X").ToUpper();
             var c = (((int)number & 0xFF0000) / 256 / 256).ToString("X").ToUpper();
 
-            if (a.Length == 1)
-                a = "0" + a;
-            if (b.Length == 1)
-                b = "0" + b;
-            if (c.Length == 1)
-                c = "0" + c;
+            if (a.Length == 1){a = "0" + a;}
+            if (b.Length == 1){b = "0" + b;}
+            if (c.Length == 1){c = "0" + c;}
             return a + b + c;
         }
 

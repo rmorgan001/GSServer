@@ -167,16 +167,16 @@ namespace GS.SkyWatcher
             _resultsDictionary = new ConcurrentDictionary<long, ISkyCommand>();
             _commandBlockingCollection = new BlockingCollection<ISkyCommand>();
 
-            Task.Factory.StartNew(() =>
-            {
-                while (!ct.IsCancellationRequested)
-                {
-                    foreach (var command in _commandBlockingCollection.GetConsumingEnumerable())
-                    {
-                        ProcessCommandQueue(command);
-                    }
-                }
-            }, ct);
+            _ = Task.Factory.StartNew(() =>
+              {
+                  while (!ct.IsCancellationRequested)
+                  {
+                      foreach (var command in _commandBlockingCollection.GetConsumingEnumerable())
+                      {
+                          ProcessCommandQueue(command);
+                      }
+                  }
+              }, ct);
 
             IsRunning = true;
         }

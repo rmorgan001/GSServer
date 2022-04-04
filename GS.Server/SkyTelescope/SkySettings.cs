@@ -625,10 +625,6 @@ namespace GS.Server.SkyTelescope
                 Properties.SkyTelescope.Default.TrackingRate = value.ToString();
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
                 OnStaticPropertyChanged();
-
-                var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
@@ -643,10 +639,6 @@ namespace GS.Server.SkyTelescope
                 Properties.SkyTelescope.Default.FrontGraphic = value.ToString();
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
                 OnStaticPropertyChanged();
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
-                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
