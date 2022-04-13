@@ -778,14 +778,14 @@ namespace GS.Server.Settings
 
         public bool ServerDevice
         {
-            get => MonitorLog.InDevices(MonitorDevice.UI);
-            set => MonitorLog.DevicesToMonitor(MonitorDevice.UI, value);
+            get => MonitorLog.InDevices(MonitorDevice.Server);
+            set => MonitorLog.DevicesToMonitor(MonitorDevice.Server, value);
         }
 
         public bool Telescope
         {
-            get => MonitorLog.InDevices(MonitorDevice.UI);
-            set => MonitorLog.DevicesToMonitor(MonitorDevice.UI, value);
+            get => MonitorLog.InDevices(MonitorDevice.Telescope);
+            set => MonitorLog.DevicesToMonitor(MonitorDevice.Telescope, value);
         }
 
         public bool UI
