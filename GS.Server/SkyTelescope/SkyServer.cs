@@ -4319,6 +4319,8 @@ namespace GS.Server.SkyTelescope
         {
             if (!IsMountRunning) { return; }
 
+            AutoHomeStop = true;
+
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
