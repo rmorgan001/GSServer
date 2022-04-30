@@ -6216,6 +6216,17 @@ namespace GS.Server.SkyTelescope
                     }
 
                     var radec = Transforms.CoordTypeToInternal(GoToRa, GoToDec);
+                    var monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.UI,
+                        Category = MonitorCategory.Interface,
+                        Type = MonitorType.Information,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"From|{SkyServer.ActualAxisX}|{SkyServer.ActualAxisY}|to|{radec.X}|{radec.Y}"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
                     SkyServer.SlewRaDec(radec.X, radec.Y);
                     IsDialogOpen = false;
                 }

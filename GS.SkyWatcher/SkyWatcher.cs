@@ -146,7 +146,7 @@ namespace GS.SkyWatcher
                     // issue new stop
                     if (counter % 5 == 0) { AxisStop(axis); }
                     counter++;
-                    Thread.Sleep(50);
+                    Thread.Sleep(100);
                 }
                 return;
             }
@@ -186,7 +186,7 @@ namespace GS.SkyWatcher
                         // issue new stop
                         if (counter % 5 == 0) { AxisStop(axis); }
                         counter++;
-                        Thread.Sleep(50);
+                        Thread.Sleep(100);
                     }
                 }
 
@@ -496,7 +496,7 @@ namespace GS.SkyWatcher
                     // issue new stop
                     if (counter % 5 == 0) { AxisStop(axis); }
                     counter++;
-                    Thread.Sleep(50);
+                    Thread.Sleep(100);
                 }
             }
 
@@ -567,7 +567,7 @@ namespace GS.SkyWatcher
                     if (axesstatus.FullStop) { break; }
                     if (counter % 5 == 0) { AxisStop(axis); }
                     counter++;
-                    Thread.Sleep(50);
+                    Thread.Sleep(100);
                 }
             }
 

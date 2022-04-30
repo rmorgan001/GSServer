@@ -1189,6 +1189,19 @@ namespace GS.Server.SkyTelescope
         /// <returns></returns>
         private static int SimGoTo(double[] target, bool trackingState)
         {
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"from|{ActualAxisX}|{ActualAxisY}|to|{target[0]}|{target[1]}|tracking|{trackingState}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
             const int returncode = 0;
             const int timer = 80; //  stop slew after seconds
             var stopwatch = Stopwatch.StartNew();
@@ -1221,7 +1234,7 @@ namespace GS.Server.SkyTelescope
             }
 
             AxesStopValidate();
-            var monitorItem = new MonitorEntry
+            monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
                 Device = MonitorDevice.Server,
@@ -1229,7 +1242,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"Initial|{_targetAxes}|{stopwatch.Elapsed.TotalSeconds}|{simTarget[0]}|{simTarget[1]}"
+                Message = $"GoToSeconds|{stopwatch.Elapsed.TotalSeconds}|SimTarget|{simTarget[0]}|{simTarget[1]}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -1237,7 +1250,7 @@ namespace GS.Server.SkyTelescope
 
             #region Final precision slew
 
-            Task decTask = Task.Run(() => SimPrecisionGotoDec(target[1], simTarget[1]));
+            Task decTask = Task.Run(() => SimPrecisionGotoDec(simTarget[1]));
             Task raTask = Task.Run(() => SimPrecisionGoToRA(target, trackingState, stopwatch));
 
             Task.WaitAll(decTask, raTask);
@@ -1253,11 +1266,22 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Performs a final precision slew of the Dec axis to target if necessary.
         /// </summary>
-        /// <param name="targetDec"></param>
-        /// <param name="skyTargetDec"></param>
+        /// <param name="simTargetDec"></param>
         /// <returns></returns>
-        private static int SimPrecisionGotoDec(double targetDec, double skyTargetDec)
+        private static int SimPrecisionGotoDec(double simTargetDec)
         {
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"from|{ActualAxisY}|to|{simTargetDec}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
             const int returncode = 0;
             var gotoPrecision = SkySettings.GotoPrecision;
             var maxtries = 0;
@@ -1270,12 +1294,12 @@ namespace GS.Server.SkyTelescope
                 // Calculate error
                 var rawPositions = GetRawDegrees();
                 if (rawPositions == null || double.IsNaN(rawPositions[1])) { break; }
-                var deltaDegree = Math.Abs(skyTargetDec - rawPositions[1]);
+                var deltaDegree = Math.Abs(simTargetDec - rawPositions[1]);
 
                 if (deltaDegree < gotoPrecision) { break; }
                 if (SlewState == SlewType.SlewNone) { break; } //check for a stop
 
-                object _ = new CmdAxisGoToTarget(0, Axis.Axis2, skyTargetDec); //move to target DEC
+                object _ = new CmdAxisGoToTarget(0, Axis.Axis2, simTargetDec); //move to target DEC
 
                 // track movement until axis is stopped
                 var stopwatch1 = Stopwatch.StartNew();
@@ -1287,7 +1311,7 @@ namespace GS.Server.SkyTelescope
                     if (axis2Status.Stopped) { break; }
                 }
 
-                var monitorItem = new MonitorEntry
+                monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
@@ -1295,7 +1319,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Dec Precision:{targetDec}|{deltaDegree}"
+                    Message = $"DeltaDegrees|{deltaDegree}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -1311,6 +1335,19 @@ namespace GS.Server.SkyTelescope
         /// <returns></returns>
         private static int SimPrecisionGoToRA(double[] target, bool trackingState, Stopwatch stopwatch)
         {
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"from|{ActualAxisX}|to|{target[0]}|state|{trackingState}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
             const int returnCode = 0;
             if (!trackingState) return returnCode;
             //attempt precision moves to target
@@ -1330,8 +1367,7 @@ namespace GS.Server.SkyTelescope
                 var deltaDegree = rate * deltaTime;
                 if (deltaDegree < gotoPrecision) { break; }
 
-
-                var monitorItem = new MonitorEntry
+                monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
@@ -1339,11 +1375,9 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"RA Delta:{rate}|{deltaTime}|{deltaDegree}"
+                    Message = $"Deltas|Rate|{rate}|Time|{deltaTime}|Degree|{deltaDegree}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-
-
 
                 target[0] += deltaDegree;
                 var deltaTarget = Axes.AxesAppToMount(target);
@@ -1370,7 +1404,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"RA Precision:{target[0]}|{deltaTime}|{deltaDegree}"
+                    Message = $"Precision|NewTarget|{target[0]}|Time|{deltaTime}|Degree|{deltaDegree}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -1619,6 +1653,18 @@ namespace GS.Server.SkyTelescope
         /// <returns></returns>
         private static int SkyGoTo(double[] target, bool trackingState)
         {
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"from|{ActualAxisX}|{ActualAxisY}|to|{target[0]}|{target[1]}|tracking|{trackingState}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
             const int returncode = 0;
             //  stop slew after 80 seconds
             const int timer = 80;
@@ -1653,7 +1699,7 @@ namespace GS.Server.SkyTelescope
             }
 
             AxesStopValidate();
-            var monitorItem = new MonitorEntry
+            monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
                 Device = MonitorDevice.Server,
@@ -1661,14 +1707,14 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"Initial|{_targetAxes}|Seconds|{stopwatch.Elapsed.TotalSeconds}|Target|{skyTarget[0]}|{skyTarget[1]}"
+                Message = $"GoToSeconds|{stopwatch.Elapsed.TotalSeconds}|SkyTarget|{skyTarget[0]}|{skyTarget[1]}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
             #endregion
 
             #region Final precision slew
-            Task decTask = Task.Run(() => SkyPrecisionGotoDec(target[1], skyTarget[1]));
+            Task decTask = Task.Run(() => SkyPrecisionGotoDec(skyTarget[1]));
             Task raTask = Task.Run(() => SkyPrecisionGoToRA(target, trackingState, stopwatch));
 
             Task.WaitAll(decTask, raTask);
@@ -1683,11 +1729,22 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Performs a final precision slew of the Dec axis to target if necessary.
         /// </summary>
-        /// <param name="targetDec"></param>
         /// <param name="skyTargetDec"></param>
         /// <returns></returns>
-        private static int SkyPrecisionGotoDec(double targetDec, double skyTargetDec)
+        private static int SkyPrecisionGotoDec(double skyTargetDec)
         {
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"from|{ActualAxisY}|to|{skyTargetDec}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
             const int returncode = 0;
             var gotoPrecision = SkySettings.GotoPrecision;
             var maxtries = 0;
@@ -1715,9 +1772,10 @@ namespace GS.Server.SkyTelescope
                     var statusy = new SkyIsAxisFullStop(SkyQueue.NewId, AxisId.Axis2);
                     var axis2stopped = Convert.ToBoolean(SkyQueue.GetCommandResult(statusy).Result);
                     if (axis2stopped) { break; }
+                    Thread.Sleep(100);
                 }
 
-                var monitorItem = new MonitorEntry
+                monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
@@ -1725,7 +1783,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Precision|Target|{targetDec}|Degree|{deltaDegree}"
+                    Message = $"DeltaDegrees|{deltaDegree}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -1741,6 +1799,18 @@ namespace GS.Server.SkyTelescope
         /// <returns></returns>
         private static int SkyPrecisionGoToRA(double[] target, bool trackingState, Stopwatch stopwatch)
         {
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"from|{ActualAxisX}|to|{target[0]}|tracking|{trackingState}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
             const int returnCode = 0;
             if (!trackingState) return returnCode;
             //attempt precision moves to target
@@ -1759,7 +1829,7 @@ namespace GS.Server.SkyTelescope
                 //calculate new target position
                 var deltaDegree = rate * deltaTime;
 
-                var monitorItem = new MonitorEntry
+                monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
@@ -1787,6 +1857,7 @@ namespace GS.Server.SkyTelescope
                     var statusx = new SkyIsAxisFullStop(SkyQueue.NewId, AxisId.Axis1);
                     var axis1stopped = Convert.ToBoolean(SkyQueue.GetCommandResult(statusx).Result);
                     if (axis1stopped) { break; }
+                    Thread.Sleep(100);
                 }
 
                 monitorItem = new MonitorEntry
@@ -1797,7 +1868,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Precision|Target|{target[0]}|Time|{deltaTime}|Degree|{deltaDegree}"
+                    Message = $"Precision|NewTarget|{target[0]}|Time|{deltaTime}|Degree|{deltaDegree}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -2964,7 +3035,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = "GoToAsync",
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Goto finished|{returncode}|{SlewState}|{_util.HoursToHMS(RightAscension, "h ", ":", "", 2)}"
+                    Message = $"{SlewState} finished|code|{returncode}|{_util.HoursToHMS(RightAscension, "h ", ":", "", 2)}|at|{ActualAxisX}|{ActualAxisY}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -3053,6 +3124,18 @@ namespace GS.Server.SkyTelescope
         public static void HcMoves(SlewSpeed speed, SlewDirection direction, HCMode HcMode, bool HcAntiRa, bool HcAntiDec, int RaBacklash, int DecBacklash)
         {
             if (!IsMountRunning) { return; }
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{SkySettings.HcSpeed}|{HcMode}|{direction}|{ActualAxisX}|{ActualAxisY}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
 
             var change = new double[] { 0, 0 };
             double delta;
@@ -3211,7 +3294,7 @@ namespace GS.Server.SkyTelescope
             // Log data to Monitor
             if (Math.Abs(change[0]) > 0 || Math.Abs(change[1]) > 0)
             {
-                var monitorItem = new MonitorEntry
+                monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
@@ -3282,7 +3365,7 @@ namespace GS.Server.SkyTelescope
             //  log anti-lash moves
             if (Math.Abs(stepsNeededDec) > 0 && HcPrevMoveDec != null)
             {
-                var monitorItem = new MonitorEntry
+                monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
@@ -3296,7 +3379,7 @@ namespace GS.Server.SkyTelescope
             }
             if (Math.Abs(stepsNeededRa) > 0 && HcPrevMoveRa != null)
             {
-                var monitorItem = new MonitorEntry
+                monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
@@ -4297,7 +4380,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{targetPosition.X}|{targetPosition.Y}|{slewState}"
+                Message = $"from|{ActualAxisX}|{ActualAxisY}|to|{targetPosition.X}|{targetPosition.Y}|SlewType|{slewState}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
