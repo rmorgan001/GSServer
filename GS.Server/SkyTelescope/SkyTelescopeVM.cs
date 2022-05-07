@@ -100,7 +100,6 @@ namespace GS.Server.SkyTelescope
                     SkySystem.StaticPropertyChanged += PropertyChangedSkySystem;
                     SkySettings.StaticPropertyChanged += PropertyChangedSkySettings;
                     Shared.Settings.StaticPropertyChanged += PropertyChangedMonitorLog;
-                    //Synthesizer.StaticPropertyChanged += PropertyChangedSynthesizer;
                     Settings.Settings.StaticPropertyChanged += PropertyChangedSettings;
                     GlobalStopOn = SkySettings.GlobalStopOn;
 
@@ -149,7 +148,6 @@ namespace GS.Server.SkyTelescope
                     HcWinVisibility = true;
                     ModelWinVisibility = true;
                     ButtonsWinVisibility = true;
-                    //DebugVisibility = SkySettings.Diagnostics;
                     PecShow = SkyServer.PecShow;
                     SchedulerShow = true;
                     CustomGearing = SkySettings.CustomGearing;
@@ -1472,6 +1470,7 @@ namespace GS.Server.SkyTelescope
         {
             KingRate = 15.0369;
         }
+
         #endregion
 
         #region RaDec Gauge
@@ -6935,6 +6934,181 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        #endregion
+
+        #region LatLong
+
+        private double _latInput;
+        public double LatInput
+        {
+            get => _latInput;
+            set
+            {
+                _latInput = Numbers.TruncateD(value, 8);
+                OnPropertyChanged();
+            }
+        }
+
+        private double _longInput;
+        public double LongInput
+        {
+            get => _longInput;
+            set
+            {
+                _longInput = Numbers.TruncateD(value,8);
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _acceptLatLongDialogCmd;
+        public ICommand AcceptLatLongDialogCmd
+        {
+            get
+            {
+                var command = _acceptLatLongDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptLatLongDialogCmd = new RelayCommand(
+                    param => AcceptLatLongDialog()
+                );
+            }
+        }
+        private void AcceptLatLongDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (!LatInput.IsBetween(-90,90) || !LongInput.IsBetween(-180, 180))
+                    {
+                        OpenDialog(Application.Current.Resources["InvCord"].ToString(), $"{Application.Current.Resources["exError"]}");
+                        return;
+                    }
+
+                    SkySettings.Latitude = LatInput;
+                    SkySettings.Longitude = LongInput;
+
+                    var monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.UI,
+                        Category = MonitorCategory.Interface,
+                        Type = MonitorType.Information,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"{NmeaSentence}"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
+
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelLatLongDialogCmd;
+        public ICommand CancelLatLongDialogCmd
+        {
+            get
+            {
+                var command = _cancelLatLongDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelLatLongDialogCmd = new RelayCommand(
+                    param => CancelLatLongDialog()
+                );
+            }
+        }
+        private void CancelLatLongDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _openLatLongDialogCmd;
+        public ICommand OpenLatLongDialogCmd
+        {
+            get
+            {
+                var command = _openLatLongDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openLatLongDialogCmd = new RelayCommand(
+                    param => OpenLatLongDialog()
+                );
+            }
+        }
+        private void OpenLatLongDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    LatInput = Numbers.TruncateD(SkySettings.Latitude, 8);
+                    LongInput = Numbers.TruncateD(SkySettings.Longitude, 8);
+                    DialogContent = new LatLongDialog();
+                    IsDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
         #endregion
 
         #region CdC Dialog

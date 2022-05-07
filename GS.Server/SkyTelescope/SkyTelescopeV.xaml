@@ -278,7 +278,7 @@
                                                 Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ClickResetSiderealRateCommand}"/>
                                     </Grid>
                                 </md:PopupBox>
-                                <TextBox md:HintAssist.Hint="{StaticResource skySiderealRate}" Width="110"  ToolTip="{StaticResource skySiderealRate}"
+                                <TextBox md:HintAssist.Hint="{StaticResource skySiderealRate}" Width="110" ToolTip="{StaticResource skySiderealRate}"
                                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" >
                                     <TextBox.Text>
                                         <Binding Path="SiderealRate" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -437,11 +437,11 @@
                                     Background="{StaticResource MaterialDesignToolBarBackground}"  >
                                 <Grid Margin="10,0,10,10">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
@@ -449,9 +449,9 @@
                                     <RowDefinition/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                    <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" HorizontalAlignment="Center" Content="{StaticResource skyOBL}"/>
+                                    <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" HorizontalAlignment="Center" Content="{StaticResource skyOBL}"/>
                                     <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="{StaticResource skyLatitude}"/>
-                                    <ComboBox Grid.Row="1" Grid.Column="1" IsEnabled="True" md:HintAssist.Hint="{StaticResource skyLat01}" Margin="10,0,0,0" ToolTip="{StaticResource skyLat0}"
+                                    <ComboBox Grid.Row="1" Grid.Column="1" IsEnabled="True" md:HintAssist.Hint="{StaticResource skyLat01}" Margin="10,5,0,0" ToolTip="{StaticResource skyLat0}"
                                               ItemsSource="{Binding LatitudeRangeNS}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                         <ComboBox.SelectedItem>
                                             <Binding Path="Lat0" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -466,7 +466,7 @@
                                             </ItemsPanelTemplate>
                                         </ComboBox.ItemsPanel>
                                     </ComboBox>
-                                    <ComboBox Grid.Row="1" Grid.Column="2" IsEnabled="True" md:HintAssist.Hint="{StaticResource edDegrees}" Margin="10,0,0,0" ToolTip="{StaticResource edDegrees}"
+                                    <ComboBox Grid.Row="1" Grid.Column="2" IsEnabled="True" md:HintAssist.Hint="{StaticResource edDegrees}" Margin="10,5,0,0" ToolTip="{StaticResource edDegrees}"
                                         ItemsSource="{Binding Range90}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                         <ComboBox.SelectedItem>
                                             <Binding Path="Lat1" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -481,7 +481,7 @@
                                             </ItemsPanelTemplate>
                                         </ComboBox.ItemsPanel>
                                     </ComboBox>
-                                    <ComboBox Grid.Row="1" Grid.Column="3" IsEnabled="True" md:HintAssist.Hint="{StaticResource edMinutes}" Margin="10,0,0,0" ToolTip="{StaticResource edMinutes}"
+                                    <ComboBox Grid.Row="1" Grid.Column="3" IsEnabled="True" md:HintAssist.Hint="{StaticResource edMinutes}" Margin="10,5,0,0" ToolTip="{StaticResource edMinutes}"
                                     ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                     <ComboBox.SelectedItem>
                                         <Binding Path="Lat2" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -496,7 +496,7 @@
                                         </ItemsPanelTemplate>
                                     </ComboBox.ItemsPanel>
                                 </ComboBox>
-                                    <ComboBox Grid.Row="1" Grid.Column="4" IsEnabled="True" md:HintAssist.Hint="{StaticResource edSeconds}" IsEditable="True" Margin="10,0,0,0" ToolTip="{StaticResource edSeconds}"
+                                    <ComboBox Grid.Row="1" Grid.Column="4" IsEnabled="True" md:HintAssist.Hint="{StaticResource edSeconds}" IsEditable="True" Margin="10,5,0,0" ToolTip="{StaticResource edSeconds}"
                                    ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                     <ComboBox.Text>
                                         <Binding Path="Lat3" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -513,7 +513,7 @@
                                     </ComboBox.ItemsPanel>
                                 </ComboBox>
                                     <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="{StaticResource skyLongitude}"/>
-                                        <ComboBox Grid.Row="2" Grid.Column="1" md:HintAssist.Hint="{StaticResource skyLong01}" Margin="10,5,0,0" ToolTip="{StaticResource skyLong0}"
+                                    <ComboBox Grid.Row="2" Grid.Column="1" md:HintAssist.Hint="{StaticResource skyLong01}" Margin="10,5,0,0" ToolTip="{StaticResource skyLong0}"
                                               ItemsSource="{Binding LongitudeRangeEW}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                         <ComboBox.SelectedItem>
                                             <Binding Path="Long0" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -528,7 +528,7 @@
                                             </ItemsPanelTemplate>
                                         </ComboBox.ItemsPanel>
                                     </ComboBox>
-                                        <ComboBox Grid.Row="2" Grid.Column="2" md:HintAssist.Hint="{StaticResource edDegrees}" Margin="10,5,0,0" ToolTip="{StaticResource edDegrees}"
+                                    <ComboBox Grid.Row="2" Grid.Column="2" md:HintAssist.Hint="{StaticResource edDegrees}" Margin="10,5,0,0" ToolTip="{StaticResource edDegrees}"
                                     ItemsSource="{Binding Range179}"
                                     Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                     <ComboBox.SelectedItem>
@@ -544,9 +544,8 @@
                                     </ItemsPanelTemplate>
                                 </ComboBox.ItemsPanel>
                                 </ComboBox>
-                                        <ComboBox Grid.Row="2" Grid.Column="3" md:HintAssist.Hint="{StaticResource edMinutes}"  Margin="10,5,0,0" ToolTip="{StaticResource edMinutes}"
-                                    ItemsSource="{Binding Range60}"
-                                    Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                                    <ComboBox Grid.Row="2" Grid.Column="3" md:HintAssist.Hint="{StaticResource edMinutes}"  Margin="10,5,0,0" ToolTip="{StaticResource edMinutes}"
+                                    ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                     <ComboBox.SelectedItem>
                                         <Binding Path="Long2" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                             <Binding.ValidationRules>
@@ -560,9 +559,9 @@
                                         </ItemsPanelTemplate>
                                     </ComboBox.ItemsPanel>
                                 </ComboBox>
-                                        <ComboBox Grid.Row="2" Grid.Column="4" md:HintAssist.Hint="{StaticResource edSeconds}" IsEditable="True" Margin="10,5,0,0" ToolTip="{StaticResource edSeconds}"
-                                    ItemsSource="{Binding Range60}"
-                                    Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                                    <ComboBox Grid.Row="2" Grid.Column="4" md:HintAssist.Hint="{StaticResource edSeconds}" IsEditable="True" Margin="10,5,0,0" ToolTip="{StaticResource edSeconds}"
+                                              ItemsSource="{Binding Range60}"
+                                              Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                     <ComboBox.Text>
                                         <Binding Path="Long3" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                             <Binding.ValidationRules>
@@ -577,7 +576,7 @@
                                         </ItemsPanelTemplate>
                                     </ComboBox.ItemsPanel>
                                 </ComboBox>
-                                    <ComboBox Grid.Row="3" Grid.Column="2" md:HintAssist.Hint="{StaticResource skyTemperature}" IsEditable="True" Margin="10,5,0,0"
+                                    <ComboBox Grid.Row="3" Grid.Column="3" md:HintAssist.Hint="{StaticResource skyTemperature}" IsEditable="True" Margin="10,5,0,0"
                                           ItemsSource="{Binding Temperatures}" ToolTip="{StaticResource skyAmbTemp}"
                                           Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                     <ComboBox.Text>
@@ -594,7 +593,7 @@
                                         </ItemsPanelTemplate>
                                     </ComboBox.ItemsPanel>
                                 </ComboBox>
-                                    <TextBox Grid.Row="3" Grid.Column="3" ToolTip="{StaticResource skyMeters}" md:HintAssist.Hint="{StaticResource skyElevation}"  Margin="10,0,0,0"
+                                    <TextBox Grid.Row="3" Grid.Column="4" ToolTip="{StaticResource skyMeters}" md:HintAssist.Hint="{StaticResource skyElevation}"  Margin="10,5,0,0"
                                              Style="{StaticResource MaterialDesignFloatingHintTextBox}">
                                     <TextBox.Text>
                                         <Binding Path="Elevation" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -605,8 +604,11 @@
                                         </Binding>
                                     </TextBox.Text>
                                 </TextBox>
-                                <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center">
-                                    <Button VerticalAlignment="Bottom" Width="60" Content="{StaticResource skyGPS}" ToolTip="{StaticResource skyGPSCon}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding OpenGpsDialogCommand}" />
+                                <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Center">
+                                        <Button VerticalAlignment="Bottom" ToolTip="{StaticResource gpsDecimals}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding OpenLatLongDialogCmd}" >
+                                        <md:PackIcon Kind="LeadPencil"/>
+                                        </Button>
+                                    <Button Margin="5,0,0,0" VerticalAlignment="Bottom" Width="60" Content="{StaticResource skyGPS}" ToolTip="{StaticResource skyGPSCon}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding OpenGpsDialogCommand}" />
                                     <Button Margin="5,0,0,0" VerticalAlignment="Bottom" Width="60" Content="{StaticResource skyCdC}" ToolTip="{StaticResource skyCdCCon}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding OpenCdcDialogCommand}"/>
                                 </StackPanel>
                             </Grid>

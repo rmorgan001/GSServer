@@ -203,9 +203,7 @@ namespace GS.Server.Gps
                 var gpsDataArr = receivedData.Split(',');
                 if (gpsDataArr[0].Length < 6) continue;
                 var code = gpsDataArr[0].Substring(3, 3);
-                LogNmEaSentence(receivedData, false);
-
-
+                
                 switch (code)
                 {
                     case "GGA":
@@ -237,6 +235,9 @@ namespace GS.Server.Gps
                                 return;
                             }
                         }
+                        break;
+                    default:
+                        LogNmEaSentence(receivedData, false);
                         break;
                 }
             }

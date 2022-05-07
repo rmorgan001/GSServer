@@ -695,5 +695,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="Rb3D">3D</system:String>
     <system:String x:Key="lbAz">Az</system:String>
     <system:String x:Key="lbAlt">Alt</system:String>
+
+    <!--1.0.4.7 -->
+    <system:String x:Key="gpsDecimals">Enter Decimals</system:String>
+    <system:String x:Key="InvCord">Invalid Coordinate</system:String>
 </ResourceDictionary>
  
