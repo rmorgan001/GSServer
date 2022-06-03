@@ -30,7 +30,6 @@ using System.Threading;
 using System.Windows.Threading;
 using Newtonsoft.Json;
 
-
 namespace ASCOM.GS.Sky.Telescope
 {
 
@@ -149,7 +148,7 @@ namespace ASCOM.GS.Sky.Telescope
             SkyServer.AbortSlew(true);
         }
 
-       public AlignmentModes AlignmentMode
+        public AlignmentModes AlignmentMode
         {
             get
             {
@@ -644,7 +643,7 @@ namespace ASCOM.GS.Sky.Telescope
             MonitorLog.LogToMonitor(monitorItem);
 
             var radec = Transforms.CoordTypeToInternal(RightAscension, Declination);
-            var r = SkyServer.SideOfPierRaDec(radec.X);
+            var r = SkyServer.DestinationSideOfPier(radec.X, radec.Y);
             return r;
         }
 
@@ -904,19 +903,44 @@ namespace ASCOM.GS.Sky.Telescope
 
         public void PulseGuide(GuideDirections Direction, int Duration)
         {
-            if (!SkyServer.AsComOn) return;
+            try
+            {
+                switch (Direction)
+                {
+                    case GuideDirections.guideNorth:
+                    case GuideDirections.guideSouth:
+                        SkyServer.IsPulseGuidingDec = true;
+                        break;
+                    case GuideDirections.guideEast:
+                    case GuideDirections.guideWest:
+                        SkyServer.IsPulseGuidingRa = true;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null);
+                }
 
-            var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{Direction},{Duration}") };
-            MonitorLog.LogToMonitor(monitorItem);
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{Direction},{Duration}") };
+                MonitorLog.LogToMonitor(monitorItem);
 
-            if (SkyServer.AtPark) throw new ParkedException();
-            if (SkyServer.IsSlewing) throw new InvalidOperationException("Pulse rejected when slewing");
-            if (!SkyServer.Tracking) throw new InvalidOperationException("Pulse rejected when tracking is off");
-            CheckCapability(SkySettings.CanPulseGuide, "PulseGuide");
-            CheckRange(Duration, 0, 30000, "PulseGuide", "Duration");
-            SkyServer.PulseGuide(Direction, Duration);
-            if (!SkySettings.CanDualAxisPulseGuide) Thread.Sleep(Duration); // Must be synchronous so wait out the pulse guide duration here
+                if (!SkyServer.AsComOn) { throw new InvalidOperationException("Not accepting commands"); }
+                if (SkyServer.AtPark) { throw new ParkedException(); }
+                if (SkyServer.IsSlewing) { throw new InvalidOperationException("Pulse rejected when slewing"); }
+                if (!SkyServer.Tracking) { throw new InvalidOperationException("Pulse rejected when tracking is off"); }
+                CheckCapability(SkySettings.CanPulseGuide, "PulseGuide");
+                CheckRange(Duration, 0, 30000, "PulseGuide", "Duration");
+                SkyServer.PulseGuide(Direction, Duration);
+                if (!SkySettings.CanDualAxisPulseGuide) { Thread.Sleep(Duration); } // Must be synchronous so wait out the pulse guide duration here
+            }
+            catch (Exception e)
+            {
+                SkyServer.IsPulseGuidingRa = false;
+                SkyServer.IsPulseGuidingDec = false;
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{e.Message}") };
+                MonitorLog.LogToMonitor(monitorItem);
+                throw;
+            }
         }
 
         /// <inheritdoc />

@@ -94,7 +94,8 @@ namespace GS.Server.Main
 
                     AppCount = GSServer.AppCount;
                     Settings.Settings.Load();
-                    Settings.Settings.WindowState = Settings.Settings.StartMinimized ? WindowState.Minimized : WindowState.Normal;
+                    WindowStates = Settings.Settings.StartMinimized ? WindowState.Minimized : WindowState.Normal;
+                    //Settings.Settings.WindowState = Settings.Settings.StartMinimized ? WindowState.Minimized : WindowState.Normal;
 
                     MountType = SkySettings.Mount;
 

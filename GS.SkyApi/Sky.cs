@@ -215,30 +215,6 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
-        public bool CanOneStepDec
-        {
-            get
-            {
-                ValidateMount();
-                var command = new SkyCanOneStepDec(SkyQueue.NewId);
-                var results = GetResult(command);
-                return results.Result;
-            }
-        }
-
-        /// <inheritdoc />
-        public bool CanOneStepRa
-        {
-            get
-            {
-                ValidateMount();
-                var command = new SkyCanOneStepRa(SkyQueue.NewId);
-                var results = GetResult(command);
-                return results.Result;
-            }
-        }
-
-        /// <inheritdoc />
         public bool CanPolarLed
         {
             get
@@ -453,24 +429,6 @@ namespace GS.SkyApi
             var command = new SkyGetMotorCardVersion(SkyQueue.NewId, validAxis);
             var results = GetResult(command);
             return results.Result;
-        }
-
-        /// <inheritdoc />
-        public bool GetOneStepIndicator(int axis)
-        {
-            ValidateMount();
-            var validAxis = ValidateAxis(axis);
-            var command = new SkyGetOneStepIndicators(SkyQueue.NewId);
-            var results = GetResult(command);
-            switch (validAxis)
-            {
-                case AxisId.Axis1:
-                    return results.Result[0];
-                case AxisId.Axis2:
-                    return results.Result[1];
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
         }
 
         /// <inheritdoc />
@@ -1195,14 +1153,6 @@ namespace GS.SkyApi
         /// </summary>
         bool CanHomeSensors { get; }
         /// <summary>
-        /// Test result if the mount can move Dec a single step in GoTo mode
-        /// </summary>
-        bool CanOneStepDec { get; }
-        /// <summary>
-        /// Test result if the mount can move Ra a single step in GoTo mode
-        /// </summary>
-        bool CanOneStepRa { get; }
-        /// <summary>
         /// q Does mount support a polar LED
         /// </summary>
         bool CanPolarLed { get; }
@@ -1293,12 +1243,6 @@ namespace GS.SkyApi
         /// </summary>
         /// <returns></returns>
         string GetMotorCardVersion(int axis);
-        /// <summary>
-        /// Runs a motor test to see of axis can move one step in GoTo mode
-        /// </summary>
-        /// <param name="axis">axis number 1 or 2</param>
-        /// <returns>Result of each axis test</returns>
-        bool GetOneStepIndicator(int axis);
         /// <summary>
         /// s Inquire PEC Period ":s(*1)", where *1: '1'= CH1, '2'= CH2, '3'= Both.
         /// </summary>

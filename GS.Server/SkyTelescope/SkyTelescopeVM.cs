@@ -6296,14 +6296,7 @@ namespace GS.Server.SkyTelescope
         private void SetParkLimitSelection(string name)
         {
             var found = ParkPositions.Find(x => x.Name == name);
-            if (found != null) // did not find match in list
-            {
-                ParkLimitSelection = found;
-            }
-            else
-            {
-                ParkLimitSelection = ParkPositions.FirstOrDefault();
-            }
+            ParkLimitSelection = found ?? ParkPositions.FirstOrDefault();
         }
 
         private bool _limitTracking;

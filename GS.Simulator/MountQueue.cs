@@ -16,7 +16,9 @@
 using GS.Principles;
 using System;
 using System.Collections.Concurrent;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,6 +32,7 @@ namespace GS.Simulator
         private static ConcurrentDictionary<long, IMountCommand> _resultsDictionary;
         private static Actions _actions;
         private static CancellationTokenSource _cts;
+        public static event PropertyChangedEventHandler StaticPropertyChanged;
 
         #endregion
 
@@ -38,6 +41,34 @@ namespace GS.Simulator
         public static bool IsRunning { get; private set; }
         private static long _id;
         public static long NewId => Interlocked.Increment(ref _id);
+
+        private static bool _isPulseGuidingDec;
+        /// <summary>
+        /// status for Dec Pulse
+        /// </summary>
+        public static bool IsPulseGuidingDec
+        {
+            get => _isPulseGuidingDec;
+            set
+            {
+                _isPulseGuidingDec = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static bool _isPulseGuidingRa;
+        /// <summary>
+        /// status for Dec Pulse
+        /// </summary>
+        public static bool IsPulseGuidingRa
+        {
+            get => _isPulseGuidingRa;
+            set
+            {
+                _isPulseGuidingRa = value;
+                OnStaticPropertyChanged();
+            }
+        }
 
         #endregion
 
@@ -181,5 +212,14 @@ namespace GS.Simulator
         }
 
         #endregion
+
+        /// <summary>
+        /// called from the setter property.  property name is not required
+        /// </summary>
+        /// <param name="propertyName"></param>
+        private static void OnStaticPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

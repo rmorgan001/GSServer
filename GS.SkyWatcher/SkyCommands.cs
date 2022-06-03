@@ -366,69 +366,69 @@ namespace GS.SkyWatcher
         }
     }
 
-    public class SkyCanOneStepDec : ISkyCommand
-    {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
+    //public class SkyCanOneStepDec : ISkyCommand
+    //{
+    //    public long Id { get; }
+    //    public DateTime CreatedUtc { get; }
+    //    public bool Successful { get; set; }
+    //    public Exception Exception { get; set; }
+    //    public dynamic Result { get; private set; }
 
-        public SkyCanOneStepDec(long id)
-        {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
-            Successful = false;
-            SkyQueue.AddCommand(this);
-        }
+    //    public SkyCanOneStepDec(long id)
+    //    {
+    //        Id = id;
+    //        CreatedUtc = Principles.HiResDateTime.UtcNow;
+    //        Successful = false;
+    //        SkyQueue.AddCommand(this);
+    //    }
 
-        public void Execute(SkyWatcher skyWatcher)
-        {
-            try
-            {
-                Result = skyWatcher.CanOneStepDec;
-                Successful = true;
+    //    public void Execute(SkyWatcher skyWatcher)
+    //    {
+    //        try
+    //        {
+    //            Result = skyWatcher.CanOneStepDec;
+    //            Successful = true;
 
-            }
-            catch (Exception e)
-            {
-                Successful = false;
-                Exception = e;
-            }
-        }
-    }
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            Successful = false;
+    //            Exception = e;
+    //        }
+    //    }
+    //}
 
-    public class SkyCanOneStepRa : ISkyCommand
-    {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
+    //public class SkyCanOneStepRa : ISkyCommand
+    //{
+    //    public long Id { get; }
+    //    public DateTime CreatedUtc { get; }
+    //    public bool Successful { get; set; }
+    //    public Exception Exception { get; set; }
+    //    public dynamic Result { get; private set; }
 
-        public SkyCanOneStepRa(long id)
-        {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
-            Successful = false;
-            SkyQueue.AddCommand(this);
-        }
+    //    public SkyCanOneStepRa(long id)
+    //    {
+    //        Id = id;
+    //        CreatedUtc = Principles.HiResDateTime.UtcNow;
+    //        Successful = false;
+    //        SkyQueue.AddCommand(this);
+    //    }
 
-        public void Execute(SkyWatcher skyWatcher)
-        {
-            try
-            {
-                Result = skyWatcher.CanOneStepRa;
-                Successful = true;
+    //    public void Execute(SkyWatcher skyWatcher)
+    //    {
+    //        try
+    //        {
+    //            Result = skyWatcher.CanOneStepRa;
+    //            Successful = true;
 
-            }
-            catch (Exception e)
-            {
-                Successful = false;
-                Exception = e;
-            }
-        }
-    }
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            Successful = false;
+    //            Exception = e;
+    //        }
+    //    }
+    //}
 
     public class SkyCanPolarLed : ISkyCommand
     {
@@ -982,36 +982,36 @@ namespace GS.SkyWatcher
         }
     }
 
-    public class SkyGetOneStepIndicators : ISkyCommand
-    {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
+    //public class SkyGetOneStepIndicators : ISkyCommand
+    //{
+    //    public long Id { get; }
+    //    public DateTime CreatedUtc { get; }
+    //    public bool Successful { get; set; }
+    //    public Exception Exception { get; set; }
+    //    public dynamic Result { get; private set; }
 
-        public SkyGetOneStepIndicators(long id)
-        {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
-            Successful = false;
-            SkyQueue.AddCommand(this);
-        }
+    //    public SkyGetOneStepIndicators(long id)
+    //    {
+    //        Id = id;
+    //        CreatedUtc = Principles.HiResDateTime.UtcNow;
+    //        Successful = false;
+    //        SkyQueue.AddCommand(this);
+    //    }
 
-        public void Execute(SkyWatcher skyWatcher)
-        {
-            try
-            {
-                Result = skyWatcher.GetOneStepIndicators();
-                Successful = true;
-            }
-            catch (Exception e)
-            {
-                Successful = false;
-                Exception = e;
-            }
-        }
-    }
+    //    public void Execute(SkyWatcher skyWatcher)
+    //    {
+    //        try
+    //        {
+    //            Result = skyWatcher.GetOneStepIndicators();
+    //            Successful = true;
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            Successful = false;
+    //            Exception = e;
+    //        }
+    //    }
+    //}
 
     public class SkyGetPecPeriod : ISkyCommand
     {
@@ -1835,69 +1835,69 @@ namespace GS.SkyWatcher
         }
     }
 
-    public class SkyPulseDecRunning : ISkyCommand
-    {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
+    //public class SkyPulseDecRunning : ISkyCommand
+    //{
+    //    public long Id { get; }
+    //    public DateTime CreatedUtc { get; }
+    //    public bool Successful { get; set; }
+    //    public Exception Exception { get; set; }
+    //    public dynamic Result { get; private set; }
 
-        public SkyPulseDecRunning(long id)
-        {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
-            Successful = false;
-            SkyQueue.AddCommand(this);
-        }
+    //    public SkyPulseDecRunning(long id)
+    //    {
+    //        Id = id;
+    //        CreatedUtc = Principles.HiResDateTime.UtcNow;
+    //        Successful = false;
+    //        SkyQueue.AddCommand(this);
+    //    }
 
-        public void Execute(SkyWatcher skyWatcher)
-        {
-            try
-            {
-                Result = skyWatcher.PulseDecRunning;
-                Successful = true;
+    //    public void Execute(SkyWatcher skyWatcher)
+    //    {
+    //        try
+    //        {
+    //            Result = skyWatcher.PulseDecRunning;
+    //            Successful = true;
 
-            }
-            catch (Exception e)
-            {
-                Successful = false;
-                Exception = e;
-            }
-        }
-    }
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            Successful = false;
+    //            Exception = e;
+    //        }
+    //    }
+    //}
 
-    public class SkyPulseRaRunning : ISkyCommand
-    {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
+    //public class SkyPulseRaRunning : ISkyCommand
+    //{
+    //    public long Id { get; }
+    //    public DateTime CreatedUtc { get; }
+    //    public bool Successful { get; set; }
+    //    public Exception Exception { get; set; }
+    //    public dynamic Result { get; private set; }
 
-        public SkyPulseRaRunning(long id)
-        {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
-            Successful = false;
-            SkyQueue.AddCommand(this);
-        }
+    //    public SkyPulseRaRunning(long id)
+    //    {
+    //        Id = id;
+    //        CreatedUtc = Principles.HiResDateTime.UtcNow;
+    //        Successful = false;
+    //        SkyQueue.AddCommand(this);
+    //    }
 
-        public void Execute(SkyWatcher skyWatcher)
-        {
-            try
-            {
-                Result = skyWatcher.PulseRaRunning;
-                Successful = true;
+    //    public void Execute(SkyWatcher skyWatcher)
+    //    {
+    //        try
+    //        {
+    //            Result = skyWatcher.PulseRaRunning;
+    //            Successful = true;
 
-            }
-            catch (Exception e)
-            {
-                Successful = false;
-                Exception = e;
-            }
-        }
-    }
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            Successful = false;
+    //            Exception = e;
+    //        }
+    //    }
+    //}
 
     public class SkySetEncoder : ISkyCommand
     {

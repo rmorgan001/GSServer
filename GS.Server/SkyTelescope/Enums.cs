@@ -86,7 +86,6 @@ namespace GS.Server.SkyTelescope
         DecPulseToGoTo,
         Encoders,
         FullCurrent,
-        GetOneStepIndicators,
         LoadDefaults,
         StopAxes,
         InstantStopAxes,

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31919.166
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32228.343
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GS.Shared", "GS.Shared\GS.Shared.csproj", "{63E824C8-585D-45FC-88E4-7E119F0C7773}"
 EndProject
@@ -41,7 +41,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NStarAlignment", "NStarAlig
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GS.FitsImageManager", "GS.FitsImageManager\GS.FitsImageManager.csproj", "{74B0434D-F37A-4B53-967C-85881529D45C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NINA", "NINA\NINA.csproj", "{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NINA", "NINA\NINA.csproj", "{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

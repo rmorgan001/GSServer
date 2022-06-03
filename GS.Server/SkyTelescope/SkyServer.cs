@@ -132,6 +132,12 @@ namespace GS.Server.SkyTelescope
                 // attach handler to watch for AlignmentSettings changing;
                 AlignmentSettings.StaticPropertyChanged += PropertyChangedAlignmentSettings;
 
+                // attach handler to watch for pulses changing;
+                SkyQueue.StaticPropertyChanged += PropertyChangedSkyQueue;
+
+                // attach handler to watch for pulses changing;
+                MountQueue.StaticPropertyChanged += PropertyChangedMountQueue;
+
             }
             catch (Exception ex)
             {
@@ -168,8 +174,6 @@ namespace GS.Server.SkyTelescope
         private static Vector _guideRate;
         private static bool _isAutoHomeRunning;
         private static bool _isHome;
-        public static bool _isPulseGuidingRa;
-        public static bool _isPulseGuidingDec;
         private static PierSide _isSideOfPier;
         private static bool _isSlewing;
         private static Exception _lastAutoHomeError;
@@ -190,7 +194,6 @@ namespace GS.Server.SkyTelescope
         private static double _rightAscensionXForm;
         private static double _slewSettleTime;
         private static double _siderealTime;
-        private static double _trackingRate;
         private static bool _spiralChanged;
         private static Vector _targetRaDec;
         private static TrackingMode _trackingMode;
@@ -527,7 +530,7 @@ namespace GS.Server.SkyTelescope
             get => _isSlewing;
             private set
             {
-                if (_isSlewing == value) return;
+                if (_isSlewing == value) { return; }
                 _isSlewing = value;
                 OnStaticPropertyChanged();
             }
@@ -571,14 +574,7 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Pulse reporting to driver
         /// </summary>
-        public static bool IsPulseGuiding
-        {
-            get
-            {
-                if (_isPulseGuidingDec || _isPulseGuidingRa) return true;
-                return false;
-            }
-        }
+        public static bool IsPulseGuiding => IsPulseGuidingDec || IsPulseGuidingRa;
 
         /// <summary>
         /// Checks if the auto home async process is running
@@ -758,6 +754,16 @@ namespace GS.Server.SkyTelescope
                 OnStaticPropertyChanged();
             }
         }
+
+        /// <summary>
+        /// Is Dec pulse guiding
+        /// </summary>
+        public static bool IsPulseGuidingDec { get; set; }
+
+        /// <summary>
+        /// Is Ra pulse guiding
+        /// </summary>
+        public static bool IsPulseGuidingRa { get; set; }
 
         /// <summary>
         /// Positions converted from mount
@@ -973,7 +979,7 @@ namespace GS.Server.SkyTelescope
                     Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
-                    Type = MonitorType.Information,
+                    Type = MonitorType.Information, 
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{value}|{SkySettings.HourAngleLimit}|{b[0]}|{b[1]}"
@@ -1156,25 +1162,12 @@ namespace GS.Server.SkyTelescope
                 {
                     if (TrackingSpeak && _trackingMode != TrackingMode.Off) Synthesizer.Speak(Application.Current.Resources["vceTrackingOff"].ToString());
                     _trackingMode = TrackingMode.Off;
-                    _isPulseGuidingDec = false; // turn off any pulses that maight get stuck
-                    _isPulseGuidingRa = false;
+                    IsPulseGuidingDec = false; // Ensure pulses are off
+                    IsPulseGuidingRa = false;
                 }
                 _tracking = value; //off
 
                 SetTracking();
-                OnStaticPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// Current Tracking rate
-        /// </summary>
-        public static double TrackingRate
-        {
-            get => _trackingRate;
-            private set
-            {
-                _trackingRate = value;
                 OnStaticPropertyChanged();
             }
         }
@@ -1461,8 +1454,6 @@ namespace GS.Server.SkyTelescope
                         case MountTaskName.Encoders:
                             break;
                         case MountTaskName.FullCurrent:
-                            break;
-                        case MountTaskName.GetOneStepIndicators:
                             break;
                         case MountTaskName.LoadDefaults:
                             break;
@@ -1942,10 +1933,6 @@ namespace GS.Server.SkyTelescope
                         case MountTaskName.GetFactorStep:
                             var skyFactor = new SkyGetFactorStepToRad(SkyQueue.NewId);
                             FactorStep = (double[])SkyQueue.GetCommandResult(skyFactor).Result;
-                            break;
-                        case MountTaskName.GetOneStepIndicators:
-                            //tests if mount can one step
-                            _ = new SkyGetOneStepIndicators(0);
                             break;
                         case MountTaskName.LoadDefaults:
                             _ = new SkyLoadDefaultMountSettings(0);
@@ -2675,7 +2662,6 @@ namespace GS.Server.SkyTelescope
                     rate *= PecBinNow.Item2;
                 }
             }
-            TrackingRate = rate;
             rate /= 3600;
             if (SkySettings.RaTrackingOffset <= 0) { return rate; }
             var offsetrate = rate * (Convert.ToDouble(SkySettings.RaTrackingOffset) / 100000);
@@ -3647,7 +3633,6 @@ namespace GS.Server.SkyTelescope
                     SkyTasks(MountTaskName.MountName);
                     SkyTasks(MountTaskName.MountVersion);
                     SkyTasks(MountTaskName.StepTimeFreq);
-                    SkyTasks(MountTaskName.GetOneStepIndicators);
                     SkyTasks(MountTaskName.CanPpec);
                     SkyTasks(MountTaskName.CanPolarLed);
                     SkyTasks(MountTaskName.PolarLedLevel);
@@ -3855,126 +3840,85 @@ namespace GS.Server.SkyTelescope
         /// <param name="duration">in milliseconds</param>
         public static void PulseGuide(GuideDirections direction, int duration)
         {
-            if (!IsMountRunning) { return; }
-            var rejected = !Tracking || IsSlewing;
-
-
-            if (duration == 0)
-            {
-                // stops the current guide command
-                switch (direction)
-                {
-                    case GuideDirections.guideNorth:
-                    case GuideDirections.guideSouth:
-                        _isPulseGuidingDec = false;
-                        break;
-                    case GuideDirections.guideEast:
-                    case GuideDirections.guideWest:
-                        _isPulseGuidingRa = false;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
-                }
-                rejected = true;
-            }
+            if (!IsMountRunning) { throw new Exception("Mount not running") ; }
 
             var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Server,
-                Category = MonitorCategory.Mount,
-                Type = MonitorType.Data,
-                Method = MethodBase.GetCurrentMethod()?.Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{direction}|{duration}|{rejected}"
-            };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{direction}|{duration}" };
             MonitorLog.LogToMonitor(monitorItem);
 
-            if (rejected) return;
-
             dynamic _;
-            PulseStatusEntry pulseStatusEntry;
             switch (direction)
             {
                 case GuideDirections.guideNorth:
                 case GuideDirections.guideSouth:
-                    _isPulseGuidingDec = true;
+                    if (duration == 0)
+                    {
+                        IsPulseGuidingDec = false;
+                        return;
+                    }
+                    IsPulseGuidingDec = true;
+                    HcResetPrevMove(MountAxis.Dec);
+                    var decGuideRate = Math.Abs(GuideRateDec);
+                    if (SideOfPier == PierSide.pierEast)
+                    {
+                        if (direction == GuideDirections.guideNorth) { decGuideRate = -decGuideRate; }
+                    }
+                    else
+                    {
+                        if (direction == GuideDirections.guideSouth) { decGuideRate = -decGuideRate; }
+                    }
+
+                    // Direction switched add backlash compensation
+                    var decbacklashamount = 0;
+                    if (direction != LastDecDirection) decbacklashamount = SkySettings.DecBacklash;
+                    LastDecDirection = direction;
+
+                    switch (SkySettings.Mount)
+                    {
+                        case MountType.Simulator:
+                            decGuideRate = decGuideRate > 0 ? -Math.Abs(decGuideRate) : Math.Abs(decGuideRate);
+                            _ = new CmdAxisPulse(0, Axis.Axis2, decGuideRate, duration);
+                            break;
+                        case MountType.SkyWatcher:
+                            _ = new SkyAxisPulse(0, AxisId.Axis2, decGuideRate, duration, decbacklashamount);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
                     break;
                 case GuideDirections.guideEast:
                 case GuideDirections.guideWest:
-                    _isPulseGuidingRa = true;
+                    if (duration == 0)
+                    {
+                        IsPulseGuidingRa = false;
+                        return;
+                    }
+                    IsPulseGuidingRa = true;
+                    HcResetPrevMove(MountAxis.Ra);
+                    var raGuideRate = Math.Abs(GuideRateRa);
+                    if (SouthernHemisphere)
+                    {
+                        if (direction == GuideDirections.guideWest) { raGuideRate = -raGuideRate; }
+                    }
+                    else
+                    {
+                        if (direction == GuideDirections.guideEast) { raGuideRate = -raGuideRate; }
+                    }
+                    
+                    switch (SkySettings.Mount)
+                    {
+                        case MountType.Simulator:
+                            _ = new CmdAxisPulse(0, Axis.Axis1, raGuideRate, duration);
+                            break;
+                        case MountType.SkyWatcher:
+                            _ = new SkyAxisPulse(0, AxisId.Axis1, raGuideRate, duration);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
-            }
-
-            if (_isPulseGuidingRa)
-            {
-                HcResetPrevMove(MountAxis.Ra);
-                var raGuideRate = Math.Abs(GuideRateRa);
-                if (SouthernHemisphere)
-                {
-                    if (direction == GuideDirections.guideWest) { raGuideRate = -raGuideRate; }
-                }
-                else
-                {
-                    if (direction == GuideDirections.guideEast) { raGuideRate = -raGuideRate; }
-                }
-
-                var createDateTime = HiResDateTime.UtcNow;
-
-                switch (SkySettings.Mount)
-                {
-                    case MountType.Simulator:
-                        _ = new CmdAxisPulse(0, Axis.Axis1, raGuideRate, duration);
-                        pulseStatusEntry = new PulseStatusEntry { Axis = (int)Axis.Axis1, Duration = duration, CreateDateTime = createDateTime };
-                        PulseStatusQueue.AddPulseStatusEntry(pulseStatusEntry);
-                        break;
-                    case MountType.SkyWatcher:
-                        _ = new SkyAxisPulse(0, AxisId.Axis1, raGuideRate, duration);
-                        pulseStatusEntry = new PulseStatusEntry { Axis = (int)AxisId.Axis1, Duration = duration, CreateDateTime = createDateTime };
-                        PulseStatusQueue.AddPulseStatusEntry(pulseStatusEntry);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-
-            if (_isPulseGuidingDec)
-            {
-                HcResetPrevMove(MountAxis.Dec);
-                var decGuideRate = Math.Abs(GuideRateDec);
-                if (SideOfPier == PierSide.pierEast)
-                {
-                    if (direction == GuideDirections.guideNorth) { decGuideRate = -decGuideRate; }
-                }
-                else
-                {
-                    if (direction == GuideDirections.guideSouth) { decGuideRate = -decGuideRate; }
-                }
-
-                // Direction switched add backlash compensation
-                var decbacklashamount = 0;
-                if (direction != LastDecDirection) decbacklashamount = SkySettings.DecBacklash;
-                LastDecDirection = direction;
-                var createDateTime = HiResDateTime.UtcNow;
-
-                switch (SkySettings.Mount)
-                {
-                    case MountType.Simulator:
-                        decGuideRate = decGuideRate > 0 ? -Math.Abs(decGuideRate) : Math.Abs(decGuideRate);
-                        _ = new CmdAxisPulse(0, Axis.Axis2, decGuideRate, duration);
-                        pulseStatusEntry = new PulseStatusEntry { Axis = (int)Axis.Axis2, Duration = duration, CreateDateTime = createDateTime };
-                        PulseStatusQueue.AddPulseStatusEntry(pulseStatusEntry);
-                        break;
-                    case MountType.SkyWatcher:
-                        _ = new SkyAxisPulse(0, AxisId.Axis2, decGuideRate, duration, decbacklashamount);
-                        pulseStatusEntry = new PulseStatusEntry { Axis = (int)Axis.Axis2, Duration = duration, CreateDateTime = createDateTime };
-                        PulseStatusQueue.AddPulseStatusEntry(pulseStatusEntry);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
             }
         }
 
@@ -4234,7 +4178,7 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         /// <param name="rightAscension">The right ascension.</param>
         /// <returns></returns>
-        public static PierSide SideOfPierRaDec(double rightAscension)
+        private static PierSide SideOfPierRaDec(double rightAscension)
         {
             if (SkySettings.AlignmentMode != AlignmentModes.algGermanPolar)
             {
@@ -4248,6 +4192,41 @@ namespace GS.Server.SkyTelescope
             else { sideOfPier = PierSide.pierUnknown; }
 
             return sideOfPier;
+        }
+
+        /// <summary>
+        /// Determine side of pier for a ra/dec coordinate
+        /// </summary>
+        /// <remarks>ra/dec must already be converted using Transforms.CordTypeToInternal</remarks>
+        /// <param name="RightAscension"></param>
+        /// <param name="Declination"></param>
+        /// <returns></returns>
+        public static PierSide DestinationSideOfPier(double RightAscension, double Declination)
+        {
+            if (SkySettings.AlignmentMode != AlignmentModes.algGermanPolar)
+            {
+                return PierSide.pierUnknown;
+            }
+
+            var flipreq = Axes.IsFlipRequired(new[] { RightAscension, Declination });
+
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, 
+                    Message = $"Ra:{RightAscension}|Dec:{Declination}|Flip:{flipreq}|SoP:{SideOfPier}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            switch (SideOfPier)
+            {
+                case PierSide.pierEast:
+                    return flipreq ? PierSide.pierWest : PierSide.pierEast;
+                case PierSide.pierWest:
+                    return flipreq ? PierSide.pierEast : PierSide.pierWest;
+                case PierSide.pierUnknown:
+                    return PierSide.pierUnknown;
+                default:
+                    return PierSide.pierUnknown;
+            }
         }
 
         /// <summary>
@@ -4739,7 +4718,6 @@ namespace GS.Server.SkyTelescope
         #endregion
 
         #region Server Items
-
         private static void PropertyChangedSkySettings(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
@@ -4770,6 +4748,30 @@ namespace GS.Server.SkyTelescope
                     break;
                 case "SampleSize":
                     AlignmentModel.SampleSize = AlignmentSettings.SampleSize;
+                    break;
+            }
+        }
+        private static void PropertyChangedSkyQueue(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "IsPulseGuidingRa":
+                    IsPulseGuidingRa = SkyQueue.IsPulseGuidingRa;
+                    break;
+                case "IsPulseGuidingDec":
+                    IsPulseGuidingDec = SkyQueue.IsPulseGuidingDec;
+                    break;
+            }
+        }
+        private static void PropertyChangedMountQueue(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "IsPulseGuidingRa":
+                    IsPulseGuidingRa = MountQueue.IsPulseGuidingRa;
+                    break;
+                case "IsPulseGuidingDec":
+                    IsPulseGuidingDec = MountQueue.IsPulseGuidingDec;
                     break;
             }
         }

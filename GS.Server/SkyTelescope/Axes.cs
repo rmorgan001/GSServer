@@ -17,6 +17,7 @@ using ASCOM.DeviceInterface;
 using GS.Principles;
 using GS.Shared;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 
@@ -167,7 +168,7 @@ namespace GS.Server.SkyTelescope
         /// <param name="altAz"></param>
         /// <param name="lst">Local Sidereal Time</param>
         /// <returns></returns>
-        internal static double[] AltAzToAxesYX(double[] altAz, double lst)
+        private static double[] AltAzToAxesYX(IReadOnlyList<double> altAz, double lst)
         {
             var axes = new[] { altAz[0], altAz[1] };
             switch (SkySettings.AlignmentMode)
@@ -229,7 +230,7 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         /// <param name="axes"></param>
         /// <returns>AltAz</returns>
-        private static double[] AxesYXToAltAz(double[] axes)
+        private static double[] AxesYXToAltAz(IReadOnlyList<double> axes)
         {
             var altAz = new[] { axes[0], axes[1] };
             switch (SkySettings.AlignmentMode)
@@ -244,7 +245,7 @@ namespace GS.Server.SkyTelescope
                         altAz = Range.RangeAltAz(altAz);
                     }
 
-                    //southern hemi
+                    //southern hemisphere
                     if (SkyServer.SouthernHemisphere) altAz[0] = -altAz[0];
 
                     //axis degrees to ha
@@ -270,7 +271,7 @@ namespace GS.Server.SkyTelescope
         /// <param name="axes"></param>
         /// <param name="localSiderealTime"></param>
         /// <returns></returns>
-        internal static double[] AxesXYToRaDec(double[] axes, double localSiderealTime)
+        private static double[] AxesXYToRaDec(IReadOnlyList<double> axes, double localSiderealTime)
         {
             var raDec = new[] { axes[0], axes[1] };
             switch (SkySettings.AlignmentMode)
@@ -290,7 +291,7 @@ namespace GS.Server.SkyTelescope
                     }
 
                     raDec[0] = localSiderealTime - raDec[0] / 15.0;
-                    //southern hemi
+                    //southern hemisphere
                     if (SkyServer.SouthernHemisphere) raDec[1] = -raDec[1];
                     break;
                 default:
@@ -309,8 +310,7 @@ namespace GS.Server.SkyTelescope
         {
             return AxesXYToRaDec(axes, SkyServer.SiderealTime);
         }
-
-
+        
         /// <summary>
         /// convert a RaDec position to an axes positions. 
         /// </summary>
@@ -327,7 +327,7 @@ namespace GS.Server.SkyTelescope
         /// <param name="raDec"></param>
         /// <param name="lst">Local Sidereal Time</param>
         /// <returns></returns>
-        internal static double[] RaDecToAxesXY(double[] raDec, double lst)
+        private static double[] RaDecToAxesXY(IReadOnlyList<double> raDec, double lst)
         {
             var axes = new[] { raDec[0], raDec[1] };
             switch (SkySettings.AlignmentMode)
@@ -366,7 +366,8 @@ namespace GS.Server.SkyTelescope
             axes = Range.RangeAxesXY(axes);
             return axes;
         }
-        internal static bool IsFlipRequired(double[] raDec, double lst)
+
+        private static bool IsFlipRequired(IReadOnlyList<double> raDec, double lst)
         {
             var axes = new[] { raDec[0], raDec[1] };
             switch (SkySettings.AlignmentMode)

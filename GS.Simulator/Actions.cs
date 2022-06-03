@@ -40,11 +40,6 @@ namespace GS.Simulator
         internal static bool IsConnected => IOSerial.IsConnected;
         internal MountInfo MountInfo { get; private set; }
         internal bool MonitorPulse { private get; set; }
-        internal bool PulseRaRunning { get; private set; }
-        internal bool PulseDecRunning { get; private set; }
-        //internal DateTime LastJ1RunTime { get; private set; }
-        //internal DateTime LastJ2RunTime { get; private set; }
-
         #endregion
 
         internal Actions()
@@ -129,37 +124,23 @@ namespace GS.Simulator
         /// <returns></returns>
         internal bool AxisPulse(Axis axis, double guideRate, int duration)
         {
-
             if (axis == Axis.Axis1)
             {
-                PulseRaRunning = true;
+                MountQueue.IsPulseGuidingRa = true;
+                MountQueue.IsPulseGuidingDec = false;
             }
             else
             {
-                PulseDecRunning = true;
+                MountQueue.IsPulseGuidingDec = true;
+                MountQueue.IsPulseGuidingRa = false;
             }
 
             var arcsecs = duration / 1000.0 * Conversions.Deg2ArcSec(Math.Abs(guideRate));
-
-            switch (axis)
+            if (arcsecs < .0002)
             {
-                case Axis.Axis1:
-                    //Check for minimum pulse or a pulse less than 1 step
-                    if (arcsecs < .0002)
-                    {
-                        PulseRaRunning = false;
-                        return false;
-                    }
-                    break;
-                case Axis.Axis2:
-                    if (arcsecs < .0002)
-                    {
-                        PulseDecRunning = false;
-                        return false;
-                    }
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
+                MountQueue.IsPulseGuidingRa = false;
+                MountQueue.IsPulseGuidingDec = false;
+                return false;
             }
 
             // setup to log and graph the pulse
@@ -169,10 +150,6 @@ namespace GS.Simulator
                 pulseEntry.Axis = (int)axis;
                 pulseEntry.Duration = duration;
                 pulseEntry.Rate = guideRate;
-                //pulseEntry.BacklashSteps = backlash;
-                //pulseEntry.Declination = declination;
-                //var loc = AxisSteps();
-                //if (MonitorPulse) pulseEntry.PositionStart = loc[(int)axis];
                 pulseEntry.StartTime = HiResDateTime.UtcNow;
                 //todo change back to 20
                 if (duration < 20) pulseEntry.Rejected = true;
@@ -187,26 +164,14 @@ namespace GS.Simulator
             }
             sw.Reset();
             _ioSerial.Send($"pulse|{axis}|{0}");
-            if (axis == Axis.Axis1)
-            {
-                PulseRaRunning = false;
-            }
-            else
-            {
-                PulseDecRunning = false;
-            }
 
-
+            MountQueue.IsPulseGuidingRa = false;
+            MountQueue.IsPulseGuidingDec = false;
+            
             if (MonitorPulse)
             {
-                //var loc1 = AxisSteps();
-                //pulseEntry.PositionEnd = loc1[(int)axis];
-                //pulseEntry.EndTime = HiResDateTime.UtcNow;
-                //pulseEntry.AltPPECon = false;
-                //pulseEntry.PPECon = false;
                 MonitorLog.LogToMonitor(pulseEntry);
             }
-
             return false;
         }
 

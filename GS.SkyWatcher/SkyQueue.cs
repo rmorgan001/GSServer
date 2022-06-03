@@ -17,9 +17,11 @@ using GS.Principles;
 using GS.Shared;
 using System;
 using System.Collections.Concurrent;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO.Ports;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,6 +35,7 @@ namespace GS.SkyWatcher
         private static ConcurrentDictionary<long, ISkyCommand> _resultsDictionary;
         private static SkyWatcher _skyWatcher;
         private static CancellationTokenSource _cts;
+        public static event PropertyChangedEventHandler StaticPropertyChanged;
 
         #endregion
 
@@ -41,6 +44,34 @@ namespace GS.SkyWatcher
         public static bool IsRunning { get; private set; }
         private static long _id;
         public static long NewId => Interlocked.Increment(ref _id);
+
+        private static bool _isPulseGuidingDec;
+        /// <summary>
+        /// status for Dec Pulse
+        /// </summary>
+        public static bool IsPulseGuidingDec
+        {
+            get => _isPulseGuidingDec;
+            set
+            {
+                _isPulseGuidingDec = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static bool _isPulseGuidingRa;
+        /// <summary>
+        /// status for Dec Pulse
+        /// </summary>
+        public static bool IsPulseGuidingRa
+        {
+            get => _isPulseGuidingRa;
+            set
+            {
+                _isPulseGuidingRa = value;
+                OnStaticPropertyChanged();
+            }
+        }
 
         #endregion
 
@@ -195,6 +226,14 @@ namespace GS.SkyWatcher
             _commandBlockingCollection = null;
         }
 
+        /// <summary>
+        /// called from the setter property.  property name is not required
+        /// </summary>
+        /// <param name="propertyName"></param>
+        private static void OnStaticPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));
+        }
         #endregion
     }
 }

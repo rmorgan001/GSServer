@@ -754,70 +754,69 @@ namespace GS.Simulator
         }
     }
 
-    public class CmdPulseDecRunning : IMountCommand
-    {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
+    //public class CmdPulseDecRunning : IMountCommand
+    //{
+    //    public long Id { get; }
+    //    public DateTime CreatedUtc { get; }
+    //    public bool Successful { get; set; }
+    //    public Exception Exception { get; set; }
+    //    public dynamic Result { get; private set; }
 
-        public CmdPulseDecRunning(long id)
-        {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
-            Successful = false;
-            MountQueue.AddCommand(this);
-        }
+    //    public CmdPulseDecRunning(long id)
+    //    {
+    //        Id = id;
+    //        CreatedUtc = Principles.HiResDateTime.UtcNow;
+    //        Successful = false;
+    //        MountQueue.AddCommand(this);
+    //    }
 
-        public void Execute(Actions actions)
-        {
-            try
-            {
-                Result = actions.PulseDecRunning;
-                Successful = true;
+    //    public void Execute(Actions actions)
+    //    {
+    //        try
+    //        {
+    //            Result = actions.PulseDecRunning;
+    //            Successful = true;
 
-            }
-            catch (Exception e)
-            {
-                Successful = false;
-                Exception = e;
-            }
-        }
-    }
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            Successful = false;
+    //            Exception = e;
+    //        }
+    //    }
+    //}
+    
+    //public class CmdPulseRaRunning : IMountCommand
+    //{
+    //    public long Id { get; }
+    //    public DateTime CreatedUtc { get; }
+    //    public bool Successful { get; set; }
+    //    public Exception Exception { get; set; }
+    //    public dynamic Result { get; private set; }
 
+    //    public CmdPulseRaRunning(long id)
+    //    {
+    //        Id = id;
+    //        CreatedUtc = Principles.HiResDateTime.UtcNow;
+    //        Successful = false;
+    //        MountQueue.AddCommand(this);
+    //    }
 
-    public class CmdPulseRaRunning : IMountCommand
-    {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
+    //    public void Execute(Actions actions)
+    //    {
+    //        try
+    //        {
+    //            Result = actions.PulseRaRunning;
+    //            Successful = true;
 
-        public CmdPulseRaRunning(long id)
-        {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
-            Successful = false;
-            MountQueue.AddCommand(this);
-        }
-
-        public void Execute(Actions actions)
-        {
-            try
-            {
-                Result = actions.PulseRaRunning;
-                Successful = true;
-
-            }
-            catch (Exception e)
-            {
-                Successful = false;
-                Exception = e;
-            }
-        }
-    }
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            Successful = false;
+    //            Exception = e;
+    //        }
+    //    }
+    //}
 
     public class CmdSnapPort : IMountCommand
     {
