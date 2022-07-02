@@ -1848,7 +1848,7 @@ namespace GS.Server.Settings
         {
             try
             {
-                Process.Start(new ProcessStartInfo("https://www.greenswamp.org/donate"));
+                Process.Start(new ProcessStartInfo("https://www.greenswamp.org/?page_id=566"));
             }
             catch (Exception ex)
             {
