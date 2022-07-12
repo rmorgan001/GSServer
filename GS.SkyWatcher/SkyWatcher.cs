@@ -997,10 +997,14 @@ namespace GS.SkyWatcher
         private void ParseCapabilities()
         {
             var result = GetCapabilities();
-            if (result == null) { return; }
-            if (result.Contains("!")) { return; }
+            if (result == null || result.Contains("!") || result.Length < 3  || !result.Contains("="))
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{result}" };
+                MonitorLog.LogToMonitor(monitorItem);
+                return;
+            }
             if (result.Contains("=")) { result = result.Replace("=", ""); }
-            if (result.Length < 3) { return; }
 
             var code = result.ToCharArray();
             for (var i = 0; i < code.Length; i++)

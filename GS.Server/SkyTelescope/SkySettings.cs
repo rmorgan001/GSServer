@@ -1063,8 +1063,6 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-
-
         private static double _homeAxisX;
         public static double HomeAxisX
         {
