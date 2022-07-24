@@ -199,6 +199,7 @@ namespace GS.SkyWatcher
         [Description("Star Adventurer(MC012)")] StarAdventurer = 7,
         [Description("Star Adventurer Mini(MC013)")] StarAdventurerMini = 8,
         [Description("Avant(MC018)")] AvAnt = 11,
+        [Description("Star Adventurer GTi(MC021)")] StarAdventurerGTi = 12,
         [Description("EQM35(MC002)")] EQM35 = 26,
         [Description("EQ8-R(MC015)")] EQ8R = 32,
         [Description("EQ8(MC015)")] EQ8a = 33,
