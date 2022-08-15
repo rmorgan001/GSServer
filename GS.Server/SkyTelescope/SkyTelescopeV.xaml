@@ -156,7 +156,7 @@
                                     </ItemsPanelTemplate>
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
-                            <ComboBox Grid.Row="2" Grid.Column="3" md:HintAssist.Hint="{StaticResource skyMeridian}" MinWidth="10" Margin="10,0,0,0" VerticalAlignment="Center"  ToolTip="{StaticResource skyMeridian}"
+                            <ComboBox Grid.Row="2" Grid.Column="3" md:HintAssist.Hint="{StaticResource skyFlipAng}" MinWidth="10" Margin="10,0,0,0" VerticalAlignment="Center" ToolTip="{StaticResource skyFlipAng}"
                                       ItemsSource="{Binding HourAngleLimits}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                 <ComboBox.SelectedItem>
                                     <Binding Path="HourAngleLimit" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">

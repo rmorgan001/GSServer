@@ -701,4 +701,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--1.0.4.7 -->
     <system:String x:Key="gpsDecimals">Entrer des décimales</system:String>
     <system:String x:Key="InvCord">Coordonnée invalide</system:String>
+
+    <!--1.0.4.8 -->
+    <system:String x:Key="skyFlipAng">Flip Angle (deg)</system:String>
 </ResourceDictionary>

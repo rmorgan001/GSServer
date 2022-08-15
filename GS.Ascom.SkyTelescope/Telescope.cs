@@ -643,7 +643,8 @@ namespace ASCOM.GS.Sky.Telescope
             MonitorLog.LogToMonitor(monitorItem);
 
             var radec = Transforms.CoordTypeToInternal(RightAscension, Declination);
-            var r = SkyServer.DestinationSideOfPier(radec.X, radec.Y);
+            var r = SkyServer.SideOfPierRaDec1(radec.X);
+            //var r = SkyServer.SideOfPierActual(radec.X, radec.Y);
             return r;
         }
 

@@ -392,7 +392,7 @@ namespace GS.Server.SkyTelescope
                     if (SkyServer.IsWithinMeridianLimits(b)) return false;
 
                     //check if farthest position is needed
-                    var alt = Axes.GetAltAxisPosition(b);
+                    var alt = GetAltAxisPosition(b);
                     var c = SkyServer.ChooseClosestPosition(SkyServer.ActualAxisX, b, alt);
                     return c == "b";
 

@@ -4178,7 +4178,7 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         /// <param name="rightAscension">The right ascension.</param>
         /// <returns></returns>
-        private static PierSide SideOfPierRaDec(double rightAscension)
+        public static PierSide SideOfPierRaDec(double rightAscension)
         {
             if (SkySettings.AlignmentMode != AlignmentModes.algGermanPolar)
             {
@@ -4195,13 +4195,38 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Determine side of pier for a ra/dec coordinate
+        /// Gets the side of pier using the right ascension, assuming it depends on the
+        /// hour angle and GSS ha limit.  Used for Destination side of Pier, NOT to determine the mount
+        /// pointing state
+        /// </summary>
+        /// <param name="rightAscension">The right ascension.</param>
+        /// <returns></returns>
+        public static PierSide SideOfPierRaDec1(double rightAscension)
+        {
+            if (SkySettings.AlignmentMode != AlignmentModes.algGermanPolar)
+            {
+                return PierSide.pierUnknown;
+            }
+
+            var limit = SkySettings.HourAngleLimit / 15;
+            var ha = Coordinate.Ra2Ha12(rightAscension, SiderealTime);
+            PierSide sideOfPier;
+
+            if (ha < (0.0 + limit) && ha >= -12.0) { sideOfPier = PierSide.pierWest; }
+            else if (ha >= (0.0 + limit) && ha <= 12.0) { sideOfPier = PierSide.pierEast; }
+            else { sideOfPier = PierSide.pierUnknown; }
+
+            return sideOfPier;
+        }
+
+        /// <summary>
+        /// Determine actual side of pier for a ra/dec coordinate
         /// </summary>
         /// <remarks>ra/dec must already be converted using Transforms.CordTypeToInternal</remarks>
         /// <param name="RightAscension"></param>
         /// <param name="Declination"></param>
         /// <returns></returns>
-        public static PierSide DestinationSideOfPier(double RightAscension, double Declination)
+        public static PierSide SideOfPierActual(double RightAscension, double Declination)
         {
             if (SkySettings.AlignmentMode != AlignmentModes.algGermanPolar)
             {
@@ -5241,7 +5266,7 @@ namespace GS.Server.SkyTelescope
                         // No bin change return
                         if (PecBinNow?.Item1 == newBinNo) return;
                         if (PecWormMaster == null || PecWormMaster?.Count == 0) { return; }
-                        PecWormMaster.TryGetValue(newBinNo, out pecBin);
+                        PecWormMaster?.TryGetValue(newBinNo, out pecBin);
                         break;
                     case PecMode.Pec360:
                         // No bin change return
@@ -5262,8 +5287,9 @@ namespace GS.Server.SkyTelescope
                             PecBinsSubs.Clear();
                             for (var i = binStart; i <= binEnd; i++)
                             {
-                                var masterResult = Pec360Master.TryGetValue(i, out var mi);
-                                if (masterResult) PecBinsSubs.Add(i, mi);
+                                var mi = Tuple.Create(0.0, 0);
+                                var masterResult = Pec360Master != null && Pec360Master.TryGetValue(i, out mi);
+                                if (masterResult ) PecBinsSubs.Add(i, mi);
                             }
 
                             count++;
