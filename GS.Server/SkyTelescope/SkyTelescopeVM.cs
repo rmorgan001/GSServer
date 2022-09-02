@@ -126,6 +126,7 @@ namespace GS.Server.SkyTelescope
                     var extendedlist = new List<int>(Numbers.InclusiveIntRange(1000, 3000, 100));
                     RaBacklashList = RaBacklashList.Concat(extendedlist);
                     DecBacklashList = DecBacklashList.Concat(extendedlist);
+                    AxisTrackingLimits = new List<double>(Numbers.InclusiveRange(0, 15, 1));
 
                     // defaults
                     AtPark = SkyServer.AtPark;
@@ -144,6 +145,7 @@ namespace GS.Server.SkyTelescope
                     SetParkLimitSelection(SkySettings.ParkLimitName);
                     TrackingRate = SkySettings.TrackingRate;
                     PolarLedLevel = SkySettings.PolarLedLevel;
+                    SkySettings.CanSetPierSide = SkySettings.HourAngleLimit != 0;
 
                     HcWinVisibility = true;
                     ModelWinVisibility = true;
@@ -856,6 +858,17 @@ namespace GS.Server.SkyTelescope
             set
             {
                 SkySettings.HourAngleLimit = value;
+                SkySettings.CanSetPierSide = value != 0;
+                OnPropertyChanged();
+            }
+        }
+        public IList<double> AxisTrackingLimits { get; }
+        public double AxisTrackingLimit
+        {
+            get => SkySettings.AxisTrackingLimit;
+            set
+            {
+                SkySettings.AxisTrackingLimit = value;
                 OnPropertyChanged();
             }
         }
@@ -7968,6 +7981,8 @@ namespace GS.Server.SkyTelescope
         public string CanHome { get; private set; }
         public string RaArcSec { get; private set; }
         public string DecArcSec { get; private set; }
+        public string Capabilities { get; private set; }
+        public string CanAdvancedCmdSupport { get; private set; }
 
         private static string SupportedBol(bool supported)
         {
@@ -8012,7 +8027,9 @@ namespace GS.Server.SkyTelescope
                     CanHome = SupportedBol(SkyServer.CanHomeSensor);
                     RaArcSec = Math.Round(SkyServer.StepsPerRevolution[0] / 360.0 / 3600, 2).ToString(CultureInfo.InvariantCulture);
                     DecArcSec = Math.Round(SkyServer.StepsPerRevolution[1] / 360.0 / 3600, 2).ToString(CultureInfo.InvariantCulture);
-                    
+                    Capabilities = SkyServer.Capabilities;
+                    CanAdvancedCmdSupport = SupportedBol(SkyServer.CanAdvancedCmdSupport);
+
                     OnPropertyChanged($"MountName");
                     OnPropertyChanged($"MountVersion");
                     OnPropertyChanged($"RaSteps");
@@ -8028,6 +8045,8 @@ namespace GS.Server.SkyTelescope
                     OnPropertyChanged($"CanHome");
                     OnPropertyChanged($"RaArcSec");
                     OnPropertyChanged($"DecArcSec");
+                    OnPropertyChanged($"Capabilities");
+                    OnPropertyChanged($"CanAdvancedCmdSupport");
                     IsDialogOpen = true;
                 }
             }

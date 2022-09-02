@@ -27,6 +27,40 @@ namespace GS.SkyWatcher
         void Execute(SkyWatcher skyWatcher);
     }
 
+    public class SkyAllowAdvancedCommandSet : ISkyCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; }
+        private readonly bool _on;
+
+        public SkyAllowAdvancedCommandSet(long id, bool on)
+        {
+            Id = id;
+            _on = on;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            Successful = false;
+            Result = null;
+            SkyQueue.AddCommand(this);
+        }
+
+        public void Execute(SkyWatcher skyWatcher)
+        {
+            try
+            {
+                skyWatcher.AllowAdvancedCommandSet(_on);
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
     public class SkyAxisMoveSteps : ISkyCommand
     {
         public long Id { get; }
@@ -514,6 +548,37 @@ namespace GS.SkyWatcher
             try
             {
                 Result = skyWatcher.CanWifi;
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
+    public class SkyGetAdvancedCmdSupport : ISkyCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; private set; }
+
+        public SkyGetAdvancedCmdSupport(long id)
+        {
+            Id = id;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            Successful = false;
+            SkyQueue.AddCommand(this);
+        }
+
+        public void Execute(SkyWatcher skyWatcher)
+        {
+            try
+            {
+                Result = skyWatcher.GetAdvancedCmdSupport();
                 Successful = true;
             }
             catch (Exception e)

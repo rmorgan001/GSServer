@@ -27,6 +27,7 @@ namespace GS.Server.AutoHome
     {
         // private int StartCount { get; set; }
         private int TripPosition { get; set; }
+        private bool HasHomeSensor { get; set; }
 
         /// <summary>
         /// auto home for the simulator
@@ -44,19 +45,17 @@ namespace GS.Server.AutoHome
                 Message = "Start"
             };
             MonitorLog.LogToMonitor(monitorItem);
-
-            Initialize();
         }
 
         /// <summary>
-        /// Initialize
+        /// Check for home sensor capability
         /// </summary>
-        private void Initialize()
+        private void HomeSensorCapabilityCheck()
         {
-            var canHomeCmda = new CmdCapabilities(MountQueue.NewId);
-            var mountinfo = (MountInfo)MountQueue.GetCommandResult(canHomeCmda).Result;
-            if (!canHomeCmda.Successful && canHomeCmda.Exception != null) throw canHomeCmda.Exception;
-            if (!mountinfo.CanHomeSensors) throw new Exception("Home sensor not supported");
+            HasHomeSensor = false;
+            var canHomeCmda = new GetHomeSensorCapability(MountQueue.NewId);
+            bool.TryParse(Convert.ToString(MountQueue.GetCommandResult(canHomeCmda).Result), out bool hasHome);
+            HasHomeSensor = hasHome;
         }
 
         ///// <summary>
@@ -157,6 +156,8 @@ namespace GS.Server.AutoHome
         /// <returns></returns>
         public int StartAutoHome(Axis axis, int maxMove = 100, int offSetDec = 0)
         {
+            HomeSensorCapabilityCheck();
+            if (!HasHomeSensor) { return -5; }
             var _ = new CmdAxisStop(0, axis);
             if (SkyServer.Tracking) SkyServer.Tracking = false;
             //StartCount = GetEncoderCount(axis);

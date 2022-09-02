@@ -241,7 +241,7 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        [global::System.Configuration.DefaultSettingValueAttribute("15")]
         public double HourAngleLimit {
             get {
                 return ((double)(this["HourAngleLimit"]));
@@ -1532,6 +1532,30 @@ namespace GS.Server.Properties {
             }
             set {
                 this["FrontGraphic"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double AxisTrackingLimit {
+            get {
+                return ((double)(this["AxisTrackingLimit"]));
+            }
+            set {
+                this["AxisTrackingLimit"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AllowAdvancedCommandSet {
+            get {
+                return ((bool)(this["AllowAdvancedCommandSet"]));
+            }
+            set {
+                this["AllowAdvancedCommandSet"] = value;
             }
         }
     }

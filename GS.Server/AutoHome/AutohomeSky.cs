@@ -27,6 +27,7 @@ namespace GS.Server.AutoHome
     {
         // private int StartCount { get; set; }
         private int TripPosition { get; set; }
+        private static bool HasHomeSensor { get; set; }
 
         /// <summary>
         /// auto home for the simulator
@@ -44,37 +45,17 @@ namespace GS.Server.AutoHome
                 Message = "Start"
             };
             MonitorLog.LogToMonitor(monitorItem);
-
-            Initialize();
         }
 
         /// <summary>
-        /// Initialize
+        /// Check for home sensor capability
         /// </summary>
-        private void Initialize()
+        private static void HomeSensorCapabilityCheck()
         {
-            try
-            {
-                var canHomeSky = new SkyCanHomeSensors(SkyQueue.NewId);
-                var hasHome = (bool)SkyQueue.GetCommandResult(canHomeSky).Result;
-                if (!canHomeSky.Successful && canHomeSky.Exception != null) throw canHomeSky.Exception;
-                if (!hasHome) throw new Exception("Home sensor not supported");
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}|{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-            }
-
+            HasHomeSensor = false;
+            var canHomeSky = new SkyCanHomeSensors(SkyQueue.NewId);
+            bool.TryParse(Convert.ToString(SkyQueue.GetCommandResult(canHomeSky).Result), out bool hasHome);
+            HasHomeSensor = hasHome;
         }
 
         ///// <summary>
@@ -188,6 +169,8 @@ namespace GS.Server.AutoHome
         /// <returns></returns>
         public int StartAutoHome(AxisId axis, int maxMove = 100, int offSetDec = 0)
         {
+            HomeSensorCapabilityCheck();
+            if (!HasHomeSensor){ return -5; }
             var _ = new SkyAxisStop(0, axis);
             if (SkyServer.Tracking) SkyServer.Tracking = false;
             //StartCount = GetEncoderCount(axis);

@@ -5,9 +5,24 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        mc:Ignorable="d" >
+        xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
     <GroupBox Header="{StaticResource botLimitOptions}" Margin="5">
         <StackPanel Orientation="Vertical">
+            <ComboBox materialDesign:HintAssist.Hint="{StaticResource lbAxisTrackingLimit}" MinWidth="10"  Margin="10,0,0,10" VerticalAlignment="Center" ToolTip="{StaticResource lbAxisTrackingLimit}" ItemsSource="{Binding AxisTrackingLimits}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                <ComboBox.SelectedItem>
+                    <Binding Path="AxisTrackingLimit" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </ComboBox.SelectedItem>
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="5">
                 <RadioButton GroupName="limit" Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource botLimitOptions}" IsChecked="{Binding LimitNothing, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Label Content="{StaticResource LimitNothing}" VerticalAlignment="Center" />

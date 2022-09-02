@@ -501,7 +501,7 @@ namespace GS.Simulator
     /// <summary>
     /// 
     /// </summary>
-    public class CmdCapabilities : IMountCommand
+    public class GetHomeSensorCapability : IMountCommand
     {
         public long Id { get; }
         public DateTime CreatedUtc { get; }
@@ -509,7 +509,7 @@ namespace GS.Simulator
         public Exception Exception { get; set; }
         public dynamic Result { get; private set; }
 
-        public CmdCapabilities(long id)
+        public GetHomeSensorCapability(long id)
         {
             Id = id;
             CreatedUtc = Principles.HiResDateTime.UtcNow;
@@ -521,7 +521,7 @@ namespace GS.Simulator
         {
             try
             {
-                Result = actions.MountInfo;
+                Result = actions.MountInfo.CanHomeSensors;
                 Successful = true;
             }
             catch (Exception e)

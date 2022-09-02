@@ -702,5 +702,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!--1.0.4.8 -->
     <system:String x:Key="skyFlipAng">Flip Angle (deg)</system:String>
+    <system:String x:Key="lbAxisTrackingLimit">Tracking Limit (deg)</system:String>
+    <system:String x:Key="mntCap">Capabilities:</system:String>
+    <system:String x:Key="mntAdv">Advanced:</system:String>
 </ResourceDictionary>
  

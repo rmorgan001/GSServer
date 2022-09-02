@@ -170,6 +170,7 @@ namespace GS.Server.SkyTelescope
         private static bool _autoHomeStop;
         private static bool _asComOn;
         private static bool _canHomeSensor;
+        private static string _capabilities;
         private static double _declinationXForm;
         private static Vector _guideRate;
         private static bool _isAutoHomeRunning;
@@ -188,6 +189,7 @@ namespace GS.Server.SkyTelescope
         private static ParkPosition _parkSelected;
         private static bool _canPPec;
         private static bool _canPolarLed;
+        private static bool _canAdvancedCmdSupport;
         private static Vector _raDec;
         private static Vector _rateAxes;
         private static Vector _rateRaDec;
@@ -376,6 +378,17 @@ namespace GS.Server.SkyTelescope
             {
                 if (_canHomeSensor == value) { return; }
                 _canHomeSensor = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
+        public static string Capabilities
+        {
+            get => _capabilities;
+            private set
+            {
+                if (_capabilities == value) { return; }
+                _capabilities = value;
                 OnStaticPropertyChanged();
             }
         }
@@ -1436,7 +1449,12 @@ namespace GS.Server.SkyTelescope
                 case MountType.Simulator:
                     switch (taskName)
                     {
+                        case MountTaskName.AllowAdvancedCommandSet:
+                            break;
                         case MountTaskName.AlternatingPpec:
+                            break;
+                        case MountTaskName.CanAdvancedCmdSupport:
+                            CanAdvancedCmdSupport = false;
                             break;
                         case MountTaskName.CanPpec:
                             CanPPec = false;
@@ -1445,9 +1463,9 @@ namespace GS.Server.SkyTelescope
                             CanPolarLed = false;
                             break;
                         case MountTaskName.CanHomeSensor:
-                            var canHomeCmda = new CmdCapabilities(MountQueue.NewId);
-                            var mountinfo = (MountInfo)MountQueue.GetCommandResult(canHomeCmda).Result;
-                            CanHomeSensor = mountinfo.CanHomeSensors;
+                            var canHomeCmda = new GetHomeSensorCapability(MountQueue.NewId);
+                            bool.TryParse(Convert.ToString(MountQueue.GetCommandResult(canHomeCmda).Result), out bool hasHome);
+                            CanHomeSensor = hasHome;
                             break;
                         case MountTaskName.DecPulseToGoTo:
                             break;
@@ -1490,6 +1508,7 @@ namespace GS.Server.SkyTelescope
                         case MountTaskName.PecTraining:
                             break;
                         case MountTaskName.Capabilities:
+                            Capabilities = @"N/A";
                             break;
                         case MountTaskName.SetSt4Guiderate:
                             break;
@@ -1897,11 +1916,19 @@ namespace GS.Server.SkyTelescope
                 case MountType.SkyWatcher:
                     switch (taskName)
                     {
+                        case MountTaskName.AllowAdvancedCommandSet:
+                            _ = new SkyAllowAdvancedCommandSet(0, SkySettings.AllowAdvancedCommandSet);
+                            break;
                         case MountTaskName.AlternatingPpec:
                             _ = new SkySetAlternatingPPec(0, SkySettings.AlternatingPPec);
                             break;
                         case MountTaskName.DecPulseToGoTo:
                             _ = new SkySetDecPulseToGoTo(0, SkySettings.DecPulseToGoTo);
+                            break;
+                        case MountTaskName.CanAdvancedCmdSupport:
+                            var SkyCanAdvanced= new SkyGetAdvancedCmdSupport(SkyQueue.NewId);
+                            bool.TryParse(Convert.ToString(SkyQueue.GetCommandResult(SkyCanAdvanced).Result), out bool pAdvancedResult);
+                            CanAdvancedCmdSupport = pAdvancedResult;
                             break;
                         case MountTaskName.CanPpec:
                             var SkyMountCanPpec = new SkyCanPPec(SkyQueue.NewId);
@@ -1919,8 +1946,8 @@ namespace GS.Server.SkyTelescope
                             CanHomeSensor = homeSensoResult;
                             break;
                         case MountTaskName.Capabilities:
-                            // populates driver with mount capabilities
-                            _ = new SkyGetCapabilities(0);
+                            var skyCap = new SkyGetCapabilities(SkyQueue.NewId);
+                            Capabilities = (string)SkyQueue.GetCommandResult(skyCap).Result;
                             break;
                         case MountTaskName.Encoders:
                             _ = new SkySetEncoder(0, AxisId.Axis1, SkySettings.Encoders);
@@ -2276,6 +2303,9 @@ namespace GS.Server.SkyTelescope
                     case -4:
                         msgcode1 = "RA too many restarts";
                         break;
+                    case -5:
+                        msgcode1 = "RA home capability check failed";
+                        break;
                     default:
                         msgcode1 = "Ra code not found";
                         break;
@@ -2297,7 +2327,10 @@ namespace GS.Server.SkyTelescope
                         //stop requested
                         break;
                     case -4:
-                        msgcode1 = "RA too many restarts";
+                        msgcode2 = "Dec too many restarts";
+                        break;
+                    case -5:
+                        msgcode2 = "Dec home capability check failed";
                         break;
                     default:
                         msgcode2 = "Dec code not found";
@@ -2447,6 +2480,9 @@ namespace GS.Server.SkyTelescope
         private static void CheckAxisLimits()
         {
             var limitHit = false;
+            var trackingLimit = false;
+            //combine flip angle and tracking limit for a total limit passed meridian
+            var totLimit = SkySettings.HourAngleLimit + SkySettings.AxisTrackingLimit;
             // check the ranges of the axes
             // primary axis must be in the range 0 to 360 for AltAz or Polar
             // and -hourAngleLimit to 180 + hourAngleLimit for german polar
@@ -2458,13 +2494,18 @@ namespace GS.Server.SkyTelescope
                     break;
                 case AlignmentModes.algGermanPolar:
                     // the primary axis needs to be in the range -180 to +180 to correspond with hour angles of -12 to 12.
-                    // check if we have hit the hour angle limit
+                    // check if we have hit the hour angle limit 
                     if (SouthernHemisphere)
                     {
                         if (_mountAxes.X >= SkySettings.HourAngleLimit ||
                             _mountAxes.X <= -SkySettings.HourAngleLimit - 180)
                         {
                             limitHit = true;
+                        }
+                        // Check tracking limit
+                        if (_mountAxes.X >= totLimit || _mountAxes.X <= -totLimit - 180)
+                        {
+                            trackingLimit = true;
                         }
                     }
                     else
@@ -2473,6 +2514,11 @@ namespace GS.Server.SkyTelescope
                             _mountAxes.X <= -SkySettings.HourAngleLimit)
                         {
                             limitHit = true;
+                        }
+                        //Check Tracking Limit
+                        if (_mountAxes.X >= totLimit + 180 || _mountAxes.X <= -totLimit)
+                        {
+                            trackingLimit = true;
                         }
                     }
 
@@ -2491,10 +2537,11 @@ namespace GS.Server.SkyTelescope
             //_mountAxes.X = Range.Range270(_mountAxes.X);
 
             LimitAlarm = limitHit;
+            if (!trackingLimit) return;
 
-            if (limitHit && Tracking && SkySettings.LimitTracking) { Tracking = false; } // turn off tracking
+            if (Tracking && SkySettings.LimitTracking) { Tracking = false; } // turn off tracking
 
-            if (limitHit && SkySettings.LimitPark && SlewState != SlewType.SlewPark) // only hit this once while in limit
+            if (SkySettings.LimitPark && SlewState != SlewType.SlewPark) // only hit this once while in limit
             {
                 var found = SkySettings.ParkPositions.Find(x => x.Name == SkySettings.ParkLimitName);
                 if (found == null)
@@ -3557,6 +3604,7 @@ namespace GS.Server.SkyTelescope
                     SimTasks(MountTaskName.StepsWormPerRevolution);
                     SimTasks(MountTaskName.CanHomeSensor);
                     SimTasks(MountTaskName.GetFactorStep);
+                    SimTasks(MountTaskName.Capabilities);
 
                     raWormTeeth = (int)(StepsPerRevolution[0] / StepsWormPerRevolution[0]);
                     decWormTeeth = (int)(StepsPerRevolution[1] / StepsWormPerRevolution[1]);
@@ -3622,6 +3670,7 @@ namespace GS.Server.SkyTelescope
                     }
 
                     // defaults
+                    SkyTasks(MountTaskName.AllowAdvancedCommandSet);
                     SkyTasks(MountTaskName.LoadDefaults);
                     SkyTasks(MountTaskName.StepsPerRevolution);
                     SkyTasks(MountTaskName.StepsWormPerRevolution);
@@ -3642,6 +3691,8 @@ namespace GS.Server.SkyTelescope
                     SkyTasks(MountTaskName.MinPulseDec);
                     SkyTasks(MountTaskName.MinPulseRa);
                     SkyTasks(MountTaskName.GetFactorStep);
+                    SkyTasks(MountTaskName.Capabilities);
+                    SkyTasks(MountTaskName.CanAdvancedCmdSupport);
                     if (CanPPec) SkyTasks(MountTaskName.Pec);
 
                     raWormTeeth = (int)(StepsPerRevolution[0] / StepsWormPerRevolution[0]);
@@ -4847,6 +4898,7 @@ namespace GS.Server.SkyTelescope
             TrackingSpeak = true;
 
             StepsTimeFreq = new long[2];
+
         }
 
         /// <summary>
@@ -5075,11 +5127,23 @@ namespace GS.Server.SkyTelescope
             get => _canPolarLed;
             private set
             {
-                if (_canPolarLed == value) return;
+                if (_canPolarLed == value) {return;}
                 _canPolarLed = value;
                 OnStaticPropertyChanged();
             }
         }
+
+        public static bool CanAdvancedCmdSupport
+        {
+            get => _canAdvancedCmdSupport;
+            private set
+            {
+                if (_canAdvancedCmdSupport == value) {return;}
+                _canAdvancedCmdSupport = value;
+                OnStaticPropertyChanged();
+            }
+        }
+        
 
         /// <summary>
         /// Turn on/off mount PPec

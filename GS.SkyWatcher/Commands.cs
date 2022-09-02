@@ -71,11 +71,21 @@ namespace GS.SkyWatcher
         private SerialPort Serial { get; }
 
         private bool MountConnected { get; set; }
-        
+
         /// <summary>
         /// Quick check to see if serial is connected and mount is receiving and sending data
         /// </summary> 
         internal bool IsConnected => Serial.IsOpen && MountConnected;
+
+        /// <summary>
+        /// Indicate whether the motor controller supports advanced command set (Firmware version 3.22.xx or above)
+        /// </summary> 
+        public bool SupportAdvancedCommandSet;
+
+        /// <summary>
+        /// Indicate whether the advanced command set is allowed to be used
+        /// </summary> 
+        public bool AllowAdvancedCommandSet { get; set; }
 
         #endregion
 
@@ -251,41 +261,56 @@ namespace GS.SkyWatcher
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         private void GetStepsPerRevolution(AxisId axis)
         {
-            var response = CmdToAxis(axis, 'a', null);
-            var gearRatio = StringToLong(response);
-            // There is a issue in the earlier version firmware(Before 2.00) of motor controller MC001.
-            // Overwrite the GearRatio reported by the MC for 80GT mount and 114GT mount.
-            if (axis == AxisId.Axis1)
+            string response;
+            if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
-                if ((_axisVersion[0] & 0x0000FF) == 0x80)
-                {
-                    gearRatio = 0x162B97; // for 80GT mount
-                }
-                if ((_axisGearRatios[0] & 0x0000FF) == 0x82)
-                {
-                    gearRatio = 0x205318; // for 114GT mount
-                }
-                _mount360Steps[0] = (int)gearRatio;
-                if (_customMount360Steps[0] > 0){ gearRatio = _customMount360Steps[0];} //Setup for custom :a
-                _axisGearRatios[0] = gearRatio;
+                response = CmdToMount(axis, 'X', "0002");    // Read 32-bit axis resolution
+                var gearRatio = int.Parse(response.Substring(1, 8), System.Globalization.NumberStyles.HexNumber);
+
+                _mount360Steps[0] = gearRatio;
+                if (_customMount360Steps[1] > 0) { gearRatio = _customMount360Steps[1]; } //Setup for custom :a
+                _axisGearRatios[1] = gearRatio;
+
+                _factorRadToStep[(int)axis] = gearRatio / (2 * Math.PI);
+                _factorStepToRad[(int)axis] = 2 * Math.PI / gearRatio;
             }
             else
             {
-                if ((_axisVersion[1] & 0x0000FF) == 0x80)
+                response = CmdToMount(axis, 'a', null);
+                var gearRatio = StringToLong(response);
+                // There is a issue in the earlier version firmware(Before 2.00) of motor controller MC001.
+                // Overwrite the GearRatio reported by the MC for 80GT mount and 114GT mount.
+                if (axis == AxisId.Axis1)
                 {
-                    gearRatio = 0x162B97; // for 80GT mount
+                    if ((_axisVersion[0] & 0x0000FF) == 0x80)
+                    {
+                        gearRatio = 0x162B97; // for 80GT mount
+                    }
+                    if ((_axisGearRatios[0] & 0x0000FF) == 0x82)
+                    {
+                        gearRatio = 0x205318; // for 114GT mount
+                    }
+                    _mount360Steps[0] = (int)gearRatio;
+                    if (_customMount360Steps[0] > 0) { gearRatio = _customMount360Steps[0]; } //Setup for custom :a
+                    _axisGearRatios[0] = gearRatio;
                 }
-                if ((_axisVersion[1] & 0x0000FF) == 0x82)
+                else
                 {
-                    gearRatio = 0x205318; // for 114GT mount
+                    if ((_axisVersion[1] & 0x0000FF) == 0x80)
+                    {
+                        gearRatio = 0x162B97; // for 80GT mount
+                    }
+                    if ((_axisVersion[1] & 0x0000FF) == 0x82)
+                    {
+                        gearRatio = 0x205318; // for 114GT mount
+                    }
+                    _mount360Steps[1] = (int)gearRatio;
+                    if (_customMount360Steps[1] > 0) { gearRatio = _customMount360Steps[1]; } //Setup for custom :a
+                    _axisGearRatios[1] = gearRatio;
                 }
-                _mount360Steps[1] = (int)gearRatio;
-                if (_customMount360Steps[1] > 0) { gearRatio = _customMount360Steps[1]; } //Setup for custom :a
-                _axisGearRatios[1] = gearRatio;
+                _factorRadToStep[(int)axis] = gearRatio / (2 * Math.PI);
+                _factorStepToRad[(int)axis] = 2 * Math.PI / gearRatio;
             }
-            _factorRadToStep[(int)axis] = gearRatio / (2 * Math.PI);
-            _factorStepToRad[(int)axis] = 2 * Math.PI / gearRatio;
-
             var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"a:|{axis}|{response}|{ _mount360Steps[(int)axis]}|Custom:{ _customMount360Steps[(int)axis]}" };
             MonitorLog.LogToMonitor(monitorItem);
@@ -297,7 +322,7 @@ namespace GS.SkyWatcher
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         private void GetTimerInterruptFreq(AxisId axis)
         {
-            var response = CmdToAxis(axis, 'b', null);
+            var response = CmdToMount(axis, 'b', null);
 
             var timeFreq = StringToLong(response);
             _stepTimerFreq[(int)axis] = timeFreq;
@@ -305,7 +330,7 @@ namespace GS.SkyWatcher
             _factorRadRateToInt[(int)axis] = _stepTimerFreq[(int)axis] / _factorRadToStep[(int)axis];
 
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"b:|{axis}|{response}|{timeFreq}|{_factorRadRateToInt[(int)axis]}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"b:|{axis}|{response}|{timeFreq}|{_factorRadRateToInt[(int)axis]}" };
             MonitorLog.LogToMonitor(monitorItem);
         }
 
@@ -315,7 +340,7 @@ namespace GS.SkyWatcher
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         internal double GetRampDownRange(AxisId axis)
         {
-            var response = CmdToAxis(axis, 'c', null);
+            var response = CmdToMount(axis, 'c', null);
             var responseString = StringToLong(response);
             return responseString;
         }
@@ -326,7 +351,7 @@ namespace GS.SkyWatcher
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         internal double GetEncoderCount(AxisId axis)
         {
-            var response = CmdToAxis(axis, 'd', null);
+            var response = CmdToMount(axis, 'd', null);
             var responseString = StringToLong(response);
             return responseString;
         }
@@ -337,10 +362,10 @@ namespace GS.SkyWatcher
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         private void LogEncoderCount(AxisId axis)
         {
-            var response = CmdToAxis(axis, 'd', null);
+            var response = CmdToMount(axis, 'd', null);
             var responseString = StringToLong(response);
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"d:|{axis}|{response}|{responseString}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"d:|{axis}|{response}|{responseString}" };
             MonitorLog.LogToMonitor(monitorItem);
         }
 
@@ -350,7 +375,7 @@ namespace GS.SkyWatcher
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         private void GetAxisVersion(AxisId axis)
         {
-            var response = CmdToAxis(axis, 'e', null);
+            var response = CmdToMount(axis, 'e', null);
             var tmpVersion = Convert.ToInt32(StringToLong(response));
             var r = ((tmpVersion & 0xFF) << 16) | ((tmpVersion & 0xFF00)) | ((tmpVersion & 0xFF0000) >> 16);
             if (axis == AxisId.Axis1)
@@ -364,8 +389,10 @@ namespace GS.SkyWatcher
                 _axisVersion[1] = r;
             }
 
+            SupportAdvancedCommandSet = r > 0x032200;
+
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"e:|{axis}|{response}|{_axisStringVersion[(int)axis]}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"e:|{axis}|{response}|{_axisStringVersion[(int)axis]}|Advanced:{SupportAdvancedCommandSet}" };
             MonitorLog.LogToMonitor(monitorItem);
         }
 
@@ -374,7 +401,7 @@ namespace GS.SkyWatcher
         /// </summary>
         internal string GetMotorCardVersion(AxisId axis)
         {
-            var response = CmdToAxis(axis, 'e', null);
+            var response = CmdToMount(axis, 'e', null);
             return response;
         }
 
@@ -385,7 +412,7 @@ namespace GS.SkyWatcher
         /// <returns></returns>
         internal AxisStatus GetAxisStatus(AxisId axis)
         {
-            var response = CmdToAxis(axis, 'f', null);
+            var response = CmdToMount(axis, 'f', null);
 
             _axesStatus[(int)axis].Response = response;
 
@@ -417,12 +444,12 @@ namespace GS.SkyWatcher
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         private void GetHighSpeedRatio(AxisId axis)
         {
-            var response = CmdToAxis(axis, 'g', null);
+            var response = CmdToMount(axis, 'g', null);
             var highSpeedRatio = StringToLong(response);
             _highSpeedRatio[(int)axis] = highSpeedRatio;
 
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"g:|{axis}|{response}|{highSpeedRatio}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"g:|{axis}|{response}|{highSpeedRatio}" };
             MonitorLog.LogToMonitor(monitorItem);
         }
 
@@ -432,7 +459,7 @@ namespace GS.SkyWatcher
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         internal double GetLastGoToTarget(AxisId axis)
         {
-            var response = CmdToAxis(axis, 'h', null);
+            var response = CmdToMount(axis, 'h', null);
             var responseString = StringToLong(response);
             return responseString;
         }
@@ -443,7 +470,7 @@ namespace GS.SkyWatcher
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         internal long GetLastSlewSpeed(AxisId axis)
         {
-            var response = CmdToAxis(axis, 'i', null);
+            var response = CmdToMount(axis, 'i', null);
             var responseString = StringToLong(response);
             return responseString;
         }
@@ -455,11 +482,21 @@ namespace GS.SkyWatcher
         /// <returns>Radians of the axis</returns>
         internal double GetAxisPosition(AxisId axis)
         {
-            var response = CmdToAxis(axis, 'j', null);
-            var iPosition = StringToLong(response);
-            iPosition -= 0x00800000;
-            _positions[(int)axis] = StepToAngle(axis, iPosition);
-            return _positions[(int)axis];
+            if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
+            {
+                var response = CmdToMount(axis, 'X', "0003");    // Read 32-bit axis position
+                var iPosition = int.Parse(response.Substring(1, 8), System.Globalization.NumberStyles.HexNumber);
+                _positions[(int)axis] = StepToAngle(axis, iPosition);
+                return _positions[(int)axis];
+            }
+            else
+            {
+                var response = CmdToMount(axis, 'j', null);
+                var iPosition = StringToLong(response);
+                iPosition -= 0x00800000;
+                _positions[(int)axis] = StepToAngle(axis, iPosition);
+                return _positions[(int)axis];
+            }
         }
 
         /// <summary>
@@ -469,7 +506,7 @@ namespace GS.SkyWatcher
         /// <returns>Radians of the axis</returns>
         private void GetStartupPosition(AxisId axis)
         {
-            var response = CmdToAxis(axis, 'j', null, true);
+            var response = CmdToMount(axis, 'j', null, true);
             try
             {
                 if (string.IsNullOrEmpty(response))
@@ -480,17 +517,17 @@ namespace GS.SkyWatcher
                 iPosition -= 0x00800000;
 
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"j:|{axis}|{response}|{iPosition}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"j:|{axis}|{response}|{iPosition}" };
                 MonitorLog.LogToMonitor(monitorItem);
             }
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
             }
         }
-        
+
         /// <summary>
         /// j Gets radians position of an axis or returns NaN
         /// </summary>
@@ -498,21 +535,42 @@ namespace GS.SkyWatcher
         /// <returns>Radians of the axis or NaN if no response is received</returns>
         internal double GetAxisPositionNaN(AxisId axis)
         {
-            var response = CmdToAxis(axis, 'j', null, true);
-            try
+            if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
+                var response = CmdToMount(axis, 'X', "0003");    // Read 32-bit axis position
                 if (string.IsNullOrEmpty(response)) return double.NaN;
-                var iPosition = StringToLong(response);
-                iPosition -= 0x00800000;
-                _positions[(int)axis] = StepToAngle(axis, iPosition);
-                return _positions[(int)axis];
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
+                try
+                {
+                    var iPosition = int.Parse(response.Substring(1, 8), System.Globalization.NumberStyles.HexNumber);
+                    _positions[(int)axis] = StepToAngle(axis, iPosition);
+                    return _positions[(int)axis];
+                }
+                catch (Exception ex)
+                {
+                    var monitorItem = new MonitorEntry
                     { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
-                MonitorLog.LogToMonitor(monitorItem);
-                return double.NaN;
+                    MonitorLog.LogToMonitor(monitorItem);
+                    return double.NaN;
+                }
+            }
+            else
+            {
+                var response = CmdToMount(axis, 'j', null, true);
+                if (string.IsNullOrEmpty(response)) return double.NaN;
+                try
+                {
+                    var iPosition = StringToLong(response);
+                    iPosition -= 0x00800000;
+                    _positions[(int)axis] = StepToAngle(axis, iPosition);
+                    return _positions[(int)axis];
+                }
+                catch (Exception ex)
+                {
+                    var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
+                    MonitorLog.LogToMonitor(monitorItem);
+                    return double.NaN;
+                }
             }
         }
 
@@ -523,18 +581,28 @@ namespace GS.SkyWatcher
         /// <returns>Cardinal encoder count</returns>
         internal double GetAxisStepsNaN(AxisId axis)
         {
-            var response = CmdToAxis(axis, 'j', null, true);
             try
             {
-                if (string.IsNullOrEmpty(response)) return double.NaN;
-                var iPosition = StringToLong(response);
-                iPosition -= 0x00800000;
-                return iPosition;
+                if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
+                {
+                    var response = CmdToMount(axis, 'X', "0003");    // Read 32-bit axis position
+                    if (string.IsNullOrEmpty(response)) return double.NaN;
+                    var iPosition = int.Parse(response.Substring(1, 8), System.Globalization.NumberStyles.HexNumber);
+                    return iPosition;
+                }
+                else
+                {
+                    var response = CmdToMount(axis, 'j', null, true);
+                    if (string.IsNullOrEmpty(response)) return double.NaN;
+                    var iPosition = StringToLong(response);
+                    iPosition -= 0x00800000;
+                    return iPosition;
+                }
             }
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 return double.NaN;
             }
@@ -547,10 +615,19 @@ namespace GS.SkyWatcher
         /// <returns>Cardinal encoder count</returns>
         internal long GetAxisPositionCounter(AxisId axis)
         {
-            var response = CmdToAxis(axis, 'j', null);
-            var iPosition = StringToLong(response);
-            iPosition -= 0x00800000;
-            return iPosition;
+            if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
+            {
+                var response = CmdToMount(axis, 'X', "0003");    // Read 32-bit axis position
+                var iPosition = int.Parse(response.Substring(1, 8), System.Globalization.NumberStyles.HexNumber);
+                return iPosition;
+            }
+            else
+            {
+                var response = CmdToMount(axis, 'j', null);
+                var iPosition = StringToLong(response);
+                iPosition -= 0x00800000;
+                return iPosition;
+            }
         }
 
         /// <summary>
@@ -563,11 +640,20 @@ namespace GS.SkyWatcher
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>  
         internal long GetHomePosition(AxisId axis)
         {
-            var szCmd = LongToHex(0);
-            var response = CmdToAxis(axis, 'q', szCmd);
-            var position = StringToLong(response);
-            if (response == "=000000") position = -position;
-            return position;
+            if (SupportAdvancedCommandSet)
+            {
+                var response = CmdToMount(axis, 'X', "000B");    // Read 32-bit axis home position
+                var position = int.Parse(response.Substring(1, 8), System.Globalization.NumberStyles.HexNumber);
+                return position;
+            }
+            else
+            {
+                var szCmd = LongToHex(0);
+                var response = CmdToMount(axis, 'q', szCmd);
+                var position = StringToLong(response);
+                if (response == "=000000") position = -position;
+                return position;
+            }
         }
 
         /// <summary>
@@ -590,10 +676,10 @@ namespace GS.SkyWatcher
         internal string GetCapabilities(AxisId axis)
         {
             var szCmd = LongToHex(1);
-            var response = CmdToAxis(axis, 'q', szCmd);
+            var response = CmdToMount(axis, 'q', szCmd);
 
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"q:|{axis}|{response}|{szCmd}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"q:|{axis}|{response}|{szCmd}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             return response;
@@ -605,17 +691,36 @@ namespace GS.SkyWatcher
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         internal double GetPecPeriod(AxisId axis)
         {
-            var response = CmdToAxis(axis, 's', null);
-            var pecPeriod = (double) StringToLong(response);
-            var ax = (int)axis;
-            if (_customRaWormSteps[ax] > 0) { pecPeriod = _customRaWormSteps[ax]; } // Setup custom mount worm steps
-            _peSteps[ax] = pecPeriod;
+            double ret;
 
-            var monitorItem = new MonitorEntry
+            if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
+            {
+                var response = CmdToMount(axis, 'X', "000E");    // Read 32-bit worm resolution
+                var pecPeriod = (double)int.Parse(response.Substring(1, 8), System.Globalization.NumberStyles.HexNumber);
+                var ax = (int)axis;
+                if (_customRaWormSteps[ax] > 0) { pecPeriod = _customRaWormSteps[ax]; } // Setup custom mount worm steps
+                _peSteps[ax] = pecPeriod;
+                ret = pecPeriod;
+
+                var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"s:|{axis}|{response}|{pecPeriod}|Custom:{_customRaWormSteps[ax]}" };
-            MonitorLog.LogToMonitor(monitorItem);
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+            else
+            {
+                var response = CmdToMount(axis, 's', null);
+                var pecPeriod = (double)StringToLong(response);
+                var ax = (int)axis;
+                if (_customRaWormSteps[ax] > 0) { pecPeriod = _customRaWormSteps[ax]; } // Setup custom mount worm steps
+                _peSteps[ax] = pecPeriod;
+                ret = pecPeriod;
 
-            return pecPeriod;
+                var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"s:|{axis}|{response}|{pecPeriod}|Custom:{_customRaWormSteps[ax]}" };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+
+            return ret;
         }
 
         /// <summary>
@@ -624,7 +729,7 @@ namespace GS.SkyWatcher
         /// <returns></returns>
         internal long GetSiderealRate(AxisId axis)
         {
-            var response = CmdToAxis(axis, 'D', null);
+            var response = CmdToMount(axis, 'D', null);
             return StringToLong(response);
         }
 
@@ -636,10 +741,19 @@ namespace GS.SkyWatcher
         internal void SetAxisPosition(AxisId axis, double radians)
         {
             var newStepIndex = AngleToStep(axis, radians);
-            newStepIndex += 0x800000;
 
-            var szCmd = LongToHex(newStepIndex);
-            CmdToAxis(axis, 'E', szCmd);
+            if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
+            {
+                var szCmd = "01" + newStepIndex.ToString("X8");
+                CmdToMount(axis, 'X', szCmd);
+            }
+            else
+            {
+                newStepIndex += 0x800000;
+
+                var szCmd = LongToHex(newStepIndex);
+                CmdToMount(axis, 'E', szCmd);
+            }
 
             _positions[(int)axis] = radians;
         }
@@ -653,26 +767,26 @@ namespace GS.SkyWatcher
             GetAxisStatus(AxisId.Axis2);
 
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"f:|Axis1|{_axesStatus[0].Response}|Init:{_axesStatus[0].Initialized}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"f:|Axis1|{_axesStatus[0].Response}|Init:{_axesStatus[0].Initialized}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"f:|Axis2|{_axesStatus[1].Response}|Init:{_axesStatus[1].Initialized}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"f:|Axis2|{_axesStatus[1].Response}|Init:{_axesStatus[1].Initialized}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             if (_axesStatus[0].Initialized == false)
             {
-                CmdToAxis(AxisId.Axis1, 'F', null);
+                CmdToMount(AxisId.Axis1, 'F', null);
                 monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"F:|Axis1" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"F:|Axis1" };
                 MonitorLog.LogToMonitor(monitorItem);
             }
 
             if (_axesStatus[1].Initialized == false)
             {
-                CmdToAxis(AxisId.Axis2, 'F', null);
+                CmdToMount(AxisId.Axis2, 'F', null);
                 monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"F:|Axis2" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"F:|Axis2" };
                 MonitorLog.LogToMonitor(monitorItem);
             }
         }
@@ -700,7 +814,7 @@ namespace GS.SkyWatcher
                     return;
             }
             var szCmd = $"{func}{direction}";
-            CmdToAxis(axis, 'G', szCmd);
+            CmdToMount(axis, 'G', szCmd);
         }
 
         /// <summary>
@@ -711,7 +825,7 @@ namespace GS.SkyWatcher
         internal void SetGotoTargetIncrement(AxisId axis, long stepsCount)
         {
             var cmd = LongToHex(stepsCount);
-            CmdToAxis(axis, 'H', cmd);
+            CmdToMount(axis, 'H', cmd);
         }
 
         /// <summary>
@@ -722,7 +836,7 @@ namespace GS.SkyWatcher
         internal void SetStepSpeed(AxisId axis, long stepSpeed)
         {
             var szCmd = LongToHex(stepSpeed);
-            CmdToAxis(axis, 'I', szCmd);
+            CmdToMount(axis, 'I', szCmd);
         }
 
         /// <summary>
@@ -731,7 +845,7 @@ namespace GS.SkyWatcher
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         internal void StartMotion(AxisId axis)
         {
-            CmdToAxis(axis, 'J', null);
+            CmdToMount(axis, 'J', null);
         }
 
         /// <summary>
@@ -740,7 +854,14 @@ namespace GS.SkyWatcher
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         internal void AxisStop(AxisId axis)
         {
-            CmdToAxis(axis, 'K', null);
+            if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
+            {
+                CmdToMount(axis, 'X', "0504");
+            }
+            else
+            {
+                CmdToMount(axis, 'K', null);
+            }
             _axesStatus[(int)axis].SetFullStop();
         }
 
@@ -750,7 +871,7 @@ namespace GS.SkyWatcher
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         internal void AxisStopInstant(AxisId axis)
         {
-            CmdToAxis(axis, 'L', null);
+            CmdToMount(axis, 'L', null);
             _axesStatus[(int)axis].SetFullStop();
         }
 
@@ -762,7 +883,7 @@ namespace GS.SkyWatcher
         internal void SetBreakPointIncrement(AxisId axis, long stepsCount)
         {
             var szCmd = LongToHex(stepsCount);
-            CmdToAxis(axis, 'M', szCmd);
+            CmdToMount(axis, 'M', szCmd);
         }
 
         /// <summary>
@@ -772,7 +893,7 @@ namespace GS.SkyWatcher
         /// <param name="on"></param>
         internal string SetSnapPort(AxisId axis, bool on)
         {
-            var response = CmdToAxis(axis, 'O', on ? "1" : "0");
+            var response = CmdToMount(axis, 'O', on ? "1" : "0");
             return response;
         }
 
@@ -782,10 +903,10 @@ namespace GS.SkyWatcher
         /// <param name="rate"> 0..4 (1.0, 0.75, 0.50, 0.25, 0.125)</param>
         internal void SetSt4GuideRate(int rate)
         {
-            CmdToAxis(AxisId.Axis1, 'P', $"{rate}");
+            CmdToMount(AxisId.Axis1, 'P', $"{rate}");
 
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"P:|Axis1|{rate}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"P:|Axis1|{rate}" };
             MonitorLog.LogToMonitor(monitorItem);
         }
 
@@ -797,7 +918,7 @@ namespace GS.SkyWatcher
         internal void SetTargetPosition(AxisId axis, double position)
         {
             var szCmd = LongToHex(Convert.ToInt64(position));
-            CmdToAxis(axis, 'S', szCmd);
+            CmdToMount(axis, 'S', szCmd);
         }
 
         /// <summary>
@@ -808,7 +929,7 @@ namespace GS.SkyWatcher
         internal void SetBreakSteps(AxisId axis, long newBrakeSteps)
         {
             var szCmd = LongToHex(newBrakeSteps);
-            CmdToAxis(axis, 'U', szCmd);
+            CmdToMount(axis, 'U', szCmd);
         }
 
         /// <summary>
@@ -818,9 +939,9 @@ namespace GS.SkyWatcher
         /// <param name="level">x00 to xFF</param>
         internal void SetPolarLedLevel(AxisId axis, int level)
         {
-            if (level < 0 || level > 255){return;}
+            if (level < 0 || level > 255) { return; }
             var szCmd = level.ToString("X2");
-            CmdToAxis(axis,'V', szCmd);
+            CmdToMount(axis, 'V', szCmd);
         }
 
         /// <summary>
@@ -835,7 +956,7 @@ namespace GS.SkyWatcher
             {
                 szCmd = LongToHex(0);
             }
-            CmdToAxis(axis, 'W', szCmd);
+            CmdToMount(axis, 'W', szCmd);
         }
 
         /// <summary>
@@ -850,7 +971,7 @@ namespace GS.SkyWatcher
             {
                 szCmd = LongToHex(2);
             }
-            var response = CmdToAxis(axis, 'W', szCmd, true);
+            var response = CmdToMount(axis, 'W', szCmd, true);
             return response;
         }
 
@@ -866,10 +987,10 @@ namespace GS.SkyWatcher
             {
                 szCmd = LongToHex(4);
             }
-            CmdToAxis(axis, 'W', szCmd);
+            CmdToMount(axis, 'W', szCmd);
 
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"W:|{axis}|{on}|{szCmd}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"W:|{axis}|{on}|{szCmd}" };
             MonitorLog.LogToMonitor(monitorItem);
         }
 
@@ -885,7 +1006,7 @@ namespace GS.SkyWatcher
             {
                 szCmd = "060100";
             }
-            CmdToAxis(axis, 'W', szCmd);
+            CmdToMount(axis, 'W', szCmd);
         }
 
         /// <summary>
@@ -895,7 +1016,7 @@ namespace GS.SkyWatcher
         internal void SetSlewingStride(AxisId axis)
         {
             var szCmd = LongToHex(7);
-            CmdToAxis(axis, 'W', szCmd);
+            CmdToMount(axis, 'W', szCmd);
         }
 
         /// <summary>
@@ -905,7 +1026,35 @@ namespace GS.SkyWatcher
         internal void SetHomePositionIndex(AxisId axis)
         {
             var szCmd = LongToHex(8);
-            CmdToAxis(axis, 'W', szCmd);
+            CmdToMount(axis, 'W', szCmd);
+        }
+
+        /// <summary>
+        /// ":Xn02vvvvvvvvvvvvvvvv" Slew an axis
+        /// </summary>
+        /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
+        /// <param name="rateInRadian">rate in radian / second</param>
+        internal void AxisSlew_Advanced(AxisId axis, double rateInRadian)
+        {
+            Int64 irateInSteps = AngleToStep(axis, rateInRadian * 1024);
+
+            var szCmd = "02" + irateInSteps.ToString("X16");
+            CmdToMount(axis, 'X', szCmd);
+        }
+
+        /// <summary>
+        /// ":Xn04ppppppppvvvvvvvvvvvvvvvv" Slew to a position and then slew in 0 velocity
+        /// </summary>
+        /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
+        /// <param name="targetInRadian">target position in radian</param>
+        internal void AxisSlewTo_Advanced(AxisId axis, double targetInRadian)
+        {
+            Int64 itargetInSteps = AngleToStep(axis, targetInRadian);
+            double rateInRadian = 0;
+            Int64 irateInSteps = AngleToStep(axis, rateInRadian * 1024);
+
+            var szCmd = "04" + itargetInSteps.ToString("X8") + irateInSteps.ToString("X16");
+            CmdToMount(axis, 'X', szCmd);
         }
 
         #endregion
@@ -920,7 +1069,7 @@ namespace GS.SkyWatcher
         /// <param name="cmdDataStr">The data need to send</param>
         /// <param name="ignoreWarnings">to ignore serial response issues</param>
         /// <returns>The response string from mount</returns>
-        private string CmdToAxis(AxisId axis, char command, string cmdDataStr, bool ignoreWarnings = false)
+        private string CmdToMount(AxisId axis, char command, string cmdDataStr, bool ignoreWarnings = false) 
         {
             MonitorEntry monitorItem;
             for (var i = 0; i < 5; i++)
@@ -1200,7 +1349,7 @@ namespace GS.SkyWatcher
             // process incoming data string
             receivedData = receivedData?.Trim();
             receivedData = receivedData?.Replace("\0", string.Empty);
-            if (string.IsNullOrEmpty(receivedData)){return null;}
+            if (string.IsNullOrEmpty(receivedData)) { return null; }
 
             switch (receivedData[0].ToString())
             {
@@ -1265,7 +1414,7 @@ namespace GS.SkyWatcher
                     monitorItem = new MonitorEntry
                     { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Abnormal Response|Axis|{axis}|Command|{command}|Received|{receivedData}|CommandStr|{cmdDataStr}|Message|{errormsg}" };
                     MonitorLog.LogToMonitor(monitorItem);
-                    if(!string.IsNullOrEmpty(subdata)){return subdata;}
+                    if (!string.IsNullOrEmpty(subdata)) { return subdata; }
                     receivedData = null;
                     break;
                 default:
@@ -1359,9 +1508,9 @@ namespace GS.SkyWatcher
             var b = (((int)number & 0xFF00) / 256).ToString("X").ToUpper();
             var c = (((int)number & 0xFF0000) / 256 / 256).ToString("X").ToUpper();
 
-            if (a.Length == 1){a = "0" + a;}
-            if (b.Length == 1){b = "0" + b;}
-            if (c.Length == 1){c = "0" + c;}
+            if (a.Length == 1) { a = "0" + a; }
+            if (b.Length == 1) { b = "0" + b; }
+            if (c.Length == 1) { c = "0" + c; }
             return a + b + c;
         }
 

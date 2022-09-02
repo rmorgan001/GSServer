@@ -79,6 +79,7 @@ namespace GS.Server.SkyTelescope
 
     public enum MountTaskName
     {
+        AllowAdvancedCommandSet,
         AlternatingPpec,
         CanPpec,
         CanPolarLed,
@@ -111,7 +112,8 @@ namespace GS.Server.SkyTelescope
         StepsPerRevolution,
         StepsWormPerRevolution,
         StepTimeFreq,
-        GetFactorStep
+        GetFactorStep,
+        CanAdvancedCmdSupport
     }
 
     public enum MountType

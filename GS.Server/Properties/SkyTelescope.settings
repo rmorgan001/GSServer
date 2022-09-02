@@ -57,7 +57,7 @@
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="HourAngleLimit" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">20</Value>
+      <Value Profile="(Default)">15</Value>
     </Setting>
     <Setting Name="KingRate" Type="System.Double" Scope="User">
       <Value Profile="(Default)">15.0369</Value>
@@ -379,6 +379,12 @@
     </Setting>
     <Setting Name="FrontGraphic" Type="System.String" Scope="User">
       <Value Profile="(Default)">None</Value>
+    </Setting>
+    <Setting Name="AxisTrackingLimit" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="AllowAdvancedCommandSet" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

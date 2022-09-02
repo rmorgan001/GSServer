@@ -86,6 +86,7 @@ namespace GS.SkyWatcher
         internal bool CanHalfTrack { get; private set; }
         internal bool CanAxisSlewsIndependent { get; private set; }
         internal bool CanPolarLed { get; private set; }
+        private string Capabilities { get; set; }
         internal bool MonitorPulse { private get; set; }
         internal string MountType { get; private set; }
         private int MountNum { get; set; }
@@ -105,10 +106,19 @@ namespace GS.SkyWatcher
         /// <param name="customRaWormSteps">Custom Mount :s replacement</param>
         internal SkyWatcher(SerialPort serial, int[] customMount360Steps, double[] customRaWormSteps)
         {
-            _commands = new Commands(serial, customMount360Steps,  customRaWormSteps);
+            _commands = new Commands(serial, customMount360Steps, customRaWormSteps);
             // _commands.TestSerial();
             MinPulseDurationRa = 20;
             MinPulseDurationDec = 20;
+        }
+
+        /// <summary>
+        /// Allows the new advanced command set to be used insted of old commands.
+        /// </summary>
+        /// <param name="on"></param>
+        internal void AllowAdvancedCommandSet(bool on)
+        {
+            _commands.AllowAdvancedCommandSet = on;
         }
 
         /// <summary>
@@ -120,79 +130,93 @@ namespace GS.SkyWatcher
         {
             rate = Principles.Units.Deg2Rad1(rate);
 
-            var internalSpeed = Math.Abs(rate); // setup a positive speed
-            if (internalSpeed > 500) { internalSpeed = 500; }
-
-            var forward = rate > 0.0; // figures out the direction of motion
-            var highspeed = false;
-
-            // Stop if speed is too slow
-            if (internalSpeed <= Constant.SiderealRate / 1000.0)
+            if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
             {
-                AxisStop(axis);
+                var forward = rate > 0.0; // figures out the direction of motion
+                const bool highspeed = false;
 
-                // Wait until the axis stops or counter runs out
-                var stopwatch = Stopwatch.StartNew();
-                var counter = 1;
-                while (stopwatch.Elapsed.TotalMilliseconds <= 3500)
-                {
-                    var axesstop = _commands.GetAxisStatus(axis);
-                    // Return if the axis has stopped.
-                    if (axesstop.FullStop) { break; }
-                    // issue new stop
-                    if (counter % 5 == 0) { AxisStop(axis); }
-                    counter++;
-                    Thread.Sleep(100);
-                }
-                return;
+                SetRates(axis, rate);
+                _commands.AxisSlew_Advanced(axis, rate);
+
+                _commands.SetSlewing((int)axis, forward, highspeed); // Set the axis status
             }
-
-            // Calculate and set step period. 
-            if (internalSpeed > _lowSpeedMargin)
+            else
             {
-                internalSpeed /= _highSpeedRatio[(int)axis]; // High speed adjustment
-                highspeed = true;
-            }
+                var internalSpeed = Math.Abs(rate); // setup a positive speed
+                if (internalSpeed > 500) { internalSpeed = 500; }
 
-            var speedInt = CalculateSpeed(axis, internalSpeed); // Calculate mount speed
+                var forward = rate > 0.0; // figures out the direction of motion
+                var highspeed = false;
 
-            SetRates(axis, rate);
-
-            var axesstatus = _commands.GetAxisStatus(axis); // Get axis status
-            if (axesstatus.FullStop || // Already stopped
-                (axesstatus.HighSpeed != highspeed) || // Change high speed
-                highspeed ||
-                (axesstatus.SlewingForward && !forward) || // Change direction 
-                (!axesstatus.SlewingForward && forward) // Change direction
-            )
-            {
-                if (!axesstatus.FullStop)
+                // Stop if speed is too slow
+                if (internalSpeed <= Constant.SiderealRate / 1000.0)
                 {
-                    // stop the motor to change motion
                     AxisStop(axis);
 
                     // Wait until the axis stops or counter runs out
                     var stopwatch = Stopwatch.StartNew();
-                    var counter = 1; 
+                    var counter = 1;
                     while (stopwatch.Elapsed.TotalMilliseconds <= 3500)
                     {
-                        axesstatus = _commands.GetAxisStatus(axis);
+                        var axesstop = _commands.GetAxisStatus(axis);
                         // Return if the axis has stopped.
-                        if (axesstatus.FullStop) { break; }
+                        if (axesstop.FullStop) { break; }
                         // issue new stop
                         if (counter % 5 == 0) { AxisStop(axis); }
                         counter++;
                         Thread.Sleep(100);
                     }
+                    return;
                 }
 
-                // Once stopped start a new motion mode
-                _commands.SetMotionMode(axis, highspeed ? 3 : 1, forward ? 0 : 1, SouthernHemisphere); // G
+                // Calculate and set step period. 
+                if (internalSpeed > _lowSpeedMargin)
+                {
+                    internalSpeed /= _highSpeedRatio[(int)axis]; // High speed adjustment
+                    highspeed = true;
+                }
+
+                var speedInt = CalculateSpeed(axis, internalSpeed); // Calculate mount speed
+
+                SetRates(axis, rate);
+
+                var axesstatus = _commands.GetAxisStatus(axis); // Get axis status
+                if (axesstatus.FullStop || // Already stopped
+                    (axesstatus.HighSpeed != highspeed) || // Change high speed
+                    highspeed ||
+                    (axesstatus.SlewingForward && !forward) || // Change direction 
+                    (!axesstatus.SlewingForward && forward) // Change direction
+                )
+                {
+                    if (!axesstatus.FullStop)
+                    {
+                        // stop the motor to change motion
+                        AxisStop(axis);
+
+                        // Wait until the axis stops or counter runs out
+                        var stopwatch = Stopwatch.StartNew();
+                        var counter = 1;
+                        while (stopwatch.Elapsed.TotalMilliseconds <= 3500)
+                        {
+                            axesstatus = _commands.GetAxisStatus(axis);
+                            // Return if the axis has stopped.
+                            if (axesstatus.FullStop) { break; }
+                            // issue new stop
+                            if (counter % 5 == 0) { AxisStop(axis); }
+                            counter++;
+                            Thread.Sleep(100);
+                        }
+                    }
+
+                    // Once stopped start a new motion mode
+                    _commands.SetMotionMode(axis, highspeed ? 3 : 1, forward ? 0 : 1, SouthernHemisphere); // G
+                }
+
+                _commands.SetStepSpeed(axis, speedInt); // I Set the axis step count
+                _commands.StartMotion(axis); // J Start motion
+                _commands.SetSlewing((int)axis, forward, highspeed); // Set the axis status
             }
 
-            _commands.SetStepSpeed(axis, speedInt); // I Set the axis step count
-            _commands.StartMotion(axis); // J Start motion
-            _commands.SetSlewing((int)axis, forward, highspeed); // Set the axis status
             _slewingSpeed[(int)axis] = rate; //store axis rate
             _commands.GetAxisPositionCounter(axis); // read for plotting
         }
@@ -206,13 +230,13 @@ namespace GS.SkyWatcher
         /// <param name="backlashSteps">Positive micro steps added for backlash</param>
         internal void AxisPulse(AxisId axis, double guideRate, int duration, int backlashSteps = 0)
         {
-            var datetime = Principles.HiResDateTime.UtcNow; 
+            var datetime = Principles.HiResDateTime.UtcNow;
             var monitorItem = new MonitorEntry // setup to log the pulse
             { Datetime = datetime, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{guideRate}|{duration}|{backlashSteps}|{MinPulseDurationRa}|{MinPulseDurationDec}|{DecPulseGoTo}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             var pulseEntry = new PulseEntry // setup to graph the pulse
-            { Axis = (int)axis, Duration = duration, Rate = guideRate, Rejected = false, StartTime = datetime, }; 
+            { Axis = (int)axis, Duration = duration, Rate = guideRate, Rejected = false, StartTime = datetime, };
 
             backlashSteps = Math.Abs(backlashSteps);
             var arcsecs = duration / 1000.0 * Math.Abs(guideRate) * 3600.0;
@@ -247,11 +271,20 @@ namespace GS.SkyWatcher
                     {                                                // small numbers will mess up the CalculateSpeed.
                         aplyRate = Constant.SiderealRate / 1000.0;   // assign a number so mount looks like it's stopped
                     }
-                    var speedInt = CalculateSpeed(AxisId.Axis1, aplyRate);  // Calculate mount speed  
 
-                    if (_pPecOn && AlternatingPPec) { SetPPec(AxisId.Axis1, false); } // implements the alternating pPEC 
+                    // Change speed of the R.A. axis
+                    if (_commands.SupportAdvancedCommandSet)
+                    {
+                        _commands.AxisSlew_Advanced(AxisId.Axis1, aplyRate);
+                    }
+                    else
+                    {
+                        var speedInt = CalculateSpeed(AxisId.Axis1, aplyRate);  // Calculate mount speed  
 
-                    _commands.SetStepSpeed(AxisId.Axis1, speedInt); // :I Send pulse to axis
+                        if (_pPecOn && AlternatingPPec) { SetPPec(AxisId.Axis1, false); } // implements the alternating pPEC 
+
+                        _commands.SetStepSpeed(AxisId.Axis1, speedInt); // :I Send pulse to axis
+                    }
 
                     pulseEntry.StartTime = _commands.LastI1RunTime; // get the last :I start time
 
@@ -264,7 +297,16 @@ namespace GS.SkyWatcher
                         while (sw1.Elapsed.TotalMilliseconds < raspan) { Thread.Sleep(1); } // loop while counting to duration
                     }
 
-                    _commands.SetStepSpeed(AxisId.Axis1, _trackingSpeeds[0]); // :I set speed back to current tracking speed
+                    // Restore sidereal rate tracking
+                    if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
+                    {
+                        //_commands.AxisSlew_Advanced(AxisId.Axis1, 2 * Math.PI / 86164);
+                        _commands.AxisSlew_Advanced(AxisId.Axis1, _trackingSpeeds[0]);
+                    }
+                    else
+                    {
+                        _commands.SetStepSpeed(AxisId.Axis1, _trackingSpeeds[0]); // :I set speed back to current tracking speed
+                    }
 
                     if (_pPecOn && AlternatingPPec) { SetPPec(AxisId.Axis1, true); } // implements the alternating pPEC
 
@@ -339,7 +381,7 @@ namespace GS.SkyWatcher
 
                         AxisSlew(AxisId.Axis2, guideRate); // Send pulse to axis 
 
-                        pulseEntry.StartTime = _commands.LastJ2RunTime; // last :J2 start time
+                          pulseEntry.StartTime = _commands.LastJ2RunTime; // last :J2 start time
 
                         var decPulseTime = Principles.HiResDateTime.UtcNow - pulseEntry.StartTime; // possible use for min pulse duration time
                         var decspan = duration - decPulseTime.TotalMilliseconds;
@@ -358,7 +400,7 @@ namespace GS.SkyWatcher
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
             }
-             
+
             if (!MonitorPulse) return;
             pulseEntry.Duration = duration;
             MonitorLog.LogToMonitor(pulseEntry);//send to monitor
@@ -394,53 +436,62 @@ namespace GS.SkyWatcher
         internal void AxisMoveSteps(AxisId axis, long movingSteps)
         {
             var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{movingSteps}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{movingSteps}" };
             MonitorLog.LogToMonitor(monitorItem);
 
-            int direction;
-
-            // If there is no increment, return directly.
-            if (movingSteps == 0)
+            if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
             {
-                return;
-            }
-
-            // Set moving direction
-            if (movingSteps > 0)
-            {
-                direction = 0;
+                long targetPositionInSteps = _commands.GetAxisPositionCounter(axis) + movingSteps;
+                _commands.AxisSlewTo_Advanced(axis, _commands.StepToAngle(AxisId.Axis2, targetPositionInSteps));
             }
             else
             {
-                direction = 1;
-                movingSteps = Math.Abs(movingSteps);
-            }
+                int direction;
 
-            //Might need to check whether motor has stopped.
-            var axesstatus = _commands.GetAxisStatus(axis);
-            if (!axesstatus.FullStop)
-            {
-                AxisStop(axis);
-
-                // Wait until the axis stops or counter runs out
-                var stopwatch = Stopwatch.StartNew();
-                var counter = 1;
-                while (stopwatch.Elapsed.TotalMilliseconds <= 3500)
+                // If there is no increment, return directly.
+                if (movingSteps == 0)
                 {
-                    axesstatus = _commands.GetAxisStatus(axis);
-                    // Return if the axis has stopped.
-                    if (axesstatus.FullStop) { break; }
-                    // issue new stop
-                    if (counter % 5 == 0) { AxisStop(axis); }
-                    counter++;
-                    Thread.Sleep(100);
+                    return;
                 }
+
+                // Set moving direction
+                if (movingSteps > 0)
+                {
+                    direction = 0;
+                }
+                else
+                {
+                    direction = 1;
+                    movingSteps = Math.Abs(movingSteps);
+                }
+
+                //Might need to check whether motor has stopped.
+                var axesstatus = _commands.GetAxisStatus(axis);
+                if (!axesstatus.FullStop)
+                {
+                    AxisStop(axis);
+
+                    // Wait until the axis stops or counter runs out
+                    var stopwatch = Stopwatch.StartNew();
+                    var counter = 1;
+                    while (stopwatch.Elapsed.TotalMilliseconds <= 3500)
+                    {
+                        axesstatus = _commands.GetAxisStatus(axis);
+                        // Return if the axis has stopped.
+                        if (axesstatus.FullStop) { break; }
+                        // issue new stop
+                        if (counter % 5 == 0) { AxisStop(axis); }
+                        counter++;
+                        Thread.Sleep(100);
+                    }
+                }
+
+                _commands.SetMotionMode(axis, 2, direction, SouthernHemisphere); // G: '2' low  speed GOTO mode, '0'  +CW  and Nth Hemisphere
+                _commands.SetGotoTargetIncrement(axis, movingSteps); // H:
+                _commands.SetBreakPointIncrement(axis, 0); // M: send 0 steps
+                _commands.StartMotion(axis); // J: Start moving
             }
 
-            _commands.SetMotionMode(axis, 2, direction, SouthernHemisphere); // G: '2' low  speed GOTO mode, '0'  +CW  and Nth Hemisphere
-            _commands.SetGotoTargetIncrement(axis, movingSteps); // H:
-            _commands.SetBreakPointIncrement(axis, 0); // M: send 0 steps
-            _commands.StartMotion(axis); // J: Start moving
             _commands.GetAxisPositionCounter(axis); // read for plotting
         }
 
@@ -452,82 +503,101 @@ namespace GS.SkyWatcher
         internal void AxisGoToTarget(AxisId axis, double targetPosition)
         {
             var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{targetPosition}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{targetPosition}" };
             MonitorLog.LogToMonitor(monitorItem);
 
-            int direction;
-
-            var curPosition = _commands.GetAxisPosition(axis); // :j Get current position (radians) of the axis.
-
-            // Calculate slewing distance.
-            // Note: For EQ mount, Positions[AXIS1] is offset( -PI/2 ) adjusted in GetAxisPosition().
-            var movingAngle = targetPosition - curPosition;
-
-            var movingSteps = _commands.AngleToStep(axis, movingAngle);// Convert distance in radian into steps.
-
-            bool forward;
-            bool highspeed;
-
-            // If there is no increment, return directly.
-            if (movingSteps == 0)
+            if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
             {
-                return;
-            }
+                _commands.AxisSlewTo_Advanced(axis, targetPosition);
 
-            // Set moving direction
-            if (movingSteps > 0)
-            {
-                direction = 0;
-                forward = true;
+                _commands.SetSlewingTo((int)axis, false, false);        // Assume we do not need to care about slewing direction and speed when using advanced command set.
             }
             else
             {
-                direction = 1;
-                movingSteps = Math.Abs(movingSteps);
-                forward = false;
-            }
+                int direction;
 
-            //Might need to check whether motor has stopped.
-            var axesstatus = _commands.GetAxisStatus(axis);
-            if (!axesstatus.FullStop)
-            {
-                // stop the motor to change motion
-                AxisStop(axis);
+                var curPosition = _commands.GetAxisPosition(axis); // :j Get current position (radians) of the axis.
 
-                // Wait until the axis stops or counter runs out
-                var sw = Stopwatch.StartNew();
-                var counter = 1;
-                while (sw.Elapsed.TotalMilliseconds <= 3500)
+                // Calculate slewing distance.
+                // Note: For EQ mount, Positions[AXIS1] is offset( -PI/2 ) adjusted in GetAxisPosition().
+                var movingAngle = targetPosition - curPosition;
+
+                var movingSteps = _commands.AngleToStep(axis, movingAngle);// Convert distance in radian into steps.
+
+                bool forward;
+                bool highspeed;
+
+                // If there is no increment, return directly.
+                if (movingSteps == 0)
                 {
-                    axesstatus = _commands.GetAxisStatus(axis);
-                    // Return if the axis has stopped.
-                    if (axesstatus.FullStop) { break; }
-                    if (counter % 5 == 0) { AxisStop(axis); }
-                    counter++;
-                    Thread.Sleep(100);
+                    return;
                 }
-            }
 
-            // Check if the distance is long enough to trigger a high speed GOTO.
-            if (movingSteps > _lowSpeedGotoMargin[(int)axis])
-            {
-                _commands.SetMotionMode(axis, 0, direction, SouthernHemisphere); // :G high speed GOTO slewing 
-                highspeed = true;
-            }
-            else
-            {
-                _commands.SetMotionMode(axis, 2, direction, SouthernHemisphere); // :G low speed GOTO slewing
-                highspeed = false;
-            }
+                // Set moving direction
+                if (movingSteps > 0)
+                {
+                    direction = 0;
+                    forward = true;
+                }
+                else
+                {
+                    direction = 1;
+                    movingSteps = Math.Abs(movingSteps);
+                    forward = false;
+                }
+
+                //Might need to check whether motor has stopped.
+                var axesstatus = _commands.GetAxisStatus(axis);
+                if (!axesstatus.FullStop)
+                {
+                    // stop the motor to change motion
+                    AxisStop(axis);
+
+                    // Wait until the axis stops or counter runs out
+                    var sw = Stopwatch.StartNew();
+                    var counter = 1;
+                    while (sw.Elapsed.TotalMilliseconds <= 3500)
+                    {
+                        axesstatus = _commands.GetAxisStatus(axis);
+                        // Return if the axis has stopped.
+                        if (axesstatus.FullStop) { break; }
+                        if (counter % 5 == 0) { AxisStop(axis); }
+                        counter++;
+                        Thread.Sleep(100);
+                    }
+                }
+
+                // Check if the distance is long enough to trigger a high speed GOTO.
+                if (movingSteps > _lowSpeedGotoMargin[(int)axis])
+                {
+                    _commands.SetMotionMode(axis, 0, direction, SouthernHemisphere); // :G high speed GOTO slewing 
+                    highspeed = true;
+                }
+                else
+                {
+                    _commands.SetMotionMode(axis, 2, direction, SouthernHemisphere); // :G low speed GOTO slewing
+                    highspeed = false;
+                }
 
 
-            _commands.SetGotoTargetIncrement(axis, movingSteps); // :H
-            _commands.SetBreakPointIncrement(axis, _breakSteps[(int)axis]); // :M
-            _commands.StartMotion(axis); // :J
+                _commands.SetGotoTargetIncrement(axis, movingSteps); // :H
+                _commands.SetBreakPointIncrement(axis, _breakSteps[(int)axis]); // :M
+                _commands.StartMotion(axis); // :J
+
+                _commands.SetSlewingTo((int)axis, forward, highspeed);
+            }
             _commands.GetAxisPositionCounter(axis); // read for plotting
 
             _targetPositions[(int)axis] = targetPosition;
-            _commands.SetSlewingTo((int)axis, forward, highspeed);
+        }
+
+        /// <summary>
+        /// Supports the new advanced command set
+        /// </summary>
+        /// <returns></returns>
+        internal bool GetAdvancedCmdSupport()
+        {
+            return _commands.SupportAdvancedCommandSet;
         }
 
         /// <summary>
@@ -771,11 +841,11 @@ namespace GS.SkyWatcher
                 if (result.Length < 7) { return string.Empty; }
 
                 var a = Convert.ToInt32(result.Substring(5, 2), 16);
-                if (!Enum.IsDefined(typeof(McModel), a)){ a = 999;}
+                if (!Enum.IsDefined(typeof(McModel), a)) { a = 999; }
 
-                MountType = GetEnumDescription((McModel) a);
+                MountType = GetEnumDescription((McModel)a);
                 MountNum = a;
-                
+
                 var first = int.Parse(result.Substring(1, 2), NumberStyles.HexNumber);
                 var second = int.Parse(result.Substring(3, 2), NumberStyles.HexNumber);
                 MountVersion = $"{first}.{second:D2}";
@@ -784,7 +854,7 @@ namespace GS.SkyWatcher
             {
                 MountVersion = "99";
             }
-            
+
             var monitorItem = new MonitorEntry
             { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{result}|{MountType}|{MountVersion}|{MountNum}" };
             MonitorLog.LogToMonitor(monitorItem);
@@ -893,9 +963,9 @@ namespace GS.SkyWatcher
             _commands.SetTargetPosition(axis, position);
         }
 
-        internal void SetPolarLedLevel(AxisId axis, int  level)
+        internal void SetPolarLedLevel(AxisId axis, int level)
         {
-            if (CanPolarLed){_commands.SetPolarLedLevel(axis, level);}
+            if (CanPolarLed) { _commands.SetPolarLedLevel(axis, level); }
         }
 
         /// <summary>
@@ -954,7 +1024,7 @@ namespace GS.SkyWatcher
 
         internal string GetCapabilities()
         {
-            return _commands.GetCapabilities(AxisId.Axis1);
+            return Capabilities;
         }
 
         internal long GetAngleToStep(AxisId axis, double angleInRad)
@@ -996,11 +1066,12 @@ namespace GS.SkyWatcher
         /// </summary>
         private void ParseCapabilities()
         {
-            var result = GetCapabilities();
-            if (result == null || result.Contains("!") || result.Length < 3  || !result.Contains("="))
+            var result = _commands.GetCapabilities(AxisId.Axis1);
+            Capabilities = result;
+            if (result == null || result.Contains("!") || result.Length < 3 || !result.Contains("="))
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{result}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{result}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 return;
             }
@@ -1120,8 +1191,9 @@ namespace GS.SkyWatcher
                 speedInt -= 3;
             }
 
-            if (speedInt < 3) { 
-                speedInt = 3; 
+            if (speedInt < 3)
+            {
+                speedInt = 3;
             }
 
             return speedInt;

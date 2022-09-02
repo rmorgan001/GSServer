@@ -238,7 +238,7 @@ namespace GS.Server.SkyTelescope
         public static bool CanSetPierSide
         {
             get => _canSetPierSide;
-            private set
+            set
             {
                 if (_canSetPierSide == value) return;
                 _canSetPierSide = value;
@@ -472,6 +472,20 @@ namespace GS.Server.SkyTelescope
                 _baudRate = value;
                 Properties.SkyTelescope.Default.BaudRate = value.ToString();
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
+            }
+        }
+
+        private static bool _allowAdvancedCommandSet;
+        public static bool AllowAdvancedCommandSet
+        {
+            get => _allowAdvancedCommandSet;
+            set
+            {
+                if (_allowAdvancedCommandSet == value) return;
+                _allowAdvancedCommandSet = value;
+                Properties.SkyTelescope.Default.AllowAdvancedCommandSet = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
+                OnStaticPropertyChanged();
             }
         }
 
@@ -777,6 +791,20 @@ namespace GS.Server.SkyTelescope
                 if (_autoTrack == value) return;
                 _autoTrack = value;
                 Properties.SkyTelescope.Default.AutoTrack = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static double _axisTraclingLimit;
+        public static double AxisTrackingLimit
+        {
+            get => _axisTraclingLimit;
+            set
+            {
+                if (Math.Abs(_axisTraclingLimit - value) < 0.0000000000001) return;
+                _axisTraclingLimit = value;
+                Properties.SkyTelescope.Default.AxisTrackingLimit = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
@@ -1792,11 +1820,13 @@ namespace GS.Server.SkyTelescope
             Enum.TryParse<PecMode>(Properties.SkyTelescope.Default.PecMode, true, out var pecparse);
             PecMode = pecparse;
 
+            AllowAdvancedCommandSet = Properties.SkyTelescope.Default.AllowAdvancedCommandSet;
             AlternatingPPec = Properties.SkyTelescope.Default.AlternatingPPEC;
             ApertureArea = Properties.SkyTelescope.Default.ApertureArea;
             ApertureDiameter = Properties.SkyTelescope.Default.ApertureDiameter;
             AtPark = Properties.SkyTelescope.Default.AtPark;
             AutoTrack = Properties.SkyTelescope.Default.AutoTrack;
+            AxisTrackingLimit = Properties.SkyTelescope.Default.AxisTrackingLimit;
             CameraHeight = Properties.SkyTelescope.Default.CameraHeight;
             CameraWidth = Properties.SkyTelescope.Default.CameraWidth;
             ComPort = Properties.SkyTelescope.Default.ComPort;
