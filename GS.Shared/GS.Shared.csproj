@@ -73,6 +73,9 @@
       <Generator></Generator>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="LanguageFiles\GSChart_it-IT.xaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="LanguageFiles\GSServer_en-US.xaml">
       <SubType>Designer</SubType>
       <Generator></Generator>
@@ -82,6 +85,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
+    <None Update="LanguageFiles\GSServer_it-IT.xaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="LanguageFiles\GSUtil_en-US.xaml">
       <SubType>Designer</SubType>
       <Generator></Generator>
@@ -90,6 +96,9 @@
     <None Update="LanguageFiles\GSUtil_fr-FR.xaml">
       <SubType>Designer</SubType>
       <Generator></Generator>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="LanguageFiles\GSUtil_it-IT.xaml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

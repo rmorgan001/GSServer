@@ -35,7 +35,7 @@ namespace GS.Shared
 
         static Languages()
         {
-            var langs = new List<string>(){ "en-US","fr-FR" };
+            var langs = new List<string>(){ "en-US","fr-FR","it-IT" };
             SupportedLanguages = langs;
         }
         public static void SetLanguageDictionary(bool local, LanguageApp app)

@@ -1,0 +1,69 @@
+﻿<!--/* Copyright(C) 2019-2022 Rob Morgan (robert.morgan.e@gmail.com)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see<https://www.gnu.org/licenses/> .
+*/-->
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!--Dialog -->
+    <system:String x:Key="diaAccept">Accetta</system:String>
+    <system:String x:Key="diaCancel">Cancella</system:String>
+    <system:String x:Key="diaOk">Ok</system:String>
+    <system:String x:Key="diaStart">Start</system:String>
+    <system:String x:Key="diaStop">Stop</system:String>
+
+<!--Converters -->
+    <system:String x:Key="cvtInvNumber">Numbero non Valido</system:String>
+    <system:String x:Key="cvtColorToBrush">ColorToBurshConverter supporta conversioni solo da Color e Stringhe</system:String>
+    <system:String x:Key="cvtEnumErr1">Il tipo del dato deve essere un Enum</system:String>
+    <system:String x:Key="cvtEnumErr2">Il tipo di Enum non è specificato</system:String>
+    <system:String x:Key="cvtInvIP">IP non valido</system:String>
+    <system:String x:Key="cvtRequired">Richiesto</system:String>
+
+    <!--Utilities-->
+    <system:String x:Key="utilLogFiles">Log Files</system:String>
+    <system:String x:Key="utilSettings">Impostazioni</system:String>
+    <system:String x:Key="utilDelete">Delete</system:String>
+    <system:String x:Key="utilDelFiles">Elimina file e impostazioni di GS</system:String>
+    <system:String x:Key="utilExit">Esci</system:String>
+    <system:String x:Key="utilAccept">Accetta</system:String>
+    <system:String x:Key="utilCancel">Cancella</system:String>
+    <system:String x:Key="utilAccDelFiles">Sicuro di eliminare?</system:String>
+    <system:String x:Key="utilDelLogFiles">File di Log eliminati</system:String>
+    <system:String x:Key="utilDelSettings">File di impostazione eliminati</system:String>
+    <system:String x:Key="utilDelSettingsVer">Setting versions deleted</system:String>
+    <system:String x:Key="utilCloseApps">Chiudi tutte le applicazioni GS</system:String>
+    <system:String x:Key="utilLockTitle">Running test: GS Server è avviato o è bloccato</system:String>
+    <system:String x:Key="utilCheck">Controlla</system:String>
+    <system:String x:Key="utilChooser">Scelta</system:String>
+    <system:String x:Key="utilChooserTitle">Connessione di test: al driver del telescopio</system:String>
+    <system:String x:Key="utilStart">Start</system:String>
+    <system:String x:Key="utilStop">Stop</system:String>
+    <system:String x:Key="utilSerial">Test Seriale:</system:String>
+    <system:String x:Key="utilComPort">ComPort</system:String>
+    <system:String x:Key="utilTimeout">Timeout Occurred Event #</system:String>
+    <system:String x:Key="utilProcessName">Nome Processo:</system:String>
+    <system:String x:Key="utilId">Id:</system:String>
+    <system:String x:Key="utilLocks">Locks:</system:String>
+    <system:String x:Key="utilCounter">Conteggio:</system:String>
+    <system:String x:Key="utilTimer">Timer:</system:String>
+    <system:String x:Key="utilNothing">Non trovato</system:String>
+    <system:String x:Key="utilBaudRate">BaudRate</system:String>
+    <system:String x:Key="utilInterval">Intervallo</system:String>
+    <system:String x:Key="utilNotFound">Non trovato</system:String>
+
+</ResourceDictionary>
+ 

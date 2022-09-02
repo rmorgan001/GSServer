@@ -1,0 +1,709 @@
+﻿<!--/* Copyright(C) 2019-2022 Rob Morgan (robert.morgan.e@gmail.com)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see<https://www.gnu.org/licenses/> .
+*/-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!--Title bar-->
+    <system:String x:Key="titleName">GS Server</system:String>
+    <system:String x:Key="titleApps">Applicazioni Connesse:</system:String>
+    <system:String x:Key="titleCloseApps">Applicazioni Connesse. Chiudere ugualmente?</system:String>
+    <system:String x:Key="titleDescription">GreenSwamp Server</system:String>
+    <system:String x:Key="titleClose">Chiudi GS Server</system:String>
+
+    <!--Tab bar-->
+    <system:String x:Key="tabSkyWatcher">SkyWatcher</system:String>
+    <system:String x:Key="tabFocuser">Focheggiatore</system:String>
+    <system:String x:Key="tabNotes">Note</system:String>
+    <system:String x:Key="tabOptions">Opzioni</system:String>
+    <system:String x:Key="tabGamePad">Gamepad</system:String>
+    <system:String x:Key="tabModel3D">3D</system:String>
+    <system:String x:Key="tabPole">Polare</system:String>
+    <system:String x:Key="tabPulses">Impulsi</system:String>
+    <system:String x:Key="tabAlignment">Allineamento</system:String>
+    <system:String x:Key="tabPlot">Plot</system:String>
+    <system:String x:Key="tabWindowFlip">Flip Window Size</system:String>
+
+    <!--Top bar-->
+    <system:String x:Key="topRa">Ascensione Retta:</system:String>
+    <system:String x:Key="topRaShort">RA:</system:String>
+    <system:String x:Key="topDec">Declinazione:</system:String>
+    <system:String x:Key="topDecShort">Dec:</system:String>
+    <system:String x:Key="topAz">Az:</system:String>
+    <system:String x:Key="topAlt">Alt:</system:String>
+    <system:String x:Key="topLHA">LHA:</system:String>
+
+    <!--Button bar-->
+    <system:String x:Key="btnHome">Home</system:String>
+    <system:String x:Key="btnBadgeHome">Home</system:String>
+    <system:String x:Key="btnTipHome">Vai a Home</system:String>
+    <system:String x:Key="btnPark">Parcheggia</system:String>
+    <system:String x:Key="btnUnPark">Togli da Parcheggio</system:String>
+    <system:String x:Key="btnHintPark">Parcheggiata</system:String>
+    <system:String x:Key="btnTipPark">Parcheggia Montatura</system:String>
+    <system:String x:Key="btnStop">Stop</system:String>
+    <system:String x:Key="btnTipStop">Ferma Montatura</system:String>
+    <system:String x:Key="btnTracking">Tracciamento</system:String>
+    <system:String x:Key="btnTipTracking">Tracciamento on/off</system:String>
+    <system:String x:Key="btnHintTracking">On</system:String>
+    <!--<system:String x:Key="btnSetHome">Set Home</system:String>-->
+    <system:String x:Key="btnTipSetHome">Reset posizione assi a Home</system:String>
+    <system:String x:Key="btnFlip">Inv. Meridiano</system:String>
+    <system:String x:Key="btnTipFlip">Inversione del Meridiano</system:String>
+    <!--<system:String x:Key="btnHomeReset">Accept to reset mount position to the Home position</system:String>-->
+    <system:String x:Key="btnContinueFlip">Accetta Inversione del Meridiano</system:String>
+    <system:String x:Key="btnTipParkPos">Posizione di Parcheggio</system:String>
+    <system:String x:Key="btnAutoHome">AutoHome</system:String>
+    <system:String x:Key="btnAutoHomeComplete">Auto Home Complete</system:String>
+    <system:String x:Key="btnAutoHomeStart">Start</system:String>
+    <system:String x:Key="btnAutoHomeLimit">Max degrees to move:</system:String>
+    <system:String x:Key="btnTipAutoHomeLimit">Limite in gradi</system:String>
+    <system:String x:Key="btnHintAutoHomeLimit">Gradi</system:String>
+    <system:String x:Key="btnDecOffset">Side Saddle Offset:</system:String>
+    <system:String x:Key="btnHintDecOffset">Gradi</system:String>
+    <system:String x:Key="btnTipScheduler">Schedulatore</system:String>
+    <system:String x:Key="btnScheduler">Schedulatore</system:String>
+
+    <!--Bottom bar-->
+    <system:String x:Key="botHome">Home</system:String>
+    <system:String x:Key="botTipHome">Home</system:String>
+    <system:String x:Key="botParked">Parcheggiato</system:String>
+    <system:String x:Key="botTipParked">Parcheggia</system:String>
+    <system:String x:Key="botSlewing">Inseguimento</system:String>
+    <system:String x:Key="botTipSlewing">Inseguendo</system:String>
+    <system:String x:Key="botTracking">Tracciamento</system:String>
+    <system:String x:Key="botTipTracking">Tracciamento</system:String>
+    <system:String x:Key="botTipSOP">Lato del Meridiano</system:String>
+    <system:String x:Key="botTipAxisLimit">Limiti Assi, click per le impostazioni</system:String>
+    <system:String x:Key="botTipWarnings">Attenzione, click per resettare</system:String>
+    <system:String x:Key="botTipErrors">Errori, click per resttare</system:String>
+    <system:String x:Key="botTipVoice">Voce</system:String>
+    <system:String x:Key="botTipMonitor">Monitor</system:String>
+    <system:String x:Key="botTipConnected">Click per le informazioni sulla Montatura</system:String>
+    <system:String x:Key="botLimitOptions">Opzioni Limiti</system:String>
+    <system:String x:Key="botLimitTracking">Spegni Tracciamento</system:String>
+
+    <!--Hand Controller-->
+    <system:String x:Key="hcTipW">O</system:String>
+    <system:String x:Key="hcTipN">N</system:String>
+    <system:String x:Key="hcTipE">E</system:String>
+    <system:String x:Key="hcTipS">S</system:String>
+    <system:String x:Key="hcTipStop">Stop</system:String>
+    <system:String x:Key="hcSpeed">Velocità</system:String>
+    <system:String x:Key="hcTipSpeed">Velocità Movimento</system:String>
+    <system:String x:Key="hcTipFlipNS">Inverti direzione N/S</system:String>
+    <system:String x:Key="hcFlipNS">N/S</system:String>
+    <system:String x:Key="hcFlip">Inverti Direzione</system:String>
+    <system:String x:Key="hcTipFlipEW">Inverti direzione E/O</system:String>
+    <system:String x:Key="hcFlipEW">E/O</system:String>
+    <system:String x:Key="hcMode">Modo</system:String>
+    <system:String x:Key="hcTipMode">Direction Mode</system:String>
+    <system:String x:Key="hcBacklash">Anti-Lash</system:String>
+    <system:String x:Key="hcTipHcAntiBacklash">Anti-Backlash</system:String>
+    <system:String x:Key="hcRa">E/O</system:String>
+    <system:String x:Key="hcDec">N/S</system:String>
+    <system:String x:Key="hcHc">GSS Hand Control</system:String>
+    <system:String x:Key="hcOpenWin">Apri Finestra</system:String>
+
+    <!--pPEC bar-->
+    <system:String x:Key="ppStartTraining">Accetta per iniziare l'apprendimento</system:String>
+    <system:String x:Key="ppStartTrainingMode">Inizia apprendimendo PPEC</system:String>
+    <system:String x:Key="ppOnOff">On/Off PPEC</system:String>
+    <system:String x:Key="ppPec">PPEC</system:String>
+    <system:String x:Key="ppTraining">PPEC Apprendimento</system:String>
+    <system:String x:Key="ppTipPecTimer">Visualizza quando la montatura è in apprendimento PEC</system:String>
+    <system:String x:Key="ppInTraining">Apprendimento in corso</system:String>
+    <system:String x:Key="ppTrackingOn">L'inseguimento deve essere attivo durante l'apprendimento</system:String>
+
+    <!--Mount Info-->
+    <system:String x:Key="mntSupported">Supportate</system:String>
+    <system:String x:Key="mntNotSupported">Non Supportate</system:String>
+    <system:String x:Key="mntMount">Montatura:</system:String>
+    <system:String x:Key="mntVersion">Versione:</system:String>
+    <system:String x:Key="mntStepsRa">StepsRa:</system:String>
+    <system:String x:Key="mntStepsDec">StepsDec:</system:String>
+    <system:String x:Key="mntPEC">PPEC:</system:String>
+    <system:String x:Key="mntHomeSensor">Sensore di Home:</system:String>
+    <system:String x:Key="mntRaSteps">Ra Steps/Arcsec:</system:String>
+    <system:String x:Key="mntDecSteps">Dec Steps/Arcsec:</system:String>
+    <system:String x:Key="mntInfo">informazioni Montatura</system:String>
+
+    <!--GoTo bar-->
+    <system:String x:Key="goAcpCoords">Accetto le Coordinate?</system:String>
+    <system:String x:Key="goRa">RA:</system:String>
+    <system:String x:Key="goDec">Dec:</system:String>
+    <system:String x:Key="goCopy">Copy</system:String>
+    <system:String x:Key="goTipCopy">Utilizza la posizione Corrente</system:String>
+    <system:String x:Key="goGoTo">GoTo</system:String>
+    <system:String x:Key="goTipGoTo">Vai alle coordinate</system:String>
+    <system:String x:Key="goTargetBelow">Target sotto l'orizzonte</system:String>
+    <system:String x:Key="goSync">Sync</system:String>
+    <system:String x:Key="goSyncWarning">Attenzione: verifica le coordinate!</system:String>
+    <system:String x:Key="goSlewing">La Montatura si sta muovendo</system:String>
+    <system:String x:Key="goOutLimits">Outside of Sync limits</system:String>
+
+    <!--Backlash -->
+    <system:String x:Key="bacDecLash">Dec Backlash</system:String>
+    <system:String x:Key="bacLashComp">Compensazione Backlash:</system:String>
+    <system:String x:Key="bacDec">Dec</system:String>
+    <system:String x:Key="bacRa">Ra</system:String>
+    <system:String x:Key="bacRaLash">Ra Backlash</system:String>
+
+    <!--Debug bar-->
+    <system:String x:Key="bugSiderealTime">Ora Siderale:</system:String>
+
+    <!--Gamepad-->
+    <system:String x:Key="gpOn">Gamepad On</system:String>
+    <system:String x:Key="gpSen">Sensibilità:</system:String>
+    <system:String x:Key="gpDoubleClickSpeed">Velocità doppio click:</system:String>
+    <system:String x:Key="gpTracking">Inseguimento</system:String>
+    <system:String x:Key="gpStop">Stop</system:String>
+    <system:String x:Key="gpPark">Parcheggio</system:String>
+    <system:String x:Key="gpHome">Home</system:String>
+    <system:String x:Key="gpSpeedUp">Vel +</system:String>
+    <system:String x:Key="gpSpeedDown">Vel -</system:String>
+    <system:String x:Key="gpVolumeUp">Volume +</system:String>
+    <system:String x:Key="gpVolumeDown">Volume -</system:String>
+    <system:String x:Key="gpSlewUp">Muovi Sù</system:String>
+    <system:String x:Key="gpSlewDown">Muovi Giù</system:String>
+    <system:String x:Key="gpSlewLeft">Muovi a Sinistra</system:String>
+    <system:String x:Key="gpSlewRight">Muovi a Destra</system:String>
+    <system:String x:Key="gpSave">Salva</system:String>
+    <system:String x:Key="gpSidereal">Velocità Siderale</system:String>
+    <system:String x:Key="gpLunar">Velocità Lunare</system:String>
+    <system:String x:Key="gpSolar">Velocità Solare</system:String>
+    <system:String x:Key="gpKing">Rate King</system:String>
+
+    <!--GPS -->
+    <system:String x:Key="gpsCom">Com Port</system:String>
+    <system:String x:Key="gpsBaud">Baud Rate</system:String>
+    <system:String x:Key="gpsRetrieve">Ricevi</system:String>
+    <system:String x:Key="gpsNmEA">NMEA:</system:String>
+    <system:String x:Key="gpsLat">Latitudine:</system:String>
+    <system:String x:Key="gpsLong">Longitudine:</system:String>
+    <system:String x:Key="gpsEle">Elevazione:</system:String>
+    <system:String x:Key="gpsAccept">Accetto le Coordinate?</system:String>
+    <system:String x:Key="gpsNoData">Missing or invalid data found on COM port</system:String>
+    <system:String x:Key="gpsGGA">GGA</system:String>
+    <system:String x:Key="gpsRMC">RMC</system:String>
+    <system:String x:Key="gpsLocal">Discrepanza con orario locale</system:String>
+    <system:String x:Key="gpsPC">PC:</system:String>
+    <system:String x:Key="gpsGPS">GPS:</system:String>
+    <system:String x:Key="gpsDeviation">Deviazione:</system:String>
+    <system:String x:Key="gpsChangeTime">Aggiorno l'ora di Sistema?</system:String>
+    <system:String x:Key="gpsTimeLimit">Out of changeable timespan limits</system:String>
+    <system:String x:Key="gpsTimeError">Erorre Orario</system:String>
+
+    <!--CdC -->
+    <system:String x:Key="cdcIP">Indirizzo IP</system:String>
+    <system:String x:Key="cdcPort">Numero Porta</system:String>
+    <system:String x:Key="cdcRetrieve">Retrieve</system:String>
+    <system:String x:Key="cdcSend">Invia</system:String>
+    <system:String x:Key="cdcNmEA">NMEA:</system:String>
+    <system:String x:Key="cdcLat">Latitudine:</system:String>
+    <system:String x:Key="cdcLong">Longitudine:</system:String>
+    <system:String x:Key="cdcEle">Elevazione:</system:String>
+    <system:String x:Key="cdcAccept">Accetto le Coordinate??</system:String>
+    <system:String x:Key="cdcOBNotFound">Informazioni Osservatorio non trovate.</system:String>
+    <system:String x:Key="cdcNotFound">Server non trovato.</system:String>
+
+    <!--Edits -->
+    <system:String x:Key="edHours">Ore</system:String>
+    <system:String x:Key="edMinutes">Minuti</system:String>
+    <system:String x:Key="edSeconds">Secondi</system:String>
+    <system:String x:Key="edDegrees">Gradi</system:String>
+
+    <!--Dialog -->
+    <system:String x:Key="diaAccept">Accetta</system:String>
+    <system:String x:Key="diaCancel">Cancella</system:String>
+    <system:String x:Key="diaOk">Ok</system:String>
+    <system:String x:Key="diaStart">Start</system:String>
+    <system:String x:Key="diaStop">Stop</system:String>
+    <system:String x:Key="diaDialog">GS Server</system:String>
+
+    <!--Synthesizer -->
+    <system:String x:Key="vceParked">Parcheggiata</system:String>
+    <system:String x:Key="vceUnParked">Non Parcheggiata</system:String>
+    <system:String x:Key="vceActive">Voce attiva</system:String>
+    <system:String x:Key="vceError">Erore errore</system:String>
+    <system:String x:Key="vceLimit">Limit warning</system:String>
+    <system:String x:Key="vceTrackingOn">Tracking on</system:String>
+    <system:String x:Key="vceTrackingOff">Tracking off</system:String>
+    <system:String x:Key="vcePeckOn">Peck on</system:String>
+    <system:String x:Key="vcePeckOff">Peck off</system:String>
+    <system:String x:Key="vcePeckTrainOn">Peck Training on</system:String>
+    <system:String x:Key="vcePeckTrainOff">Peck Training off</system:String>
+    <system:String x:Key="vceStop">Stop</system:String>
+    <system:String x:Key="vceAbortSlew">Annulla</system:String>
+    <system:String x:Key="vceParkSet">Park Set</system:String>
+    <system:String x:Key="vceSyncAz">Syncing to Azimuth</system:String>
+    <system:String x:Key="vceSyncCoords">Syncing to Coordinates</system:String>
+    <system:String x:Key="vceSlewing">Slewing</system:String>
+    <system:String x:Key="vceSlewCoords">Muovi alle coordinate</system:String>
+    <system:String x:Key="vceSlewPark">Muovi a Parcheggio</system:String>
+    <system:String x:Key="vceSlewHome">Muovi a ome</system:String>
+    <system:String x:Key="vceSlewComplete">Movimento Completato</system:String>
+    <system:String x:Key="vceHome">Home</system:String>
+    <!--<system:String x:Key="vceHomeSet">Home Set</system:String>-->
+    <system:String x:Key="vceSidereal">Siderale</system:String>
+    <system:String x:Key="vceSolar">Solare</system:String>
+    <system:String x:Key="vceLunar">Lunare</system:String>
+    <system:String x:Key="vceKing">King</system:String>
+
+    <!--Converters -->
+    <system:String x:Key="cvtInvNumber">Numero non Valido</system:String>
+    <system:String x:Key="cvtColorToBrush">ColorToBurshConverter supporta conversioni solo da Color e Stringhe</system:String>
+    <system:String x:Key="cvtEnumErr1">Type must be for an Enum</system:String>
+    <system:String x:Key="cvtEnumErr2">The EnumType must be specified</system:String>
+    <system:String x:Key="cvtInvIP">IP non valido</system:String>
+    <system:String x:Key="cvtRequired">Richiesto</system:String>
+    <system:String x:Key="cvtInvalid">Data non valida</system:String>
+    <system:String x:Key="cvtFutureDate">Future date required</system:String>
+    <system:String x:Key="cvtMustBool">Deve essere boolean</system:String>
+
+    <!--Notes -->
+    <system:String x:Key="notShortcuts">Scorciatoie:</system:String>
+    <system:String x:Key="notOpen">Apri</system:String>
+    <system:String x:Key="notSave">Salva</system:String>
+    <system:String x:Key="notSaveAs">SalvaCome</system:String>
+    <system:String x:Key="notPrint">Stampa</system:String>
+    <system:String x:Key="notCut">Taglia</system:String>
+    <system:String x:Key="notCopy">Copia</system:String>
+    <system:String x:Key="notPaste">Incolla</system:String>
+    <system:String x:Key="notRedo">Ripeti</system:String>
+    <system:String x:Key="notUndo">Annulla</system:String>
+    <system:String x:Key="notNumbering">Numerazione</system:String>
+    <system:String x:Key="notBullets">Bullets</system:String>
+    <system:String x:Key="notIndent">Diminusici Indentazione</system:String>
+    <system:String x:Key="notInIndent">Aumenta Indentazione</system:String>
+    <system:String x:Key="notLeftAlign">Allinea a Sinistra</system:String>
+    <system:String x:Key="notCenterAlign">Allinea al Centro</system:String>
+    <system:String x:Key="notRightAlign">Allinea a Destra</system:String>
+    <system:String x:Key="notBold">Grassetto</system:String>
+    <system:String x:Key="notInItalic">Corsivo</system:String>
+    <system:String x:Key="notUnderline">Sottolineato</system:String>
+    <system:String x:Key="notFont">Font</system:String>
+    <system:String x:Key="notFontSize">Dimensione Font</system:String>
+    <system:String x:Key="notFontForGround">Font Forground</system:String>
+    <system:String x:Key="notFontBackground">Font Background</system:String>
+    <system:String x:Key="notSpellCheck">Spellcheck</system:String>
+    <system:String x:Key="notDate">Data</system:String>
+    <system:String x:Key="notTime">Ora</system:String>
+    <system:String x:Key="notRa">Ra</system:String>
+    <system:String x:Key="notDec">Dec</system:String>
+    <system:String x:Key="notAlt">Alt</system:String>
+    <system:String x:Key="notAz">Az</system:String>
+    <system:String x:Key="notPhase">Fase Lunare</system:String>
+    <system:String x:Key="notEntry">Log Entry</system:String>
+    <system:String x:Key="notAlignmentMode">Modo di Allineamento</system:String>
+    <system:String x:Key="notEqType">Equatorial Coordinate Type</system:String>
+    <system:String x:Key="notObLoc">Località Osservatorio</system:String>
+    <system:String x:Key="notWeather">Weather</system:String>
+    <system:String x:Key="notMoon">Luna</system:String>
+    <system:String x:Key="notLog">Log</system:String>
+    <system:String x:Key="notAlignment">Am</system:String>
+    <system:String x:Key="notEq">Eq</system:String>
+    <system:String x:Key="notOb">Ob</system:String>
+    <system:String x:Key="notSidereal">Sidereal Time</system:String>
+    <system:String x:Key="notHa">Ha</system:String>
+    <system:String x:Key="notAngle">Ora Angolare</system:String>
+    <system:String x:Key="notNoData">Dati non trovati</system:String>
+    <system:String x:Key="notTimeout">The operation has timed out</system:String>
+    <system:String x:Key="notFullMoon">Luna Piena</system:String>
+    <system:String x:Key="notWaningGibbous">Gibbosa Calante</system:String>
+    <system:String x:Key="notLastQuarter">Ultimo quarto</system:String>
+    <system:String x:Key="notWaningCrescent">Luna Calante</system:String>
+    <system:String x:Key="notNewMoon">Luna Nuova</system:String>
+    <system:String x:Key="notWaxingCrescent">Luna Crescente</system:String>
+    <system:String x:Key="notFirstQuarter">Primo Quarto</system:String>
+    <system:String x:Key="notWaxingGibbous">Gibbosa Crescente</system:String>
+    <system:String x:Key="notLogEntry">Log Entry</system:String>
+    <system:String x:Key="notCoordinateType">Coordinate Type</system:String>
+    <system:String x:Key="notObservatory">Osservatorio</system:String>
+    <system:String x:Key="notLat">Lat</system:String>
+    <system:String x:Key="notLong">Long</system:String>
+    <system:String x:Key="notSiderealTime">Orario Siderale</system:String>
+
+    <!--SkyWatcher -->
+    <system:String x:Key="skySettings">Impostazioni</system:String>
+    <system:String x:Key="skyClose">Chiudi</system:String>
+    <system:String x:Key="skyPorts">Com Port</system:String>
+    <system:String x:Key="skyBaud">Baud Rate</system:String>
+    <system:String x:Key="skyEquatorial">Sistema Equatoriale</system:String>
+    <system:String x:Key="skyAlignment">Mode di Alliniamento</system:String>
+    <system:String x:Key="skyRaGuiding">RA Guiding Rate %</system:String>
+    <system:String x:Key="skyDecGuiding">Dec Guiding Rate %</system:String>
+    <system:String x:Key="skyMount">Tipo Montatura</system:String>
+    <system:String x:Key="skyMaxSlew">Max Slew Rate deg/sec</system:String>
+    <system:String x:Key="skyMeridian">Limite Meridiano (deg)</system:String>
+    <system:String x:Key="skyTracking">Tracking Rate</system:String>
+    <system:String x:Key="skyST4">ST4 Guiderate</system:String>
+    <system:String x:Key="skyReset">Reset</system:String>
+    <system:String x:Key="SkyResetDef">Reset ai valori di default?</system:String>
+    <system:String x:Key="skyRefraction">Rifrazione</system:String>
+    <system:String x:Key="skyEncoders">Encoders</system:String>
+    <system:String x:Key="skyAltPpEC">Alternate PPEC</system:String>
+    <system:String x:Key="skyFullCurrent">Piena Corrente</system:String>
+    <system:String x:Key="skyGoToDecPulse">Impulsi GoTo Dec</system:String>
+    <system:String x:Key="skyDiagnostics">Diagnostica</system:String>
+    <system:String x:Key="skySetPark">Imposta Parcheggio nella posizione corrente</system:String>
+    <system:String x:Key="skyOBL">Posizione Osservatorio</system:String>
+    <system:String x:Key="skyLatitude">Latitudine:</system:String>
+    <system:String x:Key="skyLongitude">Longitudine:</system:String>
+    <system:String x:Key="skyTemperature">Temperatura</system:String>
+    <system:String x:Key="skyAmbTemp">Temperatura ambiente celsius</system:String>
+    <system:String x:Key="skyElevation">Elevazione</system:String>
+    <system:String x:Key="skyMeters">Metri</system:String>
+    <system:String x:Key="skyGPS">GPS</system:String>
+    <system:String x:Key="skyGPSCon">Connetti device GPS</system:String>
+    <system:String x:Key="skyCdC">CdC</system:String>
+    <system:String x:Key="skyCdCCon">Connetti CdC server</system:String>
+    <system:String x:Key="skyCloseSave">Chiudi e Salva</system:String>
+    <system:String x:Key="skyOpen">Apri</system:String>
+    <system:String x:Key="skyConnectDis">Connetti/disconnetti mountatura</system:String>
+    <system:String x:Key="skySiderealRate">Siderele Rate</system:String>
+    <system:String x:Key="skySolarRate">Solare Rate</system:String>
+    <system:String x:Key="skyLunarRate">Lunare Rate</system:String>
+    <system:String x:Key="skyKingRate">King Rate</system:String>
+    <system:String x:Key="skyStopMount">Stop mount before setting home position</system:String>
+    <system:String x:Key="skyConnect">Connetti</system:String>
+    <system:String x:Key="skyDisconnect">Disconnetti</system:String>
+    <system:String x:Key="skyHome1">Quando si parte normalmente posizionre la montatura in 'Home'.</system:String>
+    <system:String x:Key="skyHome2">La Posizione di home è con il contrappeso basso e la declinazione punta verso il Polo.</system:String>
+    <system:String x:Key="skyHome3">Clicca 'Imposta Home' prima o dopo aver fatto un allineamento polare.</system:String>
+    <system:String x:Key="skyParkNewName">Aggiungi posizione di parcheggio</system:String>
+    <system:String x:Key="skyParkDelete">Eliminare la posizione di parcheggio?</system:String>
+    <system:String x:Key="skyLat0">Nord o Sud</system:String>
+    <system:String x:Key="skyLat01">N/S</system:String>
+    <system:String x:Key="skyLong0">Est o Ovest</system:String>
+    <system:String x:Key="skyLong01">E/O</system:String>
+    <system:String x:Key="skyMinPulseDec">Impulsi Dec Minimi</system:String>
+    <system:String x:Key="skyMinPulseRa">Impulsi Ra Minimi</system:String>
+    <system:String x:Key="skySchCol1">On/Off</system:String>
+    <system:String x:Key="skySchCol2">Azione</system:String>
+    <system:String x:Key="skySchCol3">Data</system:String>
+    <system:String x:Key="skySchCol4">Ora</system:String>
+    <system:String x:Key="skySidereal">Siderale</system:String>
+    <system:String x:Key="skySolar">Solare</system:String>
+    <system:String x:Key="skyLunar">Lunare</system:String>
+    <system:String x:Key="skyKing">King</system:String>
+    <system:String x:Key="skyNoSelected">Nessuna Selezione</system:String>
+    <system:String x:Key="skyParkSaved">Posizione salvata a</system:String>
+    <system:String x:Key="skyParkEvent1">Orario non valido</system:String>
+    <system:String x:Key="skyParkEvent2">Data non valida</system:String>
+    <system:String x:Key="skyParkEvent3">Data e Orario non validi</system:String>
+
+    <!--Exceptions -->
+    <system:String x:Key="exParked">Prima togli da Parcheggio</system:String>
+    <system:String x:Key="exError">Errore</system:String>
+
+    <!--Options and Monitor -->
+    <system:String x:Key="optMonitor">Monitor</system:String>
+    <system:String x:Key="optClose">Chiudi</system:String>
+    <system:String x:Key="optDevice">Device:</system:String>
+    <system:String x:Key="optServer">Server</system:String>
+    <system:String x:Key="optTelescope">Telescopio</system:String>
+    <system:String x:Key="optCategory">Categoria:</system:String>
+    <system:String x:Key="optDriver">Driver</system:String>
+    <system:String x:Key="optInterface">Interfaccia</system:String>
+    <system:String x:Key="optServer1">Server</system:String>
+    <system:String x:Key="optMount">Montatura</system:String>
+    <system:String x:Key="optType">Tipe:</system:String>
+    <system:String x:Key="optInfo">Info</system:String>
+    <system:String x:Key="optData">Data</system:String>
+    <system:String x:Key="optWarning">Attenzione</system:String>
+    <system:String x:Key="optError">Errore</system:String>
+    <system:String x:Key="optSessionLogOn">On/Off crea un log di sessioen</system:String>
+    <system:String x:Key="optSessionLog">Log di Sessione</system:String>
+    <system:String x:Key="optWriteFile">Writes text items to a file</system:String>
+    <system:String x:Key="optLogFile">Log su un file</system:String>
+    <system:String x:Key="optStartStop">Start/Stop Monitoraggio</system:String>
+    <system:String x:Key="optClear">Pulisic</system:String>
+    <system:String x:Key="optClearText">Clear text items</system:String>
+    <system:String x:Key="optExport">Esporta</system:String>
+    <system:String x:Key="optExportText">Esporta testo su un file</system:String>
+    <system:String x:Key="optCopy">Copia</system:String>
+    <system:String x:Key="optCopyClip">Copia negli appunti</system:String>
+    <system:String x:Key="optTotal">Totale linee testo</system:String>
+    <system:String x:Key="optTabs">Available Tabs</system:String>
+    <system:String x:Key="optOptions">Opzioni</system:String>
+    <system:String x:Key="optVoice">Voce</system:String>
+    <system:String x:Key="optColors">Colore Tema</system:String>
+    <system:String x:Key="optPerf">Performance</system:String>
+    <system:String x:Key="optSkyWatcher">SkyWatcher</system:String>
+    <system:String x:Key="optCharts">Grafici</system:String>
+    <system:String x:Key="optNotes">Note</system:String>
+    <system:String x:Key="optGamePad">Gamepad</system:String>
+    <system:String x:Key="optModel3D">3D Model</system:String>
+    <system:String x:Key="optSleepMode">Impedisci ibernazione</system:String>
+    <system:String x:Key="optStartMin">Start minimizzato</system:String>
+    <system:String x:Key="optStartTop">Start finestra visibile</system:String>
+    <system:String x:Key="optHomeWarning">Avviso Home On</system:String>
+    <system:String x:Key="optVoiceSpeech">Voce</system:String>
+    <system:String x:Key="optVoiceName">Nome Voce</system:String>
+    <system:String x:Key="optVolumeLevel">Volume</system:String>
+    <system:String x:Key="optVolume">Volume</system:String>
+    <system:String x:Key="optLight">Chiaro</system:String>
+    <system:String x:Key="optDark">Scuro</system:String>
+    <system:String x:Key="optPrimaryColor">Colore Primario</system:String>
+    <system:String x:Key="optAccentColor">Accent Color</system:String>
+    <system:String x:Key="optDisplayInterval">Visualizza Intervallo (ms)</system:String>
+    <system:String x:Key="optRestart">Reset Impostazioni. Riavvia GS server</system:String>
+    <system:String x:Key="optAcceptResetSettings">Accetta per ripristinare le opzioni selezionate</system:String>
+    <system:String x:Key="optResetSettings">Ripristina Impostazioni</system:String>
+    <system:String x:Key="optNoResetSettings">Nessuna impostazione selezionata</system:String>
+    <system:String x:Key="optServerSettings">Opzioni</system:String>
+    <system:String x:Key="optSkyTelescopeSettings">SkyWatcher</system:String>
+    <system:String x:Key="optChartsSettings">Grafici</system:String>
+    <system:String x:Key="optMonitorSettings">Monitor</system:String>
+    <system:String x:Key="optSettings">Ripristina Impostazioni</system:String>
+    <system:String x:Key="optReset">Reset</system:String>
+    <system:String x:Key="optLanguage">Lingua</system:String>
+    <system:String x:Key="optHardware">Accellerazione Off</system:String>
+    <system:String x:Key="optRender">Velocità di render</system:String>
+    <system:String x:Key="optUTCOffset">UTC OffSet</system:String>
+    <system:String x:Key="optLSTAdjusted">UTC Adjusted Date:</system:String>
+    <system:String x:Key="optLocalAdjusted">Local Adjusted Date:</system:String>
+    <system:String x:Key="optDownload">Download</system:String>
+    <system:String x:Key="optUpdateVer">Versione Disponibile:</system:String>
+    <system:String x:Key="optCurrentVer">Versione Installata:</system:String>
+    <system:String x:Key="optCheckUpdates">Controlla Aggiornamenti</system:String>
+    <system:String x:Key="optNotAvail">Aggiornamenti non Disponibili</system:String>
+    <system:String x:Key="optNotFound">>Aggiornamenti non trovati</system:String>
+    <system:String x:Key="optDisconnects">Disconnetti la montatura e riconnettila prima di eseguire l'applicazione</system:String>
+    <system:String x:Key="optPole">Posizione Polare</system:String>
+    <system:String x:Key="optCopiedClip">Copiato negli Appunti</system:String>
+
+    <!--3DModel -->
+    <system:String x:Key="3dSettings">Impostazioni</system:String>
+    <system:String x:Key="3dHud">Coordinate</system:String>
+    <system:String x:Key="3dEdit">Modifica</system:String>
+    <system:String x:Key="3dCamera">Info Camera</system:String>
+    <system:String x:Key="3dRaAxis">asse RA</system:String>
+    <system:String x:Key="3dDecAxis">asse Dec</system:String>
+    <system:String x:Key="3dTopBar">Top coords bar</system:String>
+    <system:String x:Key="3dModel">GSS 3D Model</system:String>
+    <system:String x:Key="3dResetView">Reset Vista</system:String>
+    <system:String x:Key="3dModelType">Tipo Modello</system:String>
+
+    <!--Pulses -->
+    <system:String x:Key="pulPulses">Impulsi</system:String>
+    <system:String x:Key="pulStart">Start</system:String>
+    <system:String x:Key="pulClear">Pulisci</system:String>
+    <system:String x:Key="pulSize">Adatta</system:String>
+    <system:String x:Key="pulOn">On</system:String>
+    <system:String x:Key="pulPause">Pausa</system:String>
+    <system:String x:Key="pulOpen">Apri</system:String>
+
+    <!--Plot -->
+    <system:String x:Key="pltPlot">Plot</system:String>
+    <system:String x:Key="pltStart">Start</system:String>
+    <system:String x:Key="pltClear">Pulisci</system:String>
+    <system:String x:Key="pltSize">Adatta</system:String>
+    <system:String x:Key="pltOn">On</system:String>
+    <system:String x:Key="pltPause">Pause</system:String>
+    <system:String x:Key="pltZero">Zero Base Axes</system:String>
+    <system:String x:Key="pltYScale">Y - Scala</system:String>
+    <system:String x:Key="pltQuality">Qualità Zoom</system:String>
+    <system:String x:Key="pltMaxPltPoints">Massimi Punti Visualizzati</system:String>
+    <system:String x:Key="pltMaxPoints">Punti Massimi</system:String>
+    <system:String x:Key="pltLogging">Log to GSChartLog</system:String>
+
+    <!--Pole Locator -->
+    <system:String x:Key="polLat">Latitude:</system:String>
+    <system:String x:Key="polLong">Longitude:</system:String>
+    <system:String x:Key="polLST">Sidereal Time:</system:String>
+    <system:String x:Key="polHADeg">Hour Angle:</system:String>
+    <system:String x:Key="polHAFlipDeg">HA Flip:</system:String>
+    <system:String x:Key="polLDate">Data Locale:</system:String>
+    <system:String x:Key="polLTime">Tempo Locale:</system:String>
+    <system:String x:Key="polMirrorFlip">Inverti Vista</system:String>
+    <system:String x:Key="polPolaris">Polare</system:String>
+    <system:String x:Key="polOct">Sigma Octantis</system:String>
+
+    <!--1.0.1.8 -->
+    <system:String x:Key="1018MouseLock">Mouse Blocato</system:String>
+    <system:String x:Key="1018LockMouse">Mouse Blocato, Premi un tasto della tastiera per sbloccarlo</system:String>
+
+    <!--1.0.2.1 -->
+    <system:String x:Key="1021SpiralSearch">Movimento Spirale</system:String>
+    <system:String x:Key="1021In">In</system:String>
+    <system:String x:Key="1021Out">Out</system:String>
+    <system:String x:Key="1021Abort">Annulla</system:String>
+    <system:String x:Key="1021New">Nuovo</system:String>
+    <system:String x:Key="1021Clear">Pulisci</system:String>
+    <system:String x:Key="1021Calculate">Calcola</system:String>
+    <system:String x:Key="1021WidthA">Largheza (arcsec)</system:String>
+    <system:String x:Key="1021HeightA">Altezza (arcsec)</system:String>
+    <system:String x:Key="1021LimitsOn">Limiti On</system:String>
+    <system:String x:Key="1021Distance">Distanza:</system:String>
+    <system:String x:Key="1021MM">(mm)</system:String>
+    <system:String x:Key="1021FovHeader">Calcula (FOV)</system:String>
+    <system:String x:Key="1021CameraWidth">Larghezza Camera</system:String>
+    <system:String x:Key="1021CameraHeight">Altezza Camera</system:String>
+    <system:String x:Key="1021EyepieceFS">Eyepiece Field Stop</system:String>
+    <system:String x:Key="1021OtaFL">OTA Focal Length</system:String>
+    <system:String x:Key="1021Eyepiece">Oculare</system:String>
+    <system:String x:Key="1021Camera">Camera</system:String>
+    <system:String x:Key="1021Width">Larghezza</system:String>
+    <system:String x:Key="1021Height">Altezza</system:String>
+    <system:String x:Key="1021FlipLimit">Flip Limit</system:String>
+    <system:String x:Key="1021NoHomeSensor">La Montatura non supporta il sensore di Home</system:String>
+    <system:String x:Key="1021Center">Centra</system:String>
+    <system:String x:Key="1021End">Fine</system:String>
+
+    <!--1.0.2.3 -->
+    <system:String x:Key="botTipPec">Stato PEC</system:String>
+    <system:String x:Key="Pec">PEC</system:String>
+    <system:String x:Key="tabMain">Main</system:String>
+    <system:String x:Key="PecBadge">On</system:String>
+    <system:String x:Key="PecStatus">Stato PEC</system:String>
+
+    <!--1.0.2.4 -->
+    <system:String x:Key="LimitNothing">Niente</system:String>
+    <system:String x:Key="tabSnap">Snap</system:String>
+    <system:String x:Key="snapOn">On</system:String>
+    <system:String x:Key="snapPause">Pause</system:String>
+    <system:String x:Key="snap1">Snap Port 1:</system:String>
+    <system:String x:Key="snap2">Snap Port 2:</system:String>
+    <system:String x:Key="snapTimer">Timer</system:String>
+    <system:String x:Key="snapCounter">Conteggio</system:String>
+    <system:String x:Key="snapLoops">Loops</system:String>
+    <system:String x:Key="snapDelay">Ritardo</system:String>
+    <system:String x:Key="snapTimerEr">Set timer amount</system:String>
+    <system:String x:Key="snapEnable">Enable Snap</system:String>
+    <system:String x:Key="snapConn">Non connesso alla Montatura</system:String>
+    <system:String x:Key="snapSupport">Non supportato dalla Montatura</system:String>
+    <system:String x:Key="skySyncLimitOn">Limiti Sync</system:String>
+    <system:String x:Key="diaImport">Import</system:String>
+    <system:String x:Key="msgValue">Valore non trovato</system:String>
+    <system:String x:Key="msgKey">Key non trovata</system:String>
+
+    <!-- Alignment -->
+    <!-- 1.0.2.5 -->
+    <system:String x:Key="aliOpenTooltip">Apri</system:String>
+    <system:String x:Key="aliCloseTooltip">Chiudi</system:String>
+    <system:String x:Key="aliAlignment">Alineamento</system:String>
+    <system:String x:Key="aliAlignmentOn">Alineamento On</system:String>
+    <system:String x:Key="aliAlignmentOnTooltip">Switch on star alignment modeling</system:String>
+    <system:String x:Key="aliClearModelOnStartup">Clear model on startup</system:String>
+    <system:String x:Key="aliAlignmentSettings">Settings</system:String>
+    <system:String x:Key="aliProximityLimitTooltip">How near to each other can sync points be before they replace earlier points (arc seconds).</system:String>
+    <system:String x:Key="aliSampleSizeTooltip">How many nearby sync points should be used when calculating positions.</system:String>
+    <system:String x:Key="aliNearbyLimitTooltip">How close should sync points be before they are used in calculations (degrees).</system:String>
+    <system:String x:Key="aliClearModelOnStartupTooltip">Tick if you want to create a fresh model every time you reconnect.</system:String>
+    <system:String x:Key="aliClearAll">Elimina Tutto</system:String>
+    <system:String x:Key="aliClearAllTooltip">Click this button to clear all alignment points from the model.</system:String>
+    <system:String x:Key="aliDelete">Elimina</system:String>
+    <system:String x:Key="aliDeleteTooltip">Click this button to delete the selected alignment point.</system:String>
+    <system:String x:Key="optAlignment">Allineamento</system:String>
+    <system:String x:Key="optProximityLimit">Proximity Limit</system:String>
+    <system:String x:Key="optSampleSize">Sample Size</system:String>
+    <system:String x:Key="optNearbyLimit">Vicino al Limite</system:String>
+
+    <!--1.0.3.2 -->
+    <system:String x:Key="customGears">Meccanica costum</system:String>
+    <system:String x:Key="raTotalSteps">Step Totali RA</system:String>
+    <system:String x:Key="decTotalSteps">Step Totali Dec</system:String>
+    <system:String x:Key="raWormTeeth">Denti vite RA</system:String>
+    <system:String x:Key="decWormTeeth">Denti vite Dec</system:String>
+    <system:String x:Key="raTrackingOffset">Offset Tracciamento RA</system:String>
+    <system:String x:Key="decTrackingOffset">Offset Tracciamento Dec</system:String>
+    <system:String x:Key="gearingConnect">Riconnetti per applicare i cambiamenti</system:String>
+    <system:String x:Key="applyGearing">Apply custom gearing?</system:String>
+    <system:String x:Key="mntWormStepsRa">Passi vite Ra:</system:String>
+    <system:String x:Key="mntWormStepsDec">Passi vite Dec:</system:String>
+    <system:String x:Key="mntCustomOffsetRa">Offset Personalizzato Ra:</system:String>
+    <system:String x:Key="mntCustomOffsetDec">Offset Personalizzato Dec:</system:String>
+    <system:String x:Key="mntFreqRa">Frequenza Ra:</system:String>
+    <system:String x:Key="mntFreqDec">Freqenza Dec:</system:String>
+
+
+    <!--1.0.3.4 -->
+    <system:String x:Key="btnReSyncEnc">Reimposta Encoders</system:String>
+    <system:String x:Key="btnReSyncHome">Posizione Encorder</system:String>
+    <system:String x:Key="btnReSyncAccept">Accetta di resettare la posizione della montatura</system:String>
+    <system:String x:Key="btnReSync">ReSync</system:String>
+    <system:String x:Key="vceSync">Sincronizzato</system:String>
+
+    <!-- 1.0.3.8 -->
+    <system:String x:Key="aliExport">Esporta</system:String>
+    <system:String x:Key="aliExportTooltip">Clicca questo bottone per esportale questo modello di puntamento.</system:String>
+    <system:String x:Key="aliImport">Importa</system:String>
+    <system:String x:Key="aliImportTooltip">Click this button import a point model that was previously exported.</system:String>
+    <system:String x:Key="aliConfirmClearAllCaption">Elimina punti di Allineamento</system:String>
+    <system:String x:Key="aliConfirmClearAllMessage">Accetta di eliminare tutti i punti di Allineamento.</system:String>
+    <system:String x:Key="aliConfirmDeleteCaption">Elimina punto di Allineamento</system:String>
+    <system:String x:Key="aliConfirmDeleteMessage">Accetta di eliminare il punto di Allineamento selezionato.</system:String>
+    <system:String x:Key="aliConfirmImportCaption">Importa punti di Allineamento</system:String>
+    <system:String x:Key="aliConfirmImportMessage">Accept to import previously saved alignment points. This will clear any existing alignment points.</system:String>
+    <system:String x:Key="aliAcceptButtonCaption">Accetta</system:String>
+    <system:String x:Key="aliCancelButtonCaption">Cancella</system:String>
+    <system:String x:Key="aliPointModelFileFilter">Point model files (*.GssPointModel)|*.GssPointModel|All files (*.*)|*.*</system:String>
+
+    <system:String x:Key="tabFocuserTooltip">Visualizza pannello focheggiatore</system:String>
+    <system:String x:Key="focuserSettings">Impostazioni Focheggiatore</system:String>
+    <system:String x:Key="focuserCloseTooltip">Chiudi pannello delle impostazioni del focheggiatore</system:String>
+    <system:String x:Key="focuserIn">Dentro</system:String>
+    <system:String x:Key="focuserOut">Fuori</system:String>
+    <system:String x:Key="focuserConnected">Connesso</system:String>
+    <system:String x:Key="focuserPosition">Posizione Corrente</system:String>
+    <system:String x:Key="focuserRefresh">Aggiorna</system:String>
+    <system:String x:Key="focuserRefreshTooltip">Aggiorna lista dei focheggiatori disponibili</system:String>
+    <system:String x:Key="focuserSetup">Setup</system:String>
+    <system:String x:Key="focuserSetupTooltip">Apri la finesta di Setup ASCOM per il focheggiatore selezionato</system:String>
+    <system:String x:Key="focuserConnect">Connetti</system:String>
+    <system:String x:Key="focuserConnectTooltip">Connetti Focheggiatore selezionato</system:String>
+    <system:String x:Key="focuserDisconnect">Disconnetti</system:String>
+    <system:String x:Key="focuserDisconnectTooltip">Disconnetti Focheggiatore</system:String>
+    <system:String x:Key="focuserStepSizeHint">Dimensione Passo</system:String>
+    <system:String x:Key="focuserStepSizeTooltip">The focuser position increment for each button press</system:String>
+    <system:String x:Key="focuserSelectTooltip">Seleziona Focheggiatore da connettere</system:String>
+    <system:String x:Key="focuserSelectHint">Focheggiatore</system:String>
+
+    <system:String x:Key="focuserReverseDirectionTooltip">Spunta questo riquadro per invertira la direzione quando premi i bottoni.</system:String>
+    <system:String x:Key="focuserReverseDirection">Inverti Direzione</system:String>
+
+    <!--1.0.4.2 -->
+    <system:String x:Key="mntPolarLed">LED Polare:</system:String>
+    <system:String x:Key="skyPolarLedLevel">Luminosità LED Polare</system:String>
+    <system:String x:Key="optAllowBeeps">Beep</system:String>
+    <system:String x:Key="optFreq">Frequenza</system:String>
+    <system:String x:Key="optDur">Durata</system:String>
+
+    <!--1.0.4.3 -->
+    <system:String x:Key="optUI">UI</system:String>
+    <system:String x:Key="lbEast">Est</system:String>
+    <system:String x:Key="lbWest">Ovest</system:String>
+    <system:String x:Key="lbNorth">Nord</system:String>
+    <system:String x:Key="lbSouth">Sud</system:String>
+    <system:String x:Key="lbOptics">Ottiche</system:String>
+    <system:String x:Key="RbNone">Nessuno</system:String>
+    <system:String x:Key="RbAltAz">AltAz</system:String>
+    <system:String x:Key="RbRaDec">RaDec</system:String>
+    <system:String x:Key="Rb3D">3D</system:String>
+    <system:String x:Key="lbAz">Az</system:String>
+    <system:String x:Key="lbAlt">Alt</system:String>
+
+    <!--1.0.4.7 -->
+    <system:String x:Key="gpsDecimals">Inserisci i decimali</system:String>
+    <system:String x:Key="InvCord">Coordinata non valida</system:String>
+
+    <!--1.0.4.8 -->
+    <system:String x:Key="skyFlipAng">Angolo di ribaltamento (liv)</system:String>
+    <system:String x:Key="lbAxisTrackingLimit">Limite di tracciabilità (liv)</system:String>
+    <system:String x:Key="mntCap">Capacità:</system:String>
+    <system:String x:Key="mntAdv">Avanzate:</system:String>
+</ResourceDictionary>
+ 
