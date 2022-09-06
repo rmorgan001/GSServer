@@ -38,5 +38,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="chtViewLog">Visualizza Log</system:String>
     <system:String x:Key="chtZoom">Zoom:</system:String>
     <system:String x:Key="chtNoValidRecords">Registrazioni non valide</system:String>
+
+    <system:String x:Key="optLanguage">Lingua</system:String>
 </ResourceDictionary>
  

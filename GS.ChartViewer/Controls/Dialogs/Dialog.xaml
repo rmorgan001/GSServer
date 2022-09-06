@@ -10,9 +10,7 @@
             <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <TextBlock VerticalAlignment="Center" Margin="5 0" xml:space="preserve" 
-                   Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"  
-                   Text="{Binding DialogMsg}"/>
+        <TextBlock VerticalAlignment="Center" Margin="5 0" xml:space="preserve" Text="{Binding DialogMsg}"/>
         <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center"
                     Margin="0 16 0 0">
             <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}" 

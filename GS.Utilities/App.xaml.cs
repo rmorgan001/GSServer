@@ -52,7 +52,7 @@ namespace GS.Utilities
         {
             if (!createdNew) return;
             base.OnStartup(e);
-            Languages.SetLanguageDictionary(false, LanguageApp.GSUtilities);
+            Languages.SetLanguageDictionary(false, LanguageApp.GSUtilities, Utilities.Properties.Utilities.Default.Language);
         }
 
         #region Dispose

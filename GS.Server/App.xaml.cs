@@ -62,7 +62,7 @@ namespace GS.Server
                 RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
             }
             base.OnStartup(e);
-            Languages.SetLanguageDictionary(false, LanguageApp.GSServer);
+            Languages.SetLanguageDictionary(false, LanguageApp.GSServer, Shared.Settings.Language);
             var app = new MainWindow();
             var context = new MainWindowVM();
             app.DataContext = context;

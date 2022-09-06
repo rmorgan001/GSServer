@@ -36,7 +36,7 @@ namespace GS.Shared
             _categoryCheckList = new List<MonitorCategory>();
             _typesCheckList = new List<MonitorType>();
             _deviceCheckList = new List<MonitorDevice>();
-            Settings.Load();
+            //Settings.Load();
             Load_Settings();
         }
 

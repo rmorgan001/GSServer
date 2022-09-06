@@ -44,5 +44,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="chtViewLog">View Log</system:String>
     <system:String x:Key="chtZoom">Zoom:</system:String>
     <system:String x:Key="chtNoValidRecords">No valid records found</system:String>
+
+    <system:String x:Key="optLanguage">Languages</system:String>
 </ResourceDictionary>
  

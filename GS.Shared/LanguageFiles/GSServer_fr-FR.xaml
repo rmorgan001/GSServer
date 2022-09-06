@@ -467,7 +467,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="optMonitorSettings">Moniteur</system:String>
     <system:String x:Key="optSettings">Réinitialisation des préférences</system:String>
     <system:String x:Key="optReset">Reset</system:String>
-    <system:String x:Key="optLanguage">Languages</system:String>
+    <system:String x:Key="optLanguage">Langages</system:String>
     <system:String x:Key="optHardware">Acceleration Off</system:String>
     <system:String x:Key="optRender">Capacités de rendu</system:String>
     <system:String x:Key="optUTCOffset">Décalage UTC</system:String>

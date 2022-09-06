@@ -61,5 +61,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="utilBaudRate">BaudRate</system:String>
     <system:String x:Key="utilInterval">Intervalle</system:String>
     <system:String x:Key="utilNotFound">Non trouvé</system:String>
+
+    <system:String x:Key="optLanguage">Langages</system:String>
 </ResourceDictionary>
  

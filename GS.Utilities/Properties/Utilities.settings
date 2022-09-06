@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="GS.Cleaner.Properties" GeneratedClassName="Cleaner">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="GS.Utilities.Properties" GeneratedClassName="Utilities">
   <Profiles />
   <Settings>
     <Setting Name="WindowState" Type="System.Windows.WindowState" Scope="User">
@@ -19,6 +19,9 @@
     </Setting>
     <Setting Name="Version" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Language" Type="System.String" Scope="User">
+      <Value Profile="(Default)">en-US</Value>
     </Setting>
   </Settings>
 </SettingsFile>

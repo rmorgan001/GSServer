@@ -37,18 +37,35 @@ namespace GS.Shared
         {
             var langs = new List<string>(){ "en-US","fr-FR","it-IT" };
             SupportedLanguages = langs;
+            Settings.Load();
         }
-        public static void SetLanguageDictionary(bool local, LanguageApp app)
+        public static void SetLanguageDictionary(bool local, LanguageApp app, string language)
         {
-            if (local)
-            {
-                SetLanguageDictionary(Thread.CurrentThread.CurrentCulture.ToString(), app);
-            }
-            else
-            {
-                var lang = Settings.Language;
-                SetLanguageDictionary(DoesCultureExist(lang) ? lang : "en-US", app);
-            }
+             if (local)
+             {
+                 SetLanguageDictionary(Thread.CurrentThread.CurrentCulture.ToString(), app);
+             }
+             else
+             {
+                 string lang;
+                 switch (app)
+                 {
+                     case LanguageApp.GSServer:
+                         lang = Settings.Language;
+                         break;
+                     case LanguageApp.GSChartViewer:
+                         lang = language;
+                         break;
+                     case LanguageApp.GSUtilities:
+                         lang = language;
+                         break;
+                     default:
+                         lang = "en-US";
+                         break;
+                 }
+                
+                 SetLanguageDictionary(DoesCultureExist(lang) ? lang : "en-US", app);
+             }
         }
         private static bool DoesCultureExist(string cultureName)
         {

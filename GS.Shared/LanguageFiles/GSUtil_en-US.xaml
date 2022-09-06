@@ -65,5 +65,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="utilInterval">Interval</system:String>
     <system:String x:Key="utilNotFound">Not found</system:String>
 
+    <system:String x:Key="optLanguage">Languages</system:String>
+
 </ResourceDictionary>
  

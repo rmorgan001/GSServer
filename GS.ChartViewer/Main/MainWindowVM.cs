@@ -113,6 +113,18 @@ namespace GS.ChartViewer.Main
             }
         }
 
+        public List<string> Languages => Shared.Languages.SupportedLanguages;
+
+        public string Lang
+        {
+            get => Properties.ChartViewer.Default.Language;
+            set
+            {
+                Properties.ChartViewer.Default.Language = value;
+                OnPropertyChanged();
+                OpenDialog("Restart Needed");
+            }
+        }
 
         #endregion
 
@@ -878,7 +890,6 @@ namespace GS.ChartViewer.Main
             get => _starDateTicks;
             set
             {
-                if (Math.Abs(_starDateTicks - value) < 0) return;
                 _starDateTicks = value;
                 OnPropertyChanged();
             }
@@ -890,7 +901,6 @@ namespace GS.ChartViewer.Main
             get => _endDateTicks;
             set
             {
-                if (Math.Abs(_endDateTicks - value) < 0) return;
                 _endDateTicks = value;
                 OnPropertyChanged();
             }

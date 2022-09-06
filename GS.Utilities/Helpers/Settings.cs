@@ -45,12 +45,27 @@ namespace GS.Utilities.Helpers
             }
         }
 
+        private static string _language;
+        public static string Language
+        {
+            get => _language;
+            set
+            {
+                if (_language == value) return;
+                _language = value;
+                Properties.Utilities.Default.Language = value;
+                //LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         #region Methods
 
         public static void Load()
         {
             Upgrade();
             //ThirdColor = Properties.LogView.Default.ThirdColor;
+            Language = Properties.Utilities.Default.Language;
 
         }
 

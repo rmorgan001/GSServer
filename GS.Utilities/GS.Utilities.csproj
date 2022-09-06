@@ -86,6 +86,19 @@
     <Resource Include="greenswamp1.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Properties\Utilities.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Utilities.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\Utilities.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Utilities.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="Controls\Dialogs\TwoButtonMessageDialog.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>

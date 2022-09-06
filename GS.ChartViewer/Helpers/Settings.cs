@@ -45,13 +45,27 @@ namespace GS.ChartViewer.Helpers
             }
         }
 
+        private static string _language;
+        public static string Language
+        {
+            get => _language;
+            set
+            {
+                if (_language == value) return;
+                _language = value;
+                Properties.ChartViewer.Default.Language = value;
+                //LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         #region Methods
 
         public static void Load()
         {
             Upgrade();
             //ThirdColor = Properties.LogView.Default.ThirdColor;
-
+            Language = Properties.ChartViewer.Default.Language;
         }
 
         private static void Upgrade()

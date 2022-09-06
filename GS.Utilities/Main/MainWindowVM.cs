@@ -84,6 +84,19 @@ namespace GS.Utilities.Main
             }
         }
 
+        public List<string> Languages => Shared.Languages.SupportedLanguages;
+
+        public string Lang
+        {
+            get => Properties.Utilities.Default.Language;
+            set
+            {
+                Properties.Utilities.Default.Language = value;
+                OnPropertyChanged();
+                OpenDialog("Restart Needed");
+            }
+        }
+
         #endregion
 
         #region Methods

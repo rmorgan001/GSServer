@@ -59,14 +59,24 @@
                         <RowDefinition Height="300"/>
                         <RowDefinition />
                     </Grid.RowDefinitions>
-                    <Grid Grid.Row="0" Grid.Column="0" >
-                        <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18"  Foreground="{DynamicResource PrimaryHueMidBrush}">Settings</Label>
-                        <ToggleButton DockPanel.Dock="Top" HorizontalAlignment="Right" Margin="5" 
+                            <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18"  Foreground="{DynamicResource PrimaryHueMidBrush}">Settings</Label>
+                            <ToggleButton Grid.Row="0" Grid.Column="0" DockPanel.Dock="Top" HorizontalAlignment="Right" Margin="5" 
                                           Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
                                           Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
                                           CommandParameter="{x:Static Dock.Left}"
                                           IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"/>
-                        </Grid>
+                            <StackPanel Grid.Row="1" Grid.Column="0">
+                                <ComboBox Margin="20" md:HintAssist.Hint="{StaticResource optLanguage}" MinWidth="10" HorizontalAlignment="Left" ItemsSource="{Binding Languages}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource optLanguage}">
+                                        <ComboBox.Text>
+                                            <Binding Path="Lang" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
+                                        </ComboBox.Text>
+                                        <ComboBox.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <VirtualizingStackPanel />
+                                            </ItemsPanelTemplate>
+                                        </ComboBox.ItemsPanel>
+                                    </ComboBox>
+                            </StackPanel>
                     </Grid>
                 </md:DrawerHost.LeftDrawerContent>
                 <Grid>
