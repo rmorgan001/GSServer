@@ -272,6 +272,8 @@ namespace GS.SkyWatcher
                         aplyRate = Constant.SiderealRate / 1000.0;   // assign a number so mount looks like it's stopped
                     }
 
+                    if (_pPecOn && AlternatingPPec) { SetPPec(AxisId.Axis1, false); } // implements the alternating pPEC 
+
                     // Change speed of the R.A. axis
                     if (_commands.SupportAdvancedCommandSet)
                     {
@@ -280,9 +282,6 @@ namespace GS.SkyWatcher
                     else
                     {
                         var speedInt = CalculateSpeed(AxisId.Axis1, aplyRate);  // Calculate mount speed  
-
-                        if (_pPecOn && AlternatingPPec) { SetPPec(AxisId.Axis1, false); } // implements the alternating pPEC 
-
                         _commands.SetStepSpeed(AxisId.Axis1, speedInt); // :I Send pulse to axis
                     }
 
@@ -297,10 +296,9 @@ namespace GS.SkyWatcher
                         while (sw1.Elapsed.TotalMilliseconds < raspan) { Thread.Sleep(1); } // loop while counting to duration
                     }
 
-                    // Restore sidereal rate tracking
+                    // Restore rate tracking
                     if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
                     {
-                        //_commands.AxisSlew_Advanced(AxisId.Axis1, 2 * Math.PI / 86164);
                         _commands.AxisSlew_Advanced(AxisId.Axis1, _trackingSpeeds[0]);
                     }
                     else
@@ -331,7 +329,6 @@ namespace GS.SkyWatcher
                         if (stepsNeeded < 1 || duration < MinPulseDurationDec)
                         {
                             SkyQueue.IsPulseGuidingDec = false;
-
                             if (!MonitorPulse) return;
                             pulseEntry.Rejected = true;
                             MonitorLog.LogToMonitor(pulseEntry);
@@ -362,17 +359,14 @@ namespace GS.SkyWatcher
                         if (backlashSteps > 0) // Convert lash to extra pulse duration in milliseconds
                         {
                             var lashduration = Convert.ToInt32(backlashSteps / _stepsPerSecond[1] / 3600 / Math.Abs(guideRate) * 1000);
-                            if (lashduration > 1000)
-                            {
-                                lashduration = 1000;
-                            } // PHD will error if pulse doesn't return within 2 seconds.
+                            // PHD will error if pulse doesn't return within 2 seconds.
+                            if (lashduration > 1000){lashduration = 1000;} 
                             duration += lashduration; // add the lash time to duration
                         }
 
                         if (duration < MinPulseDurationDec)
                         {
                             SkyQueue.IsPulseGuidingDec = false;
-
                             if (!MonitorPulse) { return; }
                             pulseEntry.Rejected = true;
                             MonitorLog.LogToMonitor(pulseEntry);
@@ -380,9 +374,7 @@ namespace GS.SkyWatcher
                         }
 
                         AxisSlew(AxisId.Axis2, guideRate); // Send pulse to axis 
-
-                          pulseEntry.StartTime = _commands.LastJ2RunTime; // last :J2 start time
-
+                        pulseEntry.StartTime = _commands.LastJ2RunTime; // last :J2 start time
                         var decPulseTime = Principles.HiResDateTime.UtcNow - pulseEntry.StartTime; // possible use for min pulse duration time
                         var decspan = duration - decPulseTime.TotalMilliseconds;
 
