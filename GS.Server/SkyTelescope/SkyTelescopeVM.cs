@@ -2786,31 +2786,62 @@ namespace GS.Server.SkyTelescope
                     var status = ImageManager.LoadImage(filename, out var headerData);
                     if (status != 0){return;}
 
+                    string msg = null;
+                    var vra = double.NaN;
+                    var vdec = double.NaN;
+
                     var hra = headerData.GetItemByKeyName("RA");
                     var hdec = headerData.GetItemByKeyName("DEC");
-
-                    if (hra == null || hdec == null)
+                    if (hra != null && hdec != null)
                     {
-                        OpenDialog($"{Application.Current.Resources["msgKey"]}", $"{Application.Current.Resources["exError"]}");
+                        var resultra = double.TryParse(hra.Value, out vra);
+                        var resultdec = double.TryParse(hdec.Value, out vdec);
+                        if (!resultra || !resultdec)
+                        {
+                            msg = $"RA/DEC {Application.Current.Resources["msgValue"]}";
+                        }
+                    }
+                    else
+                    {
+                        msg = $"RA/DEC {Application.Current.Resources["msgKey"]}";
+                    }
+
+                    if (msg != null)
+                    {
+                        var hcr1 = headerData.GetItemByKeyName("CRVAL1");
+                        var hcr2 = headerData.GetItemByKeyName("CRVAL2");
+                        if (hcr1 != null && hcr2 != null)
+                        {
+                            var resultra = double.TryParse(hcr1.Value, out vra);
+                            var resultdec = double.TryParse(hcr2.Value, out vdec);
+                            if (!resultra || !resultdec)
+                            {
+                                msg = $"CRVAL1/CRVAL2 {Application.Current.Resources["msgValue"]}";
+                            }
+                            else
+                            {
+                                msg = null;
+                            }
+                        }
+                        else
+                        {
+                            msg = $"CRVAL1/CRVAL2 {Application.Current.Resources["msgKey"]}";
+                        }
+                    }
+                     
+                    if (msg != null)
+                    {
+                        OpenDialog(msg, $"{Application.Current.Resources["exError"]}");
                         return;
                     }
 
-                    var resultra = double.TryParse(hra.Value, out var vra);
-                    var resultdec = double.TryParse(hdec.Value, out var vdec);
-
-                    if (!resultra || !resultdec)
-                    {
-                        OpenDialog($"{Application.Current.Resources["msgValue"]}", $"{Application.Current.Resources["exError"]}");
-                        return;
-                    }
-
-                    var ra = _util.HoursToHMS(vra, ":", ":", ":", 3);
+                    var ra = _util.DegreesToHMS(vra, ":",":",":", 3);
                     var ras = ra.Split(':');
                     RaHours = Convert.ToDouble(ras[0]);
                     RaMinutes = Convert.ToDouble(ras[1]);
                     RaSeconds = Convert.ToDouble(ras[2]);
 
-                    var dec = _util.HoursToHMS(vdec, ":", ":", ":", 3);
+                    var dec = _util.DegreesToDMS(vdec,":",":",":",3);
                     var decs = dec.Split(':');
                     DecDegrees = Convert.ToDouble(decs[0]);
                     DecMinutes = Convert.ToDouble(decs[1]);
@@ -2831,7 +2862,6 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                SkyServer.AlertState = true;
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
