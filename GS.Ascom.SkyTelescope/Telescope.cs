@@ -926,8 +926,12 @@ namespace ASCOM.GS.Sky.Telescope
 
                 if (!SkyServer.AsComOn) { throw new InvalidOperationException("Not accepting commands"); }
                 if (SkyServer.AtPark) { throw new ParkedException(); }
-                if (SkyServer.IsSlewing) { throw new InvalidOperationException("Pulse rejected when slewing"); }
-                if (!SkyServer.Tracking) { throw new InvalidOperationException("Pulse rejected when tracking is off"); }
+
+                //if (SkyServer.IsSlewing) { throw new InvalidOperationException("Pulse rejected when slewing"); }
+                //if (!SkyServer.Tracking) { throw new InvalidOperationException("Pulse rejected when tracking is off"); }
+                if (SkyServer.IsSlewing) { throw new InvalidValueException("Pulse rejected when slewing"); }
+                if (!SkyServer.Tracking) { throw new InvalidValueException("Pulse rejected when tracking is off"); }
+
                 CheckCapability(SkySettings.CanPulseGuide, "PulseGuide");
                 CheckRange(Duration, 0, 30000, "PulseGuide", "Duration");
                 SkyServer.PulseGuide(Direction, Duration);
@@ -1411,7 +1415,8 @@ namespace ASCOM.GS.Sky.Telescope
             {
                 CheckCapability(SkySettings.CanSlew, "TargetDeclination", false);
                 CheckRange(SkyServer.TargetDec, -90, 90, "TargetDeclination");
-                var r = SkyServer.TargetDec;
+                //var r = SkyServer.TargetDec;
+                var r = Transforms.DecToCoordType(SkyServer.TargetRa, SkyServer.TargetDec);
 
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{r}" };
@@ -1429,7 +1434,8 @@ namespace ASCOM.GS.Sky.Telescope
 
                 CheckCapability(SkySettings.CanSlew, "TargetDeclination", true);
                 CheckRange(value, -90, 90, "TargetDeclination");
-                var ra = SkyServer.TargetRa;
+                //var ra = SkyServer.TargetRa;
+                var ra = TargetRightAscension;
                 if (double.IsNaN(ra)) ra = RightAscension;
                 var radec = Transforms.CoordTypeToInternal(ra, value);
                 SkyServer.TargetDec = radec.Y;
@@ -1442,7 +1448,8 @@ namespace ASCOM.GS.Sky.Telescope
             {
                 CheckCapability(SkySettings.CanSlew, "TargetRightAscension", false);
                 CheckRange(SkyServer.TargetRa, 0, 24, "TargetRightAscension");
-                var r = SkyServer.TargetRa;
+                //var r = SkyServer.TargetRa;
+                var r = Transforms.RaToCoordType(SkyServer.TargetRa, SkyServer.TargetDec);
 
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{r}" };
@@ -1460,7 +1467,8 @@ namespace ASCOM.GS.Sky.Telescope
 
                 CheckCapability(SkySettings.CanSlew, "TargetRightAscension", true);
                 CheckRange(value, 0, 24, "TargetRightAscension");
-                var dec = SkyServer.TargetDec;
+                //var dec = SkyServer.TargetDec;
+                var dec = TargetDeclination;
                 if (double.IsNaN(dec)) dec = Declination;
                 var radec = Transforms.CoordTypeToInternal(value, dec);
                 SkyServer.TargetRa = radec.X;

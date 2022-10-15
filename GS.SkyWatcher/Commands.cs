@@ -389,7 +389,8 @@ namespace GS.SkyWatcher
                 _axisVersion[1] = r;
             }
 
-            SupportAdvancedCommandSet = r > 0x032200;
+            const int a = 0x032200; //205312
+            SupportAdvancedCommandSet = r > a;
 
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"e:|{axis}|{response}|{_axisStringVersion[(int)axis]}|Advanced:{SupportAdvancedCommandSet}" };
