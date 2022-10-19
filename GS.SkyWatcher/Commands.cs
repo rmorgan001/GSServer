@@ -392,6 +392,10 @@ namespace GS.SkyWatcher
             const int a = 0x032200; //205312
             SupportAdvancedCommandSet = r > a;
 
+            // SW recommends no support for single axis trackers 0x07, 0x08, 0x0A, and 0x0F
+            //"Star Adventurer Mount" advanced firmware 3.130.07 exclude
+            if (r == 0x038207){SupportAdvancedCommandSet = false;}
+
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"e:|{axis}|{response}|{_axisStringVersion[(int)axis]}|Advanced:{SupportAdvancedCommandSet}" };
             MonitorLog.LogToMonitor(monitorItem);
