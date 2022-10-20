@@ -20,6 +20,9 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>Resources\ASCOM.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="WindowsBase" />
   </ItemGroup>
