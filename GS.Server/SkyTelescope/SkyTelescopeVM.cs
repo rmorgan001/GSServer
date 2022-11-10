@@ -199,7 +199,8 @@ namespace GS.Server.SkyTelescope
                         break;
                     case FrontGraphic.Model3D:
                         Rotate();
-                        OpenResetView();
+                        //OpenResetView();
+                        LoadGEM();
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(value), value, null);
