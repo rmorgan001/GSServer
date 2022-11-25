@@ -16,6 +16,7 @@
 using GS.Shared;
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.IO.Ports;
 using System.Reflection;
@@ -264,12 +265,26 @@ namespace GS.SkyWatcher
             string response;
             if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
-                response = CmdToMount(axis, 'X', "0002");    // Read 32-bit axis resolution
-                var gearRatio = int.Parse(response.Substring(1, 8), System.Globalization.NumberStyles.HexNumber);
+                response = CmdToMount(axis, 'X', "0002");    //0x02（’02’）: Resolution of the axis (Counts per revolution)
+                var gearRatio = StringToInt(response.Substring(1, 8));
 
-                _mount360Steps[0] = gearRatio;
-                if (_customMount360Steps[1] > 0) { gearRatio = _customMount360Steps[1]; } //Setup for custom :a
-                _axisGearRatios[1] = gearRatio;
+                //var a = StringToLong("=00B289");
+
+                switch (axis)
+                {
+                    case AxisId.Axis1:
+                        _mount360Steps[0] = gearRatio;
+                        if (_customMount360Steps[0] > 0) { gearRatio = _customMount360Steps[0]; } //Setup for custom :a
+                        _axisGearRatios[0] = gearRatio;
+                        break;
+                    case AxisId.Axis2:
+                        _mount360Steps[1] = gearRatio;
+                        if (_customMount360Steps[1] > 0) { gearRatio = _customMount360Steps[1]; } //Setup for custom :a
+                        _axisGearRatios[1] = gearRatio;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
+                }
 
                 _factorRadToStep[(int)axis] = gearRatio / (2 * Math.PI);
                 _factorStepToRad[(int)axis] = 2 * Math.PI / gearRatio;
@@ -489,8 +504,8 @@ namespace GS.SkyWatcher
         {
             if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
-                var response = CmdToMount(axis, 'X', "0003");    // Read 32-bit axis position
-                var iPosition = int.Parse(response.Substring(1, 8), System.Globalization.NumberStyles.HexNumber);
+                var response = CmdToMount(axis, 'X', "0003");    // 0x03（’03’）: Position reading of the axis
+                var iPosition = StringToInt(response.Substring(1, 8));
                 _positions[(int)axis] = StepToAngle(axis, iPosition);
                 return _positions[(int)axis];
             }
@@ -542,11 +557,11 @@ namespace GS.SkyWatcher
         {
             if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
-                var response = CmdToMount(axis, 'X', "0003");    // Read 32-bit axis position
+                var response = CmdToMount(axis, 'X', "0003");    // 0x03（’03’）: Position reading of the axis
                 if (string.IsNullOrEmpty(response)) return double.NaN;
                 try
                 {
-                    var iPosition = int.Parse(response.Substring(1, 8), System.Globalization.NumberStyles.HexNumber);
+                    var iPosition = StringToInt(response.Substring(1, 8));
                     _positions[(int)axis] = StepToAngle(axis, iPosition);
                     return _positions[(int)axis];
                 }
@@ -590,9 +605,9 @@ namespace GS.SkyWatcher
             {
                 if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
                 {
-                    var response = CmdToMount(axis, 'X', "0003");    // Read 32-bit axis position
+                    var response = CmdToMount(axis, 'X', "0003");    // 0x03（’03’）: Position reading of the axis
                     if (string.IsNullOrEmpty(response)) return double.NaN;
-                    var iPosition = int.Parse(response.Substring(1, 8), System.Globalization.NumberStyles.HexNumber);
+                    var iPosition = StringToInt(response.Substring(1, 8));
                     return iPosition;
                 }
                 else
@@ -622,8 +637,8 @@ namespace GS.SkyWatcher
         {
             if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
-                var response = CmdToMount(axis, 'X', "0003");    // Read 32-bit axis position
-                var iPosition = int.Parse(response.Substring(1, 8), System.Globalization.NumberStyles.HexNumber);
+                var response = CmdToMount(axis, 'X', "0003");    // 0x03（’03’）: Position reading of the axis
+                var iPosition = StringToInt(response.Substring(1, 8));
                 return iPosition;
             }
             else
@@ -645,10 +660,10 @@ namespace GS.SkyWatcher
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>  
         internal long GetHomePosition(AxisId axis)
         {
-            if (SupportAdvancedCommandSet)
+            if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
-                var response = CmdToMount(axis, 'X', "000B");    // Read 32-bit axis home position
-                var position = int.Parse(response.Substring(1, 8), System.Globalization.NumberStyles.HexNumber);
+                var response = CmdToMount(axis, 'X', "000B");    // Read 32-bit axis home index position
+                var position = StringToInt(response.Substring(1, 8));
                 return position;
             }
             else
@@ -700,8 +715,8 @@ namespace GS.SkyWatcher
 
             if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
-                var response = CmdToMount(axis, 'X', "000E");    // Read 32-bit worm resolution
-                var pecPeriod = (double)int.Parse(response.Substring(1, 8), System.Globalization.NumberStyles.HexNumber);
+                var response = CmdToMount(axis, 'X', "000E");    // Read 32-bit Resolution of the worm(Counts per revolution)
+                var pecPeriod = (double)StringToInt(response.Substring(1, 8));
                 var ax = (int)axis;
                 if (_customRaWormSteps[ax] > 0) { pecPeriod = _customRaWormSteps[ax]; } // Setup custom mount worm steps
                 _peSteps[ax] = pecPeriod;
@@ -898,7 +913,15 @@ namespace GS.SkyWatcher
         /// <param name="on"></param>
         internal string SetSnapPort(AxisId axis, bool on)
         {
-            var response = CmdToMount(axis, 'O', on ? "1" : "0");
+            string response;
+            if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
+            {
+                response = CmdToMount(axis, 'X', on ? "00" : "01");
+            }
+            else
+            {
+                response = CmdToMount(axis, 'O', on ? "1" : "0");
+            }
             return response;
         }
 
@@ -1041,7 +1064,7 @@ namespace GS.SkyWatcher
         /// <param name="rateInRadian">rate in radian / second</param>
         internal void AxisSlew_Advanced(AxisId axis, double rateInRadian)
         {
-            Int64 irateInSteps = AngleToStep(axis, rateInRadian * 1024);
+            var irateInSteps = AngleToStep(axis, rateInRadian * 1024);
 
             var szCmd = "02" + irateInSteps.ToString("X16");
             CmdToMount(axis, 'X', szCmd);
@@ -1371,7 +1394,7 @@ namespace GS.SkyWatcher
                             if (command == 'q') subdata = "=000000";
                             break;
                         case "!0":
-                            errormsg = "Invalid Command: Command doesn't apply to the model";
+                            errormsg = "Unknown Command: Command doesn't apply to the model";
                             switch (command)
                             {
                                 case 'q':
@@ -1410,6 +1433,12 @@ namespace GS.SkyWatcher
                         case "!8":
                             errormsg = "Invalid pPEC model";
                             subdata = "!8";
+                            break;
+                        case "!9":
+                            errormsg = "Invalid Command";
+                            break;
+                        case "!A":
+                            errormsg = "Extra following data overtime";
                             break;
                         default:
                             errormsg = "Code Not Found";
@@ -1491,7 +1520,7 @@ namespace GS.SkyWatcher
                 long value = 0;
                 for (var i = 1; i + 1 < str.Length; i += 2)
                 {
-                    value += (long)(int.Parse(str.Substring(i, 2), System.Globalization.NumberStyles.AllowHexSpecifier) * Math.Pow(16, i - 1));
+                    value += (long)(int.Parse(str.Substring(i, 2), NumberStyles.AllowHexSpecifier) * Math.Pow(16, i - 1));
                 }
                 return value;
             }
@@ -1542,6 +1571,35 @@ namespace GS.SkyWatcher
             //var a = (long)(angleInRad * _factorRadToStep[(int)axis]);
             var a = (long)Math.Floor(angleInRad * _factorRadToStep[(int)axis]);
             return a;
+        }
+
+        /// <summary>
+        /// Converts hex response to integer for new advanced command set
+        /// </summary>
+        /// <notes>
+        /// The stepper motor driver IC runs in 256 micro-step, while the previous motor board runs in 64 micro-step.
+        /// Since the CPR value is larger than a 24-bit integer, we have to cheat the host in the old command set.
+        /// </notes>
+        private static int StringToInt(string response)
+        {
+            try
+            {
+                //int.Parse(response.Substring(1, 8), System.Globalization.NumberStyles.HexNumber);
+                var parsed = int.Parse(response, NumberStyles.HexNumber);
+                var a = parsed / 4;
+
+                //var b = int.Parse("00B289", NumberStyles.HexNumber);
+
+                return a;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{response}|{ex.Message}|{ex.StackTrace}" };
+                MonitorLog.LogToMonitor(monitorItem);
+                throw;
+            }
+
         }
 
         #endregion
