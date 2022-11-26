@@ -70,7 +70,6 @@ namespace GS.Shared
                     axes[1] = southernHemisphere ? Math.Round(ay - 180, 3) : Math.Round(ay * -1.0, 3);
                     break;
                 case "SkyWatcher":
-                case "AstroEQ":
                     axes[0] = Math.Round(ax, 3);
                     axes[1] = Math.Round(ay - 180, 3);
                     break;

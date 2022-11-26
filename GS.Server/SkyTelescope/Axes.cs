@@ -69,7 +69,6 @@ namespace GS.Server.SkyTelescope
                     }
                     break;
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     if (SkyServer.SouthernHemisphere)
                     {
                         a[0] = 180 - a[0];
@@ -114,7 +113,6 @@ namespace GS.Server.SkyTelescope
 
                     break;
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     if (SkyServer.SouthernHemisphere)
                     {
                         a[0] = a[0] * -1.0;

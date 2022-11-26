@@ -1851,7 +1851,6 @@ namespace ASCOM.GS.Sky.Telescope
                     delay += SkySettings.DisplayInterval;
                     break;
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     delay += 20;  // some go tos have been off .10 to .70 seconds, not sure exactly why
                     delay += SkySettings.DisplayInterval;
                     break;

@@ -438,7 +438,6 @@ namespace GS.Server.SkyTelescope
                         _ = new CmdRate(0, Axis.Axis1, _rateRaDec.X);
                         break;
                     case MountType.SkyWatcher:
-                    case MountType.AstroEQ:
                         var rate = GetSlewRate();
                         _ = new SkyAxisSlew(0, AxisId.Axis1, rate.X);
                         break;
@@ -564,7 +563,6 @@ namespace GS.Server.SkyTelescope
                         _mountRunning = MountQueue.IsRunning;
                         break;
                     case MountType.SkyWatcher:
-                    case MountType.AstroEQ:
                         _mountRunning = SkyQueue.IsRunning;
                         break;
                 }
@@ -822,7 +820,6 @@ namespace GS.Server.SkyTelescope
                         _ = new CmdRateAxis(0, Axis.Axis2, _rateAxes.Y);
                         break;
                     case MountType.SkyWatcher:
-                    case MountType.AstroEQ:
                         var rate = GetSlewRate();
                         _ = new SkyAxisSlew(0, AxisId.Axis2, rate.Y);
                         break;
@@ -875,7 +872,6 @@ namespace GS.Server.SkyTelescope
                         _ = new CmdRateAxis(0, Axis.Axis1, _rateAxes.X);
                         break;
                     case MountType.SkyWatcher:
-                    case MountType.AstroEQ:
                         var rate = GetSlewRate();
                         _ = new SkyAxisSlew(0, AxisId.Axis1, rate.X);
                         break;
@@ -913,7 +909,6 @@ namespace GS.Server.SkyTelescope
                         _ = new CmdRate(0, Axis.Axis2, _rateRaDec.Y);
                         break;
                     case MountType.SkyWatcher:
-                    case MountType.AstroEQ:
                         var rate = GetSlewRate();
                         _ = new SkyAxisSlew(0, AxisId.Axis1, rate.X);
                         break;
@@ -1451,7 +1446,6 @@ namespace GS.Server.SkyTelescope
             switch (SkySettings.Mount)
             {
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     break;
                 case MountType.Simulator:
                     switch (taskName)
@@ -1921,7 +1915,6 @@ namespace GS.Server.SkyTelescope
                 case MountType.Simulator:
                     break;
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     switch (taskName)
                     {
                         case MountTaskName.AllowAdvancedCommandSet:
@@ -2230,7 +2223,6 @@ namespace GS.Server.SkyTelescope
                     SimTasks(MountTaskName.StopAxes);
                     break;
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     SkyTasks(MountTaskName.StopAxes);
                     break;
                 default:
@@ -2284,7 +2276,6 @@ namespace GS.Server.SkyTelescope
                         returncode2 = await Task.Run(() => autosim.StartAutoHome(Axis.Axis2, degreeLimit, offSetDec));
                         break;
                     case MountType.SkyWatcher:
-                    case MountType.AstroEQ:
                         var autossky = new AutoHomeSky();
                         returncode1 = await Task.Run(() => autossky.StartAutoHome(AxisId.Axis1, degreeLimit));
                         AutoHomeProgressBar = 50;
@@ -2440,7 +2431,6 @@ namespace GS.Server.SkyTelescope
                     }
                     return false;
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     stopwatch = Stopwatch.StartNew();
                     while (stopwatch.Elapsed.TotalMilliseconds <= 5000)
                     {
@@ -2826,7 +2816,6 @@ namespace GS.Server.SkyTelescope
                     actualDegrees = (double[])MountQueue.GetCommandResult(simPositions).Result;
                     break;
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     var skyPositions = new SkyGetPositionsInDegrees(SkyQueue.NewId);
                     actualDegrees = (double[])SkyQueue.GetCommandResult(skyPositions).Result;
                     return CheckSkyErrors(skyPositions) ? null : actualDegrees;
@@ -2851,7 +2840,6 @@ namespace GS.Server.SkyTelescope
                     degrees = steps / FactorStep[axis];
                     break;
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     degrees = Principles.Units.Rad2Deg1(steps * FactorStep[axis]);
                     break;
                 default:
@@ -2877,7 +2865,6 @@ namespace GS.Server.SkyTelescope
                     steps[1] *= FactorStep[1];
                     break;
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     var skySteps = new SkyGetSteps(SkyQueue.NewId);
                     steps = (double[])SkyQueue.GetCommandResult(skySteps).Result;
                     return CheckSkyErrors(skySteps) ? new[] { double.NaN, double.NaN } : steps;
@@ -2910,7 +2897,6 @@ namespace GS.Server.SkyTelescope
                             return null;
                     }
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     switch (axis)
                     {
                         case 0:
@@ -2945,7 +2931,6 @@ namespace GS.Server.SkyTelescope
                             return null;
                     }
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     switch (axis)
                     {
                         case 0:
@@ -3036,7 +3021,6 @@ namespace GS.Server.SkyTelescope
                     returncode = await Task.Run(() => SimGoTo(target, trackingState));
                     break;
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     returncode = await Task.Run(() => SkyGoTo(target, trackingState));
                     break;
                 default:
@@ -3281,7 +3265,6 @@ namespace GS.Server.SkyTelescope
                                     change[1] = SideOfPier == PierSide.pierEast ? delta : -delta;
                                     break;
                                 case MountType.SkyWatcher:
-                                case MountType.AstroEQ:
                                     change[1] = SideOfPier == PierSide.pierEast ? -delta : delta;
                                     break;
                                 default:
@@ -3296,7 +3279,6 @@ namespace GS.Server.SkyTelescope
                                     change[1] = SideOfPier == PierSide.pierWest ? delta : -delta;
                                     break;
                                 case MountType.SkyWatcher:
-                                case MountType.AstroEQ:
                                     change[1] = SideOfPier == PierSide.pierWest ? -delta : delta;
                                     break;
                                 default:
@@ -3534,7 +3516,6 @@ namespace GS.Server.SkyTelescope
 
                     break;
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     // implement anti-backlash
                     if (Math.Abs(stepsNeededDec) > 0)
                     {
@@ -3678,7 +3659,6 @@ namespace GS.Server.SkyTelescope
 
                     break;
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     SkyHCRate = new Vector(0, 0);
                     SkyTrackingRate = new Vector(0, 0);
 
@@ -3841,7 +3821,6 @@ namespace GS.Server.SkyTelescope
                     if (!MountQueue.IsRunning) { throw new Exception("Failed to start simulator queue"); }
                     break;
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     // open serial port
                     SkySystem.ConnectSerial = false;
                     SkySystem.ConnectSerial = true;
@@ -3957,7 +3936,6 @@ namespace GS.Server.SkyTelescope
                             _ = new CmdAxisPulse(0, Axis.Axis2, decGuideRate, duration);
                             break;
                         case MountType.SkyWatcher:
-                        case MountType.AstroEQ:
                             _ = new SkyAxisPulse(0, AxisId.Axis2, decGuideRate, duration, decbacklashamount);
                             break;
                         default:
@@ -3989,7 +3967,6 @@ namespace GS.Server.SkyTelescope
                             _ = new CmdAxisPulse(0, Axis.Axis1, raGuideRate, duration);
                             break;
                         case MountType.SkyWatcher:
-                        case MountType.AstroEQ:
                             _ = new SkyAxisPulse(0, AxisId.Axis1, raGuideRate, duration);
                             break;
                         default:
@@ -4047,7 +4024,6 @@ namespace GS.Server.SkyTelescope
                     _ = new CmdAxisToDegrees(0, Axis.Axis2, position[1]);
                     break;
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     SkyTasks(MountTaskName.StopAxes);
                     _ = new SkySetAxisPosition(0, AxisId.Axis1, position[0]);
                     _ = new SkySetAxisPosition(0, AxisId.Axis2, position[1]);
@@ -4205,7 +4181,6 @@ namespace GS.Server.SkyTelescope
                     _ = new CmdAxisTracking(0, Axis.Axis1, rateChange);
                     break;
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     SkyTrackingRate.X = rateChange;
                     var rate = GetSlewRate();
                     _ = new SkyAxisSlew(0, AxisId.Axis1, rate.X);
@@ -4375,7 +4350,6 @@ namespace GS.Server.SkyTelescope
                     if (SouthernHemisphere) { alt[0] = 180 - alt[0]; }
                     break;
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     if (SouthernHemisphere)
                     {
                         alt[0] = 180 - alt[0];
@@ -4518,7 +4492,6 @@ namespace GS.Server.SkyTelescope
                         SimTasks(MountTaskName.StopAxes);
                         break;
                     case MountType.SkyWatcher:
-                    case MountType.AstroEQ:
                         SkyTasks(MountTaskName.StopAxes);
                         break;
                     default:
@@ -4561,7 +4534,6 @@ namespace GS.Server.SkyTelescope
                     SimTasks(MountTaskName.SyncAltAz);
                     break;
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     SkyTasks(MountTaskName.StopAxes);
                     SkyTasks(MountTaskName.SyncAltAz);
                     break;
@@ -4613,7 +4585,6 @@ namespace GS.Server.SkyTelescope
                     }
                     break;
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     SkyTasks(MountTaskName.StopAxes);
                     if (AlignmentModel.IsAlignmentOn)
                     {
@@ -5297,7 +5268,6 @@ namespace GS.Server.SkyTelescope
                 case MountType.Simulator:
                     break;
                 case MountType.SkyWatcher:
-                case MountType.AstroEQ:
                     if (!PecTraining)
                     {
                         PecTrainInProgress = false;
