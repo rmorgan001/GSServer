@@ -704,6 +704,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skyFlipAng">Angolo di ribaltamento (liv)</system:String>
     <system:String x:Key="lbAxisTrackingLimit">Limite di tracciabilità (liv)</system:String>
     <system:String x:Key="mntCap">Capacità:</system:String>
-    <system:String x:Key="mntAdv">Avanzate:</system:String>
+    <system:String x:Key="mntAdv">Set avanzato</system:String>
+
 </ResourceDictionary>
  

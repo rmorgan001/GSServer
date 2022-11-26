@@ -706,5 +706,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skyFlipAng">Inverser l'angle (deg)</system:String>
     <system:String x:Key="lbAxisTrackingLimit">Limite de suivi (deg)</system:String>
     <system:String x:Key="mntCap">Capacités:</system:String>
-    <system:String x:Key="mntAdv">Avancé:</system:String>
+    <system:String x:Key="mntAdv">Ensemble avancé</system:String>
+
+
 </ResourceDictionary>

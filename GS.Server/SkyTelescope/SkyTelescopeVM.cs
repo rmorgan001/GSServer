@@ -1041,6 +1041,16 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
+        public bool AllowAdvancedCommands
+        {
+            get => SkySettings.AllowAdvancedCommandSet;
+            set
+            {
+                if (value == SkySettings.AllowAdvancedCommandSet) return;
+                SkySettings.AllowAdvancedCommandSet = value;
+                OnPropertyChanged();
+            }
+        }
         public IList<string> LatitudeRangeNS { get; }
         public string Lat0
         {
