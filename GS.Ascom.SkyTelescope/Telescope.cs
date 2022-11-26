@@ -93,9 +93,12 @@ namespace ASCOM.GS.Sky.Telescope
 
             var monitorItem = new MonitorEntry
             {
-                Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server,
-                Category = MonitorCategory.Driver, Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Driver,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $" ActionName:{ActionName}, ActionParameters:'{ActionParameters}'"
             };
             MonitorLog.LogToMonitor(monitorItem);
@@ -104,7 +107,7 @@ namespace ASCOM.GS.Sky.Telescope
             {
                 // ReSharper disable once StringLiteralTypo
                 case string str when str.Equals("telescope:setparkposition", StringComparison.InvariantCultureIgnoreCase):
-                    if (SkyServer.IsMountRunning == false){throw new NotConnectedException("Mount Not Connected");}
+                    if (SkyServer.IsMountRunning == false) { throw new NotConnectedException("Mount Not Connected"); }
                     var found = SkySettings.ParkPositions.Find(x => string.Equals(x.Name, ActionParameters, StringComparison.InvariantCultureIgnoreCase));
                     if (found == null)
                     {
@@ -132,7 +135,7 @@ namespace ASCOM.GS.Sky.Telescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 // ReSharper disable once StringLiteralTypo
-                var sa = new ArrayList {@"Telescope:SetParkPosition"};
+                var sa = new ArrayList { @"Telescope:SetParkPosition" };
 
                 return sa;
             }
@@ -538,7 +541,7 @@ namespace ASCOM.GS.Sky.Telescope
             try
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{Command},{Raw}") };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{Command},{Raw}") };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 if (string.IsNullOrWhiteSpace(Command)) { throw new MethodNotImplementedException("CommandString"); }
@@ -583,7 +586,7 @@ namespace ASCOM.GS.Sky.Telescope
             }
         }
 
-       public double Declination
+        public double Declination
         {
             get
             {
@@ -620,7 +623,7 @@ namespace ASCOM.GS.Sky.Telescope
             }
         }
 
-       public string Description
+        public string Description
         {
             get
             {
@@ -921,7 +924,7 @@ namespace ASCOM.GS.Sky.Telescope
                 }
 
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{Direction},{Duration}") };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{Direction},{Duration}") };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 if (!SkyServer.AsComOn) { throw new InvalidOperationException("Not accepting commands"); }
@@ -942,7 +945,7 @@ namespace ASCOM.GS.Sky.Telescope
                 SkyServer.IsPulseGuidingRa = false;
                 SkyServer.IsPulseGuidingDec = false;
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{e.Message}") };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{e.Message}") };
                 MonitorLog.LogToMonitor(monitorItem);
                 throw;
             }
@@ -1028,11 +1031,11 @@ namespace ASCOM.GS.Sky.Telescope
             while (true)
             {
                 Thread.Sleep(100);
-                if (SkyServer.OpenSetupDialogFinished){break;}
+                if (SkyServer.OpenSetupDialogFinished) { break; }
             }
 
             monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Open:{SkyServer.OpenSetupDialog}, Finished:{SkyServer.OpenSetupDialogFinished}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Open:{SkyServer.OpenSetupDialog}, Finished:{SkyServer.OpenSetupDialogFinished}" };
             MonitorLog.LogToMonitor(monitorItem);
 
         }
@@ -1549,8 +1552,8 @@ namespace ASCOM.GS.Sky.Telescope
         {
             get
             {
-               // var r = HiResDateTime.UtcNow.Add(SkySettings.UTCDateOffset);
-               var r = HiResDateTime.UtcNow;
+                // var r = HiResDateTime.UtcNow.Add(SkySettings.UTCDateOffset);
+                var r = HiResDateTime.UtcNow;
 
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{r}" };
@@ -1626,7 +1629,7 @@ namespace ASCOM.GS.Sky.Telescope
 
             throw new InvalidValueException("TrackingRate invalid");
         }
-        
+
         private void CheckRate(TelescopeAxes axis, double rate)
         {
             var monitorItem = new MonitorEntry
@@ -1756,7 +1759,7 @@ namespace ASCOM.GS.Sky.Telescope
         private static void CheckRate(double rate)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{rate}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{rate}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             if (rate > SkyServer.SlewSpeedEight || rate < -SkyServer.SlewSpeedEight)
@@ -1848,6 +1851,7 @@ namespace ASCOM.GS.Sky.Telescope
                     delay += SkySettings.DisplayInterval;
                     break;
                 case MountType.SkyWatcher:
+                case MountType.AstroEQ:
                     delay += 20;  // some go tos have been off .10 to .70 seconds, not sure exactly why
                     delay += SkySettings.DisplayInterval;
                     break;
@@ -1865,12 +1869,12 @@ namespace ASCOM.GS.Sky.Telescope
         /// <remarks>planetarium programs fix which doesn't turn on tracking before a goto</remarks>
         private static void CycleOnTracking(bool silence)
         {
-            if (silence){SkyServer.TrackingSpeak = false;}
+            if (silence) { SkyServer.TrackingSpeak = false; }
 
-            SkyServer.Tracking = false; 
+            SkyServer.Tracking = false;
             SkyServer.Tracking = true;
 
-            if(silence){ SkyServer.TrackingSpeak = true;}
+            if (silence) { SkyServer.TrackingSpeak = true; }
         }
 
         #endregion

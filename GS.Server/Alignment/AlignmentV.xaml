@@ -203,12 +203,12 @@
                         <!-- Ordinal formatting left in for reference -->
                         <!--<DataGridTemplateColumn Header="#" CellTemplate="{StaticResource OrdinalColumnDataTemplate}" HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>-->
                         <DataGridTextColumn Header="###" Binding="{Binding Id, StringFormat='{}{0:D3}'}"  HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Altitude" Binding="{Binding AltAz[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Azimuth" Binding="{Binding AltAz[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Pier Side" Binding="{Binding PierSide}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Mount RA/Dec Axes" Binding="{Binding MountAxes}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Observed RA/Dec Axis" Binding="{Binding ObservedAxes}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Correction" Binding="{Binding Correction}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Encoder RA" Binding="{Binding Encoder[0], StringFormat='{}{0:D8}'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Encoder Dec" Binding="{Binding Encoder[1], StringFormat='{}{0:D8}'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="RA" Binding="{Binding OrigRaDec[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Dec" Binding="{Binding OrigRaDec[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Target RA" Binding="{Binding Target[0], StringFormat='{}{0:D8}'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Target Dec" Binding="{Binding Target[1], StringFormat='{}{0:D8}'}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Synched" Binding="{Binding Synched}" IsReadOnly="True" />
                     </DataGrid.Columns>
                 </DataGrid>

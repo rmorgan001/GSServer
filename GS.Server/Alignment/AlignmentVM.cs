@@ -23,7 +23,7 @@ using GS.Shared;
 using GS.Shared.Command;
 using GS.Utilities.Controls.Dialogs;
 using MaterialDesignThemes.Wpf;
-using NStarAlignment.DataTypes;
+using EqmodNStarAlignment.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -39,6 +39,7 @@ using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
+using EqmodNStarAlignment.Model;
 
 namespace GS.Server.Alignment
 {

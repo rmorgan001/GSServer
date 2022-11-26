@@ -69,6 +69,7 @@ namespace GS.Server.SkyTelescope
                     }
                     break;
                 case MountType.SkyWatcher:
+                case MountType.AstroEQ:
                     if (SkyServer.SouthernHemisphere)
                     {
                         a[0] = 180 - a[0];
@@ -113,6 +114,7 @@ namespace GS.Server.SkyTelescope
 
                     break;
                 case MountType.SkyWatcher:
+                case MountType.AstroEQ:
                     if (SkyServer.SouthernHemisphere)
                     {
                         a[0] = a[0] * -1.0;
@@ -310,7 +312,7 @@ namespace GS.Server.SkyTelescope
         {
             return AxesXYToRaDec(axes, SkyServer.SiderealTime);
         }
-        
+
         /// <summary>
         /// convert a RaDec position to an axes positions. 
         /// </summary>

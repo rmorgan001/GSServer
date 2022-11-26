@@ -446,7 +446,7 @@ namespace GS.Server.Snap
                 case MountType.Simulator:
                     SkyServer.SimTasks(MountTaskName.SetSnapPort1);
                     break;
-                case MountType.SkyWatcher:
+                case MountType.SkyWatcher: case MountType.AstroEQ:
                     SkyServer.SkyTasks(MountTaskName.SetSnapPort1);
                     break;
                 default:
@@ -813,7 +813,7 @@ namespace GS.Server.Snap
                 case MountType.Simulator:
                     SkyServer.SimTasks(MountTaskName.SetSnapPort2);
                     break;
-                case MountType.SkyWatcher:
+                case MountType.SkyWatcher: case MountType.AstroEQ:
                     SkyServer.SkyTasks(MountTaskName.SetSnapPort2);
                     break;
                 default:

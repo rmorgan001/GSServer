@@ -77,6 +77,7 @@
     <ProjectReference Include="..\ColorPicker\ColorPicker.csproj">
       <Private>false</Private>
     </ProjectReference>
+    <ProjectReference Include="..\EQMODAlignment\EqmodNStarAlignment.csproj" />
     <ProjectReference Include="..\GS.FitsImageManager\GS.FitsImageManager.csproj" />
     <ProjectReference Include="..\GS.Principle\GS.Principles.csproj">
       <Private>false</Private>
@@ -92,7 +93,6 @@
     </ProjectReference>
     <ProjectReference Include="..\GS.Utilities\GS.Utilities.csproj" />
     <ProjectReference Include="..\NINA\NINA.csproj" />
-    <ProjectReference Include="..\NStarAlignment\NStarAlignment.csproj" />
     <ProjectReference Include="..\XInputDotNetPure\XInputDotNetPure.csproj" />
   </ItemGroup>
   <ItemGroup>

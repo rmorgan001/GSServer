@@ -1228,7 +1228,7 @@ namespace GS.Server.SkyTelescope
                     {
                         case MountType.Simulator:
                             break;
-                        case MountType.SkyWatcher:
+                        case MountType.SkyWatcher: case MountType.AstroEQ:
                             SkyServer.SkyTasks(MountTaskName.PolarLedLevel);
                             break;
                         default:
@@ -4709,7 +4709,7 @@ namespace GS.Server.SkyTelescope
                     //msg += Environment.NewLine + Application.Current.Resources["skyHome3"];
                     OpenDialog(msg);
                     break;
-                case MountType.SkyWatcher:
+                case MountType.SkyWatcher: case MountType.AstroEQ:
                     switch (SkySettings.AlignmentMode)
                     {
                         case AlignmentModes.algAltAz:

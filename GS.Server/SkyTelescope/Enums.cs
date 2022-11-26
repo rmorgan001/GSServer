@@ -119,7 +119,8 @@ namespace GS.Server.SkyTelescope
     public enum MountType
     {
         Simulator,
-        SkyWatcher
+        SkyWatcher,
+        AstroEQ
     }
 
     public enum ErrorCode

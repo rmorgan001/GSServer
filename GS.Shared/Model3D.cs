@@ -62,7 +62,7 @@ namespace GS.Shared
         }
         public static double[] RotateModel(string mountType, double ax, double ay, bool southernHemisphere)
         {
-            var axes = new[] {0.0, 0.0};
+            var axes = new[] { 0.0, 0.0 };
             switch (mountType)
             {
                 case "Simulator":
@@ -70,6 +70,7 @@ namespace GS.Shared
                     axes[1] = southernHemisphere ? Math.Round(ay - 180, 3) : Math.Round(ay * -1.0, 3);
                     break;
                 case "SkyWatcher":
+                case "AstroEQ":
                     axes[0] = Math.Round(ax, 3);
                     axes[1] = Math.Round(ay - 180, 3);
                     break;
