@@ -279,7 +279,7 @@ namespace EqmodNStarAlignment.Model
 
 
 
-        private double Get_EncoderHours(double RAencoderPosition)
+        public double Get_EncoderHours(double RAencoderPosition)
         {
 
             double hours;

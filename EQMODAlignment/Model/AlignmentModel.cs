@@ -8,6 +8,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Linq;
 
 namespace EqmodNStarAlignment.Model
 {
@@ -145,7 +146,7 @@ namespace EqmodNStarAlignment.Model
         public bool PolarEnable
         {
             get => _polarEnable;
-            set 
+            set
             {
                 if (_polarEnable == value) return;
                 _polarEnable = value;
@@ -311,8 +312,12 @@ namespace EqmodNStarAlignment.Model
                         foreach (var alignmentPoint in loaded)
                         {
                             AlignmentPoints.Add(alignmentPoint);
+                            _oneStarAdjustment = alignmentPoint.Delta;
                         }
-                        SendToMatrix(); // Updates the cartesean values.
+                        if (AlignmentPoints.Count >= 3)
+                        {
+                            SendToMatrix(); // Updates the cartesean values.
+                        }
                     }
                 }
                 catch (Exception ex)

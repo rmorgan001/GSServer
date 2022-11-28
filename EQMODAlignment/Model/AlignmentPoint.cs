@@ -45,17 +45,22 @@ namespace EqmodNStarAlignment.Model
         /// <summary>
         /// The cartesean version of the unadjusted encoder positions
         /// </summary>
-        [JsonIgnore]
         public Coord TargetCartesian { get; set;}
 
+        [JsonIgnore]
         public EncoderPosition Delta => (Target - Encoder);
+
+        public AlignmentPoint()
+        {
+
+        }
 
         public AlignmentPoint(long[] encoder, double[] origRaDec, long[] target, DateTime syncTime)
         {
             Encoder = new EncoderPosition(encoder);
             OrigRaDec = new AxisPosition(origRaDec);
             Target = new EncoderPosition(target);
-            
+            AlignTime = syncTime;
         }
 
     }

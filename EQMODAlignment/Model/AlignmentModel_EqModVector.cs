@@ -341,7 +341,7 @@ namespace EqmodNStarAlignment.Model
 
         //Function to convert spherical coordinates to Cartesian using the Coord structure
 
-        internal Coord EQ_sp2Cs(EncoderPosition pos)
+        public Coord EQ_sp2Cs(EncoderPosition pos)
         {
             Coord result = new Coord();
 
@@ -1276,7 +1276,7 @@ namespace EqmodNStarAlignment.Model
         //}
 
 
-        private SphericalCoord EQ_SphericalPolar(EncoderPosition spherical)
+        public SphericalCoord EQ_SphericalPolar(EncoderPosition spherical)
         {
             SphericalCoord result = new SphericalCoord();
 

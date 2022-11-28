@@ -22,6 +22,7 @@ namespace EqmodNStarAlignment.Model
             {
                 if (AlignmentPoints.Count == 3)
                 {
+                    AlignmentPoints.Add(data);
                     // Update the matrices
                     SendToMatrix();
                 }
