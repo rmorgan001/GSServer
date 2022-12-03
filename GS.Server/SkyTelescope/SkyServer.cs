@@ -1209,7 +1209,7 @@ namespace GS.Server.SkyTelescope
             MonitorLog.LogToMonitor(monitorItem);
 
             const int returncode = 0;
-            const int timer = 80; //  stop slew after seconds
+            const int timer = 120; //  stop slew after seconds
             var stopwatch = Stopwatch.StartNew();
 
             SimTasks(MountTaskName.StopAxes);
@@ -1238,6 +1238,7 @@ namespace GS.Server.SkyTelescope
 
                 break;
             }
+            stopwatch.Stop();
 
             AxesStopValidate();
             monitorItem = new MonitorEntry
@@ -1255,17 +1256,16 @@ namespace GS.Server.SkyTelescope
             #endregion
 
             #region Final precision slew
+            if (stopwatch.Elapsed.TotalSeconds <= timer)
+            {
+                Task decTask = Task.Run(() => SimPrecisionGotoDec(simTarget[1]));
+                Task raTask = Task.Run(() => SimPrecisionGoToRA(target, trackingState, stopwatch));
 
-            Task decTask = Task.Run(() => SimPrecisionGotoDec(simTarget[1]));
-            Task raTask = Task.Run(() => SimPrecisionGoToRA(target, trackingState, stopwatch));
-
-            Task.WaitAll(decTask, raTask);
-
+                Task.WaitAll(decTask, raTask);
+            }
             #endregion
 
             SimTasks(MountTaskName.StopAxes);//make sure all axes are stopped
-
-            stopwatch.Stop();
             return returncode;
         }
 
@@ -1677,7 +1677,7 @@ namespace GS.Server.SkyTelescope
 
             const int returncode = 0;
             //  stop slew after 80 seconds
-            const int timer = 80;
+            const int timer = 120;// increased from 80 to 120, slew is taking longer for new commands
             var stopwatch = Stopwatch.StartNew();
 
             SkyTasks(MountTaskName.StopAxes);
@@ -1707,7 +1707,7 @@ namespace GS.Server.SkyTelescope
                 }
                 break;
             }
-
+            stopwatch.Stop();
             AxesStopValidate();
             monitorItem = new MonitorEntry
             {
@@ -1720,19 +1720,18 @@ namespace GS.Server.SkyTelescope
                 Message = $"GoToSeconds|{stopwatch.Elapsed.TotalSeconds}|SkyTarget|{skyTarget[0]}|{skyTarget[1]}"
             };
             MonitorLog.LogToMonitor(monitorItem);
-
             #endregion
 
             #region Final precision slew
-            Task decTask = Task.Run(() => SkyPrecisionGotoDec(skyTarget[1]));
-            Task raTask = Task.Run(() => SkyPrecisionGoToRA(target, trackingState, stopwatch));
-
-            Task.WaitAll(decTask, raTask);
+            if (stopwatch.Elapsed.TotalSeconds <= timer)
+            {
+                Task decTask = Task.Run(() => SkyPrecisionGotoDec(skyTarget[1]));
+                Task raTask = Task.Run(() => SkyPrecisionGoToRA(target, trackingState, stopwatch));
+                Task.WaitAll(decTask, raTask);
+            }
             #endregion
 
             SkyTasks(MountTaskName.StopAxes); //make sure all axes are stopped
-
-            stopwatch.Stop();
             return returncode;
         }
 
@@ -1784,6 +1783,7 @@ namespace GS.Server.SkyTelescope
                     if (axis2stopped) { break; }
                     Thread.Sleep(100);
                 }
+                stopwatch1.Stop();
 
                 monitorItem = new MonitorEntry
                 {
@@ -1793,7 +1793,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"DeltaDegrees|{deltaDegree}"
+                    Message = $"DeltaDegrees|{deltaDegree}|Seconds|{stopwatch1.Elapsed.TotalSeconds}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -1869,6 +1869,7 @@ namespace GS.Server.SkyTelescope
                     if (axis1stopped) { break; }
                     Thread.Sleep(100);
                 }
+                stopwatch1.Stop();
 
                 monitorItem = new MonitorEntry
                 {
@@ -1878,7 +1879,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Precision|NewTarget|{target[0]}|Time|{deltaTime}|Degree|{deltaDegree}"
+                    Message = $"Precision|NewTarget|{target[0]}|Time|{deltaTime}|Degree|{deltaDegree}|Seconds|{stopwatch1.Elapsed.TotalSeconds}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
