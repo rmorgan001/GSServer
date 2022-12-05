@@ -515,7 +515,7 @@ namespace GS.SkyWatcher
         /// </summary>
         /// <param name="axis">>AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="targetPosition">Total radians of target position</param>
-        internal void AxisGoToTarget(AxisId axis, double targetPosition)
+        internal void AxisGoToTarget(AxisId axis, double targetPosition) 
         {
             var monitorItem = new MonitorEntry
                 { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{targetPosition}" };
