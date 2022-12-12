@@ -76,6 +76,8 @@ using EqmodNStarAlignment.DataTypes;
 using EqmodNStarAlignment.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Text;
 
 namespace EqmodNStarAlignment.Model
@@ -169,7 +171,7 @@ namespace EqmodNStarAlignment.Model
 
         // Subroutine to draw the Transformation Matrix (Taki Method)
 
-        private int EQ_AssembleMatrix_Taki(double x, double Y, Coord a1, Coord a2, Coord a3, Coord m1, Coord m2, Coord m3)
+        private bool EQ_AssembleMatrix_Taki(double x, double Y, Coord a1, Coord a2, Coord a3, Coord m1, Coord m2, Coord m3)
         {
 
 
@@ -243,7 +245,7 @@ namespace EqmodNStarAlignment.Model
 
             if ((x + Y) == 0)
             {
-                return 0;
+                return false;
             }
             else
             {
@@ -272,7 +274,7 @@ namespace EqmodNStarAlignment.Model
 
         // Subroutine to draw the Transformation Matrix (Affine Mapping Method)
 
-        private int EQ_AssembleMatrix_Affine(double x, double Y, Coord a1, Coord a2, Coord a3, Coord m1, Coord m2, Coord m3)
+        private bool EQ_AssembleMatrix_Affine(double x, double Y, Coord a1, Coord a2, Coord a3, Coord m1, Coord m2, Coord m3)
         {
 
             double Det = 0;
@@ -315,7 +317,7 @@ namespace EqmodNStarAlignment.Model
 
             if ((x + Y) == 0)
             {
-                return 0;
+                return false;
             }
             else
             {
@@ -325,19 +327,18 @@ namespace EqmodNStarAlignment.Model
         }
 
 
-        ////Function to transform the Coordinates (Affine Mapping) using the M Matrix and Offset Vector
-
-        //private Coord EQ_Transform_Affine(Coord ob)
-        //{
-
-        //    // CoordTransform = Offset + CoordObject * Matrix M
-
-        //    Coord result = new Coord();
-        //    result.x = EQCO.x + ((ob.x * EQMM.Element[0, 0]) + (ob.y * EQMM.Element[1, 0]));
-        //    result.y = EQCO.y + ((ob.x * EQMM.Element[0, 1]) + (ob.y * EQMM.Element[1, 1]));
-
-        //    return result;
-        //}
+        /// <summary>
+        /// Function to transform the Coordinates (Affine Mapping) using the M Matrix and Offset Vector
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <returns></returns>
+        private CartesCoord EQ_Transform_Affine(CartesCoord pos)
+        {
+            CartesCoord result = new CartesCoord();
+            result.x = EQCO.x + ((pos.x * EQMM.Element[0, 0]) + (pos.y * EQMM.Element[1, 0]));
+            result.y = EQCO.y + ((pos.x * EQMM.Element[0, 1]) + (pos.y * EQMM.Element[1, 1]));
+            return result;
+        }
 
         //Function to convert spherical coordinates to Cartesian using the Coord structure
 
@@ -431,52 +432,42 @@ namespace EqmodNStarAlignment.Model
         //    return result;
         //}
 
-        ////Implement an Affine transformation on a Polar coordinate system
-        ////This is done by converting the Polar Data to Cartesian, Apply affine transformation
-        ////Then restore the transformed Cartesian Coordinates back to polar
 
+        /// <summary>
+        /// Implement an Affine transformation on a Polar coordinate system
+        /// This is done by converting the Polar Data to Cartesian, Apply affine transformation
+        /// Then restore the transformed Cartesian Coordinates back to polar
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        internal EncoderPosition EQ_plAffine(EncoderPosition pos)
+        {
+            EncoderPosition result = new EncoderPosition();
+            CartesCoord tmpobj1 = new CartesCoord();
+            CartesCoord tmpobj3 = new CartesCoord();
+            SphericalCoord tmpobj2 = new SphericalCoord();
+            SphericalCoord tmpobj4 = new SphericalCoord();
 
-        //internal Coord EQ_plAffine(Coord obj)
-        //{
-        //    Coord result = new Coord();
-        //    double gDECEncoder_Home_pos = 0;
-        //    double gLatitude = 0;
-        //    double gTot_step = 0;
-        //    object HC = null;
-        //    double RAEncoder_Home_pos = 0;
+            if (PolarEnable)
+            {
+                tmpobj4 = EQ_SphericalPolar(pos);
+                tmpobj1 = EQ_Polar2Cartes(tmpobj4);
+                tmpobj3 = EQ_Transform_Affine(tmpobj1);
+                tmpobj2 = EQ_Cartes2Polar(tmpobj3, tmpobj1);
 
-        //    CartesCoord tmpobj1 = new CartesCoord();
-        //    Coord tmpobj2 = new Coord();
-        //    Coord tmpobj3 = new Coord();
-        //    SphericalCoord tmpobj4 = new SphericalCoord();
+                result = EQ_PolarSpherical(tmpobj2, tmpobj4);
 
-        //    if (PolarEnable)
-        //    {
-        //        tmpobj4 = EQ_SphericalPolar(obj.x, obj.y, gTot_step, RAEncoder_Home_pos, gDECEncoder_Home_pos, gLatitude);
+            }
+            else
+            {
+                tmpobj3 = EQ_Transform_Affine(new CartesCoord() { x = pos.RA, y = pos.Dec });
+                result.RA = (long)Math.Round(tmpobj3.x, 0);
+                result.Dec = (long)Math.Round(tmpobj3.y, 0);
+                // result.z = 1;
+            }
 
-        //        tmpobj1 = EQ_Polar2Cartes(tmpobj4.x, tmpobj4.y, gTot_step, RAEncoder_Home_pos, gDECEncoder_Home_pos);
-
-        //        tmpobj2.x = tmpobj1.x;
-        //        tmpobj2.y = tmpobj1.y;
-        //        tmpobj2.z = 1;
-
-        //        tmpobj3 = EQ_Transform_Affine(tmpobj2);
-
-        //        tmpobj2 = EQ_Cartes2Polar(tmpobj3.x, tmpobj3.y, tmpobj1.r, tmpobj1.ra, gTot_step, RAEncoder_Home_pos, gDECEncoder_Home_pos);
-
-        //        result = EQ_PolarSpherical(tmpobj2.x, tmpobj2.y, gTot_step, RAEncoder_Home_pos, gDECEncoder_Home_pos, gLatitude, tmpobj4.r);
-
-        //    }
-        //    else
-        //    {
-        //        tmpobj3 = EQ_Transform_Affine(obj);
-        //        result.x = tmpobj3.x;
-        //        result.y = tmpobj3.y;
-        //        result.z = 1;
-        //    }
-
-        //    return result;
-        //}
+            return result;
+        }
 
 
         //internal Coord EQ_plAffine2(Coord obj)
@@ -566,8 +557,11 @@ namespace EqmodNStarAlignment.Model
         //    return result;
         //}
 
-        // Function to Convert Polar RA/DEC Stepper coordinates to Cartesian Coordinates
-
+        /// <summary>
+        /// Function to Convert Polar RA/DEC Stepper coordinates to Cartesian Coordinates
+        /// </summary>
+        /// <param name="polar"></param>
+        /// <returns></returns>
         private CartesCoord EQ_Polar2Cartes(SphericalCoord polar)
         {
             CartesCoord result = new CartesCoord();
@@ -622,78 +616,74 @@ namespace EqmodNStarAlignment.Model
 
         ////Function to convert the Cartesian Coordinate data back to RA/DEC polar
 
-        //private Coord EQ_Cartes2Polar(double x, double Y, double r, double RA, double TOT, double RACENTER, double DECCENTER)
-        //{
-        //    Coord result = new Coord();
-        //    double PI = 0;
-        //    double RAD_DEG = 0;
+        private SphericalCoord EQ_Cartes2Polar(CartesCoord cart, CartesCoord rads)
+        {
+            SphericalCoord result = new SphericalCoord();
+
+            // Ah the famous radius formula
+            double radiusder = Math.Sqrt((cart.x * cart.x) + (cart.y * cart.y)) * rads.r;
 
 
-        //    // Ah the famous radius formula
+            // And the nasty angle compute routine (any simpler way to impelent this ?)
 
-        //    double radiusder = Math.Sqrt((x * x) + (Y * Y)) * r;
+            double angle = 0;
+            if (cart.x > 0)
+            {
+                angle = Math.Atan(cart.y / cart.x);
+            }
+            if (cart.x < 0)
+            {
+                if (cart.y >= 0)
+                {
+                    angle = Math.Atan(cart.y / cart.x) + Math.PI;
 
+                }
+                else
+                {
+                    angle = Math.Atan(cart.y / cart.x) - Math.PI;
+                }
+            }
+            if (cart.x == 0)
+            {
+                if (cart.y > 0)
+                {
+                    angle = Math.PI / 2d;
+                }
+                else
+                {
+                    angle = -1 * (Math.PI / 2d);
+                }
+            }
 
-        //    // And the nasty angle compute routine (any simpler way to impelent this ?)
+            // Convert angle to degrees
 
-        //    double angle = 0;
-        //    if (x > 0)
-        //    {
-        //        angle = Math.Atan(Y / x);
-        //    }
-        //    if (x < 0)
-        //    {
-        //        if (Y >= 0)
-        //        {
-        //            angle = Math.Atan(Y / x) + PI;
+            angle = AstroConvert.RadToDeg(angle);
 
-        //        }
-        //        else
-        //        {
-        //            angle = Math.Atan(Y / x) - PI;
-        //        }
-        //    }
-        //    if (x == 0)
-        //    {
-        //        if (Y > 0)
-        //        {
-        //            angle = PI / 2d;
-        //        }
-        //        else
-        //        {
-        //            angle = -1 * (PI / 2d);
-        //        }
-        //    }
+            if (angle < 0)
+            {
+                angle = 360 + angle;
+            }
 
-        //    // Convert angle to degrees
+            if (rads.r < 0)
+            {
+                angle = Range.Range360((angle + 180));
+            }
 
-        //    angle *= RAD_DEG;
+            if (angle > 180)
+            {
+                result.x = this.HomeEncoder.RA - (((360 - angle) / 360d) * this.StepsPerRev.RA);
+            }
+            else
+            {
+                result.x = ((angle / 360d) * this.StepsPerRev.RA) + this.HomeEncoder.RA;
+            }
 
-        //    if (angle < 0)
-        //    {
-        //        angle = 360 + angle;
-        //    }
+            //treat y as the polar coordinate radius (ra var not used - always 0)
 
-        //    if (r < 0)
-        //    {
-        //        angle = Range.Range360((angle + 180));
-        //    }
+            result.y = radiusder + this.HomeEncoder.Dec + rads.ra;
 
-        //    if (angle > 180)
-        //    {
-        //        result.x = RACENTER - (((360 - angle) / 360d) * TOT);
-        //    }
-        //    else
-        //    {
-        //        result.x = ((angle / 360d) * TOT) + RACENTER;
-        //    }
-
-        //    //treat y as the polar coordinate radius (ra var not used - always 0)
-
-        //    result.y = radiusder + DECCENTER + RA;
-
-        //    return result;
-        //}
+            return result;
+        }
 
         //internal int EQ_UpdateTaki(double x, double Y)
         //{
@@ -738,53 +728,45 @@ namespace EqmodNStarAlignment.Model
 
         //}
 
-        //internal int EQ_UpdateAffine(AxisPosition encoder)
-        //{
-        //    int result = 0;
-        //    int g3PointAlgorithm = 0;
-        //    int gAlignmentStars_count = 0;
+        internal bool EQ_UpdateAffine(EncoderPosition pos)
+        {
+            bool result = false;
 
-        //    TriangleCoord tr = new TriangleCoord();
+            List<AlignmentPoint> nearestPoints = new List<AlignmentPoint>();
 
-        //    if (gAlignmentStars_count < 3)
-        //    {
-        //        return result;
-        //    }
+            if (this.AlignmentPoints.Count < 3)
+            {
+                return result;
+            }
 
-        //    switch (g3PointAlgorithm)
-        //    {
-        //        case 1:
-        //            // find the 50 nearest points - then find the nearest enclosing triangle 
-        //            tr = EQ_ChooseNearest3Points(encoder);
-        //            break;
-        //        default:
-        //            // find the 50 nearest points - then find the enclosing triangle with the nearest centre point 
-        //            tr = EQ_Choose_3Points(encoder);
-        //            break;
-        //    }
+            switch (this.ThreePointAlgorithm)
+            {
+                case ThreePointAlgorithmEnum.BestCentre:
+                    // find the 50 nearest points - then find the nearest enclosing triangle 
+                    nearestPoints = EQ_ChooseNearest3Points(pos);
+                    break;
+                default:
+                    // find the 50 nearest points - then find the enclosing triangle with the nearest centre point 
+                    nearestPoints = EQ_Choose_3Points(pos);
+                    break;
+            }
 
-        //    double gAffine1 = tr.i;
-        //    double gAffine2 = tr.j;
-        //    double gAffine3 = tr.k;
 
-        //    if (gAffine1 == 0 || gAffine1 == 0 || gAffine1 == 0)
-        //    {
-        //        return 0;
-        //    }
+            if (nearestPoints.Count < 3)
+            {
+                return false;
+            }
 
-        //    Coord tmpcoord = EQ_sp2Cs(encoder);
+            Coord tmpcoord = EQ_sp2Cs(pos);
 
-        //    result = EQ_AssembleMatrix_Affine(tmpcoord.x, tmpcoord.y, EQASCOM.my_PointsC[Convert.ToInt32(gAffine1)], EQASCOM.my_PointsC[Convert.ToInt32(gAffine2)], EQASCOM.my_PointsC[Convert.ToInt32(gAffine3)], EQASCOM.ct_PointsC[Convert.ToInt32(gAffine1)], EQASCOM.ct_PointsC[Convert.ToInt32(gAffine2)], EQASCOM.ct_PointsC[Convert.ToInt32(gAffine3)]);
-
-        //    if (result == 0)
-        //    {
-        //        gAffine1 = 0;
-        //        gAffine2 = 0;
-        //        gAffine3 = 0;
-        //    }
-
-        //    return result;
-        //}
+            return EQ_AssembleMatrix_Affine(tmpcoord.x, tmpcoord.y,
+                nearestPoints[0].EncoderCartesian,
+                nearestPoints[1].EncoderCartesian,
+                nearestPoints[2].EncoderCartesian,
+                nearestPoints[0].TargetCartesian,
+                nearestPoints[1].TargetCartesian,
+                nearestPoints[1].TargetCartesian);
+        }
 
         //// Subroutine to implement find Array index with the lowest value
         //private int EQ_FindLowest(double[] List, int min, int max)
@@ -1166,7 +1148,7 @@ namespace EqmodNStarAlignment.Model
 
         // Function to check if a point is inside the triangle. Computed based sum of areas method
 
-        private int EQ_CheckPoint_in_Triangle(double px, double py, double px1, double py1, double px2, double py2, double px3, double py3)
+        private bool EQ_CheckPoint_in_Triangle(double px, double py, double px1, double py1, double px2, double py2, double px3, double py3)
         {
 
 
@@ -1178,113 +1160,120 @@ namespace EqmodNStarAlignment.Model
 
             if (Math.Abs(ta - t1 - t2 - t3) < 2)
             {
-                return 1;
+                return true;
             }
             else
             {
-                return 0;
+                return false;
             }
 
         }
 
 
 
-
-        //private Coord EQ_GetCenterPoint(Coord p1, Coord p2, Coord p3)
-        //{
-
-        //    Coord result = new Coord();
-        //    double p2x = 0;
-        //    double p2y = 0;
-        //    double p4x = 0;
-        //    double p4y = 0;
-
-
-
-
-
-        //    // Get the two line 4 point data
-
-        //    double p1x = p1.x;
-        //    double p1y = p1.y;
-
-
-        //    if (p3.x > p2.x)
-        //    {
-        //        p2x = ((p3.x - p2.x) / 2d) + p2.x;
-        //    }
-        //    else
-        //    {
-        //        p2x = ((p2.x - p3.x) / 2d) + p3.x;
-        //    }
-
-        //    if (p3.y > p2.y)
-        //    {
-        //        p2y = ((p3.y - p2.y) / 2d) + p2.y;
-        //    }
-        //    else
-        //    {
-        //        p2y = ((p2.y - p3.y) / 2d) + p3.y;
-        //    }
-
-        //    double p3x = p2.x;
-        //    double p3y = p2.y;
-
-
-        //    if (p1.x > p3.x)
-        //    {
-        //        p4x = ((p1.x - p3.x) / 2d) + p3.x;
-        //    }
-        //    else
-        //    {
-        //        p4x = ((p3.x - p1.x) / 2d) + p1.x;
-        //    }
-
-        //    if (p1.y > p3.y)
-        //    {
-        //        p4y = ((p1.y - p3.y) / 2d) + p3.y;
-        //    }
-        //    else
-        //    {
-        //        p4y = ((p3.y - p1.y) / 2d) + p1.y;
-        //    }
-
-
-        //    double XD1 = p2x - p1x;
-        //    double XD2 = p4x - p3x;
-        //    double YD1 = p2y - p1y;
-        //    double YD2 = p4y - p3y;
-        //    double XD3 = p1x - p3x;
-        //    double YD3 = p1y - p3y;
-
-
-        //    double dv = (YD2 * XD1) - (XD2 * YD1);
-
-        //    if (dv == 0)
-        //    {
-        //        dv = 0.00000001d;
-        //    } //avoid div 0 errors
-
-
-        //    double ua = ((XD2 * YD3) - (YD2 * XD3)) / dv;
-        //    double ub = ((XD1 * YD3) - (YD1 * XD3)) / dv;
-
-        //    result.x = p1x + (ua * XD1);
-        //    result.y = p1y + (ub * YD1);
-
-        //    return result;
-        //}
-
-
-        public SphericalCoord EQ_SphericalPolar(EncoderPosition spherical)
+        /// <summary>
+        /// Returns the centroid of a triangle.
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <param name="p3"></param>
+        /// <returns></returns>
+        private Coord EQ_GetCenterPoint(Coord p1, Coord p2, Coord p3)
         {
+
+            Coord result = new Coord();
+            double p2x = 0d;
+            double p2y = 0d;
+            double p4x = 0d;
+            double p4y = 0d;
+
+            // Get the two line 4 point data
+
+            double p1x = p1.x;
+            double p1y = p1.y;
+
+
+            if (p3.x > p2.x)
+            {
+                p2x = ((p3.x - p2.x) / 2d) + p2.x;
+            }
+            else
+            {
+                p2x = ((p2.x - p3.x) / 2d) + p3.x;
+            }
+
+            if (p3.y > p2.y)
+            {
+                p2y = ((p3.y - p2.y) / 2d) + p2.y;
+            }
+            else
+            {
+                p2y = ((p2.y - p3.y) / 2d) + p3.y;
+            }
+
+            double p3x = p2.x;
+            double p3y = p2.y;
+
+
+            if (p1.x > p3.x)
+            {
+                p4x = ((p1.x - p3.x) / 2d) + p3.x;
+            }
+            else
+            {
+                p4x = ((p3.x - p1.x) / 2d) + p1.x;
+            }
+
+            if (p1.y > p3.y)
+            {
+                p4y = ((p1.y - p3.y) / 2d) + p3.y;
+            }
+            else
+            {
+                p4y = ((p3.y - p1.y) / 2d) + p1.y;
+            }
+
+
+            double XD1 = p2x - p1x;
+            double XD2 = p4x - p3x;
+            double YD1 = p2y - p1y;
+            double YD2 = p4y - p3y;
+            double XD3 = p1x - p3x;
+            double YD3 = p1y - p3y;
+
+
+            double dv = (YD2 * XD1) - (XD2 * YD1);
+
+            if (dv == 0)
+            {
+                dv = 0.00000001d;
+            } //avoid div 0 errors
+
+
+            double ua = ((XD2 * YD3) - (YD2 * XD3)) / dv;
+            double ub = ((XD1 * YD3) - (YD1 * XD3)) / dv;
+
+            result.x = p1x + (ua * XD1);
+            result.y = p1y + (ub * YD1);
+
+            return result;
+        }
+
+
+        private SphericalCoord EQ_SphericalPolar(EncoderPosition spherical)
+        {
+            //Debug.WriteLine($"Spherical -> Polar");
+            //Debug.WriteLine($"Input = {spherical.RA}/{spherical.Dec}");
             SphericalCoord result = new SphericalCoord();
 
-            double ha = Get_EncoderHours(spherical.RA);
-            double dec = Range.Range360(Get_EncoderDegrees(spherical.Dec) + 270);
-
-            double[] altAz = AstroConvert.HaDec2AltAz(ha, dec, SiteLatitude);
-
+            double haRad = AstroConvert.HrsToRad(Get_EncoderHours(spherical.RA));
+            double decRad = AstroConvert.DegToRad(Range.Range360(Get_EncoderDegrees(spherical.Dec) + 270));
+            double latRad = AstroConvert.DegToRad(this.SiteLatitude);
+            //Debug.WriteLine($"lat/ha/dec (Radians) = {latRad}/{haRad}/{decRad}");
+            double[] altAzRad = AstroConvert.GetAltAz(latRad, haRad, decRad);
+            //Debug.WriteLine($"alt/Az (Radians) = {altAzRad[0]}/{altAzRad[1]}");
+            double[] altAz = new double[] { AstroConvert.RadToDeg(altAzRad[0]), AstroConvert.RadToDeg(altAzRad[1])};
+            //Debug.WriteLine($"alt/Az = {altAz[0]}/{altAz[1]}");
 
             result.x = (((altAz[1] - 180) / 360d) * this.StepsPerRev.RA) + this.HomeEncoder.RA;
             result.y = (((altAz[0] + 90) / 180d) * this.StepsPerRev.Dec) + this.HomeEncoder.Dec;
@@ -1299,69 +1288,76 @@ namespace EqmodNStarAlignment.Model
             {
                 result.r = 0;
             }
-
+            //Debug.WriteLine($"Output = {result.x}/{result.y}/{result.r}");
             return result;
         }
 
-        //private Coord EQ_PolarSpherical(double RA, double DEC, double TOT, double RACENTER, double DECCENTER, double Latitude, double range)
-        //{
-        //    Coord result = new Coord();
-        //    double x = 0;
-        //    double y = 0;
+        private EncoderPosition EQ_PolarSpherical(SphericalCoord pos, SphericalCoord range)
+        {
+            //Debug.WriteLine($"Polar -> Spherical");
+            //Debug.WriteLine($"Input = {pos.x}/{pos.y}/{range.r}");
+            EncoderPosition result = new EncoderPosition();
+            double az = (((pos.x - this.HomeEncoder.RA) / this.StepsPerRev.RA) * 360) + 180;
+            double azRad = AstroConvert.DegToRad(az);
+            double alt = (((pos.y - this.HomeEncoder.Dec) / this.StepsPerRev.Dec) * 180) - 90;
+            double altRad = AstroConvert.DegToRad(alt);
+            double latRad = AstroConvert.DegToRad(this.SiteLatitude);
+            //Debug.WriteLine($"az/alt (Degrees) = {az}/{alt}");
+            //Debug.WriteLine($"lat/alt/Az (Radians) = {latRad}/{altRad}/{azRad}");
+            double[] haDecRad = AstroConvert.GetHaDec(latRad, altRad, azRad);
+            //Debug.WriteLine($"ha/dec (Radians) = {haDecRad[0]}/{haDecRad[1]}");
+            double[] haDec = new double[] { AstroConvert.RadToHrs(haDecRad[0]), AstroConvert.RadToDeg(haDecRad[1]) };
+            //Debug.WriteLine($"ha/dec = {haDec[0]}/{haDec[1]}");
 
+            if (az > 180)
+            {
+                if (range.r == 0)
+                {
+                    haDec[1] = Range.Range360(180 - haDec[1]);
+                }
+                else
+                {
+                    haDec[1] = Range.Range360(haDec[1]);
+                }
+            }
+            else
+            {
+                if (range.r == 0)
+                {
+                    haDec[1] = Range.Range360(haDec[1]);
+                }
+                else
+                {
+                    haDec[1] = Range.Range360(180 - haDec[1]);
+                }
+            }
 
-        //    double i = (((RA - RACENTER) / TOT) * 360) + 180;
-        //    double j = (((DEC - DECCENTER) / TOT) * 180) - 90;
+            alt = Range.Range360(haDec[1] + 90);
 
-        //    object tempAuxVar = aa_hadec[Convert.ToInt32(Latitude * DEG_RAD), Convert.ToInt32(j * DEG_RAD), Convert.ToInt32(i * DEG_RAD), Convert.ToInt32(x), Convert.ToInt32(y)];
+            if (alt < 180)
+            {
+                if (range.r == 1)
+                {
+                    haDec[0] = Range.Range24(haDec[0]);
+                }
+                else
+                {
+                    haDec[0] = Range.Range24(24 + haDec[0]);
+                }
+            }
+            else
+            {
+                haDec[0] = Range.Range24(12 + haDec[0]);
+            }
 
-        //    if (i > 180)
-        //    {
-        //        if (range == 0)
-        //        {
-        //            y = Range.Range360(180 - AstroConvert.RadToDeg(y));
-        //        }
-        //        else
-        //        {
-        //            y = Range.Range360(AstroConvert.RadToDeg(y));
-        //        }
-        //    }
-        //    else
-        //    {
-        //        if (range == 0)
-        //        {
-        //            y = Range.Range360(AstroConvert.RadToDeg(y));
-        //        }
-        //        else
-        //        {
-        //            y = Range.Range360(180 - AstroConvert.RadToDeg(y));
-        //        }
-        //    }
+            //Debug.WriteLine($"X/Y = {haDec[0]}/{haDec[1]}");
 
-        //    j = Range.Range360(y + 90);
+            result.RA = Get_EncoderfromHours(haDec[0]);
+            result.Dec = Get_EncoderfromDegrees(haDec[1] + 90);
 
-        //    if (j < 180)
-        //    {
-        //        if (range == 1)
-        //        {
-        //            x = Range.Range24(AstroConvert.RadToHrs(x));
-        //        }
-        //        else
-        //        {
-        //            x = Range.Range24(24 + AstroConvert.RadToHrs(x));
-        //        }
-        //    }
-        //    else
-        //    {
-        //        x = Range.Range24(12 + AstroConvert.RadToHrs(x));
-        //    }
-
-
-        //    result.x = Get_EncoderfromHours(this.HomeEncoder.RA, x, this.StepsPerRev.RA, 0);
-        //    result.y = Get_EncoderfromDegrees(this.HomeEncoder.Dec, y + 90, this.StepsPerRev.Dec, 0, 0);
-
-        //    return result;
-        //}
+            //Debug.WriteLine($"Output = {result.RA}/{result.Dec}");
+            return result;
+        }
 
 
         //private CartesCoord EQ_Spherical2Cartes(double RA, double DEC, double TOT, double RACENTER, double DECCENTER)
@@ -1394,314 +1390,226 @@ namespace EqmodNStarAlignment.Model
 
         //}
 
+        /// <summary>
+        /// Returns the 3 points making up at triangle with the centre nearest the position
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <returns>List of 3 points or an empty list</returns>
+        internal List<AlignmentPoint> EQ_Choose_3Points(EncoderPosition pos)
+        {
+            Dictionary<int, double> distances = new Dictionary<int, double>();
+            List<AlignmentPoint> results = new List<AlignmentPoint>();
+            // Adjust only if there are three alignment stars
 
-        //internal TriangleCoord EQ_Choose_3Points(AxisPosition encoder)
-        //{
-        //    TriangleCoord result = new TriangleCoord();
-        //    Coord tmpcoords = new Coord();
-        //    Coord p1 = new Coord();
-        //    Coord p2 = new Coord();
-        //    Coord p3 = new Coord();
-        //    Coord pc = new Coord();
+            if (AlignmentPoints.Count <= 3)
+            {
+                foreach (AlignmentPoint pt in this.AlignmentPoints)
+                {
+                    results.Add(pt);
+                }
+                return results;
+            }
 
-        //    Tdatholder[] datholder = new Tdatholder[EQASCOM.MAX_STARS];
-        //    double combi_cnt = 0;
-        //    double tmp1 = 0;
-        //    int tmp2 = 0;
-        //    bool first = false;
-        //    double last_dist = 0;
-        //    double new_dist = 0;
+            Coord posCartesean = EQ_sp2Cs(pos);
 
-        //    // Adjust only if there are three alignment stars
+            // first find out the distances to the alignment stars
+            foreach (AlignmentPoint pt in this.AlignmentPoints)
+            {
+                switch (this.ActivePoints)
+                {
+                    case ActivePointsEnum.All:
+                        // all points 
 
-        //    if (AlignmentPoints.Count < 3)
-        //    {
-        //        result.i = 1;
-        //        result.j = 2;
-        //        result.k = 3;
-        //        return result;
-        //    }
+                        break;
+                    case ActivePointsEnum.PierSide:
+                        // only consider points on this side of the meridian 
+                        if (pt.EncoderCartesian.y * posCartesean.y < 0)
+                        {
+                            continue;
+                        }
 
-        //    Coord tmpcoord = EQ_sp2Cs(encoder);
+                        break;
+                    case ActivePointsEnum.LocalQuadrant:
+                        // local quadrant 
+                        if (!GetQuadrant(posCartesean).Equals(GetQuadrant(pt.EncoderCartesian)))
+                        {
+                            continue;
+                        }
 
-        //    int Count = 0;
-        //    for (int i = 0; i < EQASCOM.gAlignmentStars_count; i++)
-        //    {
+                        break;
+                }
 
-        //        datholder[Count].cc = EQASCOM.my_PointsC[i];
-        //        switch (ActivePoints)
-        //        {
-        //            case ActivePointsEnum.All:
-        //                // all points 
+                if (CheckLocalPier)
+                {
+                    // calculate polar distance
+                    distances.Add(pt.Id, Math.Pow(pt.Encoder.RA - pos.RA, 2) + Math.Pow(pt.Encoder.Dec - pos.Dec, 2));
+                }
+                else
+                {
+                    // calculate cartesian disatnce
+                    distances.Add(pt.Id, Math.Pow(pt.EncoderCartesian.x - posCartesean.x, 2) + Math.Pow(pt.EncoderCartesian.y - posCartesean.y, 2));
+                }
+            }
 
-        //                break;
-        //            case ActivePointsEnum.PierSide:
-        //                // only consider points on this side of the meridian 
-        //                if (datholder[Count].cc.y * tmpcoord.y < 0)
-        //                {
-        //                    goto NextPoint;
-        //                }
+            if (distances.Count < 3)
+            {
+                return results; // Empty list.
+            }
 
-        //                break;
-        //            case ActivePointsEnum.LocalQuadrant:
-        //                // local quadrant 
-        //                if (!GetQuadrant(tmpcoord).Equals(GetQuadrant(datholder[Count].cc)))
-        //                {
-        //                    goto NextPoint;
-        //                }
+            // now sort the distances so the closest stars are at the top
+            //Just use the nearest 50 stars (or max) - saves processing time
+            List<int> sortedIds = distances.OrderBy(d => d.Value).Select(d => d.Key).Take(this.NStarMaxCombinationCount).ToList();
 
-        //                break;
-        //        }
+            var tmp1 = sortedIds.Count - 1;
+            var tmp2 = tmp1 - 1;
 
-        //        if (CheckLocalPier)
-        //        {
-        //            // calculate polar distance
-        //            datholder[Count].dat = Math.Pow(EQASCOM.my_Points[i].x - x, 2) + Math.Pow(EQASCOM.my_Points[i].y - Y, 2);
-        //        }
-        //        else
-        //        {
-        //            // calculate cartesian disatnce
-        //            datholder[Count].dat = Math.Pow(datholder[Count].cc.x - tmpcoord.x, 2) + Math.Pow(datholder[Count].cc.y - tmpcoord.y, 2);
-        //        }
+            // iterate through all the triangles posible using the nearest alignment points
+            double minCentreDistance = double.MaxValue;
+            double centreDistance;
+            Coord triangleCentre;
+            for (int i = 0; i <= tmp2; i++)
+            {
+                var p1 = this.AlignmentPoints.First(pt => pt.Id == sortedIds[i]);
+                for (int j = i + 1; j < tmp1; j++)
+                {
+                    var p2 = this.AlignmentPoints.First(pt => pt.Id == sortedIds[j]);
+                    for (int k = (j + 1); k < sortedIds.Count; k++)
+                    {
+                        var p3 = this.AlignmentPoints.First(pt => pt.Id == sortedIds[k]);
 
-        //        // Also save the reference star id for this particular reference star
-        //        datholder[Count].idx = Convert.ToInt16(i);
 
-        //        Count++;
-        //    NextPoint:;
-        //    }
+                        if (EQ_CheckPoint_in_Triangle(posCartesean.x, posCartesean.y,
+                            p1.EncoderCartesian.x, p1.EncoderCartesian.y,
+                            p2.EncoderCartesian.x, p2.EncoderCartesian.y,
+                            p3.EncoderCartesian.x, p3.EncoderCartesian.y))
+                        {
+                            // Compute for the center point
+                            triangleCentre = EQ_GetCenterPoint(p1.EncoderCartesian, p2.EncoderCartesian, p3.EncoderCartesian);
+                            // don't need full pythagoras - sum of squares is good enough
+                            centreDistance = Math.Pow(triangleCentre.x - posCartesean.x, 2) + Math.Pow(triangleCentre.y - posCartesean.y, 2);
+                            if (centreDistance < minCentreDistance)
+                            {
+                                results = new List<AlignmentPoint> { p1, p2, p3 };
+                                minCentreDistance = centreDistance;
+                            }
+                        }
+                    }
+                }
+            }
 
-        //    if (Count < 3)
-        //    {
-        //        // not enough points to do 3-point
-        //        result.i = 0;
-        //        result.j = 0;
-        //        result.k = 0;
-        //        return result;
-        //    }
+            return results;
 
-        //    // now sort the disatnces so the closest stars are at the top
-        //    EQ_Quicksort2(datholder, 1, Count);
+        }
 
-        //    //Just use the nearest 50 stars (max) - saves processing time
-        //    if (Count > EQASCOM.gMaxCombinationCount - 1)
-        //    {
-        //        combi_cnt = EQASCOM.gMaxCombinationCount;
-        //    }
-        //    else
-        //    {
-        //        combi_cnt = Count;
-        //    }
 
-        //    //    combi_offset = 1
-        //    tmp1 = combi_cnt - 1;
-        //    tmp2 = Convert.ToInt32(combi_cnt - 2);
-        //    first = true;
-        //    // iterate through all the triangles posible using the nearest alignment points
-        //    int l = 1;
-        //    int m = 2;
-        //    int n = 3;
-        //    int tempForEndVar2 = (tmp2);
-        //    for (int i = 1; i <= tempForEndVar2; i++)
-        //    {
-        //        p1 = datholder[Convert.ToInt32(i) - 1].cc;
-        //        double tempForEndVar3 = (tmp1);
-        //        for (int j = i + 1; j <= tempForEndVar3; j++)
-        //        {
-        //            p2 = datholder[Convert.ToInt32(j) - 1].cc;
-        //            double tempForEndVar4 = combi_cnt;
-        //            for (int k = (j + 1); k <= tempForEndVar4; k++)
-        //            {
-        //                p3 = datholder[Convert.ToInt32(k) - 1].cc;
 
-        //                if (EQ_CheckPoint_in_Triangle(tmpcoord.x, tmpcoord.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y) == 1)
-        //                {
-        //                    // Compute for the center point
-        //                    pc = EQ_GetCenterPoint(p1, p2, p3);
-        //                    // don't need full pythagoras - sum of squares is good enough
-        //                    new_dist = Math.Pow(pc.x - tmpcoord.x, 2) + Math.Pow(pc.y - tmpcoord.y, 2);
+        /// <summary>
+        /// Returns the nearest 3 alignment points that form and enclosing triangle around a position.
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <returns>List of 3 points or an empty list.</returns>
+        internal List<AlignmentPoint> EQ_ChooseNearest3Points(EncoderPosition pos)
+        {
+            Dictionary<int, double> distances = new Dictionary<int, double>();
+            List<AlignmentPoint> results = new List<AlignmentPoint>();
+            // Adjust only if there are three alignment stars
 
-        //                    if (first)
-        //                    {
-        //                        // first time through
-        //                        last_dist = new_dist;
-        //                        first = false;
-        //                        l = i;
-        //                        m = j;
-        //                        n = Convert.ToInt32(k);
-        //                    }
-        //                    else
-        //                    {
-        //                        if (new_dist < last_dist)
-        //                        {
-        //                            l = i;
-        //                            m = j;
-        //                            n = Convert.ToInt32(k);
-        //                            last_dist = new_dist;
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
+            if (AlignmentPoints.Count <= 3)
+            {
+                foreach (AlignmentPoint pt in this.AlignmentPoints)
+                {
+                    results.Add(pt);
+                }
+                return results;
+            }
 
-        //    if (first)
-        //    {
-        //        result.i = 0;
-        //        result.j = 0;
-        //        result.k = 0;
-        //    }
-        //    else
-        //    {
-        //        result.i = datholder[Convert.ToInt32(l) - 1].idx;
-        //        result.j = datholder[Convert.ToInt32(m) - 1].idx;
-        //        result.k = datholder[n - 1].idx;
-        //    }
+            Coord posCartesean = EQ_sp2Cs(pos);
 
-        //    return result;
-        //}
+            // first find out the distances to the alignment stars
+            foreach (AlignmentPoint pt in this.AlignmentPoints)
+            {
+                switch (ActivePoints)
+                {
+                    case ActivePointsEnum.All:
+                        // all points 
 
-        //internal TriangleCoord EQ_ChooseNearest3Points(AxisPosition encoder)
-        //{
-        //    TriangleCoord result = new TriangleCoord();
-        //    Coord p1 = new Coord();
-        //    Coord p2 = new Coord();
-        //    Coord p3 = new Coord();
-        //    Coord pc = new Coord();
+                        break;
+                    case ActivePointsEnum.PierSide:
+                        // only consider points on this side of the meridian 
+                        if (pt.EncoderCartesian.y * posCartesean.y < 0)
+                        {
+                            continue;
+                        }
 
-        //    Tdatholder[] datholder = new Tdatholder[EQASCOM.MAX_STARS];
-        //    double combi_cnt = 0;
-        //    double tmp1 = 0;
-        //    int tmp2 = 0;
-        //    bool first = false;
+                        break;
+                    case ActivePointsEnum.LocalQuadrant:
+                        // local quadrant 
+                        if (!GetQuadrant(posCartesean).Equals(GetQuadrant(pt.EncoderCartesian)))
+                        {
+                            continue;
+                        }
 
-        //    // Adjust only if there are three alignment stars
+                        break;
+                }
 
-        //    if (AlignmentPoints.Count <= 3)
-        //    {
-        //        result.i = 1;
-        //        result.j = 2;
-        //        result.k = 3;
-        //        return result;
-        //    }
+                if (CheckLocalPier)
+                {
+                    // calculate polar distance
+                    distances.Add(pt.Id, Math.Pow(pt.Encoder.RA - pos.RA, 2) + Math.Pow(pt.Encoder.Dec - pos.Dec, 2));
+                }
+                else
+                {
+                    // calculate cartesian disatnce
+                    distances.Add(pt.Id, Math.Pow(pt.EncoderCartesian.x - posCartesean.x, 2) + Math.Pow(pt.EncoderCartesian.y - posCartesean.y, 2));
+                }
+            }
 
-        //    Coord tmpcoord = EQ_sp2Cs(encoder);
+            if (distances.Count < 3)
+            {
+                return results; // Empty list.
+            }
 
-        //    int Count = 0;
-        //    // first find out the distances to the alignment stars
-        //    for (int i = 1; i <= EQASCOM.gAlignmentStars_count; i++)
-        //    {
+            // now sort the distances so the closest stars are at the top
+            //Just use the nearest 50 stars (or max) - saves processing time
+            List<int> sortedIds = distances.OrderBy(d => d.Value).Select(d => d.Key).Take(this.NStarMaxCombinationCount).ToList();
 
-        //        datholder[Count].cc = EQASCOM.my_PointsC[Convert.ToInt32(i)];
+            var tmp1 = sortedIds.Count - 1;
+            var tmp2 = tmp1 - 1;
+            bool done = false;
 
-        //        switch (ActivePoints)
-        //        {
-        //            case ActivePointsEnum.All:
-        //                // all points 
 
-        //                break;
-        //            case ActivePointsEnum.PierSide:
-        //                // only consider points on this side of the meridian 
-        //                if (datholder[Count].cc.y * tmpcoord.y < 0)
-        //                {
-        //                    goto NextPoint;
-        //                }
+            // iterate through all the triangles posible using the nearest alignment points
+            for (int i = 0; i <= tmp2; i++)
+            {
+                var p1 = this.AlignmentPoints.First(pt => pt.Id == sortedIds[i]);
+                for (int j = i + 1; j < tmp1; j++)
+                {
+                    var p2 = this.AlignmentPoints.First(pt => pt.Id == sortedIds[j]);
+                    for (int k = (j + 1); k < sortedIds.Count; k++)
+                    {
+                        var p3 = this.AlignmentPoints.First(pt => pt.Id == sortedIds[k]);
 
-        //                break;
-        //            case ActivePointsEnum.LocalQuadrant:
-        //                // local quadrant 
-        //                if (!GetQuadrant(tmpcoord).Equals(GetQuadrant(datholder[Count].cc)))
-        //                {
-        //                    goto NextPoint;
-        //                }
 
-        //                break;
-        //        }
+                        if (EQ_CheckPoint_in_Triangle(posCartesean.x, posCartesean.y,
+                            p1.EncoderCartesian.x, p1.EncoderCartesian.y,
+                            p2.EncoderCartesian.x, p2.EncoderCartesian.y,
+                            p3.EncoderCartesian.x, p3.EncoderCartesian.y))
+                        {
+                            results.Add(p1);
+                            results.Add(p2);
+                            results.Add(p3);
+                            done = true;
+                        }
+                        if (done) break;
+                    }
+                    if (done) break;
+                }
+                if (done) break;
+            }
 
-        //        if (CheckLocalPier)
-        //        {
-        //            // calculate polar distance
-        //            datholder[Count].dat = Math.Pow(EQASCOM.my_Points[i].x - x, 2) + Math.Pow(EQASCOM.my_Points[i].y - Y, 2);
-        //        }
-        //        else
-        //        {
-        //            // calculate cartesian disatnce
-        //            datholder[Count].dat = Math.Pow(datholder[Count].cc.x - tmpcoord.x, 2) + Math.Pow(datholder[Count].cc.y - tmpcoord.y, 2);
-        //        }
+            return results;
 
-        //        // Also save the reference star id for this particular reference star
-        //        datholder[Count].idx = Convert.ToInt16(i);
-
-        //        Count++;
-        //    NextPoint:;
-        //    }
-
-        //    if (Count < 3)
-        //    {
-        //        // not enough points to do 3-point
-        //        result.i = 0;
-        //        result.j = 0;
-        //        result.k = 0;
-        //        return result;
-        //    }
-
-        //    // now sort the disatnces so the closest stars are at the top
-        //    EQ_Quicksort2(datholder, 1, Count);
-
-        //    //Just use the nearest 50 stars (max) - saves processing time
-        //    if (Count > EQASCOM.gMaxCombinationCount - 1)
-        //    {
-        //        combi_cnt = EQASCOM.gMaxCombinationCount;
-        //    }
-        //    else
-        //    {
-        //        combi_cnt = Count;
-        //    }
-
-        //    tmp1 = combi_cnt - 1;
-        //    tmp2 = Convert.ToInt32(combi_cnt - 2);
-        //    first = true;
-
-        //    // iterate through all the triangles posible using the nearest alignment points
-        //    int l = 1;
-        //    int m = 2;
-        //    int n = 3;
-        //    int tempForEndVar2 = (tmp2);
-        //    for (int i = 1; i <= tempForEndVar2; i++)
-        //    {
-        //        p1 = datholder[Convert.ToInt32(i) - 1].cc;
-        //        double tempForEndVar3 = (tmp1);
-        //        for (int j = i + 1; j <= tempForEndVar3; j++)
-        //        {
-        //            p2 = datholder[Convert.ToInt32(j) - 1].cc;
-        //            double tempForEndVar4 = combi_cnt;
-        //            for (int k = (j + 1); k <= tempForEndVar4; k++)
-        //            {
-        //                p3 = datholder[Convert.ToInt32(k) - 1].cc;
-
-        //                if (EQ_CheckPoint_in_Triangle(tmpcoord.x, tmpcoord.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y) == 1)
-        //                {
-        //                    l = i;
-        //                    m = j;
-        //                    n = Convert.ToInt32(k);
-        //                    goto alldone;
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    result.i = 0;
-        //    result.j = 0;
-        //    result.k = 0;
-        //    return result;
-
-        //alldone:
-        //    result.i = datholder[Convert.ToInt32(l) - 1].idx;
-        //    result.j = datholder[Convert.ToInt32(m) - 1].idx;
-        //    result.k = datholder[n - 1].idx;
-
-        //    return result;
-        //}
+        }
 
         //public static float GetRnd()
         //{

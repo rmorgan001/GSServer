@@ -50,9 +50,12 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Legacy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EqmodVectorTests.cs" />
     <Compile Include="AlignmentModelTests.cs" />
+    <Compile Include="RangeTests.cs" />
+    <Compile Include="AstroConvertTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\AlignmentPointsIn.json">
@@ -65,6 +68,11 @@
       <Project>{b2375ca6-17ae-4875-b33d-b276781cc1da}</Project>
       <Name>EqmodNStarAlignment</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="astro32.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

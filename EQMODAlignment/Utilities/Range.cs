@@ -14,6 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using System;
+
 namespace EqmodNStarAlignment.Utilities
 {
     /// <summary>
@@ -22,6 +24,23 @@ namespace EqmodNStarAlignment.Utilities
     /// <remarks>Attention to the order of parameters (AltAz vs AzAlt) in the method names</remarks>
     public static class Range
     {
+        ///* insure 0 <= *v < r.
+        //  233 void
+        //  234 range(double* v, double r)
+        //  235 {
+        //  236     *v -= r* floor(*v/r);
+        //  237 }
+        public static double ZeroToValue(double d, double range)
+        {
+            while ((d >= range) || (d < 0.0))
+            {
+                if (d < 0.0) d += range;
+                if (d >= range) d -= range;
+            }
+            return d;
+
+        }
+
         /// <summary>
         /// Returns double in the range -12 to +12
         /// </summary>

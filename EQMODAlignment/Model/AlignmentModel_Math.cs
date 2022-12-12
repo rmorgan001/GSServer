@@ -61,6 +61,7 @@ using EqmodNStarAlignment.DataTypes;
 using EqmodNStarAlignment.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace EqmodNStarAlignment.Model
@@ -279,22 +280,22 @@ namespace EqmodNStarAlignment.Model
 
 
 
-        public double Get_EncoderHours(double RAencoderPosition)
+        private double Get_EncoderHours(long encoderPosition)
         {
-
+            double pos = encoderPosition * 1d;
             double hours;
 
             // Compute in Hours the encoder value based on 0 position value (RAOffset0)
             // and Total 360 degree rotation microstep count (Tot_Enc
 
-            if (RAencoderPosition > this.HomeEncoder.RA)
+            if (pos > this.HomeEncoder.RA)
             {
-                hours = ((RAencoderPosition - this.HomeEncoder.RA) / StepsPerRev.RA) * 24;
+                hours = ((pos - this.HomeEncoder.RA) / StepsPerRev.RA) * 24d;
                 hours = 24 - hours;
             }
             else
             {
-                hours = ((this.HomeEncoder.RA - RAencoderPosition) / StepsPerRev.RA) * 24;
+                hours = ((this.HomeEncoder.RA - pos) / StepsPerRev.RA) * 24d;
             }
 
             if (Hemisphere == HemisphereEnum.Northern)
@@ -308,69 +309,69 @@ namespace EqmodNStarAlignment.Model
 
         }
 
-        //private int Get_EncoderfromHours(double encOffset0, double hourval, double Tot_enc, int hmspr)
-        //{
-
-        //    hourval = Range24(hourval - 6d); // Re-normalize from a perpendicular position
-        //    if (hmspr == 0)
-        //    {
-        //        if (hourval < 12)
-        //        {
-        //            return Convert.ToInt32(encOffset0 - ((hourval / 24d) * Tot_enc));
-        //        }
-        //        else
-        //        {
-        //            return Convert.ToInt32((((24 - hourval) / 24d) * Tot_enc) + encOffset0);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        if (hourval < 12)
-        //        {
-        //            return Convert.ToInt32(((hourval / 24d) * Tot_enc) + encOffset0);
-        //        }
-        //        else
-        //        {
-        //            return Convert.ToInt32(encOffset0 - (((24 - hourval) / 24d) * Tot_enc));
-        //        }
-        //    }
-
-        //}
-
-        //private int Get_EncoderfromDegrees(double encOffset0, double degval, double Tot_enc, double Pier, int hmspr)
-        //{
-
-        //    if (hmspr == 1)
-        //    {
-        //        degval = 360 - degval;
-        //    }
-        //    if ((degval > 180) && (Pier == 0))
-        //    {
-        //        return Convert.ToInt32(encOffset0 - (((360 - degval) / 360d) * Tot_enc));
-        //    }
-        //    else
-        //    {
-        //        return Convert.ToInt32(((degval / 360d) * Tot_enc) + encOffset0);
-        //    }
-
-        //}
-
-
-        private double Get_EncoderDegrees(double DecEncoderPosition)
+        private long Get_EncoderfromHours(double hourval)
         {
 
+            hourval = Range.Range24(hourval - 6d); // Re-normalize from a perpendicular position
+            if (this.Hemisphere == HemisphereEnum.Northern)
+            {
+                if (hourval < 12)
+                {
+                    return (long)Math.Round(this.HomeEncoder.RA - ((hourval / 24d) * this.StepsPerRev.RA));
+                }
+                else
+                {
+                    return (long)Math.Round((((24 - hourval) / 24d) * this.StepsPerRev.RA) + this.HomeEncoder.RA);
+                }
+            }
+            else
+            {
+                if (hourval < 12)
+                {
+                    return (long)Math.Round(((hourval / 24d) * this.StepsPerRev.RA) + this.HomeEncoder.RA);
+                }
+                else
+                {
+                    return (long)Math.Round(this.HomeEncoder.RA - (((24 - hourval) / 24d) * this.StepsPerRev.RA));
+                }
+            }
+
+        }
+
+        private long Get_EncoderfromDegrees(double degval)
+        {
+
+            if (this.Hemisphere == HemisphereEnum.Southern)
+            {
+                degval = 360 - degval;
+            }
+            if ((degval > 180)) // && (Pier == 0))
+            {
+                return (long)Math.Round(this.HomeEncoder.Dec - (((360 - degval) / 360d) * this.StepsPerRev.Dec));
+            }
+            else
+            {
+                return (long)Math.Round(((degval / 360d) * this.StepsPerRev.Dec) + this.HomeEncoder.Dec);
+            }
+
+        }
+
+
+        private double Get_EncoderDegrees(long encoderPosition)
+        { 
+            double pos = encoderPosition * 1.0d;// Convert to double to prevent truncation
             double decDegrees = 0;
 
             // Compute in Hours the encoder value based on 0 position value (EncOffset0)
             // and Total 360 degree rotation microstep count (Tot_Enc
 
-            if (DecEncoderPosition > this.HomeEncoder.Dec)
+            if (pos > this.HomeEncoder.Dec)
             {
-                decDegrees = ((DecEncoderPosition - this.HomeEncoder.Dec) / this.StepsPerRev.Dec) * 360;
+                decDegrees = ((pos - this.HomeEncoder.Dec) / this.StepsPerRev.Dec) * 360d;
             }
             else
             {
-                decDegrees = ((this.HomeEncoder.Dec - DecEncoderPosition) / this.StepsPerRev.Dec) * 360;
+                decDegrees = ((double)(this.HomeEncoder.Dec - pos) / this.StepsPerRev.Dec) * 360d;
                 decDegrees = 360 - decDegrees;
             }
 
@@ -746,19 +747,19 @@ namespace EqmodNStarAlignment.Model
 
         //}
 
-        //private double Delta_RA_Map(double RAENCODER)
-        //{
+        private double Delta_RA_Map(double raEncoder)
+        {
 
-        //    return RAENCODER + gRA1Star + gRASync01;
+            return raEncoder + this._oneStarAdjustment.RA; // + gRASync01 (Eqmod has an ASCOM Sync mode which would set this value)
 
-        //}
+        }
 
-        //private double Delta_DEC_Map(double DecEncoder)
-        //{
+        private double Delta_DEC_Map(double decEncoder)
+        {
 
-        //    return DecEncoder + gDEC1Star + gDECSync01;
+            return decEncoder + this._oneStarAdjustment.Dec; // + gDECSync01  (Eqmod has an ASCOM Sync mode which would set this value)
 
-        //}
+        }
 
 
         //private Coordt Delta_Matrix_Map(double RA, double DEC)
@@ -793,72 +794,70 @@ namespace EqmodNStarAlignment.Model
         //}
 
 
-        //private Coordt Delta_Matrix_Reverse_Map(double RA, double DEC)
-        //{
+        private EncoderPosition Delta_Matrix_Reverse_Map(EncoderPosition pos)
+        {
 
-        //    Coordt result = new Coordt();
-        //    Coord obtmp = new Coord();
+            EncoderPosition result = new EncoderPosition();
 
-        //    if ((RA >= 0x1000000) || (DEC >= 0x1000000))
-        //    {
-        //        result.x = RA;
-        //        result.y = DEC;
-        //        result.z = 1;
-        //        result.f = 0;
-        //        return result;
-        //    }
-
-        //    obtmp.x = RA + gRASync01;
-        //    obtmp.y = DEC + gDECSync01;
-        //    obtmp.z = 1;
-
-        //    // re transform using the 3 nearest stars
-        //    int i = EQ_UpdateAffine(obtmp.x, obtmp.y);
-        //    Coord obtmp2 = EQ_plAffine(obtmp);
-
-        //    result.x = obtmp2.x;
-        //    result.y = obtmp2.y;
-        //    result.z = 1;
-        //    result.f = (short)i;
+            if ((pos.RA >= 0x1000000) || (pos.Dec >= 0x1000000))
+            {
+                result.RA = pos.RA;
+                result.Dec = pos.Dec;
+                //result.z = 1;
+                //result.f = 0;
+                return result;
+            }
 
 
-        //    return result;
-        //}
+            // re transform using the 3 nearest stars
+            _=EQ_UpdateAffine(pos);
+            EncoderPosition obtmp2 = EQ_plAffine(pos);
+
+            result.RA = obtmp2.RA;
+            result.Dec = obtmp2.Dec;
+            //result.z = 1;
+            //result.f = (short)i;
 
 
-        //private Coordt DeltaSync_Matrix_Map(double RA, double DEC)
-        //{
-        //    Coordt result = new Coordt();
-        //    int i = 0;
+            return result;
+        }
 
-        //    if ((RA >= 0x1000000) || (DEC >= 0x1000000))
-        //    {
-        //        result.x = RA;
-        //        result.y = DEC;
-        //        result.z = 0;
-        //        result.f = 0;
-        //    }
-        //    else
-        //    {
-        //        i = GetNearest(RA, DEC);
-        //        if (i != -1)
-        //        {
-        //            EQASCOM.gSelectStar = i;
-        //            result.x = RA + (EQASCOM.ct_Points[i].x - EQASCOM.my_Points[i].x) + gRASync01;
-        //            result.y = DEC + (EQASCOM.ct_Points[i].y - EQASCOM.my_Points[i].y) + gDECSync01;
-        //            result.z = 1;
-        //            result.f = 0;
-        //        }
-        //        else
-        //        {
-        //            result.x = RA;
-        //            result.y = DEC;
-        //            result.z = 0;
-        //            result.f = 0;
-        //        }
-        //    }
-        //    return result;
-        //}
+        /// <summary>
+        /// Maps an encoder position to the calculate target position
+        /// </summary>
+        /// <param name="encoderPosition"></param>
+        /// <returns></returns>
+        private EncoderPosition DeltaSync_Matrix_Map(EncoderPosition encoderPosition)
+        {
+            EncoderPosition result = new EncoderPosition();
+
+            if ((encoderPosition.RA >= 0x1000000) || (encoderPosition.Dec >= 0x1000000))
+            {
+                result.RA = encoderPosition.RA;
+                result.Dec = encoderPosition.Dec;
+                // result.z = 0;
+                // result.f = 0;
+            }
+            else
+            {
+                this.SelectedAlignmentPoint = GetNearest(encoderPosition);
+                if (this.SelectedAlignmentPoint != null)
+                {
+                    result.RA = encoderPosition.RA + (this.SelectedAlignmentPoint.Target.RA - this.SelectedAlignmentPoint.Encoder.RA);       // + gRASync01;
+                    result.Dec = encoderPosition.Dec + (this.SelectedAlignmentPoint.Target.Dec - this.SelectedAlignmentPoint.Encoder.Dec);    // + gDecSync01;
+                    // result.z = 1;
+                    // result.f = 0;
+                }
+                else
+                {
+                    result.RA = encoderPosition.RA;
+                    result.Dec = encoderPosition.Dec;
+                    // result.z = 0;
+                    // result.f = 0;
+                }
+            }
+            return result;
+        }
 
 
         //private Coordt DeltaSyncReverse_Matrix_Map(double RA, double DEC)
@@ -895,117 +894,104 @@ namespace EqmodNStarAlignment.Model
         //    }
         //    return result;
         //}
-        //private int GetQuadrant(Coord tmpcoord)
-        //{
-        //    int ret = 0;
+        
+        //TODO: Improve GetQuadrant to return an Enum value (NW, NE, SW or SE) instead of an int.
 
-        //    if (tmpcoord.x >= 0)
-        //    {
-        //        if (tmpcoord.y >= 0)
-        //        {
-        //            ret = 0;
-        //        }
-        //        else
-        //        {
-        //            ret = 1;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        if (tmpcoord.y >= 0)
-        //        {
-        //            ret = 2;
-        //        }
-        //        else
-        //        {
-        //            ret = 3;
-        //        }
-        //    }
+        /// <summary>
+        /// Returns a quadrant based on a cartesean coordinate
+        /// </summary>
+        /// <param name="tmpcoord"></param>
+        /// <returns></returns>
+        private int GetQuadrant(Coord tmpcoord)
+        {
+            int ret = 0;
 
-        //    return ret;
+            if (tmpcoord.x >= 0)
+            {
+                if (tmpcoord.y >= 0)
+                {
+                    ret = 0;
+                }
+                else
+                {
+                    ret = 1;
+                }
+            }
+            else
+            {
+                if (tmpcoord.y >= 0)
+                {
+                    ret = 2;
+                }
+                else
+                {
+                    ret = 3;
+                }
+            }
 
-        //}
+            return ret;
+
+        }
 
 
-        //private int GetNearest(double RA, double DEC)
-        //{
-        //    int i = 0;
-        //    Coord tmpcoord = new Coord();
-        //    Coord tmpcoord2 = new Coord();
-        //    double[] datholder = new double[EQASCOM.MAX_STARS];
-        //    int[] datholder2 = new int[EQASCOM.MAX_STARS];
+        /// <summary>
+        /// Return the nearest alignment point to an encoder position
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <returns></returns>
+        private AlignmentPoint GetNearest(EncoderPosition pos)
+        {
+            Dictionary<int, double> distances = new Dictionary<int, double>();
+            int[] datholder2 = new int[this.AlignmentPoints.Count];
 
-        //    tmpcoord.x = RA;
-        //    tmpcoord.y = DEC;
-        //    tmpcoord = EQ_sp2Cs(tmpcoord);
+            Coord posCartesean = EQ_sp2Cs(pos);
 
-        //    int Count = 0;
+            foreach (AlignmentPoint pt in this.AlignmentPoints)
+            {
+                switch (ActivePoints)
+                {
+                    case ActivePointsEnum.All:
+                        // all points 
+                        break;
+                    case ActivePointsEnum.PierSide:
+                        // only consider points on this side of the meridian 
+                        if (pt.EncoderCartesian.y * posCartesean.y < 0)
+                        {
+                            continue;
+                        }
+                        break;
+                    case ActivePointsEnum.LocalQuadrant:
+                        // local quadrant 
+                        if (GetQuadrant(posCartesean) != GetQuadrant(pt.EncoderCartesian))
+                        {
+                            continue;
+                        }
+                        break;
+                }
 
-        //    for (i = 1; i <= EQASCOM.gAlignmentStars_count; i++)
-        //    {
+                if (CheckLocalPier)
+                {
+                    // calculate polar distance
+                    distances.Add(pt.Id, Math.Pow(pt.Encoder.RA - pos.RA, 2) + Math.Pow(pt.Encoder.Dec - pos.Dec, 2));
+                }
+                else
+                {
+                    // calculate cartesian disatnce
+                    distances.Add(pt.Id, Math.Pow(pt.EncoderCartesian.x - posCartesean.x, 2) + Math.Pow(pt.EncoderCartesian.y - posCartesean.y, 2));
+                }
+            }
 
-        //        tmpcoord2 = EQASCOM.my_PointsC[i];
+            if (distances.Count == 0)
+            {
+                return null;
+            }
+            else
+            {
+                int nearestId = distances.OrderBy(kvp => kvp.Value).Select(kvp => kvp.Key).First();
+                return AlignmentPoints.FirstOrDefault(pt => pt.Id == nearestId);
+            }
 
-        //        switch (ActivePoints)
-        //        {
-        //            case ActivePointsEnum.All:
-        //                // all points 
-
-        //                break;
-        //            case ActivePointsEnum.PierSide:
-        //                // only consider points on this side of the meridian 
-        //                if (tmpcoord2.y * tmpcoord.y < 0)
-        //                {
-        //                    goto NextPoint;
-        //                }
-
-        //                break;
-        //            case ActivePointsEnum.LocalQuadrant:
-        //                // local quadrant 
-        //                if (GetQuadrant(tmpcoord) != GetQuadrant(tmpcoord2))
-        //                {
-        //                    goto NextPoint;
-        //                }
-
-        //                break;
-        //        }
-
-        //        Count++;
-        //        if (CheckLocalPier)
-        //        {
-        //            // calculate polar distance
-        //            datholder[Count - 1] = Math.Pow(EQASCOM.my_Points[i].x - RA, 2) + Math.Pow(EQASCOM.my_Points[i].y - DEC, 2);
-        //        }
-        //        else
-        //        {
-        //            // calculate cartesian disatnce
-        //            datholder[Count - 1] = Math.Pow(tmpcoord2.x - tmpcoord.x, 2) + Math.Pow(tmpcoord2.y - tmpcoord.y, 2);
-        //        }
-
-        //        datholder2[Count - 1] = i;
-
-        //    NextPoint:;
-        //    }
-
-        //    if (Count == 0)
-        //    {
-        //        return -1;
-        //    }
-        //    else
-        //    {
-        //        //    i = EQ_FindLowest(datholder(), 1, gAlignmentStars_count)
-        //        i = EQ_FindLowest(datholder, 1, Count);
-        //        if (i == -1)
-        //        {
-        //            return -1;
-        //        }
-        //        else
-        //        {
-        //            return datholder2[i - 1];
-        //        }
-        //    }
-
-        //}
+        }
 
 
     }

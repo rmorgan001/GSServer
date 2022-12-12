@@ -63,12 +63,13 @@ namespace EqmodNStarAlignment.Model
             if (AlignmentPoints.Count >= 3)
             {
 
-                _ =EQ_AssembleMatrix_Taki(0, 0,
-                    AlignmentPoints[0].TargetCartesian, AlignmentPoints[1].TargetCartesian, AlignmentPoints[2].TargetCartesian, 
-                    AlignmentPoints[0].EncoderCartesian, AlignmentPoints[1].EncoderCartesian,AlignmentPoints[2].EncoderCartesian);
-                _ =EQ_AssembleMatrix_Affine(0, 0, 
+                _ = EQ_AssembleMatrix_Taki(0, 0,
+                    AlignmentPoints[0].TargetCartesian, AlignmentPoints[1].TargetCartesian, AlignmentPoints[2].TargetCartesian,
+                    AlignmentPoints[0].EncoderCartesian, AlignmentPoints[1].EncoderCartesian, AlignmentPoints[2].EncoderCartesian);
+                _ = EQ_AssembleMatrix_Affine(0, 0,
                     AlignmentPoints[0].EncoderCartesian, AlignmentPoints[1].EncoderCartesian, AlignmentPoints[2].EncoderCartesian,
                     AlignmentPoints[0].TargetCartesian, AlignmentPoints[1].TargetCartesian, AlignmentPoints[2].TargetCartesian);
+                _threeStarEnabled = true;
             }
         }
         // /pec /showalignment

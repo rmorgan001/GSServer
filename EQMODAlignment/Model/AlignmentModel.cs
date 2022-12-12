@@ -42,6 +42,15 @@ namespace EqmodNStarAlignment.Model
         LocalQuadrant
     }
 
+    [TypeConverter(typeof(EnumTypeConverter))]
+    public enum ThreePointAlgorithmEnum
+    {
+        [Description("Best Centre")]
+        BestCentre,
+        [Description("Closest Points")]
+        ClosestPoints
+    }
+
     public enum HemisphereEnum
     {
         Northern,
@@ -156,6 +165,8 @@ namespace EqmodNStarAlignment.Model
 
         public bool CheckLocalPier { get; set; }
 
+        public ThreePointAlgorithmEnum ThreePointAlgorithm { get; set;} = ThreePointAlgorithmEnum.BestCentre;
+
         public EncoderPosition HomeEncoder { get; private set; }
 
         public void SetHomePosition(long RAEncoder, long decEncoder)
@@ -179,7 +190,11 @@ namespace EqmodNStarAlignment.Model
 
         public AlignmentPointCollection AlignmentPoints { get; } = new AlignmentPointCollection();
 
+        public AlignmentPoint SelectedAlignmentPoint {get; private set; }
+
         public DateTime? LastAccessDateTime { get; private set; }
+
+        public int NStarMaxCombinationCount { get; set; } = 50;
 
         // String builder for building more detailed messages.
         private readonly StringBuilder _stringBuilder = new StringBuilder();

@@ -40,11 +40,13 @@ SOFTWARE.
 */
 
 using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace EqmodNStarAlignment.Utilities
 {
 
-    public class AstroConvert
+    public static class AstroConvert
     {
         /// <summary>
         /// Radians per degree
@@ -71,138 +73,112 @@ namespace EqmodNStarAlignment.Utilities
 
         #endregion
 
-        /// <summary>
-        /// Right Ascension to Local 12 Hour Angles
-        /// </summary>
-        /// <remarks>
-        /// The hour angle (HA) of an object is equal to the difference between
-        /// the current local sidereal time (LST) and the right ascension of that object.
-        /// Adopted from ASCOM
-        /// </remarks>
-        /// <param name="rightAscension">In decimal hours</param>
-        /// <param name="localSiderealTime">In decimal hours</param>
-        /// <returns>Local Hour Angles in decimal hours</returns>
-        public static double Ra2Ha12(double rightAscension, double localSiderealTime)
-        {
-            var a = localSiderealTime - rightAscension;
-            var ra2Ha = Range.Range12(a);
-            return ra2Ha;
-        }
+        #region Astro32.dll functions ...
+        /*
+         * The methods in this region are created using the code that I believe was originally used
+         * to create the astro32.dll that was shipped with EQMOD.
+         * Source: http://mmto.org/~dclark/Reports/MountDoxygen/html/aa__hadec_8c_source.html
+         */
+
+        static double lastLatitide;
+        static double sinLatitude = 0.0;
+        static double cosLatitude = 0.0;
 
 
-        /// <summary>
-        /// Right Ascension and Declination to Altitude and Azimuth
-        /// Adopted from ASCOM
-        /// </summary>
-        /// <param name="rightAscension">In decimal hours</param>
-        /// <param name="declination">In decimal degrees</param>
-        /// <param name="localSiderealTime">In decimal hours</param>
-        /// <param name="latitude">In decimal degrees</param>
-        /// <returns>Array of Azimuth, Altitude in decimal degrees</returns>
-        public static double[] RaDec2AltAz(double rightAscension, double declination, double localSiderealTime, double latitude)
+        /* given geographical latitude (n+, radians), lt, altitude (up+, radians),
+           * alt, and azimuth (angle round to the east from north+, radians),
+           * return hour angle (radians), ha, and declination (radians), dec.
+           * Originally called aa_hadec
+           */
+
+        public static double[] GetHaDec(double lt, double alt, double az)
         {
-            var a = Ra2Ha12(rightAscension, localSiderealTime);
-            var raDec2AltAz = HaDec2AltAz(a, declination, latitude);
-            return raDec2AltAz;
+            double ha = 0d, dec = 0d;
+            aaha_aux(lt, az, alt, ref ha, ref dec);
+            if (ha > Math.PI)
+                ha -= 2 * Math.PI;
+            return new double[] { ha, dec };
         }
 
-        /// <summary>
-        /// Hour Angles and Declination to Altitude and Azimuth
-        /// Adopted from ASCOM
-        /// </summary>
-        /// <param name="hourAngle">Local Hour angle</param>
-        /// <param name="declination">In decimal degrees</param>
-        /// <param name="latitude">In decimal degrees</param>
-        /// <returns>Array of Azimuth, Altitude in decimal degrees</returns>
-        public static double[] HaDec2AltAz(double hourAngle, double declination, double latitude)
+        /* given geographical (n+, radians), lt, hour angle (radians), ha, and
+         * declination (radians), dec, return altitude (up+, radians), alt, and
+         * azimuth (angle round to the east from north+, radians),
+         * Originally caled hadec_aa
+         */
+        public static double[] GetAltAz(double lt, double ha, double dec)
         {
-            double a = HrsToRad(hourAngle);
-            double b = DegToRad(declination);
-            double c = DegToRad(latitude);
-            double d = Math.Sin(a);
-            double e = Math.Cos(a);
-            double f = Math.Sin(b);
-            double g = Math.Cos(b);
-            double h = Math.Sin(c);
-            double i = Math.Cos(c);
-            double j = f * i - e * g * h;
-            double k = -(d * g);
-            double l = e * g * i + f * h;
-            double m = Math.Sqrt(j * j + k * k);
-            double n = RadToDeg(Math.Atan2(k, j));
-            double o = RadToDeg(Math.Atan2(l, m));
-            double p = Range.Range360(n);
-            double q = Range.Range90(o);
-            double[] altAz = { q, p };
-            return altAz;
+            double alt = 0d, az = 0d;
+            aaha_aux(lt, ha, dec, ref az, ref alt);
+            return new double[] { alt, az };
         }
 
-        /// <summary>
-        /// Azimuth and Altitude to Right Ascension and Declination
-        /// </summary>
-        /// <param name="altitude">In decimal degrees</param>
-        /// <param name="azimuth">In decimal degrees</param>
-        /// <param name="latitude">In decimal degrees</param>
-        /// <param name="lst">In decimal hours</param>
-        /// <returns>Ra in decimal hours, Dec in decimal degrees</returns>
-        public static double[] AltAz2RaDec(double altitude, double azimuth, double latitude, double lst)
+        static void aaha_aux(double latitude, double x, double y, ref double p, ref double q)
         {
-            var a = AltAz2Ra(altitude, azimuth, latitude, lst);
-            var b = AltAz2Dec(altitude, azimuth, latitude);
-            var altAz2RaDec = new[] { a, b };
-            return altAz2RaDec;
+            lastLatitide = double.MinValue;
+            double cap = 0.0;
+            double B = 0.0;
+
+            if (latitude != lastLatitide)
+            {
+                sinLatitude = Math.Sin(latitude);
+                cosLatitude = Math.Cos(latitude);
+                lastLatitide = latitude;
+            }
+
+            solve_sphere(-x, Math.PI / 2 - y, sinLatitude, cosLatitude, ref cap, ref B);
+            p = B;
+            q = Math.PI / 2 - Math.Acos(cap);
         }
 
-        /// <summary>
-        /// Azimuth and Altitude to Declination
-        /// Adopted from ASCOM
-        /// </summary>
-        /// <param name="altitude">In decimal degrees</param>
-        /// <param name="azimuth">In decimal degrees</param>
-        /// <param name="latitude">In decimal degrees</param>
-        /// <returns>Declination in decimal degrees</returns>
-        public static double AltAz2Dec(double altitude, double azimuth, double latitude)
+        /* solve a spherical triangle:
+         *           A
+         *          /  \
+         *         /    \
+         *      c /      \ b
+         *       /        \
+         *      /          \
+         *    B ____________ C
+         *           a
+         *
+         * given A, b, c find B and a in range 0..B..2PI and 0..a..PI, respectively..
+         * cap and Bp may be NULL if not interested in either one.
+         * N.B. we pass in cos(c) and sin(c) because in many problems one of the sides
+         *   remains constant for many values of A and b.
+         */
+        static void solve_sphere(double A, double b, double cc, double sc, ref double cap, ref double Bp)
         {
-            var a = DegToRad(azimuth);
-            var b = DegToRad(altitude);
-            var c = DegToRad(latitude);
-            //var d = Math.Sin(a);
-            var e = Math.Cos(a);
-            var f = Math.Sin(b);
-            var g = Math.Cos(b);
-            var h = Math.Sin(c);
-            var i = Math.Cos(c);
-            var j = e * i * g + h * f;
-            var k = RadToDeg(Math.Asin(j));
-            var altAz2Dec = Range.Range90(k);
-            return altAz2Dec;
-        }
+            double cb = Math.Cos(b), sb = Math.Sin(b);
+            double sA, cA = Math.Cos(A);
+            double x, y;
+            double ca;
+            double B;
 
-        /// <summary>
-        /// Azimuth and Altitude to Right Ascension
-        /// Adopted from ASCOM
-        /// </summary>
-        /// <param name="altitude">In decimal degrees</param>
-        /// <param name="azimuth">In decimal degrees</param>
-        /// <param name="latitude">In decimal degrees</param>
-        /// <param name="lst">In decimal hours</param>
-        /// <returns>Right Ascension in decimal hours</returns>
-        public static double AltAz2Ra(double altitude, double azimuth, double latitude, double lst)
-        {
-            var a = DegToRad(azimuth);
-            var b = DegToRad(altitude);
-            var c = DegToRad(latitude);
-            var d = Math.Sin(a);
-            var e = Math.Cos(a);
-            var f = Math.Sin(b);
-            var g = Math.Cos(b);
-            var h = Math.Sin(c);
-            var i = Math.Cos(c);
-            var j = -d * g;
-            var k = -e * h * g + f * i;
-            var l = RadToHrs(Math.Atan2(j, k));
-            var altAz2Ra = Range.Range24(lst - l);
-            return altAz2Ra;
+            ca = cb * cc + sb * sc * cA;
+            if (ca > 1.0)
+            {
+                ca = 1.0;
+            }
+            if (ca < -1.0)
+            {
+                ca = -1.0;
+            }
+            cap = ca;
+
+            if (sc < 1e-7)
+            {
+                B = cc < 0 ? A : Math.PI - A;
+            }
+            else
+            {
+                sA = Math.Sin(A);
+                y = sA * sb * sc;
+                x = cb - ca * cc;
+                B = Math.Atan2(y, x);
+            }
+
+            Bp = Range.ZeroToValue(B, Math.PI * 2);
         }
+        #endregion
+
     }
 }

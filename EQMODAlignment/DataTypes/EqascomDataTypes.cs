@@ -94,14 +94,13 @@ namespace EqmodNStarAlignment.DataTypes
     //    }
     //}
 
-    //[Serializable]
-    //public struct Coordt
-    //{
-    //    public double x; //x = X Coordinate
-    //    public double y; //y = Y Coordinate
-    //    public double z;
-    //    public short f;
-    //}
+    public struct Coordt
+    {
+        public double x; //x = X Coordinate
+        public double y; //y = Y Coordinate
+        public double z;
+        public short f;
+    }
 
     public struct CartesCoord
     {
@@ -109,6 +108,14 @@ namespace EqmodNStarAlignment.DataTypes
         public double y; //y = Y Coordinate
         public double r; // Radius Sign
         public double ra; // Radius Alpha
+
+        public CartesCoord(double xValue, double yValue, double rValue, double raValue)
+        {
+            x = xValue;
+            y = yValue;
+            r = rValue;
+            ra = raValue;
+        }
     }
 
     public struct SphericalCoord
@@ -116,15 +123,21 @@ namespace EqmodNStarAlignment.DataTypes
         public double x; //x = X Coordinate
         public double y; //y = Y Coordinate
         public double r; //r = RA Range Flag
+
+        public SphericalCoord(double xValue, double yValue, double rValue)
+        {
+            x = xValue;
+            y = yValue;
+            r = rValue;
+        }
     }
 
 
-    //[Serializable]
-    //public struct TriangleCoord
-    //{
-    //    public double i; // Offset 1
-    //    public double j; // Offset 2
-    //    public double k; // offset 3
+    public struct TriangleCoord
+    {
+        public double i; // Offset 1
+        public double j; // Offset 2
+        public double k; // offset 3
 
-    //}
+    }
 }
