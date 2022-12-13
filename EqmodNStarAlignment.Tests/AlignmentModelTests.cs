@@ -121,7 +121,7 @@ namespace EqmodNStarAlignment.Tests
                 _alignmentModel.EQ_NPointAppend(points[i]);
             }
 
-            Assert.IsTrue(_alignmentModel.AlignmentPoints.Count == 23);
+            Assert.IsTrue(_alignmentModel.AlignmentPoints.Count == 3);
 
             Assert.AreEqual(ExpectedTaki.Element[0, 0], AlignmentModel.EQMT.Element[0, 0], doubleDelta);
             Assert.AreEqual(ExpectedTaki.Element[0, 1], AlignmentModel.EQMT.Element[0, 1], doubleDelta);
@@ -177,8 +177,8 @@ namespace EqmodNStarAlignment.Tests
             MethodInfo methodInfo = type.GetMethod("Delta_Matrix_Reverse_Map", BindingFlags.NonPublic | BindingFlags.Instance);
             EncoderPosition result = (EncoderPosition)methodInfo.Invoke(_alignmentModel, new object[] { test });
             // var result = AlignmentModel.Delta_Matrix_Reverse_Map(new EncoderPosition(testRA, testDec));
-            Assert.AreEqual(expectedRa, result.RA, "RA result is incorrect");
-            Assert.AreEqual(expectedDec, result.Dec, "Dec result is incorrect");
+            Assert.AreEqual(expectedRa, result.RA, 120, "RA result is incorrect");
+            Assert.AreEqual(expectedDec, result.Dec, 120, "Dec result is incorrect");
         }
 
         /*

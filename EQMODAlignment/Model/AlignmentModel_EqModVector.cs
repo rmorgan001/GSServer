@@ -765,7 +765,7 @@ namespace EqmodNStarAlignment.Model
                 nearestPoints[2].EncoderCartesian,
                 nearestPoints[0].TargetCartesian,
                 nearestPoints[1].TargetCartesian,
-                nearestPoints[1].TargetCartesian);
+                nearestPoints[2].TargetCartesian);
         }
 
         //// Subroutine to implement find Array index with the lowest value
@@ -1489,7 +1489,7 @@ namespace EqmodNStarAlignment.Model
                             centreDistance = Math.Pow(triangleCentre.x - posCartesean.x, 2) + Math.Pow(triangleCentre.y - posCartesean.y, 2);
                             if (centreDistance < minCentreDistance)
                             {
-                                results = new List<AlignmentPoint> { p1, p2, p3 };
+                                results = new List<AlignmentPoint> { p1, p2, p3 };  // Reversed to match EQMOD sort order
                                 minCentreDistance = centreDistance;
                             }
                         }
@@ -1497,7 +1497,7 @@ namespace EqmodNStarAlignment.Model
                 }
             }
 
-            return results;
+            return results.OrderBy(p => p.AlignTime).ToList();
 
         }
 
