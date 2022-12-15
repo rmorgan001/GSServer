@@ -47,6 +47,10 @@ namespace EqmodNStarAlignment.Model
         }
         public void SendToMatrix()
         {
+            if (AlignmentPoints.Count < 3)
+            {
+                return;
+            }
             foreach (AlignmentPoint pt in AlignmentPoints)
             {
                 pt.EncoderCartesian = EQ_sp2Cs(pt.Encoder);

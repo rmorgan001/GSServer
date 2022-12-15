@@ -358,7 +358,7 @@ namespace EqmodNStarAlignment.Model
 
 
         private double Get_EncoderDegrees(long encoderPosition)
-        { 
+        {
             double pos = encoderPosition * 1.0d;// Convert to double to prevent truncation
             double decDegrees = 0;
 
@@ -747,20 +747,27 @@ namespace EqmodNStarAlignment.Model
 
         //}
 
-        private double Delta_RA_Map(double raEncoder)
+        private long Delta_RA_Map(long raEncoder)
         {
 
             return raEncoder + this._oneStarAdjustment.RA; // + gRASync01 (Eqmod has an ASCOM Sync mode which would set this value)
 
         }
 
-        private double Delta_DEC_Map(double decEncoder)
+        private long Delta_DEC_Map(long decEncoder)
         {
 
             return decEncoder + this._oneStarAdjustment.Dec; // + gDECSync01  (Eqmod has an ASCOM Sync mode which would set this value)
 
         }
 
+        private MapResult Delta_Map(EncoderPosition original)
+        {
+            return new MapResult()
+            {
+                EncoderPosition = new EncoderPosition(Delta_RA_Map(original.RA), Delta_DEC_Map(original.Dec))
+            };
+        }
 
         //private Coordt Delta_Matrix_Map(double RA, double DEC)
         //{
@@ -794,29 +801,24 @@ namespace EqmodNStarAlignment.Model
         //}
 
 
-        private EncoderPosition Delta_Matrix_Reverse_Map(EncoderPosition pos)
+        private MapResult Delta_Matrix_Reverse_Map(EncoderPosition pos)
         {
 
-            EncoderPosition result = new EncoderPosition();
+            MapResult result = new MapResult();
 
             if ((pos.RA >= 0x1000000) || (pos.Dec >= 0x1000000))
             {
-                result.RA = pos.RA;
-                result.Dec = pos.Dec;
-                //result.z = 1;
-                //result.f = 0;
+                result.EncoderPosition = new EncoderPosition(pos.RA, pos.Dec);
                 return result;
             }
 
 
             // re transform using the 3 nearest stars
-            _=EQ_UpdateAffine(pos);
+            bool inTriangle = EQ_UpdateAffine(pos);
             EncoderPosition obtmp2 = EQ_plAffine(pos);
 
-            result.RA = obtmp2.RA;
-            result.Dec = obtmp2.Dec;
-            //result.z = 1;
-            //result.f = (short)i;
+            result.EncoderPosition = new EncoderPosition(obtmp2.RA, obtmp2.Dec);
+            result.InTriangle = inTriangle;
 
 
             return result;
@@ -827,31 +829,29 @@ namespace EqmodNStarAlignment.Model
         /// </summary>
         /// <param name="encoderPosition"></param>
         /// <returns></returns>
-        private EncoderPosition DeltaSync_Matrix_Map(EncoderPosition encoderPosition)
+        private MapResult DeltaSync_Matrix_Map(EncoderPosition encoderPosition)
         {
-            EncoderPosition result = new EncoderPosition();
+            MapResult result = new MapResult();
 
             if ((encoderPosition.RA >= 0x1000000) || (encoderPosition.Dec >= 0x1000000))
             {
-                result.RA = encoderPosition.RA;
-                result.Dec = encoderPosition.Dec;
-                // result.z = 0;
-                // result.f = 0;
+                result.EncoderPosition = encoderPosition;
             }
             else
             {
                 this.SelectedAlignmentPoint = GetNearest(encoderPosition);
                 if (this.SelectedAlignmentPoint != null)
                 {
-                    result.RA = encoderPosition.RA + (this.SelectedAlignmentPoint.Target.RA - this.SelectedAlignmentPoint.Encoder.RA);       // + gRASync01;
-                    result.Dec = encoderPosition.Dec + (this.SelectedAlignmentPoint.Target.Dec - this.SelectedAlignmentPoint.Encoder.Dec);    // + gDecSync01;
+                    result.EncoderPosition = new EncoderPosition(
+                    encoderPosition.RA + (this.SelectedAlignmentPoint.Target.RA - this.SelectedAlignmentPoint.Encoder.RA),       // + gRASync01;
+                    encoderPosition.Dec + (this.SelectedAlignmentPoint.Target.Dec - this.SelectedAlignmentPoint.Encoder.Dec)
+                    );    // + gDecSync01;
                     // result.z = 1;
                     // result.f = 0;
                 }
                 else
                 {
-                    result.RA = encoderPosition.RA;
-                    result.Dec = encoderPosition.Dec;
+                    result.EncoderPosition = encoderPosition;
                     // result.z = 0;
                     // result.f = 0;
                 }
@@ -894,7 +894,7 @@ namespace EqmodNStarAlignment.Model
         //    }
         //    return result;
         //}
-        
+
         //TODO: Improve GetQuadrant to return an Enum value (NW, NE, SW or SE) instead of an int.
 
         /// <summary>

@@ -151,7 +151,7 @@ namespace EqmodNStarAlignment.Model
 
         public double SiteElevation { get; set; }
 
-        private bool _polarEnable;
+        private bool _polarEnable = true;
         public bool PolarEnable
         {
             get => _polarEnable;
@@ -165,12 +165,16 @@ namespace EqmodNStarAlignment.Model
 
         public bool CheckLocalPier { get; set; }
 
-        public ThreePointAlgorithmEnum ThreePointAlgorithm { get; set;} = ThreePointAlgorithmEnum.BestCentre;
+        public ThreePointAlgorithmEnum ThreePointAlgorithm { get; set; } = ThreePointAlgorithmEnum.BestCentre;
 
         public EncoderPosition HomeEncoder { get; private set; }
 
+        private long[] _reportedHomePosition = new long[]{ 0, 0 };
+
         public void SetHomePosition(long RAEncoder, long decEncoder)
         {
+            _reportedHomePosition[0] = RAEncoder;
+            _reportedHomePosition[1] = decEncoder;
             // EQMod expects the RA Home position to have a step value of 0x800000 (0 hours)
             // and the Dec Home position to be 0xA26C80 (90 degrees)
 
@@ -181,16 +185,29 @@ namespace EqmodNStarAlignment.Model
             EncoderMappingOffset = new EncoderPosition(HomeEncoder.RA - RAEncoder, HomeEncoder.Dec - decEncoder);
             // To convert: Mount = Internal - EncoderMappingOffset
             //             Internal = Mount + EncoderMappingOffset
-
+            SendToMatrix();
         }
 
-        public EncoderPosition StepsPerRev { get; private set; }
+        private EncoderPosition _stepsPerRev;
+        public EncoderPosition StepsPerRev
+        {
+            get => _stepsPerRev;
+            set
+            {
+                if (_stepsPerRev == value)
+                {
+                    return;
+                }
+                _stepsPerRev = value;
+                SetHomePosition(_reportedHomePosition[0], _reportedHomePosition[1]);
+            }
+        }
 
         public ActivePointsEnum ActivePoints { get; set; }
 
         public AlignmentPointCollection AlignmentPoints { get; } = new AlignmentPointCollection();
 
-        public AlignmentPoint SelectedAlignmentPoint {get; private set; }
+        public AlignmentPoint SelectedAlignmentPoint { get; private set; }
 
         public DateTime? LastAccessDateTime { get; private set; }
 
@@ -217,14 +234,18 @@ namespace EqmodNStarAlignment.Model
         #endregion
 
         #region Constructor ...
-        public AlignmentModel(double siteLatitude, double siteLongitude, double siteElevation, EncoderPosition stepsPerRev, bool clearPointsOnStartup = false)
+        public AlignmentModel(double siteLatitude, double siteLongitude, double siteElevation)
         {
             SiteLatitude = siteLatitude;
             SiteLongitude = siteLongitude;
             SiteElevation = siteElevation;
-            StepsPerRev = stepsPerRev;
             RefreshProximitySteps();
 
+        }
+        #endregion
+
+        public void Connect(bool clearPointsOnStartup = false)
+        {
             try
             {
                 // Load the last access time property.
@@ -242,8 +263,6 @@ namespace EqmodNStarAlignment.Model
                 LogException(ex, true);
             }
         }
-        #endregion
-
 
         #region Alignment point management ...
         public bool SyncToRaDec(long[] encoder, double[] origRaDec, long[] target, DateTime syncTime)
@@ -329,10 +348,7 @@ namespace EqmodNStarAlignment.Model
                             AlignmentPoints.Add(alignmentPoint);
                             _oneStarAdjustment = alignmentPoint.Delta;
                         }
-                        if (AlignmentPoints.Count >= 3)
-                        {
-                            SendToMatrix(); // Updates the cartesean values.
-                        }
+                        SendToMatrix(); // Updates the cartesean values.
                     }
                 }
                 catch (Exception ex)

@@ -28,7 +28,8 @@ namespace EqmodNStarAlignment.Tests
         [TestInitialize]
         public void Initialize()
         {
-            AlignmentModel = new AlignmentModel(siteLatitude, siteLongitude, siteElevation, stepsPerRev);
+            AlignmentModel = new AlignmentModel(siteLatitude, siteLongitude, siteElevation);
+            AlignmentModel.StepsPerRev = stepsPerRev;
             AlignmentModel.SetHomePosition(raHomePos, decHomePos);
             AlignmentModel.PolarEnable = true;
 

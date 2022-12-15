@@ -54,7 +54,8 @@ namespace EqmodNStarAlignment.Tests
         [TestInitialize]
         public void Initialize()
         {
-            _alignmentModel = new AlignmentModel(siteLatitude, siteLongitude, siteElevation, stepsPerRev);
+            _alignmentModel = new AlignmentModel(siteLatitude, siteLongitude, siteElevation);
+            _alignmentModel.StepsPerRev = stepsPerRev;
             _alignmentModel.SetHomePosition(raHomePos, decHomePos);
             _alignmentModel.PolarEnable = true;
             string inputFile = Path.Combine(Directory.GetCurrentDirectory(), "Data", "AlignmentPointsIn.json");
@@ -175,10 +176,10 @@ namespace EqmodNStarAlignment.Tests
             EncoderPosition test = new EncoderPosition(testRA, testDec);
             Type type = _alignmentModel.GetType();
             MethodInfo methodInfo = type.GetMethod("Delta_Matrix_Reverse_Map", BindingFlags.NonPublic | BindingFlags.Instance);
-            EncoderPosition result = (EncoderPosition)methodInfo.Invoke(_alignmentModel, new object[] { test });
+            MapResult result = (MapResult)methodInfo.Invoke(_alignmentModel, new object[] { test });
             // var result = AlignmentModel.Delta_Matrix_Reverse_Map(new EncoderPosition(testRA, testDec));
-            Assert.AreEqual(expectedRa, result.RA, 120, "RA result is incorrect");
-            Assert.AreEqual(expectedDec, result.Dec, 120, "Dec result is incorrect");
+            Assert.AreEqual(expectedRa, result.EncoderPosition.RA, 120, "RA result is incorrect");
+            Assert.AreEqual(expectedDec, result.EncoderPosition.Dec, 120, "Dec result is incorrect");
         }
 
         /*

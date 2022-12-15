@@ -349,7 +349,7 @@ namespace EqmodNStarAlignment.Model
             CartesCoord tmpobj = new CartesCoord();
             SphericalCoord tmpobj4 = new SphericalCoord();
 
-            if (PolarEnable)
+            if (PolarEnable)    // TODO Why would this ever be false.
             {
                 tmpobj4 = EQ_SphericalPolar(pos);
                 tmpobj = EQ_Polar2Cartes(tmpobj4);
@@ -1405,9 +1405,10 @@ namespace EqmodNStarAlignment.Model
             {
                 foreach (AlignmentPoint pt in this.AlignmentPoints)
                 {
+                    pt.SelectedForGoto = true;
                     results.Add(pt);
                 }
-                return results;
+                return results.OrderBy(p => p.AlignTime).ToList();
             }
 
             Coord posCartesean = EQ_sp2Cs(pos);
@@ -1415,6 +1416,7 @@ namespace EqmodNStarAlignment.Model
             // first find out the distances to the alignment stars
             foreach (AlignmentPoint pt in this.AlignmentPoints)
             {
+                pt.SelectedForGoto = false;
                 switch (this.ActivePoints)
                 {
                     case ActivePointsEnum.All:
@@ -1496,7 +1498,7 @@ namespace EqmodNStarAlignment.Model
                     }
                 }
             }
-
+            results.ForEach(p => p.SelectedForGoto = true);
             return results.OrderBy(p => p.AlignTime).ToList();
 
         }
@@ -1518,9 +1520,10 @@ namespace EqmodNStarAlignment.Model
             {
                 foreach (AlignmentPoint pt in this.AlignmentPoints)
                 {
+                    pt.SelectedForGoto = true;
                     results.Add(pt);
                 }
-                return results;
+                return results.OrderBy(p => p.AlignTime).ToList();
             }
 
             Coord posCartesean = EQ_sp2Cs(pos);
@@ -1528,6 +1531,7 @@ namespace EqmodNStarAlignment.Model
             // first find out the distances to the alignment stars
             foreach (AlignmentPoint pt in this.AlignmentPoints)
             {
+                pt.SelectedForGoto = false;
                 switch (ActivePoints)
                 {
                     case ActivePointsEnum.All:
@@ -1606,8 +1610,8 @@ namespace EqmodNStarAlignment.Model
                 }
                 if (done) break;
             }
-
-            return results;
+            results.ForEach(p => p.SelectedForGoto = true);
+            return results.OrderBy(p => p.AlignTime).ToList();
 
         }
 

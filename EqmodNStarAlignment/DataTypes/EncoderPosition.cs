@@ -54,6 +54,9 @@ namespace EqmodNStarAlignment.DataTypes
         }
 
 
+        public EncoderPosition(double[] axes) : this((long)Math.Round(axes[0],0), (long)Math.Round(axes[1],0))
+        { }
+
         public EncoderPosition(long[] axes) : this(axes[0], axes[1])
         { }
 

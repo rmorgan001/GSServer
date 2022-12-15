@@ -40,6 +40,7 @@ using GS.Server.Windows;
 using GS.Server.Alignment;
 using AxisStatus = GS.Simulator.AxisStatus;
 using Range = GS.Principles.Range;
+using EqmodNStarAlignment.DataTypes;
 
 namespace GS.Server.SkyTelescope
 {
@@ -118,13 +119,11 @@ namespace GS.Server.SkyTelescope
                 AlignmentModel = new AlignmentModel(
                     SkySettings.Latitude,
                     SkySettings.Longitude,
-                    SkySettings.Elevation,
-                    new EqmodNStarAlignment.DataTypes.EncoderPosition(SkyServer.StepsPerRevolution[0], SkyServer.StepsPerRevolution[1]),
-                    AlignmentSettings.ClearModelOnStartup)
+                    SkySettings.Elevation)
                 {
-                    IsAlignmentOn = (AlignmentShow && AlignmentSettings.IsAlignmentOn)
+                    IsAlignmentOn = (AlignmentShow && AlignmentSettings.IsAlignmentOn),
+                    ThreePointAlgorithm = ThreePointAlgorithmEnum.BestCentre
                 };
-                AlignmentModel.SetHomePosition(0, 0);
                 AlignmentModel.Notification += AlignmentModel_Notification;
 
                 // attach handler to watch for SkySettings changing.
@@ -2867,6 +2866,7 @@ namespace GS.Server.SkyTelescope
                 case MountType.SkyWatcher:
                     var skySteps = new SkyGetSteps(SkyQueue.NewId);
                     steps = (double[])SkyQueue.GetCommandResult(skySteps).Result;
+
                     return CheckSkyErrors(skySteps) ? new[] { double.NaN, double.NaN } : steps;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -3656,6 +3656,8 @@ namespace GS.Server.SkyTelescope
                         positionsSet = true;
 
                     }
+                    // Update AlignmentModel settings.
+                    ConnectAlignmentModel();
 
                     break;
                 case MountType.SkyWatcher:
@@ -3760,6 +3762,9 @@ namespace GS.Server.SkyTelescope
                         positionsSet = true;
 
                     }
+
+                    // Update AlignmentModel settings.
+                    ConnectAlignmentModel();
 
                     break;
                 default:
@@ -4695,6 +4700,13 @@ namespace GS.Server.SkyTelescope
 
         #region Alignment
 
+        private static void ConnectAlignmentModel()
+        {
+            AlignmentModel.StepsPerRev = new EqmodNStarAlignment.DataTypes.EncoderPosition(SkyServer.StepsPerRevolution[0], SkyServer.StepsPerRevolution[1]);
+            AlignmentModel.SetHomePosition(0, 0);
+            AlignmentModel.Connect(AlignmentSettings.ClearModelOnStartup);
+        }
+
         private static bool _alignmentShow;
         /// <summary>
         /// sets up bool to load a test tab
@@ -4739,16 +4751,14 @@ namespace GS.Server.SkyTelescope
             // To get the target steps
             var xy = Axes.RaDecToAxesXY(new[] { TargetRa, TargetDec });
             var targ = Axes.AxesAppToMount(new[] { xy[0], xy[1] });
-            var targetSteps = new[] {
-                (long)Math.Floor(DegToRad(targ[0]) + SkyServer.FactorStep[0]),
-                (long)Math.Floor(DegToRad(targ[1]) + SkyServer.FactorStep[1])};
-
-
-
+            var raCmd = new SkyGetAngleToStep(SkyQueue.NewId, AxisId.Axis1, DegToRad(targ[0]));
+            var decCmd = new SkyGetAngleToStep(SkyQueue.NewId, AxisId.Axis2, DegToRad(targ[1]));
+            long targetRaSteps = Convert.ToInt64(SkyQueue.GetCommandResult(raCmd).Result);
+            long targetDecSteps = Convert.ToInt64(SkyQueue.GetCommandResult(decCmd).Result);
             if (AlignmentModel.SyncToRaDec(
                 new long[] { (long)SkyServer.Steps[0], (long)SkyServer.Steps[0] },
                 new double[] { TargetRa, TargetDec },
-                targetSteps,
+                new long[] {targetRaSteps, targetDecSteps },
                 DateTime.Now))
             {
                 var monitorItem = new MonitorEntry
@@ -4759,7 +4769,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Alignment point added: Mount axis = {SkyServer.Steps[0]}/{SkyServer.Steps[1]}, RA/Dec = {TargetRa}/{TargetDec}, Target axis = {targetSteps[0]}/{targetSteps[1]}"
+                    Message = $"Alignment point added: Mount axis = {SkyServer.Steps[0]}/{SkyServer.Steps[1]}, RA/Dec = {TargetRa}/{TargetDec}, Target axis = {targetRaSteps}/{targetDecSteps}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -4773,7 +4783,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Alignment point rejected: Mount axis = {SkyServer.Steps[0]}/{SkyServer.Steps[1]}, RA/Dec = {TargetRa}/{TargetDec}, Target axis = {targetSteps[0]}/{targetSteps[1]}"
+                    Message = $"Alignment point rejected: Mount axis = {SkyServer.Steps[0]}/{SkyServer.Steps[1]}, RA/Dec = {TargetRa}/{TargetDec}, Target axis = {targetRaSteps}/{targetDecSteps}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -5003,8 +5013,17 @@ namespace GS.Server.SkyTelescope
                 if (rawSteps == null) { return; }
                 if (double.IsNaN(rawSteps[0]) || double.IsNaN(rawSteps[1])) { return; }
 
+
                 // store actual steps
-                Steps = rawSteps;
+                //if (AlignmentModel.IsAlignmentOn)
+                //{
+                //    EncoderPosition target = AlignmentModel.GetTargetSteps(new EncoderPosition(rawSteps));
+                //    Steps = new double[]{target[0], target[1] };
+                //}
+                //else
+                //{
+                    Steps = rawSteps;
+                //}
 
                 //Implement Pec
                 PecCheck();

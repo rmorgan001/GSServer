@@ -261,3 +261,5 @@ paket-files/
 __pycache__/
 *.pyc
 /Resources/Installer/ASCOMGSServer1048Setup.exe
+/EQMODAlignment.NetStd20
+/MigrationBackup
