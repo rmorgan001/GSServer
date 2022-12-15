@@ -2,18 +2,18 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("EqmodNStarAlignment.Tests")]
+[assembly: AssemblyTitle("EqmocNStarAlignment.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("EqmodNStarAlignment.Tests")]
+[assembly: AssemblyProduct("EqmocNStarAlignment.Tests")]
 [assembly: AssemblyCopyright("Copyright ©  2022")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]
 
-[assembly: Guid("a546006b-d866-41b9-b378-f0666f18618c")]
+[assembly: Guid("55fbcfca-0220-43e2-82d0-dd9253a1d254")]
 
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
