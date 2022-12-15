@@ -1387,7 +1387,7 @@ namespace GS.SkyWatcher
                                 throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
                         }
                     }
-                    if (cmdDataStr.Substring(1,2) == "02")
+                    if (cmdDataStr.Substring(0,2) == "02")
                     {
                         switch (axis)
                         {
