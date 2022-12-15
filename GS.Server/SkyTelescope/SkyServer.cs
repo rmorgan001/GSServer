@@ -1717,7 +1717,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"GoToSeconds|{stopwatch.Elapsed.TotalSeconds}|SkyTarget|{skyTarget[0]}|{skyTarget[1]}"
+                Message = $"Current|{_util.HoursToHMS(RightAscensionXForm, "h ", ":", "", 2)}|{_util.DegreesToDMS(DeclinationXForm, "° ", ":", "", 2)}|Seconds|{stopwatch.Elapsed.TotalSeconds}|Target|{skyTarget[0]}|{skyTarget[1]}"
             };
             MonitorLog.LogToMonitor(monitorItem);
             #endregion
@@ -1793,7 +1793,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"DeltaDegrees|{deltaDegree}|Seconds|{stopwatch1.Elapsed.TotalSeconds}"
+                    Message = $"{_util.DegreesToDMS(DeclinationXForm, "° ", ":", "", 2)}|Delta|{deltaDegree}|Seconds|{stopwatch1.Elapsed.TotalSeconds}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -1847,7 +1847,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Deltas|Rate|{rate}|Time|{deltaTime}|Degree|{deltaDegree}"
+                    Message = $"Delta|{deltaDegree}|Rate|{rate}|Time|{deltaTime}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -1879,7 +1879,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Precision|NewTarget|{target[0]}|Time|{deltaTime}|Degree|{deltaDegree}|Seconds|{stopwatch1.Elapsed.TotalSeconds}"
+                    Message = $"{_util.HoursToHMS(RightAscensionXForm, "h ", ":", "", 2)}|NewTarget|{target[0]}|Seconds|{stopwatch1.Elapsed.TotalSeconds}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -2027,7 +2027,7 @@ namespace GS.Server.SkyTelescope
                             var targ = Axes.AxesAppToMount(new[] { xy[0], xy[1] });
                             _ = new SkySyncAxis(0, AxisId.Axis1, targ[0]);
                             _ = new SkySyncAxis(0, AxisId.Axis2, targ[1]);
-                            monitorItem.Message += $",{TargetRa}|{TargetDec}|{xy[0]}|{xy[1]}|{targ[0]}|{targ[1]}";
+                            monitorItem.Message += $",{_util.HoursToHMS(TargetRa, "h ", ":", "", 2)}|{_util.DegreesToDMS(TargetDec, "° ", ":", "", 2)}|{xy[0]}|{xy[1]}|{targ[0]}|{targ[1]}";
                             MonitorLog.LogToMonitor(monitorItem);
                             break;
                         case MountTaskName.SyncAltAz:
@@ -3069,7 +3069,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = "GoToAsync",
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{SlewState} finished|code|{returncode}|{_util.HoursToHMS(RightAscension, "h ", ":", "", 2)}|at|{ActualAxisX}|{ActualAxisY}"
+                    Message = $"{SlewState} finished|code|{returncode}|{_util.HoursToHMS(RightAscensionXForm, "h ", ":", "", 2)}|{_util.DegreesToDMS(DeclinationXForm, "° ", ":", "", 2)}|Actual|{ActualAxisX}|{ActualAxisY}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 

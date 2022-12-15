@@ -135,29 +135,6 @@ namespace GS.SkyWatcher
                 var forward = rate > 0.0; // figures out the direction of motion
                 const bool highspeed = false;
 
-                // not sure if this is needed
-                var internalSpeed = Math.Abs(rate); // setup a positive speed
-                // Stop if speed is too slow
-                if (internalSpeed <= Constant.SiderealRate / 1000.0)
-                {
-                    AxisStop(axis);
-
-                    // Wait until the axis stops or counter runs out
-                    var stopwatch = Stopwatch.StartNew();
-                    var counter = 1;
-                    while (stopwatch.Elapsed.TotalMilliseconds <= 3500)
-                    {
-                        var axesstop = _commands.GetAxisStatus(axis);
-                        // Return if the axis has stopped.
-                        if (axesstop.FullStop) { break; }
-                        // issue new stop
-                        if (counter % 5 == 0) { AxisStop(axis); }
-                        counter++;
-                        Thread.Sleep(100);
-                    }
-                    return;
-                }
-
                 SetRates(axis, rate);
                 _commands.AxisSlew_Advanced(axis, rate);
                 _commands.SetSlewing((int)axis, forward, highspeed); // Set the axis status
@@ -523,6 +500,19 @@ namespace GS.SkyWatcher
 
             if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
             {
+                var curPosition = _commands.GetAxisPosition(axis);
+                monitorItem = new MonitorEntry
+                {
+                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Mount,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"axis|{axis}|Target|{targetPosition}|curPosition|{curPosition}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
                 _commands.AxisSlewTo_Advanced(axis, targetPosition);
                 _commands.SetSlewingTo((int)axis, false, false);  // Assume we do not need to care about slewing direction and speed when using advanced command set.
             }
@@ -537,6 +527,18 @@ namespace GS.SkyWatcher
                 var movingAngle = targetPosition - curPosition;
 
                 var movingSteps = _commands.AngleToStep(axis, movingAngle);// Convert distance in radian into steps.
+
+                monitorItem = new MonitorEntry
+                {
+                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Mount,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"axis|{axis}|Target|{targetPosition}|curPosition|{curPosition}|movingSteps|{movingSteps}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
 
                 bool forward;
                 bool highspeed;

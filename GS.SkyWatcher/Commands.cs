@@ -1151,10 +1151,25 @@ namespace GS.SkyWatcher
         /// <param name="rateInRadian">rate in radian / second</param>
         internal void AxisSlew_Advanced(AxisId axis, double rateInRadian)
         {
+            var ratePad = '0';
             var irateInSteps = AngleToStep(axis, rateInRadian * 1024);
             irateInSteps *= 4;
+            if (rateInRadian < 0){ ratePad = 'F'; } // F for negative numbers
 
-            var szCmd = "02" + irateInSteps.ToString("X16");
+            var szCmd = "02" + irateInSteps.ToString("X").PadLeft(16, ratePad);
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Mount,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"axis|{axis}|X szCmd|{szCmd}|Rate|{rateInRadian}|Steps|{irateInSteps}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
             CmdToMount(axis, 'X', szCmd);
         }
 
@@ -1163,15 +1178,21 @@ namespace GS.SkyWatcher
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="targetInRadian">target position in radian</param>
-        internal void AxisSlewTo_Advanced(AxisId axis, double targetInRadian)
+        /// <param name="rateInRadian"></param>
+        internal void AxisSlewTo_Advanced(AxisId axis, double targetInRadian, double rateInRadian = 0 )
         {
+            var targetPad = '0';
             var itargetInSteps = AngleToStep(axis, targetInRadian);
             itargetInSteps *= 4;
-            const double rateInRadian = 0;
-            var irateInSteps = AngleToStep(axis, rateInRadian * 1024);
-             irateInSteps *= 4;
+            if (itargetInSteps < 0) { targetPad = 'F'; } // F for negative numbers
 
-            var szCmd = "04" + itargetInSteps.ToString("X8") + irateInSteps.ToString("X16");
+            var ratePad = '0';
+            var irateInSteps = AngleToStep(axis, rateInRadian * 1024);
+            irateInSteps *= 4;
+            if (irateInSteps < 0) { ratePad = 'F'; } // F for negative numbers
+
+
+            var szCmd = "04" + itargetInSteps.ToString("X").PadLeft(8, targetPad) + irateInSteps.ToString("X").PadLeft(16, ratePad);
             CmdToMount(axis, 'X', szCmd);
 
             var monitorItem = new MonitorEntry
@@ -1179,7 +1200,7 @@ namespace GS.SkyWatcher
                 Datetime = HiResDateTime.UtcNow,
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Mount,
-                Type = MonitorType.Data,
+                Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"axis|{axis}|X szCmd|{szCmd}|Target|{targetInRadian}|TSteps|{itargetInSteps}|RSteps|{irateInSteps}"
