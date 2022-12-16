@@ -1213,7 +1213,7 @@ namespace GS.Server.SkyTelescope
             var stopwatch = Stopwatch.StartNew();
 
             SimTasks(MountTaskName.StopAxes);
-            var simTarget = Axes.AxesAppToMount(target);
+            var simTarget = GetAlignedTarget(Axes.AxesAppToMount(target));
 
             #region First Slew
 
@@ -1386,7 +1386,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 target[0] += deltaDegree;
-                var deltaTarget = Axes.AxesAppToMount(target);
+                var deltaTarget = GetAlignedTarget(Axes.AxesAppToMount(target));
 
                 if (SlewState == SlewType.SlewNone) { break; } //check for a stop
 
@@ -1681,7 +1681,7 @@ namespace GS.Server.SkyTelescope
             var stopwatch = Stopwatch.StartNew();
 
             SkyTasks(MountTaskName.StopAxes);
-            var skyTarget = Axes.AxesAppToMount(target);
+            var skyTarget = GetAlignedTarget(Axes.AxesAppToMount(target));
 
             #region First Slew
             // time could be off a bit may need to deal with each axis separate
@@ -1854,7 +1854,7 @@ namespace GS.Server.SkyTelescope
                 if (deltaDegree < gotoPrecision) { break; }
 
                 target[0] += deltaDegree;
-                var deltaTarget = Axes.AxesAppToMount(target);
+                var deltaTarget = GetAlignedTarget(Axes.AxesAppToMount(target));
                 if (SlewState == SlewType.SlewNone) { break; } //check for a stop
 
                 object _ = new SkyAxisGoToTarget(0, AxisId.Axis1, deltaTarget[0]); //move to new target
@@ -4628,7 +4628,7 @@ namespace GS.Server.SkyTelescope
 
             //convert ra dec to mount positions
             var xy = Axes.RaDecToAxesXY(new[] { ra, dec });
-            var target = Axes.AxesAppToMount(xy);
+            var target = GetAlignedTarget(Axes.AxesAppToMount(xy));
 
             //convert current position to mount position
             var current = Axes.AxesMountToApp(new[] { _mountAxisX, _mountAxisY });
@@ -4668,7 +4668,7 @@ namespace GS.Server.SkyTelescope
 
             //convert ra dec to mount positions
             var yx = Axes.AltAzToAxesYX(new[] { alt, az });
-            var target = Axes.AxesAppToMount(new[] { yx[1], yx[0] });
+            var target = GetAlignedTarget(Axes.AxesAppToMount(new[] { yx[1], yx[0] }));
 
             //convert current position to mount position
             var current = Axes.AxesMountToApp(new[] { _mountAxisX, _mountAxisY });
@@ -4758,7 +4758,7 @@ namespace GS.Server.SkyTelescope
             if (AlignmentModel.SyncToRaDec(
                 new long[] { (long)SkyServer.Steps[0], (long)SkyServer.Steps[0] },
                 new double[] { TargetRa, TargetDec },
-                new long[] {targetRaSteps, targetDecSteps },
+                new long[] { targetRaSteps, targetDecSteps },
                 DateTime.Now))
             {
                 var monitorItem = new MonitorEntry
@@ -4789,7 +4789,53 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static double[] GetAlignedTarget(double[] target)
+        {
+            if (AlignmentModel.IsAlignmentOn)
+            {
+                var raCmd = new SkyGetAngleToStep(SkyQueue.NewId, AxisId.Axis1, DegToRad(target[0]));
+                var decCmd = new SkyGetAngleToStep(SkyQueue.NewId, AxisId.Axis2, DegToRad(target[1]));
+                long targetRaSteps = Convert.ToInt64(SkyQueue.GetCommandResult(raCmd).Result);
+                long targetDecSteps = Convert.ToInt64(SkyQueue.GetCommandResult(decCmd).Result);
+                EncoderPosition aligned = AlignmentModel.GetTargetSteps(new EncoderPosition(targetRaSteps, targetDecSteps));
+                var alignedRaCmd = new SkyGetStepToAngle(SkyQueue.NewId, AxisId.Axis1, aligned.RA);
+                var alignedDecCmd = new SkyGetStepToAngle(SkyQueue.NewId, AxisId.Axis2, aligned.Dec);
+                double alignedRa = RadToDeg(Convert.ToDouble(SkyQueue.GetCommandResult(alignedRaCmd).Result));
+                double alignedDec = RadToDeg(Convert.ToDouble(SkyQueue.GetCommandResult(alignedDecCmd).Result));
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Alignment,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"Mapped Encoder steps: {targetRaSteps}/{targetDecSteps} to {aligned.RA}/{aligned.Dec}\n"
+                            + $"         Axis angles: {target[0]}/{target[1]} to {alignedRa}/{alignedDec}"
+                };
 
+                return new double[] { alignedRa, alignedDec };
+            }
+            else
+            {
+                return target;
+            }
+        }
+
+
+        private static double[] GetDealignedEncoder(double[] alignedSteps)
+        {
+            if (AlignmentModel.IsAlignmentOn)
+            {
+                var reported = AlignmentModel.GetEncoderSteps(new long[]{(long)alignedSteps[0], (long)alignedSteps[1] });
+                return new double[] {reported.RA, reported.Dec};
+                
+            }
+            else
+            {
+                return alignedSteps;
+            }
+        }
         #endregion
 
         #region Server Items
@@ -5022,7 +5068,7 @@ namespace GS.Server.SkyTelescope
                 //}
                 //else
                 //{
-                    Steps = rawSteps;
+                Steps = GetDealignedEncoder(rawSteps);
                 //}
 
                 //Implement Pec

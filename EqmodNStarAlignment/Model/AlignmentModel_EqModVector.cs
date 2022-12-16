@@ -256,24 +256,32 @@ namespace EqmodNStarAlignment.Model
         }
 
 
-        ////Function to transform the Coordinates (Taki Method)  using the MT Matrix and Offset Vector
+        /// <summary>
+        /// Function to transform the Coordinates (Taki Method)  using the MT Matrix and Offset Vector
+        /// </summary>
+        /// <param name="ob"></param>
+        /// <returns></returns>
+        private CartesCoord EQ_Transform_Taki(CartesCoord pos)
+        {
+            CartesCoord result = new CartesCoord();
+            result.x = EQCT.x + ((pos.x * EQMT.Element[0, 0]) + (pos.y * EQMT.Element[1, 0]) + (pos.z * EQMT.Element[2, 0]));
+            result.y = EQCT.y + ((pos.x * EQMT.Element[0, 1]) + (pos.y * EQMT.Element[1, 1]) + (pos.z * EQMT.Element[2, 1]));
+            result.z = EQCT.z + ((pos.x * EQMT.Element[0, 2]) + (pos.y * EQMT.Element[1, 2]) + (pos.z * EQMT.Element[2, 2]));
+            return result;
+        }
 
-        //private Coord EQ_Transform_Taki(Coord ob)
-        //{
-
-        //    // CoordTransform = Offset + CoordObject * Matrix MT
-
-        //    Coord result = new Coord();
-        //    result.x = EQCT.x + ((ob.x * EQMT.Element[0, 0]) + (ob.y * EQMT.Element[1, 0]) + (ob.z * EQMT.Element[2, 0]));
-        //    result.y = EQCT.y + ((ob.x * EQMT.Element[0, 1]) + (ob.y * EQMT.Element[1, 1]) + (ob.z * EQMT.Element[2, 1]));
-        //    result.z = EQCT.z + ((ob.x * EQMT.Element[0, 2]) + (ob.y * EQMT.Element[1, 2]) + (ob.z * EQMT.Element[2, 2]));
-
-
-        //    return result;
-        //}
-
-        // Subroutine to draw the Transformation Matrix (Affine Mapping Method)
-
+        /// <summary>
+        /// Subroutine to draw the Transformation Matrix (Affine Mapping Method) 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="Y"></param>
+        /// <param name="a1"></param>
+        /// <param name="a2"></param>
+        /// <param name="a3"></param>
+        /// <param name="m1"></param>
+        /// <param name="m2"></param>
+        /// <param name="m3"></param>
+        /// <returns></returns>
         private bool EQ_AssembleMatrix_Affine(double x, double Y, Coord a1, Coord a2, Coord a3, Coord m1, Coord m2, Coord m3)
         {
 
@@ -349,20 +357,11 @@ namespace EqmodNStarAlignment.Model
             CartesCoord tmpobj = new CartesCoord();
             SphericalCoord tmpobj4 = new SphericalCoord();
 
-            if (PolarEnable)    // TODO Why would this ever be false.
-            {
-                tmpobj4 = EQ_SphericalPolar(pos);
-                tmpobj = EQ_Polar2Cartes(tmpobj4);
-                result.x = tmpobj.x;
-                result.y = tmpobj.y;
-                result.z = 1;
-            }
-            else
-            {
-                result.x = pos.RA;
-                result.y = pos.Dec;
-                result.z = 1;
-            }
+            tmpobj4 = EQ_SphericalPolar(pos);
+            tmpobj = EQ_Polar2Cartes(tmpobj4);
+            result.x = tmpobj.x;
+            result.y = tmpobj.y;
+            result.z = 1;
 
             return result;
         }
@@ -448,24 +447,13 @@ namespace EqmodNStarAlignment.Model
             SphericalCoord tmpobj2 = new SphericalCoord();
             SphericalCoord tmpobj4 = new SphericalCoord();
 
-            if (PolarEnable)
-            {
-                tmpobj4 = EQ_SphericalPolar(pos);
-                tmpobj1 = EQ_Polar2Cartes(tmpobj4);
-                tmpobj3 = EQ_Transform_Affine(tmpobj1);
-                tmpobj2 = EQ_Cartes2Polar(tmpobj3, tmpobj1);
+            tmpobj4 = EQ_SphericalPolar(pos);
+            tmpobj1 = EQ_Polar2Cartes(tmpobj4);
 
-                result = EQ_PolarSpherical(tmpobj2, tmpobj4);
+            tmpobj3 = EQ_Transform_Affine(tmpobj1);
 
-            }
-            else
-            {
-                tmpobj3 = EQ_Transform_Affine(new CartesCoord() { x = pos.RA, y = pos.Dec });
-                result.RA = (long)Math.Round(tmpobj3.x, 0);
-                result.Dec = (long)Math.Round(tmpobj3.y, 0);
-                // result.z = 1;
-            }
-
+            tmpobj2 = EQ_Cartes2Polar(tmpobj3, tmpobj1);
+            result = EQ_PolarSpherical(tmpobj2, tmpobj4);
             return result;
         }
 
@@ -512,50 +500,34 @@ namespace EqmodNStarAlignment.Model
 
         //    return result;
         //}
-        ////Implement a TAKI transformation on a Polar coordinate system
-        ////This is done by converting the Polar Data to Cartesian, Apply TAKI transformation
-        ////Then restore the transformed Cartesian Coordinates back to polar
 
-        //internal Coord EQ_plTaki(Coord obj)
-        //{
-        //    Coord result = new Coord();
-        //    double gDECEncoder_Home_pos = 0;
-        //    double gLatitude = 0;
-        //    double gTot_step = 0;
-        //    object HC = null;
-        //    double RAEncoder_Home_pos = 0;
 
-        //    CartesCoord tmpobj1 = new CartesCoord();
-        //    Coord tmpobj2 = new Coord();
-        //    Coord tmpobj3 = new Coord();
-        //    SphericalCoord tmpobj4 = new SphericalCoord();
+        /// <summary>
+        /// Implement a TAKI transformation on a Polar coordinate system
+        /// This is done by converting the Polar Data to Cartesian, Apply TAKI transformation
+        /// Then restore the transformed Cartesian Coordinates back to polar
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        internal EncoderPosition EQ_plTaki(EncoderPosition pos)
+        {
+            EncoderPosition result = new EncoderPosition();
+            CartesCoord tmpobj1 = new CartesCoord();
+            CartesCoord tmpobj3 = new CartesCoord();
+            SphericalCoord tmpobj2 = new SphericalCoord();
+            SphericalCoord tmpobj4 = new SphericalCoord();
 
-        //    if (PolarEnable)
-        //    {
-        //        tmpobj4 = EQ_SphericalPolar(obj.x, obj.y, gTot_step, RAEncoder_Home_pos, gDECEncoder_Home_pos, gLatitude);
-        //        tmpobj1 = EQ_Polar2Cartes(tmpobj4.x, tmpobj4.y, gTot_step, RAEncoder_Home_pos, gDECEncoder_Home_pos);
+            tmpobj4 = EQ_SphericalPolar(pos);
+            tmpobj1 = EQ_Polar2Cartes(tmpobj4);
 
-        //        tmpobj2.x = tmpobj1.x;
-        //        tmpobj2.y = tmpobj1.y;
-        //        tmpobj2.z = 1;
+            tmpobj3 = EQ_Transform_Taki(tmpobj1);
 
-        //        tmpobj3 = EQ_Transform_Taki(tmpobj2);
+            tmpobj2 = EQ_Cartes2Polar(tmpobj3, tmpobj1);
+            result = EQ_PolarSpherical(tmpobj2, tmpobj4);
 
-        //        tmpobj2 = EQ_Cartes2Polar(tmpobj3.x, tmpobj3.y, tmpobj1.r, tmpobj1.ra, gTot_step, RAEncoder_Home_pos, gDECEncoder_Home_pos);
 
-        //        result = EQ_PolarSpherical(tmpobj2.x, tmpobj2.y, gTot_step, RAEncoder_Home_pos, gDECEncoder_Home_pos, gLatitude, tmpobj4.r);
-
-        //    }
-        //    else
-        //    {
-        //        tmpobj3 = EQ_Transform_Taki(obj);
-        //        result.x = tmpobj3.x;
-        //        result.y = tmpobj3.y;
-        //        result.z = 1;
-        //    }
-
-        //    return result;
-        //}
+            return result;
+        }
 
         /// <summary>
         /// Function to Convert Polar RA/DEC Stepper coordinates to Cartesian Coordinates
@@ -685,48 +657,46 @@ namespace EqmodNStarAlignment.Model
             return result;
         }
 
-        //internal int EQ_UpdateTaki(double x, double Y)
-        //{
-        //    int g3PointAlgorithm = 0;
-        //    int gAlignmentStars_count = 0;
+        internal bool EQ_UpdateTaki(EncoderPosition pos)
+        {
+            bool result = false;
+            List<AlignmentPoint> nearestPoints = new List<AlignmentPoint>();
 
-        //    TriangleCoord tr = new TriangleCoord();
-        //    Coord tmpcoord = new Coord();
-
-        //    // Adjust only if there are four alignment stars
-        //    if (gAlignmentStars_count < 3)
-        //    {
-        //        return 0;
-        //    }
+            // Adjust only if there are four alignment stars
+            if (this.AlignmentPoints.Count < 3)
+            {
+                return result;
+            }
 
 
-        //    switch (g3PointAlgorithm)
-        //    {
-        //        case 1:
-        //            // find the 50 nearest points - then find the nearest enclosing triangle 
-        //            tr = EQ_ChooseNearest3Points(x, Y);
-        //            break;
-        //        default:
-        //            // find the 50 nearest points - then find the enclosing triangle with the nearest centre point 
-        //            tr = EQ_Choose_3Points(x, Y);
-        //            break;
-        //    }
+            switch (this.ThreePointAlgorithm)
+            {
+                case ThreePointAlgorithmEnum.BestCentre:
+                    // find the 50 nearest points - then find the nearest enclosing triangle 
+                    nearestPoints = EQ_ChooseNearest3Points(pos);
+                    break;
+                default:
+                    // find the 50 nearest points - then find the enclosing triangle with the nearest centre point 
+                    nearestPoints = EQ_Choose_3Points(pos);
+                    break;
+            }
 
-        //    double gTaki1 = tr.i;
-        //    double gTaki2 = tr.j;
-        //    double gTaki3 = tr.k;
+            if (nearestPoints.Count < 3)
+            {
+                return false;
+            }
 
-        //    if (gTaki1 == 0 || gTaki2 == 0 || gTaki3 == 0)
-        //    {
-        //        return 0;
-        //    }
+            Coord tmpCoord = EQ_sp2Cs(pos);
 
-        //    tmpcoord.x = x;
-        //    tmpcoord.y = Y;
-        //    tmpcoord = EQ_sp2Cs(tmpcoord);
-        //    return EQ_AssembleMatrix_Taki(tmpcoord.x, tmpcoord.y, EQASCOM.ct_PointsC[Convert.ToInt32(gTaki1)], EQASCOM.ct_PointsC[Convert.ToInt32(gTaki2)], EQASCOM.ct_PointsC[Convert.ToInt32(gTaki3)], EQASCOM.my_PointsC[Convert.ToInt32(gTaki1)], EQASCOM.my_PointsC[Convert.ToInt32(gTaki2)], EQASCOM.my_PointsC[Convert.ToInt32(gTaki3)]);
+            return EQ_AssembleMatrix_Taki(tmpCoord.x, tmpCoord.y,
+                nearestPoints[0].EncoderCartesian,
+                nearestPoints[1].EncoderCartesian,
+                nearestPoints[2].EncoderCartesian,
+                nearestPoints[0].TargetCartesian,
+                nearestPoints[1].TargetCartesian,
+                nearestPoints[2].TargetCartesian);
 
-        //}
+        }
 
         internal bool EQ_UpdateAffine(EncoderPosition pos)
         {
@@ -1272,7 +1242,7 @@ namespace EqmodNStarAlignment.Model
             //Debug.WriteLine($"lat/ha/dec (Radians) = {latRad}/{haRad}/{decRad}");
             double[] altAzRad = AstroConvert.GetAltAz(latRad, haRad, decRad);
             //Debug.WriteLine($"alt/Az (Radians) = {altAzRad[0]}/{altAzRad[1]}");
-            double[] altAz = new double[] { AstroConvert.RadToDeg(altAzRad[0]), AstroConvert.RadToDeg(altAzRad[1])};
+            double[] altAz = new double[] { AstroConvert.RadToDeg(altAzRad[0]), AstroConvert.RadToDeg(altAzRad[1]) };
             //Debug.WriteLine($"alt/Az = {altAz[0]}/{altAz[1]}");
 
             result.x = (((altAz[1] - 180) / 360d) * this.StepsPerRev.RA) + this.HomeEncoder.RA;

@@ -94,25 +94,27 @@ namespace EqmodNStarAlignment.DataTypes
     //    }
     //}
 
-    public struct Coordt
-    {
-        public double x; //x = X Coordinate
-        public double y; //y = Y Coordinate
-        public double z;
-        public short f;
-    }
+    //public struct Coordt
+    //{
+    //    public double x; //x = X Coordinate
+    //    public double y; //y = Y Coordinate
+    //    public double z;
+    //    public short f;
+    //}
 
     public struct CartesCoord
     {
         public double x; //x = X Coordinate
         public double y; //y = Y Coordinate
+        public double z; //z = Z coordinate
         public double r; // Radius Sign
         public double ra; // Radius Alpha
 
-        public CartesCoord(double xValue, double yValue, double rValue, double raValue)
+        public CartesCoord(double xValue, double yValue, double zValue, double rValue, double raValue)
         {
             x = xValue;
             y = yValue;
+            z = zValue;
             r = rValue;
             ra = raValue;
         }

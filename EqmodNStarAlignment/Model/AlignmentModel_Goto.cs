@@ -11,50 +11,68 @@ namespace EqmodNStarAlignment.Model
         /// <summary>
         /// Returns the encoder steps for a given target.
         /// Based on code from EQMOD's EncoderTimer.Timer event.
+        /// Used when reporting current position
         /// </summary>
         /// <param name="encoderSteps"></param>
         /// <returns></returns>
-        public EncoderPosition GetTargetSteps(EncoderPosition encoder)
+        public EncoderPosition GetEncoderSteps(EncoderPosition encoder)
         {
             MapResult result;
-            EncoderPosition target = encoder;
             if (!_threeStarEnabled)
             {
                 SelectedAlignmentPoint = null;
                 result = Delta_Map(encoder);
-                target = result.EncoderPosition;
             }
             else
             {
-                switch (this.ThreePointAlgorithm)
+                switch (this.AlignmentMode)
                 {
-                    case ThreePointAlgorithmEnum.BestCentre:
+                    case AlignmentModeEnum.Nearest:
                         result = DeltaSync_Matrix_Map(encoder);
-                        break;
-                    case ThreePointAlgorithmEnum.ClosestPoints:
-                        result = Delta_Matrix_Reverse_Map(encoder);
                         break;
                     default:
                         result = Delta_Matrix_Reverse_Map(encoder);
                         if (!result.InTriangle)
                         {
-                            result = DeltaSync_Matrix_Map(target);
+                            result = DeltaSync_Matrix_Map(encoder);
                         }
-                        target = result.EncoderPosition;
                         break;
                 }
             }
-            return target;
+            return result.EncoderPosition;
         }
 
         /// <summary>
-        /// Returns the target steps for a given encoder position.
+        /// Returns the target steps to go to to an aligned target.
+        /// Used for goto.
         /// </summary>
-        /// <param name="targetSteps"></param>
+        /// <param name="target">The steps for the target</param>
         /// <returns></returns>
-        public double[] GetEncoderSteps(double[] targetSteps)
+        public EncoderPosition GetTargetSteps(EncoderPosition target)
         {
-            return targetSteps;
+            MapResult result;
+            if (!_threeStarEnabled)
+            {
+                SelectedAlignmentPoint = null;
+                result = DeltaReverse_Map(target);
+
+            }
+            {
+                switch (this.AlignmentMode)
+                {
+                    case AlignmentModeEnum.Nearest:
+                        result = DeltaSyncReverse_Matrix_Map(target);
+                        break;
+                    default:
+                        result = Delta_Matrix_Map(target);
+                        if (!result.InTriangle)
+                        {
+                            result = DeltaSyncReverse_Matrix_Map(target);
+                        }
+                        break;
+                }
+            }
+            return result.EncoderPosition;
         }
 
 

@@ -51,6 +51,16 @@ namespace EqmodNStarAlignment.Model
         ClosestPoints
     }
 
+    [TypeConverter(typeof(EnumTypeConverter))]
+    public enum AlignmentModeEnum
+    {
+        [Description("N-Star + Nearest")]
+        NStarPlusNearest,
+        [Description("Nearest")]
+        Nearest
+    }
+
+
     public enum HemisphereEnum
     {
         Northern,
@@ -151,19 +161,9 @@ namespace EqmodNStarAlignment.Model
 
         public double SiteElevation { get; set; }
 
-        private bool _polarEnable = true;
-        public bool PolarEnable
-        {
-            get => _polarEnable;
-            set
-            {
-                if (_polarEnable == value) return;
-                _polarEnable = value;
-                SendToMatrix();
-            }
-        }
-
         public bool CheckLocalPier { get; set; }
+
+        public AlignmentModeEnum AlignmentMode { get; set; } = AlignmentModeEnum.NStarPlusNearest;
 
         public ThreePointAlgorithmEnum ThreePointAlgorithm { get; set; } = ThreePointAlgorithmEnum.BestCentre;
 

@@ -57,7 +57,6 @@ namespace EqmodNStarAlignment.Tests
             _alignmentModel = new AlignmentModel(siteLatitude, siteLongitude, siteElevation);
             _alignmentModel.StepsPerRev = stepsPerRev;
             _alignmentModel.SetHomePosition(raHomePos, decHomePos);
-            _alignmentModel.PolarEnable = true;
             string inputFile = Path.Combine(Directory.GetCurrentDirectory(), "Data", "AlignmentPointsIn.json");
             _alignmentModel.LoadAlignmentPoints(inputFile);
 
@@ -259,8 +258,8 @@ namespace EqmodNStarAlignment.Tests
             _alignmentModel.ThreePointAlgorithm = ThreePointAlgorithmEnum.ClosestPoints;
             _alignmentModel.ActivePoints = ActivePointsEnum.All;
 
-            CartesCoord test = new CartesCoord(testX, testY, 0d, 0d);
-            CartesCoord rads = new CartesCoord(0d, 0d, testR, testRa);
+            CartesCoord test = new CartesCoord(testX, testY, 0d, 0d, 0d);
+            CartesCoord rads = new CartesCoord(0d, 0d, 0d, testR, testRa);
             Type type = _alignmentModel.GetType();
             MethodInfo methodInfo = type.GetMethod("EQ_Cartes2Polar", BindingFlags.NonPublic | BindingFlags.Instance);
             SphericalCoord result = (SphericalCoord)methodInfo.Invoke(_alignmentModel, new object[] { test, rads });

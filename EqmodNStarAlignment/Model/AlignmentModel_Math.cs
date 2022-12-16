@@ -769,36 +769,48 @@ namespace EqmodNStarAlignment.Model
             };
         }
 
-        //private Coordt Delta_Matrix_Map(double RA, double DEC)
-        //{
-        //    Coordt result = new Coordt();
-        //    Coord obtmp = new Coord();
+        private long DeltaReverse_RA_Map(long raTarget)
+        {
 
-        //    if ((RA >= 0x1000000) || (DEC >= 0x1000000))
-        //    {
-        //        result.x = RA;
-        //        result.y = DEC;
-        //        result.z = 1;
-        //        result.f = 0;
-        //        return result;
-        //    }
+            return raTarget - this._oneStarAdjustment.RA; // + gRASync01 (Eqmod has an ASCOM Sync mode which would set this value)
 
-        //    obtmp.x = RA;
-        //    obtmp.y = DEC;
-        //    obtmp.z = 1;
+        }
 
-        //    // re transform based on the nearest 3 stars
-        //    int i = EQ_UpdateTaki(RA, DEC);
+        private long DeltaReverse_DEC_Map(long decTarget)
+        {
 
-        //    Coord obtmp2 = EQ_plTaki(obtmp);
+            return decTarget - this._oneStarAdjustment.Dec; // + gDECSync01  (Eqmod has an ASCOM Sync mode which would set this value)
 
-        //    result.x = obtmp2.x;
-        //    result.y = obtmp2.y;
-        //    result.z = 1;
-        //    result.f = (short)i;
+        }
 
-        //    return result;
-        //}
+        private MapResult DeltaReverse_Map(EncoderPosition original)
+        {
+            return new MapResult()
+            {
+                EncoderPosition = new EncoderPosition(DeltaReverse_RA_Map(original.RA), DeltaReverse_DEC_Map(original.Dec))
+            };
+        }
+
+
+        private MapResult Delta_Matrix_Map(EncoderPosition pos)
+        {
+            MapResult result = new MapResult();
+
+            if ((pos.RA >= 0x1000000) || (pos.Dec >= 0x1000000))
+            {
+                result.EncoderPosition = new EncoderPosition(pos.RA, pos.Dec);
+                return result;
+            }
+
+            // re transform based on the nearest 3 stars
+            bool inTriangle = EQ_UpdateTaki(pos);
+
+            EncoderPosition obtmp2 = EQ_plTaki(pos);
+            result.EncoderPosition = new EncoderPosition(obtmp2.RA, obtmp2.Dec);
+            result.InTriangle = inTriangle;
+
+            return result;
+        }
 
 
         private MapResult Delta_Matrix_Reverse_Map(EncoderPosition pos)
@@ -859,41 +871,36 @@ namespace EqmodNStarAlignment.Model
             return result;
         }
 
+        /// <summary>
+        /// Reverse map from an aligned target position to the encoder position
+        /// </summary>
+        /// <param name="targetPosition"></param>
+        /// <returns></returns>
+        private MapResult DeltaSyncReverse_Matrix_Map(EncoderPosition targetPosition)
+        {
+            MapResult result = new MapResult();
 
-        //private Coordt DeltaSyncReverse_Matrix_Map(double RA, double DEC)
-        //{
-        //    Coordt result = new Coordt();
-        //    int i = 0;
-
-        //    if ((RA >= 0x1000000) || (DEC >= 0x1000000) || EQASCOM.gAlignmentStars_count == 0)
-        //    {
-        //        result.x = RA;
-        //        result.y = DEC;
-        //        result.z = 1;
-        //        result.f = 0;
-        //    }
-        //    else
-        //    {
-        //        i = GetNearest(RA, DEC);
-
-        //        if (i != -1)
-        //        {
-        //            EQASCOM.gSelectStar = i;
-        //            result.x = RA - (EQASCOM.ct_Points[i].x - EQASCOM.my_Points[i].x);
-        //            result.y = DEC - (EQASCOM.ct_Points[i].y - EQASCOM.my_Points[i].y);
-        //            result.z = 1;
-        //            result.f = 0;
-        //        }
-        //        else
-        //        {
-        //            result.x = RA;
-        //            result.y = DEC;
-        //            result.z = 1;
-        //            result.f = 0;
-        //        }
-        //    }
-        //    return result;
-        //}
+            if ((targetPosition.RA >= 0x1000000) || (targetPosition.Dec >= 0x1000000) || this.AlignmentPoints.Count == 0)
+            {
+                result.EncoderPosition = targetPosition;
+            }
+            else
+            {
+                this.SelectedAlignmentPoint = GetNearest(targetPosition);
+                if (this.SelectedAlignmentPoint != null)
+                {
+                    result.EncoderPosition = new EncoderPosition(
+                        targetPosition.RA - (this.SelectedAlignmentPoint.Target.RA - this.SelectedAlignmentPoint.Encoder.RA),       // + gRASync01;
+                        targetPosition.Dec - (this.SelectedAlignmentPoint.Target.Dec - this.SelectedAlignmentPoint.Encoder.Dec)
+                        );
+                }
+                else
+                {
+                    result.EncoderPosition = targetPosition;
+                }
+            }
+            return result;
+        }
 
         //TODO: Improve GetQuadrant to return an Enum value (NW, NE, SW or SE) instead of an int.
 

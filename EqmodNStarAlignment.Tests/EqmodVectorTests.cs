@@ -31,7 +31,6 @@ namespace EqmodNStarAlignment.Tests
             AlignmentModel = new AlignmentModel(siteLatitude, siteLongitude, siteElevation);
             AlignmentModel.StepsPerRev = stepsPerRev;
             AlignmentModel.SetHomePosition(raHomePos, decHomePos);
-            AlignmentModel.PolarEnable = true;
 
         }
 
