@@ -19,7 +19,7 @@ namespace EqmodNStarAlignment.Tests
         const long decHomePos = 9003008;
         const long raHomePos = 8388608;
         const double doubleDelta = 0.0001;
-        const double deltaEncoder = 10; // 1/16 arcsecond
+        const double deltaEncoder = 500; // approx 25 arc seconds
         AlignmentPoint[] points = new AlignmentPoint[] {
                 new AlignmentPoint(new EncoderPosition(8987817, 8919464), new double[] { 23.6715774536133, 77.7643051147461 }, new EncoderPosition(8987821, 8919479), new DateTime(2022, 11, 28, 19, 06, 06)),
                 new AlignmentPoint(new EncoderPosition(7985357, 9135000), new double[] { 21.481803894043, 70.6648559570313 }, new EncoderPosition(7985268, 9135003), new DateTime(2022, 11, 28, 19, 07, 17)),
@@ -177,8 +177,8 @@ namespace EqmodNStarAlignment.Tests
             MethodInfo methodInfo = type.GetMethod("Delta_Matrix_Reverse_Map", BindingFlags.NonPublic | BindingFlags.Instance);
             MapResult result = (MapResult)methodInfo.Invoke(_alignmentModel, new object[] { test });
             // var result = AlignmentModel.Delta_Matrix_Reverse_Map(new EncoderPosition(testRA, testDec));
-            Assert.AreEqual(expectedRa, result.EncoderPosition.RA, 120, "RA result is incorrect");
-            Assert.AreEqual(expectedDec, result.EncoderPosition.Dec, 120, "Dec result is incorrect");
+            Assert.AreEqual(expectedRa, result.EncoderPosition.RA, deltaEncoder, "RA result is incorrect");
+            Assert.AreEqual(expectedDec, result.EncoderPosition.Dec, deltaEncoder, "Dec result is incorrect");
         }
 
 
@@ -213,9 +213,62 @@ namespace EqmodNStarAlignment.Tests
             MethodInfo methodInfo = type.GetMethod("Delta_Matrix_Map", BindingFlags.NonPublic | BindingFlags.Instance);
             MapResult result = (MapResult)methodInfo.Invoke(_alignmentModel, new object[] { test });
             // var result = AlignmentModel.Delta_Matrix_Reverse_Map(new EncoderPosition(testRA, testDec));
-            Assert.AreEqual(expectedRa, result.EncoderPosition.RA, 120, "RA result is incorrect");
-            Assert.AreEqual(expectedDec, result.EncoderPosition.Dec, 120, "Dec result is incorrect");
+            Assert.AreEqual(expectedRa, result.EncoderPosition.RA, deltaEncoder, "RA result is incorrect");
+            Assert.AreEqual(expectedDec, result.EncoderPosition.Dec, deltaEncoder, "Dec result is incorrect");
         }
+
+
+        [DataRow(8352920, 9189469, 8352753, 9189475)]
+        [DataRow(8353213, 9189469, 8353046, 9189475)]
+        [DataRow(8353251, 9189469, 8353084, 9189475)]
+        [DataTestMethod]
+        public void TestDeltaSyncReverse_Matrix_Map(long expectedRa, long expectedDec, long testRA, long testDec)
+        {
+            _alignmentModel.ThreePointAlgorithm = ThreePointAlgorithmEnum.ClosestPoints;
+            _alignmentModel.ActivePoints = ActivePointsEnum.All;
+
+            EncoderPosition test = new EncoderPosition(testRA, testDec);
+            Type type = _alignmentModel.GetType();
+            MethodInfo methodInfo = type.GetMethod("DeltaSyncReverse_Matrix_Map", BindingFlags.NonPublic | BindingFlags.Instance);
+            MapResult result = (MapResult)methodInfo.Invoke(_alignmentModel, new object[] { test });
+            // var result = AlignmentModel.Delta_Matrix_Reverse_Map(new EncoderPosition(testRA, testDec));
+            Assert.AreEqual(expectedRa, result.EncoderPosition.RA, deltaEncoder, "RA result is incorrect");
+            Assert.AreEqual(expectedDec, result.EncoderPosition.Dec, deltaEncoder, "Dec result is incorrect");
+        }
+
+
+        [DataRow(8388973, 9002686, 8389140, 9002680)]
+        [DataRow(8390205, 9001670, 8390372, 9001664)]
+        [DataRow(8392461, 8999710, 8392628, 8999704)]
+        [DataRow(8396005, 8996502, 8396172, 8996496)]
+        [DataRow(8425094, 8968120, 8425140, 8968128)]
+        [DataRow(8430214, 8962352, 8430260, 8962360)]
+        [DataRow(8433950, 8956216, 8433996, 8956224)]
+        [DataRow(8437598, 8944216, 8437644, 8944224)]
+        [DataRow(8438238, 8937976, 8438284, 8937984)]
+        [DataRow(8438356, 8924648, 8438402, 8924656)]
+        [DataRow(8438416, 8876272, 8438462, 8876280)]
+        [DataRow(8438423, 8870216, 8438469, 8870224)]
+        [DataRow(8438430, 8864368, 8438476, 8864376)]
+        [DataRow(8438332, 8822237, 8438528, 8822224)]
+        [DataRow(8438431, 8816106, 8438536, 8816088)]
+        [DataRow(8440706, 8802554, 8440811, 8802536)]
+        [DataTestMethod]
+        public void TestDeltaSync_Matrix_Map(long expectedRa, long expectedDec, long testRA, long testDec)
+        {
+            _alignmentModel.ThreePointAlgorithm = ThreePointAlgorithmEnum.ClosestPoints;
+            _alignmentModel.ActivePoints = ActivePointsEnum.All;
+
+            EncoderPosition test = new EncoderPosition(testRA, testDec);
+            Type type = _alignmentModel.GetType();
+            MethodInfo methodInfo = type.GetMethod("DeltaSync_Matrix_Map", BindingFlags.NonPublic | BindingFlags.Instance);
+            MapResult result = (MapResult)methodInfo.Invoke(_alignmentModel, new object[] { test });
+            // var result = AlignmentModel.Delta_Matrix_Reverse_Map(new EncoderPosition(testRA, testDec));
+            Assert.AreEqual(expectedRa, result.EncoderPosition.RA, deltaEncoder, "RA result is incorrect"); // 1000 is about 50 arc seconds just over the angular diameter of Jupiter
+            Assert.AreEqual(expectedDec, result.EncoderPosition.Dec, deltaEncoder, "Dec result is incorrect");
+        }
+
+
 
 
         [DataRow(8388037, 9196760, 8673472.03453868, 9625248.59910099, 1)]
@@ -255,11 +308,6 @@ namespace EqmodNStarAlignment.Tests
         }
 
 
-
-
-        //    EQ_Transform_Affine[DataRow(509688.110229567, 43.3535014036799, 509701.89727284, -0.545762684044915, 1)] // (EQ_plAffine)
-
-
         [DataRow(8388641.26987594, 9512696.11207337, 0, 509688.110229567, 43.3535014036799, 1, 0)] // 2457601  8388608  9003008.25 (EQ_plAffine)
         [DataTestMethod]
         public void Test_EQ_Cartes2Polar(double expectedX, double expectedY, double expectedR, double testX, double testY, double testR,double testRa)
@@ -277,28 +325,7 @@ namespace EqmodNStarAlignment.Tests
             Assert.AreEqual(expectedY, result.y, doubleDelta, "y result is incorrect");
         }
 
-        /*
-        i / j  =  45.6245611530248 /-35.8465499073082 
-        aa_hadec [DataRow( 0.919235827154167 ,-0.625640320648098 , 0.796298810987879 ,-2.51826869952598 ,-0.122171513161253 )]// (EQ_PolarSpherical)
-        X/Y =  2.38092213307473 / 186.999912079268 
-        [DataRow( 7471271.29753954 , 9742383.65611805 , 1 , 8759202 , 8436394 )] // (EQ_PolarSpherical)
-        
-        i / j  =  293.182350156892 /-35.2779827906899 
-        aa_hadec [DataRow( 0.919235827154167 ,-0.615716952455876 , 5.11699731312566 , 2.24992160190372 ,-0.267520981472236 )]// (EQ_PolarSpherical)
-        X/Y =  8.59406745883108 / 344.672176833943 
-        [DataRow( 9161266.49146647 , 9750146.49564232 , 1 , 8122975 , 9512771 )] // (EQ_PolarSpherical)
-
-        i / j  =  225.266546243132 /-15.7592732434377 
-        aa_hadec [DataRow( 0.919235827154167 ,-0.275051205505143 , 3.93164292204616 , 1.07035991069787 ,-0.677340930938018 )]// (EQ_PolarSpherical)
-        X/Y =  4.08847369169778 / 321.191223374651 
-        [DataRow( 8697627.74809352 , 10016642.0517647 , 1 , 8584348 , 9352474 )] // (EQ_PolarSpherical)
-
-        i / j  =  135.229150634789 /-31.6026716503086 
-        aa_hadec [DataRow( 0.919235827154167 ,-0.551570672094294 , 2.36019392055553 ,-1.30546762821246 ,-0.900034929862018 )]// (EQ_PolarSpherical)
-        X/Y =  7.01348097965497 / 231.568202883672 
-        [DataRow( 8082972.21063669 , 9800326.76416405 , 1 , 8284828 , 8740647 )] // (EQ_PolarSpherical)
-
-         */
+    
 
         [DataRow(7471271.29753954, 9742383.65611805, 1, 8759202, 8436394)] // (EQ_PolarSpherical)
         [DataRow(9161266.49146647, 9750146.49564232, 1, 8122975, 9512771)] // (EQ_PolarSpherical)
