@@ -181,32 +181,42 @@ namespace EqmodNStarAlignment.Tests
             Assert.AreEqual(expectedDec, result.EncoderPosition.Dec, 120, "Dec result is incorrect");
         }
 
-        /*
-        Get_EncoderHours [DataRow( 6.00557616960605 , 8388608 , 8388037 , 2457601 )] // (EQ_SphericalPolar)
-        Get_EncoderDegrees [DataRow( 298.381592455407 , 9003008.25 , 9196760 , 2457601 )] // (EQ_SphericalPolar)
-        Range360 [DataRow( 298.381592455407 )] // (EQ_SphericalPolar)
-        hadec_aa [DataRow( 0.919235827154167 , 1.57225616639081 , 5.20774120974001 ,-0.775376033155811 , 3.86988561836677 )] // (EQ_SphericalPolar)
-        [DataRow( 8388037 , 9196760 , 8673472.03453868 , 9625248.59910099 , 1 )] // (EQ_SphericalPolar)
 
-                 * 
-        Get_EncoderHours [DataRow( 7.3038666569553 , 8388608 , 8255092 , 2457601 )] // (EQ_SphericalPolar)
-        Get_EncoderDegrees [DataRow( 596.661305069456 , 9003008.25 , 8775416 , 2457601 )] // (EQ_SphericalPolar)
-        Range360 [DataRow( 236.661305069456 )] // (EQ_SphericalPolar)
-        hadec_aa [DataRow( 0.919235827154167 , 1.91214782155489 , 4.13051898080895 ,-0.585620724448854 , 2.47103051434048 )] // (EQ_SphericalPolar)
-        [DataRow( 8255092 , 8775416 , 8126324.76231087 , 9773690.13425487 , 1 )] // (EQ_SphericalPolar)
 
-        Get_EncoderHours [DataRow( 2.10939611434078 , 8388608 , 8787006 , 2457601 )] // (EQ_SphericalPolar)
-        Get_EncoderDegrees [DataRow( 544.180076424122 , 9003008.25 , 8417144 , 2457601 )] // (EQ_SphericalPolar)
-        Range360 [DataRow( 184.180076424122 )] // (EQ_SphericalPolar)
-        hadec_aa [DataRow( 0.919235827154167 , 0.552238611994933 , 3.21454874650256 ,-0.610002127045004 , 0.692316929152782 )] // (EQ_SphericalPolar)
-        [DataRow( 8787006 , 8417144 , 7430599.89173006 , 9754617.08246391 , 1 )] // (EQ_SphericalPolar)
-        
-        Get_EncoderHours [DataRow( 9.09690303674193 , 8388608 , 8071485 , 2457601 )] // (EQ_SphericalPolar)
-        Get_EncoderDegrees [DataRow( 360.214379795581 , 9003008.25 , 9618872 , 2457601 )] // (EQ_SphericalPolar)
-        Range360 [DataRow( 0.214379795581124 )] // (EQ_SphericalPolar)
-        hadec_aa [DataRow( 0.919235827154167 , 2.38156364862407 , 3.74163327836756E-03 ,-0.45178319762006 , 5.41095216511199 )] // (EQ_SphericalPolar)
-        [DataRow( 8071485 , 9618872 , 9276243.79763711 , 9878388.38000644 , 1 )] // (EQ_SphericalPolar)         
-         */
+        [DataRow(8318556, 9135011, 8318406, 9135007)]
+        [DataRow(8318680, 9135011, 8318530, 9135007)]
+        [DataRow(8318720, 9135011, 8318570, 9135007)]
+        [DataRow(8415618, 8802574, 8415466, 8802564)]
+        [DataRow(8416084, 8802574, 8415932, 8802564)]
+        [DataRow(8416122, 8802574, 8415970, 8802564)]
+        [DataRow(8817928, 8501604, 8817859, 8501627)]
+        [DataRow(8818483, 8501604, 8818414, 8501627)]
+        [DataRow(8818520, 8501604, 8818451, 8501627)]
+        [DataRow(7987185, 9739355, 7987148, 9739356)]
+        [DataRow(7988774, 9739355, 7988737, 9739356)]
+        [DataRow(7988813, 9739355, 7988776, 9739356)]
+        [DataRow(8159832, 9424845, 8159627, 9424835)]
+        [DataRow(8160276, 9424845, 8160071, 9424835)]
+        [DataRow(8160314, 9424845, 8160109, 9424835)]
+        [DataRow(8100720, 9086494, 8100493, 9086534)]
+        [DataRow(8101199, 9086494, 8100972, 9086534)]
+        [DataRow(8101237, 9086494, 8101010, 9086534)]
+        [DataRow(8488796, 9229195, 8488634, 9229188)]
+        [DataTestMethod]
+        public void TestDelta_Matrix_Map(long expectedRa, long expectedDec, long testRA, long testDec)
+        {
+            _alignmentModel.ThreePointAlgorithm = ThreePointAlgorithmEnum.ClosestPoints;
+            _alignmentModel.ActivePoints = ActivePointsEnum.All;
+
+            EncoderPosition test = new EncoderPosition(testRA, testDec);
+            Type type = _alignmentModel.GetType();
+            MethodInfo methodInfo = type.GetMethod("Delta_Matrix_Map", BindingFlags.NonPublic | BindingFlags.Instance);
+            MapResult result = (MapResult)methodInfo.Invoke(_alignmentModel, new object[] { test });
+            // var result = AlignmentModel.Delta_Matrix_Reverse_Map(new EncoderPosition(testRA, testDec));
+            Assert.AreEqual(expectedRa, result.EncoderPosition.RA, 120, "RA result is incorrect");
+            Assert.AreEqual(expectedDec, result.EncoderPosition.Dec, 120, "Dec result is incorrect");
+        }
+
 
         [DataRow(8388037, 9196760, 8673472.03453868, 9625248.59910099, 1)]
         [DataRow(8255092, 8775416, 8126324.76231087, 9773690.13425487, 1)] // (EQ_SphericalPolar)

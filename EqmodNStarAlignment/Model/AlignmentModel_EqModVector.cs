@@ -689,12 +689,12 @@ namespace EqmodNStarAlignment.Model
             Coord tmpCoord = EQ_sp2Cs(pos);
 
             return EQ_AssembleMatrix_Taki(tmpCoord.x, tmpCoord.y,
-                nearestPoints[0].EncoderCartesian,
-                nearestPoints[1].EncoderCartesian,
-                nearestPoints[2].EncoderCartesian,
                 nearestPoints[0].TargetCartesian,
                 nearestPoints[1].TargetCartesian,
-                nearestPoints[2].TargetCartesian);
+                nearestPoints[2].TargetCartesian,
+                nearestPoints[0].EncoderCartesian,
+                nearestPoints[1].EncoderCartesian,
+                nearestPoints[2].EncoderCartesian);
 
         }
 
@@ -1461,7 +1461,7 @@ namespace EqmodNStarAlignment.Model
                             centreDistance = Math.Pow(triangleCentre.x - posCartesean.x, 2) + Math.Pow(triangleCentre.y - posCartesean.y, 2);
                             if (centreDistance < minCentreDistance)
                             {
-                                results = new List<AlignmentPoint> { p1, p2, p3 };  // Reversed to match EQMOD sort order
+                                results = new List<AlignmentPoint> { p3, p2, p1 };  // Reversed to match EQMOD sort order
                                 minCentreDistance = centreDistance;
                             }
                         }
@@ -1469,7 +1469,7 @@ namespace EqmodNStarAlignment.Model
                 }
             }
             results.ForEach(p => p.SelectedForGoto = true);
-            return results.OrderBy(p => p.AlignTime).ToList();
+            return results.ToList();
 
         }
 
@@ -1581,7 +1581,7 @@ namespace EqmodNStarAlignment.Model
                 if (done) break;
             }
             results.ForEach(p => p.SelectedForGoto = true);
-            return results.OrderBy(p => p.AlignTime).ToList();
+            return results.ToList();
 
         }
 
