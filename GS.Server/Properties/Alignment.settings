@@ -8,17 +8,20 @@
     <Setting Name="ProximityLimit" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.27777777</Value>
     </Setting>
-    <Setting Name="SampleSize" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">3</Value>
-    </Setting>
     <Setting Name="ClearModelOnStartup" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="Version" Type="System.String" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="NearbyLimit" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">45</Value>
+    <Setting Name="AlignmentBehaviour" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="ActivePoints" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="ThreePointAlgorithm" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>
 </SettingsFile>

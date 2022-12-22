@@ -25,11 +25,12 @@
             <md:DrawerHost.LeftDrawerContent>
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="40" />
+                        <RowDefinition />
+                        <RowDefinition />
                         <RowDefinition Height="Auto" MinHeight="150"/>
-                        <RowDefinition Height="Auto" MinHeight="150"/>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -42,7 +43,24 @@
                                   Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
                                   CommandParameter="{x:Static Dock.Left}"
                                   IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"/>
-                    <StackPanel Grid.Row="1" Grid.Column="0"  Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="20,0,5,20">
+
+                    <ComboBox Grid.Row="1" md:HintAssist.Hint="{StaticResource optAlignmentMode}" 
+                              MinWidth="10" Margin="20,0,5,20" Width="200" 
+                              HorizontalAlignment="Left" VerticalAlignment="Top" 
+                              ToolTip="{StaticResource aliAlignmentModeTooltip}" 
+                              ItemsSource="{Binding Source={domain:EnumValueBindingSource {x:Type alignment:AlignmentBehaviourEnum}}}" 
+                              SelectedItem="{Binding AlignmentMode}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <ComboBox.Text>
+                            <Binding Path="AlignmentMode" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
+                        </ComboBox.Text>
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                    </ComboBox>
+                    <StackPanel Grid.Row="2" Grid.Column="0"  Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="20,0,5,20">
                         <md:PopupBox  StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{StaticResource skyReset}">
                             <Grid Width="150">
                                 <Grid.RowDefinitions>
@@ -54,13 +72,13 @@
                                         Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ResetProximityLimit}"/>
                             </Grid>
                         </md:PopupBox>
-                        <TextBox Grid.Row="1" Grid.Column="0"  Width="110" IsReadOnly="True"
+                        <TextBox Grid.Row="2" Grid.Column="0"  Width="110" IsReadOnly="True"
                                  md:HintAssist.Hint="{StaticResource optProximityLimit}" 
                                  Text="{Binding ProximityLimitArcSeconds}"
                                  ToolTip="{StaticResource aliProximityLimitTooltip}"
                                  Style="{StaticResource MaterialDesignFloatingHintTextBox}" domain:TextBoxMaskBehaviour.Mask="Decimal" />
                     </StackPanel>
-                    <Slider Grid.Row="1" Grid.Column="2" Value="{Binding ProximityLimitArcSeconds}" 
+                    <Slider Grid.Row="2" Grid.Column="2" Value="{Binding ProximityLimitArcSeconds}" 
                             Style="{StaticResource MaterialDesignDiscreteVerticalSlider}"
                             ToolTip="{StaticResource aliProximityLimitTooltip}"
                             Width="75"
@@ -68,62 +86,34 @@
                             Minimum="0" Maximum="7200" 
                             TickFrequency="200"
                             TickPlacement="None" />
-                    <StackPanel Grid.Row="2" Grid.Column="0"  Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="20,0,5,20">
-                        <md:PopupBox  StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{StaticResource skyReset}">
-                            <Grid Width="150">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="30" />
-                                    <RowDefinition Height="40" />
-                                </Grid.RowDefinitions>
-                                <Label Grid.Row="0" HorizontalAlignment="Center" Content="{StaticResource SkyResetDef}"/>
-                                <Button Grid.Row="1" HorizontalAlignment="Center" Content="{StaticResource diaAccept}" 
-                                        Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ResetNearbyLimit}"/>
-                            </Grid>
-                        </md:PopupBox>
-                        <TextBox   md:HintAssist.Hint="{StaticResource optNearbyLimit}" Width="110" HorizontalAlignment="Left" VerticalAlignment="Bottom" IsReadOnly="True"
-                                 ToolTip="{StaticResource aliNearbyLimitTooltip}" 
-                                 Text="{Binding NearbyLimit}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" domain:TextBoxMaskBehaviour.Mask="Decimal"/>
 
-                    </StackPanel>
-                    <Slider Grid.Row="2" Grid.Column="2" Value="{Binding NearbyLimit}" 
-                            Style="{StaticResource MaterialDesignDiscreteVerticalSlider}"
-                            ToolTip="{StaticResource aliNearbyLimitTooltip}"
-                            Width="75"
-                            Orientation="Vertical"
-                            Minimum="5" Maximum="90" 
-                            TickFrequency="5"
-                            TickPlacement="None" />
-                    <!--<TextBox Grid.Row="3" Margin="20,0,5,20" md:HintAssist.Hint="{StaticResource optSampleSize}" Width="120" HorizontalAlignment="Left" ToolTip="{StaticResource aliSampleSizeTooltip}" 
-                             Text="{Binding SampleSize}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" domain:TextBoxMaskBehaviour.Mask="Integer"/>-->
-                    <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Grid.Column="0"  Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="20,0,5,20">
-                        <md:PopupBox  StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{StaticResource skyReset}">
-                            <Grid Width="150">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="30" />
-                                    <RowDefinition Height="40" />
-                                </Grid.RowDefinitions>
-                                <Label Grid.Row="0" HorizontalAlignment="Center" Content="{StaticResource SkyResetDef}"/>
-                                <Button Grid.Row="1" HorizontalAlignment="Center" Content="{StaticResource diaAccept}" 
-                                        Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ResetSampleSize}"/>
-                            </Grid>
-                        </md:PopupBox>
-                        <ComboBox md:HintAssist.Hint="{StaticResource optSampleSize}" Width="120" HorizontalAlignment="Left" ToolTip="{StaticResource aliSampleSizeTooltip}"
-                                  ItemsSource="{Binding SampleSizeList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
-                            <ComboBox.SelectedItem>
-                                <Binding Path="SampleSize" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
-                                    <Binding.ValidationRules>
-                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
-                                    </Binding.ValidationRules>
-                                </Binding>
-                            </ComboBox.SelectedItem>
-                            <ComboBox.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <VirtualizingStackPanel />
-                                </ItemsPanelTemplate>
-                            </ComboBox.ItemsPanel>
-                        </ComboBox>
-                    </StackPanel>
-                    <StackPanel Grid.Row="4" Grid.ColumnSpan="3" Grid.Column="0" Orientation="Horizontal" Margin="20,0,5,20">
+                    <ComboBox Grid.Row="3" md:HintAssist.Hint="{StaticResource optActivePoints}" 
+                              MinWidth="10" Margin="20,0,5,20" Width="200" 
+                              HorizontalAlignment="Left" VerticalAlignment="Top" 
+                              ToolTip="{StaticResource aliActivePointsTooltip}" 
+                              ItemsSource="{Binding Source={domain:EnumValueBindingSource {x:Type alignment:ActivePointsEnum}}}" 
+                              SelectedItem="{Binding ActivePoints}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                    </ComboBox>
+                    <ComboBox Grid.Row="4" md:HintAssist.Hint="{StaticResource optThreePointAlgorithm}" 
+                              MinWidth="10" Margin="20,0,5,20" Width="200" 
+                              HorizontalAlignment="Left" VerticalAlignment="Top" 
+                              ToolTip="{StaticResource aliThreePointAlgorithmTooltip}" 
+                              ItemsSource="{Binding Source={domain:EnumValueBindingSource {x:Type alignment:ThreePointAlgorithmEnum}}}"
+                              SelectedItem="{Binding ThreePointAlgorithm}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                    </ComboBox>
+                    <StackPanel Grid.Row="5" Grid.ColumnSpan="3" Grid.Column="0" Orientation="Horizontal" Margin="20,0,5,20">
                         <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center"  Margin="12,0,0,0"  Width="25" Height="25" ToolTip="{StaticResource aliClearModelOnStartupTooltip}"
                                       IsChecked="{Binding ClearModelOnStartup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource aliClearModelOnStartup}"/>
@@ -203,13 +193,13 @@
                         <!-- Ordinal formatting left in for reference -->
                         <!--<DataGridTemplateColumn Header="#" CellTemplate="{StaticResource OrdinalColumnDataTemplate}" HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>-->
                         <DataGridTextColumn Header="###" Binding="{Binding Id, StringFormat='{}{0:D3}'}"  HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Encoder RA" Binding="{Binding Encoder[0], StringFormat='{}{0:D8}'}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Encoder Dec" Binding="{Binding Encoder[1], StringFormat='{}{0:D8}'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Unsynced RA" Binding="{Binding Unsynced[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Unsynced Dec" Binding="{Binding Unsynced[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
                         <DataGridTextColumn Header="RA" Binding="{Binding OrigRaDec[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Dec" Binding="{Binding OrigRaDec[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Target RA" Binding="{Binding Target[0], StringFormat='{}{0:D8}'}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Target Dec" Binding="{Binding Target[1], StringFormat='{}{0:D8}'}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Synched" Binding="{Binding Synched}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Synced RA" Binding="{Binding Synced[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Synced Dec" Binding="{Binding Synced[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Synched" Binding="{Binding SyncedTime}" IsReadOnly="True" />
                     </DataGrid.Columns>
                 </DataGrid>
 

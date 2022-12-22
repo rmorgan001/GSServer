@@ -64,30 +64,46 @@ namespace GS.Server.Alignment
 
         }
 
-        private static double _nearbyLimit;
-        public static double NearbyLimit
+
+        private static AlignmentBehaviourEnum _alignmentBehaviour;
+        public static AlignmentBehaviourEnum AlignmentBehaviour
         {
-            get => _nearbyLimit;
+            get => _alignmentBehaviour;
             set
             {
-                if (Math.Abs(_nearbyLimit - value) < 0.0000000000001) return;
-                _nearbyLimit = value;
-                Properties.Alignment.Default.NearbyLimit = value;
+                if (_alignmentBehaviour == value) return;
+                _alignmentBehaviour = value;
+                Properties.Alignment.Default.AlignmentBehaviour = (int)value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
 
         }
 
-        private static int _sampleSize;
-        public static int SampleSize
+        private static ActivePointsEnum _activePoints;
+        public static ActivePointsEnum ActivePoints
         {
-            get => _sampleSize;
+            get => _activePoints;
             set
             {
-                if (_sampleSize == value) return;
-                _sampleSize = value;
-                Properties.Alignment.Default.SampleSize = value;
+                if (_activePoints == value) return;
+                _activePoints = value;
+                Properties.Alignment.Default.ActivePoints = (int)value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+
+        }
+
+        private static ThreePointAlgorithmEnum _threePointAlgorithm;
+        public static ThreePointAlgorithmEnum ThreePointAlgorithm
+        {
+            get => _threePointAlgorithm;
+            set
+            {
+                if (_threePointAlgorithm == value) return;
+                _threePointAlgorithm = value;
+                Properties.Alignment.Default.ThreePointAlgorithm = (int)value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
@@ -123,8 +139,9 @@ namespace GS.Server.Alignment
             IsAlignmentOn = Properties.Alignment.Default.IsAlignmentOn;
             ClearModelOnStartup = Properties.Alignment.Default.ClearModelOnStartup;
             ProximityLimit = Properties.Alignment.Default.ProximityLimit;
-            NearbyLimit = Properties.Alignment.Default.NearbyLimit;
-            SampleSize = Properties.Alignment.Default.SampleSize;
+            AlignmentBehaviour = (AlignmentBehaviourEnum)Properties.Alignment.Default.AlignmentBehaviour;
+            ActivePoints = (ActivePointsEnum)Properties.Alignment.Default.ActivePoints;
+            ThreePointAlgorithm = (ThreePointAlgorithmEnum)Properties.Alignment.Default.ThreePointAlgorithm;
         }
 
         /// <summary>

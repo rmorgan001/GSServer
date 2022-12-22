@@ -22,7 +22,6 @@ using GS.Server.Helpers;
 using GS.Shared;
 using GS.Simulator;
 using GS.SkyWatcher;
-using EqmodNStarAlignment.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -40,7 +39,6 @@ using GS.Server.Windows;
 using GS.Server.Alignment;
 using AxisStatus = GS.Simulator.AxisStatus;
 using Range = GS.Principles.Range;
-using EqmodNStarAlignment.DataTypes;
 
 namespace GS.Server.SkyTelescope
 {
@@ -1213,7 +1211,7 @@ namespace GS.Server.SkyTelescope
             var stopwatch = Stopwatch.StartNew();
 
             SimTasks(MountTaskName.StopAxes);
-            var simTarget = GetAlignedTarget(Axes.AxesAppToMount(target));
+            var simTarget = GetSyncedAxes(Axes.AxesAppToMount(target));
 
             #region First Slew
 
@@ -1386,7 +1384,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 target[0] += deltaDegree;
-                var deltaTarget = GetAlignedTarget(Axes.AxesAppToMount(target));
+                var deltaTarget = GetSyncedAxes(Axes.AxesAppToMount(target));
 
                 if (SlewState == SlewType.SlewNone) { break; } //check for a stop
 
@@ -1681,7 +1679,7 @@ namespace GS.Server.SkyTelescope
             var stopwatch = Stopwatch.StartNew();
 
             SkyTasks(MountTaskName.StopAxes);
-            var skyTarget = GetAlignedTarget(Axes.AxesAppToMount(target));
+            var skyTarget = GetSyncedAxes(Axes.AxesAppToMount(target));
 
             #region First Slew
             // time could be off a bit may need to deal with each axis separate
@@ -1854,7 +1852,7 @@ namespace GS.Server.SkyTelescope
                 if (deltaDegree < gotoPrecision) { break; }
 
                 target[0] += deltaDegree;
-                var deltaTarget = GetAlignedTarget(Axes.AxesAppToMount(target));
+                var deltaTarget = GetSyncedAxes(Axes.AxesAppToMount(target));
                 if (SlewState == SlewType.SlewNone) { break; } //check for a stop
 
                 object _ = new SkyAxisGoToTarget(0, AxisId.Axis1, deltaTarget[0]); //move to new target
@@ -3823,7 +3821,10 @@ namespace GS.Server.SkyTelescope
             {
                 case MountType.Simulator:
                     MountQueue.Start();
-                    if (!MountQueue.IsRunning) { throw new Exception("Failed to start simulator queue"); }
+                    if (MountQueue.IsRunning) { ConnectAlignmentModel(); }
+                    else
+                    { throw new Exception("Failed to start simulator queue"); }
+
                     break;
                 case MountType.SkyWatcher:
                     // open serial port
@@ -3844,7 +3845,11 @@ namespace GS.Server.SkyTelescope
                     }
 
                     SkyQueue.Start(SkySystem.Serial, Custom360Steps, CustomWormSteps);
-                    if (!SkyQueue.IsRunning)
+                    if (SkyQueue.IsRunning)
+                    {
+                        ConnectAlignmentModel();
+                    }
+                    else
                     {
                         throw new SkyServerException(ErrorCode.ErrMount, "Failed to start sky queue");
                     }
@@ -4628,7 +4633,7 @@ namespace GS.Server.SkyTelescope
 
             //convert ra dec to mount positions
             var xy = Axes.RaDecToAxesXY(new[] { ra, dec });
-            var target = GetAlignedTarget(Axes.AxesAppToMount(xy));
+            var target = GetSyncedAxes(Axes.AxesAppToMount(xy));
 
             //convert current position to mount position
             var current = Axes.AxesMountToApp(new[] { _mountAxisX, _mountAxisY });
@@ -4668,7 +4673,7 @@ namespace GS.Server.SkyTelescope
 
             //convert ra dec to mount positions
             var yx = Axes.AltAzToAxesYX(new[] { alt, az });
-            var target = GetAlignedTarget(Axes.AxesAppToMount(new[] { yx[1], yx[0] }));
+            var target = GetSyncedAxes(Axes.AxesAppToMount(new[] { yx[1], yx[0] }));
 
             //convert current position to mount position
             var current = Axes.AxesMountToApp(new[] { _mountAxisX, _mountAxisY });
@@ -4702,9 +4707,8 @@ namespace GS.Server.SkyTelescope
 
         private static void ConnectAlignmentModel()
         {
-            AlignmentModel.StepsPerRev = new EqmodNStarAlignment.DataTypes.EncoderPosition(SkyServer.StepsPerRevolution[0], SkyServer.StepsPerRevolution[1]);
-            AlignmentModel.SetHomePosition(0, 0);
             AlignmentModel.Connect(AlignmentSettings.ClearModelOnStartup);
+            AlignmentModel.SetHomePosition(_homeAxes.X, _homeAxes.Y);
         }
 
         private static bool _alignmentShow;
@@ -4750,15 +4754,13 @@ namespace GS.Server.SkyTelescope
             //      SkyServer.FactorStep contains the conversion from radians to steps
             // To get the target steps
             var xy = Axes.RaDecToAxesXY(new[] { TargetRa, TargetDec });
-            var targ = Axes.AxesAppToMount(new[] { xy[0], xy[1] });
-            var raCmd = new SkyGetAngleToStep(SkyQueue.NewId, AxisId.Axis1, DegToRad(targ[0]));
-            var decCmd = new SkyGetAngleToStep(SkyQueue.NewId, AxisId.Axis2, DegToRad(targ[1]));
-            long targetRaSteps = Convert.ToInt64(SkyQueue.GetCommandResult(raCmd).Result);
-            long targetDecSteps = Convert.ToInt64(SkyQueue.GetCommandResult(decCmd).Result);
+            var unsynced = Axes.AxesAppToMount(new[] { xy[0], xy[1] });
+            var rawSteps = GetRawSteps();
+            double[] synced = new double[] { ConvertStepsToDegrees(rawSteps[0], 0), ConvertStepsToDegrees(rawSteps[1], 1) };
             if (AlignmentModel.SyncToRaDec(
-                new long[] { (long)SkyServer.Steps[0], (long)SkyServer.Steps[0] },
+                unsynced,
                 new double[] { TargetRa, TargetDec },
-                new long[] { targetRaSteps, targetDecSteps },
+                synced,
                 DateTime.Now))
             {
                 var monitorItem = new MonitorEntry
@@ -4769,7 +4771,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Alignment point added: Mount axis = {SkyServer.Steps[0]}/{SkyServer.Steps[1]}, RA/Dec = {TargetRa}/{TargetDec}, Target axis = {targetRaSteps}/{targetDecSteps}"
+                    Message = $"Alignment point added: Unsynced axis = {unsynced[0]}/{unsynced[1]}, RA/Dec = {TargetRa}/{TargetDec}, Synched axis = {synced[0]}/{synced[1]}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -4783,25 +4785,17 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Alignment point rejected: Mount axis = {SkyServer.Steps[0]}/{SkyServer.Steps[1]}, RA/Dec = {TargetRa}/{TargetDec}, Target axis = {targetRaSteps}/{targetDecSteps}"
+                    Message = $"Alignment point added: Unsynced axis = {unsynced[0]}/{unsynced[1]}, RA/Dec = {TargetRa}/{TargetDec}, Synched axis = {synced[0]}/{synced[1]}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
-        private static double[] GetAlignedTarget(double[] target)
+        private static double[] GetSyncedAxes(double[] unsynced)
         {
             if (AlignmentModel.IsAlignmentOn)
             {
-                var raCmd = new SkyGetAngleToStep(SkyQueue.NewId, AxisId.Axis1, DegToRad(target[0]));
-                var decCmd = new SkyGetAngleToStep(SkyQueue.NewId, AxisId.Axis2, DegToRad(target[1]));
-                long targetRaSteps = Convert.ToInt64(SkyQueue.GetCommandResult(raCmd).Result);
-                long targetDecSteps = Convert.ToInt64(SkyQueue.GetCommandResult(decCmd).Result);
-                EncoderPosition aligned = AlignmentModel.GetTargetSteps(new EncoderPosition(targetRaSteps, targetDecSteps));
-                var alignedRaCmd = new SkyGetStepToAngle(SkyQueue.NewId, AxisId.Axis1, aligned.RA);
-                var alignedDecCmd = new SkyGetStepToAngle(SkyQueue.NewId, AxisId.Axis2, aligned.Dec);
-                double alignedRa = RadToDeg(Convert.ToDouble(SkyQueue.GetCommandResult(alignedRaCmd).Result));
-                double alignedDec = RadToDeg(Convert.ToDouble(SkyQueue.GetCommandResult(alignedDecCmd).Result));
+                double[] synced = AlignmentModel.GetSyncedValue(unsynced);
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
@@ -4810,30 +4804,39 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Mapped Encoder steps: {targetRaSteps}/{targetDecSteps} to {aligned.RA}/{aligned.Dec}\n"
-                            + $"         Axis angles: {target[0]}/{target[1]} to {alignedRa}/{alignedDec}"
+                    Message = $"Mapped unsynced axis angles: {unsynced[0]}/{unsynced[1]} to {synced[0]}/{synced[1]}"
                 };
 
-                return new double[] { alignedRa, alignedDec };
+                return synced;
             }
             else
             {
-                return target;
+                return unsynced;
             }
         }
 
 
-        private static double[] GetDealignedEncoder(double[] alignedSteps)
+        private static double[] GetUnsyncedAxes(double[] synced)
         {
             if (AlignmentModel.IsAlignmentOn)
             {
-                var reported = AlignmentModel.GetEncoderSteps(new long[]{(long)alignedSteps[0], (long)alignedSteps[1] });
-                return new double[] {reported.RA, reported.Dec};
-                
+                double[] unsynced = AlignmentModel.GetUnsyncedValue(synced);
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Alignment,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"Mapped synced axis angles: {synced[0]}/{synced[1]} to {unsynced[0]}/{unsynced[1]}"
+                };
+
+                return unsynced;
             }
             else
             {
-                return alignedSteps;
+                return synced;
             }
         }
         #endregion
@@ -4862,13 +4865,16 @@ namespace GS.Server.SkyTelescope
                     AlignmentModel.IsAlignmentOn = AlignmentSettings.IsAlignmentOn;
                     break;
                 case "ProximityLimit":
-                    // AlignmentModel.ProximityLimit = AlignmentSettings.ProximityLimit;
+                    AlignmentModel.ProximityLimit = AlignmentSettings.ProximityLimit;
                     break;
-                case "NearbyLimit":
-                    // AlignmentModel.NearbyLimit = AlignmentSettings.NearbyLimit;
+                case "AlignmentMode":
+                    AlignmentModel.AlignmentBehaviour = AlignmentSettings.AlignmentBehaviour;
                     break;
-                case "SampleSize":
-                    // AlignmentModel.SampleSize = AlignmentSettings.SampleSize;
+                case "ActivePoints":
+                    AlignmentModel.ActivePoints = AlignmentSettings.ActivePoints;
+                    break;
+                case "ThreePointAlgorithm":
+                    AlignmentModel.ThreePointAlgorithm = AlignmentSettings.ThreePointAlgorithm;
                     break;
             }
         }
@@ -5060,22 +5066,15 @@ namespace GS.Server.SkyTelescope
                 if (double.IsNaN(rawSteps[0]) || double.IsNaN(rawSteps[1])) { return; }
 
 
-                // store actual steps
-                //if (AlignmentModel.IsAlignmentOn)
-                //{
-                //    EncoderPosition target = AlignmentModel.GetTargetSteps(new EncoderPosition(rawSteps));
-                //    Steps = new double[]{target[0], target[1] };
-                //}
-                //else
-                //{
-                Steps = GetDealignedEncoder(rawSteps);
-                //}
+                Steps = rawSteps;
 
                 //Implement Pec
                 PecCheck();
 
                 //Convert Positions to degrees
-                double[] rawPositions = { ConvertStepsToDegrees(rawSteps[0], 0), ConvertStepsToDegrees(rawSteps[1], 1) };
+                // double[] rawPositions = { ConvertStepsToDegrees(rawSteps[0], 0), ConvertStepsToDegrees(rawSteps[1], 1) };
+                double[] rawPositions = GetUnsyncedAxes(new double[] { ConvertStepsToDegrees(rawSteps[0], 0), ConvertStepsToDegrees(rawSteps[1], 1) });
+
 
                 // UI diagnostics in degrees
                 ActualAxisX = rawPositions[0];

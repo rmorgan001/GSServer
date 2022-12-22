@@ -49,18 +49,6 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3")]
-        public int SampleSize {
-            get {
-                return ((int)(this["SampleSize"]));
-            }
-            set {
-                this["SampleSize"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool ClearModelOnStartup {
             get {
@@ -85,13 +73,37 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("45")]
-        public double NearbyLimit {
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int AlignmentBehaviour {
             get {
-                return ((double)(this["NearbyLimit"]));
+                return ((int)(this["AlignmentBehaviour"]));
             }
             set {
-                this["NearbyLimit"] = value;
+                this["AlignmentBehaviour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ActivePoints {
+            get {
+                return ((int)(this["ActivePoints"]));
+            }
+            set {
+                this["ActivePoints"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ThreePointAlgorithm {
+            get {
+                return ((int)(this["ThreePointAlgorithm"]));
+            }
+            set {
+                this["ThreePointAlgorithm"] = value;
             }
         }
     }
