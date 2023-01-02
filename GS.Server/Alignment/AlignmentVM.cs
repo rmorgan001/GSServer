@@ -133,7 +133,7 @@ namespace GS.Server.Alignment
 
         }
 
-        public AlignmentBehaviourEnum AlignmentMode
+        public AlignmentBehaviourEnum AlignmentBehaviour
         {
             get => AlignmentSettings.AlignmentBehaviour;
             set

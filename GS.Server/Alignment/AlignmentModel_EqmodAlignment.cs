@@ -9,40 +9,35 @@ namespace GS.Server.Alignment
         public bool EQ_NPointAppend(AlignmentPoint data)
         {
             bool eq_NPointAppend = true;
+
+            // Check for points within proximity distance of the new point and remove them
+            if (AlignmentPoints.Count > 0)
+            {
+                var nearPoints = this.AlignmentPoints
+                    .Where(p => p.Unsynced.IncludedAngleTo(data.Unsynced) <= ProximityLimit).ToList();
+                foreach (AlignmentPoint ap in nearPoints)
+                {
+                    this.AlignmentPoints.Remove(ap);
+                }
+
+            }
+            
+            // Add the new point.
+            AlignmentPoints.Add(data);
+
+            // Update one star alignment to use the latest data
             _oneStarAdjustment = data.Delta;
 
-            if (AlignmentPoints.Count < 2)
+            // Check if matrix should be updated.
+            if (AlignmentPoints.Count > 2)
             {
-                // Less than three alignment points so just add the incoming one.
-                AlignmentPoints.Add(data);
+                // Update the matrices
+                SendToMatrix();
             }
-            else
-            {
-                if (AlignmentPoints.Count == 2)
-                {
-                    AlignmentPoints.Add(data);
-                    // Update the matrices
-                    SendToMatrix();
-                }
-                else
-                {
-                    // Now have more than 3 so see if this point is a replacement
-                    var nearPoints = this.AlignmentPoints.Where(ap => Math.Abs(ap.Unsynced.RA - data.Unsynced.RA) < _proximityLimit
-                                                                || Math.Abs(ap.Unsynced.Dec - data.Unsynced.Dec) < _proximityLimit).ToList();
-                    foreach (AlignmentPoint ap in nearPoints)
-                    {
-                        this.AlignmentPoints.Remove(ap);
-                    }
 
-                    // Add the incoming point
-                    AlignmentPoints.Add(data);
-
-                    // Update the matrices
-                    SendToMatrix();
-                }
-            }
             return eq_NPointAppend;
         }
+
         public void SendToMatrix()
         {
             if (AlignmentPoints.Count < 3)

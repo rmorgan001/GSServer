@@ -49,11 +49,8 @@
                               HorizontalAlignment="Left" VerticalAlignment="Top" 
                               ToolTip="{StaticResource aliAlignmentModeTooltip}" 
                               ItemsSource="{Binding Source={domain:EnumValueBindingSource {x:Type alignment:AlignmentBehaviourEnum}}}" 
-                              SelectedItem="{Binding AlignmentMode}"
+                              SelectedItem="{Binding AlignmentBehaviour}"
                               Style="{StaticResource MaterialDesignFloatingHintComboBox}">
-                        <ComboBox.Text>
-                            <Binding Path="AlignmentMode" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
-                        </ComboBox.Text>
                         <ComboBox.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <VirtualizingStackPanel />

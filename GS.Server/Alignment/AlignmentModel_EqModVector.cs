@@ -579,7 +579,7 @@ namespace GS.Server.Alignment
                 result.r = -1;
             }
 
-            Debug.WriteLine($"Polar2Cartes {polar.x}/{polar.y} => {result.x}/{result.y}/{result.r}");
+            // Debug.WriteLine($"Polar2Cartes {polar.x}/{polar.y} => {result.x}/{result.y}/{result.r}");
             return result;
         }
 
@@ -651,7 +651,7 @@ namespace GS.Server.Alignment
 
             result.y = radiusder + Home.Dec;
 
-            Debug.WriteLine($"Cartes2Polar {cart.x}/{cart.y}/{rads.r} => {result.x}/{result.y}");
+            // Debug.WriteLine($"Cartes2Polar {cart.x}/{cart.y}/{rads.r} => {result.x}/{result.y}");
             return result;
         }
 
@@ -1252,7 +1252,7 @@ namespace GS.Server.Alignment
             {
                 result.r = 0;   // Weight up
             }
-            Debug.WriteLine($"EQ_SphericalPolar {spherical.RA}/{spherical.Dec} Weights down {result.r} => {result.x}/{result.y}");
+            // Debug.WriteLine($"EQ_SphericalPolar {spherical.RA}/{spherical.Dec} Weights down {result.r} => {result.x}/{result.y}");
             return result;
         }
 
@@ -1294,7 +1294,7 @@ namespace GS.Server.Alignment
                     result = new AxisPosition(raDec);
                 }
             }
-            Debug.WriteLine($"EQ_PolarSpherical {pos.x}/{pos.y} Weights down {range.r} => {result.RA}/{result.Dec}");
+            // Debug.WriteLine($"EQ_PolarSpherical {pos.x}/{pos.y} Weights down {range.r} => {result.RA}/{result.Dec}");
 
             return result;
         }

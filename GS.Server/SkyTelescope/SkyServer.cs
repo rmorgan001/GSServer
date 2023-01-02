@@ -4867,7 +4867,7 @@ namespace GS.Server.SkyTelescope
                 case "ProximityLimit":
                     AlignmentModel.ProximityLimit = AlignmentSettings.ProximityLimit;
                     break;
-                case "AlignmentMode":
+                case "AlignmentBehaviour":
                     AlignmentModel.AlignmentBehaviour = AlignmentSettings.AlignmentBehaviour;
                     break;
                 case "ActivePoints":

@@ -149,13 +149,39 @@ namespace GS.Server.Alignment
 
         public HemisphereEnum Hemisphere { get; private set; } = HemisphereEnum.Northern;
 
-        public double SiteElevation { get; set; }
+        private double _siteElevation;
+        public double SiteElevation
+        {
+            get => _siteElevation;
+            set
+            {
+                if (_siteElevation == value) return;
+                _siteElevation = value;
+            }
+        }
 
         public bool CheckLocalPier { get; set; }
 
-        public AlignmentBehaviourEnum AlignmentBehaviour { get; set; } = AlignmentBehaviourEnum.NStarPlusNearest;
-
-        public ThreePointAlgorithmEnum ThreePointAlgorithm { get; set; } = ThreePointAlgorithmEnum.BestCentre;
+        private AlignmentBehaviourEnum _alignmentBehaviour = AlignmentBehaviourEnum.NStarPlusNearest;
+        public AlignmentBehaviourEnum AlignmentBehaviour
+        {
+            get => _alignmentBehaviour;
+            set
+            {
+                if (_alignmentBehaviour == value) return;
+                _alignmentBehaviour = value;
+            }
+        }
+        private ThreePointAlgorithmEnum _threePointAlgorithm = ThreePointAlgorithmEnum.BestCentre;
+        public ThreePointAlgorithmEnum ThreePointAlgorithm
+        {
+            get => _threePointAlgorithm;
+            set
+            {
+                if (_threePointAlgorithm == value) return;
+                _threePointAlgorithm = value;
+            }
+        }
 
         public AxisPosition Home { get; private set; }
 
@@ -167,21 +193,17 @@ namespace GS.Server.Alignment
             SendToMatrix();
         }
 
-        //private AxisPosition _stepsPerRev;
-        //public AxisPosition StepsPerRev
-        //{
-        //    get => _stepsPerRev;
-        //    set
-        //    {
-        //        if (_stepsPerRev == value)
-        //        {
-        //            return;
-        //        }
-        //        _stepsPerRev = value;
-        //    }
-        //}
 
-        public ActivePointsEnum ActivePoints { get; set; }
+        private ActivePointsEnum _activePoints;
+        public ActivePointsEnum ActivePoints
+        {
+            get => _activePoints;
+            set
+            {
+                if (_activePoints == value) return;
+                _activePoints = value;
+            }
+        }
 
         public AlignmentPointCollection AlignmentPoints { get; } = new AlignmentPointCollection();
 
@@ -248,18 +270,10 @@ namespace GS.Server.Alignment
                 lock (_accessLock)
                 {
 
-                    // AlignmentPoints.Add(new AlignmentPoint(unsynced, origRaDec, synced, syncTime));
-                    if (EQ_NPointAppend(new AlignmentPoint(unsynced , origRaDec, synced, syncTime)))
-                    {
-
-                    }
-                    //_currentChecksum = int.MinValue;    // Reset checksum so that offsets are recalculated
-
-                    //OneStarAdjustment[0] = observedAxes[0] - mountAxes[0];
-                    //OneStarAdjustment[1] = observedAxes[1] - mountAxes[1];
+                    bool result = EQ_NPointAppend(new AlignmentPoint(unsynced, origRaDec, synced, syncTime));
                     SaveAlignmentPoints();
 
-                    return true;
+                    return result;
                 }
             }
             catch (Exception ex)
@@ -284,7 +298,7 @@ namespace GS.Server.Alignment
                     }
                     else
                     {
-                        _oneStarAdjustment = AlignmentPoints[ptCt-1].Delta; // Use the last point's delta
+                        _oneStarAdjustment = AlignmentPoints[ptCt - 1].Delta; // Use the last point's delta
                     }
                     if (ptCt < 3)
                     {

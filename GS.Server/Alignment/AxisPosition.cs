@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 using System;
+using GS.Principles;
 using Newtonsoft.Json;
 
 namespace GS.Server.Alignment
@@ -179,6 +180,21 @@ namespace GS.Server.Alignment
         }
 
 
+        public double IncludedAngleTo(AxisPosition axisPosition2)
+        {
+            double piby2 = Math.PI * 0.5;
+            double thisRARadians = Units.Deg2Rad(this.RA);
+            double thisDecRadians = Units.Deg2Rad(this.Dec);
+            double thatRARadians = Units.Deg2Rad(axisPosition2.RA);
+            double thatDecRadians = Units.Deg2Rad(axisPosition2.Dec);
+            // Using the law of Cosines
+            double c = (Math.Cos(piby2 - thisDecRadians) * Math.Cos(piby2 - thatDecRadians))
+                       + (Math.Sin(piby2 - thisDecRadians) * Math.Sin(piby2 - thatDecRadians) *
+                          Math.Cos(thisRARadians - thatRARadians));
+            double angleRadians = Math.Abs(Math.Acos(c));
+            return Units.Rad2Deg(angleRadians);
+
+        }
 
     }
 }
