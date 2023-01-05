@@ -187,11 +187,11 @@ namespace GS.Server.Alignment
 
         //private double[] _reportedHomePosition = new double[]{ 0, 0 };
 
-        public void SetHomePosition(double ra, double dec)
-        {
-            Home = new AxisPosition(ra, dec);
-            SendToMatrix();
-        }
+        //public void SetHomePosition(double ra, double dec)
+        //{
+        //    Home = new AxisPosition(ra, dec);
+        //    SendToMatrix();
+        //}
 
 
         private ActivePointsEnum _activePoints;
@@ -242,8 +242,9 @@ namespace GS.Server.Alignment
         }
         #endregion
 
-        public void Connect(bool clearPointsOnStartup = false)
+        public void Connect(double raHome, double decHome, bool clearPointsOnStartup = false)
         {
+            Home = new AxisPosition(raHome, decHome);
             try
             {
                 // Load the last access time property.

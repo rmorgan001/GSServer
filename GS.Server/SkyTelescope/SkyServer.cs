@@ -3801,8 +3801,6 @@ namespace GS.Server.SkyTelescope
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Pec: {pecmsg}" };
             MonitorLog.LogToMonitor(monitorItem);
 
-            // Update Alignment Model home position
-            AlignmentModel.SetHomePosition(0, 0);
             return true;
         }
 
@@ -3845,11 +3843,7 @@ namespace GS.Server.SkyTelescope
                     }
 
                     SkyQueue.Start(SkySystem.Serial, Custom360Steps, CustomWormSteps);
-                    if (SkyQueue.IsRunning)
-                    {
-                        ConnectAlignmentModel();
-                    }
-                    else
+                    if (!SkyQueue.IsRunning)
                     {
                         throw new SkyServerException(ErrorCode.ErrMount, "Failed to start sky queue");
                     }
@@ -4707,8 +4701,7 @@ namespace GS.Server.SkyTelescope
 
         private static void ConnectAlignmentModel()
         {
-            AlignmentModel.Connect(AlignmentSettings.ClearModelOnStartup);
-            AlignmentModel.SetHomePosition(_homeAxes.X, _homeAxes.Y);
+            AlignmentModel.Connect(_homeAxes.X, _homeAxes.Y, AlignmentSettings.ClearModelOnStartup);
         }
 
         private static bool _alignmentShow;

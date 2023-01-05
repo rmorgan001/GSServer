@@ -537,7 +537,6 @@ namespace GS.Server.Alignment
         {
             CartesCoord result = new CartesCoord();
             double raDiff;
-
             if (polar.x > Home.RA)
             {
                 raDiff = polar.x - Home.RA;
@@ -1234,14 +1233,16 @@ namespace GS.Server.Alignment
         /// <returns></returns>
         private SphericalCoord EQ_SphericalPolar(AxisPosition spherical)
         {
+            var axes = Axes.AxesMountToApp(spherical);
             //Debug.WriteLine($"Spherical -> Polar");
             //Debug.WriteLine($"Input = {spherical.RA}/{spherical.Dec}");
             SphericalCoord result = new SphericalCoord();
-            double[] azAlt = Axes.AxesXYToAzAlt(spherical);
+            double[] azAlt = Axes.AxesXYToAzAlt(axes);
 
 
             result.x = (azAlt[0] - 180);
             result.y = (azAlt[1] + 90);
+
             double quadrant = 90d;
             // Check if RA value is within allowed visible range
             if (spherical.RA < this.Home.RA + quadrant && spherical.RA > this.Home.RA - quadrant)
@@ -1263,7 +1264,7 @@ namespace GS.Server.Alignment
             double alt = pos.y - 90;
             double[] axes = Axes.AltAzToAxesYX(new double[]{alt, az });
 
-            double[] raDec = new double[] { axes[1], axes[0] };
+            double[] raDec = Axes.AxesAppToMount(new double[] { axes[1], axes[0] });
             //Debug.WriteLine($"ha/dec = {haDec[0]}/{haDec[1]}");
             double quadrant = 90d;
             if (range.r == 1)
