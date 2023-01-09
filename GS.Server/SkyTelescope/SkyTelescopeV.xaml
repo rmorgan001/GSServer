@@ -203,18 +203,14 @@
                             </ComboBox>
                             <ComboBox Grid.Row="3" Grid.Column="2" md:HintAssist.Hint="{StaticResource skyTracking}" MinWidth="10" Margin="10,0,5,0" VerticalAlignment="Center"  ToolTip="{StaticResource skyTracking}"
                                   ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type deviceInterface:DriveRates}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
-                            <ComboBox.SelectedItem>
-                                <Binding Path="TrackingRate" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
-                                    <Binding.ValidationRules>
-                                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
-                                    </Binding.ValidationRules>
-                                </Binding>
-                            </ComboBox.SelectedItem>
-                            <ComboBox.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <VirtualizingStackPanel />
-                                </ItemsPanelTemplate>
-                            </ComboBox.ItemsPanel>
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                                <ComboBox.Text>
+                                    <Binding Path="TrackingRate" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
+                                </ComboBox.Text>
                             </ComboBox>
                             <ComboBox Grid.Row="3" Grid.Column="3" md:HintAssist.Hint="{StaticResource skyPolarLedLevel}" MinWidth="10" Margin="10,0,0,0" VerticalAlignment="Center"  ToolTip="{StaticResource skyPolarLedLevel}" ItemsSource="{Binding PolarLedLevels}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEnabled="{Binding PolarLedLevelEnabled}">
                                     <ComboBox.SelectedItem>

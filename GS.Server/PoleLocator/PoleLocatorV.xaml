@@ -11,6 +11,7 @@
         <ResourceDictionary>
             <domain:UtcToLocalDateTimeConverter x:Key="UTCtoLocal" />
             <BooleanToVisibilityConverter x:Key="BoolToVis" />
+            <domain:RadioButtonCheckedConverter x:Key="RbConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
     <md:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" CloseOnClickAway="True" >
@@ -27,7 +28,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <!--Data-->
-                <StackPanel Orientation="Vertical" Grid.Column="0" HorizontalAlignment="Left" Margin="0,35,0,0">
+                <StackPanel Orientation="Vertical" Grid.Column="0" HorizontalAlignment="Left" Margin="0,30,0,0">
                     <StackPanel Orientation="Horizontal">
                     <TextBlock HorizontalAlignment="Center" Text="Pole Locator:"/>
                         <TextBlock Text="{StaticResource polPolaris}" Margin="5,0,0,0" Visibility="{Binding NorthernHemisphere, Converter={StaticResource BoolToVis}}"/>
@@ -36,7 +37,22 @@
                     <StackPanel Orientation="Horizontal" >
                         <TextBlock Text="{Binding Ra}" Margin="5,5,0,0"/>
                     </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="10">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Dec}" Margin="5,5,0,0" />
+                    </StackPanel>
+                        <RadioButton GroupName="group2" Margin="5,2" IsChecked="{Binding Epoch, Converter={StaticResource RbConverter}, 
+                            ConverterParameter={x:Static poleLocator:TransOptions.J2000}}">
+                            <TextBlock TextWrapping="Wrap" Text="J2000" />
+                        </RadioButton>
+                        <RadioButton GroupName="group2" Margin="5,2" IsChecked="{Binding Epoch, Converter={StaticResource RbConverter}, 
+                                ConverterParameter={x:Static poleLocator:TransOptions.Apparent}}">
+                            <TextBlock TextWrapping="Wrap" Text="Apparent" />
+                        </RadioButton>
+                        <RadioButton GroupName="group2" Margin="5,2" IsChecked="{Binding Epoch, Converter={StaticResource RbConverter}, 
+                                ConverterParameter={x:Static poleLocator:TransOptions.Topocentric}}">
+                            <TextBlock TextWrapping="Wrap" Text="Topocentric" />
+                        </RadioButton>
+                        <StackPanel Orientation="Horizontal" Margin="5">
                         <CheckBox Height="25" Width="25" IsChecked="{Binding MirrorFlip}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource polMirrorFlip}" />
                         <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource polMirrorFlip}" />
                     </StackPanel>

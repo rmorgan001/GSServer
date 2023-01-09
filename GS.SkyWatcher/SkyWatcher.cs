@@ -113,7 +113,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// Allows the new advanced command set to be used insted of old commands.
+        /// Allows the new advanced command set to be used instead of old commands.
         /// </summary>
         /// <param name="on"></param>
         internal void AllowAdvancedCommandSet(bool on)
@@ -137,7 +137,6 @@ namespace GS.SkyWatcher
 
                 SetRates(axis, rate);
                 _commands.AxisSlew_Advanced(axis, rate);
-
                 _commands.SetSlewing((int)axis, forward, highspeed); // Set the axis status
             }
             else
@@ -275,7 +274,7 @@ namespace GS.SkyWatcher
                     if (_pPecOn && AlternatingPPec) { SetPPec(AxisId.Axis1, false); } // implements the alternating pPEC 
 
                     // Change speed of the R.A. axis
-                    if (_commands.SupportAdvancedCommandSet)
+                    if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
                     {
                         _commands.AxisSlew_Advanced(AxisId.Axis1, aplyRate);
                     }
@@ -299,7 +298,8 @@ namespace GS.SkyWatcher
                     // Restore rate tracking
                     if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
                     {
-                        _commands.AxisSlew_Advanced(AxisId.Axis1, _trackingSpeeds[0]);
+                        //_commands.AxisSlew_Advanced(AxisId.Axis1, _trackingSpeeds[0]);
+                        _commands.AxisSlew_Advanced(AxisId.Axis1, _trackingRates[0]);
                     }
                     else
                     {
@@ -434,7 +434,7 @@ namespace GS.SkyWatcher
             if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
             {
                 long targetPositionInSteps = _commands.GetAxisPositionCounter(axis) + movingSteps;
-                _commands.AxisSlewTo_Advanced(axis, _commands.StepToAngle(AxisId.Axis2, targetPositionInSteps));
+                _commands.AxisSlewTo_Advanced(axis, _commands.StepToAngle(axis, targetPositionInSteps));
             }
             else
             {
@@ -492,7 +492,7 @@ namespace GS.SkyWatcher
         /// </summary>
         /// <param name="axis">>AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="targetPosition">Total radians of target position</param>
-        internal void AxisGoToTarget(AxisId axis, double targetPosition)
+        internal void AxisGoToTarget(AxisId axis, double targetPosition) 
         {
             var monitorItem = new MonitorEntry
                 { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{targetPosition}" };
@@ -500,9 +500,21 @@ namespace GS.SkyWatcher
 
             if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
             {
-                _commands.AxisSlewTo_Advanced(axis, targetPosition);
+                var curPosition = _commands.GetAxisPosition(axis);
+                monitorItem = new MonitorEntry
+                {
+                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Mount,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"axis|{axis}|Target|{targetPosition}|curPosition|{curPosition}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
 
-                _commands.SetSlewingTo((int)axis, false, false);        // Assume we do not need to care about slewing direction and speed when using advanced command set.
+                _commands.AxisSlewTo_Advanced(axis, targetPosition);
+                _commands.SetSlewingTo((int)axis, false, false);  // Assume we do not need to care about slewing direction and speed when using advanced command set.
             }
             else
             {
@@ -515,6 +527,18 @@ namespace GS.SkyWatcher
                 var movingAngle = targetPosition - curPosition;
 
                 var movingSteps = _commands.AngleToStep(axis, movingAngle);// Convert distance in radian into steps.
+
+                monitorItem = new MonitorEntry
+                {
+                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Mount,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"axis|{axis}|Target|{targetPosition}|curPosition|{curPosition}|movingSteps|{movingSteps}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
 
                 bool forward;
                 bool highspeed;
@@ -570,8 +594,7 @@ namespace GS.SkyWatcher
                     _commands.SetMotionMode(axis, 2, direction, SouthernHemisphere); // :G low speed GOTO slewing
                     highspeed = false;
                 }
-
-
+                
                 _commands.SetGotoTargetIncrement(axis, movingSteps); // :H
                 _commands.SetBreakPointIncrement(axis, _breakSteps[(int)axis]); // :M
                 _commands.StartMotion(axis); // :J
@@ -816,7 +839,7 @@ namespace GS.SkyWatcher
 
         internal long GetLastSlewSpeed(AxisId axis)
         {
-            return _commands.GetLastSlewSpeed(axis);
+            return _commands.GetCurrentSlewSpeed(axis);
         }
 
         internal long? GetHomePosition(AxisId axis)
@@ -826,21 +849,27 @@ namespace GS.SkyWatcher
 
         internal string GetMotorCardVersion(AxisId axis)
         {
-            var result = _commands.GetMotorCardVersion(axis);
+            _commands.GetAxisVersion(axis);
+            var models = _commands.GetModel();
+            var versions = _commands.GetAxisStringVersions();
 
             try
             {
-                if (result.Length < 7) { return string.Empty; }
-
-                var a = Convert.ToInt32(result.Substring(5, 2), 16);
-                if (!Enum.IsDefined(typeof(McModel), a)) { a = 999; }
-
-                MountType = GetEnumDescription((McModel)a);
-                MountNum = a;
-
-                var first = int.Parse(result.Substring(1, 2), NumberStyles.HexNumber);
-                var second = int.Parse(result.Substring(3, 2), NumberStyles.HexNumber);
-                MountVersion = $"{first}.{second:D2}";
+                switch (axis)
+                {
+                    case AxisId.Axis1:
+                        MountVersion = versions[0];
+                        MountType = GetEnumDescription((McModel)models[0]);
+                        MountNum = models[0];
+                        break;
+                    case AxisId.Axis2:
+                        MountVersion = versions[1];
+                        MountType = GetEnumDescription((McModel)models[1]);
+                        MountNum = models[1];
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
+                }
             }
             catch (Exception)
             {
@@ -848,10 +877,10 @@ namespace GS.SkyWatcher
             }
 
             var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{result}|{MountType}|{MountVersion}|{MountNum}" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{MountType}|{MountVersion}|{MountNum}" };
             MonitorLog.LogToMonitor(monitorItem);
 
-            return result.Substring(1, 6);
+            return MountVersion;
         }
 
         internal double GetPecPeriod(AxisId axis)
@@ -970,11 +999,24 @@ namespace GS.SkyWatcher
             if (axis == AxisId.Axis1)
             {
                 _trackingRates[0] = rate;
-                _trackingSpeeds[0] = CalculateSpeed(AxisId.Axis1, rate);
+                //_trackingSpeeds[0] = CalculateSpeed(AxisId.Axis1, rate);
             }
             else
             {
                 _trackingRates[1] = rate;
+                //_trackingSpeeds[1] = CalculateSpeed(AxisId.Axis2, rate);
+            }
+
+            if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet) return;
+
+            if (axis == AxisId.Axis1)
+            {
+                // _trackingRates[0] = rate;
+                _trackingSpeeds[0] = CalculateSpeed(AxisId.Axis1, rate);
+            }
+            else
+            {
+                //  _trackingRates[1] = rate;
                 _trackingSpeeds[1] = CalculateSpeed(AxisId.Axis2, rate);
             }
         }
@@ -1019,7 +1061,7 @@ namespace GS.SkyWatcher
             return Capabilities;
         }
 
-        internal long GetAngleToStep(AxisId axis, double angleInRad)
+        internal int GetAngleToStep(AxisId axis, double angleInRad)
         {
             return _commands.AngleToStep(axis, angleInRad);
         }
@@ -1048,9 +1090,18 @@ namespace GS.SkyWatcher
         /// <returns></returns>
         private long RadSpeedToInt(AxisId axis, double rateInRad)
         {
-            _factorRadRateToInt = _commands.GetFactorRadRateToInt();
-            var r = (rateInRad * _factorRadRateToInt[(int)axis]);
-            return (long)Math.Round(r, 0, MidpointRounding.AwayFromZero);
+            try
+            {
+                _factorRadRateToInt = _commands.GetFactorRadRateToInt();
+                var r = (rateInRad * _factorRadRateToInt[(int)axis]);
+                var a = (long)Math.Round(r, 0, MidpointRounding.AwayFromZero);
+                return a;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         /// <summary>

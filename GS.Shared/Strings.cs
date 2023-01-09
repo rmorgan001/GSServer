@@ -14,6 +14,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using System;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace GS.Shared
@@ -77,9 +78,25 @@ namespace GS.Shared
             long value = 0;
             for (var i = 1; i + 1 < str.Length; i += 2)
             {
-                value += (long)(int.Parse(str.Substring(i, 2), System.Globalization.NumberStyles.AllowHexSpecifier) * Math.Pow(16, i - 1));
+                value += (long)(int.Parse(str.Substring(i, 2), NumberStyles.AllowHexSpecifier) * Math.Pow(16, i - 1));
             }
             return value;
+        }
+
+        /// <summary>
+        /// Converts hex response to integer for new advanced command set
+        /// </summary>
+        /// <notes>
+        /// The stepper motor driver IC runs in 256 micro-step, while the previous motor board runs in 64 micro-step.
+        /// Since the CPR value is larger than a 24-bit integer, we have to cheat the host in the old command set.
+        /// </notes>
+        public static int String32ToInt(string response, bool parseFirst, int divFactor)
+        {
+            if (parseFirst && response.Length > 0)
+            { response = response.Substring(1, response.Length - 1);}
+            var parsed = int.Parse(response, NumberStyles.HexNumber);
+            var a = parsed / divFactor;
+            return a;
         }
 
     }

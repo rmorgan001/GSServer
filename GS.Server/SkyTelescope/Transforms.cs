@@ -13,6 +13,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+using System;
 using ASCOM.Astrometry.Transform;
 using ASCOM.DeviceInterface;
 using System.Windows;
@@ -25,49 +27,60 @@ namespace GS.Server.SkyTelescope
 
         private static readonly Transform xForm = new Transform();
 
-        ///// <summary>
-        ///// Convert RA and DEC to Azimuth and Altitude using Transform
-        ///// </summary>
-        ///// <param name="rightAscension"></param>
-        ///// <param name="declination"></param>
-        ///// <param name="latitude"></param>
-        ///// <param name="longitude"></param>
-        ///// <param name="elevation"></param>
-        ///// <returns></returns>
-        //private static Vector CalculateAltAz(double rightAscension, double declination, double latitude, double longitude, double elevation)
-        //{
-        //    xForm.SiteElevation = elevation;
-        //    xForm.SiteLatitude = latitude;
-        //    xForm.SiteLongitude = longitude;
-        //    xForm.Refraction = SkyServer.Refraction;
-        //    switch (SkyServer.EquatorialCoordinateType)
-        //    {
-        //        case EquatorialCoordinateType.equJ2000:
-        //            xForm.SetJ2000(rightAscension, declination);
-        //            break;
-        //        case EquatorialCoordinateType.equLocalTopocentric:
-        //            xForm.SetTopocentric(rightAscension, declination);
-        //            break;
-        //        case EquatorialCoordinateType.equOther:
-        //            xForm.SetApparent(rightAscension, declination);
-        //            break;
-        //        case EquatorialCoordinateType.equJ2050:
-        //            xForm.SetJ2000(rightAscension, declination);
-        //            break;
-        //        case EquatorialCoordinateType.equB1950:
-        //            xForm.SetJ2000(rightAscension, declination);
-        //            break;
-        //        default:
-        //            xForm.SetApparent(rightAscension, declination);
-        //            break;
-        //    }
-        //    var r = new Vector
-        //    {
-        //        X = xForm.AzimuthTopocentric,
-        //        Y = xForm.ElevationTopocentric
-        //    };
-        //    return r;
-        //}
+        /// <summary>
+        /// Convert RA and DEC to Azimuth and Altitude using Transform
+        /// </summary>
+        /// <param name="rightAscension"></param>
+        /// <param name="declination"></param>
+        /// <param name="latitude"></param>
+        /// <param name="longitude"></param>
+        /// <param name="elevation"></param>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <returns></returns>
+        public static Vector ConvertRaDec(double rightAscension, double declination, double latitude, double longitude, double elevation, string from, string to)
+        {
+            xForm.SiteElevation = elevation;
+            xForm.SiteLatitude = latitude;
+            xForm.SiteLongitude = longitude;
+            xForm.Refraction = SkySettings.Refraction;
+            switch (from.ToLower())
+            {
+                case "j2000":
+                    xForm.SetJ2000(rightAscension, declination);
+                    break;
+                case "topocentric":
+                    xForm.SetTopocentric(rightAscension, declination);
+                    break;
+                case "apparent":
+                    xForm.SetApparent(rightAscension, declination);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            Vector r = new Vector(0, 0);
+
+            switch (to.ToLower())
+            {
+                case "j2000":
+                    r.X = xForm.RAJ2000;
+                    r.Y = xForm.DecJ2000;
+                    break;
+                case "topocentric":
+                    r.X = xForm.RATopocentric;
+                    r.Y = xForm.DECTopocentric;
+                    break;
+                case "apparent":
+                    r.X = xForm.RAApparent;
+                    r.Y = xForm.DECApparent;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return r;
+        }
 
         /// <summary>
         /// Converts RA and DEC to the required EquatorialCoordinateType
