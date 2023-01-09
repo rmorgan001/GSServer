@@ -284,6 +284,34 @@ namespace GS.Shared
                         Cmdj2SentEntry = entry;
                         //  WriteOutCmdj(entry);
                     }
+                    if (entry.Message.Contains(":X10003"))
+                    {
+                        var msg = entry.Message.Split('|');
+                        if (msg.Length < 2) return;
+                        // make sure it a valid mount response
+                        msg[1] = msg[1].Trim();
+                        if (!msg[1].Contains("=")) return;
+                        // convert response
+                        var msgval = Strings.String32ToInt(msg[1],true,4);
+                        entry.Message = $"{msg[0].Trim()}|{msg[1]}|{msgval}";
+                        //send to charting and log
+                        CmdjSentEntry = entry;
+                        //  WriteOutCmdj(entry);
+                    }
+                    if (entry.Message.Contains(":X20003"))
+                    {
+                        var msg = entry.Message.Split('|');
+                        if (msg.Length < 2) return;
+                        // make sure it a valid mount response
+                        msg[1] = msg[1].Trim();
+                        if (!msg[1].Contains("=")) return;
+                        // convert response
+                        var msgval = Strings.String32ToInt(msg[1],true,4);
+                        entry.Message = $"{msg[0].Trim()}|{msg[1]}|{msgval}";
+                        //send to charting and log
+                        Cmdj2SentEntry = entry;
+                        //  WriteOutCmdj(entry);
+                    }
                     break;
                 case "AxesDegrees":  // from simulator
                     if (entry.Message.Contains("steps1"))

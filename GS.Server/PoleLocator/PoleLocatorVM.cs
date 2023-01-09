@@ -44,9 +44,14 @@ namespace GS.Server.PoleLocator
         private MainWindowVM _mainWindowVM;
         private readonly Util _util = new Util();
         private readonly DispatcherTimer _timer;
-        private readonly double _polaris = 2.53019444;
-        private const double _octans = 21.4233333;
+        private readonly double _polarisRa = 2.53019444;
+        private readonly double _polarisDec = 89.264167;
+        //private const double _octansRa = 21.4233333;
+        private const double _octansRa = 21.1463333335;
+        //private const double _octansDec = -88.9563888900;
+        private const double _octansDec = 0;
         private double _poleRa;
+        private double _poleDec;
 
         #endregion
 
@@ -65,6 +70,7 @@ namespace GS.Server.PoleLocator
                 CenterX = 200;
                 CenterY = 200;
                 GridAngle = 0;
+                Epoch = TransOptions.J2000;
                 StarCenter = $"{CenterX},{30 + YearPosition()}";
 
                 //ConvertRaDec();
@@ -77,6 +83,24 @@ namespace GS.Server.PoleLocator
                 _timer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(1)};
                 _timer.Tick += Timer_Tick;
                 _timer.Start();
+
+
+                ////apparent
+                //var a = TransformCoords(_polarisRa, _polarisDec, "j2000", "apparent");
+                //var b = _util.HoursToHMS(a.X);
+                //var C = _util.DegreesToDMS(a.Y);
+                
+                ////topocentric
+                //var d = TransformCoords(_polarisRa, _polarisDec, "j2000", "topocentric");
+                //var e = _util.HoursToHMS(d.X);
+                //var f = _util.DegreesToDMS(d.Y);
+
+                ////J2000
+                //var g = _polarisRa;
+                //var h = _polarisDec;
+                //var i = _util.HoursToHMS(g);
+                //var j = _util.DegreesToDMS(h);
+
             }
             catch (Exception ex)
             {
@@ -195,6 +219,13 @@ namespace GS.Server.PoleLocator
             if (_mainWindowVM == null) _mainWindowVM = MainWindowVM._mainWindowVm;
         }
 
+        private Vector TransformCoords(double ra, double dec, string from, string to)
+        {
+            var a = Transforms.ConvertRaDec(ra, dec, SkySettings.Latitude, SkySettings.Longitude,
+                SkySettings.Elevation, from, to);
+            return a;
+        }
+
         /// <summary>
         /// Calculates all the positions for both hemisphere
         /// </summary>
@@ -228,8 +259,31 @@ namespace GS.Server.PoleLocator
             NorthernHemisphere = !shemi;
             SouthernHemisphere = shemi;
 
-            _poleRa = shemi ? _octans : _polaris;
+            var tmpRa = shemi ? _octansRa : _polarisRa;
+            var tmpDec = shemi ? _octansDec : _polarisDec;
+
+            var a = new Vector(0, 0);
+            switch (Epoch)
+            {
+                case TransOptions.Apparent:
+                    //apparent
+                    a = TransformCoords(tmpRa, tmpDec, "j2000", "apparent");
+                    break;
+                case TransOptions.Topocentric:
+                    a = TransformCoords(tmpRa, tmpDec, "j2000", "topocentric");
+                    break;
+                case TransOptions.J2000:
+                    a.X = tmpRa;
+                    a.Y = tmpDec;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            _poleRa = a.X;
+            _poleDec = a.Y;
             Ra = _util.HoursToHMS(_poleRa,"h ", ":","",2);
+            Dec = _util.DegreesToDMS(_poleDec, "° ", ":", "", 2);
         }
 
         /// <summary>
@@ -304,6 +358,18 @@ namespace GS.Server.PoleLocator
             {
                 if (value == _ra) return;
                 _ra = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _dec;
+        public string Dec
+        {
+            get => _dec;
+            set
+            {
+                if (value == _dec) return;
+                _dec = value;
                 OnPropertyChanged();
             }
         }
@@ -476,6 +542,18 @@ namespace GS.Server.PoleLocator
             set
             {
                 _gridAngle = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private TransOptions _epoch;
+
+        public TransOptions Epoch
+        {
+            get => _epoch;
+            set
+            {
+                _epoch = value;
                 OnPropertyChanged();
             }
         }
@@ -687,5 +765,12 @@ namespace GS.Server.PoleLocator
             //}
         }
         #endregion
+    }
+
+    public enum TransOptions
+    {
+        Apparent,
+        Topocentric,
+        J2000
     }
 }
