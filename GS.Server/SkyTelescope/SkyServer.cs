@@ -4752,7 +4752,6 @@ namespace GS.Server.SkyTelescope
             double[] synced = new double[] { ConvertStepsToDegrees(rawSteps[0], 0), ConvertStepsToDegrees(rawSteps[1], 1) };
             if (AlignmentModel.SyncToRaDec(
                 unsynced,
-                new double[] { TargetRa, TargetDec },
                 synced,
                 DateTime.Now))
             {

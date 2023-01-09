@@ -32,13 +32,6 @@ namespace GS.Server.Alignment
         /// </summary>
         public Coord UnsyncedCartesian { get; set; }
 
-
-        /// <summary>
-        /// The Target Ra/Dec in hours/degrees
-        /// </summary>
-        public AxisPosition OrigRaDec { get; set; }
-
-
         /// <summary>
         /// The unadjusted axis position after sync
         /// </summary>
@@ -96,10 +89,9 @@ namespace GS.Server.Alignment
 
         }
 
-        public AlignmentPoint(double[] unsynced, double[] origRaDec, double[] synced, DateTime syncTime)
+        public AlignmentPoint(double[] unsynced, double[] synced, DateTime syncTime)
         {
             Unsynced = new AxisPosition(unsynced);
-            OrigRaDec = new AxisPosition(origRaDec);
             Synced = new AxisPosition(synced);
             AlignTime = syncTime;
         }

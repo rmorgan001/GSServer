@@ -192,8 +192,6 @@
                         <DataGridTextColumn Header="###" Binding="{Binding Id, StringFormat='{}{0:D3}'}"  HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Unsynced RA" Binding="{Binding Unsynced[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Unsynced Dec" Binding="{Binding Unsynced[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="RA" Binding="{Binding OrigRaDec[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Dec" Binding="{Binding OrigRaDec[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Synced RA" Binding="{Binding Synced[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Synced Dec" Binding="{Binding Synced[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Synched" Binding="{Binding SyncedTime}" IsReadOnly="True" />

@@ -264,14 +264,14 @@ namespace GS.Server.Alignment
         }
 
         #region Alignment point management ...
-        public bool SyncToRaDec(double[] unsynced, double[] origRaDec, double[] synced, DateTime syncTime)
+        public bool SyncToRaDec(double[] unsynced, double[] synced, DateTime syncTime)
         {
             try
             {
                 lock (_accessLock)
                 {
 
-                    bool result = EQ_NPointAppend(new AlignmentPoint(unsynced, origRaDec, synced, syncTime));
+                    bool result = EQ_NPointAppend(new AlignmentPoint(unsynced, synced, syncTime));
                     SaveAlignmentPoints();
 
                     return result;
@@ -431,11 +431,11 @@ namespace GS.Server.Alignment
         {
             _stringBuilder.Clear();
             _stringBuilder.AppendLine("=============== Alignment points ===============");
-            _stringBuilder.AppendLine("ID \tUnsynced Ra/Dec         \tOrig Ra/Dec        \tSynced RaDec   \tObserved time");
+            _stringBuilder.AppendLine("ID \tUnsynced Ra/Dec         \tSynced RaDec   \tObserved time");
             foreach (var pt in AlignmentPoints)
             {
                 _stringBuilder.AppendLine(
-                    $"{pt.Id:D3}\t{pt.Unsynced.RA}/{pt.Unsynced.Dec}\t{pt.OrigRaDec.RA}/{pt.OrigRaDec.Dec}\t{pt.Synced.RA}/{pt.Synced.Dec}\t{pt.AlignTime}");
+                    $"{pt.Id:D3}\t{pt.Unsynced.RA}/{pt.Unsynced.Dec}\t{pt.Synced.RA}/{pt.Synced.Dec}\t{pt.AlignTime}");
             }
             RaiseNotification(NotificationType.Data, MethodBase.GetCurrentMethod()?.Name, _stringBuilder.ToString());
             _stringBuilder.Clear();
