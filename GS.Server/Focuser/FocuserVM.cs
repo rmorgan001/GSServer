@@ -22,7 +22,6 @@ using GS.Utilities.Controls.Dialogs;
 using NINA.Model.MyFocuser;
 using NINA.Utility;
 using NINA.ViewModel.Equipment.Focuser;
-using NStarAlignment.Utilities;
 using System;
 using System.ComponentModel;
 using System.Reflection;
