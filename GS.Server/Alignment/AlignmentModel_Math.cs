@@ -82,10 +82,22 @@ namespace GS.Server.Alignment
 
         private MapResult Delta_Map(AxisPosition original)
         {
-            return new MapResult()
+            AlignmentPoint nearestPoint = GetNearest(original);
+            if (nearestPoint != null)
             {
-                Position = new AxisPosition(Delta_RA_Map(original.RA), Delta_DEC_Map(original.Dec))
-            };
+                SelectedAlignmentPoint = nearestPoint;
+                return new MapResult()
+                {
+                    Position = new AxisPosition(original.RA - nearestPoint.Delta.RA, original.Dec - nearestPoint.Delta.Dec)
+                };
+            }
+            else
+            {
+                return new MapResult()
+                {
+                    Position = new AxisPosition(Delta_RA_Map(original.RA), Delta_DEC_Map(original.Dec))
+                };
+            }
         }
 
         private double DeltaReverse_RA_Map(double raTarget)
@@ -104,10 +116,23 @@ namespace GS.Server.Alignment
 
         private MapResult DeltaReverse_Map(AxisPosition original)
         {
-            return new MapResult()
+
+            AlignmentPoint nearestPoint = GetNearest(original);
+            if (nearestPoint != null)
             {
-                Position = new AxisPosition(DeltaReverse_RA_Map(original.RA), DeltaReverse_DEC_Map(original.Dec))
-            };
+                SelectedAlignmentPoint = nearestPoint;
+                return new MapResult()
+                {
+                    Position = new AxisPosition(original.RA + nearestPoint.Delta.RA, original.Dec + nearestPoint.Delta.Dec)
+                };
+            }
+            else
+            {
+                return new MapResult()
+                {
+                    Position = new AxisPosition(DeltaReverse_RA_Map(original.RA), DeltaReverse_DEC_Map(original.Dec))
+                };
+            }
         }
 
 
@@ -156,8 +181,8 @@ namespace GS.Server.Alignment
             if (this.SelectedAlignmentPoint != null)
             {
                 result.Position = new AxisPosition(
-                encoderPosition.RA + (this.SelectedAlignmentPoint.Synced.RA - this.SelectedAlignmentPoint.Unsynced.RA),       // + gRASync01;
-                encoderPosition.Dec + (this.SelectedAlignmentPoint.Synced.Dec - this.SelectedAlignmentPoint.Unsynced.Dec)
+                encoderPosition.RA + this.SelectedAlignmentPoint.Delta.RA,       // + gRASync01;
+                encoderPosition.Dec + this.SelectedAlignmentPoint.Delta.Dec
                 );    // + gDecSync01;
                       // result.z = 1;
                       // result.f = 0;
@@ -190,8 +215,8 @@ namespace GS.Server.Alignment
                 if (this.SelectedAlignmentPoint != null)
                 {
                     result.Position = new AxisPosition(
-                        targetPosition.RA - (this.SelectedAlignmentPoint.Synced.RA - this.SelectedAlignmentPoint.Unsynced.RA),       // + gRASync01;
-                        targetPosition.Dec - (this.SelectedAlignmentPoint.Synced.Dec - this.SelectedAlignmentPoint.Unsynced.Dec)
+                        targetPosition.RA - this.SelectedAlignmentPoint.Delta.RA,       // + gRASync01;
+                        targetPosition.Dec - this.SelectedAlignmentPoint.Delta.Dec
                         );
                 }
                 else
@@ -255,6 +280,7 @@ namespace GS.Server.Alignment
 
             foreach (AlignmentPoint pt in this.AlignmentPoints)
             {
+                pt.SelectedForGoto = false;
                 switch (ActivePoints)
                 {
                     case ActivePointsEnum.All:
@@ -295,7 +321,9 @@ namespace GS.Server.Alignment
             else
             {
                 int nearestId = distances.OrderBy(kvp => kvp.Value).Select(kvp => kvp.Key).First();
-                return AlignmentPoints.FirstOrDefault(pt => pt.Id == nearestId);
+                AlignmentPoint result = AlignmentPoints.First(pt => pt.Id == nearestId);
+                result.SelectedForGoto = true;
+                return result;
             }
 
         }

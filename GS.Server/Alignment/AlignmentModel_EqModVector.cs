@@ -1526,11 +1526,6 @@ namespace GS.Server.Alignment
 
         }
 
-        //public static float GetRnd()
-        //{
-        //    Random r = new Random();
-        //    return (float)(r.Next(1, 1000) / 1000.0);
-        //}
 
     }
 }
