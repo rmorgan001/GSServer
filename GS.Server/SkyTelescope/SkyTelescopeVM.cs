@@ -2641,13 +2641,24 @@ namespace GS.Server.SkyTelescope
         #region RA Coord GoTo Control
         public IList<int> Hours { get; }
 
+        private double _raDecimal;
+        public double RaDecimal
+        {
+            get => _raDecimal;
+            set
+            {
+                _raDecimal = Math.Abs(value);
+                OnPropertyChanged();
+            }
+        }
+
         private double _raHours;
         public double RaHours
         {
             get => _raHours;
             set
             {
-                if (Math.Abs(value - _raHours) < 0.00001) return;
+                if (Math.Abs(value - _raHours) < 0.00001) {return;}
                 _raHours = value;
                 OnPropertyChanged();
             }
@@ -2673,6 +2684,17 @@ namespace GS.Server.SkyTelescope
             {
                 if (Math.Abs(value - _raSeconds) < 0.00001) return;
                 _raSeconds = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _decDecimal;
+        public double DecDecimal
+        {
+            get => _decDecimal;
+            set
+            {
+                _decDecimal = value;
                 OnPropertyChanged();
             }
         }
@@ -6180,7 +6202,6 @@ namespace GS.Server.SkyTelescope
         #endregion
 
         #region GoTo Dialog
-
         public double GoToDec => Principles.Units.Deg2Dou(DecDegrees, DecMinutes, DecSeconds);
         public double GoToRa => Principles.Units.Ra2Dou(RaHours, RaMinutes, RaSeconds);
         public string GoToDecString => _util.DegreesToDMS(GoToDec, "° ", "m ", "s", 3);
@@ -6344,6 +6365,285 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private ICommand _openRaDecimalDialogCmd;
+        public ICommand OpenRaDecimalDialogCmd
+        {
+            get
+            {
+                var command = _openRaDecimalDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openRaDecimalDialogCmd = new RelayCommand(
+                    param => OpenRaDecimalDialog()
+                );
+            }
+        }
+        private void OpenRaDecimalDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    RaDecimal = _util.HMSToHours($"{RaHours}:{RaMinutes}:{RaSeconds}");
+                    DialogContent = new RaGoToDecimalDialog();
+                    IsDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelRaDecimalDialogCmd;
+        public ICommand CancelRaDecimalDialogCmd
+        {
+            get
+            {
+                var command = _cancelRaDecimalDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelRaDecimalDialogCmd = new RelayCommand(
+                    param => CancelRaDecimalDialog()
+                );
+            }
+        }
+        private void CancelRaDecimalDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _acceptRaDecimalDialogCmd;
+        public ICommand AcceptRaDecimalDialogCmd
+        {
+            get
+            {
+                var command = _acceptRaDecimalDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptRaDecimalDialogCmd = new RelayCommand(
+                    param => AcceptRaDecimalDialog()
+                );
+            }
+        }
+        private void AcceptRaDecimalDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (RaDecimal <= 0.0 || RaDecimal >= 24.0 )
+                    {
+                        throw new Exception($"{Application.Current.Resources["exError"]}");
+                    }
+                    var ra = _util.HoursToHMS(RaDecimal, ":", ":", ":", 3);
+                    var ras = ra.Split(':');
+                    RaHours = Convert.ToDouble(ras[0]);
+                    RaMinutes = Convert.ToDouble(ras[1]);
+                    RaSeconds = Convert.ToDouble(ras[2]);
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _openDecDecimalDialogCmd;
+        public ICommand OpenDecDecimalDialogCmd
+        {
+            get
+            {
+                var command = _openDecDecimalDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openDecDecimalDialogCmd = new RelayCommand(
+                    param => OpenDecDecimalDialog()
+                );
+            }
+        }
+        private void OpenDecDecimalDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    DecDecimal = _util.DMSToDegrees($"{DecDegrees}:{DecMinutes}:{DecSeconds}");
+                    DialogContent = new DecGoToDecimalDialog();
+                    IsDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelDecDecimalDialogCmd;
+        public ICommand CancelDecDecimalDialogCmd
+        {
+            get
+            {
+                var command = _cancelDecDecimalDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelDecDecimalDialogCmd = new RelayCommand(
+                    param => CancelDecDecimalDialog()
+                );
+            }
+        }
+        private void CancelDecDecimalDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _acceptDecDecimalDialogCmd;
+        public ICommand AcceptDecDecimalDialogCmd
+        {
+            get
+            {
+                var command = _acceptDecDecimalDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptDecDecimalDialogCmd = new RelayCommand(
+                    param => AcceptDecDecimalDialog()
+                );
+            }
+        }
+        private void AcceptDecDecimalDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (DecDecimal <= -91.0 || DecDecimal >= 91.0)
+                    {
+                        throw new Exception($"{Application.Current.Resources["exError"]}");
+                    }
+                    var ra = _util.DegreesToDMS(DecDecimal, ":", ":", ":", 3);
+                    var ras = ra.Split(':');
+                    DecDegrees = Convert.ToDouble(ras[0]);
+                    DecMinutes = Convert.ToDouble(ras[1]);
+                    DecSeconds = Convert.ToDouble(ras[2]);
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
         #endregion
 
         #region Limit Dialog
