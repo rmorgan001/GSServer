@@ -6,7 +6,7 @@
         mc:Ignorable="d" 
         xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
         xmlns:domain="clr-namespace:GS.Server.Domain">
-    <GroupBox Margin="5">
+    <GroupBox Header="{StaticResource goRa}" Margin="5">
         <StackPanel Orientation="Vertical">
             <TextBox Width="110" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
                 <TextBox.Text>
