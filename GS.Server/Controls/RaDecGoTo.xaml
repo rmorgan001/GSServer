@@ -9,21 +9,33 @@
              xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
     <Border Margin="0,0,10,0" BorderBrush="DimGray"  BorderThickness="2" CornerRadius="5">
-        <Grid Background="{StaticResource MaterialDesignToolBarBackground}">
+        <Grid Background="{StaticResource MaterialDesignToolBarBackground}" ShowGridLines="False">
             <Grid.RowDefinitions>
                 <RowDefinition Height="47"/>
                 <RowDefinition Height="47"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="90"/>
+                <ColumnDefinition Width="80"/>
                 <ColumnDefinition Width="40"/>
-                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="65"/>
                 <ColumnDefinition Width="70"/>
                 <ColumnDefinition Width="80"/>
             </Grid.ColumnDefinitions>
-            <Label Grid.Row="0" Grid.Column="1" Content="{StaticResource goRa}" VerticalAlignment="Center"/>
-            <ComboBox Grid.Row="0" Grid.Column="2" md:HintAssist.Hint="{StaticResource edHours}"  IsEditable="True" Width="55"
-                                  ItemsSource="{Binding Hours}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
+            <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Orientation="Vertical" VerticalAlignment="Center">
+                <Button Margin="0,0,0,0" Height="20" Padding="-5" Width="75" ToolTip="{StaticResource goTipCopy}" Command="{Binding PopulateGoToRaDecCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource goCopy}" />
+                <Button Margin="0,2,0,0" Height="20" Padding="-5" Width="75" ToolTip="{StaticResource goTipGoTo}" Command="{Binding OpenRaGoToDialogCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource goGoTo}" />
+                <Button Margin="0,2,0,0" Height="20" Padding="-5" Width="75" ToolTip="{StaticResource goSync}" Command="{Binding OpenRaGoToSyncDialogCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource goSync}" />
+                <Button Margin="0,2,0,0" Height="20" Padding="-5" Width="75" ToolTip="{StaticResource diaImport}" Command="{Binding ImportGoToRaDecCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource diaImport}" />
+            </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" >
+                <StackPanel>
+                        <Label Content="{StaticResource goRa}" />
+                    <Button Margin="-5,0,0,0" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding OpenRaDecimalDialogCmd}" Width="18" Height="18" >
+                        <md:PackIcon Kind="Plus" />
+                        </Button>
+                    </StackPanel>
+            </StackPanel>
+            <ComboBox Grid.Row="0" Grid.Column="2" md:HintAssist.Hint="{StaticResource edHours}" IsEditable="True" md:HintAssist.FloatingScale="1" Width="60" Margin="2" ItemsSource="{Binding Hours}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
             <ComboBox.Text>
                 <Binding Path="RaHours" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
                     <Binding.ValidationRules>
@@ -38,7 +50,7 @@
                 </ItemsPanelTemplate>
             </ComboBox.ItemsPanel>
             </ComboBox>
-            <ComboBox Grid.Row="0" Grid.Column="3" md:HintAssist.Hint="{StaticResource edMinutes}" IsEditable="True" Width="55"
+            <ComboBox Grid.Row="0" Grid.Column="3" md:HintAssist.Hint="{StaticResource edMinutes}" IsEditable="True" md:HintAssist.FloatingScale="1" Width="66" Margin="2"
                                 ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
                 <ComboBox.Text>
                     <Binding Path="RaMinutes" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -54,7 +66,7 @@
                     </ItemsPanelTemplate>
                 </ComboBox.ItemsPanel>
             </ComboBox>
-            <ComboBox Grid.Row="0" Grid.Column="4" md:HintAssist.Hint="{StaticResource edSeconds}" IsEditable="True" Width="70"
+            <ComboBox Grid.Row="0" Grid.Column="4" md:HintAssist.Hint="{StaticResource edSeconds}" IsEditable="True" md:HintAssist.FloatingScale="1" Width="76" Margin="2"
                                 ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
                 <ComboBox.Text>
                     <Binding Path="RaSeconds" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -70,9 +82,15 @@
                     </ItemsPanelTemplate>
                 </ComboBox.ItemsPanel>
             </ComboBox>
-            <Label Grid.Row="1" Grid.Column="1" Content="{StaticResource goDec}" VerticalAlignment="Center"/>
-            <ComboBox Grid.Row="1" Grid.Column="2" md:HintAssist.Hint="{StaticResource edDegrees}"  IsEditable="True" Width="55"
-                                      ItemsSource="{Binding DecRange}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
+            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" >
+                <StackPanel>
+                    <Label Content="{StaticResource goDec}" />
+                    <Button Margin="-10,0,0,0"  Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding OpenDecDecimalDialogCmd}" Width="18" Height="18">
+                        <md:PackIcon Kind="Plus" />
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+            <ComboBox Grid.Row="1" Grid.Column="2" md:HintAssist.Hint="{StaticResource edDegrees}" md:HintAssist.FloatingScale="1" IsEditable="True" Width="60" Margin="2" ItemsSource="{Binding DecRange}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
                 <ComboBox.Text>
                     <Binding Path="DecDegrees" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
                         <Binding.ValidationRules>
@@ -87,7 +105,7 @@
                     </ItemsPanelTemplate>
                 </ComboBox.ItemsPanel>
             </ComboBox>
-            <ComboBox Grid.Row="1" Grid.Column="3" md:HintAssist.Hint="{StaticResource edMinutes}" IsEditable="True" Width="55"
+            <ComboBox Grid.Row="1" Grid.Column="3" md:HintAssist.Hint="{StaticResource edMinutes}" IsEditable="True" md:HintAssist.FloatingScale="1" Width="67" Margin="2"
                                       ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
                 <ComboBox.Text>
                     <Binding Path="DecMinutes" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -103,7 +121,7 @@
                     </ItemsPanelTemplate>
                 </ComboBox.ItemsPanel>
             </ComboBox>
-            <ComboBox Grid.Row="1" Grid.Column="4" md:HintAssist.Hint="{StaticResource edSeconds}" IsEditable="True" Width="70"
+            <ComboBox Grid.Row="1" Grid.Column="4" md:HintAssist.Hint="{StaticResource edSeconds}" IsEditable="True" md:HintAssist.FloatingScale="1" Width="76" Margin="2"
                       ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
                 <ComboBox.Text>
                     <Binding Path="DecSeconds" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
@@ -119,18 +137,6 @@
                     </ItemsPanelTemplate>
                 </ComboBox.ItemsPanel>
             </ComboBox>
-            <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Orientation="Vertical" VerticalAlignment="Center">
-                    <Button Margin="0,0,0,0" Height="20" Padding="-5" Width="85" ToolTip="{StaticResource goTipCopy}" 
-                    Command="{Binding PopulateGoToRaDecCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource goCopy}"/>
-
-                    <Button Margin="0,2,0,0" Height="20" Padding="-5" Width="85" ToolTip="{StaticResource goTipGoTo}" 
-                        Command="{Binding OpenRaGoToDialogCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource goGoTo}"/>
-
-
-                    <Button Margin="0,2,0,0" Height="20" Padding="-5" Width="85" ToolTip="{StaticResource goSync}" 
-                            Command="{Binding OpenRaGoToSyncDialogCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource goSync}"/>
-                    <Button Margin="0,2,0,0" Height="20" Padding="-5" Width="85" ToolTip="{StaticResource diaImport}" Command="{Binding ImportGoToRaDecCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource diaImport}" />
-            </StackPanel>
-            </Grid>
+        </Grid>
     </Border>
 </UserControl>

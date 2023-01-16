@@ -1162,8 +1162,8 @@ namespace GS.SkyWatcher
             {
                 Datetime = HiResDateTime.UtcNow,
                 Device = MonitorDevice.Telescope,
-                Category = MonitorCategory.Mount,
-                Type = MonitorType.Information,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Data,
                 Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"axis|{axis}|X szCmd|{szCmd}|Rate|{rateInRadian}|Steps|{irateInSteps}"
@@ -1199,8 +1199,8 @@ namespace GS.SkyWatcher
             {
                 Datetime = HiResDateTime.UtcNow,
                 Device = MonitorDevice.Telescope,
-                Category = MonitorCategory.Mount,
-                Type = MonitorType.Information,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Data,
                 Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"axis|{axis}|X szCmd|{szCmd}|Target|{targetInRadian}|TSteps|{itargetInSteps}|RSteps|{irateInSteps}"
