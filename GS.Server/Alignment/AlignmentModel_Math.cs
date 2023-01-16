@@ -236,7 +236,7 @@ namespace GS.Server.Alignment
         /// <returns></returns>
         private int GetQuadrant(Coord tmpcoord)
         {
-            int ret = 0;
+            int ret;
 
             if (tmpcoord.x >= 0)
             {
@@ -274,7 +274,6 @@ namespace GS.Server.Alignment
         private AlignmentPoint GetNearest(AxisPosition pos)
         {
             Dictionary<int, double> distances = new Dictionary<int, double>();
-            int[] datholder2 = new int[this.AlignmentPoints.Count];
 
             Coord posCartesean = EQ_sp2Cs(pos);
 
