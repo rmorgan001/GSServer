@@ -21,6 +21,8 @@ using GS.Server.SkyTelescope;
 using GS.Shared;
 using GS.Shared.Command;
 using GS.Utilities.Controls.Dialogs;
+using LiveCharts;
+using LiveCharts.Defaults;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -179,6 +181,14 @@ namespace GS.Server.Alignment
                 OnPropertyChanged();
             }
         }
+
+        #region Plotting properties ...
+        public ChartValues<ObservablePoint> UnsyncedPoints { get; } = new ChartValues<ObservablePoint>();
+        public ChartValues<ObservablePoint> SyncedPoints { get; } = new ChartValues<ObservablePoint>();
+
+        public ChartValues<ObservablePoint> SelectedPoints { get; } = new ChartValues<ObservablePoint>();
+
+        #endregion
 
         #region Commands ...
 
