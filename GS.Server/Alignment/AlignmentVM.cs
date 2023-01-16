@@ -15,15 +15,14 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using GS.Principles;
-using GS.Server.Controls.Dialogs;
 using GS.Server.Helpers;
 using GS.Server.Main;
 using GS.Server.SkyTelescope;
 using GS.Shared;
 using GS.Shared.Command;
 using GS.Utilities.Controls.Dialogs;
-using MaterialDesignThemes.Wpf;
-using NStarAlignment.DataTypes;
+using LiveCharts;
+using LiveCharts.Defaults;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -33,10 +32,8 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Forms;
 using System.Windows.Input;
 using Application = System.Windows.Application;
-using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
@@ -133,32 +130,47 @@ namespace GS.Server.Alignment
             {
                 AlignmentSettings.ProximityLimit = value / 3600;
                 OnPropertyChanged();
+                AlignmentSettings.Save();
             }
 
         }
 
-        public double NearbyLimit
+        public AlignmentBehaviourEnum AlignmentBehaviour
         {
-            get => AlignmentSettings.NearbyLimit;
+            get => AlignmentSettings.AlignmentBehaviour;
             set
             {
-                AlignmentSettings.NearbyLimit = value;
+                AlignmentSettings.AlignmentBehaviour = value;
                 OnPropertyChanged();
+                AlignmentSettings.Save();
             }
 
         }
 
-        public IList<int> SampleSizeList { get; } = new List<int>(Enumerable.Range(2, 8));
-
-        public int SampleSize
+        public ActivePointsEnum ActivePoints
         {
-            get => AlignmentSettings.SampleSize;
+            get => AlignmentSettings.ActivePoints;
             set
             {
-                AlignmentSettings.SampleSize = value;
+                AlignmentSettings.ActivePoints = value;
                 OnPropertyChanged();
+                AlignmentSettings.Save();
             }
+
         }
+
+        public ThreePointAlgorithmEnum ThreePointAlgorithm
+        {
+            get => AlignmentSettings.ThreePointAlgorithm;
+            set
+            {
+                AlignmentSettings.ThreePointAlgorithm = value;
+                OnPropertyChanged();
+                AlignmentSettings.Save();
+            }
+
+        }
+
 
         public bool ClearModelOnStartup
         {
@@ -169,6 +181,14 @@ namespace GS.Server.Alignment
                 OnPropertyChanged();
             }
         }
+
+        #region Plotting properties ...
+        public ChartValues<ObservablePoint> UnsyncedPoints { get; } = new ChartValues<ObservablePoint>();
+        public ChartValues<ObservablePoint> SyncedPoints { get; } = new ChartValues<ObservablePoint>();
+
+        public ChartValues<ObservablePoint> SelectedPoints { get; } = new ChartValues<ObservablePoint>();
+
+        #endregion
 
         #region Commands ...
 
@@ -226,37 +246,6 @@ namespace GS.Server.Alignment
             }
         }
 
-        private RelayCommand _resetNearbyLimit;
-
-        public RelayCommand ResetNearbyLimit
-        {
-            get
-            {
-                return _resetNearbyLimit
-                       ?? (_resetNearbyLimit = new RelayCommand(
-                           param =>
-                           {
-                               NearbyLimit = 45.0;
-                           })
-                       );
-            }
-        }
-
-        private RelayCommand _resetSampleSize;
-
-        public RelayCommand ResetSampleSize
-        {
-            get
-            {
-                return _resetSampleSize
-                       ?? (_resetSampleSize = new RelayCommand(
-                           param =>
-                           {
-                               SampleSize = 3;
-                           })
-                       );
-            }
-        }
 
 
         private RelayCommand _deleteSelectedPointCommand;

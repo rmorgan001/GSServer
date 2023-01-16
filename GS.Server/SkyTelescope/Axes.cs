@@ -310,7 +310,7 @@ namespace GS.Server.SkyTelescope
         {
             return AxesXYToRaDec(axes, SkyServer.SiderealTime);
         }
-        
+
         /// <summary>
         /// convert a RaDec position to an axes positions. 
         /// </summary>

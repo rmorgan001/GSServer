@@ -1719,7 +1719,7 @@ namespace GS.SkyWatcher
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="angleInRad"></param>
         /// <returns></returns>
-        internal int AngleToStep(AxisId axis, double angleInRad)
+        public int AngleToStep(AxisId axis, double angleInRad)
         {
             //var a = (long)(angleInRad * _factorRadToStep[(int)axis]);
             var a = (int)Math.Floor(angleInRad * _factorRadToStep[(int)axis]);

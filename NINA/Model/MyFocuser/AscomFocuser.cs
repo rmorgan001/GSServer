@@ -440,7 +440,7 @@ namespace NINA.Model.MyFocuser
 
         public async Task<bool> Connect(CancellationToken token)
         {
-            return await Task<bool>.Run(() => {
+            return await Task.Run(() => {
                 try
                 {
                     _focuser = GetFocuser(true);
@@ -451,7 +451,7 @@ namespace NINA.Model.MyFocuser
                         // RaiseAllPropertiesChanged();
                     }
                 }
-                catch (ASCOM.DriverAccessCOMException ex)
+                catch (DriverAccessCOMException ex)
                 {
                     // Utility.Utility.HandleAscomCOMException(ex);
                     var monitorItem = new MonitorEntry

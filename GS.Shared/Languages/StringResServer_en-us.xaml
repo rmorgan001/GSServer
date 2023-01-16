@@ -601,8 +601,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliClearModelOnStartup">Clear model on startup</system:String>
     <system:String x:Key="aliAlignmentSettings">Settings</system:String>
     <system:String x:Key="aliProximityLimitTooltip">How near to each other can sync points be before they replace earlier points (arc seconds).</system:String>
-    <system:String x:Key="aliSampleSizeTooltip">How many nearby sync points should be used when calculating positions.</system:String>
-    <system:String x:Key="aliNearbyLimitTooltip">How close should sync points be before they are used in calculations (degrees).</system:String>
+    <system:String x:Key="aliAlignmentModeTooltip">Choose whether to use the nearest point or the nearest three points</system:String>
+    <system:String x:Key="aliActivePointsTooltip">Choose whether to consider all points, just points on the same side of the pier or just points in the local quadrant or </system:String>
+    <system:String x:Key="aliThreePointAlgorithmTooltip">How to pick the three points, triangle with closest points or the triangle with the centre nearest.</system:String>
     <system:String x:Key="aliClearModelOnStartupTooltip">Tick if you want to create a fresh model every time you reconnect.</system:String>
     <system:String x:Key="aliClearAll">Clear All</system:String>
     <system:String x:Key="aliClearAllTooltip">Click this button to clear all alignment points from the model.</system:String>
@@ -610,8 +611,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliDeleteTooltip">Click this button to delete the selected alignment point.</system:String>
     <system:String x:Key="optAlignment">Alignment</system:String>
     <system:String x:Key="optProximityLimit">Proximity Limit</system:String>
-    <system:String x:Key="optSampleSize">Sample Size</system:String>
-    <system:String x:Key="optNearbyLimit">Near by Limit</system:String>
+    <system:String x:Key="optAlignmentMode">Alignment Behaviour</system:String>
+    <system:String x:Key="optActivePoints">Point Filter</system:String>
+    <system:String x:Key="optThreePointAlgorithm">Three Point Selection</system:String>
 
     <!--1.0.3.2 -->
     <system:String x:Key="customGears">Custom Gears</system:String>

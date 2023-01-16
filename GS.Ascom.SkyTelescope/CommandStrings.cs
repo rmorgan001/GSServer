@@ -11,12 +11,12 @@ namespace ASCOM.GS.Sky.Telescope
             //if (raw) { throw new DriverException("Raw param error"); }
             if (command.Length < 2) { throw new DriverException("Command length error"); }
             if (!command.Contains(":")) { throw new DriverException("Command colon error"); }
-            
+
             // case statement for the mount commands
-            switch (command.Substring(0,2))
+            switch (command.Substring(0, 2))
             {
                 case ":O":// Trigger Snap Port
-                    if (command.Length != 4){ throw new DriverException("Param Cmd error"); }
+                    if (command.Length != 4) { throw new DriverException("Param Cmd error"); }
                     switch (command.Substring(2, 1))
                     {
                         case "1": //Port 1
