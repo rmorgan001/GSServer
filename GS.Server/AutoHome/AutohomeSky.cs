@@ -103,16 +103,17 @@ namespace GS.Server.AutoHome
 
             switch (sensorStatus)
             {
-                // =FFFFFF or =7FFFFFFF
-                case 8388607:       //standard commands 16777215 -= 0x00800000
-                case 536870911:     //advanced commands 2147483644 / 4
-                    return false;
-                // =000000 or =80000000 
-                case -8388608:      //standard commands 0 -= 0x00800000
-                case -536870912:    //advanced commands -2147483644 / 4
+                case 100000000000:      //-2147483647 =80000000 
+                case 300000000000:      //0 =000000 
                     return true;
+                case 200000000000:      //2147483647 =7FFFFFFF
+                case 400000000000:      //16777215 =FFFFFF
+                    return false;
                 default:
-                    TripPosition = Convert.ToInt32(sensorStatus);
+                    if (sensorStatus < 100000000000)
+                    {
+                        TripPosition = Convert.ToInt32(sensorStatus);
+                    }
                     return null;
             }
         }

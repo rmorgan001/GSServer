@@ -20,6 +20,7 @@ using System.Globalization;
 using System.IO;
 using System.IO.Ports;
 using System.Reflection;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
 using GS.Principles;
@@ -728,16 +729,32 @@ namespace GS.SkyWatcher
             if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
                 var response = CmdToMount(axis, 'X', "000B");    // Read 32-bit axis home index position
-                var position = String32ToInt(response, true,4);
-                return position;
+                var position = String32ToInt(response, true,1);
+                switch (position)
+                {
+                    case -2147483648:
+                        return 100000000000;
+                    case 2147483647:
+                        return 200000000000;
+                    default:
+                        return position;
+                }
             }
             else
             {
                 var szCmd = LongToHex(0);
                 var response = CmdToMount(axis, 'q', szCmd);
                 var iPosition = StringToLong(response);
-                iPosition -= 0x00800000;
-                return iPosition;
+                switch (iPosition)
+                {
+                    case 0:
+                        return 300000000000;
+                    case 16777215:
+                        return 400000000000;
+                    default:
+                        iPosition -= 0x00800000;
+                        return iPosition;
+                }
             }
         }
 
