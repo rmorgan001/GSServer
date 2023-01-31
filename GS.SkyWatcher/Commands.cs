@@ -267,7 +267,7 @@ namespace GS.SkyWatcher
         #region Commands
 
         /// <summary>
-        /// a Inquire Grid Per Revolution ":a(*2)", where *2: '1'= CH1, '2' = CH2.
+        /// a or X0002 Inquire Grid Per Revolution ":a(*2)", where *2: '1'= CH1, '2' = CH2.
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         private void GetStepsPerRevolution(AxisId axis)
@@ -394,7 +394,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// e Gets version of the axis
+        /// e or X0005 Gets version of the axis
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         internal void GetAxisVersion(AxisId axis)
@@ -526,7 +526,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// i Get Current "slew" speed
+        /// i or X0007 Get Current "slew" speed
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         internal long GetCurrentSlewSpeed(AxisId axis)
@@ -548,7 +548,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// j Gets radians position of an axis
+        /// j or X0003 Gets radians position of an axis
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <returns>Radians of the axis</returns>
@@ -572,7 +572,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// j Gets startup position of an axis
+        /// j or X0003 Gets startup position of an axis
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <returns>Radians of the axis</returns>
@@ -614,7 +614,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// j Gets radians position of an axis or returns NaN
+        /// j or X0003 Gets radians position of an axis or returns NaN
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <returns>Radians of the axis or NaN if no response is received</returns>
@@ -660,7 +660,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// j Gets axis position steps or returns NaN
+        /// j or X0003 Gets axis position steps or returns NaN
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <returns>Cardinal encoder count</returns>
@@ -694,7 +694,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// j Gets axis position steps
+        /// j or X0003 Gets axis position steps
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <returns>Cardinal encoder count</returns>
@@ -716,11 +716,11 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// qx00 Home position
+        /// qx00 or X000B Home position
         /// Send :qx000000[0D]
-        ///     =000000[0D]    if axis is CW  from home ( ie -ve ) just after home sensor trip has been reset
-        ///     =FFFFFF[0D]    CCW from home(ie +ve ) just after home sensor trip has been reset )
-        ///     =llhhLL[0D]    if sensor has tripped since reset(use :W to clear data first )
+        ///     =000000[0D] or =80000000   if axis is CW  from home ( ie -ve ) just after home sensor trip has been reset
+        ///     =FFFFFF[0D] or =7FFFFFFF   CCW from home(ie +ve ) just after home sensor trip has been reset )
+        ///     =llhhLL[0D] or =1234ABCD   if sensor has tripped since reset(use :W to clear data first )
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>  
         internal long GetHomePosition(AxisId axis)
@@ -735,9 +735,9 @@ namespace GS.SkyWatcher
             {
                 var szCmd = LongToHex(0);
                 var response = CmdToMount(axis, 'q', szCmd);
-                var position = StringToLong(response);
-                if (response == "=000000") position = -position;
-                return position;
+                var iPosition = StringToLong(response);
+                iPosition -= 0x00800000;
+                return iPosition;
             }
         }
 
@@ -771,7 +771,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// s Inquire PEC Period ":s(*1)", where *1: '1'= CH1, '2'= CH2, '3'= Both.
+        /// s or X000E Inquire PEC Period ":s(*1)", where *1: '1'= CH1, '2'= CH2, '3'= Both.
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         internal double GetPecPeriod(AxisId axis)
@@ -819,7 +819,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// E Set the target axis position to the specify value
+        /// E or X01 Set the target axis position to the specify value
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <param name="radians">radian value</param>
@@ -845,7 +845,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// F Initial the target axis
+        /// F or X0505 Initial the target axis
         /// </summary>
         internal void InitializeAxes()
         {
@@ -956,7 +956,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// K Stop the target axis normally
+        /// K or X0504 Stop the target axis normally
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         internal void AxisStop(AxisId axis)
@@ -994,7 +994,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// O on/off trigger
+        /// O or X05 on/off trigger
         /// </summary>
         /// <param name="axis"></param>
         /// <param name="on"></param>

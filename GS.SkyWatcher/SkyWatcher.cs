@@ -844,6 +844,7 @@ namespace GS.SkyWatcher
 
         internal long? GetHomePosition(AxisId axis)
         {
+            CanHomeSensors = true; //removeX
             return !CanHomeSensors ? ((long?)null).GetValueOrDefault() : _commands.GetHomePosition(axis);
         }
 
