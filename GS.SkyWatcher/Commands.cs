@@ -20,7 +20,6 @@ using System.Globalization;
 using System.IO;
 using System.IO.Ports;
 using System.Reflection;
-using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
 using GS.Principles;
@@ -737,7 +736,7 @@ namespace GS.SkyWatcher
                     case 2147483647:
                         return 200000000000;
                     default:
-                        return position;
+                        return Convert.ToInt32(position / 4);
                 }
             }
             else
