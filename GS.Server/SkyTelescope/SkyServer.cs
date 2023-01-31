@@ -3701,7 +3701,7 @@ namespace GS.Server.SkyTelescope
                     SkyTasks(MountTaskName.CanAdvancedCmdSupport);
                     if (CanPPec) SkyTasks(MountTaskName.Pec);
 
-                    //CanHomeSensor = true; //removeX
+                    //CanHomeSensor = true; //test autohome
 
                     raWormTeeth = (int)(StepsPerRevolution[0] / StepsWormPerRevolution[0]);
                     decWormTeeth = (int)(StepsPerRevolution[1] / StepsWormPerRevolution[1]);

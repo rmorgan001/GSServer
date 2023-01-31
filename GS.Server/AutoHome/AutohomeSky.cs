@@ -103,7 +103,7 @@ namespace GS.Server.AutoHome
 
             switch (sensorStatus)
             {
-                case 100000000000:      //-2147483647 =80000000 
+                case 100000000000:      //-2147483648 =80000000 
                 case 300000000000:      //0 =000000 
                     return true;
                 case 200000000000:      //2147483647 =7FFFFFFF
@@ -175,7 +175,7 @@ namespace GS.Server.AutoHome
         public int StartAutoHome(AxisId axis, int maxMove = 100, int offSetDec = 0)
         {
             //var a = GetHomeSensorStatus(AxisId.Axis1);
-            //return 0; removeX
+            //return 0; //test autohome
 
             HomeSensorCapabilityCheck();
             if (!HasHomeSensor){ return -5; }
