@@ -18,7 +18,6 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO.Ports;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -101,12 +100,9 @@ namespace GS.SkyWatcher
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="serial">Needs a connected serial object</param>
-        /// <param name="customMount360Steps">Custom Mount :a replacement</param>
-        /// <param name="customRaWormSteps">Custom Mount :s replacement</param>
-        internal SkyWatcher(SerialPort serial, int[] customMount360Steps, double[] customRaWormSteps)
+        internal SkyWatcher()
         {
-            _commands = new Commands(serial, customMount360Steps, customRaWormSteps);
+            _commands = new Commands();
             // _commands.TestSerial();
             MinPulseDurationRa = 20;
             MinPulseDurationDec = 20;

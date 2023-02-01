@@ -18,7 +18,6 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.IO.Ports;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -54,8 +53,6 @@ namespace GS.SkyWatcher
         private readonly object _syncObject = new object();
         private int _conErrCnt;                                         // Number of continuous errors
         private const int ConErrMax = 50;                              // Max number of allowed continuous errors
-        private readonly int[] _customMount360Steps;                    // Custom Mount :a replacement
-        private readonly double[] _customRaWormSteps;                      // Custom Mount :s replacement
         private readonly int[] _mount360Steps = { 0, 0 };               // From mount :a
 
         #endregion
@@ -67,17 +64,14 @@ namespace GS.SkyWatcher
         public DateTime Last_j2RunTime { get; private set; }
         public DateTime LastJ2RunTime { get; private set; }
 
-        /// <summary>
-        /// Serial object
-        /// </summary>
-        private SerialPort Serial { get; }
+
 
         private bool MountConnected { get; set; }
 
         /// <summary>
         /// Quick check to see if serial is connected and mount is receiving and sending data
         /// </summary> 
-        internal bool IsConnected => Serial.IsOpen && MountConnected;
+        internal bool IsConnected => SkyQueue.Serial.IsOpen && MountConnected;
 
         /// <summary>
         /// Indicate whether the motor controller supports advanced command set (Firmware version 3.22.xx or above)
@@ -93,12 +87,9 @@ namespace GS.SkyWatcher
 
         #region Methods
 
-        public Commands(SerialPort serial, int[] customMount360Steps, double[] customRaWormSteps)
+        public Commands()
         {
-            Serial = serial;
-            _customMount360Steps = customMount360Steps;
-            _customRaWormSteps = customRaWormSteps;
-            if (serial.IsOpen)
+            if (SkyQueue.Serial.IsOpen)
             {
                 //Serial.DataReceived += DataReceived;
                 //Serial.ErrorReceived += ErrorReceived;
@@ -282,12 +273,12 @@ namespace GS.SkyWatcher
                 {
                     case AxisId.Axis1:
                         _mount360Steps[0] = gearRatio;
-                        if (_customMount360Steps[0] > 0) { gearRatio = _customMount360Steps[0]; } //Setup for custom :a
+                        if (SkyQueue.CustomMount360Steps[0] > 0) { gearRatio = SkyQueue.CustomMount360Steps[0]; } //Setup for custom :a
                         _axisGearRatios[0] = gearRatio;
                         break;
                     case AxisId.Axis2:
                         _mount360Steps[1] = gearRatio;
-                        if (_customMount360Steps[1] > 0) { gearRatio = _customMount360Steps[1]; } //Setup for custom :a
+                        if (SkyQueue.CustomMount360Steps[1] > 0) { gearRatio = SkyQueue.CustomMount360Steps[1]; } //Setup for custom :a
                         _axisGearRatios[1] = gearRatio;
                         break;
                     default:
@@ -315,7 +306,7 @@ namespace GS.SkyWatcher
                         gearRatio = 0x205318; // for 114GT mount
                     }
                     _mount360Steps[0] = (int)gearRatio;
-                    if (_customMount360Steps[0] > 0) { gearRatio = _customMount360Steps[0]; } //Setup for custom :a
+                    if (SkyQueue.CustomMount360Steps[0] > 0) { gearRatio = SkyQueue.CustomMount360Steps[0]; } //Setup for custom :a
                     _axisGearRatios[0] = gearRatio;
                 }
                 else
@@ -329,14 +320,14 @@ namespace GS.SkyWatcher
                         gearRatio = 0x205318; // for 114GT mount
                     }
                     _mount360Steps[1] = (int)gearRatio;
-                    if (_customMount360Steps[1] > 0) { gearRatio = _customMount360Steps[1]; } //Setup for custom :a
+                    if (SkyQueue.CustomMount360Steps[1] > 0) { gearRatio = SkyQueue.CustomMount360Steps[1]; } //Setup for custom :a
                     _axisGearRatios[1] = gearRatio;
                 }
                 _factorRadToStep[(int)axis] = gearRatio / (2 * Math.PI);
                 _factorStepToRad[(int)axis] = 2 * Math.PI / gearRatio;
             }
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $":{msg}|{axis}|{response}|{ _mount360Steps[(int)axis]}|Custom:{ _customMount360Steps[(int)axis]}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $":{msg}|{axis}|{response}|{ _mount360Steps[(int)axis]}|Custom:{ SkyQueue.CustomMount360Steps[(int)axis]}" };
             MonitorLog.LogToMonitor(monitorItem);
         }
 
@@ -799,12 +790,12 @@ namespace GS.SkyWatcher
                 var response = CmdToMount(axis, 'X', "000E");    // Read 32-bit Resolution of the worm(Counts per revolution)
                 var pecPeriod = (double)String32ToInt(response, true,4);
                 var ax = (int)axis;
-                if (_customRaWormSteps[ax] > 0) { pecPeriod = _customRaWormSteps[ax]; } // Setup custom mount worm steps
+                if (SkyQueue.CustomRaWormSteps[ax] > 0) { pecPeriod = SkyQueue.CustomRaWormSteps[ax]; } // Setup custom mount worm steps
                 _peSteps[ax] = pecPeriod;
                 ret = pecPeriod;
 
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $":X000E|{axis}|{response}|{pecPeriod}|Custom:{_customRaWormSteps[ax]}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $":X000E|{axis}|{response}|{pecPeriod}|Custom:{SkyQueue.CustomRaWormSteps[ax]}" };
                 MonitorLog.LogToMonitor(monitorItem);
             }
             else
@@ -812,12 +803,12 @@ namespace GS.SkyWatcher
                 var response = CmdToMount(axis, 's', null);
                 var pecPeriod = (double)StringToLong(response);
                 var ax = (int)axis;
-                if (_customRaWormSteps[ax] > 0) { pecPeriod = _customRaWormSteps[ax]; } // Setup custom mount worm steps
+                if (SkyQueue.CustomRaWormSteps[ax] > 0) { pecPeriod = SkyQueue.CustomRaWormSteps[ax]; } // Setup custom mount worm steps
                 _peSteps[ax] = pecPeriod;
                 ret = pecPeriod;
 
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $":s|{axis}|{response}|{pecPeriod}|Custom:{_customRaWormSteps[ax]}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $":s|{axis}|{response}|{pecPeriod}|Custom:{SkyQueue.CustomRaWormSteps[ax]}" };
                 MonitorLog.LogToMonitor(monitorItem);
             }
 
@@ -1253,8 +1244,8 @@ namespace GS.SkyWatcher
                             string responseString = null;
                             for (var c = 0; c < 5; c++)
                             {
-                                Serial.DiscardInBuffer();
-                                Serial.DiscardOutBuffer();
+                                SkyQueue.Serial.DiscardInBuffer();
+                                SkyQueue.Serial.DiscardOutBuffer();
                                 // send the request
                                 var cmdData = SendRequest(axis, command, cmdDataStr);
                                 // receive the response
@@ -1421,7 +1412,7 @@ namespace GS.SkyWatcher
             }
 
             //Serial.Transmit(commandStr.ToString());
-            Serial.Write(commandStr.ToString());
+            SkyQueue.Serial.Write(commandStr.ToString());
 
             return $"{commandStr.ToString().Trim()}";
         }
@@ -1494,9 +1485,9 @@ namespace GS.SkyWatcher
             var StartReading = false;
 
             var sw = Stopwatch.StartNew();
-            while (sw.Elapsed.TotalMilliseconds < Serial.ReadTimeout)
+            while (sw.Elapsed.TotalMilliseconds < SkyQueue.Serial.ReadTimeout)
             {
-                var data = Serial.ReadExisting();
+                var data = SkyQueue.Serial.ReadExisting();
                 foreach (var byt in data)
                 {
                     // this code order is important
