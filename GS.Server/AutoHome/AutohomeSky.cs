@@ -103,12 +103,17 @@ namespace GS.Server.AutoHome
 
             switch (sensorStatus)
             {
-                case 16777215:
-                    return false;
-                case 0:
+                case 100000000000:      //-2147483648 =80000000 
+                case 300000000000:      //0 =000000 
                     return true;
+                case 200000000000:      //2147483647 =7FFFFFFF
+                case 400000000000:      //16777215 =FFFFFF
+                    return false;
                 default:
-                    TripPosition = Convert.ToInt32(sensorStatus);
+                    if (sensorStatus < 100000000000)
+                    {
+                        TripPosition = Convert.ToInt32(sensorStatus);
+                    }
                     return null;
             }
         }
@@ -169,6 +174,9 @@ namespace GS.Server.AutoHome
         /// <returns></returns>
         public int StartAutoHome(AxisId axis, int maxMove = 100, int offSetDec = 0)
         {
+            //var a = GetHomeSensorStatus(AxisId.Axis1);
+            //return 0; //test autohome
+
             HomeSensorCapabilityCheck();
             if (!HasHomeSensor){ return -5; }
             var _ = new SkyAxisStop(0, axis);
@@ -330,7 +338,7 @@ namespace GS.Server.AutoHome
             if (SkyServer.AutoHomeStop) return -3; //stop requested
 
             //convert position to mount degrees 
-            var a = TripPosition -= 0x00800000;
+            var a = TripPosition; // -= 0x00800000;
             var skyCmd = new SkyGetStepToAngle(SkyQueue.NewId, axis, a);
             var b = (double)SkyQueue.GetCommandResult(skyCmd).Result;
             var c = Units.Rad2Deg1(b);

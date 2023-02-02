@@ -37,15 +37,34 @@ namespace GS.SkyWatcher
         private static CancellationTokenSource _cts;
         public static event PropertyChangedEventHandler StaticPropertyChanged;
 
+        private static long _id;
+        private static bool _isPulseGuidingDec;
+        private static bool _isPulseGuidingRa;
+
         #endregion
 
         #region Properties
 
+        /// <summary>
+        /// Serial object
+        /// </summary>
+        internal static SerialPort Serial { get; private set; }
+        /// <summary>
+        /// Custom Mount :s replacement
+        /// </summary>
+        internal static int[] CustomMount360Steps { get; private set; }
+        /// <summary>
+        /// Custom Mount :s replacement
+        /// </summary>// Custom Mount :a replacement
+        internal static double[] CustomRaWormSteps { get; private set; }
+        /// <summary>
+        /// IsRunning
+        /// </summary>
         public static bool IsRunning { get; private set; }
-        private static long _id;
+        /// <summary>
+        /// Locking id
+        /// </summary>
         public static long NewId => Interlocked.Increment(ref _id);
-
-        private static bool _isPulseGuidingDec;
         /// <summary>
         /// status for Dec Pulse
         /// </summary>
@@ -58,8 +77,6 @@ namespace GS.SkyWatcher
                 OnStaticPropertyChanged();
             }
         }
-
-        private static bool _isPulseGuidingRa;
         /// <summary>
         /// status for Dec Pulse
         /// </summary>
@@ -190,11 +207,14 @@ namespace GS.SkyWatcher
         /// <param name="customRaWormSteps"></param>
         public static void Start(SerialPort serial, int[] customMount360Steps, double[] customRaWormSteps)
         {
+            Serial = serial;
+            CustomMount360Steps = customMount360Steps;
+            CustomRaWormSteps = customRaWormSteps;
             Stop();
             if (_cts == null) _cts = new CancellationTokenSource();
             var ct = _cts.Token;
 
-            _skyWatcher = new SkyWatcher(serial, customMount360Steps,  customRaWormSteps);
+            _skyWatcher = new SkyWatcher();
             _resultsDictionary = new ConcurrentDictionary<long, ISkyCommand>();
             _commandBlockingCollection = new BlockingCollection<ISkyCommand>();
 

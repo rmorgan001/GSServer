@@ -3701,6 +3701,8 @@ namespace GS.Server.SkyTelescope
                     SkyTasks(MountTaskName.CanAdvancedCmdSupport);
                     if (CanPPec) SkyTasks(MountTaskName.Pec);
 
+                    //CanHomeSensor = true; //test autohome
+
                     raWormTeeth = (int)(StepsPerRevolution[0] / StepsWormPerRevolution[0]);
                     decWormTeeth = (int)(StepsPerRevolution[1] / StepsWormPerRevolution[1]);
                     WormTeethCount = new[] { raWormTeeth, decWormTeeth };
@@ -4799,7 +4801,7 @@ namespace GS.Server.SkyTelescope
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"Mapped unsynced axis angles: {unsynced[0]}/{unsynced[1]} to {synced[0]}/{synced[1]}"
                 };
-
+                MonitorLog.LogToMonitor(monitorItem);
                 return synced;
             }
             else
@@ -4824,13 +4826,11 @@ namespace GS.Server.SkyTelescope
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"Mapped synced axis angles: {synced[0]}/{synced[1]} to {unsynced[0]}/{unsynced[1]}"
                 };
-
+                MonitorLog.LogToMonitor(monitorItem);
                 return unsynced;
             }
-            else
-            {
-                return synced;
-            }
+
+            return synced;
         }
         #endregion
 
@@ -5066,7 +5066,7 @@ namespace GS.Server.SkyTelescope
 
                 //Convert Positions to degrees
                 // double[] rawPositions = { ConvertStepsToDegrees(rawSteps[0], 0), ConvertStepsToDegrees(rawSteps[1], 1) };
-                double[] rawPositions = GetUnsyncedAxes(new double[] { ConvertStepsToDegrees(rawSteps[0], 0), ConvertStepsToDegrees(rawSteps[1], 1) });
+                var rawPositions = GetUnsyncedAxes(new[] { ConvertStepsToDegrees(rawSteps[0], 0), ConvertStepsToDegrees(rawSteps[1], 1) });
 
 
                 // UI diagnostics in degrees
