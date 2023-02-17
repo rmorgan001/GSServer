@@ -349,7 +349,7 @@ namespace GS.Server.SkyTelescope
                     }
                     axes = Range.RangeAxesXY(axes);
 
-                    //check for alternative position within meridian limits
+                    //check for alternative position within Flip Angle limits
                     var b = AxesAppToMount(axes);
 
                     var alt = SkyServer.CheckAlternatePosition(b);
@@ -367,6 +367,13 @@ namespace GS.Server.SkyTelescope
             return axes;
         }
 
+        /// <summary>
+        /// Determine if a flip is needed to reach the RA/Dec coordinates
+        /// </summary>
+        /// <remarks>Uses a SideOfPier test at the converted coordinates and compares to current SideOfPier</remarks>
+        /// <param name="raDec"></param>
+        /// <param name="lst"></param>
+        /// <returns></returns>
         private static bool IsFlipRequired(IReadOnlyList<double> raDec, double lst)
         {
             var axes = new[] { raDec[0], raDec[1] };
@@ -385,17 +392,43 @@ namespace GS.Server.SkyTelescope
                         axes[0] += 180;
                         axes[1] = 180 - axes[1];
                     }
+
                     axes = Range.RangeAxesXY(axes);
 
-                    //check within meridian limits
+                    //check if within Flip Angle
                     var b = AxesAppToMount(axes);
-                    if (SkyServer.IsWithinMeridianLimits(b)) return false;
+                    if (SkyServer.IsWithinFlipLimits(b))
+                    {
+                        return false;
+                    }
 
-                    //check if farthest position is needed
-                    var alt = GetAltAxisPosition(b);
-                    var c = SkyServer.ChooseClosestPosition(SkyServer.ActualAxisX, b, alt);
-                    return c == "b";
+                    //similar to SideOfPier property code but this passes conform for both hemispheres
+                    PierSide e;
+                    if (SkyServer.SideOfPier == PierSide.pierUnknown) { return false; }
 
+                    switch (SkySettings.Mount)
+                    {
+                        case MountType.Simulator:
+                            if (b[1] < 90.0000000001 && b[1] > -90.0000000001) { e = PierSide.pierEast; }
+                            else { e = PierSide.pierWest; }
+                            break;
+                        case MountType.SkyWatcher:
+                            if (SkyServer.SouthernHemisphere)
+                            {
+                                if (b[1] < 90.0 && b[1] > -90.0) {e = PierSide.pierEast; }
+                                else{e = PierSide.pierWest; }
+                            }
+                            else
+                            {
+                                if (b[1] < 90.0 && b[1] > -90.0) { e = PierSide.pierWest; }
+                                else { e = PierSide.pierEast; }
+                            }
+
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    return e != SkyServer.SideOfPier;
                 case AlignmentModes.algPolar:
                     return false;
                 default:

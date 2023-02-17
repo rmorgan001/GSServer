@@ -213,13 +213,13 @@ namespace GS.Server.Helpers
 
         void IClassFactory.LockServer(bool bLock)
         {
-            //    // LocalSystem.TraceLogItem("LockServer", "Lock server: " + bLock);
+            //LocalSystem.TraceLogItem("LockServer", "Lock server: " + bLock);
             if (bLock)
                 GSServer.CountLock();
             else
-                //      LocalServer.UncountLock();
+                GSServer.UncountLock();
                 // Always attempt to see if we need to shutdown this server application.
-                //    // LocalSystem.TraceLogItem("LockServer", "Calling ExitIf to check whether we can exit the server");
+                // LocalSystem.TraceLogItem("LockServer", "Calling ExitIf to check whether we can exit the server");
                 GSServer.ExitIf();
         }
         #endregion

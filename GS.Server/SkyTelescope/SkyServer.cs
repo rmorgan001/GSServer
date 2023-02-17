@@ -1001,7 +1001,7 @@ namespace GS.Server.SkyTelescope
                     monitorItem.Type = MonitorType.Warning;
                     MonitorLog.LogToMonitor(monitorItem);
                     throw new InvalidOperationException(
-                        $"SideOfPier ({value}) is outside the range of set Meridian Limits: {SkySettings.HourAngleLimit}");
+                        $"SideOfPier ({value}) is outside the range of set Limits: {SkySettings.HourAngleLimit}");
                 }
                 MonitorLog.LogToMonitor(monitorItem);
                 SlewAxes(b[0], b[1], SlewType.SlewRaDec);
@@ -2716,6 +2716,94 @@ namespace GS.Server.SkyTelescope
             return rate;
         }
 
+        /// <summary>
+        /// Determine which SideOfPier for a given Ra/Dec coordinate
+        /// </summary>
+        /// <remarks>Ra/Dec must already be converted using Transforms.CordTypeToInternal.</remarks>
+        /// <remarks>Checks if a flip it required for coordinates</remarks>
+        /// <param name="RightAscension"></param>
+        /// <param name="Declination"></param>
+        /// <returns></returns>
+        public static PierSide DetermineSideOfPier(double RightAscension, double Declination)
+        {
+            var sop = SideOfPier;
+            if (SkySettings.AlignmentMode != AlignmentModes.algGermanPolar)
+            {
+                return PierSide.pierUnknown;
+            }
+
+            var flipreq = Axes.IsFlipRequired(new[] { RightAscension, Declination });
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"Ra:{RightAscension}|Dec:{Declination}|Flip:{flipreq}|SoP:{sop}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            switch (sop)
+            {
+                case PierSide.pierEast:
+                    return flipreq ? PierSide.pierWest : PierSide.pierEast;
+                case PierSide.pierWest:
+                    return flipreq ? PierSide.pierEast : PierSide.pierWest;
+                case PierSide.pierUnknown:
+                    return PierSide.pierUnknown;
+                default:
+                    return PierSide.pierUnknown;
+            }
+        }
+
+        ///// <summary>
+        ///// Gets the side of pier using the right ascension, assuming it depends on the
+        ///// hour angle only.  Used for Destination side of Pier, NOT to determine the mount
+        ///// pointing state
+        ///// </summary>
+        ///// <param name="rightAscension">The right ascension.</param>
+        ///// <returns></returns>
+        //public static PierSide SideOfPierRaDec(double rightAscension)
+        //{
+        //    if (SkySettings.AlignmentMode != AlignmentModes.algGermanPolar)
+        //    {
+        //        return PierSide.pierUnknown;
+        //    }
+        //    var ha = Coordinate.Ra2Ha12(rightAscension, SiderealTime);
+        //    PierSide sideOfPier;
+        //    if (ha < 0.0 && ha >= -12.0) { sideOfPier = PierSide.pierWest; }
+        //    else if (ha >= 0.0 && ha <= 12.0) { sideOfPier = PierSide.pierEast; }
+        //    else { sideOfPier = PierSide.pierUnknown; }
+        //    return sideOfPier;
+        //}
+        ///// <summary>
+        ///// Gets pierSide based on the Right Ascension (HA) using only the meridian or by adding in the Angle limit
+        ///// Used for Destination side of Pier.  
+        ///// </summary>
+        ///// <param name="rightAscension">The right ascension.</param>
+        ///// <returns>PierSide</returns>
+        //public static PierSide SideOfPierRaDec1(double rightAscension)
+        //{
+        //    if (SkySettings.AlignmentMode != AlignmentModes.algGermanPolar)
+        //    {
+        //        return PierSide.pierUnknown;
+        //    }
+        //    var limit = 0.0;
+        //    if (UseLimitInDSoP) // new user setting
+        //    {
+        //        limit = SkySettings.HourAngleLimit / 15;
+        //    }
+        //    var ha = Coordinate.Ra2Ha12(rightAscension, SiderealTime);
+        //    PierSide sideOfPier;
+        //    if (ha < (0.0 + limit) && ha >= -12.0) { sideOfPier = PierSide.pierWest; }
+        //    else if (ha >= (0.0 + limit) && ha <= 12.0) { sideOfPier = PierSide.pierEast; }
+        //    else { sideOfPier = PierSide.pierUnknown; }
+        //    return sideOfPier;
+        //}
+
         public static ParkPosition GetStoredParkPosition()
         {
             var p = new ParkPosition { Name = SkySettings.ParkName, X = SkySettings.ParkAxisX, Y = SkySettings.ParkAxisY };
@@ -3701,7 +3789,7 @@ namespace GS.Server.SkyTelescope
                     SkyTasks(MountTaskName.CanAdvancedCmdSupport);
                     if (CanPPec) SkyTasks(MountTaskName.Pec);
 
-                    //CanHomeSensor = true; //test autohome
+                    //CanHomeSensor = true; //test auto home
 
                     raWormTeeth = (int)(StepsPerRevolution[0] / StepsWormPerRevolution[0]);
                     decWormTeeth = (int)(StepsPerRevolution[1] / StepsWormPerRevolution[1]);
@@ -4236,95 +4324,6 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Gets the side of pier using the right ascension, assuming it depends on the
-        /// hour angle only.  Used for Destination side of Pier, NOT to determine the mount
-        /// pointing state
-        /// </summary>
-        /// <param name="rightAscension">The right ascension.</param>
-        /// <returns></returns>
-        public static PierSide SideOfPierRaDec(double rightAscension)
-        {
-            if (SkySettings.AlignmentMode != AlignmentModes.algGermanPolar)
-            {
-                return PierSide.pierUnknown;
-            }
-
-            var ha = Coordinate.Ra2Ha12(rightAscension, SiderealTime);
-            PierSide sideOfPier;
-            if (ha < 0.0 && ha >= -12.0) { sideOfPier = PierSide.pierWest; }
-            else if (ha >= 0.0 && ha <= 12.0) { sideOfPier = PierSide.pierEast; }
-            else { sideOfPier = PierSide.pierUnknown; }
-
-            return sideOfPier;
-        }
-
-        /// <summary>
-        /// Gets the side of pier using the right ascension, assuming it depends on the
-        /// hour angle and GSS ha limit.  Used for Destination side of Pier, NOT to determine the mount
-        /// pointing state
-        /// </summary>
-        /// <param name="rightAscension">The right ascension.</param>
-        /// <returns></returns>
-        public static PierSide SideOfPierRaDec1(double rightAscension)
-        {
-            if (SkySettings.AlignmentMode != AlignmentModes.algGermanPolar)
-            {
-                return PierSide.pierUnknown;
-            }
-
-            var limit = SkySettings.HourAngleLimit / 15;
-            var ha = Coordinate.Ra2Ha12(rightAscension, SiderealTime);
-            PierSide sideOfPier;
-
-            if (ha < (0.0 + limit) && ha >= -12.0) { sideOfPier = PierSide.pierWest; }
-            else if (ha >= (0.0 + limit) && ha <= 12.0) { sideOfPier = PierSide.pierEast; }
-            else { sideOfPier = PierSide.pierUnknown; }
-
-            return sideOfPier;
-        }
-
-        /// <summary>
-        /// Determine actual side of pier for a ra/dec coordinate
-        /// </summary>
-        /// <remarks>ra/dec must already be converted using Transforms.CordTypeToInternal</remarks>
-        /// <param name="RightAscension"></param>
-        /// <param name="Declination"></param>
-        /// <returns></returns>
-        public static PierSide SideOfPierActual(double RightAscension, double Declination)
-        {
-            if (SkySettings.AlignmentMode != AlignmentModes.algGermanPolar)
-            {
-                return PierSide.pierUnknown;
-            }
-
-            var flipreq = Axes.IsFlipRequired(new[] { RightAscension, Declination });
-
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Server,
-                Category = MonitorCategory.Server,
-                Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod()?.Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"Ra:{RightAscension}|Dec:{Declination}|Flip:{flipreq}|SoP:{SideOfPier}"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            switch (SideOfPier)
-            {
-                case PierSide.pierEast:
-                    return flipreq ? PierSide.pierWest : PierSide.pierEast;
-                case PierSide.pierWest:
-                    return flipreq ? PierSide.pierEast : PierSide.pierWest;
-                case PierSide.pierUnknown:
-                    return PierSide.pierUnknown;
-                default:
-                    return PierSide.pierUnknown;
-            }
-        }
-
-        /// <summary>
         /// Starts slew with ra/dec coordinates
         /// </summary>
         /// <param name="rightAscension"></param>
@@ -4346,7 +4345,7 @@ namespace GS.Server.SkyTelescope
         public static double[] CheckAlternatePosition(double[] position)
         {
             // See if the target is within limits
-            if (!IsWithinMeridianLimits(position)) { return null; }
+            if (!IsWithinFlipLimits(position)) { return null; }
             var alt = Axes.GetAltAxisPosition(position);
 
             var cl = ChooseClosestPosition(ActualAxisX, position, alt);
@@ -4379,7 +4378,7 @@ namespace GS.Server.SkyTelescope
         /// <param name="a">First pair of positions</param>
         /// <param name="b">Seconds pair of positions</param>
         /// <returns>a or b as string</returns>
-        public static string ChooseClosestPosition(double position, IReadOnlyList<double> a, IReadOnlyList<double> b)
+        private static string ChooseClosestPosition(double position, IReadOnlyList<double> a, IReadOnlyList<double> b)
         {
             var val1 = Math.Abs(a[0] - position);
             var val2 = Math.Abs(b[0] - position);
@@ -4388,11 +4387,11 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Calculates if axis position is within the defined meridian limits
+        /// Calculates if axis position is within the defined flip angle
         /// </summary>
         /// <param name="position">X axis position of mount</param>
         /// <returns>True if within limits otherwise false</returns>
-        public static bool IsWithinMeridianLimits(IReadOnlyList<double> position)
+        public static bool IsWithinFlipLimits(IReadOnlyList<double> position)
         {
             return position[0] > -SkySettings.HourAngleLimit && position[0] < SkySettings.HourAngleLimit ||
                    position[0] > 180 - SkySettings.HourAngleLimit && position[0] < 180 + SkySettings.HourAngleLimit;
@@ -4746,7 +4745,7 @@ namespace GS.Server.SkyTelescope
         private static void AddAlignmentPoint()
         {
             // At this point:
-            //      SkyServer.Steps contains the current encoder posititions.
+            //      SkyServer.Steps contains the current encoder positions.
             //      SkyServer.FactorStep contains the conversion from radians to steps
             // To get the target steps
             var xy = Axes.RaDecToAxesXY(new[] { TargetRa, TargetDec });
@@ -4766,7 +4765,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Alignment point added: Unsynced axis = {unsynced[0]}/{unsynced[1]}, RA/Dec = {TargetRa}/{TargetDec}, Synched axis = {synced[0]}/{synced[1]}"
+                    Message = $"Alignment point added: Un-synced axis = {unsynced[0]}/{unsynced[1]}, RA/Dec = {TargetRa}/{TargetDec}, Synched axis = {synced[0]}/{synced[1]}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -4780,7 +4779,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Alignment point added: Unsynced axis = {unsynced[0]}/{unsynced[1]}, RA/Dec = {TargetRa}/{TargetDec}, Synched axis = {synced[0]}/{synced[1]}"
+                    Message = $"Alignment point added: Un-synced axis = {unsynced[0]}/{unsynced[1]}, RA/Dec = {TargetRa}/{TargetDec}, Synched axis = {synced[0]}/{synced[1]}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -5112,6 +5111,9 @@ namespace GS.Server.SkyTelescope
 
                 // Event interval time set for UI performance
                 _mediaTimer.Period = SkySettings.DisplayInterval;
+
+                //var r = DetermineSideOfPier(RightAscension, Declination);
+                //Debug.WriteLine($"DSoP = {r}");
             }
             catch (Exception ex)
             {
