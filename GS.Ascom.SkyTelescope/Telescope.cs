@@ -19,6 +19,7 @@ using GS.Principles;
 using GS.Server.Helpers;
 using GS.Server.SkyTelescope;
 using GS.Shared;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Diagnostics;
@@ -28,7 +29,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Threading;
-using Newtonsoft.Json;
 
 namespace ASCOM.GS.Sky.Telescope
 {
@@ -646,8 +646,7 @@ namespace ASCOM.GS.Sky.Telescope
             MonitorLog.LogToMonitor(monitorItem);
 
             var radec = Transforms.CoordTypeToInternal(RightAscension, Declination);
-            var r = SkyServer.SideOfPierRaDec1(radec.X);
-            //var r = SkyServer.SideOfPierActual(radec.X, radec.Y);
+            var r = SkyServer.DetermineSideOfPier(radec.X, radec.Y);
             return r;
         }
 
