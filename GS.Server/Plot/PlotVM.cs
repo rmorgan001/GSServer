@@ -247,8 +247,8 @@ namespace GS.Server.Plot
             IsZeroBased = false;
             TitleItems = new BindingList<TitleItem>();
 
-            if (Values1 == null) Values1 = new GearedValues<PointModel>();
-            if (Values2 == null) Values2 = new GearedValues<PointModel>();
+            if (Values1 == null){ Values1 = new GearedValues<PointModel>();}
+            if (Values2 == null){ Values2 = new GearedValues<PointModel>();}
 
             ChartQuality = Quality.Low;
 
@@ -279,7 +279,7 @@ namespace GS.Server.Plot
             SetXAxisLimits(HiResDateTime.UtcNow.ToLocalTime());
             Zoom = "Xy";
 
-            Scale = ChartScale.Steps;
+            Scale = ChartScale.Arcsecs;
 
             Values1Title = "Ra";
             Values1Series = ChartSeriesType.GLineSeries;
@@ -567,7 +567,7 @@ namespace GS.Server.Plot
             get => _scale;
             set
             {
-                if (_scale == value) return;
+                //if (_scale == value){return;}
                 _scale = value;
                 OnPropertyChanged();
             }

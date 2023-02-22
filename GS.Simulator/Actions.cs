@@ -378,13 +378,13 @@ namespace GS.Simulator
         }
 
         /// <summary>
-        /// Rates from driver
+        /// RA & Dec Rates from driver
         /// </summary>
         /// <param name="axis"></param>
         /// <param name="degrees"></param>
-        internal void Rate(Axis axis, double degrees)
+        internal void RaDecRate(Axis axis, double degrees)
         {
-            _ioSerial.Send($"rate|{axis}|{degrees}");
+            _ioSerial.Send($"radecrate|{axis}|{degrees}");
         }
 
         /// <summary>
@@ -397,13 +397,13 @@ namespace GS.Simulator
         }
 
         /// <summary>
-        /// Axis rates from driver
+        /// MoveAxis rates from driver
         /// </summary>
         /// <param name="axis"></param>
         /// <param name="degrees"></param>
-        internal void RateAxis(Axis axis, double degrees)
+        internal void MoveAxisRate(Axis axis, double degrees)
         {
-            _ioSerial.Send($"rateaxis|{axis}|{degrees}");
+            _ioSerial.Send($"moveaxisrate|{axis}|{degrees}");
         }
 
         /// <summary>

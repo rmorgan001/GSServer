@@ -600,11 +600,15 @@ namespace ASCOM.GS.Sky.Telescope
                 return dec;
             }
         }
+
+        /// <summary>
+        /// The declination tracking rate (arc seconds per second, default = 0.0) 
+        /// </summary>
         public double DeclinationRate
         {
             get
             {
-                var r = SkyServer.RateDec;
+                var r = Conversions.Deg2ArcSec(SkyServer.RateDec);
 
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{r}" };
@@ -618,8 +622,9 @@ namespace ASCOM.GS.Sky.Telescope
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
+                CheckCapability(SkySettings.CanSetEquRates, "DeclinationRate", true);
                 CheckRate(value);
-                SkyServer.RateDec = value;
+                SkyServer.RateDec = Conversions.ArcSec2Deg(value);
             }
         }
 
@@ -829,6 +834,11 @@ namespace ASCOM.GS.Sky.Telescope
             }
         }
 
+        /// <summary>
+        /// Move one axis at the given AxisRates(TelescopeAxes axis). 
+        /// </summary>
+        /// <param name="Axis"></param>
+        /// <param name="Rate"></param>
         public void MoveAxis(TelescopeAxes Axis, double Rate)
         {
             if (!SkyServer.AsComOn) return;
@@ -846,19 +856,19 @@ namespace ASCOM.GS.Sky.Telescope
 
             CheckVersionOne("MoveAxis");
             CheckRate(Axis, Rate);
-            if (!CanMoveAxis(Axis))
-                throw new MethodNotImplementedException("CanMoveAxis " + Enum.GetName(typeof(TelescopeAxes), Axis));
+            if (!CanMoveAxis(Axis)){throw new MethodNotImplementedException("CanMoveAxis " + Enum.GetName(typeof(TelescopeAxes), Axis));}
             CheckParked("MoveAxis");
 
             switch (Axis)
             {
                 case TelescopeAxes.axisPrimary:
-                    SkyServer.RateAxisRa = Rate;
+                    SkyServer.RateMoveAxisRa = Rate;
                     break;
                 case TelescopeAxes.axisSecondary:
-                    SkyServer.RateAxisDec = Rate;
+                    SkyServer.RateMoveAxisDec = Rate;
                     break;
                 case TelescopeAxes.axisTertiary:
+                default:
                     // not implemented
                     break;
             }
@@ -929,10 +939,8 @@ namespace ASCOM.GS.Sky.Telescope
                 if (!SkyServer.AsComOn) { throw new InvalidOperationException("Not accepting commands"); }
                 if (SkyServer.AtPark) { throw new ParkedException(); }
 
-                //if (SkyServer.IsSlewing) { throw new InvalidOperationException("Pulse rejected when slewing"); }
-                //if (!SkyServer.Tracking) { throw new InvalidOperationException("Pulse rejected when tracking is off"); }
                 if (SkyServer.IsSlewing) { throw new InvalidValueException("Pulse rejected when slewing"); }
-                if (!SkyServer.Tracking) { throw new InvalidValueException("Pulse rejected when tracking is off"); }
+                //if (!SkyServer.Tracking) { throw new InvalidValueException("Pulse rejected when tracking is off"); }
 
                 CheckCapability(SkySettings.CanPulseGuide, "PulseGuide");
                 CheckRange(Duration, 0, 30000, "PulseGuide", "Duration");
@@ -977,6 +985,7 @@ namespace ASCOM.GS.Sky.Telescope
 
         /// <inheritdoc />
         /// <summary>
+        /// The right ascension tracking rate offset from sidereal (seconds per sidereal second, default = 0.0) 
         /// This property, together with DeclinationRate, provides support for "offset tracking".
         /// Offset tracking is used primarily for tracking objects that move relatively slowly against
         /// the equatorial coordinate system. It also may be used by a software guiding system that
@@ -986,7 +995,7 @@ namespace ASCOM.GS.Sky.Telescope
         {
             get
             {
-                var r = SkyServer.RateRa;
+                var r = SkyServer.RateRaOrg;
 
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{r}" };
@@ -1001,9 +1010,10 @@ namespace ASCOM.GS.Sky.Telescope
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                CheckCapability(SkySettings.CanSetEquRates, "RightAscensionRate", true);
+                CheckCapability(SkySettings.CanSetEquRates, "RightAscensionRate ", true);
                 CheckRate(value);
-                SkyServer.RateRa = value;
+                SkyServer.RateRaOrg = value;
+                SkyServer.RateRa = Conversions.ArcSec2Deg(Conversions.SideSec2ArcSec(value));
             }
         }
 
@@ -1629,25 +1639,6 @@ namespace ASCOM.GS.Sky.Telescope
             throw new InvalidValueException("TrackingRate invalid");
         }
 
-        private void CheckRate(TelescopeAxes axis, double rate)
-        {
-            var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{rate}" };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            var rates = AxisRates(axis);
-            var ratesStr = string.Empty;
-            foreach (Rate item in rates)
-            {
-                if (Math.Abs(rate) >= item.Minimum && Math.Abs(rate) <= item.Maximum)
-                {
-                    return;
-                }
-                ratesStr = $"{ratesStr}, {item.Minimum} to {item.Maximum}";
-            }
-            throw new InvalidValueException("MoveAxis", rate.ToString(CultureInfo.InvariantCulture), ratesStr);
-        }
-
         private static void CheckRange(double value, double min, double max, string propertyOrMethod, string valueName)
         {
             if (double.IsNaN(value))
@@ -1760,11 +1751,34 @@ namespace ASCOM.GS.Sky.Telescope
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{rate}" };
             MonitorLog.LogToMonitor(monitorItem);
-
-            if (rate > SkyServer.SlewSpeedEight || rate < -SkyServer.SlewSpeedEight)
-            {
-                throw new InvalidOperationException($"{rate} is out of limits");
+            var deg = Conversions.ArcSec2Deg(rate);
+            if (deg > SkyServer.SlewSpeedEight || deg < -SkyServer.SlewSpeedEight){
+                throw new InvalidValueException($"{rate} is out of limits");
             }
+        }
+
+        /// <summary>
+        /// CheckRate in degrees against the axis rates
+        /// </summary>
+        /// <param name="axis"></param>
+        /// <param name="rate"></param>
+        private void CheckRate(TelescopeAxes axis, double rate)
+        {
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{rate}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            var rates = AxisRates(axis);
+            var ratesStr = string.Empty;
+            foreach (Rate item in rates)
+            {
+                if (Math.Abs(rate) >= item.Minimum && Math.Abs(rate) <= item.Maximum)
+                {
+                    return;
+                }
+                ratesStr = $"{ratesStr}, {item.Minimum} to {item.Maximum}";
+            }
+            throw new InvalidValueException($"MoveAxis", rate.ToString(CultureInfo.InvariantCulture), ratesStr);
         }
 
         /// <summary>
