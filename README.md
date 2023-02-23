@@ -4,9 +4,9 @@ GS Server is SkyWatcher ASCOM telescope driver for use with astronomy software a
 ![Main Workflow](https://github.com/rmorgan001/GSServer/actions/workflows/GS.CI.yml/badge.svg)
 [![Windows](https://img.shields.io/github/v/release/rmorgan001/GSServer)](https://github.com/rmorgan001/GSServer/releases)
 
-Download the GSServer installer program at ## http://www.greenswamp.org/
+## Download the GSServer installer program at http://www.greenswamp.org/
 
-![Alt text](Docs/gsserver3.jpg?raw=true "GS Server")
+![Alt text](Docs/Sshot_GSSMain1.jpg?raw=true "GS Server")
 
 ## ScreenShots here https://greenswamp.org/?page_id=857
 
