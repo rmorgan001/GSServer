@@ -1187,7 +1187,7 @@ namespace GS.Server.SkyTelescope
                 }
                 else
                 {
-                    if (TrackingSpeak && _trackingMode != TrackingMode.Off) Synthesizer.Speak(Application.Current.Resources["vceTrackingOff"].ToString());
+                    if (TrackingSpeak && _trackingMode != TrackingMode.Off){Synthesizer.Speak(Application.Current.Resources["vceTrackingOff"].ToString());}
                     _trackingMode = TrackingMode.Off;
                     IsPulseGuidingDec = false; // Ensure pulses are off
                     IsPulseGuidingRa = false;
@@ -4555,6 +4555,11 @@ namespace GS.Server.SkyTelescope
             MonitorLog.LogToMonitor(monitorItem);
 
             var trackingstate = Tracking;
+            if (trackingstate)
+            {
+                TrackingSpeak = false;
+                Tracking = false;
+            }
 
             _altAzSync = new Vector(targetAzimuth, targetAltitude);
             switch (SkySettings.Mount)
@@ -4573,8 +4578,8 @@ namespace GS.Server.SkyTelescope
 
             if (trackingstate)
             {
-                Tracking = false;
                 Tracking = true;
+                TrackingSpeak = true;
             }
 
             Synthesizer.Speak(Application.Current.Resources["vceSyncAz"].ToString());
@@ -4595,11 +4600,16 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $" {TargetRa}|{TargetDec}"
+                Message = $" {TargetRa}|{TargetDec}|{Tracking}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
             var trackingstate = Tracking;
+            if (trackingstate)
+            {
+                TrackingSpeak = false;
+                Tracking = false;
+            }
 
             switch (SkySettings.Mount)
             {
@@ -4630,11 +4640,10 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
 
-
             if (trackingstate)
             {
-                Tracking = false;
                 Tracking = true;
+                TrackingSpeak = true;
             }
 
             Synthesizer.Speak(Application.Current.Resources["vceSyncCoords"].ToString());
