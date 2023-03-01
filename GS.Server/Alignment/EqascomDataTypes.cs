@@ -47,6 +47,12 @@ namespace GS.Server.Alignment
         public double x; //x = X Coordinate
         public double y; //y = Y Coordinate
         public double z;
+
+        public static Coord operator -(Coord pos1, Coord pos2)
+        {
+            return new Coord(){x = pos1.x - pos2.x, y =pos1.y - pos2.y};
+        }
+
     }
 
     //[Serializable]
@@ -107,30 +113,53 @@ namespace GS.Server.Alignment
         public double x; //x = X Coordinate
         public double y; //y = Y Coordinate
         public double z; //z = Z coordinate
-        public double r; // Radius Sign
-        public double ra; // Radius Alpha
+        public int rSign; // Radius Sign
+        public bool divZeroProtected; // Radius switched from 0 to 1 to prevent divide by zero error
+        public bool weightsUp;   // Flag to indicate original axis position was weights up.
 
-        public CartesCoord(double xValue, double yValue, double zValue, double rValue, double raValue)
+        public CartesCoord(double xValue, double yValue)
+        {
+            x = xValue;
+            y = yValue;
+            z = 1;
+            rSign = 1;
+            divZeroProtected = false;
+            weightsUp = false;
+        }
+
+        public CartesCoord(double xValue, double yValue, double zValue, int rSignValue, bool divZeroProtectedValue)
         {
             x = xValue;
             y = yValue;
             z = zValue;
-            r = rValue;
-            ra = raValue;
+            rSign = rSignValue;
+            divZeroProtected = divZeroProtectedValue;
+            weightsUp = false;
         }
+
+        public CartesCoord(Coord coord)
+        {
+            x = coord.x;
+            y = coord.y;
+            z = 1;
+            rSign = 1;
+            divZeroProtected = false;
+            weightsUp = false;
+        }
+
     }
 
     public struct SphericalCoord
     {
         public double x; //x = X Coordinate
         public double y; //y = Y Coordinate
-        public double r; //r = RA Range Flag
+        public bool weightsUp; //r = RA Range Flag
 
-        public SphericalCoord(double xValue, double yValue, double rValue)
+        public SphericalCoord(double xValue, double yValue)
         {
             x = xValue;
             y = yValue;
-            r = rValue;
+            weightsUp = false;
         }
     }
 

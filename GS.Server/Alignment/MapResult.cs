@@ -6,7 +6,7 @@ namespace GS.Server.Alignment
 {
     public class MapResult
     {
-        public AxisPosition Position { get; set;} 
+        public CartesCoord Position { get; set;} 
 
         public bool InTriangle { get;set;} = false;
     }

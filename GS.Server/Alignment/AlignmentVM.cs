@@ -32,7 +32,13 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Forms.VisualStyles;
 using System.Windows.Input;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Drawing.Geometries;
+using LiveChartsCore.SkiaSharpView.Painting;
+using SkiaSharp;
 using Application = System.Windows.Application;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
@@ -89,6 +95,7 @@ namespace GS.Server.Alignment
                     SelectedAlignmentPoint = AlignmentPoints.FirstOrDefault();
                 }
             }
+
             ClearAllPointsCommand.RaiseCanExecuteChanged();
             DeleteSelectedPointCommand.RaiseCanExecuteChanged();
         }
@@ -183,11 +190,109 @@ namespace GS.Server.Alignment
         }
 
         #region Plotting properties ...
-        public ChartValues<ObservablePoint> UnsyncedPoints { get; } = new ChartValues<ObservablePoint>();
-        public ChartValues<ObservablePoint> SyncedPoints { get; } = new ChartValues<ObservablePoint>();
 
-        public ChartValues<ObservablePoint> SelectedPoints { get; } = new ChartValues<ObservablePoint>();
+        public ObservableCollection<ISeries> ChartData { get; } = new ObservableCollection<ISeries>()
+        {
+            // Current telescope position
+            new LineSeries<CartesCoord>
+            {
+                Stroke = new SolidColorPaint(SKColors.Green) { StrokeThickness = 4 },
+                Fill = null,
+                Values = SkyServer.AlignmentModel.CurrentPoint,
+                Mapping = (coord, point) =>
+                {
+                    point.PrimaryValue = coord.x ;
+                    point.SecondaryValue = -coord.y ;
+                },
+                GeometrySize = 10,
+                GeometryFill = new SolidColorPaint(SKColors.Red.WithAlpha(80)),
+                GeometryStroke = new SolidColorPaint(SKColors.Red.WithAlpha(80))
+            },
+            // Triangle for 3 points synched
+            new LineSeries<AlignmentPoint>
+            {
+                Values = SkyServer.AlignmentModel.ChartTrianglePoints,
+                Mapping = (alignmentPoint, point) =>
+                {
+                    point.PrimaryValue = alignmentPoint.SyncedCartesian.x ;
+                    point.SecondaryValue = -alignmentPoint.SyncedCartesian.y ;
+                },
+                Fill = null,
+                Stroke = new SolidColorPaint(SKColors.Green) {StrokeThickness = 1},
+                LineSmoothness=0,
+                GeometrySize=0
+            },
+            // Triangle for 3 points un-synched
+            new LineSeries<AlignmentPoint>
+            {
+                Values = SkyServer.AlignmentModel.ChartTrianglePoints,
+                Mapping = (alignmentPoint, point) =>
+                {
+                    point.PrimaryValue = alignmentPoint.UnsyncedCartesian.x;
+                    point.SecondaryValue = -alignmentPoint.UnsyncedCartesian.y;
+                },
+                Fill = null,
+                Stroke = new SolidColorPaint(SKColors.Red) {StrokeThickness = 1},
+                LineSmoothness=0,
+                GeometrySize=0
+            },
+            // Single point highlighted.
+            new LineSeries<CartesCoord>
+            {
+                Stroke = null,
+                Fill = null,
+                Values = SkyServer.AlignmentModel.ChartNearestPoint,
+                Mapping = (alignmentPoint, point) =>
+                {
+                    point.PrimaryValue = alignmentPoint.x;
+                    point.SecondaryValue = -alignmentPoint.y;
+                },
+                GeometrySize = 30,
+                GeometryFill = null,
+                GeometryStroke = new SolidColorPaint(SKColors.Green)
+            },
+            // Unsynced values
+            new ScatterSeries<AlignmentPoint>
+            {
+                Stroke = new SolidColorPaint(SKColors.LightCoral) { StrokeThickness = 1 },
+                Fill = null,
+                Values = SkyServer.AlignmentModel.AlignmentPoints,
+                Mapping = (alignmentPoint, point) =>
+                {
+                    point.PrimaryValue = alignmentPoint.UnsyncedCartesian.x;
+                    point.SecondaryValue = -alignmentPoint.UnsyncedCartesian.y;
+                },
+                GeometrySize = 10
+            },
+            // Synced values
+            new ScatterSeries<AlignmentPoint, SquareGeometry>
+            {
+                Stroke = new SolidColorPaint(SKColors.LightGreen) { StrokeThickness = 1 },
+                Fill = null,
+                Values = SkyServer.AlignmentModel.AlignmentPoints,
+                Mapping = (alignmentPoint, point) =>
+                {
+                    point.PrimaryValue = alignmentPoint.SyncedCartesian.x;
+                    point.SecondaryValue = -alignmentPoint.SyncedCartesian.y;
+                },
+                GeometrySize = 10
+            }
 
+        };
+
+        const double ChartLimit = 12.0E6;
+
+        public List<Axis> ChartXAxes { get; } = new List<Axis>()
+        {
+            new Axis { IsVisible = false, MinLimit = -ChartLimit, MaxLimit = ChartLimit},
+        };
+
+        public List<Axis> ChartYAxes { get; }= new List<Axis>()
+        {
+            new Axis{IsVisible = false, MinLimit = -ChartLimit, MaxLimit = ChartLimit},
+        };
+
+        public LiveChartsCore.Measure.Margin ChartMargin { get; set; } = new LiveChartsCore.Measure.Margin(25);
         #endregion
 
         #region Commands ...
@@ -304,9 +409,17 @@ namespace GS.Server.Alignment
 
         private void ExportPointModel()
         {
-            var dlg = new SaveFileDialog { Filter = $"{Application.Current.Resources["aliPointModelFileFilter"]}" };
+            var dlg = new SaveFileDialog { Filter = $"{Application.Current.Resources["aliPointModelFileFilter"]}|Test data (*.datarows)|*.datarows" };
             if (dlg.ShowDialog() != true) return;
-            SkyServer.AlignmentModel.SaveAlignmentPoints(dlg.FileName);
+            if (dlg.FileName.EndsWith(".datarows"))
+            {
+                // Export test data suitable for unit testing the code
+                SkyServer.AlignmentModel.ExportAlignmentPointTestData(dlg.FileName);
+            }
+            else
+            {
+                SkyServer.AlignmentModel.SaveAlignmentPoints(dlg.FileName);
+            }
         }
 
         private RelayCommand _importCommand;
@@ -368,6 +481,7 @@ namespace GS.Server.Alignment
             if (filename != null)
             {
                 SkyServer.AlignmentModel.LoadAlignmentPoints(filename);
+                SkyServer.AlignmentModel.SaveAlignmentPoints(); // Save to default configuration file.
             }
 
         }

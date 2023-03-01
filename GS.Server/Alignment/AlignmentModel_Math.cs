@@ -60,6 +60,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using XInputDotNetPure;
 
 namespace GS.Server.Alignment
 {
@@ -69,33 +70,54 @@ namespace GS.Server.Alignment
         private double Delta_RA_Map(double raEncoder)
         {
 
-            return raEncoder - this._oneStarAdjustment.RA; // + gRASync01 (Eqmod has an ASCOM Sync mode which would set this value)
+            return raEncoder - this._oneStarAdjustment.x; // + gRASync01 (Eqmod has an ASCOM Sync mode which would set this value)
 
         }
 
         private double Delta_DEC_Map(double decEncoder)
         {
 
-            return decEncoder - this._oneStarAdjustment.Dec; // + gDECSync01  (Eqmod has an ASCOM Sync mode which would set this value)
+            return decEncoder - this._oneStarAdjustment.y; // + gDECSync01  (Eqmod has an ASCOM Sync mode which would set this value)
 
         }
 
-        private MapResult Delta_Map(AxisPosition original)
+        private void UpdateChartingPoints(AlignmentPoint point)
+        {
+            // Update charting lists
+            if (_CurrentNearestPointId != point.Id)
+            {
+                ChartNearestPoint.Clear();
+                ChartNearestPoint.Add(new CartesCoord() { x = point.SyncedCartesian.x, y = point.SyncedCartesian.y });
+                _CurrentNearestPointId = point.Id;
+            }
+            ChartTrianglePoints.Clear();
+        }
+        private void ClearChartNearestPoint()
+        {
+            // Update charting lists
+            ChartNearestPoint.Clear();
+            _CurrentNearestPointId = null;
+        }
+
+        private MapResult Delta_Map(CartesCoord original)
         {
             AlignmentPoint nearestPoint = GetNearest(original);
             if (nearestPoint != null)
             {
+
                 SelectedAlignmentPoint = nearestPoint;
+                UpdateChartingPoints(nearestPoint);
                 return new MapResult()
                 {
-                    Position = new AxisPosition(original.RA - nearestPoint.Delta.RA, original.Dec - nearestPoint.Delta.Dec)
+                    Position = new CartesCoord(original.x - nearestPoint.Delta.x, original.y - nearestPoint.Delta.y)
                 };
             }
             else
             {
+                ClearChartNearestPoint();
                 return new MapResult()
                 {
-                    Position = new AxisPosition(Delta_RA_Map(original.RA), Delta_DEC_Map(original.Dec))
+                    Position = new CartesCoord(Delta_RA_Map(original.x), Delta_DEC_Map(original.y))
                 };
             }
         }
@@ -103,55 +125,56 @@ namespace GS.Server.Alignment
         private double DeltaReverse_RA_Map(double raTarget)
         {
 
-            return raTarget + this._oneStarAdjustment.RA; // + gRASync01 (Eqmod has an ASCOM Sync mode which would set this value)
+            return raTarget + this._oneStarAdjustment.x; // + gRASync01 (Eqmod has an ASCOM Sync mode which would set this value)
 
         }
 
         private double DeltaReverse_DEC_Map(double decTarget)
         {
 
-            return decTarget + this._oneStarAdjustment.Dec; // + gDECSync01  (Eqmod has an ASCOM Sync mode which would set this value)
+            return decTarget + this._oneStarAdjustment.y; // + gDECSync01  (Eqmod has an ASCOM Sync mode which would set this value)
 
         }
 
-        private MapResult DeltaReverse_Map(AxisPosition original)
+        private MapResult DeltaReverse_Map(CartesCoord original)
         {
 
             AlignmentPoint nearestPoint = GetNearest(original);
             if (nearestPoint != null)
             {
                 SelectedAlignmentPoint = nearestPoint;
+                UpdateChartingPoints(nearestPoint);
                 return new MapResult()
                 {
-                    Position = new AxisPosition(original.RA + nearestPoint.Delta.RA, original.Dec + nearestPoint.Delta.Dec)
+                    Position = new CartesCoord(original.x + nearestPoint.Delta.x, original.y + nearestPoint.Delta.y)
                 };
             }
             else
             {
                 return new MapResult()
                 {
-                    Position = new AxisPosition(DeltaReverse_RA_Map(original.RA), DeltaReverse_DEC_Map(original.Dec))
+                    Position = new CartesCoord(DeltaReverse_RA_Map(original.x), DeltaReverse_DEC_Map(original.y))
                 };
             }
         }
 
 
-        private MapResult Delta_Matrix_Map(AxisPosition pos)
+        private MapResult Delta_Matrix_Map(CartesCoord pos)
         {
             MapResult result = new MapResult();
 
             // re transform based on the nearest 3 stars
             bool inTriangle = EQ_UpdateTaki(pos);
 
-            AxisPosition obtmp2 = EQ_plTaki(pos);
-            result.Position = new AxisPosition(obtmp2.RA, obtmp2.Dec);
+            CartesCoord transformed = EQ_plTaki(pos);
+            result.Position = transformed;
             result.InTriangle = inTriangle;
 
             return result;
         }
 
 
-        private MapResult Delta_Matrix_Reverse_Map(AxisPosition pos)
+        private MapResult Delta_Matrix_Reverse_Map(CartesCoord pos)
         {
 
             MapResult result = new MapResult();
@@ -159,9 +182,9 @@ namespace GS.Server.Alignment
 
             // re transform using the 3 nearest stars
             bool inTriangle = EQ_UpdateAffine(pos);
-            AxisPosition obtmp2 = EQ_plAffine(pos);
+            CartesCoord transformed = EQ_plAffine(pos);
 
-            result.Position = new AxisPosition(obtmp2.RA, obtmp2.Dec);
+            result.Position = transformed;
             result.InTriangle = inTriangle;
 
 
@@ -173,16 +196,17 @@ namespace GS.Server.Alignment
         /// </summary>
         /// <param name="encoderPosition"></param>
         /// <returns></returns>
-        private MapResult DeltaSync_Matrix_Map(AxisPosition encoderPosition)
+        private MapResult DeltaSync_Matrix_Map(CartesCoord encoderPosition)
         {
             MapResult result = new MapResult();
 
             this.SelectedAlignmentPoint = GetNearest(encoderPosition);
             if (this.SelectedAlignmentPoint != null)
             {
-                result.Position = new AxisPosition(
-                encoderPosition.RA + this.SelectedAlignmentPoint.Delta.RA,       // + gRASync01;
-                encoderPosition.Dec + this.SelectedAlignmentPoint.Delta.Dec
+                UpdateChartingPoints(this.SelectedAlignmentPoint);
+                result.Position = new CartesCoord(
+                encoderPosition.x + this.SelectedAlignmentPoint.Delta.x,       // + gRASync01;
+                encoderPosition.y + this.SelectedAlignmentPoint.Delta.y
                 );    // + gDecSync01;
                       // result.z = 1;
                       // result.f = 0;
@@ -201,7 +225,7 @@ namespace GS.Server.Alignment
         /// </summary>
         /// <param name="targetPosition"></param>
         /// <returns></returns>
-        private MapResult DeltaSyncReverse_Matrix_Map(AxisPosition targetPosition)
+        private MapResult DeltaSyncReverse_Matrix_Map(CartesCoord targetPosition)
         {
             MapResult result = new MapResult();
 
@@ -214,9 +238,9 @@ namespace GS.Server.Alignment
                 this.SelectedAlignmentPoint = GetNearest(targetPosition);
                 if (this.SelectedAlignmentPoint != null)
                 {
-                    result.Position = new AxisPosition(
-                        targetPosition.RA - this.SelectedAlignmentPoint.Delta.RA,       // + gRASync01;
-                        targetPosition.Dec - this.SelectedAlignmentPoint.Delta.Dec
+                    result.Position = new CartesCoord(
+                        targetPosition.x - this.SelectedAlignmentPoint.Delta.x,       // + gRASync01;
+                        targetPosition.y - this.SelectedAlignmentPoint.Delta.y
                         );
                 }
                 else
@@ -234,48 +258,53 @@ namespace GS.Server.Alignment
         /// </summary>
         /// <param name="tmpcoord"></param>
         /// <returns></returns>
-        private int GetQuadrant(Coord tmpcoord)
+        private int GetQuadrant(CartesCoord tmpcoord)
         {
             int ret;
 
             if (tmpcoord.x >= 0)
             {
-                if (tmpcoord.y >= 0)
-                {
-                    ret = 0;
-                }
-                else
-                {
-                    ret = 1;
-                }
+                ret = tmpcoord.y >= 0 ? 0 : 1;
             }
             else
             {
-                if (tmpcoord.y >= 0)
-                {
-                    ret = 2;
-                }
-                else
-                {
-                    ret = 3;
-                }
+                ret = tmpcoord.y >= 0 ? 2 : 3;
             }
 
             return ret;
 
         }
 
+        /// <summary>
+        /// Returns a quadrant based on a cartesean coordinate
+        /// </summary>
+        /// <param name="tmpcoord"></param>
+        /// <returns></returns>
+        private int GetQuadrant(Coord tmpcoord)
+        {
+            int ret;
+
+            if (tmpcoord.x >= 0)
+            {
+                ret = tmpcoord.y >= 0 ? 0 : 1;
+            }
+            else
+            {
+                ret = tmpcoord.y >= 0 ? 2 : 3;
+            }
+
+            return ret;
+
+        }
 
         /// <summary>
         /// Return the nearest alignment point to an encoder position
         /// </summary>
         /// <param name="pos"></param>
         /// <returns></returns>
-        private AlignmentPoint GetNearest(AxisPosition pos)
+        private AlignmentPoint GetNearest(CartesCoord pos)
         {
             Dictionary<int, double> distances = new Dictionary<int, double>();
-
-            Coord posCartesean = EQ_sp2Cs(pos);
 
             foreach (AlignmentPoint pt in this.AlignmentPoints)
             {
@@ -287,30 +316,22 @@ namespace GS.Server.Alignment
                         break;
                     case ActivePointsEnum.PierSide:
                         // only consider points on this side of the meridian 
-                        if (pt.UnsyncedCartesian.y * posCartesean.y < 0)
+                        if (pt.UnsyncedCartesian.y * pos.y < 0)
                         {
                             continue;
                         }
                         break;
                     case ActivePointsEnum.LocalQuadrant:
                         // local quadrant 
-                        if (GetQuadrant(posCartesean) != GetQuadrant(pt.UnsyncedCartesian))
+                        if (GetQuadrant(pos) != GetQuadrant(pt.UnsyncedCartesian))
                         {
                             continue;
                         }
                         break;
                 }
 
-                if (CheckLocalPier)
-                {
-                    // calculate polar distance
-                    distances.Add(pt.Id, Math.Pow(pt.Unsynced.RA - pos.RA, 2) + Math.Pow(pt.Unsynced.Dec - pos.Dec, 2));
-                }
-                else
-                {
-                    // calculate cartesian disatnce
-                    distances.Add(pt.Id, Math.Pow(pt.UnsyncedCartesian.x - posCartesean.x, 2) + Math.Pow(pt.UnsyncedCartesian.y - posCartesean.y, 2));
-                }
+                // calculate cartesian distance
+                distances.Add(pt.Id, Math.Pow(pt.UnsyncedCartesian.x - pos.x, 2) + Math.Pow(pt.UnsyncedCartesian.y - pos.y, 2));
             }
 
             if (distances.Count == 0)

@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
              xmlns:alignment="clr-namespace:GS.Server.Alignment"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance alignment:AlignmentVM}">
     <!-- Ordinal formatting left in for reference -->
@@ -16,7 +17,7 @@
         </DataTemplate>
     </UserControl.Resources>-->
     <Grid MinWidth="600">
-        <md:DialogHost HorizontalAlignment="Center" VerticalAlignment="Center" CloseOnClickAway="True"
+        <md:DialogHost CloseOnClickAway="True"
                       IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
 
         <md:DrawerHost HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0" 
@@ -124,8 +125,8 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
                     <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False" x:Name="MenuToggleButton" ToolTip="{StaticResource aliOpenTooltip}" 
@@ -143,7 +144,7 @@
                             ToolTip="{StaticResource aliDeleteTooltip}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding DeleteSelectedPointCommand}"
                             Content="{StaticResource aliDelete}"/>
                 </StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Margin="0,0,0,0" Height="30" HorizontalAlignment="Right"
                                 ToolTip="{StaticResource aliExportTooltip}"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ExportCommand}"
                                 Content="{StaticResource aliExport}"/>
@@ -152,52 +153,68 @@
                                 Content="{StaticResource aliImport}"/>
 
                 </StackPanel>
-                <DataGrid Grid.Row="1" Grid.ColumnSpan="2"
+                <TabControl Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Stretch" Background="Transparent">
+                    <TabItem Header="Data">
+                        <DataGrid 
                           ItemsSource="{Binding AlignmentPoints}" 
                           SelectedItem="{Binding DataContext.SelectedAlignmentPoint, RelativeSource={RelativeSource AncestorType=alignment:AlignmentV}}"
                           CanUserAddRows="False"
                           CanUserDeleteRows="False"
                           AutoGenerateColumns="False"
                           >
-                    <DataGrid.Resources>
-                        <Style x:Key="RightAlignedGridHeaderStyle" TargetType="DataGridColumnHeader" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
-                            <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                        </Style>
-                    </DataGrid.Resources>
-                    <DataGrid.RowStyle>
-                        <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource MaterialDesignDataGridRow}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Selected}" Value="true">
-                                    <Setter Property="FontWeight" Value="ExtraBold"></Setter>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Selected}" Value="false">
-                                    <Setter Property="FontWeight" Value="Normal"></Setter>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </DataGrid.RowStyle>
-                    <DataGrid.CellStyle>
-                        <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource MaterialDesignDataGridCell}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding SelectedForGoto}" Value="true">
-                                    <Setter Property="Foreground" Value="{DynamicResource SecondaryHueMidBrush}" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </DataGrid.CellStyle>
+                            <DataGrid.Resources>
+                                <Style x:Key="RightAlignedGridHeaderStyle" TargetType="DataGridColumnHeader" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                                </Style>
+                            </DataGrid.Resources>
+                            <DataGrid.RowStyle>
+                                <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource MaterialDesignDataGridRow}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Selected}" Value="true">
+                                            <Setter Property="FontWeight" Value="ExtraBold"></Setter>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Selected}" Value="false">
+                                            <Setter Property="FontWeight" Value="Normal"></Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.RowStyle>
+                            <DataGrid.CellStyle>
+                                <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedForGoto}" Value="true">
+                                            <Setter Property="Foreground" Value="{DynamicResource SecondaryHueMidBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.CellStyle>
 
-                    <DataGrid.Columns>
-                        <!-- Ordinal formatting left in for reference -->
-                        <!--<DataGridTemplateColumn Header="#" CellTemplate="{StaticResource OrdinalColumnDataTemplate}" HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>-->
-                        <DataGridTextColumn Header="###" Binding="{Binding Id, StringFormat='{}{0:D3}'}"  HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Unsynced RA" Binding="{Binding Unsynced[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Unsynced Dec" Binding="{Binding Unsynced[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Synced RA" Binding="{Binding Synced[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Synced Dec" Binding="{Binding Synced[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Synched" Binding="{Binding SyncedTime}" IsReadOnly="True" />
-                    </DataGrid.Columns>
-                </DataGrid>
+                            <DataGrid.Columns>
+                                <!-- Ordinal formatting left in for reference -->
+                                <!--<DataGridTemplateColumn Header="#" CellTemplate="{StaticResource OrdinalColumnDataTemplate}" HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>-->
+                                <DataGridTextColumn Header="###" Binding="{Binding Id, StringFormat='{}{0:D3}'}"  HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Unsynced RA" Binding="{Binding Unsynced[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
+                                <DataGridTextColumn Header="Unsynced Dec" Binding="{Binding Unsynced[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
+                                <DataGridTextColumn Header="Synced RA" Binding="{Binding Synced[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
+                                <DataGridTextColumn Header="Synced Dec" Binding="{Binding Synced[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
+                                <DataGridTextColumn Header="Synched" Binding="{Binding SyncedTime}" IsReadOnly="True" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </TabItem>
+                    <TabItem Header="Chart" >
+                        <Grid>
+                            <lvc:CartesianChart Series="{Binding ChartData}"
+                                            XAxes="{Binding ChartXAxes}"
+                                            YAxes="{Binding ChartYAxes}"
+                                            DrawMargin="{Binding ChartMargin}"
+                                            EasingFunction="{x:Null}"
+                                            TooltipPosition="Hidden"
+                                            ZoomMode="None">
 
+                            </lvc:CartesianChart>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
             </Grid>
         </md:DrawerHost>
     </Grid>

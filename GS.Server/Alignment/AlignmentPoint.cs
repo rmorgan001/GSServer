@@ -43,7 +43,7 @@ namespace GS.Server.Alignment
         public Coord SyncedCartesian { get; set; }
 
         [JsonIgnore]
-        public AxisPosition Delta => (Synced - Unsynced);
+        public Coord Delta => (SyncedCartesian - UnsyncedCartesian);
 
 
         [JsonIgnore]

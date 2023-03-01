@@ -265,7 +265,7 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("28.3558330535889")]
+        [global::System.Configuration.DefaultSettingValueAttribute("56.76")]
         public double Latitude {
             get {
                 return ((double)(this["Latitude"]));
@@ -277,7 +277,7 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-81.8272247314453")]
+        [global::System.Configuration.DefaultSettingValueAttribute("-5.85")]
         public double Longitude {
             get {
                 return ((double)(this["Longitude"]));

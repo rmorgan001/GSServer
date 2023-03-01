@@ -26,7 +26,7 @@ namespace GS.Server.Alignment
             AlignmentPoints.Add(data);
 
             // Update one star alignment to use the latest data
-            _oneStarAdjustment = data.Delta;
+            _oneStarAdjustment = new CartesCoord(data.Delta);
 
             // Check if matrix should be updated.
             if (AlignmentPoints.Count > 2)
@@ -44,21 +44,6 @@ namespace GS.Server.Alignment
             {
                 return;
             }
-            System.Diagnostics.Debug.WriteLine("");
-            foreach (AlignmentPoint pt in AlignmentPoints)
-            {
-                pt.UnsyncedCartesian = EQ_sp2Cs(pt.Unsynced);
-                pt.SyncedCartesian = EQ_sp2Cs(pt.Synced);
-
-                // Testing round trip
-                //var tmpobj4 = EQ_SphericalPolar(pt.Unsynced);
-                //var tmpobj1 = EQ_Polar2Cartes(tmpobj4);
-                //var tmpobj2 = EQ_Cartes2Polar(tmpobj1, tmpobj1);
-                //var result = EQ_PolarSpherical(tmpobj2, tmpobj4);
-                //System.Diagnostics.Debug.WriteLine($"{pt.Id}: ({pt.Unsynced.RA}, {pt.Unsynced.Dec}) => ({tmpobj4.x}, {tmpobj4.y})  => ({result.RA}, {result.Dec}) ");
-                // End of round trip test.
-            }
-
             ActivateMatrix();
         }
 

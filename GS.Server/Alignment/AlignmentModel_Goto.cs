@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using GS.Server.SkyTelescope;
 
 namespace GS.Server.Alignment
 {
@@ -16,29 +18,38 @@ namespace GS.Server.Alignment
         /// <returns></returns>
         public AxisPosition GetUnsyncedValue(AxisPosition synced)
         {
-            MapResult result;
+            CartesCoord sXy = EQ_sp2Cs(synced);
+            MapResult mapResult;
+
             if (!_threeStarEnabled)
             {
                 SelectedAlignmentPoint = null;
-                result = Delta_Map(synced);
+                mapResult = Delta_Map(sXy);
             }
             else
             {
                 switch (this.AlignmentBehaviour)
                 {
                     case AlignmentBehaviourEnum.Nearest:
-                        result = DeltaSync_Matrix_Map(synced);
+                        mapResult = DeltaSync_Matrix_Map(sXy);
                         break;
                     default:
-                        result = Delta_Matrix_Reverse_Map(synced);
-                        if (!result.InTriangle)
+                        mapResult = Delta_Matrix_Reverse_Map(sXy);
+                        if (!mapResult.InTriangle)
                         {
-                            result = DeltaSync_Matrix_Map(synced);
+                            mapResult = DeltaSync_Matrix_Map(sXy);
                         }
                         break;
                 }
             }
-            return result.Position;
+
+            
+            // Current telescope position
+            CurrentPoint.Clear();
+            CurrentPoint.Add(mapResult.Position);
+
+            AxisPosition result = EQ_cs2Sp(mapResult.Position, sXy);
+            return result;
         }
 
         /// <summary>
@@ -49,11 +60,11 @@ namespace GS.Server.Alignment
         /// <returns></returns>
         public AxisPosition GetSyncedValue(AxisPosition unsynced)
         {
-            MapResult result;
+            CartesCoord uXy = EQ_sp2Cs(unsynced);
+            MapResult mapResult;
             if (!_threeStarEnabled)
             {
-                SelectedAlignmentPoint = null;
-                result = DeltaReverse_Map(unsynced);
+                mapResult = DeltaReverse_Map(uXy);
 
             }
             else
@@ -61,18 +72,20 @@ namespace GS.Server.Alignment
                 switch (this.AlignmentBehaviour)
                 {
                     case AlignmentBehaviourEnum.Nearest:
-                        result = DeltaSyncReverse_Matrix_Map(unsynced);
+                        mapResult = DeltaSyncReverse_Matrix_Map(uXy);
                         break;
                     default:
-                        result = Delta_Matrix_Map(unsynced);
-                        if (!result.InTriangle)
+                        mapResult = Delta_Matrix_Map(uXy);
+                        if (!mapResult.InTriangle)
                         {
-                            result = DeltaSyncReverse_Matrix_Map(unsynced);
+                            mapResult = DeltaSyncReverse_Matrix_Map(uXy);
                         }
                         break;
                 }
             }
-            return result.Position;
+
+            AxisPosition result = EQ_cs2Sp(mapResult.Position, uXy);
+            return result;
         }
 
 

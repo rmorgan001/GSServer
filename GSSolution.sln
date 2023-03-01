@@ -41,6 +41,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GS.FitsImageManager", "GS.F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NINA", "NINA\NINA.csproj", "{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlignmentModelTests", "AlignmentModelTests\AlignmentModelTests.csproj", "{D814704D-79CB-49DF-BD81-8241EE9A8272}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		AppVeyor|Any CPU = AppVeyor|Any CPU
@@ -306,6 +308,24 @@ Global
 		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.Release|x64.Build.0 = Release|Any CPU
 		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.Release|x86.ActiveCfg = Release|Any CPU
 		{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}.Release|x86.Build.0 = Release|Any CPU
+		{D814704D-79CB-49DF-BD81-8241EE9A8272}.AppVeyor|Any CPU.ActiveCfg = Debug|Any CPU
+		{D814704D-79CB-49DF-BD81-8241EE9A8272}.AppVeyor|Any CPU.Build.0 = Debug|Any CPU
+		{D814704D-79CB-49DF-BD81-8241EE9A8272}.AppVeyor|x64.ActiveCfg = Debug|Any CPU
+		{D814704D-79CB-49DF-BD81-8241EE9A8272}.AppVeyor|x64.Build.0 = Debug|Any CPU
+		{D814704D-79CB-49DF-BD81-8241EE9A8272}.AppVeyor|x86.ActiveCfg = Debug|Any CPU
+		{D814704D-79CB-49DF-BD81-8241EE9A8272}.AppVeyor|x86.Build.0 = Debug|Any CPU
+		{D814704D-79CB-49DF-BD81-8241EE9A8272}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D814704D-79CB-49DF-BD81-8241EE9A8272}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D814704D-79CB-49DF-BD81-8241EE9A8272}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D814704D-79CB-49DF-BD81-8241EE9A8272}.Debug|x64.Build.0 = Debug|Any CPU
+		{D814704D-79CB-49DF-BD81-8241EE9A8272}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D814704D-79CB-49DF-BD81-8241EE9A8272}.Debug|x86.Build.0 = Debug|Any CPU
+		{D814704D-79CB-49DF-BD81-8241EE9A8272}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D814704D-79CB-49DF-BD81-8241EE9A8272}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D814704D-79CB-49DF-BD81-8241EE9A8272}.Release|x64.ActiveCfg = Release|Any CPU
+		{D814704D-79CB-49DF-BD81-8241EE9A8272}.Release|x64.Build.0 = Release|Any CPU
+		{D814704D-79CB-49DF-BD81-8241EE9A8272}.Release|x86.ActiveCfg = Release|Any CPU
+		{D814704D-79CB-49DF-BD81-8241EE9A8272}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

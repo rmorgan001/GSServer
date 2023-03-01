@@ -1193,7 +1193,7 @@ namespace GS.Server.SkyTelescope
         /// <returns></returns>
         private static int SimGoTo(double[] target, bool trackingState)
         {
-
+            
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
@@ -4703,7 +4703,7 @@ namespace GS.Server.SkyTelescope
 
         private static void ConnectAlignmentModel()
         {
-            AlignmentModel.Connect(_homeAxes.X, _homeAxes.Y, AlignmentSettings.ClearModelOnStartup);
+            AlignmentModel.Connect(_homeAxes.X, _homeAxes.Y, StepsPerRevolution, AlignmentSettings.ClearModelOnStartup);
         }
 
         private static bool _alignmentShow;
@@ -4787,7 +4787,7 @@ namespace GS.Server.SkyTelescope
 
         private static double[] GetSyncedAxes(double[] unsynced)
         {
-            if (AlignmentModel.IsAlignmentOn)
+            if (AlignmentModel.IsAlignmentOn && SkyServer.SlewState== SlewType.SlewRaDec && !SkyServer.IsHome && !SkyServer.AtPark)
             {
                 double[] synced = AlignmentModel.GetSyncedValue(unsynced);
                 var monitorItem = new MonitorEntry
@@ -4812,7 +4812,8 @@ namespace GS.Server.SkyTelescope
 
         private static double[] GetUnsyncedAxes(double[] synced)
         {
-            if (AlignmentModel.IsAlignmentOn)
+            if (AlignmentModel.IsAlignmentOn && SkyServer.SlewState != SlewType.SlewPark && SkyServer.SlewState != SlewType.SlewHome
+                && !SkyServer.IsHome && !SkyServer.AtPark)
             {
                 double[] unsynced = AlignmentModel.GetUnsyncedValue(synced);
                 var monitorItem = new MonitorEntry
