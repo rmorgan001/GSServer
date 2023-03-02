@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Linq;
+using GS.Server.Helpers;
 using GS.Shared.Domain;
 
 namespace GS.Server.Alignment
@@ -105,6 +106,8 @@ namespace GS.Server.Alignment
         #endregion
 
         #region Properties ...
+
+
         public bool IsAlignmentOn { get; set; }
 
         private double _proximityLimit = 0.5;
@@ -211,6 +214,19 @@ namespace GS.Server.Alignment
         public AlignmentPointCollection AlignmentPoints { get; } = new AlignmentPointCollection();
 
         /// <summary>
+        /// Gets the maximum un-synced/synced difference found in the current alignment points
+        /// </summary>
+        public double[] MaxDelta
+        {
+            get
+            {
+                double maxRa = Math.Abs(AlignmentPoints.Max(p => Math.Abs(p.Synced.RA) - Math.Abs(p.Unsynced.RA)));
+                double maxDec = Math.Abs(AlignmentPoints.Max(p => Math.Abs(p.Synced.Dec) - Math.Abs(p.Unsynced.Dec)));
+                return new double[] { maxRa, maxDec};
+            }
+        }
+
+        /// <summary>
         /// Collection of points making up the current triangle
         /// </summary>
         public AlignmentPointCollection ChartTrianglePoints { get; } = new AlignmentPointCollection();
@@ -258,6 +274,9 @@ namespace GS.Server.Alignment
             SiteLatitude = siteLatitude;
             SiteLongitude = siteLongitude;
             SiteElevation = siteElevation;
+            AlignmentBehaviour = AlignmentSettings.AlignmentBehaviour;
+            ActivePoints = AlignmentSettings.ActivePoints;
+            ThreePointAlgorithm = AlignmentSettings.ThreePointAlgorithm;
         }
         #endregion
 

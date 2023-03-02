@@ -49,7 +49,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AignmentPointTests.cs" />
+    <Compile Include="AlignmentPointTests.cs" />
     <Compile Include="SphericalPolarTests.cs" />
     <Compile Include="PolarCartesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

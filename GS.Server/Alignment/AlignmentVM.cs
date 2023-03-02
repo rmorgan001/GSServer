@@ -78,9 +78,17 @@ namespace GS.Server.Alignment
 
             BindingOperations.EnableCollectionSynchronization(AlignmentPoints, _alignmentPointsLock);
             SkyServer.AlignmentModel.AlignmentPoints.CollectionChanged += AlignmentPoints_CollectionChanged;
+            AlignmentSettings.StaticPropertyChanged += AlignmentSettings_StaticPropertyChanged;
 
         }
 
+        private void AlignmentSettings_StaticPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "IsAlignmentOn")
+            {
+                RaisePropertyChanged(e.PropertyName);
+            };
+        }
 
         private void AlignmentPoints_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -204,9 +212,9 @@ namespace GS.Server.Alignment
                     point.PrimaryValue = coord.x ;
                     point.SecondaryValue = -coord.y ;
                 },
-                GeometrySize = 10,
-                GeometryFill = new SolidColorPaint(SKColors.Red.WithAlpha(80)),
-                GeometryStroke = new SolidColorPaint(SKColors.Red.WithAlpha(80))
+                GeometrySize = 15,
+                GeometryFill = new SolidColorPaint(SKColors.Red.WithAlpha(90)),
+                GeometryStroke = new SolidColorPaint(SKColors.Red.WithAlpha(90))
             },
             // Triangle for 3 points synched
             new LineSeries<AlignmentPoint>
@@ -289,7 +297,7 @@ namespace GS.Server.Alignment
 
         public List<Axis> ChartYAxes { get; }= new List<Axis>()
         {
-            new Axis{IsVisible = false, MinLimit = -ChartLimit, MaxLimit = ChartLimit},
+            new Axis{IsVisible = false, MinLimit = -ChartLimit*1.2, MaxLimit = ChartLimit*1.2},
         };
 
         public LiveChartsCore.Measure.Margin ChartMargin { get; set; } = new LiveChartsCore.Measure.Margin(25);
@@ -578,6 +586,7 @@ namespace GS.Server.Alignment
             if (disposing)
             {
                 WeakEventManager<AlignmentPointCollection, NotifyCollectionChangedEventArgs>.RemoveHandler(SkyServer.AlignmentModel.AlignmentPoints, "CollectionChanged", AlignmentPoints_CollectionChanged);
+                AlignmentSettings.StaticPropertyChanged -= AlignmentSettings_StaticPropertyChanged;
 
                 _skyTelescopeVM?.Dispose();
             }

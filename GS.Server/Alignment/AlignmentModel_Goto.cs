@@ -46,7 +46,7 @@ namespace GS.Server.Alignment
             
             // Current telescope position
             CurrentPoint.Clear();
-            CurrentPoint.Add(mapResult.Position);
+            CurrentPoint.Add(sXy);
 
             AxisPosition result = EQ_cs2Sp(mapResult.Position, sXy);
             return result;

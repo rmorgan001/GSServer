@@ -45,6 +45,9 @@ namespace GS.Server.Alignment
         [JsonIgnore]
         public Coord Delta => (SyncedCartesian - UnsyncedCartesian);
 
+        [JsonIgnore]
+        public double OffsetDistance => Math.Sqrt(((SyncedCartesian.x - UnsyncedCartesian.x) * (SyncedCartesian.x - UnsyncedCartesian.x)) 
+            + ((SyncedCartesian.y - UnsyncedCartesian.y) * (SyncedCartesian.y - UnsyncedCartesian.y)));
 
         [JsonIgnore]
         public string SyncedTime => $"{AlignTime:G}";

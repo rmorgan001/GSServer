@@ -4785,6 +4785,11 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        /// <summary>
+        /// Gets the alignment model corrected target (physical) axis positions for a given calculated axis position.
+        /// </summary>
+        /// <param name="unsynced"></param>
+        /// <returns></returns>
         private static double[] GetSyncedAxes(double[] unsynced)
         {
             if (AlignmentModel.IsAlignmentOn && SkyServer.SlewState== SlewType.SlewRaDec && !SkyServer.IsHome && !SkyServer.AtPark)
@@ -4801,7 +4806,32 @@ namespace GS.Server.SkyTelescope
                     Message = $"Mapped unsynced axis angles: {unsynced[0]}/{unsynced[1]} to {synced[0]}/{synced[1]}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                return synced;
+
+                // For safety, check the difference is within the max unsynced/synched difference found in the alignment model.
+                var a = Math.Abs(unsynced[0]) - Math.Abs(synced[0]);
+                var b = Math.Abs(unsynced[1]) - Math.Abs(synced[1]);
+                double[] maxDelta = AlignmentModel.MaxDelta;
+                if (Math.Abs(a) > maxDelta[0] || Math.Abs(b) > maxDelta[1])
+                {
+                    // Log a warning message, switch off the alignment model and return the original calculated position.
+                    monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Server,
+                        Category = MonitorCategory.Alignment,
+                        Type = MonitorType.Warning,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"{unsynced[0]}|{unsynced[1]}|{synced[0]}|{synced[1]}|{maxDelta[0]}|{maxDelta[1]}"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
+                    AlignmentSettings.IsAlignmentOn = false;
+                    return unsynced;
+                }
+                else
+                {
+                    return synced;
+                }
             }
             else
             {
@@ -4809,19 +4839,24 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-
+        /// <summary>
+        /// Get the axis positions to report for a given physical axis position.
+        /// </summary>
+        /// <param name="synced"></param>
+        /// <returns></returns>
         private static double[] GetUnsyncedAxes(double[] synced)
         {
+            double[] unsynced = AlignmentModel.GetUnsyncedValue(synced);
+
             if (AlignmentModel.IsAlignmentOn && SkyServer.SlewState != SlewType.SlewPark && SkyServer.SlewState != SlewType.SlewHome
                 && !SkyServer.IsHome && !SkyServer.AtPark)
             {
-                double[] unsynced = AlignmentModel.GetUnsyncedValue(synced);
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Alignment,
-                    Type = MonitorType.Information,
+                    Type = MonitorType.Data,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"Mapped synced axis angles: {synced[0]}/{synced[1]} to {unsynced[0]}/{unsynced[1]}"
