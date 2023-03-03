@@ -211,7 +211,6 @@
                                             EasingFunction="{x:Null}"
                                             TooltipPosition="Hidden"
                                             ZoomMode="None">
-
                             </lvc:CartesianChart>
                         </Grid>
                     </TabItem>
