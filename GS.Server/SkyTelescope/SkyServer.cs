@@ -4825,7 +4825,7 @@ namespace GS.Server.SkyTelescope
                         Message = $"{unsynced[0]}|{unsynced[1]}|{synced[0]}|{synced[1]}|{maxDelta[0]}|{maxDelta[1]}"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
-                    AlignmentSettings.IsAlignmentOn = false;
+                    AlignmentSettings.IsAlertOn = true;
                     return unsynced;
                 }
                 else

@@ -39,6 +39,8 @@ using SkiaSharp;
 using Application = System.Windows.Application;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
+using System.Diagnostics.Eventing.Reader;
+using System.Windows.Threading;
 
 namespace GS.Server.Alignment
 {
@@ -53,6 +55,8 @@ namespace GS.Server.Alignment
         public int Uid => 10;
 
         private readonly SkyTelescopeVM _skyTelescopeVM;
+
+        DispatcherTimer _alertTimer;
 
         #endregion
 
@@ -95,6 +99,16 @@ namespace GS.Server.Alignment
                 AlignmentSettings.IsAlignmentOn = value;
                 OnPropertyChanged();
             }
+        }
+
+        public string AlertBadge
+        {
+            get => AlignmentSettings.AlertBadge;
+        }
+
+        public bool IsAlertOn
+        {
+            get => AlignmentSettings.IsAlertOn;
         }
 
         public double ProximityLimitArcSeconds
@@ -287,6 +301,12 @@ namespace GS.Server.Alignment
 
             CompleteChartSeriesInit();
 
+            _alertTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(15)
+            };
+            _alertTimer.Tick += AlertTimer_Tick;
+
         }
 
         private void CompleteChartSeriesInit()
@@ -323,12 +343,41 @@ namespace GS.Server.Alignment
 
         }
 
+
+        private void AlertTimer_Tick(object sender, EventArgs e)
+        {
+            SpeakAlert();
+        }
+
+        private void SpeakAlert()
+        {
+            Synthesizer.Beep(BeepType.Default);
+            Synthesizer.Speak(Application.Current.Resources["vceAlignmentAlert"].ToString());
+        }
         private void AlignmentSettings_StaticPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "IsAlignmentOn")
             {
                 RaisePropertyChanged(e.PropertyName);
-            };
+            }
+            else if(e.PropertyName == "AlertBadge")
+            {
+                RaisePropertyChanged(e.PropertyName);
+            }
+            else if (e.PropertyName == "IsAlertOn")
+            {
+                CancelAlertCommand.RaiseCanExecuteChanged();
+                RaisePropertyChanged(e.PropertyName);
+                if (AlignmentSettings.IsAlertOn)
+                {
+                    SpeakAlert();
+                    _alertTimer.Start();
+                }
+                else
+                {
+                    _alertTimer.Stop();
+                }
+            }
         }
 
         private void AlignmentPoints_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -580,6 +629,20 @@ namespace GS.Server.Alignment
                 SkyServer.AlignmentModel.SaveAlignmentPoints(); // Save to default configuration file.
             }
 
+        }
+
+        private RelayCommand _cancelAlertCommand;
+
+        public RelayCommand CancelAlertCommand
+        {
+            get
+            {
+                return _cancelAlertCommand
+                       ?? (_cancelAlertCommand = new RelayCommand(
+                           param => { AlignmentSettings.IsAlertOn = false; },
+                           param => AlignmentSettings.IsAlertOn)
+                       );
+            }
         }
 
         #endregion

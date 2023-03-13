@@ -49,6 +49,40 @@ namespace GS.Server.Alignment
 
         }
 
+        private static bool _isAlertOn;
+        public static bool IsAlertOn
+        {
+            get => _isAlertOn;
+            set
+            {
+                if (_isAlertOn == value) return;
+                _isAlertOn = value;
+                if (_isAlertOn) 
+                {
+                    IsAlignmentOn = false;
+                }
+                AlertBadge = (_isAlertOn ? "!" : "");
+                OnStaticPropertyChanged();
+            }
+
+        }
+
+        private static string _alertBadge;
+        /// <summary>
+        /// Trigger the display of a badge on the AlignmentTab
+        /// </summary>
+        public static string AlertBadge
+        {
+            get => _alertBadge;
+            set
+            {
+                if (_alertBadge == value) return;
+                _alertBadge = value;
+                OnStaticPropertyChanged();
+            }
+
+        }
+
         private static double _proximityLimit;
         public static double ProximityLimit
         {

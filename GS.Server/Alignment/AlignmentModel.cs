@@ -220,9 +220,16 @@ namespace GS.Server.Alignment
         {
             get
             {
-                double maxRa = Math.Abs(AlignmentPoints.Max(p => Math.Abs(p.Synced.RA) - Math.Abs(p.Unsynced.RA)));
-                double maxDec = Math.Abs(AlignmentPoints.Max(p => Math.Abs(p.Synced.Dec) - Math.Abs(p.Unsynced.Dec)));
-                return new double[] { maxRa, maxDec};
+                if (AlignmentPoints.Any())
+                {
+                    double maxRa = Math.Abs(AlignmentPoints.Max(p => Math.Abs(p.Synced.RA) - Math.Abs(p.Unsynced.RA)));
+                    double maxDec = Math.Abs(AlignmentPoints.Max(p => Math.Abs(p.Synced.Dec) - Math.Abs(p.Unsynced.Dec)));
+                    return new double[] { maxRa, maxDec };
+                }
+                else
+                {
+                    return new double[] { 0d, 0d };
+                }
             }
         }
 
