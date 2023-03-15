@@ -788,7 +788,7 @@ namespace GS.Server.SkyTelescope
                         _ = new CmdMoveAxisRate(0, Axis.Axis2, _rateMoveAxes.Y);
                         break;
                     case MountType.SkyWatcher:
-                        var rate = GetSlewRate();
+                        var rate = SkyGetRate();
                         _ = new SkyAxisSlew(0, AxisId.Axis2, rate.Y);
                         break;
                     default:
@@ -840,10 +840,10 @@ namespace GS.Server.SkyTelescope
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
-                        _ = new CmdMoveAxisRate(0, Axis.Axis1, _rateMoveAxes.X);
+                        _ = new CmdMoveAxisRate(0, Axis.Axis1, _rateRaDec.X);
                         break;
                     case MountType.SkyWatcher:
-                        var rate = GetSlewRate();
+                        var rate = SkyGetRate();
                         _ = new SkyAxisSlew(0, AxisId.Axis1, rate.X);
                         break;
                     default:
@@ -878,10 +878,11 @@ namespace GS.Server.SkyTelescope
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
-                        _ = new CmdRaDecRate(0, Axis.Axis2, _rateRaDec.Y);
+                        var a = GetDecRateDirection(_rateRaDec.Y);
+                        _ = new CmdRaDecRate(0, Axis.Axis2, a);
                         break;
                     case MountType.SkyWatcher:
-                        var rate = GetSlewRate();
+                        var rate = SkyGetRate();
                         _ = new SkyAxisSlew(0, AxisId.Axis2, rate.Y);
                         break;
                     default:
@@ -921,10 +922,11 @@ namespace GS.Server.SkyTelescope
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
-                        _ = new CmdRaDecRate(0, Axis.Axis1, _rateRaDec.X);
+                        var a = GetRaRateDirection(_rateRaDec.X);
+                        _ = new CmdRaDecRate(0, Axis.Axis1, a);
                         break;
                     case MountType.SkyWatcher:
-                        var rate = GetSlewRate();
+                        var rate = SkyGetRate();
                         _ = new SkyAxisSlew(0, AxisId.Axis1, rate.X);
                         break;
                     default:
@@ -1648,7 +1650,7 @@ namespace GS.Server.SkyTelescope
         /// combines multiple rates for a single slew rate
         /// </summary>
         /// <returns></returns>
-        private static Vector GetSlewRate()
+        private static Vector SkyGetRate()
         {
             var change = new Vector();
             if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
@@ -1662,12 +1664,12 @@ namespace GS.Server.SkyTelescope
             if (Math.Abs(RateMoveAxisRa) > 0)// MoveAxis RA absolute at the given rate
             {change.X += RateMoveAxisRa; }
             else
-            { change.X += RateRa; }
+            { change.X += GetRaRateDirection(RateRa); }
 
             if (Math.Abs(RateMoveAxisDec) > 0)// MoveAxis Dec absolute at the given rate
             { change.Y += RateMoveAxisDec; }
             else
-            { change.Y += RateDec; }
+            { change.Y += GetDecRateDirection(RateDec); }
 
             CheckAxisLimits();
 
@@ -2833,6 +2835,104 @@ namespace GS.Server.SkyTelescope
         //    return sideOfPier;
         //}
 
+        /// <summary>
+        /// Set mechanical direction for dec rate
+        /// Positive direction mean go mechanical north
+        /// </summary>
+        /// <returns></returns>
+        private static double GetDecRateDirection(double rate)
+        {
+            var north = rate > 0;
+            rate = Math.Abs(rate);
+            switch (SkySettings.Mount)
+            {
+                case MountType.Simulator:
+                    switch (SideOfPier)
+                    {
+                        case PierSide.pierEast:
+                            if (SouthernHemisphere)
+                            {
+                                if (north) { rate = -rate; }
+                            }
+                            else
+                            {
+                                if (!north) { rate = -rate; }
+                            }
+                            break;
+                        case PierSide.pierUnknown:
+                            break;
+                        case PierSide.pierWest:
+                            if (SouthernHemisphere)
+                            {
+                                if (!north) { rate = -rate; }
+                            }
+                            else
+                            {
+                                if (north) { rate = -rate; }
+                            }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    break;
+                case MountType.SkyWatcher:
+                    switch (SideOfPier)
+                    {
+                        case PierSide.pierEast:
+                            if (SouthernHemisphere)
+                            {
+                                if (north) { rate = -rate; }
+                            }
+                            else
+                            {
+                                if (north) { rate = -rate; }
+                            }
+                            break;
+                        case PierSide.pierUnknown:
+                            break;
+                        case PierSide.pierWest:
+                            if (SouthernHemisphere)
+                            {
+                                if (!north) { rate = -rate; }
+                            }
+                            else
+                            {
+                                if (!north) { rate = -rate; }
+                            }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return rate;
+        }
+
+        /// <summary>
+        /// Set mechanical direction for ra rate
+        /// Positive direction mean go mechanical east
+        /// </summary>
+        /// <returns></returns>
+        private static double GetRaRateDirection(double rate)
+        {
+            var east = rate > 0;
+            rate = Math.Abs(rate);
+
+            if (SouthernHemisphere)
+            {
+                if (!east) { rate = -rate; }
+            }
+            else
+            {
+                if (east) { rate = -rate; }
+            }
+
+            return rate;
+        }
+        
         public static ParkPosition GetStoredParkPosition()
         {
             var p = new ParkPosition { Name = SkySettings.ParkName, X = SkySettings.ParkAxisX, Y = SkySettings.ParkAxisY };
@@ -3669,7 +3769,7 @@ namespace GS.Server.SkyTelescope
 
                     SkyHCRate.X = change[0];
                     SkyHCRate.Y = change[1];
-                    var rate = GetSlewRate();
+                    var rate = SkyGetRate();
                     _ = new SkyAxisSlew(0, AxisId.Axis1, rate.X);
                     _ = new SkyAxisSlew(0, AxisId.Axis2, rate.Y);
 
@@ -4306,7 +4406,7 @@ namespace GS.Server.SkyTelescope
                     break;
                 case MountType.SkyWatcher:
                     SkyTrackingRate.X = rateChange;
-                    var rate =  GetSlewRate();
+                    var rate =  SkyGetRate();
                     _ = new SkyAxisSlew(0, AxisId.Axis1, rate.X);
                     break;
                 default:
