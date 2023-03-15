@@ -820,7 +820,7 @@ namespace GS.Server.SkyTelescope
                 _rateMoveAxes.X = value;
                 if (Math.Abs(value) > 0)
                 {
-                    if (Tracking){_MoveAxisPrevTracking = true;}
+                    if (Tracking) { _MoveAxisPrevTracking = true; }
                     Tracking = false;
                     IsSlewing = true;
                     SlewState = SlewType.SlewMoveAxis;
@@ -829,7 +829,8 @@ namespace GS.Server.SkyTelescope
                 {
                     IsSlewing = false;
                     SlewState = SlewType.SlewNone;
-                    if (_MoveAxisPrevTracking){
+                    if (_MoveAxisPrevTracking)
+                    {
                         Tracking = true;
                         _MoveAxisPrevTracking = false;
                     }
@@ -865,6 +866,7 @@ namespace GS.Server.SkyTelescope
 
         /// <summary>
         /// The declination tracking rate in degrees, DeclinationRate
+        /// corrected direction applied
         /// </summary>
         public static double RateDec
         {
@@ -901,7 +903,13 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
+        /// Store the original DeclinationRate to maintain direction
+        /// </summary>
+        public static double RateDecOrg { get; set; }
+
+        /// <summary>
         /// The right ascension tracking in degrees, RightAscensionRate
+        /// corrected direction applied
         /// </summary>
         public static double RateRa
         {
@@ -938,7 +946,7 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Store the original RightAscensionRate
+        /// Store the original RightAscensionRate and maintain direction
         /// Previous conversions were not exact
         /// </summary>
         public static double RateRaOrg { get; set; }
@@ -1651,18 +1659,16 @@ namespace GS.Server.SkyTelescope
             change += SkyTrackingRate; // Tracking
             change += SkyHCRate; // Hand controller
             
-            //change += _rateRaDec;// * replace with below
-            if (Math.Abs(_rateMoveAxes.X) > 0)// MoveAxis RA absolute at the given rate
-            {change.X += _rateMoveAxes.X;}
+            if (Math.Abs(RateMoveAxisRa) > 0)// MoveAxis RA absolute at the given rate
+            {change.X += RateMoveAxisRa; }
             else
-            { change.X += _rateRaDec.X;}
+            { change.X += RateRa; }
 
-            if (Math.Abs(_rateMoveAxes.Y) > 0)// MoveAxis Dec absolute at the given rate
-            { change.Y += _rateMoveAxes.Y;}
+            if (Math.Abs(RateMoveAxisDec) > 0)// MoveAxis Dec absolute at the given rate
+            { change.Y += RateMoveAxisDec; }
             else
-            { change.Y += _rateRaDec.Y; }
+            { change.Y += RateDec; }
 
-            //todo might be a good place to reject for axis limits
             CheckAxisLimits();
 
             var monitorItem = new MonitorEntry
@@ -1698,8 +1704,7 @@ namespace GS.Server.SkyTelescope
             MonitorLog.LogToMonitor(monitorItem);
 
             const int returncode = 0;
-            //  stop slew after 80 seconds
-            const int timer = 120;// increased from 80 to 120, slew is taking longer for new commands
+            const int timer = 240; // stop goto after timer
             var stopwatch = Stopwatch.StartNew();
 
             SkyTasks(MountTaskName.StopAxes);

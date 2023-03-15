@@ -52,8 +52,9 @@ namespace GS.SkyWatcher
         private const int _threadLockTimeout = 50;                      // milliseconds
         private readonly object _syncObject = new object();
         private int _conErrCnt;                                         // Number of continuous errors
-        private const int ConErrMax = 50;                              // Max number of allowed continuous errors
-        private readonly int[] _mount360Steps = { 0, 0 };               // From mount :a
+        private const int ConErrMax = 50;                               // Max number of allowed continuous errors
+        private readonly int[] _stepsPerRev = { 0, 0 };                 // From mount :a or :X0002
+        private readonly int[] _resolutionFactor = { 1, 1 };            // Step division factor from :a and :X0002
 
         #endregion
 
@@ -63,9 +64,6 @@ namespace GS.SkyWatcher
         public DateTime Last_j1RunTime { get; private set; }
         public DateTime Last_j2RunTime { get; private set; }
         public DateTime LastJ2RunTime { get; private set; }
-
-
-
         private bool MountConnected { get; set; }
 
         /// <summary>
@@ -106,6 +104,8 @@ namespace GS.SkyWatcher
             MountConnected = true;
             GetAxisVersion(AxisId.Axis1);
             GetAxisVersion(AxisId.Axis2);
+            //calculate resolution needed
+            GetResolutionFactors();
             // Inquire Gear Rate
             GetStepsPerRevolution(AxisId.Axis1);
             GetStepsPerRevolution(AxisId.Axis2);
@@ -258,7 +258,58 @@ namespace GS.SkyWatcher
         #region Commands
 
         /// <summary>
-        /// a or X0002 Inquire Grid Per Revolution ":a(*2)", where *2: '1'= CH1, '2' = CH2.
+        /// calculates the correct resolution needed to factor the advanced set into the correct steps and speeds
+        /// </summary>
+        private void GetResolutionFactors()
+        {
+            if (!SupportAdvancedCommandSet || !AllowAdvancedCommandSet){ return; }  // default _resolutionFactor is already set to 1
+
+            long[] revOld = { 0, 0 };
+            long[] revNew = { 0, 0 };
+
+            //axis 1
+            var response = CmdToMount(AxisId.Axis1, 'X', "0002");
+            revNew[0] = String32ToInt(response, true, 1);
+
+            response = CmdToMount(AxisId.Axis1, 'a', null);
+            revOld[0] = StringToLong(response);
+            if ((_axisVersion[0] & 0x0000FF) == 0x80)
+            {
+                revOld[0] = 0x162B97; // for 80GT mount
+            }
+            if ((_axisGearRatios[0] & 0x0000FF) == 0x82)
+            {
+                revOld[0] = 0x205318; // for 114GT mount
+            }
+
+            _resolutionFactor[0] = (int)(revNew[0] / revOld[0]);
+            if (_resolutionFactor[0] == 0){_resolutionFactor[0] = 1; } //make sure its not 0
+
+            //axis 2
+            response = CmdToMount(AxisId.Axis1, 'X', "0002");    //0x02（’02’）: Resolution of the axis (Counts per revolution)
+            revNew[1] = String32ToInt(response, true, 1);
+
+            response = CmdToMount(AxisId.Axis1, 'a', null);
+            revOld[1] = StringToLong(response);
+            if ((_axisVersion[1] & 0x0000FF) == 0x80)
+            {
+                revOld[1] = 0x162B97; // for 80GT mount
+            }
+            if ((_axisGearRatios[1] & 0x0000FF) == 0x82)
+            {
+                revOld[1] = 0x205318; // for 114GT mount
+            }
+
+            _resolutionFactor[1] = (int)(revNew[1] / revOld[1]);
+            if (_resolutionFactor[1] == 0) { _resolutionFactor[1] = 1; } //make sure its not 0
+
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Adv:{revNew[0]};{revNew[1]}|Old:{revOld[0]};{revOld[1]}|Factor:{_resolutionFactor[0]};{_resolutionFactor[1]}" };
+            MonitorLog.LogToMonitor(monitorItem);
+        }
+
+        /// <summary>
+        /// a or X0002 Steps Per Revolution 
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         private void GetStepsPerRevolution(AxisId axis)
@@ -267,17 +318,17 @@ namespace GS.SkyWatcher
             if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
                 response = CmdToMount(axis, 'X', "0002");    //0x02（’02’）: Resolution of the axis (Counts per revolution)
-                var gearRatio = String32ToInt(response, true,4);
+                var gearRatio = String32ToInt(response, true, _resolutionFactor[(int) axis]);
                 msg = "X0002";
                 switch (axis)
                 {
                     case AxisId.Axis1:
-                        _mount360Steps[0] = gearRatio;
+                        _stepsPerRev[0] = gearRatio;
                         if (SkyQueue.CustomMount360Steps[0] > 0) { gearRatio = SkyQueue.CustomMount360Steps[0]; } //Setup for custom :a
                         _axisGearRatios[0] = gearRatio;
                         break;
                     case AxisId.Axis2:
-                        _mount360Steps[1] = gearRatio;
+                        _stepsPerRev[1] = gearRatio;
                         if (SkyQueue.CustomMount360Steps[1] > 0) { gearRatio = SkyQueue.CustomMount360Steps[1]; } //Setup for custom :a
                         _axisGearRatios[1] = gearRatio;
                         break;
@@ -305,7 +356,7 @@ namespace GS.SkyWatcher
                     {
                         gearRatio = 0x205318; // for 114GT mount
                     }
-                    _mount360Steps[0] = (int)gearRatio;
+                    _stepsPerRev[0] = (int)gearRatio;
                     if (SkyQueue.CustomMount360Steps[0] > 0) { gearRatio = SkyQueue.CustomMount360Steps[0]; } //Setup for custom :a
                     _axisGearRatios[0] = gearRatio;
                 }
@@ -319,7 +370,7 @@ namespace GS.SkyWatcher
                     {
                         gearRatio = 0x205318; // for 114GT mount
                     }
-                    _mount360Steps[1] = (int)gearRatio;
+                    _stepsPerRev[1] = (int)gearRatio;
                     if (SkyQueue.CustomMount360Steps[1] > 0) { gearRatio = SkyQueue.CustomMount360Steps[1]; } //Setup for custom :a
                     _axisGearRatios[1] = gearRatio;
                 }
@@ -327,7 +378,7 @@ namespace GS.SkyWatcher
                 _factorStepToRad[(int)axis] = 2 * Math.PI / gearRatio;
             }
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $":{msg}|{axis}|{response}|{ _mount360Steps[(int)axis]}|Custom:{ SkyQueue.CustomMount360Steps[(int)axis]}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $":{msg}|{axis}|{response}|{ _stepsPerRev[(int)axis]}|Custom:{ SkyQueue.CustomMount360Steps[(int)axis]}" };
             MonitorLog.LogToMonitor(monitorItem);
         }
 
@@ -448,15 +499,6 @@ namespace GS.SkyWatcher
             MonitorLog.LogToMonitor(monitorItem);
         }
 
-        ///// <summary>
-        ///// e Gets motor card version
-        ///// </summary>
-        //internal string GetMotorCardVersion(AxisId axis)
-        //{
-        //    var response = CmdToMount(axis, 'e', null);
-        //    return response;
-        //}
-
         /// <summary>
         /// f Get the target axis's status as a struct
         /// </summary>
@@ -527,7 +569,7 @@ namespace GS.SkyWatcher
             if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
                 response = CmdToMount(axis, 'X', "0007");    // 0x07（’07’）: Current slewing speed in ticks /1024 seconds
-                iSpeed = String32ToInt(response, true, 1);
+                iSpeed = String32ToInt(response, true, _resolutionFactor[(int)axis]);
                 return iSpeed;
             }
             else
@@ -548,7 +590,7 @@ namespace GS.SkyWatcher
             if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
                 var response = CmdToMount(axis, 'X', "0003");    // 0x03（’03’）: Position reading of the axis
-                var iPosition = String32ToInt(response, true,4);
+                var iPosition = String32ToInt(response, true, _resolutionFactor[(int)axis]);
                 _positions[(int)axis] = StepToAngle(axis, iPosition);
                 return _positions[(int)axis];
             }
@@ -576,7 +618,7 @@ namespace GS.SkyWatcher
                 if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
                 {
                     response = CmdToMount(axis, 'X', "0003");
-                    iPosition = String32ToInt(response, true, 4);
+                    iPosition = String32ToInt(response, true, _resolutionFactor[(int)axis]);
                    // _positions[(int)axis] = StepToAngle(axis, iPosition);
                    msg = "X";
                 }
@@ -617,7 +659,7 @@ namespace GS.SkyWatcher
                 if (string.IsNullOrEmpty(response)) return double.NaN;
                 try
                 {
-                    var iPosition = String32ToInt(response, true,4);
+                    var iPosition = String32ToInt(response, true, _resolutionFactor[(int)axis]);
                     _positions[(int)axis] = StepToAngle(axis, iPosition);
                     return _positions[(int)axis];
                 }
@@ -663,7 +705,7 @@ namespace GS.SkyWatcher
                 {
                     var response = CmdToMount(axis, 'X', "0003");    // 0x03（’03’）: Position reading of the axis
                     if (string.IsNullOrEmpty(response)) return double.NaN;
-                    var iPosition = String32ToInt(response, true,4);
+                    var iPosition = String32ToInt(response, true, _resolutionFactor[(int)axis]);
                     return iPosition;
                 }
                 else
@@ -694,7 +736,7 @@ namespace GS.SkyWatcher
             if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
                 var response = CmdToMount(axis, 'X', "0003");    // 0x03（’03’）: Position reading of the axis
-                var iPosition = String32ToInt(response, true,4);
+                var iPosition = String32ToInt(response, true, _resolutionFactor[(int)axis]);
                 return iPosition;
             }
             else
@@ -727,7 +769,7 @@ namespace GS.SkyWatcher
                     case 2147483647:
                         return 200000000000;
                     default:
-                        return Convert.ToInt32(position / 4);
+                        return Convert.ToInt32(position / _resolutionFactor[(int)axis]);
                 }
             }
             else
@@ -788,7 +830,7 @@ namespace GS.SkyWatcher
             if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
                 var response = CmdToMount(axis, 'X', "000E");    // Read 32-bit Resolution of the worm(Counts per revolution)
-                var pecPeriod = (double)String32ToInt(response, true,4);
+                var pecPeriod = (double)String32ToInt(response, true, _resolutionFactor[(int)axis]);
                 var ax = (int)axis;
                 if (SkyQueue.CustomRaWormSteps[ax] > 0) { pecPeriod = SkyQueue.CustomRaWormSteps[ax]; } // Setup custom mount worm steps
                 _peSteps[ax] = pecPeriod;
@@ -836,7 +878,7 @@ namespace GS.SkyWatcher
 
             if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
-                newStepIndex *= 4;
+                newStepIndex *= _resolutionFactor[(int)axis];
                 var szCmd = "01" + newStepIndex.ToString("X8");
                 CmdToMount(axis, 'X', szCmd);
             }
@@ -1160,7 +1202,7 @@ namespace GS.SkyWatcher
         {
             var ratePad = '0';
             var irateInSteps = AngleToStep(axis, rateInRadian * 1024);
-            irateInSteps *= 4;
+            irateInSteps *= _resolutionFactor[(int)axis];
             if (rateInRadian < 0){ ratePad = 'F'; } // F for negative numbers
 
             var szCmd = "02" + irateInSteps.ToString("X").PadLeft(16, ratePad);
@@ -1190,12 +1232,12 @@ namespace GS.SkyWatcher
         {
             var targetPad = '0';
             var itargetInSteps = AngleToStep(axis, targetInRadian);
-            itargetInSteps *= 4;
+            itargetInSteps *= _resolutionFactor[(int)axis];
             if (itargetInSteps < 0) { targetPad = 'F'; } // F for negative numbers
 
             var ratePad = '0';
             var irateInSteps = AngleToStep(axis, rateInRadian * 1024);
-            irateInSteps *= 4;
+            irateInSteps *= _resolutionFactor[(int)axis];
             if (irateInSteps < 0) { ratePad = 'F'; } // F for negative numbers
 
 
@@ -1478,7 +1520,7 @@ namespace GS.SkyWatcher
         /// Read serial port buffer - skyWatcher original source
         /// </summary>
         /// <returns></returns>
-        private string ReceiveResponse()
+        private static string ReceiveResponse()
         {
             // format "::e1\r=020883\r"
             var mBuffer = new StringBuilder(15);

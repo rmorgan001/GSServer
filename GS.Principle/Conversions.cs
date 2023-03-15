@@ -132,7 +132,7 @@ namespace GS.Principles
         /// <param name="seconds">seconds per sidereal second</param>
         public static double SideSec2ArcSec(double seconds)
         {
-            return seconds * 1.0027304323;
+            return seconds * 1.0027304323 * 15;
         }
 
 

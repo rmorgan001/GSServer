@@ -608,8 +608,8 @@ namespace ASCOM.GS.Sky.Telescope
         {
             get
             {
-                var r = Conversions.Deg2ArcSec(SkyServer.RateDec);
-
+                var r = SkyServer.RateDecOrg;
+                
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{r}" };
                 MonitorLog.LogToMonitor(monitorItem);
@@ -624,6 +624,7 @@ namespace ASCOM.GS.Sky.Telescope
 
                 CheckCapability(SkySettings.CanSetEquRates, "DeclinationRate", true);
                 CheckRate(value);
+                SkyServer.RateDecOrg = value;
                 SkyServer.RateDec = Conversions.ArcSec2Deg(value);
             }
         }
