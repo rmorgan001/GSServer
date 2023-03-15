@@ -262,49 +262,44 @@ namespace GS.SkyWatcher
         /// </summary>
         private void GetResolutionFactors()
         {
-            if (!SupportAdvancedCommandSet || !AllowAdvancedCommandSet){ return; }  // default _resolutionFactor is already set to 1
-
+            string response;
+            var newMsg = $"Adv:N/A;N/A";
             long[] revOld = { 0, 0 };
             long[] revNew = { 0, 0 };
 
-            //axis 1
-            var response = CmdToMount(AxisId.Axis1, 'X', "0002");
-            revNew[0] = String32ToInt(response, true, 1);
+            if (SupportAdvancedCommandSet || AllowAdvancedCommandSet)
+            {
+                // New
+                response = CmdToMount(AxisId.Axis1, 'X', "0002");
+                revNew[0] = String32ToInt(response, true, 1);
 
+                response = CmdToMount(AxisId.Axis1, 'X', "0002"); 
+                revNew[1] = String32ToInt(response, true, 1);
+
+                newMsg = $"Adv:{revNew[0]};{revNew[1]}";
+            }
+
+            // Old
             response = CmdToMount(AxisId.Axis1, 'a', null);
             revOld[0] = StringToLong(response);
-            if ((_axisVersion[0] & 0x0000FF) == 0x80)
-            {
-                revOld[0] = 0x162B97; // for 80GT mount
-            }
-            if ((_axisGearRatios[0] & 0x0000FF) == 0x82)
-            {
-                revOld[0] = 0x205318; // for 114GT mount
-            }
-
-            _resolutionFactor[0] = (int)(revNew[0] / revOld[0]);
-            if (_resolutionFactor[0] == 0){_resolutionFactor[0] = 1; } //make sure its not 0
-
-            //axis 2
-            response = CmdToMount(AxisId.Axis1, 'X', "0002");    //0x02（’02’）: Resolution of the axis (Counts per revolution)
-            revNew[1] = String32ToInt(response, true, 1);
-
+            if ((_axisVersion[0] & 0x0000FF) == 0x80){revOld[0] = 0x162B97;} // for 80GT mount
+            if ((_axisGearRatios[0] & 0x0000FF) == 0x82){revOld[0] = 0x205318;} // for 114GT mount
+        
             response = CmdToMount(AxisId.Axis1, 'a', null);
             revOld[1] = StringToLong(response);
-            if ((_axisVersion[1] & 0x0000FF) == 0x80)
-            {
-                revOld[1] = 0x162B97; // for 80GT mount
-            }
-            if ((_axisGearRatios[1] & 0x0000FF) == 0x82)
-            {
-                revOld[1] = 0x205318; // for 114GT mount
-            }
+            if ((_axisVersion[1] & 0x0000FF) == 0x80){revOld[1] = 0x162B97; } // for 80GT mount
+            if ((_axisGearRatios[1] & 0x0000FF) == 0x82){revOld[1] = 0x205318;} // for 114GT mount
+        
+            // default _resolutionFactor is already set to 1
+            if (revOld[0] > 0){ _resolutionFactor[0] = (int)(revNew[0] / revOld[0]); }
+            if (_resolutionFactor[0] == 0) { _resolutionFactor[0] = 1; } //make sure its not 0
 
-            _resolutionFactor[1] = (int)(revNew[1] / revOld[1]);
+            if (revOld[1] > 0){_resolutionFactor[1] = (int)(revNew[1] / revOld[1]);}
             if (_resolutionFactor[1] == 0) { _resolutionFactor[1] = 1; } //make sure its not 0
 
+            // log
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Adv:{revNew[0]};{revNew[1]}|Old:{revOld[0]};{revOld[1]}|Factor:{_resolutionFactor[0]};{_resolutionFactor[1]}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{newMsg}|Old:{revOld[0]};{revOld[1]}|Factor:{_resolutionFactor[0]};{_resolutionFactor[1]}" };
             MonitorLog.LogToMonitor(monitorItem);
         }
 
