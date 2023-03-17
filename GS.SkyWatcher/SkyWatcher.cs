@@ -885,6 +885,11 @@ namespace GS.SkyWatcher
             return _commands.GetPecPeriod(axis);
         }
 
+        internal string GetPositionsAndTime(bool raw, string pp = "00000000")
+        {
+            return _commands.GetPositionsAndTime(raw, pp);
+        }
+
         internal void InitializeAxes()
         {
             _commands.InitializeAxes();

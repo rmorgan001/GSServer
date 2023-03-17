@@ -273,7 +273,7 @@ namespace GS.SkyWatcher
                 response = CmdToMount(AxisId.Axis1, 'X', "0002");
                 revNew[0] = String32ToInt(response, true, 1);
 
-                response = CmdToMount(AxisId.Axis1, 'X', "0002"); 
+                response = CmdToMount(AxisId.Axis2, 'X', "0002"); 
                 revNew[1] = String32ToInt(response, true, 1);
 
                 newMsg = $"Adv:{revNew[0]};{revNew[1]}";
@@ -285,7 +285,7 @@ namespace GS.SkyWatcher
             if ((_axisVersion[0] & 0x0000FF) == 0x80){revOld[0] = 0x162B97;} // for 80GT mount
             if ((_axisGearRatios[0] & 0x0000FF) == 0x82){revOld[0] = 0x205318;} // for 114GT mount
         
-            response = CmdToMount(AxisId.Axis1, 'a', null);
+            response = CmdToMount(AxisId.Axis2, 'a', null);
             revOld[1] = StringToLong(response);
             if ((_axisVersion[1] & 0x0000FF) == 0x80){revOld[1] = 0x162B97; } // for 80GT mount
             if ((_axisGearRatios[1] & 0x0000FF) == 0x82){revOld[1] = 0x205318;} // for 114GT mount
@@ -850,6 +850,38 @@ namespace GS.SkyWatcher
             }
 
             return ret;
+        }
+
+        /// <summary>
+        /// Capture axes positions and timestamp. 8 hex for ra, 8 hex for dec, 16 hex in microseconds
+        /// </summary>
+        /// <param name="raw">process hex or not</param>
+        /// <param name="pp"></param>
+        /// <returns></returns>
+        internal string GetPositionsAndTime(bool raw, string pp)
+        {
+            var response = string.Empty;
+            if (string.IsNullOrEmpty(pp)){pp = "00000000";}
+
+            if (!SupportAdvancedCommandSet || !AllowAdvancedCommandSet) return response;
+
+            var szCmd = "0F" + pp.Substring(0, 8);
+            response = CmdToMount(AxisId.Axis1, 'X', szCmd);
+
+            if (raw){return response;}
+            if(response.Length != 33){return response;}
+            try
+            {
+                var a = String32ToInt(response.Substring(1, 8), false, 1);
+                var b = String32ToInt(response.Substring(9, 8), false, 1);
+                var c = response.Substring(17, 16);
+                response = a + ";" + b + ";" + c;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            return response;
         }
 
         /// <summary>

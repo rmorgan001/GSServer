@@ -1111,6 +1111,39 @@ namespace GS.SkyWatcher
         }
     }
 
+    public class SkyGetPositionsAndTime : ISkyCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; private set; }
+        private readonly bool _raw;
+
+        public SkyGetPositionsAndTime(long id, bool raw)
+        {
+            Id = id;
+            _raw = raw;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            Successful = false;
+            SkyQueue.AddCommand(this);
+        }
+
+        public void Execute(SkyWatcher skyWatcher)
+        {
+            try
+            {
+                Result = skyWatcher.GetPositionsAndTime(_raw);
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
     public class SkyGetPositionsInDegrees : ISkyCommand
     {
         public long Id { get; }
