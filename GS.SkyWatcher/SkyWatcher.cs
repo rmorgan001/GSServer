@@ -835,7 +835,7 @@ namespace GS.SkyWatcher
 
         internal long GetLastSlewSpeed(AxisId axis)
         {
-            return _commands.GetCurrentSlewSpeed(axis);
+            return _commands.GetLastSlewSpeed(axis);
         }
 
         internal long? GetHomePosition(AxisId axis)

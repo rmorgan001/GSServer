@@ -554,10 +554,10 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// i or X0007 Get Current "slew" speed
+        /// i or X0007 Get last "slew" speed
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
-        internal long GetCurrentSlewSpeed(AxisId axis)
+        internal long GetLastSlewSpeed(AxisId axis)
         {
             string response;
             long iSpeed;
@@ -565,21 +565,20 @@ namespace GS.SkyWatcher
             {
                 response = CmdToMount(axis, 'X', "0007");    // 0x07（’07’）: Current slewing speed in ticks /1024 seconds
                 iSpeed = String32ToInt(response, true, _resolutionFactor[(int)axis]);
-                return iSpeed;
             }
             else
             {
                 response = CmdToMount(axis, 'i', null);
                 iSpeed = StringToLong(response);
-                return iSpeed;
             }
+            return iSpeed;
         }
 
         /// <summary>
         /// j or X0003 Gets radians position of an axis
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
-        /// <returns>Radians of the axis</returns>
+        /// <returns>Radians of the axis</returns> 
         internal double GetAxisPosition(AxisId axis)
         {
             if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)

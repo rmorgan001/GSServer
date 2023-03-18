@@ -2923,11 +2923,11 @@ namespace GS.Server.SkyTelescope
 
             if (SouthernHemisphere)
             {
-                if (east) { rate = -rate; }
+                if (!east) { rate = -rate; }
             }
             else
             {
-                if (!east) { rate = -rate; }
+                if (east) { rate = -rate; }
             }
 
             return rate;
