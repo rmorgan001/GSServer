@@ -835,7 +835,7 @@ namespace GS.SkyWatcher
 
         internal long GetLastSlewSpeed(AxisId axis)
         {
-            return _commands.GetCurrentSlewSpeed(axis);
+            return _commands.GetLastSlewSpeed(axis);
         }
 
         internal long? GetHomePosition(AxisId axis)
@@ -883,6 +883,11 @@ namespace GS.SkyWatcher
         internal double GetPecPeriod(AxisId axis)
         {
             return _commands.GetPecPeriod(axis);
+        }
+
+        internal string GetPositionsAndTime(bool raw, string pp = "00000000")
+        {
+            return _commands.GetPositionsAndTime(raw, pp);
         }
 
         internal void InitializeAxes()

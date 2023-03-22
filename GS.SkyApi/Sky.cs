@@ -440,6 +440,15 @@ namespace GS.SkyApi
             var results = GetResult(command);
             return results.Result;
         }
+        
+        /// <inheritdoc />
+        public string GetPositionsAndTime(bool raw)
+        {
+            ValidateMount();
+            var command = new SkyGetPositionsAndTime(SkyQueue.NewId, raw);
+            var results = GetResult(command);
+            return results.Result;
+        }
 
         /// <inheritdoc />
         public double GetRampDownRange(int axis)
@@ -1248,6 +1257,12 @@ namespace GS.SkyApi
         /// </summary>
         /// <param name="axis">axis number 1 or 2</param>
         double GetPecPeriod(int axis);
+        /// <summary>
+        /// Capture axes position and timestamp. 8 hex for ra, 8 hex for dec, 16 hex in microseconds
+        /// </summary>
+        /// <param name="raw"></param>
+        /// <returns></returns>
+        string GetPositionsAndTime(bool raw);
         /// <summary>
         /// c Micro steps from target where the ramp down process begins
         /// </summary>

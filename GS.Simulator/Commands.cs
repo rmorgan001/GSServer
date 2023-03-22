@@ -30,7 +30,7 @@ namespace GS.Simulator
     /// <summary>
     /// 
     /// </summary>
-    public class CmdRate : IMountCommand
+    public class CmdRaDecRate : IMountCommand
     {
         public long Id { get; }
         public DateTime CreatedUtc { get; }
@@ -39,7 +39,7 @@ namespace GS.Simulator
         public dynamic Result { get; }
         private readonly Axis _axis;
         private readonly double _rate;
-        public CmdRate(long id, Axis axis, double rate)
+        public CmdRaDecRate(long id, Axis axis, double rate)
         {
             Id = id;
             CreatedUtc = Principles.HiResDateTime.UtcNow;
@@ -53,7 +53,7 @@ namespace GS.Simulator
         {
             try
             {
-                actions.Rate(_axis, _rate);
+                actions.RaDecRate(_axis, _rate);
                 Successful = true;
             }
             catch (Exception e)
@@ -67,7 +67,7 @@ namespace GS.Simulator
     /// <summary>
     /// 
     /// </summary>
-    public class CmdRateAxis : IMountCommand
+    public class CmdMoveAxisRate : IMountCommand
     {
         public long Id { get; }
         public DateTime CreatedUtc { get; }
@@ -76,7 +76,7 @@ namespace GS.Simulator
         public dynamic Result { get; }
         private readonly Axis _axis;
         private readonly double _rate;
-        public CmdRateAxis(long id, Axis axis, double rate)
+        public CmdMoveAxisRate(long id, Axis axis, double rate)
         {
             Id = id;
             CreatedUtc = Principles.HiResDateTime.UtcNow;
@@ -90,7 +90,7 @@ namespace GS.Simulator
         {
             try
             {
-                actions.RateAxis(_axis, _rate);
+                actions.MoveAxisRate(_axis, _rate);
                 Successful = true;
             }
             catch (Exception e)

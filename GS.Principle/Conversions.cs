@@ -125,5 +125,24 @@ namespace GS.Principles
         {
             return arcSecs / 15;
         }
+
+        /// <summary>
+        /// Seconds per sidereal second to Arc seconds per second
+        /// </summary>
+        /// <param name="seconds">seconds per sidereal second</param>
+        public static double SideSec2ArcSec(double seconds)
+        {
+            return seconds * 1.0027304323 * 15;
+        }
+
+
+        /// <summary>
+        /// Arc seconds per second to Seconds per sidereal second
+        /// </summary>
+        /// <param name="seconds">arc seconds per second</param>
+        public static double ArcSec2SideSec(double seconds)
+        {
+            return seconds * 0.9972695677;
+        }
     }
 }

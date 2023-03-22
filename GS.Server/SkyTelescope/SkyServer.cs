@@ -189,7 +189,8 @@ namespace GS.Server.SkyTelescope
         private static bool _canPolarLed;
         private static bool _canAdvancedCmdSupport;
         private static Vector _raDec;
-        private static Vector _rateAxes;
+        private static Vector _rateMoveAxes;
+        private static bool _MoveAxisPrevTracking;
         private static Vector _rateRaDec;
         private static double _rightAscensionXForm;
         private static double _slewSettleTime;
@@ -416,43 +417,6 @@ namespace GS.Server.SkyTelescope
                 var dec = Transforms.DecToCoordType(RightAscension, value);
                 _declinationXForm = dec;
                 OnStaticPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// The right ascension tracking rate tracking rate (arc seconds per second, default = 0.0) 
-        /// </summary>
-        public static double RateRa
-        {
-            get => _rateRaDec.X;
-            set
-            {
-                _rateRaDec.X = value;
-                object _;
-                switch (SkySettings.Mount)
-                {
-                    case MountType.Simulator:
-                        _ = new CmdRate(0, Axis.Axis1, _rateRaDec.X);
-                        break;
-                    case MountType.SkyWatcher:
-                        var rate = GetSlewRate();
-                        _ = new SkyAxisSlew(0, AxisId.Axis1, rate.X);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
-                    Category = MonitorCategory.Server,
-                    Type = MonitorType.Data,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{_rateRaDec.X}|{SkyTrackingOffset[0]}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
@@ -791,16 +755,18 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Move the telescope in one axis at the given rate
+        /// Move dec at the given rate in degrees, MoveAxis
         /// </summary>
-        public static double RateAxisDec
+        public static double RateMoveAxisDec
         {
-            private get => _rateAxes.Y;
+            private get => _rateMoveAxes.Y;
             set
             {
-                _rateAxes.Y = value;
+                _rateMoveAxes.Y = value;
                 if (Math.Abs(value) > 0)
                 {
+                    if (Tracking){_MoveAxisPrevTracking = true;}
+                    Tracking = false;
                     IsSlewing = true;
                     SlewState = SlewType.SlewMoveAxis;
                 }
@@ -808,16 +774,21 @@ namespace GS.Server.SkyTelescope
                 {
                     IsSlewing = false;
                     SlewState = SlewType.SlewNone;
+                    if (_MoveAxisPrevTracking)
+                    {
+                        Tracking = true;
+                        _MoveAxisPrevTracking = false;
+                    }
                 }
 
                 object _;
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
-                        _ = new CmdRateAxis(0, Axis.Axis2, _rateAxes.Y);
+                        _ = new CmdMoveAxisRate(0, Axis.Axis2, _rateMoveAxes.Y);
                         break;
                     case MountType.SkyWatcher:
-                        var rate = GetSlewRate();
+                        var rate = SkyGetRate();
                         _ = new SkyAxisSlew(0, AxisId.Axis2, rate.Y);
                         break;
                     default:
@@ -832,23 +803,25 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Data,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{_rateAxes.Y}|{SkyTrackingOffset[1]}"
+                    Message = $"{_rateMoveAxes.Y}|{SkyTrackingOffset[1]}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
         /// <summary>
-        /// Move the telescope in one axis at the given rate
+        /// Move ra at the given rate in degrees, MoveAxis
         /// </summary>
-        public static double RateAxisRa
+        public static double RateMoveAxisRa
         {
-            private get => _rateAxes.X;
+            private get => _rateMoveAxes.X;
             set
             {
-                _rateAxes.X = value;
+                _rateMoveAxes.X = value;
                 if (Math.Abs(value) > 0)
                 {
+                    if (Tracking) { _MoveAxisPrevTracking = true; }
+                    Tracking = false;
                     IsSlewing = true;
                     SlewState = SlewType.SlewMoveAxis;
                 }
@@ -856,20 +829,21 @@ namespace GS.Server.SkyTelescope
                 {
                     IsSlewing = false;
                     SlewState = SlewType.SlewNone;
-                    //if (Tracking) //off
-                    //{
-                    //    SetTracking();
-                    //}
+                    if (_MoveAxisPrevTracking)
+                    {
+                        Tracking = true;
+                        _MoveAxisPrevTracking = false;
+                    }
                 }
 
                 object _;
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
-                        _ = new CmdRateAxis(0, Axis.Axis1, _rateAxes.X);
+                        _ = new CmdMoveAxisRate(0, Axis.Axis1, _rateRaDec.X);
                         break;
                     case MountType.SkyWatcher:
-                        var rate = GetSlewRate();
+                        var rate = SkyGetRate();
                         _ = new SkyAxisSlew(0, AxisId.Axis1, rate.X);
                         break;
                     default:
@@ -884,14 +858,15 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Data,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{_rateAxes.X}|{SkyTrackingOffset[0]}"
+                    Message = $"{_rateMoveAxes.X}|{SkyTrackingOffset[0]}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
         /// <summary>
-        /// The declination tracking rate (arc seconds per second, default = 0.0) 
+        /// The declination tracking rate in degrees, DeclinationRate
+        /// corrected direction applied
         /// </summary>
         public static double RateDec
         {
@@ -903,11 +878,12 @@ namespace GS.Server.SkyTelescope
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
-                        _ = new CmdRate(0, Axis.Axis2, _rateRaDec.Y);
+                        var a = GetDecRateDirection(_rateRaDec.Y);
+                        _ = new CmdRaDecRate(0, Axis.Axis2, a);
                         break;
                     case MountType.SkyWatcher:
-                        var rate = GetSlewRate();
-                        _ = new SkyAxisSlew(0, AxisId.Axis1, rate.X);
+                        var rate = SkyGetRate();
+                        _ = new SkyAxisSlew(0, AxisId.Axis2, rate.Y);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -926,6 +902,56 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
             }
         }
+
+        /// <summary>
+        /// Store the original DeclinationRate to maintain direction
+        /// </summary>
+        public static double RateDecOrg { get; set; }
+
+        /// <summary>
+        /// The right ascension tracking in degrees, RightAscensionRate
+        /// corrected direction applied
+        /// </summary>
+        public static double RateRa
+        {
+            get => _rateRaDec.X;
+            set
+            {
+                _rateRaDec.X = value;
+                object _;
+                switch (SkySettings.Mount)
+                {
+                    case MountType.Simulator:
+                        var a = GetRaRateDirection(_rateRaDec.X);
+                        _ = new CmdRaDecRate(0, Axis.Axis1, a);
+                        break;
+                    case MountType.SkyWatcher:
+                        var rate = SkyGetRate();
+                        _ = new SkyAxisSlew(0, AxisId.Axis1, rate.X);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Data,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{_rateRaDec.X}|{SkyTrackingOffset[0]}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+        }
+
+        /// <summary>
+        /// Store the original RightAscensionRate and maintain direction
+        /// Previous conversions were not exact
+        /// </summary>
+        public static double RateRaOrg { get; set; }
 
         /// <summary>
         /// UI display for converted ra
@@ -1171,7 +1197,7 @@ namespace GS.Server.SkyTelescope
                 }
                 else
                 {
-                    if (TrackingSpeak && _trackingMode != TrackingMode.Off) Synthesizer.Speak(Application.Current.Resources["vceTrackingOff"].ToString());
+                    if (TrackingSpeak && _trackingMode != TrackingMode.Off){Synthesizer.Speak(Application.Current.Resources["vceTrackingOff"].ToString());}
                     _trackingMode = TrackingMode.Off;
                     IsPulseGuidingDec = false; // Ensure pulses are off
                     IsPulseGuidingRa = false;
@@ -1624,21 +1650,27 @@ namespace GS.Server.SkyTelescope
         /// combines multiple rates for a single slew rate
         /// </summary>
         /// <returns></returns>
-        private static Vector GetSlewRate()
+        private static Vector SkyGetRate()
         {
             var change = new Vector();
-            change += SkyTrackingRate; // Tracking
-
             if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
             {
                 change = ConvertRateToAltAz(change.X);
             }
 
+            change += SkyTrackingRate; // Tracking
             change += SkyHCRate; // Hand controller
-            change += _rateAxes; // MoveAxis at the given rate
-            change += _rateRaDec;// External tracking rate
+            
+            if (Math.Abs(RateMoveAxisRa) > 0)// MoveAxis RA absolute at the given rate
+            {change.X += RateMoveAxisRa; }
+            else
+            { change.X += GetRaRateDirection(RateRa); }
 
-            //todo might be a good place to reject for axis limits
+            if (Math.Abs(RateMoveAxisDec) > 0)// MoveAxis Dec absolute at the given rate
+            { change.Y += RateMoveAxisDec; }
+            else
+            { change.Y += GetDecRateDirection(RateDec); }
+
             CheckAxisLimits();
 
             var monitorItem = new MonitorEntry
@@ -1674,8 +1706,7 @@ namespace GS.Server.SkyTelescope
             MonitorLog.LogToMonitor(monitorItem);
 
             const int returncode = 0;
-            //  stop slew after 80 seconds
-            const int timer = 120;// increased from 80 to 120, slew is taking longer for new commands
+            const int timer = 240; // stop goto after timer
             var stopwatch = Stopwatch.StartNew();
 
             SkyTasks(MountTaskName.StopAxes);
@@ -2209,8 +2240,8 @@ namespace GS.Server.SkyTelescope
             MonitorLog.LogToMonitor(monitorItem);
 
             //IsSlewing = false;
-            _rateAxes = new Vector();
-            _rateRaDec = new Vector();
+            _rateMoveAxes = new Vector(0,0);
+            _rateRaDec = new Vector(0,0);
             SlewState = SlewType.SlewNone;
             var tracking = Tracking;
             Tracking = false; //added back in for spec "Tracking is returned to its pre-slew state"
@@ -2599,7 +2630,7 @@ namespace GS.Server.SkyTelescope
                     break;
             }
 
-            if (Math.Abs(RateAxisRa + RateAxisDec) > 0) { slewing = true; }
+            if (Math.Abs(RateMoveAxisRa + RateMoveAxisDec) > 0) { slewing = true; }
             IsSlewing = slewing;
         }
 
@@ -2804,6 +2835,104 @@ namespace GS.Server.SkyTelescope
         //    return sideOfPier;
         //}
 
+        /// <summary>
+        /// Set mechanical direction for dec rate
+        /// Positive direction mean go mechanical north
+        /// </summary>
+        /// <returns></returns>
+        private static double GetDecRateDirection(double rate)
+        {
+            var north = rate > 0;
+            rate = Math.Abs(rate);
+            switch (SkySettings.Mount)
+            {
+                case MountType.Simulator:
+                    switch (SideOfPier)
+                    {
+                        case PierSide.pierEast:
+                            if (SouthernHemisphere)
+                            {
+                                if (north) { rate = -rate; }
+                            }
+                            else
+                            {
+                                if (!north) { rate = -rate; }
+                            }
+                            break;
+                        case PierSide.pierUnknown:
+                            break;
+                        case PierSide.pierWest:
+                            if (SouthernHemisphere)
+                            {
+                                if (!north) { rate = -rate; }
+                            }
+                            else
+                            {
+                                if (north) { rate = -rate; }
+                            }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    break;
+                case MountType.SkyWatcher:
+                    switch (SideOfPier)
+                    {
+                        case PierSide.pierEast:
+                            if (SouthernHemisphere)
+                            {
+                                if (north) { rate = -rate; }
+                            }
+                            else
+                            {
+                                if (north) { rate = -rate; }
+                            }
+                            break;
+                        case PierSide.pierUnknown:
+                            break;
+                        case PierSide.pierWest:
+                            if (SouthernHemisphere)
+                            {
+                                if (!north) { rate = -rate; }
+                            }
+                            else
+                            {
+                                if (!north) { rate = -rate; }
+                            }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return rate;
+        }
+
+        /// <summary>
+        /// Set mechanical direction for ra rate
+        /// Positive direction mean go mechanical east
+        /// </summary>
+        /// <returns></returns>
+        private static double GetRaRateDirection(double rate)
+        {
+            var east = rate > 0;
+            rate = Math.Abs(rate);
+
+            if (SouthernHemisphere)
+            {
+                if (!east) { rate = -rate; }
+            }
+            else
+            {
+                if (east) { rate = -rate; }
+            }
+
+            return rate;
+        }
+        
         public static ParkPosition GetStoredParkPosition()
         {
             var p = new ParkPosition { Name = SkySettings.ParkName, X = SkySettings.ParkAxisX, Y = SkySettings.ParkAxisY };
@@ -3640,7 +3769,7 @@ namespace GS.Server.SkyTelescope
 
                     SkyHCRate.X = change[0];
                     SkyHCRate.Y = change[1];
-                    var rate = GetSlewRate();
+                    var rate = SkyGetRate();
                     _ = new SkyAxisSlew(0, AxisId.Axis1, rate.X);
                     _ = new SkyAxisSlew(0, AxisId.Axis2, rate.Y);
 
@@ -4245,7 +4374,7 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Send tracking on or off to mount
+        /// Set tracking on or off
         /// </summary>
         private static void SetTracking()
         {
@@ -4277,7 +4406,7 @@ namespace GS.Server.SkyTelescope
                     break;
                 case MountType.SkyWatcher:
                     SkyTrackingRate.X = rateChange;
-                    var rate = GetSlewRate();
+                    var rate =  SkyGetRate();
                     _ = new SkyAxisSlew(0, AxisId.Axis1, rate.X);
                     break;
                 default:
@@ -4486,8 +4615,8 @@ namespace GS.Server.SkyTelescope
             };
             MonitorLog.LogToMonitor(monitorItem);
 
-            _rateAxes = new Vector();
-            _rateRaDec = new Vector();
+            _rateMoveAxes = new Vector(0,0);
+            _rateRaDec = new Vector(0,0);
             SlewState = SlewType.SlewNone;
 
             if (!AxesStopValidate())
@@ -4531,6 +4660,11 @@ namespace GS.Server.SkyTelescope
             MonitorLog.LogToMonitor(monitorItem);
 
             var trackingstate = Tracking;
+            if (trackingstate)
+            {
+                TrackingSpeak = false;
+                Tracking = false;
+            }
 
             _altAzSync = new Vector(targetAzimuth, targetAltitude);
             switch (SkySettings.Mount)
@@ -4549,8 +4683,8 @@ namespace GS.Server.SkyTelescope
 
             if (trackingstate)
             {
-                Tracking = false;
                 Tracking = true;
+                TrackingSpeak = true;
             }
 
             Synthesizer.Speak(Application.Current.Resources["vceSyncAz"].ToString());
@@ -4571,11 +4705,16 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $" {TargetRa}|{TargetDec}"
+                Message = $" {TargetRa}|{TargetDec}|{Tracking}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
             var trackingstate = Tracking;
+            if (trackingstate)
+            {
+                TrackingSpeak = false;
+                Tracking = false;
+            }
 
             switch (SkySettings.Mount)
             {
@@ -4606,11 +4745,10 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
 
-
             if (trackingstate)
             {
-                Tracking = false;
                 Tracking = true;
+                TrackingSpeak = true;
             }
 
             Synthesizer.Speak(Application.Current.Resources["vceSyncCoords"].ToString());
@@ -4741,7 +4879,6 @@ namespace GS.Server.SkyTelescope
         }
         internal static double DegToRad(double degree) { return (degree / 180.0 * Math.PI); }
         internal static double RadToDeg(double rad) { return (rad / Math.PI * 180.0); }
-
         private static void AddAlignmentPoint()
         {
             // At this point:
@@ -4957,8 +5094,8 @@ namespace GS.Server.SkyTelescope
             PecWormMaster = null;
 
             // reset any rates so slewing doesn't start
-            _rateRaDec = new Vector(0, 0);
-            _rateAxes = new Vector(0, 0);
+            _rateRaDec = new Vector(0,0);
+            _rateMoveAxes = new Vector(0,0);
             SlewState = SlewType.SlewNone;
 
             // invalid any target positions

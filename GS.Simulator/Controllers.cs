@@ -45,10 +45,10 @@ namespace GS.Simulator
         private double _gotoY;
         private double _pulseX;
         private double _pulseY;
-        private double _rateX;
-        private double _rateY;
-        private double _rateAxisX;
-        private double _rateAxisY;
+        private double _raDecRateX;
+        private double _raDecRateY;
+        private double _moveAxisRateX;
+        private double _moveAxisRateY;
         private double _slewX;
         private double _slewY;
         private double _trackingX;
@@ -179,31 +179,31 @@ namespace GS.Simulator
                     return Start().ToString();
                 case "shutdown":
                     return Stop().ToString();
-                case "rate":
+                case "radecrate":
                     a = Convert.ToDouble(cmd[2]);
                     switch (ParseAxis(cmd[1]))
                     {
                         case Axis.Axis1:
                             _isRateTrackingX = true;
-                            _rateX = a;
+                            _raDecRateX = a;
                             break;
                         case Axis.Axis2:
                             _isRateTrackingY = true;
-                            _rateY = a;
+                            _raDecRateY = a;
                             break;
                     }
                     break;
-                case "rateaxis":
+                case "moveaxisrate":
                     a = Convert.ToDouble(cmd[2]);
                     switch (ParseAxis(cmd[1]))
                     {
                         case Axis.Axis1:
                             _isRateAxisSlewingX = true;
-                            _rateAxisX = a;
+                            _moveAxisRateX = a;
                             break;
                         case Axis.Axis2:
                             _isRateAxisSlewingY = true;
-                            _rateAxisY = a;
+                            _moveAxisRateY = a;
                             break;
                     }
                     break;
@@ -458,16 +458,16 @@ namespace GS.Simulator
         /// <param name="axis"></param>
         /// <param name="interval"></param>
         /// <returns></returns>
-        private double Rate(Axis axis, double interval)
+        private double RaDecRate(Axis axis, double interval)
         {
             switch (axis)
             {
                 case Axis.Axis1:
-                    _isRateTrackingX = Math.Abs(_rateX) > 0;
-                    return _isRateTrackingX ? _rateX * interval : 0;
+                    _isRateTrackingX = Math.Abs(_raDecRateX) > 0;
+                    return _isRateTrackingX ? _raDecRateX * interval : 0;
                 case Axis.Axis2:
-                    _isRateTrackingY = Math.Abs(_rateY) > 0;
-                    return _isRateTrackingY ? _rateY * interval : 0;
+                    _isRateTrackingY = Math.Abs(_raDecRateY) > 0;
+                    return _isRateTrackingY ? _raDecRateY * interval : 0;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
             }
@@ -497,16 +497,16 @@ namespace GS.Simulator
         /// <param name="axis"></param>
         /// <param name="interval"></param>
         /// <returns></returns>
-        private double RateAxis(Axis axis, double interval)
+        private double MoveAxisRate(Axis axis, double interval)
         {
             switch (axis)
             {
                 case Axis.Axis1:
-                    _isRateAxisSlewingX = Math.Abs(_rateAxisX) > 0;
-                    return _isRateAxisSlewingX ? _rateAxisX * interval : 0;
+                    _isRateAxisSlewingX = Math.Abs(_moveAxisRateX) > 0;
+                    return _isRateAxisSlewingX ? _moveAxisRateX * interval : 0;
                 case Axis.Axis2:
-                    _isRateAxisSlewingY = Math.Abs(_rateAxisY) > 0;
-                    return _isRateAxisSlewingY ? _rateAxisY * interval : 0;
+                    _isRateAxisSlewingY = Math.Abs(_moveAxisRateY) > 0;
+                    return _isRateAxisSlewingY ? _moveAxisRateY * interval : 0;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
             }
@@ -624,21 +624,43 @@ namespace GS.Simulator
             changeX += Pulse(Axis.Axis1);
             changeY += Pulse(Axis.Axis2);
 
-            // RateAxis
-            changeX += RateAxis(Axis.Axis1, seconds);
-            changeY += RateAxis(Axis.Axis2, seconds);
+            // Tracking
+            var trkX = Tracking(Axis.Axis1, seconds);
+            var trkY = Tracking(Axis.Axis2, seconds);
 
-            // Rate
-            changeX += Rate(Axis.Axis1, seconds);
-            changeY += Rate(Axis.Axis2, seconds);
+            //Move Axis Rates
+            var marX = MoveAxisRate(Axis.Axis1, seconds);
+            var marY = MoveAxisRate(Axis.Axis2, seconds);
+
+            // Ra & Dec Rates 
+            var rdrX= RaDecRate(Axis.Axis1, seconds);
+            var rdrY = RaDecRate(Axis.Axis2, seconds);
+
+            //MoveAxis is absolute
+            if (Math.Abs(marX) > 0)
+            {
+                changeX += marX;
+            }
+            else
+            {
+                changeX += rdrX;
+                changeX += trkX;
+            }
+
+            //MoveAxis is absolute
+            if (Math.Abs(marY) > 0)
+            {
+                changeY += marY;
+            }
+            else
+            {
+                changeY += rdrY;
+                changeY += trkY;
+            }
 
             // Slew
             changeX += Slew(Axis.Axis1, seconds);
             changeY += Slew(Axis.Axis2, seconds);
-
-            // Tracking
-            changeX += Tracking(Axis.Axis1, seconds);
-            changeY += Tracking(Axis.Axis2, seconds);
 
             // Hand controls
             changeX += HandControl(Axis.Axis1, seconds);
@@ -760,18 +782,18 @@ namespace GS.Simulator
             switch (axis)
             {
                 case Axis.Axis1:
-                    _rateX = 0;
+                    _raDecRateX = 0;
                     _gotoX = double.NaN;
-                    _rateAxisX = 0;
+                    _moveAxisRateX = 0;
                     _slewX = 0;
                     _trackingX = 0;
                     _pulseX = 0;
                     HcX = 0;
                     break;
                 case Axis.Axis2:
-                    _rateY = 0;
+                    _raDecRateY = 0;
                     _gotoY = double.NaN;
-                    _rateAxisY = 0;
+                    _moveAxisRateY = 0;
                     _slewY = 0;
                     _trackingY = 0;
                     _pulseY = 0;
