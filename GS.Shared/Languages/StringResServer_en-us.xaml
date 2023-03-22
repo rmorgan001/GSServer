@@ -713,5 +713,11 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="mntCap">Capabilities:</system:String>
     <system:String x:Key="mntAdv">Advanced Set</system:String>
 
+    <!-- 1.0.?.? -->
+    <system:String x:Key="aliAlertTooltip">Alignment modelling has been switched off due to an unexpectedly large offset.</system:String>
+    <system:String x:Key="aliCancelAlert">Cancel Alignment Alert</system:String>
+    <system:String x:Key="aliCancelAlertTooltip">Click this button cancel the alignment alert.</system:String>
+    <system:String x:Key="vceAlignmentAlert">Alignment Alert</system:String>
+
 </ResourceDictionary>
  

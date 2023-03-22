@@ -1,12 +1,14 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Linq;
+using GS.Server.Helpers;
 using GS.Shared.Domain;
 
 namespace GS.Server.Alignment
@@ -104,6 +106,8 @@ namespace GS.Server.Alignment
         #endregion
 
         #region Properties ...
+
+
         public bool IsAlignmentOn { get; set; }
 
         private double _proximityLimit = 0.5;
@@ -160,8 +164,6 @@ namespace GS.Server.Alignment
             }
         }
 
-        public bool CheckLocalPier { get; set; }
-
         private AlignmentBehaviourEnum _alignmentBehaviour = AlignmentBehaviourEnum.NStarPlusNearest;
         public AlignmentBehaviourEnum AlignmentBehaviour
         {
@@ -185,14 +187,18 @@ namespace GS.Server.Alignment
 
         public AxisPosition Home { get; private set; }
 
-        //private double[] _reportedHomePosition = new double[]{ 0, 0 };
+        /// <summary>
+        /// The Steps per revolution for each axis
+        /// </summary>
+        public long[] StepsPerRev { get; private set; }
 
-        //public void SetHomePosition(double ra, double dec)
-        //{
-        //    Home = new AxisPosition(ra, dec);
-        //    SendToMatrix();
-        //}
-
+        /// <summary>
+        /// EQMOD worked with encoder positions which meant that it was working with a linear scale
+        /// angles used where converted to differences and converted to positions on this linear scale
+        /// GSS uses the axis positions of 90 and 90 for home. This constant represents 90 on the
+        /// linear scale the same as in EQMOD.
+        /// </summary>
+        public long[] ScaleCenter { get; } = {9003008, 9003008};
 
         private ActivePointsEnum _activePoints;
         public ActivePointsEnum ActivePoints
@@ -206,6 +212,44 @@ namespace GS.Server.Alignment
         }
 
         public AlignmentPointCollection AlignmentPoints { get; } = new AlignmentPointCollection();
+
+        /// <summary>
+        /// Gets the maximum un-synced/synced difference found in the current alignment points
+        /// </summary>
+        public double[] MaxDelta
+        {
+            get
+            {
+                if (AlignmentPoints.Any())
+                {
+                    double maxRa = Math.Abs(AlignmentPoints.Max(p => Math.Abs(p.Synced.RA) - Math.Abs(p.Unsynced.RA)));
+                    double maxDec = Math.Abs(AlignmentPoints.Max(p => Math.Abs(p.Synced.Dec) - Math.Abs(p.Unsynced.Dec)));
+                    return new double[] { maxRa, maxDec };
+                }
+                else
+                {
+                    return new double[] { 0d, 0d };
+                }
+            }
+        }
+
+        /// <summary>
+        /// Collection of points making up the current triangle
+        /// </summary>
+        public AlignmentPointCollection ChartTrianglePoints { get; } = new AlignmentPointCollection();
+
+        /// <summary>
+        /// Collection containing the alignment point selected outside a triangle
+        /// </summary>
+        public ObservableCollection<CartesCoord> ChartNearestPoint { get; } = new ObservableCollection<CartesCoord>();
+
+        private int? _CurrentNearestPointId;
+
+        /// <summary>
+        /// Collection containing the current position of the telescope
+        /// </summary>
+        public ObservableCollection<CartesCoord> CurrentPoint { get; } = new ObservableCollection<CartesCoord>();
+
 
         public AlignmentPoint SelectedAlignmentPoint { get; private set; }
 
@@ -222,14 +266,12 @@ namespace GS.Server.Alignment
 
         private readonly string _timeStampFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"EqmodNStarAlignment\TimeStamp.config");
 
-        private const double _homeZeroPosition = 0x800000;    // As per EQMOD
-
-        public AxisPosition EncoderMappingOffset { get; private set; } // Mapping from Mount unsynced positions to internal unsynced positions
+        public CartesCoord EncoderMappingOffset { get; private set; } // Mapping from Mount unsynced positions to internal unsynced positions
 
         /// <summary>
         /// RA/Dec unsynced adjustments for when there is only one star/point logged.
         /// </summary>
-        private AxisPosition _oneStarAdjustment = new AxisPosition(0, 0);
+        private CartesCoord _oneStarAdjustment = new CartesCoord(0, 0);
 
         #endregion
 
@@ -239,12 +281,16 @@ namespace GS.Server.Alignment
             SiteLatitude = siteLatitude;
             SiteLongitude = siteLongitude;
             SiteElevation = siteElevation;
+            AlignmentBehaviour = AlignmentSettings.AlignmentBehaviour;
+            ActivePoints = AlignmentSettings.ActivePoints;
+            ThreePointAlgorithm = AlignmentSettings.ThreePointAlgorithm;
         }
         #endregion
 
-        public void Connect(double raHome, double decHome, bool clearPointsOnStartup = false)
+        public void Connect(double raHome, double decHome, long[] stepsPerRev, bool clearPointsOnStartup = false)
         {
             Home = new AxisPosition(raHome, decHome);
+            StepsPerRev = stepsPerRev;
             try
             {
                 // Load the last access time property.
@@ -270,8 +316,14 @@ namespace GS.Server.Alignment
             {
                 lock (_accessLock)
                 {
-
-                    bool result = EQ_NPointAppend(new AlignmentPoint(unsynced, synced, syncTime));
+                    CartesCoord uXy = EQ_sp2Cs(unsynced);
+                    CartesCoord sXy = EQ_sp2Cs(synced);
+                    AlignmentPoint newPoint = new AlignmentPoint(unsynced, synced, syncTime)
+                    {
+                        UnsyncedCartesian = new Coord(){x=uXy.x, y=uXy.y },
+                        SyncedCartesian = new Coord(){x = sXy.x, y=sXy.y}
+                    };
+                    bool result = EQ_NPointAppend(newPoint);
                     SaveAlignmentPoints();
 
                     return result;
@@ -295,11 +347,11 @@ namespace GS.Server.Alignment
                     int ptCt = AlignmentPoints.Count();
                     if (ptCt == 0)
                     {
-                        _oneStarAdjustment = new AxisPosition(0d, 0d);
+                        _oneStarAdjustment = new CartesCoord(0d, 0d);
                     }
                     else
                     {
-                        _oneStarAdjustment = AlignmentPoints[ptCt - 1].Delta; // Use the last point's delta
+                        _oneStarAdjustment = new CartesCoord(AlignmentPoints[ptCt - 1].Delta); // Use the last point's delta
                     }
                     if (ptCt < 3)
                     {
@@ -323,7 +375,7 @@ namespace GS.Server.Alignment
             File.WriteAllText(filename, JsonConvert.SerializeObject(AlignmentPoints, Formatting.Indented));
         }
 
-        private void SaveAlignmentPoints()
+        public void SaveAlignmentPoints()
         {
             var dir = Path.GetDirectoryName(_configFile);
             if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
@@ -334,6 +386,17 @@ namespace GS.Server.Alignment
             ReportAlignmentPoints();
         }
 
+        public void ExportAlignmentPointTestData(string filename)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("(int id, double unsyncedRA, double unsyncedDec, double unsynchedX, double unsyncedY, double syncedRA, double syncedDec, double synchedX, double syncedY, string syncTime)");
+            foreach (AlignmentPoint ap in this.AlignmentPoints)
+            {
+                sb.AppendLine(
+                    $"[DataRow({ap.Id}, {ap.Unsynced.RA}, {ap.Unsynced.Dec}, {ap.UnsyncedCartesian.x}, {ap.UnsyncedCartesian.y}, {ap.Synced.RA}, {ap.Synced.Dec}, {ap.SyncedCartesian.x}, {ap.SyncedCartesian.y}, \"{ap.AlignTime.ToString("O")}\")]");
+            }
+            File.WriteAllText(filename, sb.ToString());
+        }
 
         public void LoadAlignmentPoints(string filename)
         {
@@ -350,7 +413,7 @@ namespace GS.Server.Alignment
                         foreach (var alignmentPoint in loaded)
                         {
                             AlignmentPoints.Add(alignmentPoint);
-                            _oneStarAdjustment = alignmentPoint.Delta;
+                            _oneStarAdjustment = new CartesCoord(alignmentPoint.Delta);
                         }
                         SendToMatrix(); // Updates the cartesean values.
                     }
@@ -382,7 +445,7 @@ namespace GS.Server.Alignment
             try
             {
                 AlignmentPoints.Clear();
-                _oneStarAdjustment = new AxisPosition(0d, 0d);
+                _oneStarAdjustment = new CartesCoord(0d, 0d);
                 _threeStarEnabled = false;
                 SaveAlignmentPoints();
             }

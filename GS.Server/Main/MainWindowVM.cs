@@ -392,6 +392,7 @@ namespace GS.Server.Main
                         if (!PageViewModels.Contains(_alignmentVM))
                         {
                             _alignmentVM = new AlignmentVM();
+                            _alignmentVM.PropertyChanged += AlignmentVM_PropertyChanged;
                             PageViewModels.Add(_alignmentVM);
                         }
                         AlignmentRadioVisible = true;
@@ -406,6 +407,14 @@ namespace GS.Server.Main
                         AlignmentRadioVisible = false;
                     }
                     break;
+            }
+        }
+
+        private void AlignmentVM_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "AlertBadge")
+            {
+                OnPropertyChanged(nameof(this.AlignmentAlertBadge));
             }
         }
 
@@ -763,6 +772,11 @@ namespace GS.Server.Main
                     OnPropertyChanged();
                 }
             }
+        }
+
+        public string AlignmentAlertBadge
+        {
+            get => _alignmentVM.AlertBadge;
         }
 
         private bool _alignmentRadioVisible;

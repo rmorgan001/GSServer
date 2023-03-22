@@ -16,7 +16,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/> 
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
@@ -44,7 +44,13 @@
                 <RadioButton Grid.Column="9" FontSize="16" MinWidth="0" Padding="10,0,10,0" IsChecked="{Binding PulsesVMRadioRadio}" Visibility="{Binding Path=PulsesRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource tabPulses}" />
                 <RadioButton Grid.Column="10" FontSize="16" MinWidth="0" Padding="10,0,10,0" IsChecked="{Binding SnapVMRadioRadio}" Visibility="{Binding Path=SnapRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource tabSnap}" />
                 <RadioButton Grid.Column="11" FontSize="16" MinWidth="0" Padding="10,0,10,0" IsChecked="{Binding FocuserVMRadioRadio}" Visibility="{Binding Path=FocuserRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource tabFocuser}" />
-                <RadioButton Grid.Column="12" FontSize="16" MinWidth="0" Padding="10,0,10,0" IsChecked="{Binding AlignmentVMRadioRadio}" Visibility="{Binding Path=AlignmentRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource tabAlignment}" />
+                <RadioButton Grid.Column="12" FontSize="16" MinWidth="0" Padding="10,0,10,0" IsChecked="{Binding AlignmentVMRadioRadio}" Visibility="{Binding Path=AlignmentRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}">
+                    <RadioButton.Content>
+                        <md:Badged   Badge="{Binding AlignmentAlertBadge}" BadgePlacementMode="Right" BadgeBackground="Gold" ToolTip="{StaticResource aliAlertTooltip}">
+                            <TextBlock Text="{StaticResource tabAlignment}"/>
+                        </md:Badged>
+                    </RadioButton.Content>
+                </RadioButton>
             </Grid>
         </ScrollViewer>
     </md:ColorZone>

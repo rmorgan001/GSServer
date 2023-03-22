@@ -78,6 +78,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using System.Windows.Media.Converters;
+using GS.Simulator;
 
 namespace GS.Server.Alignment
 {
@@ -349,22 +353,18 @@ namespace GS.Server.Alignment
 
         //Function to convert spherical coordinates to Cartesian using the Coord structure
 
-        public Coord EQ_sp2Cs(AxisPosition pos)
+        public CartesCoord EQ_sp2Cs(AxisPosition pos)
         {
-            Coord result = new Coord();
+            SphericalCoord polar = EQ_SphericalPolar(pos);
+            return EQ_Polar2Cartes(polar);
 
-            CartesCoord tmpobj = new CartesCoord();
-            SphericalCoord tmpobj4 = new SphericalCoord();
-
-            tmpobj4 = EQ_SphericalPolar(pos);
-            tmpobj = EQ_Polar2Cartes(tmpobj4);
-            result.x = tmpobj.x;
-            result.y = tmpobj.y;
-            result.z = 1;
-
-            return result;
         }
 
+        public AxisPosition EQ_cs2Sp(CartesCoord coord, CartesCoord original)
+        {
+            SphericalCoord polar = EQ_Cartes2Polar(new CartesCoord(coord.x, coord.y, coord.z, 0, false), original);
+            return EQ_PolarSpherical(polar);
+        }
 
         ////Function to convert spherical coordinates to Cartesian using the Coord structure
 
@@ -438,22 +438,9 @@ namespace GS.Server.Alignment
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        internal AxisPosition EQ_plAffine(AxisPosition pos)
+        internal CartesCoord EQ_plAffine(CartesCoord pos)
         {
-            AxisPosition result = new AxisPosition();
-            CartesCoord tmpobj1 = new CartesCoord();
-            CartesCoord tmpobj3 = new CartesCoord();
-            SphericalCoord tmpobj2 = new SphericalCoord();
-            SphericalCoord tmpobj4 = new SphericalCoord();
-
-            tmpobj4 = EQ_SphericalPolar(pos);
-            tmpobj1 = EQ_Polar2Cartes(tmpobj4);
-
-            tmpobj3 = EQ_Transform_Affine(tmpobj1);
-
-            tmpobj2 = EQ_Cartes2Polar(tmpobj3, tmpobj1);
-            result = EQ_PolarSpherical(tmpobj2, tmpobj4);
-            return result;
+            return EQ_Transform_Affine(pos);
         }
 
 
@@ -508,28 +495,13 @@ namespace GS.Server.Alignment
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        internal AxisPosition EQ_plTaki(AxisPosition pos)
+        internal CartesCoord EQ_plTaki(CartesCoord pos)
         {
-            AxisPosition result = new AxisPosition();
-            CartesCoord tmpobj1 = new CartesCoord();
-            CartesCoord tmpobj3 = new CartesCoord();
-            SphericalCoord tmpobj2 = new SphericalCoord();
-            SphericalCoord tmpobj4 = new SphericalCoord();
-
-            tmpobj4 = EQ_SphericalPolar(pos);
-            tmpobj1 = EQ_Polar2Cartes(tmpobj4);
-
-            tmpobj3 = EQ_Transform_Taki(tmpobj1);
-
-            tmpobj2 = EQ_Cartes2Polar(tmpobj3, tmpobj1);
-            result = EQ_PolarSpherical(tmpobj2, tmpobj4);
-
-
-            return result;
+            return EQ_Transform_Taki(pos);
         }
 
         /// <summary>
-        /// Function to Convert Polar RA/DEC Stepper coordinates to Cartesian Coordinates
+        /// Function to Convert Polar coordinate based on the Alt/Az into a cartesian coordinate
         /// </summary>
         /// <param name="polar"></param>
         /// <returns></returns>
@@ -537,21 +509,24 @@ namespace GS.Server.Alignment
         {
             CartesCoord result = new CartesCoord();
             double raDiff;
-            if (polar.x > Home.RA)
+            if (polar.x > ScaleCenter[0])
             {
-                raDiff = polar.x - Home.RA;
+                raDiff = ((polar.x - ScaleCenter[0]) / StepsPerRev[0]) * 360d;
             }
             else
             {
-                raDiff = 360d - (Home.RA-polar.x);
+                raDiff = 360d - (((ScaleCenter[0] - polar.x) / StepsPerRev[0]) * 360d);
             }
+
+
             double theta = SkyServer.DegToRad(Range.Range360(raDiff));
 
             //treat y as the radius of the polar coordinate
 
-            double radius = polar.y - Home.Dec;
+            double radius = polar.y - ScaleCenter[1];
 
-            double radpeak = 0;
+
+            bool divZeroProtect = false;
 
 
             // Avoid division 0 errors
@@ -559,24 +534,17 @@ namespace GS.Server.Alignment
             if (radius == 0)
             {
                 radius = 1;
+                divZeroProtect = true;    // Flag that the radius was converted from 0 to 1
             }
 
             // Get the cartesian coordinates
 
             result.x = Math.Cos(theta) * radius;
             result.y = Math.Sin(theta) * radius;
-            result.ra = radpeak;
-
-            // if radius is a negative number, pass this info on the next conversion routine
-
-            if (radius > 0)
-            {
-                result.r = 1;
-            }
-            else
-            {
-                result.r = -1;
-            }
+            result.z = 1d;
+            result.rSign = radius > 0 ? 1 : -1;
+            result.divZeroProtected = divZeroProtect;
+            result.weightsUp = polar.weightsUp;
 
             // Debug.WriteLine($"Polar2Cartes {polar.x}/{polar.y} => {result.x}/{result.y}/{result.r}");
             return result;
@@ -587,74 +555,70 @@ namespace GS.Server.Alignment
         private SphericalCoord EQ_Cartes2Polar(CartesCoord cart, CartesCoord rads)
         {
             SphericalCoord result = new SphericalCoord();
-
+            double radius = 0d;
             // Ah the famous radius formula
-            double radiusder = Math.Sqrt((cart.x * cart.x) + (cart.y * cart.y)) * rads.r;
-
-
-            // And the nasty angle compute routine (any simpler way to impelent this ?)
-
-            double angle = 0;
-            if (cart.x > 0)
+            if (!rads.divZeroProtected)
             {
-                angle = Math.Atan(cart.y / cart.x);
+                // The radius was converted from 0 to 1 to prevent division by zero errors
+                radius = Math.Sqrt((cart.x * cart.x) + (cart.y * cart.y)) * rads.rSign;
+
             }
+
+            // And the nasty angle compute routine (any simpler way to implement this ?)
+
+            double angle = SkyServer.RadToDeg(Math.Atan(cart.y / cart.x));
             if (cart.x < 0)
             {
                 if (cart.y >= 0)
                 {
-                    angle = Math.Atan(cart.y / cart.x) + Math.PI;
-
+                    angle += 180d;
                 }
                 else
                 {
-                    angle = Math.Atan(cart.y / cart.x) - Math.PI;
+                    angle -= 180d;
                 }
             }
+
             if (cart.x == 0)
             {
                 if (cart.y > 0)
                 {
-                    angle = Math.PI / 2d;
+                    angle = 90d;
                 }
                 else
                 {
-                    angle = -1 * (Math.PI / 2d);
+                    angle = -90d;
                 }
             }
 
-            // Convert angle to degrees
-
-            angle = SkyServer.RadToDeg(angle);
-
             if (angle < 0)
             {
-                angle = 360 + angle;
+                angle = 360d + angle;
             }
 
-            if (rads.r < 0)
+            if (rads.rSign < 0)
             {
-                angle = Range.Range360((angle + 180));
+                angle = Range.Range360(angle + 180d);
             }
 
-            if (angle > 180)
+            if (angle > 180d)
             {
-                result.x = Home.RA -  (360 - angle);
+                result.x = ScaleCenter[0] - (((360d - angle) / 360d) * StepsPerRev[0]);
             }
             else
             {
-                result.x = angle + Home.RA;
+                result.x = ((angle / 360d) * StepsPerRev[0]) + ScaleCenter[0];
             }
-
             //treat y as the polar coordinate radius (ra var not used - always 0)
 
-            result.y = radiusder + Home.Dec;
+            result.y = radius + ScaleCenter[1];
+            result.weightsUp = rads.weightsUp;
 
             // Debug.WriteLine($"Cartes2Polar {cart.x}/{cart.y}/{rads.r} => {result.x}/{result.y}");
             return result;
         }
 
-        internal bool EQ_UpdateTaki(AxisPosition pos)
+        internal bool EQ_UpdateTaki(CartesCoord pos)
         {
             bool result = false;
             List<AlignmentPoint> nearestPoints = new List<AlignmentPoint>();
@@ -670,11 +634,11 @@ namespace GS.Server.Alignment
             {
                 case ThreePointAlgorithmEnum.BestCentre:
                     // find the 50 nearest points - then find the nearest enclosing triangle 
-                    nearestPoints = EQ_ChooseNearest3Points(pos);
+                    nearestPoints = EQ_Choose_3Points(pos);
                     break;
                 default:
                     // find the 50 nearest points - then find the enclosing triangle with the nearest centre point 
-                    nearestPoints = EQ_Choose_3Points(pos);
+                    nearestPoints = EQ_ChooseNearest3Points(pos);
                     break;
             }
 
@@ -683,9 +647,7 @@ namespace GS.Server.Alignment
                 return false;
             }
 
-            Coord tmpCoord = EQ_sp2Cs(pos);
-
-            return EQ_AssembleMatrix_Taki(tmpCoord.x, tmpCoord.y,
+            return EQ_AssembleMatrix_Taki(pos.x, pos.y,
                 nearestPoints[0].UnsyncedCartesian,
                 nearestPoints[1].UnsyncedCartesian,
                 nearestPoints[2].UnsyncedCartesian,
@@ -695,7 +657,7 @@ namespace GS.Server.Alignment
 
         }
 
-        internal bool EQ_UpdateAffine(AxisPosition pos)
+        internal bool EQ_UpdateAffine(CartesCoord pos)
         {
             bool result = false;
 
@@ -709,24 +671,30 @@ namespace GS.Server.Alignment
             switch (this.ThreePointAlgorithm)
             {
                 case ThreePointAlgorithmEnum.BestCentre:
-                    // find the 50 nearest points - then find the nearest enclosing triangle 
-                    nearestPoints = EQ_ChooseNearest3Points(pos);
+                    nearestPoints = EQ_Choose_3Points(pos);
                     break;
                 default:
-                    // find the 50 nearest points - then find the enclosing triangle with the nearest centre point 
-                    nearestPoints = EQ_Choose_3Points(pos);
+                    nearestPoints = EQ_ChooseNearest3Points(pos);
                     break;
             }
 
 
             if (nearestPoints.Count < 3)
             {
+                ChartTrianglePoints.Clear();
                 return false;
             }
 
-            Coord tmpcoord = EQ_sp2Cs(pos);
+            // Update triangle points for charting. Need to close with first point.
+            ChartTrianglePoints.Clear();
+            foreach (var pt in nearestPoints)
+            {
+                ChartTrianglePoints.Add(pt);
+            }
+            ChartTrianglePoints.Add(nearestPoints[0]);
+            ClearChartNearestPoint();
 
-            return EQ_AssembleMatrix_Affine(tmpcoord.x, tmpcoord.y,
+            return EQ_AssembleMatrix_Affine(pos.x, pos.y,
                 nearestPoints[0].SyncedCartesian,
                 nearestPoints[1].SyncedCartesian,
                 nearestPoints[2].SyncedCartesian,
@@ -1227,76 +1195,44 @@ namespace GS.Server.Alignment
         }
 
         /// <summary>
-        /// Converts EQ axis positions in degrees to a polar coordinate base on the Alt/Az.
+        /// Converts EQ axis positions in degrees to a polar coordinate based on the Alt/Az.
         /// </summary>
         /// <param name="spherical">Axis positions in degrees</param>
         /// <returns></returns>
         private SphericalCoord EQ_SphericalPolar(AxisPosition spherical)
         {
             var axes = Axes.AxesMountToApp(spherical);
-            //Debug.WriteLine($"Spherical -> Polar");
-            //Debug.WriteLine($"Input = {spherical.RA}/{spherical.Dec}");
+            
             SphericalCoord result = new SphericalCoord();
             double[] azAlt = Axes.AxesXYToAzAlt(axes);
 
 
-            result.x = (azAlt[0] - 180);
-            result.y = (azAlt[1] + 90);
+            result.x = (((azAlt[0] - 180d) / 360d) * StepsPerRev[0]) + ScaleCenter[0];
+            result.y = (((azAlt[1] + 90d) / 180d) * StepsPerRev[1]) + ScaleCenter[1];
+            result.weightsUp = (spherical.RA < 0.0 || spherical.RA > 180.0);    // Signal the original axis position is weights up.
 
-            double quadrant = 90d;
-            // Check if RA value is within allowed visible range
-            if (spherical.RA < this.Home.RA + quadrant && spherical.RA > this.Home.RA - quadrant)
-            {
-                result.r = 1;   // Weights down
-            }
-            else
-            {
-                result.r = 0;   // Weight up
-            }
-            // Debug.WriteLine($"EQ_SphericalPolar {spherical.RA}/{spherical.Dec} Weights down {result.r} => {result.x}/{result.y}");
             return result;
         }
 
-        private AxisPosition EQ_PolarSpherical(SphericalCoord pos, SphericalCoord range)
+        /// <summary>
+        /// Converts polar coordinates based on the Alt/Az to EQ axis position.
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <returns></returns>
+        private AxisPosition EQ_PolarSpherical(SphericalCoord pos)
         {
-            AxisPosition result = new AxisPosition();
-            double az = pos.x + 180;
-            double alt = pos.y - 90;
-            double[] axes = Axes.AltAzToAxesYX(new double[]{alt, az });
+            double az = (((pos.x - ScaleCenter[0]) / StepsPerRev[0]) * 360d) + 180d;
+            double alt = (((pos.y - ScaleCenter[1]) / StepsPerRev[1]) * 180d) - 90d;
 
-            double[] raDec = Axes.AxesAppToMount(new double[] { axes[1], axes[0] });
-            //Debug.WriteLine($"ha/dec = {haDec[0]}/{haDec[1]}");
-            double quadrant = 90d;
-            if (range.r == 1)
-            {
-                // Originally weights were down.
-                if (raDec[0] < this.Home.RA + quadrant && raDec[0] > this.Home.RA - quadrant)
-                {
-                    // Weights down so nothing to do.
-                    result = new AxisPosition(raDec);
-                }
-                else
-                {
-                    // Weights would be up so flip to alternative axis position.
-                    result = new AxisPosition(Axes.GetAltAxisPosition(raDec));
-                }
-            }
-            else
-            {
-                // Origininally weights were up!
-                if (raDec[0] < this.Home.RA + quadrant && raDec[0] > this.Home.RA - quadrant)
-                {
-                    // Weights would be down so flip
-                    result = new AxisPosition(Axes.GetAltAxisPosition(raDec));
-                }
-                else
-                {
-                    // Weights woudl be up so nothing to do.
-                    result = new AxisPosition(raDec);
-                }
-            }
-            // Debug.WriteLine($"EQ_PolarSpherical {pos.x}/{pos.y} Weights down {range.r} => {result.RA}/{result.Dec}");
 
+            double[] axes = Axes.AltAzToAxesYX(new double[] { alt, az });
+
+            AxisPosition result = Axes.AxesAppToMount(new AxisPosition(axes[1], axes[0]));
+            if (pos.weightsUp)
+            {
+                result = Axes.GetAltAxisPosition(result);
+            }
+                
             return result;
         }
 
@@ -1306,7 +1242,7 @@ namespace GS.Server.Alignment
         /// </summary>
         /// <param name="pos"></param>
         /// <returns>List of 3 points or an empty list</returns>
-        internal List<AlignmentPoint> EQ_Choose_3Points(AxisPosition pos)
+        internal List<AlignmentPoint> EQ_Choose_3Points(CartesCoord pos)
         {
             Dictionary<int, double> distances = new Dictionary<int, double>();
             List<AlignmentPoint> results = new List<AlignmentPoint>();
@@ -1322,8 +1258,6 @@ namespace GS.Server.Alignment
                 return results.OrderBy(p => p.AlignTime).ToList();
             }
 
-            Coord posCartesean = EQ_sp2Cs(pos);
-
             // first find out the distances to the alignment stars
             foreach (AlignmentPoint pt in this.AlignmentPoints)
             {
@@ -1336,7 +1270,7 @@ namespace GS.Server.Alignment
                         break;
                     case ActivePointsEnum.PierSide:
                         // only consider points on this side of the meridian 
-                        if (pt.UnsyncedCartesian.y * posCartesean.y < 0)
+                        if (pt.UnsyncedCartesian.y * pos.y < 0)
                         {
                             continue;
                         }
@@ -1344,7 +1278,7 @@ namespace GS.Server.Alignment
                         break;
                     case ActivePointsEnum.LocalQuadrant:
                         // local quadrant 
-                        if (!GetQuadrant(posCartesean).Equals(GetQuadrant(pt.UnsyncedCartesian)))
+                        if (!GetQuadrant(pos).Equals(GetQuadrant(pt.UnsyncedCartesian)))
                         {
                             continue;
                         }
@@ -1352,16 +1286,8 @@ namespace GS.Server.Alignment
                         break;
                 }
 
-                if (CheckLocalPier)
-                {
-                    // calculate polar distance
-                    distances.Add(pt.Id, Math.Pow(pt.Unsynced.RA - pos.RA, 2) + Math.Pow(pt.Unsynced.Dec - pos.Dec, 2));
-                }
-                else
-                {
-                    // calculate cartesian disatnce
-                    distances.Add(pt.Id, Math.Pow(pt.UnsyncedCartesian.x - posCartesean.x, 2) + Math.Pow(pt.UnsyncedCartesian.y - posCartesean.y, 2));
-                }
+                // calculate cartesian disatnce
+                distances.Add(pt.Id, Math.Pow(pt.UnsyncedCartesian.x - pos.x, 2) + Math.Pow(pt.UnsyncedCartesian.y - pos.y, 2));
             }
 
             if (distances.Count < 3)
@@ -1391,7 +1317,7 @@ namespace GS.Server.Alignment
                         var p3 = this.AlignmentPoints.First(pt => pt.Id == sortedIds[k]);
 
 
-                        if (EQ_CheckPoint_in_Triangle(posCartesean.x, posCartesean.y,
+                        if (EQ_CheckPoint_in_Triangle(pos.x, pos.y,
                             p1.UnsyncedCartesian.x, p1.UnsyncedCartesian.y,
                             p2.UnsyncedCartesian.x, p2.UnsyncedCartesian.y,
                             p3.UnsyncedCartesian.x, p3.UnsyncedCartesian.y))
@@ -1399,7 +1325,7 @@ namespace GS.Server.Alignment
                             // Compute for the center point
                             triangleCentre = EQ_GetCenterPoint(p1.UnsyncedCartesian, p2.UnsyncedCartesian, p3.UnsyncedCartesian);
                             // don't need full pythagoras - sum of squares is good enough
-                            centreDistance = Math.Pow(triangleCentre.x - posCartesean.x, 2) + Math.Pow(triangleCentre.y - posCartesean.y, 2);
+                            centreDistance = Math.Pow(triangleCentre.x - pos.x, 2) + Math.Pow(triangleCentre.y - pos.y, 2);
                             if (centreDistance < minCentreDistance)
                             {
                                 results = new List<AlignmentPoint> { p3, p2, p1 };  // Reversed to match EQMOD sort order
@@ -1421,7 +1347,7 @@ namespace GS.Server.Alignment
         /// </summary>
         /// <param name="pos"></param>
         /// <returns>List of 3 points or an empty list.</returns>
-        internal List<AlignmentPoint> EQ_ChooseNearest3Points(AxisPosition pos)
+        internal List<AlignmentPoint> EQ_ChooseNearest3Points(CartesCoord pos)
         {
             Dictionary<int, double> distances = new Dictionary<int, double>();
             List<AlignmentPoint> results = new List<AlignmentPoint>();
@@ -1437,8 +1363,6 @@ namespace GS.Server.Alignment
                 return results.OrderBy(p => p.AlignTime).ToList();
             }
 
-            Coord posCartesean = EQ_sp2Cs(pos);
-
             // first find out the distances to the alignment stars
             foreach (AlignmentPoint pt in this.AlignmentPoints)
             {
@@ -1451,7 +1375,7 @@ namespace GS.Server.Alignment
                         break;
                     case ActivePointsEnum.PierSide:
                         // only consider points on this side of the meridian 
-                        if (pt.UnsyncedCartesian.y * posCartesean.y < 0)
+                        if (pt.UnsyncedCartesian.y * pos.y < 0)
                         {
                             continue;
                         }
@@ -1459,7 +1383,7 @@ namespace GS.Server.Alignment
                         break;
                     case ActivePointsEnum.LocalQuadrant:
                         // local quadrant 
-                        if (!GetQuadrant(posCartesean).Equals(GetQuadrant(pt.UnsyncedCartesian)))
+                        if (!GetQuadrant(pos).Equals(GetQuadrant(pt.UnsyncedCartesian)))
                         {
                             continue;
                         }
@@ -1467,16 +1391,8 @@ namespace GS.Server.Alignment
                         break;
                 }
 
-                if (CheckLocalPier)
-                {
-                    // calculate polar distance
-                    distances.Add(pt.Id, Math.Pow(pt.Unsynced.RA - pos.RA, 2) + Math.Pow(pt.Unsynced.Dec - pos.Dec, 2));
-                }
-                else
-                {
-                    // calculate cartesian disatnce
-                    distances.Add(pt.Id, Math.Pow(pt.UnsyncedCartesian.x - posCartesean.x, 2) + Math.Pow(pt.UnsyncedCartesian.y - posCartesean.y, 2));
-                }
+                // calculate cartesian distance
+                distances.Add(pt.Id, Math.Pow(pt.UnsyncedCartesian.x - pos.x, 2) + Math.Pow(pt.UnsyncedCartesian.y - pos.y, 2));
             }
 
             if (distances.Count < 3)
@@ -1493,7 +1409,7 @@ namespace GS.Server.Alignment
             bool done = false;
 
 
-            // iterate through all the triangles posible using the nearest alignment points
+            // iterate through all the triangles possible using the nearest alignment points
             for (int i = 0; i <= tmp2; i++)
             {
                 var p1 = this.AlignmentPoints.First(pt => pt.Id == sortedIds[i]);
@@ -1505,7 +1421,7 @@ namespace GS.Server.Alignment
                         var p3 = this.AlignmentPoints.First(pt => pt.Id == sortedIds[k]);
 
 
-                        if (EQ_CheckPoint_in_Triangle(posCartesean.x, posCartesean.y,
+                        if (EQ_CheckPoint_in_Triangle(pos.x, pos.y,
                             p1.UnsyncedCartesian.x, p1.UnsyncedCartesian.y,
                             p2.UnsyncedCartesian.x, p2.UnsyncedCartesian.y,
                             p3.UnsyncedCartesian.x, p3.UnsyncedCartesian.y))
