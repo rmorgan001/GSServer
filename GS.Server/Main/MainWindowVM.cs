@@ -387,7 +387,7 @@ namespace GS.Server.Main
                     }
                     break;
                 case "Alignment":
-                    if (SkyServer.AlignmentShow && Settings.Settings.AlignmentTabVisible)
+                    if (Settings.Settings.AlignmentTabVisible)
                     {
                         if (!PageViewModels.Contains(_alignmentVM))
                         {
