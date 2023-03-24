@@ -119,7 +119,7 @@ namespace GS.Server.SkyTelescope
                     SkySettings.Longitude,
                     SkySettings.Elevation)
                 {
-                    IsAlignmentOn = (AlignmentShow && AlignmentSettings.IsAlignmentOn),
+                    IsAlignmentOn = AlignmentSettings.IsAlignmentOn,
                     ThreePointAlgorithm = ThreePointAlgorithmEnum.BestCentre
                 };
                 AlignmentModel.Notification += AlignmentModel_Notification;
@@ -4842,24 +4842,6 @@ namespace GS.Server.SkyTelescope
         private static void ConnectAlignmentModel()
         {
             AlignmentModel.Connect(_homeAxes.X, _homeAxes.Y, StepsPerRevolution, AlignmentSettings.ClearModelOnStartup);
-        }
-
-        private static bool _alignmentShow;
-        /// <summary>
-        /// sets up bool to load a test tab
-        /// </summary>
-        public static bool AlignmentShow
-        {
-            get => _alignmentShow;
-            set
-            {
-                _alignmentShow = value;
-                if (_alignmentShow && AlignmentSettings.IsAlignmentOn)
-                {
-                    AlignmentModel.IsAlignmentOn = true;
-                }
-                OnStaticPropertyChanged();
-            }
         }
 
         private static void AlignmentModel_Notification(object sender, NotificationEventArgs e)

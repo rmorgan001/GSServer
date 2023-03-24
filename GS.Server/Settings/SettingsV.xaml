@@ -107,7 +107,7 @@
                                 <CheckBox IsChecked="{Binding Mount}" Style="{StaticResource MaterialDesignCheckBox}"/>
                                 <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optMount}"/>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Visibility="{Binding AlignmentShow, Converter={StaticResource BoolToClap}}">
+                            <StackPanel Orientation="Horizontal" >
                                 <CheckBox IsChecked="{Binding Alignment}" Style="{StaticResource MaterialDesignCheckBox}"/>
                                 <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optAlignment}"/>
                             </StackPanel>
@@ -219,7 +219,7 @@
                                     <CheckBox Height="25" Width="25" IsChecked="{Binding Focuser}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource tabFocuserTooltip}"/>
                                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource tabFocuser}"/>
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal" Width="Auto" Visibility="{Binding AlignmentShow, Converter={StaticResource BoolToClap}}">
+                                <StackPanel Orientation="Horizontal" Width="Auto">
                                     <CheckBox Height="25" Width="25" IsChecked="{Binding AlignmentTabVisible}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource aliAlignment}"/>
                                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource aliAlignment}"/>
                                 </StackPanel>

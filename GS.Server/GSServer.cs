@@ -637,9 +637,6 @@ namespace GS.Server
                         case @"/pec":
                             SkyServer.PecShow = true;
                             break;
-                        case @"/showalignment":
-                            SkyServer.AlignmentShow = true;
-                            break;
                         case @"/en":
                         case @"/english":
                             Shared.Settings.Language = "en-US";
@@ -650,7 +647,7 @@ namespace GS.Server
                             break;
                         default:
                             MessageBox.Show(
-                                @"Unknown argument: '" + arg.ToLower() + @"' Valid are : -register, -unregister, -embedding, /pec, /showalignment, /en, /english, /fr and /french",
+                                @"Unknown argument: '" + arg.ToLower() + @"' Valid are : -register, -unregister, -embedding, /pec, /en, /english, /fr and /french",
                                 @"GSServer", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                             break;
                     }
