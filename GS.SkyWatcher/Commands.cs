@@ -267,7 +267,7 @@ namespace GS.SkyWatcher
             long[] revOld = { 0, 0 };
             long[] revNew = { 0, 0 };
 
-            if (SupportAdvancedCommandSet || AllowAdvancedCommandSet)
+            if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
                 // New
                 response = CmdToMount(AxisId.Axis1, 'X', "0002");
@@ -820,7 +820,6 @@ namespace GS.SkyWatcher
         internal double GetPecPeriod(AxisId axis)
         {
             double ret;
-
             if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
                 var response = CmdToMount(axis, 'X', "000E");    // Read 32-bit Resolution of the worm(Counts per revolution)
