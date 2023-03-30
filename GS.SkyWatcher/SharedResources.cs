@@ -206,7 +206,7 @@ namespace GS.SkyWatcher
         [Description("AZ-EQ6(MC015)")] AzEQ6 = 34,
         [Description("EQ6-R(MC015)")] EQ6R = 35,
         [Description("NEQ6 PRO(MC015)")] NEQ6PRO = 36,
-        [Description("EQ7(MC015)")] EQ7 = 37,
+        [Description("CQ350(MC015)")] CQ350 = 37,
         [Description("DOB 18(MC015)")] DOB18 = 183,
         [Description("EQ3(MC019)")] EQ_3 = 48,
         [Description("EQ5(MC019)")] EQ_5 = 49,
