@@ -147,7 +147,9 @@ namespace GS.SkyWatcher
         {
             if (!IsRunning || _cts.IsCancellationRequested || !_skyWatcher.IsConnected)
             {
-                var e = new MountControlException(ErrorCode.ErrQueueFailed, "Queue not running");
+                var a = "Queue | IsRunning:" + IsRunning + "| IsCancel:" + _cts.IsCancellationRequested + "| IsConnected:" + _skyWatcher.IsConnected;
+                if (command.Exception != null){a += "| Ex:" + command.Exception.Message;}
+                var e = new MountControlException(ErrorCode.ErrQueueFailed, a);
                 command.Exception = e;
                 command.Successful = false;
                 return command;

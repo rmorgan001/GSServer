@@ -2208,11 +2208,10 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Warning,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{command.Successful},{command.Exception.Message},{command.Exception.StackTrace}"
+                    Message = $"{command.Successful}|{command.Exception.Message}|{command.Exception.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
-
             return !command.Successful || command.Exception != null;
         }
 

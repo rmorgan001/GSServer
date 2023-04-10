@@ -262,7 +262,8 @@ namespace GS.SkyWatcher
         /// </summary>
         private void GetResolutionFactors()
         {
-            string response;
+            string response, msg;
+            MonitorEntry monitorItem;
             var newMsg = $"Adv:N/A;N/A";
             long[] revOld = { 0, 0 };
             long[] revNew = { 0, 0 };
@@ -272,11 +273,22 @@ namespace GS.SkyWatcher
                 // New
                 response = CmdToMount(AxisId.Axis1, 'X', "0002");
                 revNew[0] = String32ToInt(response, true, 1);
+                msg = $"Axis1|:X0002|{response}";
+                monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = msg };
+                MonitorLog.LogToMonitor(monitorItem);
 
                 response = CmdToMount(AxisId.Axis2, 'X', "0002"); 
                 revNew[1] = String32ToInt(response, true, 1);
+                msg = $"Axis2|:X0002|{response}";
+                monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = msg };
+                MonitorLog.LogToMonitor(monitorItem);
 
                 newMsg = $"Adv:{revNew[0]};{revNew[1]}";
+                monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{newMsg}|Old:{revOld[0]};{revOld[1]}|Factor:{_resolutionFactor[0]};{_resolutionFactor[1]}" };
+                MonitorLog.LogToMonitor(monitorItem);
             }
 
             // Old
@@ -284,12 +296,20 @@ namespace GS.SkyWatcher
             revOld[0] = StringToLong(response);
             if ((_axisVersion[0] & 0x0000FF) == 0x80){revOld[0] = 0x162B97;} // for 80GT mount
             if ((_axisGearRatios[0] & 0x0000FF) == 0x82){revOld[0] = 0x205318;} // for 114GT mount
-        
+            msg = $"Axis1|:a|{response}";
+            monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = msg };
+            MonitorLog.LogToMonitor(monitorItem);
+
             response = CmdToMount(AxisId.Axis2, 'a', null);
             revOld[1] = StringToLong(response);
             if ((_axisVersion[1] & 0x0000FF) == 0x80){revOld[1] = 0x162B97; } // for 80GT mount
             if ((_axisGearRatios[1] & 0x0000FF) == 0x82){revOld[1] = 0x205318;} // for 114GT mount
-        
+            msg = $"Axis2|:a|{response}";
+            monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = msg };
+            MonitorLog.LogToMonitor(monitorItem);
+
             // default _resolutionFactor is already set to 1
             if (revOld[0] > 0){ _resolutionFactor[0] = (int)(revNew[0] / revOld[0]); }
             if (_resolutionFactor[0] == 0) { _resolutionFactor[0] = 1; } //make sure its not 0
@@ -298,7 +318,7 @@ namespace GS.SkyWatcher
             if (_resolutionFactor[1] == 0) { _resolutionFactor[1] = 1; } //make sure its not 0
 
             // log
-            var monitorItem = new MonitorEntry
+            monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{newMsg}|Old:{revOld[0]};{revOld[1]}|Factor:{_resolutionFactor[0]};{_resolutionFactor[1]}" };
             MonitorLog.LogToMonitor(monitorItem);
         }
@@ -819,31 +839,28 @@ namespace GS.SkyWatcher
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         internal double GetPecPeriod(AxisId axis)
         {
-            double ret;
+            var response = CmdToMount(axis, 's', null);
+            var pecPeriod = (double)StringToLong(response);
+            var ax = (int)axis;
+            if (SkyQueue.CustomRaWormSteps[ax] > 0) { pecPeriod = SkyQueue.CustomRaWormSteps[ax]; } // Setup custom mount worm steps
+            _peSteps[ax] = pecPeriod;
+            var ret = pecPeriod;
+
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $":s|{axis}|{response}|{pecPeriod}|Custom:{SkyQueue.CustomRaWormSteps[ax]}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
             if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
-                var response = CmdToMount(axis, 'X', "000E");    // Read 32-bit Resolution of the worm(Counts per revolution)
-                var pecPeriod = (double)String32ToInt(response, true, _resolutionFactor[(int)axis]);
-                var ax = (int)axis;
+                response = CmdToMount(axis, 'X', "000E");    // Read 32-bit Resolution of the worm(Counts per revolution)
+                pecPeriod = String32ToInt(response, true, _resolutionFactor[(int)axis]);
+                ax = (int)axis;
                 if (SkyQueue.CustomRaWormSteps[ax] > 0) { pecPeriod = SkyQueue.CustomRaWormSteps[ax]; } // Setup custom mount worm steps
                 _peSteps[ax] = pecPeriod;
                 ret = pecPeriod;
 
-                var monitorItem = new MonitorEntry
+                monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $":X000E|{axis}|{response}|{pecPeriod}|Custom:{SkyQueue.CustomRaWormSteps[ax]}" };
-                MonitorLog.LogToMonitor(monitorItem);
-            }
-            else
-            {
-                var response = CmdToMount(axis, 's', null);
-                var pecPeriod = (double)StringToLong(response);
-                var ax = (int)axis;
-                if (SkyQueue.CustomRaWormSteps[ax] > 0) { pecPeriod = SkyQueue.CustomRaWormSteps[ax]; } // Setup custom mount worm steps
-                _peSteps[ax] = pecPeriod;
-                ret = pecPeriod;
-
-                var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $":s|{axis}|{response}|{pecPeriod}|Custom:{SkyQueue.CustomRaWormSteps[ax]}" };
                 MonitorLog.LogToMonitor(monitorItem);
             }
 
