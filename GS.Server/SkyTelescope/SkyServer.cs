@@ -4020,10 +4020,6 @@ namespace GS.Server.SkyTelescope
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Pec: {pecmsg}" };
             MonitorLog.LogToMonitor(monitorItem);
 
-            //set Ra Dec targets to current location
-            _targetRaDec.X = RightAscension;
-            _targetRaDec.Y = Declination;
-
             return true;
         }
 
