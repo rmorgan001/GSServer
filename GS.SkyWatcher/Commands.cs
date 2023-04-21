@@ -335,7 +335,7 @@ namespace GS.SkyWatcher
                 response = CmdToMount(axis, 'X', "0002");    //0x02（’02’）: Resolution of the axis (Counts per revolution)
                 var gearRatio = String32ToInt(response, true, _resolutionFactor[(int) axis]);
                 msg = "X0002";
-                switch (axis)
+                switch (axis) 
                 {
                     case AxisId.Axis1:
                         _stepsPerRev[0] = gearRatio;

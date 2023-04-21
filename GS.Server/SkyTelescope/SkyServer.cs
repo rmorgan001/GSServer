@@ -765,8 +765,8 @@ namespace GS.Server.SkyTelescope
                 _rateMoveAxes.Y = value;
                 if (Math.Abs(value) > 0)
                 {
-                    if (Tracking){_MoveAxisPrevTracking = true;}
-                    Tracking = false;
+                    //if (Tracking){_MoveAxisPrevTracking = true;}
+                    //Tracking = false;
                     IsSlewing = true;
                     SlewState = SlewType.SlewMoveAxis;
                 }
@@ -774,11 +774,11 @@ namespace GS.Server.SkyTelescope
                 {
                     IsSlewing = false;
                     SlewState = SlewType.SlewNone;
-                    if (_MoveAxisPrevTracking)
-                    {
-                        Tracking = true;
-                        _MoveAxisPrevTracking = false;
-                    }
+                    //if (_MoveAxisPrevTracking)
+                    //{
+                    //    Tracking = true;
+                    //    _MoveAxisPrevTracking = false;
+                    //}
                 }
 
                 object _;
@@ -4019,6 +4019,10 @@ namespace GS.Server.SkyTelescope
             monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Pec: {pecmsg}" };
             MonitorLog.LogToMonitor(monitorItem);
+
+            //set Ra Dec targets to current location
+            _targetRaDec.X = RightAscension;
+            _targetRaDec.Y = Declination;
 
             return true;
         }
