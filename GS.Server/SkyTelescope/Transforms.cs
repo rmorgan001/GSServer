@@ -15,9 +15,13 @@
  */
 
 using System;
+using System.Reflection;
+using System.Threading;
 using ASCOM.Astrometry.Transform;
 using ASCOM.DeviceInterface;
 using System.Windows;
+using GS.Principles;
+using GS.Shared;
 
 namespace GS.Server.SkyTelescope
 {
@@ -37,8 +41,9 @@ namespace GS.Server.SkyTelescope
         /// <param name="elevation"></param>
         /// <param name="from"></param>
         /// <param name="to"></param>
+        /// /// <param name="log"></param>
         /// <returns></returns>
-        public static Vector ConvertRaDec(double rightAscension, double declination, double latitude, double longitude, double elevation, string from, string to)
+        public static Vector ConvertRaDec(double rightAscension, double declination, double latitude, double longitude, double elevation, string from, string to, bool log = false)
         {
             xForm.SiteElevation = elevation;
             xForm.SiteLatitude = latitude;
@@ -59,7 +64,7 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
 
-            Vector r = new Vector(0, 0);
+            var r = new Vector(0, 0);
 
             switch (to.ToLower())
             {
@@ -78,7 +83,20 @@ namespace GS.Server.SkyTelescope
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
+            if (log)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"lat:{latitude}|long:{longitude}|Ref:{SkySettings.Refraction}|Ele:{elevation}|ra/dec:{rightAscension},{declination}|{r.X},{r.Y}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
             return r;
         }
 
@@ -88,10 +106,11 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         /// <param name="rightAscension"></param>
         /// <param name="declination"></param>
+        /// /// <param name="log"></param>
         /// <returns></returns>
-        public static Vector CoordTypeToInternal(double rightAscension, double declination)
+        public static Vector CoordTypeToInternal(double rightAscension, double declination, bool log = false)
         {
-            //internal is already topo so return it
+            //internal is already to-po so return it
             if (SkySettings.EquatorialCoordinateType == EquatorialCoordinateType.equTopocentric) return new Vector(rightAscension, declination);
 
             xForm.SiteElevation = SkySettings.Elevation;
@@ -119,6 +138,21 @@ namespace GS.Server.SkyTelescope
                     xForm.SetTopocentric(rightAscension, declination);
                     break;
             }
+            if (log)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"lat:{SkySettings.Latitude}|long:{SkySettings.Longitude}|Ref:{SkySettings.Refraction}|Ele:{SkySettings.Elevation}|ra/dec:{rightAscension},{declination}|{xForm.RATopocentric},{xForm.DECTopocentric}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+
             return new Vector(xForm.RATopocentric, xForm.DECTopocentric);
         }
 
@@ -128,11 +162,12 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         /// <param name="rightAscension"></param>
         /// <param name="declination"></param>
+        /// /// <param name="log"></param>
         /// <returns></returns>
-        public static Vector InternalToCoordType(double rightAscension, double declination)
+        public static Vector InternalToCoordType(double rightAscension, double declination, bool log = false)
         {
             var radec = new Vector();
-            //internal is already topo so return it
+            //internal is already to-po so return it
             if (SkySettings.EquatorialCoordinateType == EquatorialCoordinateType.equTopocentric) return new Vector(rightAscension, declination);
 
             xForm.SiteElevation = SkySettings.Elevation;
@@ -168,103 +203,21 @@ namespace GS.Server.SkyTelescope
                     radec.Y = declination;
                     break;
             }
+            if (log)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"lat:{SkySettings.Latitude}|long:{SkySettings.Longitude}|Ref:{SkySettings.Refraction}|Ele:{SkySettings.Elevation}|ra/dec:{rightAscension},{declination}/{radec.X},{radec.Y}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
             return radec;
-        }
-
-        /// <summary>
-        /// Converts internal stored coords to the stored EquatorialCoordinateType
-        /// Used for all RA coordinates going out of the system  
-        /// </summary>
-        /// <param name="rightAscension"></param>
-        /// <param name="declination"></param>
-        /// <returns></returns>
-        public static double RaToCoordType(double rightAscension, double declination)
-        {
-            double ra;
-            //internal is already topo so return it
-            if (SkySettings.EquatorialCoordinateType == EquatorialCoordinateType.equTopocentric) return rightAscension;
-            xForm.SiteElevation = SkySettings.Elevation;
-            xForm.SiteLatitude = SkySettings.Latitude;
-            xForm.SiteLongitude = SkySettings.Longitude;
-            xForm.Refraction = SkySettings.Refraction;
-            xForm.SiteTemperature = SkySettings.Temperature;
-            xForm.SetTopocentric(rightAscension, declination);
-            switch (SkySettings.EquatorialCoordinateType)
-            {
-                case EquatorialCoordinateType.equJ2000:
-                    ra = xForm.RAJ2000;
-                    //radec.Y = declination;
-                    break;
-                case EquatorialCoordinateType.equTopocentric:
-                    ra = rightAscension;
-                    //radec.Y = xform.DECTopocentric;
-                    break;
-                case EquatorialCoordinateType.equOther:
-                    ra = xForm.RAApparent;
-                    //radec.Y = xform.DECApparent;
-                    break;
-                case EquatorialCoordinateType.equJ2050:
-                    ra = xForm.RAJ2000;
-                    //radec.Y = xform.DecJ2000;
-                    break;
-                case EquatorialCoordinateType.equB1950:
-                    ra = xForm.RAJ2000;
-                    //radec.Y = xForm.DecJ2000;
-                    break;
-                default:
-                    ra = rightAscension;
-                    //xForm.Y = xForm.DECTopocentric;
-                    break;
-            }
-            return ra;
-        }
-
-        /// <summary>
-        /// Converts internal stored coords to the stored EquatorialCoordinateType
-        /// Used for all DEC coordinates going out of the system  
-        /// </summary>
-        /// <param name="rightAscension"></param>
-        /// <param name="declination"></param>
-        /// <returns></returns>
-        public static double DecToCoordType(double rightAscension, double declination)
-        {
-            double dec;
-            //internal is already topo so return it
-            if (SkySettings.EquatorialCoordinateType == EquatorialCoordinateType.equTopocentric) return declination;
-            xForm.SiteElevation = SkySettings.Elevation;
-            xForm.SiteLatitude = SkySettings.Latitude;
-            xForm.SiteLongitude = SkySettings.Longitude;
-            xForm.Refraction = SkySettings.Refraction;
-            xForm.SiteTemperature = SkySettings.Temperature;
-            xForm.SetTopocentric(rightAscension, declination);
-            switch (SkySettings.EquatorialCoordinateType)
-            {
-                case EquatorialCoordinateType.equJ2000:
-                    //ra = rightAscension;
-                    dec = xForm.DecJ2000;
-                    break;
-                case EquatorialCoordinateType.equTopocentric:
-                    //ra = xForm.RATopocentric;
-                    dec = declination;
-                    break;
-                case EquatorialCoordinateType.equOther:
-                    //ra = xform.RAApparent;
-                    dec = xForm.DECApparent;
-                    break;
-                case EquatorialCoordinateType.equJ2050:
-                    //ra = xForm.RAJ2000;
-                    dec = xForm.DecJ2000;
-                    break;
-                case EquatorialCoordinateType.equB1950:
-                    //ra = xForm.RAJ2000;
-                    dec = xForm.DecJ2000;
-                    break;
-                default:
-                    //ra = xForm.RATopocentric;
-                    dec = xForm.DECTopocentric;
-                    break;
-            }
-            return dec;
         }
 
         #endregion

@@ -6125,16 +6125,15 @@ namespace GS.Server.SkyTelescope
                         return;
                     }
 
-                    var radec = Transforms.CoordTypeToInternal(GoToRa, GoToDec);
-                    var result = SkyServer.CheckRaDecSyncLimit(radec.X, radec.Y);
+                    var result = SkyServer.CheckRaDecSyncLimit(GoToRa, GoToDec);
 
                     if (!result)
                     {
                         OpenDialog($"{Application.Current.Resources["goOutLimits"]}", $"{Application.Current.Resources["exError"]}");
                         return;
                     }
-                    SkyServer.TargetDec = radec.Y;
-                    SkyServer.TargetRa = radec.X;
+                    SkyServer.TargetDec = GoToDec;
+                    SkyServer.TargetRa = GoToRa;
                     SkyServer.SyncToTargetRaDec();
                     IsDialogOpen = false;
                 }

@@ -402,7 +402,6 @@ namespace GS.Server.SkyTelescope
             {
                 if (Math.Abs(value - _raDec.Y) < 0.000000000000001) { return; }
                 _raDec.Y = value;
-                DeclinationXForm = value;
             }
         }
 
@@ -414,8 +413,7 @@ namespace GS.Server.SkyTelescope
             get => _declinationXForm;
             private set
             {
-                var dec = Transforms.DecToCoordType(RightAscension, value);
-                _declinationXForm = dec;
+                _declinationXForm = value;
                 OnStaticPropertyChanged();
             }
         }
@@ -750,7 +748,6 @@ namespace GS.Server.SkyTelescope
             {
                 if (Math.Abs(value - _raDec.X) < 0.000000000000001) return;
                 _raDec.X = value;
-                RightAscensionXForm = value;
             }
         }
 
@@ -961,8 +958,7 @@ namespace GS.Server.SkyTelescope
             get => _rightAscensionXForm;
             private set
             {
-                var ra = Transforms.RaToCoordType(value, Declination);
-                _rightAscensionXForm = ra;
+                _rightAscensionXForm = value;
                 OnStaticPropertyChanged();
             }
         }
@@ -1122,7 +1118,8 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Dec target for slewing
+        /// Dec target for slewing, epoch is same as EquatorialSystem Property
+        /// convert to top-o-centric for any internal calculations
         /// </summary>
         public static double TargetDec
         {
@@ -1131,7 +1128,8 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Ra target for slewing
+        /// Ra target for slewing, epoch is same as EquatorialSystem Property
+        /// convert to top-o-centric for any internal calculations
         /// </summary>
         public static double TargetRa
         {
@@ -1513,7 +1511,8 @@ namespace GS.Server.SkyTelescope
                             _ = new CmdAxisToDegrees(0, Axis.Axis2, sync[1]);
                             break;
                         case MountTaskName.SyncTarget:
-                            var xy = Axes.RaDecToAxesXY(new[] { TargetRa, TargetDec });
+                            var a = Transforms.CoordTypeToInternal(TargetRa, TargetDec);
+                            var xy = Axes.RaDecToAxesXY(new[] { a.X, a.Y });
                             var targ = Axes.AxesAppToMount(new[] { xy[0], xy[1] });
                             _ = new CmdAxisToDegrees(0, Axis.Axis1, targ[0]);
                             _ = new CmdAxisToDegrees(0, Axis.Axis2, targ[1]);
@@ -2052,11 +2051,12 @@ namespace GS.Server.SkyTelescope
                             MonitorLog.LogToMonitor(monitorItem);
                             break;
                         case MountTaskName.SyncTarget:
-                            var xy = Axes.RaDecToAxesXY(new[] { TargetRa, TargetDec });
+                            var a = Transforms.CoordTypeToInternal(TargetRa, TargetDec);
+                            var xy = Axes.RaDecToAxesXY(new[] { a.X, a.Y });
                             var targ = Axes.AxesAppToMount(new[] { xy[0], xy[1] });
                             _ = new SkySyncAxis(0, AxisId.Axis1, targ[0]);
                             _ = new SkySyncAxis(0, AxisId.Axis2, targ[1]);
-                            monitorItem.Message += $",{_util.HoursToHMS(TargetRa, "h ", ":", "", 2)}|{_util.DegreesToDMS(TargetDec, "° ", ":", "", 2)}|{xy[0]}|{xy[1]}|{targ[0]}|{targ[1]}";
+                            monitorItem.Message += $",{_util.HoursToHMS(a.X, "h ", ":", "", 2)}|{_util.DegreesToDMS(a.Y, "° ", ":", "", 2)}|{xy[0]}|{xy[1]}|{targ[0]}|{targ[1]}";
                             MonitorLog.LogToMonitor(monitorItem);
                             break;
                         case MountTaskName.SyncAltAz:
@@ -4866,10 +4866,11 @@ namespace GS.Server.SkyTelescope
             //      SkyServer.Steps contains the current encoder positions.
             //      SkyServer.FactorStep contains the conversion from radians to steps
             // To get the target steps
-            var xy = Axes.RaDecToAxesXY(new[] { TargetRa, TargetDec });
+            var a = Transforms.CoordTypeToInternal(TargetRa, TargetDec);
+            var xy = Axes.RaDecToAxesXY(new[] { a.X, a.Y });
             var unsynced = Axes.AxesAppToMount(new[] { xy[0], xy[1] });
             var rawSteps = GetRawSteps();
-            double[] synced = new double[] { ConvertStepsToDegrees(rawSteps[0], 0), ConvertStepsToDegrees(rawSteps[1], 1) };
+            var synced = new[] { ConvertStepsToDegrees(rawSteps[0], 0), ConvertStepsToDegrees(rawSteps[1], 1) };
             if (AlignmentModel.SyncToRaDec(
                 unsynced,
                 synced,
@@ -4883,7 +4884,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Alignment point added: Un-synced axis = {unsynced[0]}/{unsynced[1]}, RA/Dec = {TargetRa}/{TargetDec}, Synched axis = {synced[0]}/{synced[1]}"
+                    Message = $"Alignment point added: Un-synced axis = {unsynced[0]}/{unsynced[1]}, RA/Dec = {a.X}/{a.Y}, Synched axis = {synced[0]}/{synced[1]}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -4897,7 +4898,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Alignment point added: Un-synced axis = {unsynced[0]}/{unsynced[1]}, RA/Dec = {TargetRa}/{TargetDec}, Synched axis = {synced[0]}/{synced[1]}"
+                    Message = $"Alignment point added: Un-synced axis = {unsynced[0]}/{unsynced[1]}, RA/Dec = {a.X}/{a.Y}, Synched axis = {synced[0]}/{synced[1]}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -4921,7 +4922,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Mapped unsynced axis angles: {unsynced[0]}/{unsynced[1]} to {synced[0]}/{synced[1]}"
+                    Message = $"Mapped un-synced axis angles: {unsynced[0]}/{unsynced[1]} to {synced[0]}/{synced[1]}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
@@ -5242,10 +5243,15 @@ namespace GS.Server.SkyTelescope
                 Azimuth = altaz[0];
                 Altitude = altaz[1];
 
-                // Calculate mount Ra/Dec
+                // Calculate top-o-centric Ra/Dec
                 var radec = Axes.AxesXYToRaDec(axes);
                 RightAscension = radec[0];
                 Declination = radec[1];
+
+                // Calculate EquatorialSystem Property Ra/Dec for UI
+                var xy = Transforms.InternalToCoordType(radec[0], radec[1]);
+                RightAscensionXForm = xy.X;
+                DeclinationXForm = xy.Y;
 
                 Lha = Coordinate.Ra2Ha12(RightAscensionXForm, SiderealTime);
 
