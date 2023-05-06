@@ -21,7 +21,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
+using System.IO.Ports;
 
 namespace GS.Server.Gps
 {
@@ -57,7 +57,7 @@ namespace GS.Server.Gps
         public void GpsOn()
         {
             GpsRunning = true;
-            GpsLoopAsync();
+            ConnectSerialPort();
         }
         public void GpsOff()
         {
@@ -104,78 +104,33 @@ namespace GS.Server.Gps
         /// </summary>
         internal TimeSpan TimeSpan { get; private set; }
 
-        /// <summary>
-        /// Main async process
-        /// </summary>
-        private async void GpsLoopAsync()
+        private void ConnectSerialPort()
         {
-            try
+            var _serial = new SerialPort()
             {
-                if (_ctsGps == null) _ctsGps = new CancellationTokenSource();
-                var ct = _ctsGps.Token;
-                var task = Task.Run(() =>
-                {
-                    while (GpsRunning)
-                    {
-                        if (ct.IsCancellationRequested)
-                        {
-                            // Clean up here, then...
-                            // ct.ThrowIfCancellationRequested();
-                            GpsRunning = false;
-                        }
-                        else
-                        {
-                            ConnectSerial();
-                            GpsRunning = false;
-                            break;
-                        }
-                    }
-                }, ct);
-                await task;
-                task.Wait(ct);
-                GpsRunning = false;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                GpsRunning = false;
-                //throw;
-            }
-        }
-
-        /// <summary>
-        /// Serial connection to the gps device
-        /// </summary>
-        private void ConnectSerial()
-        {
-            var _serial = new Serial
-            {
-                Port = _gpsPort,
-                Speed =  _gpsSerialSpeed,
-                ReceiveTimeoutMs = 5000,
-                StopBits = SerialStopBits.One,
+                PortName = "COM" + _gpsPort,
+                BaudRate = (int)_gpsSerialSpeed,
+                ReadTimeout = 20000,
+                StopBits = StopBits.One,
                 DataBits = 8,
-                DTREnable = false,
-                RTSEnable = false,
-                Handshake = SerialHandshake.RequestToSendXonXoff,
-                Parity = SerialParity.None,
+                //DTREnable = false,
+                //RTSEnable = false,
+                Handshake = Handshake.RequestToSendXOnXOff,
+                Parity = Parity.None,
             };
 
             try
             {
-                _serial.Connected = true;
-                IsConnected = _serial.Connected;
+                _serial.Open();
+                IsConnected = _serial.IsOpen;
                 ReadGpsData(_serial);
-                _serial.Connected = false;
+                _serial.Close();
                 _serial.Dispose();
             }
             catch (Exception)
             {
                 GpsRunning = false;
-                _serial.Connected = false;
+                _serial.Close();
                 _serial.Dispose();
                 throw;
             }
@@ -187,7 +142,7 @@ namespace GS.Server.Gps
         /// </summary>
         /// <remarks>https://gpsd.gitlab.io/gpsd/NMEA.html#_rmc_recommended_minimum_navigation_information</remarks>
         /// <returns></returns>
-        private void ReadGpsData(Serial _serial)
+        private void ReadGpsData(SerialPort _serial)
         {
             if (!Gga && !Rmc) return;
             if (!IsConnected) return;
@@ -197,7 +152,7 @@ namespace GS.Server.Gps
                 ClearProperties();
                 HasData = false;
                 PcUtcNow = Principles.HiResDateTime.UtcNow;
-                var receivedData = _serial.ReceiveTerminated("\r\n");
+                var receivedData = _serial.ReadLine();
                 //var receivedData = "$GPGGA,010537,2934.2442,N,09816.2099,W,1,05,2.1,227.0,M,-22.2,M,,*76\r\n";
                 if (receivedData.Length <= 0) continue;
                 var gpsDataArr = receivedData.Split(',');

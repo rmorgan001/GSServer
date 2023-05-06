@@ -286,9 +286,6 @@ namespace GS.SkyWatcher
                 MonitorLog.LogToMonitor(monitorItem);
 
                 newMsg = $"Adv:{revNew[0]};{revNew[1]}";
-                monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{newMsg}|Old:{revOld[0]};{revOld[1]}|Factor:{_resolutionFactor[0]};{_resolutionFactor[1]}" };
-                MonitorLog.LogToMonitor(monitorItem);
             }
 
             // Old

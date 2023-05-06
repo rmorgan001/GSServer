@@ -28,7 +28,6 @@ using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -6952,7 +6951,7 @@ namespace GS.Server.SkyTelescope
         public bool IsGpsRunning { get; set; }
         public SerialSpeed GpsBaudRate
         {
-            get => SkySettings.GpsBaudRate;
+            get =>SkySettings.GpsBaudRate;
             set
             {
                 if (value == SkySettings.GpsBaudRate) return;
@@ -7188,14 +7187,8 @@ namespace GS.Server.SkyTelescope
                     HasGSPData = false;
                     var gpsHardware = new GpsHardware(GpsComPort, GpsBaudRate) { Gga = GpsGga, Rmc = GpsRmc };
                     gpsHardware.GpsOn();
-                    var stopwatch = Stopwatch.StartNew();
-                    while (gpsHardware.GpsRunning && stopwatch.Elapsed.TotalSeconds < 30)
-                    {
-                        if (gpsHardware.HasData) break;
-                    }
 
-
-                    if (gpsHardware.HasData)
+                    if (gpsHardware.GpsRunning && gpsHardware.HasData)
                     {
                         GpsLong = gpsHardware.Longitude;
                         GpsLongString = _util.DegreesToDMS(GpsLong, "° ", ":", "", 2);
@@ -7215,7 +7208,6 @@ namespace GS.Server.SkyTelescope
                         gpsHardware.GpsOff();
                         OpenDialog($"{Application.Current.Resources["gpsNoData"]}{GpsComPort}{Environment.NewLine}{gpsHardware.NmEaSentence}");
                     }
-
                 }
             }
             catch (Exception ex)
