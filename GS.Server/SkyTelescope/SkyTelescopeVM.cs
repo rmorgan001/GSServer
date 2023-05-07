@@ -126,7 +126,7 @@ namespace GS.Server.SkyTelescope
                     RaBacklashList = RaBacklashList.Concat(extendedlist);
                     DecBacklashList = DecBacklashList.Concat(extendedlist);
                     AxisTrackingLimits = new List<double>(Numbers.InclusiveRange(0, 15, 1));
-
+                    
                     // defaults
                     AtPark = SkyServer.AtPark;
                     ConnectButtonContent = Application.Current.Resources["skyConnect"].ToString();
@@ -6796,6 +6796,8 @@ namespace GS.Server.SkyTelescope
 
         #region GPS Dialog
 
+        public List<int> GpsTimeoutRange { get; set; }
+
         private bool _allowTimeChange;
         public bool AllowTimeChange
         {
@@ -6948,6 +6950,18 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
+
+        private int _gpsTimeout;
+        public int GpsTimeout
+        {
+            get => _gpsTimeout;
+            set
+            {
+                _gpsTimeout = value;
+                OnPropertyChanged();
+            }
+        }
+
         public bool IsGpsRunning { get; set; }
         public SerialSpeed GpsBaudRate
         {
@@ -7058,6 +7072,8 @@ namespace GS.Server.SkyTelescope
                     GpsTime = new DateTime();
                     GpsGga = true;
                     GpsRmc = false;
+                    GpsTimeoutRange = new List<int>(Enumerable.Range(5, 56));
+                    GpsTimeout = 20;
                     AllowTimeChange = false;
                     AllowTimeVis = SystemInfo.IsAdministrator();
 
@@ -7185,7 +7201,7 @@ namespace GS.Server.SkyTelescope
                     if (IsGpsRunning) return;
                     IsGpsRunning = true;
                     HasGSPData = false;
-                    var gpsHardware = new GpsHardware(GpsComPort, GpsBaudRate) { Gga = GpsGga, Rmc = GpsRmc };
+                    var gpsHardware = new GpsHardware(GpsComPort, GpsBaudRate, GpsTimeout) { Gga = GpsGga, Rmc = GpsRmc };
                     gpsHardware.GpsOn();
 
                     if (gpsHardware.GpsRunning && gpsHardware.HasData)
@@ -7223,7 +7239,7 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                IsDialogOpen = false;
+                //IsDialogOpen = false;
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
             finally

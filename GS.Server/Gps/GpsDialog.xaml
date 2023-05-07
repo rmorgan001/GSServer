@@ -14,7 +14,7 @@
     <GroupBox Header="{StaticResource skyGPS}" Margin="5">
         <StackPanel Orientation="Vertical">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,10">
-                <ComboBox md:HintAssist.Hint="{StaticResource gpsCom}" ItemsSource="{Binding ComPorts}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                <ComboBox md:HintAssist.Hint="{StaticResource gpsCom}" ToolTip="{StaticResource gpsCom}" ItemsSource="{Binding ComPorts}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                     <ComboBox.SelectedItem>
                         <Binding Path="GpsComPort" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
@@ -41,7 +41,21 @@
                     </ComboBox.ItemsPanel>
                 </ComboBox>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,10">
+                <ComboBox Margin="0,0,10,0" md:HintAssist.Hint="Sec" ToolTip="Timeout" ItemsSource="{Binding GpsTimeoutRange}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                    <ComboBox.SelectedItem>
+                        <Binding Path="GpsTimeout" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </ComboBox.SelectedItem>
+                    <ComboBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </ComboBox.ItemsPanel>
+                </ComboBox>
                 <CheckBox Margin="5,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Style="{StaticResource MaterialDesignCheckBox}" IsChecked="{Binding GpsGga}" />
                 <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{StaticResource gpsGGA}" />
                 <CheckBox Margin="15,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Style="{StaticResource MaterialDesignCheckBox}" IsChecked="{Binding GpsRmc}" />
