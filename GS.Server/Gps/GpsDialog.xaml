@@ -42,7 +42,7 @@
                 </ComboBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,10">
-                <ComboBox Margin="0,0,10,0" md:HintAssist.Hint="Sec" ToolTip="Timeout" ItemsSource="{Binding GpsTimeoutRange}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                <ComboBox md:HintAssist.Hint="{StaticResource notTime}" Margin="0,0,5,0" ToolTip="{StaticResource edSeconds}" ItemsSource="{Binding GpsTimeoutRange}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                     <ComboBox.SelectedItem>
                         <Binding Path="GpsTimeout" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>

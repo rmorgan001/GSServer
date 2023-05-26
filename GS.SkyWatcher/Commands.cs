@@ -574,11 +574,12 @@ namespace GS.SkyWatcher
         /// i or X0007 Get last "slew" speed
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
-        internal long GetLastSlewSpeed(AxisId axis)
+        /// <param name="old_i">force old i: command</param>
+        internal long GetLastSlewSpeed(AxisId axis, bool old_i = true)
         {
             string response;
             long iSpeed;
-            if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
+            if (SupportAdvancedCommandSet && AllowAdvancedCommandSet && !old_i)
             {
                 response = CmdToMount(axis, 'X', "0007");    // 0x07（’07’）: Current slewing speed in ticks /1024 seconds
                 iSpeed = String32ToInt(response, true, _resolutionFactor[(int)axis]);

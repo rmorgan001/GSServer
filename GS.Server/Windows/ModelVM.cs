@@ -532,23 +532,10 @@ namespace GS.Server.Windows
         {
             try
             {
-                if (CameraIndex == 1)
-                {
-                    Settings.Settings.ModelLookDirection1 = new Vector3D(-2616, -3167, -1170);
-                    Settings.Settings.ModelUpDirection1 = new Vector3D(.35, .43, .82);
-                    Settings.Settings.ModelPosition1 = new Point3D(2523, 3000, 1379);
-                }
-                else
-                {
-                    Settings.Settings.ModelLookDirection2 = new Vector3D(-900, -1100, -400);
-                    Settings.Settings.ModelUpDirection2 = new Vector3D(.35, .43, .82);
-                    Settings.Settings.ModelPosition2 = new Point3D(900, 1100, 800);
-                }
                 LookDirection = new Vector3D(-900, -1100, -400);
                 UpDirection = new Vector3D(.35, .43, .82);
                 Position = new Point3D(900, 1100, 800);
-                
-                LoadGEM();
+                //LoadGEM();
             }
             catch (Exception ex)
             {
@@ -567,6 +554,45 @@ namespace GS.Server.Windows
             }
         }
 
+        private ICommand _saveModelViewCmd;
+        public ICommand SaveModelViewCmd
+        {
+            get
+            {
+                var cmd = _saveModelViewCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _saveModelViewCmd = new RelayCommand(param => SaveModelView());
+            }
+        }
+        private void SaveModelView()
+        {
+            try
+            {
+                Settings.Settings.ModelLookDirection1 = LookDirection;
+                Settings.Settings.ModelUpDirection1 = UpDirection;
+                Settings.Settings.ModelPosition1 = Position;
+                Settings.Settings.Save();
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
         #endregion
 
         #region Window Info

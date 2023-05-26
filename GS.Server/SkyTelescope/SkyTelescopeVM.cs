@@ -2003,10 +2003,50 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
-                Settings.Settings.ModelLookDirection2 = new Vector3D(-900, -1100, -400);
-                Settings.Settings.ModelUpDirection2 = new Vector3D(.35, .43, .82);
-                Settings.Settings.ModelPosition2 = new Point3D(900, 1100, 800);
-                LoadGEM();
+                LookDirection = new Vector3D(-900, -1100, -400);
+                UpDirection = new Vector3D(.35, .43, .82);
+                Position = new Point3D(900, 1100, 800);
+                //LoadGEM();
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _saveModelViewCmd;
+        public ICommand SaveModelViewCmd
+        {
+            get
+            {
+                var cmd = _saveModelViewCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _saveModelViewCmd = new RelayCommand(param => SaveModelView());
+            }
+        }
+        private void SaveModelView()
+        {
+            try
+            {
+                Settings.Settings.ModelLookDirection2 = LookDirection;
+                Settings.Settings.ModelUpDirection2 = UpDirection;
+                Settings.Settings.ModelPosition2 = Position;
+                Settings.Settings.Save();
             }
             catch (Exception ex)
             {
@@ -8475,11 +8515,6 @@ namespace GS.Server.SkyTelescope
         // exactly as they are.
         ~SkyTelescopeVM()
         {
-            Settings.Settings.ModelLookDirection2 = LookDirection;
-            Settings.Settings.ModelUpDirection2 = UpDirection;
-            Settings.Settings.ModelPosition2 = Position;
-            Settings.Settings.Save();
-
             // Finalizer calls Dispose(false)
             Dispose(false);
         }

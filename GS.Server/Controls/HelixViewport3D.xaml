@@ -47,7 +47,10 @@
             <h:BoxVisual3D Height="0" Width="2000" Length="2000" Center="0,0,0" Fill="Transparent" BottomFace="False" BackMaterial="{Binding Compass, Mode=OneWay}" Material="{Binding Compass, Mode=OneWay}" />
         </h:HelixViewport3D>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-        <Button Width="20" Height="20" Margin="5" ToolTip="{StaticResource hcOpenWin}" Command="{Binding OpenModelWindowCmd}" Style="{StaticResource MaterialDesignRaisedAccentButton}" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Visibility="{Binding ModelWinVisibility, Converter={StaticResource BoolToVis}}">
+            <Button Width="20" Height="20" Margin="5" ToolTip="{StaticResource gpSave}" Command="{Binding SaveModelViewCmd}" Style="{StaticResource MaterialDesignRaisedAccentButton}" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Visibility="{Binding ModelWinVisibility, Converter={StaticResource BoolToVis}}">
+                <materialDesign:PackIcon Kind="CompassOutline" Margin="-14,-2,0,0" />
+            </Button>
+            <Button Width="20" Height="20" Margin="5" ToolTip="{StaticResource hcOpenWin}" Command="{Binding OpenModelWindowCmd}" Style="{StaticResource MaterialDesignRaisedAccentButton}" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Visibility="{Binding ModelWinVisibility, Converter={StaticResource BoolToVis}}">
             <materialDesign:PackIcon Kind="OpenInNew" Margin="-14,-2,0,0" />
         </Button>
         <Button Width="20" Height="20" Margin="5" ToolTip="{StaticResource 3dResetView}" Command="{Binding OpenResetViewCmd}" Style="{StaticResource MaterialDesignRaisedAccentButton}" VerticalAlignment="Top" HorizontalAlignment="Right"  HorizontalContentAlignment="Left" VerticalContentAlignment="Top">

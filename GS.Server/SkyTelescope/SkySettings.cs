@@ -796,14 +796,14 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static double _axisTraclingLimit;
+        private static double _axisTrackingLimit;
         public static double AxisTrackingLimit
         {
-            get => _axisTraclingLimit;
+            get => _axisTrackingLimit;
             set
             {
-                if (Math.Abs(_axisTraclingLimit - value) < 0.0000000000001) return;
-                _axisTraclingLimit = value;
+                if (Math.Abs(_axisTrackingLimit - value) < 0.0000000000001) return;
+                _axisTrackingLimit = value;
                 Properties.SkyTelescope.Default.AxisTrackingLimit = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();

@@ -584,7 +584,7 @@ namespace GS.Server.Settings
             ModelUpDirection1 = Vector3D.Parse(Properties.Server.Default.ModelUpDirection1);
             ModelLookDirection2 = Vector3D.Parse(Properties.Server.Default.ModelLookDirection2);
             ModelPosition2 = Point3D.Parse(Properties.Server.Default.ModelPosition2);
-            ModelUpDirection2 = Vector3D.Parse(Properties.Server.Default.ModelPosition2);
+            ModelUpDirection2 = Vector3D.Parse(Properties.Server.Default.ModelUpDirection2);
             Pec = Properties.Server.Default.Pec;
             Plot = Properties.Server.Default.Plot;
             PoleLocator = Properties.Server.Default.PoleLocator;

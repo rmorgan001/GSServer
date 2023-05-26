@@ -116,6 +116,18 @@ namespace GS.Server.Settings
                     ClearSettings();
 
                     RenderCapability = (System.Windows.Media.RenderCapability.Tier >> 16).ToString();
+                    monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.UI,
+                        Category = MonitorCategory.Interface,
+                        Type = MonitorType.Information,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"RenderCapability|{RenderCapability}"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
+
                     CurrentVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
                     Settings.SkyWatcher = true;
                     PecShow = SkyServer.PecShow;
