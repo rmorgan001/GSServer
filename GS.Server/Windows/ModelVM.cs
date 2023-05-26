@@ -398,7 +398,6 @@ namespace GS.Server.Windows
             {
                 CameraVis = false;
 
-                //camera direction
                 if (CameraIndex == 1)
                 {
                     LookDirection = Settings.Settings.ModelLookDirection1;
@@ -411,7 +410,6 @@ namespace GS.Server.Windows
                     UpDirection = Settings.Settings.ModelUpDirection2;
                     Position = Settings.Settings.ModelPosition2;
                 }
-
 
                 //offset for model to match start position
                 xAxisOffset = 90;
@@ -532,10 +530,7 @@ namespace GS.Server.Windows
         {
             try
             {
-                LookDirection = new Vector3D(-900, -1100, -400);
-                UpDirection = new Vector3D(.35, .43, .82);
-                Position = new Point3D(900, 1100, 800);
-                //LoadGEM();
+                LoadGEM();
             }
             catch (Exception ex)
             {

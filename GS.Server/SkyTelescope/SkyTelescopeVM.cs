@@ -198,7 +198,6 @@ namespace GS.Server.SkyTelescope
                         break;
                     case FrontGraphic.Model3D:
                         Rotate();
-                        //OpenResetView();
                         LoadGEM();
                         break;
                     default:
@@ -1903,10 +1902,10 @@ namespace GS.Server.SkyTelescope
                 }
                 //color weights
                 var materialweights = MaterialHelper.CreateMaterial(new SolidColorBrush(Color.FromRgb(64, 64, 64)));
-                if (model.Children[1] is GeometryModel3D weights) weights.Material = materialweights;
+                if (model.Children[1] is GeometryModel3D weights){ weights.Material = materialweights;}
                 //color bar
                 var materialbar = MaterialHelper.CreateMaterial(Brushes.Gainsboro);
-                if (model.Children[2] is GeometryModel3D bar) bar.Material = materialbar;
+                if (model.Children[2] is GeometryModel3D bar){ bar.Material = materialbar;}
 
                 Model = model;
             }
@@ -2003,10 +2002,7 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
-                LookDirection = new Vector3D(-900, -1100, -400);
-                UpDirection = new Vector3D(.35, .43, .82);
-                Position = new Point3D(900, 1100, 800);
-                //LoadGEM();
+                LoadGEM();
             }
             catch (Exception ex)
             {
