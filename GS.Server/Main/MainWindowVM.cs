@@ -645,7 +645,7 @@ namespace GS.Server.Main
                 OnPropertyChanged();
             }
         }
-        
+
         private bool _poleLocatorVMRadio;
         public bool PoleLocatorVMRadioRadio
         {
@@ -776,7 +776,7 @@ namespace GS.Server.Main
 
         public string AlignmentAlertBadge
         {
-            get => _alignmentVM.AlertBadge;
+            get => _alignmentVM?.AlertBadge;
         }
 
         private bool _alignmentRadioVisible;
