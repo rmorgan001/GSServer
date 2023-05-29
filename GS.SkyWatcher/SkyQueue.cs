@@ -15,6 +15,7 @@
  */
 using GS.Principles;
 using GS.Shared;
+using GS.Shared.Transport;
 using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
@@ -48,7 +49,7 @@ namespace GS.SkyWatcher
         /// <summary>
         /// Serial object
         /// </summary>
-        internal static SerialPort Serial { get; private set; }
+        internal static ISerialPort Serial { get; private set; }
         /// <summary>
         /// Custom Mount :s replacement
         /// </summary>
@@ -207,7 +208,7 @@ namespace GS.SkyWatcher
         /// <param name="serial"></param>
         /// <param name="customMount360Steps"></param>
         /// <param name="customRaWormSteps"></param>
-        public static void Start(SerialPort serial, int[] customMount360Steps, double[] customRaWormSteps)
+        public static void Start(ISerialPort serial, int[] customMount360Steps, double[] customRaWormSteps)
         {
             Serial = serial;
             CustomMount360Steps = customMount360Steps;

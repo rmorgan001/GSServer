@@ -74,7 +74,7 @@ namespace GS.SkyWatcher
         /// <summary>
         /// Indicate whether the motor controller supports advanced command set (Firmware version 3.22.xx or above)
         /// </summary> 
-        public bool SupportAdvancedCommandSet;
+        public bool SupportAdvancedCommandSet { get; private set; }
 
         /// <summary>
         /// Indicate whether the advanced command set is allowed to be used
@@ -1567,7 +1567,8 @@ namespace GS.SkyWatcher
             var StartReading = false;
 
             var sw = Stopwatch.StartNew();
-            while (sw.Elapsed.TotalMilliseconds < SkyQueue.Serial.ReadTimeout)
+            var readTimeout = SkyQueue.Serial.ReadTimeout;
+            while (sw.Elapsed < readTimeout)
             {
                 var data = SkyQueue.Serial.ReadExisting();
                 foreach (var byt in data)
