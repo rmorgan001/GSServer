@@ -12,7 +12,7 @@
  */
 //---------------------------------------------------------------------
 // based on original work
-// Copyright � 2006 Raymund Sarmiento
+// Copyright (C) 2006 Raymund Sarmiento
 //
 // Permission is hereby granted to use this Software for any purpose
 // including combining with commercial products, creating derivative
@@ -274,7 +274,7 @@ namespace GS.Server.Alignment
         }
 
         /// <summary>
-        /// Subroutine to draw the Transformation Matrix (Affine Mapping Method) 
+        /// Subroutine to draw the Transformation Matrix (Affine Mapping Method)
         /// </summary>
         /// <param name="x"></param>
         /// <param name="Y"></param>
@@ -633,11 +633,11 @@ namespace GS.Server.Alignment
             switch (this.ThreePointAlgorithm)
             {
                 case ThreePointAlgorithmEnum.BestCentre:
-                    // find the 50 nearest points - then find the nearest enclosing triangle 
+                    // find the 50 nearest points - then find the nearest enclosing triangle
                     nearestPoints = EQ_Choose_3Points(pos);
                     break;
                 default:
-                    // find the 50 nearest points - then find the enclosing triangle with the nearest centre point 
+                    // find the 50 nearest points - then find the enclosing triangle with the nearest centre point
                     nearestPoints = EQ_ChooseNearest3Points(pos);
                     break;
             }
@@ -1202,7 +1202,7 @@ namespace GS.Server.Alignment
         private SphericalCoord EQ_SphericalPolar(AxisPosition spherical)
         {
             var axes = Axes.AxesMountToApp(spherical);
-            
+
             SphericalCoord result = new SphericalCoord();
             double[] azAlt = Axes.AxesXYToAzAlt(axes);
 
@@ -1232,7 +1232,7 @@ namespace GS.Server.Alignment
             {
                 result = Axes.GetAltAxisPosition(result);
             }
-                
+
             return result;
         }
 
@@ -1265,11 +1265,11 @@ namespace GS.Server.Alignment
                 switch (this.ActivePoints)
                 {
                     case ActivePointsEnum.All:
-                        // all points 
+                        // all points
 
                         break;
                     case ActivePointsEnum.PierSide:
-                        // only consider points on this side of the meridian 
+                        // only consider points on this side of the meridian
                         if (pt.UnsyncedCartesian.y * pos.y < 0)
                         {
                             continue;
@@ -1277,7 +1277,7 @@ namespace GS.Server.Alignment
 
                         break;
                     case ActivePointsEnum.LocalQuadrant:
-                        // local quadrant 
+                        // local quadrant
                         if (!GetQuadrant(pos).Equals(GetQuadrant(pt.UnsyncedCartesian)))
                         {
                             continue;
@@ -1370,11 +1370,11 @@ namespace GS.Server.Alignment
                 switch (ActivePoints)
                 {
                     case ActivePointsEnum.All:
-                        // all points 
+                        // all points
 
                         break;
                     case ActivePointsEnum.PierSide:
-                        // only consider points on this side of the meridian 
+                        // only consider points on this side of the meridian
                         if (pt.UnsyncedCartesian.y * pos.y < 0)
                         {
                             continue;
@@ -1382,7 +1382,7 @@ namespace GS.Server.Alignment
 
                         break;
                     case ActivePointsEnum.LocalQuadrant:
-                        // local quadrant 
+                        // local quadrant
                         if (!GetQuadrant(pos).Equals(GetQuadrant(pt.UnsyncedCartesian)))
                         {
                             continue;
