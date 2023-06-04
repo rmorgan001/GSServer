@@ -101,7 +101,7 @@ namespace GS.SkyWatcher
         /// <param name="command"></param>
         public static void AddCommand(ISkyCommand command)
         {
-            if (!IsRunning || _cts.IsCancellationRequested || !_skyWatcher.IsConnected) return;
+            if (!IsRunning || _cts.IsCancellationRequested || _skyWatcher?.IsConnected != true) return;
             CleanResults(40, 180);
             if (_commandBlockingCollection.TryAdd(command) == false)
             {
@@ -117,7 +117,7 @@ namespace GS.SkyWatcher
         /// <param name="seconds"></param>
         private static void CleanResults(int count, int seconds)
         {
-            if (!IsRunning || _cts.IsCancellationRequested || !_skyWatcher.IsConnected) return;
+            if (!IsRunning || _cts.IsCancellationRequested || _skyWatcher?.IsConnected != true) return;
             if (_resultsDictionary.IsEmpty) return;
             var recordscount = _resultsDictionary.Count;
             if (recordscount == 0) return;
@@ -146,7 +146,7 @@ namespace GS.SkyWatcher
         /// <returns></returns>
         public static ISkyCommand GetCommandResult(ISkyCommand command)
         {
-            if (!IsRunning || _cts.IsCancellationRequested || !_skyWatcher.IsConnected)
+            if (!IsRunning || _cts.IsCancellationRequested || _skyWatcher?.IsConnected != true)
             {
                 var a = "Queue | IsRunning:" + IsRunning + "| IsCancel:" + _cts.IsCancellationRequested + "| IsConnected:" + (_skyWatcher?.IsConnected == true);
                 if (command.Exception != null){a += "| Ex:" + command.Exception.Message;}
@@ -177,7 +177,7 @@ namespace GS.SkyWatcher
         {
             try
             {
-                if (!IsRunning || _cts.IsCancellationRequested || !_skyWatcher.IsConnected) return;
+                if (!IsRunning || _cts.IsCancellationRequested || _skyWatcher?.IsConnected != true) return;
                 command.Execute(_skyWatcher);
                 if (command.Exception != null)
                 {
