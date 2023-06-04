@@ -4,7 +4,10 @@ namespace GS.Shared.Transport
 {
     public interface ISerialPort : IDisposable
     {
-        TimeSpan ReadTimeout { get; }
+        /// <summary>
+        /// Read timeout in milliseconds
+        /// </summary>
+        int ReadTimeout { get; }
 
         bool IsOpen { get; }
 

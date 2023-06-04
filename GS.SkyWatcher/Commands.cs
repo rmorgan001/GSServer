@@ -1581,8 +1581,8 @@ namespace GS.SkyWatcher
             var StartReading = false;
 
             var sw = Stopwatch.StartNew();
-            var readTimeout = Debugger.IsAttached ? TimeSpan.FromMinutes(10) : SkyQueue.Serial.ReadTimeout;
-            while (sw.Elapsed < readTimeout)
+            var readTimeout = Debugger.IsAttached ? (int)TimeSpan.FromMinutes(10).TotalMilliseconds : SkyQueue.Serial.ReadTimeout;
+            while (sw.ElapsedMilliseconds < readTimeout)
             {
                 var data = SkyQueue.Serial.ReadExisting();
                 foreach (var byt in data)
