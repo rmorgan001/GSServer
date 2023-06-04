@@ -57,12 +57,14 @@ namespace GS.Shared.Transport
         public event EventHandler<DiscoveryEventArgs> RemovedDeviceEvent;
 
         /// <summary>
+        /// Discovers all COM serial ports.
         /// Sends <c>:e1\r</c> to all WiFi broadcast addresses (no NAT traversal).
+        /// Cleans up non-active and previously discovered devices.
         /// <list type="number">
         ///   <item>Initializes UDP clients for broadcast, one per network interface</item>
         ///   <item>Removes all UDP devices that where discovered previously but did not respond on last invocation of this method</item>
         ///   <item>Marks all currently active UDP devices as dirty</item>
-        ///   <item>Discovers all serial ports (synchronously)</item>
+        ///   <item>Discovers all COM serial ports (synchronously)</item>
         ///   <item>Broadcasts and listens for responses</item>
         /// </list>
         /// </summary>
@@ -89,22 +91,28 @@ namespace GS.Shared.Transport
                 }
             }
 
+            var added = new List<Device>();
             foreach (var portNumber in portNumbers.OrderBy(x => x))
             {
                 var device = new Device(portNumber);
                 if (_allDevices.TryAdd(portNumber, device))
                 {
-                    DiscoveredDeviceEvent?.Invoke(this, new DiscoveryEventArgs(device));
+                    added.Add(device);
                 }
             }
 
+            DiscoveredDeviceEvent?.Invoke(this, new DiscoveryEventArgs(added));
+
+            var removed = new List<Device>();
             foreach (var deviceIndex in _allDevices.Keys)
             {
                 if (deviceIndex > 0 && !portNumbers.Contains(deviceIndex) && _allDevices.TryRemove(deviceIndex, out var device))
                 {
-                    RemovedDeviceEvent?.Invoke(this, new DiscoveryEventArgs(device));
+                    removed.Add(device);
                 }
             }
+
+            RemovedDeviceEvent?.Invoke(this, new DiscoveryEventArgs(removed));
         }
 
         void BroadcastDiscoverMessage()
@@ -162,13 +170,16 @@ namespace GS.Shared.Transport
         /// </summary>
         void CleanupDirtyUdpDevices()
         {
+            var removed = new List<Device>();
             foreach (var ep in _dirtyUdpDevices.Keys)
             {
                 if (_dirtyUdpDevices.TryRemove(ep, out var deviceIndex) && _allDevices.TryRemove(deviceIndex, out var device))
                 {
-                    RemovedDeviceEvent?.Invoke(this, new DiscoveryEventArgs(device));
+                    removed.Add(device);
                 }
             }
+
+            RemovedDeviceEvent?.Invoke(this, new DiscoveryEventArgs(removed));
         }
 
         /// <summary>
@@ -227,9 +238,9 @@ namespace GS.Shared.Transport
                 deviceId = _activeUdpDevices.GetOrAdd(remoteEP, _ => Interlocked.Decrement(ref _deviceIndex));
             }
 
-            var dsicoveredDevice = _allDevices.GetOrAdd(deviceId, new Device(deviceId, remoteEP));
+            var discoveredDevice = _allDevices.GetOrAdd(deviceId, new Device(deviceId, remoteEP));
 
-            DiscoveredDeviceEvent?.Invoke(this, new DiscoveryEventArgs(dsicoveredDevice));
+            DiscoveredDeviceEvent?.Invoke(this, new DiscoveryEventArgs(new[] { discoveredDevice }));
         }
 
         static bool IsSuccessfulResponse(string response) => response?.Length > 2 && response[0] == '=';

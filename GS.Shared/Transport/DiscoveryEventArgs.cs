@@ -1,15 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GS.Shared.Transport
 {
     public class DiscoveryEventArgs : EventArgs
     {
-        public DiscoveryEventArgs(Device device)
+        public DiscoveryEventArgs(IReadOnlyList<Device> devices)
         {
-            Device = device;
+            Devices = devices;
         }
 
-        public Device Device { get; }
+        public IReadOnlyList<Device> Devices { get; }
     }
 }
 

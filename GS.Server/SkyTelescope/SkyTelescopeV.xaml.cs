@@ -30,10 +30,20 @@ namespace GS.Server.SkyTelescope
         {
             Dispatcher.InvokeAsync(() =>
             {
+                var isChanged = false;
                 var ctx = DataContext as SkyTelescopeVM;
-                if (!ctx.Devices.Contains(e.Device))
+
+                foreach (var device in e.Devices)
                 {
-                    ctx.Devices.Add(e.Device);
+                    if (!ctx.Devices.Contains(device))
+                    {
+                        ctx.Devices.Add(device);
+                        isChanged = true;
+                    }
+                }
+
+                if (isChanged)
+                {
                     ctx?.RaisePropertyChanged(nameof(SkyTelescopeVM.Devices));
                 }
             });
@@ -43,8 +53,18 @@ namespace GS.Server.SkyTelescope
         {
             Dispatcher.InvokeAsync(() =>
             {
+                var isChanged = false;
                 var ctx = DataContext as SkyTelescopeVM;
-                if (ctx.Devices.Remove(e.Device))
+
+                foreach (var device in e.Devices)
+                {
+                    if (ctx.Devices.Remove(device))
+                    {
+                        isChanged = true;
+                    }
+                }
+
+                if (isChanged)
                 {
                     ctx?.RaisePropertyChanged(nameof(SkyTelescopeVM.Devices));
                 }
