@@ -51,6 +51,7 @@ using Color = System.Windows.Media.Color;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using NativeMethods = GS.Server.Helpers.NativeMethods;
 using Point = System.Windows.Point;
+using GS.Shared.Transport;
 
 namespace GS.Server.SkyTelescope
 {
@@ -720,30 +721,21 @@ namespace GS.Server.SkyTelescope
                 }
             }
         }
-        public IList<int> ComPorts
+
+        public IDiscoveryService DiscoveryService { get; } = new DiscoveryService();
+
+        public IList<Device> Devices
         {
-            get
-            {
-                var ports = new List<int>();
-                foreach (var item in System.IO.Ports.SerialPort.GetPortNames())
-                {
-                    if (string.IsNullOrEmpty(item)) continue;
-                    var tmp = Strings.GetNumberFromString(item);
-                    if (tmp.HasValue)
-                    {
-                        ports.Add((int)tmp);
-                    }
-                }
-                return ports;
-            }
+            get => SkySettings.Devices;
         }
-        public int ComPort
+
+        public int DeviceIndex
         {
-            get => SkySettings.ComPort;
+            get => SkySettings.DeviceIndex;
             set
             {
-                if (value == SkySettings.ComPort) return;
-                SkySettings.ComPort = value;
+                if (value == SkySettings.DeviceIndex) return;
+                SkySettings.DeviceIndex = value;
                 OnPropertyChanged();
             }
         }
@@ -2119,12 +2111,20 @@ namespace GS.Server.SkyTelescope
             get => _openSetupDialog;
             set
             {
-                if (value == _openSetupDialog){return;}
+                if (value == _openSetupDialog) return;
+
                 _openSetupDialog = value;
-                if (!value) { ClickCloseSettings(); }
+
+                if (value)
+                {
+                    DiscoveryService.Discover();
+                }
+                else
+                {
+                    ClickCloseSettings();
+                }
+
                 OnPropertyChanged();
-                // forces the updating of the com ports
-                OnPropertyChanged($"ComPorts");
             }
         }
 

@@ -500,11 +500,25 @@ namespace GS.SkyWatcher
             }
             
             const int a = 0x032200; //205312
-            SupportAdvancedCommandSet = intVersion > a;
 
+            if (intVersion == 0x0325A5) // AZ GTI in EQ mode
+            {
+                SupportAdvancedCommandSet = false;
+            }
             // SW recommends no support for single axis trackers 0x07, 0x08, 0x0A, and 0x0F
             //"Star Adventurer Mount" advanced firmware 3.130.07 exclude
-            if (intVersion == 0x038207){SupportAdvancedCommandSet = false;}
+            else if (intVersion == 0x038207)
+            {
+                SupportAdvancedCommandSet = false;
+            }
+            else if (intVersion > a)
+            {
+                SupportAdvancedCommandSet = true;
+            }
+            else
+            {
+                SupportAdvancedCommandSet = false;
+            }
 
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $":{msg}|{axis}|{response}|{_axisStringVersion[(int)axis]}|Advanced:{SupportAdvancedCommandSet}" };
@@ -1496,7 +1510,7 @@ namespace GS.SkyWatcher
             //Serial.Transmit(commandStr.ToString());
             SkyQueue.Serial.Write(commandStr.ToString());
 
-            return $"{commandStr.ToString().Trim()}";
+            return commandStr.ToString().Trim();
         }
 
         ///// <summary>
@@ -1567,7 +1581,7 @@ namespace GS.SkyWatcher
             var StartReading = false;
 
             var sw = Stopwatch.StartNew();
-            var readTimeout = SkyQueue.Serial.ReadTimeout;
+            var readTimeout = Debugger.IsAttached ? TimeSpan.FromMinutes(10) : SkyQueue.Serial.ReadTimeout;
             while (sw.Elapsed < readTimeout)
             {
                 var data = SkyQueue.Serial.ReadExisting();

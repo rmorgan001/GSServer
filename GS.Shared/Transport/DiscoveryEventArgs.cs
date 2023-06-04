@@ -4,12 +4,12 @@ namespace GS.Shared.Transport
 {
     public class DiscoveryEventArgs : EventArgs
     {
-        public DiscoveryEventArgs(RemoteDevice device)
+        public DiscoveryEventArgs(Device device)
         {
             Device = device;
         }
 
-        public RemoteDevice Device { get; }
+        public Device Device { get; }
     }
 }
 

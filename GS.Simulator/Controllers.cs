@@ -170,7 +170,7 @@ namespace GS.Simulator
         {
             var cmd = command.Split('|');
             double a;
-            switch (cmd[0].ToLower())
+            switch (cmd[0].ToLowerInvariant())
             {
                 case "capabilities":
                     return

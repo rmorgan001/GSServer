@@ -90,36 +90,40 @@ namespace GS.Server.SkyTelescope
 
         public static bool ConnectSerial
         {
-            get => Serial != null && Serial.IsOpen;
+            get => Serial?.IsOpen == true;
             internal set
             {
                 try
                 {
-                    if (value)
-                    {
-                        Serial?.Dispose();
-                        Serial = null;
+                    Serial?.Dispose();
+                    Serial = null;
 
-                        var options = SerialOptions.DiscardNull
-                            | (SkySettings.DtrEnable ? SerialOptions.DtrEnable : SerialOptions.None)
-                            | (SkySettings.RtsEnable ? SerialOptions.RtsEnable : SerialOptions.None);
-
-                        Serial = new GSSerialPort(
-                            $"COM{SkySettings.ComPort}",
-                            (int)SkySettings.BaudRate,
-                            TimeSpan.FromMilliseconds(SkySettings.ReadTimeout),
-                            SkySettings.HandShake,
-                            Parity.None,
-                            StopBits.One,
-                            SkySettings.DataBits,
-                            options
-                        );
-                        Serial.Open();
-                    }
-                    else
+                    if (value && SkySettings.TryGetDevice(out var device))
                     {
-                        Serial?.Dispose();
-                        Serial = null;
+                        var readTimeout = TimeSpan.FromMilliseconds(SkySettings.ReadTimeout);
+                        if (device.Index > 0)
+                        {
+                            var options = SerialOptions.DiscardNull
+                                | (SkySettings.DtrEnable ? SerialOptions.DtrEnable : SerialOptions.None)
+                                | (SkySettings.RtsEnable ? SerialOptions.RtsEnable : SerialOptions.None);
+
+                            Serial = new GSSerialPort(
+                                $"COM{device.Index}",
+                                (int)SkySettings.BaudRate,
+                                readTimeout,
+                                SkySettings.HandShake,
+                                Parity.None,
+                                StopBits.One,
+                                SkySettings.DataBits,
+                                options
+                            );
+                        }
+                        else if (device.Endpoint != null)
+                        {
+                            Serial = new SerialOverUdpPort(device.Endpoint, readTimeout);
+                        }
+
+                        Serial?.Open();
                     }
                     OnStaticPropertyChanged();
                 }
@@ -139,7 +143,6 @@ namespace GS.Server.SkyTelescope
 
                     Serial = null;
                 }
-
             }
         }
 

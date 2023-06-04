@@ -10,7 +10,9 @@
              xmlns:deviceInterface="clr-namespace:ASCOM.DeviceInterface;assembly=ASCOM.DeviceInterfaces"
              xmlns:controls="clr-namespace:GS.Server.Controls"
              xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
-             Loaded="SkyTelescopeV_OnLoaded" mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+             Loaded="SkyTelescopeV_OnLoaded"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
     <UserControl.Resources>
         <domain:ComparisonConverter x:Key="Compare" />
         <domain:InverseBooleanConverter x:Key="InvertBool" />
@@ -49,14 +51,15 @@
                                     CommandParameter="{x:Static Dock.Left}" IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked}"/>
                                 </Grid>
                             <ComboBox Grid.Row="1" Grid.Column="0" md:HintAssist.Hint="{StaticResource skyPorts}" MinWidth="10" Margin="0,0,0,0" VerticalAlignment="Center"  ToolTip="{StaticResource skyPorts}"  
-                                          ItemsSource="{Binding ComPorts}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
-                                <ComboBox.SelectedItem>
-                                    <Binding Path="ComPort" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                          ItemsSource="{Binding Devices}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                                <ComboBox.SelectedValue>
+                                    <Binding Path="DeviceIndex" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                         <Binding.ValidationRules>
                                             <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
                                         </Binding.ValidationRules>
                                     </Binding>
-                                </ComboBox.SelectedItem>
+                                </ComboBox.SelectedValue>
+                                <ComboBox.SelectedValuePath>Index</ComboBox.SelectedValuePath>
                                 <ComboBox.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <VirtualizingStackPanel />

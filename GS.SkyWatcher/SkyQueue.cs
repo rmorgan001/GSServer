@@ -49,7 +49,7 @@ namespace GS.SkyWatcher
         /// <summary>
         /// Serial object
         /// </summary>
-        internal static ISerialPort Serial { get; private set; }
+        internal static ISerialPort Serial { [MethodImpl(MethodImplOptions.AggressiveInlining)] get; private set; }
         /// <summary>
         /// Custom Mount :s replacement
         /// </summary>
@@ -148,7 +148,7 @@ namespace GS.SkyWatcher
         {
             if (!IsRunning || _cts.IsCancellationRequested || !_skyWatcher.IsConnected)
             {
-                var a = "Queue | IsRunning:" + IsRunning + "| IsCancel:" + _cts.IsCancellationRequested + "| IsConnected:" + _skyWatcher.IsConnected;
+                var a = "Queue | IsRunning:" + IsRunning + "| IsCancel:" + _cts.IsCancellationRequested + "| IsConnected:" + (_skyWatcher?.IsConnected == true);
                 if (command.Exception != null){a += "| Ex:" + command.Exception.Message;}
                 var e = new MountControlException(ErrorCode.ErrQueueFailed, a);
                 command.Exception = e;

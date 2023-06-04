@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace GS.Shared.Transport
 {
-    public class SerialUdpPortDiscoveryService : ISerialUdpPortDiscoveryService
+    public class DiscoveryService : IDiscoveryService
     {
         private readonly byte[] DiscoverMsg = Encode(":e1\r");
 
@@ -19,28 +19,30 @@ namespace GS.Shared.Transport
         static string Decode(byte[] msg) => msg != null ? Encoding.ASCII.GetString(msg).Replace("\0", "").Trim() : "";
 
         private readonly ConcurrentDictionary<IPAddress, Lazy<UdpClient>> _udpClients;
-        private readonly ConcurrentDictionary<IPEndPoint, int> _dirtyDevices;
-        private readonly ConcurrentDictionary<IPEndPoint, int> _activeDevices;
-        private readonly ConcurrentDictionary<int, RemoteDevice> _allDevices;
+        private readonly ConcurrentDictionary<IPEndPoint, int> _dirtyUdpDevices;
+        private readonly ConcurrentDictionary<IPEndPoint, int> _activeUdpDevices;
+        private readonly ConcurrentDictionary<int, Device> _allDevices;
         private readonly int _remotePort;
 
         private volatile int _deviceIndex = 0;
         private bool disposedValue;
 
-        public SerialUdpPortDiscoveryService(int remotePort)
+        public DiscoveryService(int remotePort = Device.DefaultPort)
         {
             _udpClients = new ConcurrentDictionary<IPAddress, Lazy<UdpClient>>();
-            _dirtyDevices = new ConcurrentDictionary<IPEndPoint, int>();
-            _activeDevices = new ConcurrentDictionary<IPEndPoint, int>();
-            _allDevices = new ConcurrentDictionary<int, RemoteDevice>();
+            _dirtyUdpDevices = new ConcurrentDictionary<IPEndPoint, int>();
+            _activeUdpDevices = new ConcurrentDictionary<IPEndPoint, int>();
+            _allDevices = new ConcurrentDictionary<int, Device>();
             _remotePort = remotePort;
         }
 
-        public IEnumerable<RemoteDevice> ActiveDevices
+        public IEnumerable<Device> AllDevices => _allDevices.Values;
+
+        public IEnumerable<Device> ActiveDevices
         {
             get
             {
-                foreach (var activeDeviceId in _activeDevices.Values)
+                foreach (var activeDeviceId in _activeUdpDevices.Values)
                 {
                     if (_allDevices.TryGetValue(activeDeviceId, out var device))
                     {
@@ -58,17 +60,51 @@ namespace GS.Shared.Transport
         /// Sends <c>:e1\r</c> to all WiFi broadcast addresses (no NAT traversal).
         /// <list type="number">
         ///   <item>Initializes UDP clients for broadcast, one per network interface</item>
-        ///   <item>Removes all devices that where discovered previously but did not respond on last invocation of this method</item>
-        ///   <item>Marks all currently active devices as dirty</item>
+        ///   <item>Removes all UDP devices that where discovered previously but did not respond on last invocation of this method</item>
+        ///   <item>Marks all currently active UDP devices as dirty</item>
+        ///   <item>Discovers all serial ports (synchronously)</item>
         ///   <item>Broadcasts and listens for responses</item>
         /// </list>
         /// </summary>
         public void Discover()
         {
             InitializeUdpClients();
-            CleanupDirtyDevices();
+            CleanupDirtyUdpDevices();
             MarkPreviouslyActiveDevicesAsDirty();
+            DiscoverSerialDevices();
             BroadcastDiscoverMessage();
+        }
+
+        void DiscoverSerialDevices()
+        {
+            var allPorts = System.IO.Ports.SerialPort.GetPortNames();
+            var portNumbers = new HashSet<int>();
+            foreach (var port in allPorts)
+            {
+                if (string.IsNullOrEmpty(port)) continue;
+                var portNumber = Strings.GetNumberFromString(port);
+                if (portNumber >= 1)
+                {
+                    portNumbers.Add(portNumber.Value);
+                }
+            }
+
+            foreach (var portNumber in portNumbers.OrderBy(x => x))
+            {
+                var device = new Device(portNumber);
+                if (_allDevices.TryAdd(portNumber, device))
+                {
+                    DiscoveredDeviceEvent?.Invoke(this, new DiscoveryEventArgs(device));
+                }
+            }
+
+            foreach (var deviceIndex in _allDevices.Keys)
+            {
+                if (deviceIndex > 0 && !portNumbers.Contains(deviceIndex) && _allDevices.TryRemove(deviceIndex, out var device))
+                {
+                    RemovedDeviceEvent?.Invoke(this, new DiscoveryEventArgs(device));
+                }
+            }
         }
 
         void BroadcastDiscoverMessage()
@@ -124,11 +160,11 @@ namespace GS.Shared.Transport
         /// <summary>
         /// Removes all devices that are currently dirty (as they have not been fully discovered last run).
         /// </summary>
-        void CleanupDirtyDevices()
+        void CleanupDirtyUdpDevices()
         {
-            foreach (var ep in _dirtyDevices.Keys)
+            foreach (var ep in _dirtyUdpDevices.Keys)
             {
-                if (_activeDevices.TryRemove(ep, out var deviceIndex) && _allDevices.TryRemove(deviceIndex, out var device))
+                if (_dirtyUdpDevices.TryRemove(ep, out var deviceIndex) && _allDevices.TryRemove(deviceIndex, out var device))
                 {
                     RemovedDeviceEvent?.Invoke(this, new DiscoveryEventArgs(device));
                 }
@@ -142,11 +178,11 @@ namespace GS.Shared.Transport
         /// </summary>
         void MarkPreviouslyActiveDevicesAsDirty()
         {
-            foreach (var ep in _activeDevices.Keys)
+            foreach (var ep in _activeUdpDevices.Keys)
             {
-                if (_activeDevices.TryRemove(ep, out var device))
+                if (_activeUdpDevices.TryRemove(ep, out var device))
                 {
-                    _dirtyDevices.AddOrUpdate(ep, device, (_, old) => device);
+                    _dirtyUdpDevices.AddOrUpdate(ep, device, (_, old) => device);
                 }
             }
         }
@@ -170,28 +206,28 @@ namespace GS.Shared.Transport
                 var response = Decode(updClient.Value.EndReceive(receiveRes, ref remoteEP));
                 if (remoteEP != null && IsSuccessfulResponse(response))
                 {
-                    OnDeviceDiscovery(remoteEP);
+                    OnUdpDeviceDiscovery(remoteEP);
                 }
             }
         }
 
-        void OnDeviceDiscovery(IPEndPoint remoteEP)
+        void OnUdpDeviceDiscovery(IPEndPoint remoteEP)
         {
             int deviceId;
-            if (_dirtyDevices.TryRemove(remoteEP, out var dirtyDeviceId))
+            if (_dirtyUdpDevices.TryRemove(remoteEP, out var dirtyDeviceId))
             {
-                deviceId = _activeDevices.GetOrAdd(remoteEP, dirtyDeviceId);
+                deviceId = _activeUdpDevices.GetOrAdd(remoteEP, dirtyDeviceId);
             }
-            else if (_activeDevices.TryGetValue(remoteEP, out var activeDeviceId))
+            else if (_activeUdpDevices.TryGetValue(remoteEP, out var activeDeviceId))
             {
                 deviceId = activeDeviceId;
             }
             else
             {
-                deviceId = _activeDevices.GetOrAdd(remoteEP, _ => Interlocked.Increment(ref _deviceIndex));
+                deviceId = _activeUdpDevices.GetOrAdd(remoteEP, _ => Interlocked.Decrement(ref _deviceIndex));
             }
 
-            var dsicoveredDevice = _allDevices.GetOrAdd(deviceId, new RemoteDevice(deviceId, remoteEP));
+            var dsicoveredDevice = _allDevices.GetOrAdd(deviceId, new Device(deviceId, remoteEP));
 
             DiscoveredDeviceEvent?.Invoke(this, new DiscoveryEventArgs(dsicoveredDevice));
         }
@@ -213,8 +249,8 @@ namespace GS.Shared.Transport
                     }
                 }
 
-                _dirtyDevices.Clear();
-                _activeDevices.Clear();
+                _dirtyUdpDevices.Clear();
+                _activeUdpDevices.Clear();
                 _allDevices.Clear();
 
                 disposedValue =true;

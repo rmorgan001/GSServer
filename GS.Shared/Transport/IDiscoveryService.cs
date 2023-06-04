@@ -3,9 +3,10 @@ using System.Collections.Generic;
 
 namespace GS.Shared.Transport
 {
-    public interface ISerialUdpPortDiscoveryService : IDisposable
+    public interface IDiscoveryService : IDisposable
     {
-        IEnumerable<RemoteDevice> ActiveDevices { get; }
+        IEnumerable<Device> AllDevices { get; }
+        IEnumerable<Device> ActiveDevices { get; }
 
         /// <summary>
         /// Asynchronously sends UDP broadcast messages to discover all reachable devices.

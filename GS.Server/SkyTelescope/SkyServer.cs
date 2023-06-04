@@ -4050,7 +4050,7 @@ namespace GS.Server.SkyTelescope
                     if (!SkySystem.ConnectSerial)
                     {
                         throw new SkyServerException(ErrorCode.ErrSerialFailed,
-                            $"Serial Failed COM{SkySettings.ComPort}");
+                            $"Serial Failed {(SkySettings.TryGetDevice(out var device) ? device.ToString() : "(no device)")}");
                     }
                     // Start up, pass custom mount gearing if needed
                     var Custom360Steps = new[] { 0, 0 };

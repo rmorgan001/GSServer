@@ -1,6 +1,9 @@
-﻿using System;
+﻿using GS.Principles;
+using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
+using System.Threading;
 
 namespace GS.Shared.Transport
 {
@@ -25,7 +28,7 @@ namespace GS.Shared.Transport
 
         public void DiscardInBuffer()
         {
-            if (_udpClient.Available > 0)
+            if (IsOpen && _udpClient.Available > 0)
             {
                 _ = ReadExisting();
             }
@@ -53,13 +56,23 @@ namespace GS.Shared.Transport
         public string ReadExisting()
         {
             IPEndPoint remoteEp = null;
-            var bytes = _udpClient.Receive(ref remoteEp);
-            var chars = new char[bytes.Length];
-            for (var i = 0; i < bytes.Length; i++)
+            try
             {
-                chars[i] = (char)bytes[i];
+                var bytes = _udpClient.Receive(ref remoteEp);
+                var chars = new char[bytes.Length];
+                for (var i = 0; i < bytes.Length; i++)
+                {
+                    chars[i] = (char)bytes[i];
+                }
+                return new string(chars);
             }
-            return new string(chars);
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = ex.Message };
+                MonitorLog.LogToMonitor(monitorItem);
+                return string.Empty;
+            }
         }
 
         public void Write(string data)
