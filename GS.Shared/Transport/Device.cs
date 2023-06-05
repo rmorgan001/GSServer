@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Net;
-using System.Text;
 
 namespace GS.Shared.Transport
 {
     /// <summary>
-    /// Represents a remote-addressable device that supports the SkyWatcher serial protocol,
-    /// e.g. through the SkyWatcher WiFi adapter or a using a built-in WiFi, e.g. AZ GTI.
+    /// Represents a device that supports the SkyWatcher serial protocol via a transport mechanism,
+    /// currently supported is COM serial port (AKA EQMOD cable) and SkyWatcher WiFi, e.g. through the SkyWatcher WiFi adapter or
+    /// a using a built-in WiFi, e.g. AZ GTI.
     /// </summary>
     public class Device : IEquatable<Device>
     {
@@ -24,7 +24,7 @@ namespace GS.Shared.Transport
         }
 
         /// <summary>
-        /// Unique index (-1 or lower) used in device discovery (see <see cref="SerialUdpPortDiscoveryService"/>).
+        /// Unique index (-1 or lower) used in device discovery (see <see cref="DiscoveryService.Discover"/>).
         /// Will be the COM port number (1 or greater) if this is a serial device.
         /// </summary>
         public int Index { get; }
@@ -45,10 +45,13 @@ namespace GS.Shared.Transport
             unchecked
             {
                 int hash = 1009;
-                hash = (hash * 9176) + Endpoint.GetHashCode();
                 if (Index > 0)
                 {
                     hash = (hash * 9176) + Index.GetHashCode();
+                }
+                else if (Endpoint != null)
+                {
+                    hash = (hash * 9176) + Endpoint.GetHashCode();
                 }
                 return hash;
             }

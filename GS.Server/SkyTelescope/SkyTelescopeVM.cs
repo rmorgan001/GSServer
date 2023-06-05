@@ -86,8 +86,13 @@ namespace GS.Server.SkyTelescope
                     };
                     MonitorLog.LogToMonitor(monitorItem);
 
+
+                    // discovery service
+                    DiscoveryService = new DiscoveryService();
+
                     _skyTelescopeVM = this;
                     LoadImages();  // load front image
+
                     if (!Properties.Server.Default.SkyWatcher) return; // Show in Tab?
 
                     // Deals with applications trying to open the setup dialog more than once. 
@@ -722,12 +727,9 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        public IDiscoveryService DiscoveryService { get; } = new DiscoveryService();
+        public IDiscoveryService DiscoveryService { get; }
 
-        public IList<Device> Devices
-        {
-            get => SkySettings.Devices;
-        }
+        public IList<Device> Devices => SkySettings.Devices;
 
         public int DeviceIndex
         {
