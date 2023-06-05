@@ -12,7 +12,7 @@ namespace GS.Shared.Transport
         DiscardNull = 1 << 2
     }
 
-    public class GSSerialPort : SerialPort, ISerialPort
+    public sealed class GSSerialPort : SerialPort, ISerialPort
     {
         public GSSerialPort(
             string portName,

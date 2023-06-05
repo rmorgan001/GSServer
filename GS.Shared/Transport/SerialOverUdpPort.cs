@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace GS.Shared.Transport
 {
-    public class SerialOverUdpPort : UdpClient, ISerialPort
+    public sealed class SerialOverUdpPort : UdpClient, ISerialPort
     {
         private readonly IPEndPoint _remoteEndpoint;
 
