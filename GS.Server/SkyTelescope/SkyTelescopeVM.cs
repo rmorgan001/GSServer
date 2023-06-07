@@ -141,9 +141,9 @@ namespace GS.Server.SkyTelescope
                     ParkSelectionSetting = ParkPositions.FirstOrDefault();
                     SetHCFlipsVisibility();
                     RightAscension = "00h 00m 00s";
-                    Declination = "00° 00m 00s";
-                    Azimuth = "00° 00m 00s";
-                    Altitude = "00° 00m 00s";
+                    Declination = "00\xb0 00m 00s";
+                    Azimuth = "00\xb0 00m 00s";
+                    Altitude = "00\xb0 00m 00s";
                     Lha = "00h 00m 00s";
                     Graphic = SkySettings.FrontGraphic;
                     SetTrackingIcon(SkySettings.TrackingRate);
@@ -731,13 +731,13 @@ namespace GS.Server.SkyTelescope
 
         public IList<Device> Devices => SkySettings.Devices;
 
-        public int DeviceIndex
+        public Device SelectedDevice
         {
-            get => SkySettings.DeviceIndex;
+            get => Devices.SingleOrDefault(device => device.Index == SkySettings.DeviceIndex);
             set
             {
-                if (value == SkySettings.DeviceIndex) return;
-                SkySettings.DeviceIndex = value;
+                if (value.Index == SkySettings.DeviceIndex) return;
+                SkySettings.DeviceIndex = value.Index;
                 OnPropertyChanged();
             }
         }

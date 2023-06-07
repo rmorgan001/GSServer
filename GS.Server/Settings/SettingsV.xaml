@@ -8,6 +8,8 @@
              xmlns:mdc="clr-namespace:MaterialDesignColors;assembly=MaterialDesignColors"
              xmlns:domain="clr-namespace:GS.Server.Domain"
              xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
+             xmlns:settings="clr-namespace:GS.Server.Settings"
+             d:DataContext="{d:DesignInstance Type=settings:SettingsVM}"
              mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>

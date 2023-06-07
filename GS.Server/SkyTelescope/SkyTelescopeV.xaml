@@ -51,15 +51,9 @@
                                     CommandParameter="{x:Static Dock.Left}" IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked}"/>
                                 </Grid>
                             <ComboBox Grid.Row="1" Grid.Column="0" md:HintAssist.Hint="{StaticResource skyPorts}" MinWidth="10" Margin="0,0,0,0" VerticalAlignment="Center"  ToolTip="{StaticResource skyPorts}"  
-                                          ItemsSource="{Binding Devices}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
-                                <ComboBox.SelectedValue>
-                                    <Binding Path="DeviceIndex" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
-                                        <Binding.ValidationRules>
-                                            <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
-                                        </Binding.ValidationRules>
-                                    </Binding>
-                                </ComboBox.SelectedValue>
-                                <ComboBox.SelectedValuePath>Index</ComboBox.SelectedValuePath>
+                                      ItemsSource="{Binding Devices, UpdateSourceTrigger=PropertyChanged}"
+                                      SelectedItem="{Binding SelectedDevice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                 <ComboBox.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <VirtualizingStackPanel />

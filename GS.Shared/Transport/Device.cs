@@ -57,7 +57,7 @@ namespace GS.Shared.Transport
             }
         }
 
-        public bool Equals(Device other) => Index > 0 ? Index == other.Index : Endpoint.Equals(other.Endpoint);
+        public bool Equals(Device other) => Index > 0 ? Index == other?.Index : Endpoint.Equals(other.Endpoint);
 
         public override string ToString()
         {

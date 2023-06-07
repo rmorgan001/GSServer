@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace GS.Server.SkyTelescope
 {
@@ -30,21 +31,24 @@ namespace GS.Server.SkyTelescope
         {
             Dispatcher.InvokeAsync(() =>
             {
-                var hasChanges = false;
-                var ctx = DataContext as SkyTelescopeVM;
-
-                foreach (var device in e.Devices)
+                if (DataContext is SkyTelescopeVM ctx)
                 {
-                    if (!ctx.Devices.Contains(device))
+                    var hasChanges = false;
+
+                    foreach (var device in e.Devices)
                     {
-                        ctx.Devices.Add(device);
-                        hasChanges = true;
+                        if (!ctx.Devices.Contains(device))
+                        {
+                            ctx.Devices.Add(device);
+                            hasChanges = true;
+                        }
                     }
-                }
 
-                if (hasChanges)
-                {
-                    ctx?.RaisePropertyChanged(nameof(SkyTelescopeVM.Devices));
+                    if (hasChanges)
+                    {
+                        ctx.RaisePropertyChanged(nameof(SkyTelescopeVM.Devices));
+                        ctx.RaisePropertyChanged(nameof(SkyTelescopeVM.SelectedDevice));
+                    }
                 }
             });
         }
@@ -53,20 +57,23 @@ namespace GS.Server.SkyTelescope
         {
             Dispatcher.InvokeAsync(() =>
             {
-                var hasChanges = false;
-                var ctx = DataContext as SkyTelescopeVM;
-
-                foreach (var device in e.Devices)
+                if (DataContext is SkyTelescopeVM ctx)
                 {
-                    if (ctx.Devices.Remove(device))
+                    var hasChanges = false;
+
+                    foreach (var device in e.Devices)
                     {
-                        hasChanges = true;
+                        if (ctx.Devices.Remove(device))
+                        {
+                            hasChanges = true;
+                        }
                     }
-                }
 
-                if (hasChanges)
-                {
-                    ctx?.RaisePropertyChanged(nameof(SkyTelescopeVM.Devices));
+                    if (hasChanges)
+                    {
+                        ctx.RaisePropertyChanged(nameof(SkyTelescopeVM.Devices));
+                        ctx.RaisePropertyChanged(nameof(SkyTelescopeVM.SelectedDevice));
+                    }
                 }
             });
         }
