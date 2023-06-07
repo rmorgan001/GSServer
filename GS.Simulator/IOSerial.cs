@@ -35,7 +35,7 @@ namespace GS.Simulator
         internal string Send(string command)
         {
             //if (Queues.Serial.Connected) return null; 
-            var received = _controllers.Command(command.ToLower().Trim());
+            var received = _controllers.Command(command.ToLowerInvariant().Trim());
 
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{command}={received}" };

@@ -16,6 +16,7 @@
 using ASCOM.DeviceInterface;
 using ASCOM.Utilities;
 using GS.Shared;
+using GS.Shared.Transport;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -838,18 +839,35 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static int _comPort;
-        public static int ComPort
+        private static IList<Device> _devices = new List<Device>();
+
+        public static IList<Device> Devices
         {
-            get => _comPort;
+            get => _devices;
+            set => _devices = value ?? new List<Device>();
+        }
+
+        private static int _deviceIndex;
+        public static int DeviceIndex
+        {
+            get => _deviceIndex;
             set
             {
-                if (_comPort == value) return;
-                _comPort = value;
-                Properties.SkyTelescope.Default.ComPort = value;
-                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                if (_deviceIndex == value) return;
+                _deviceIndex = value;
+                Properties.SkyTelescope.Default.DeviceIndex = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
                 OnStaticPropertyChanged();
             }
+        }
+
+        public static bool TryGetDevice(out Device device) => TryGetDevice(DeviceIndex, out device);
+
+        public static bool TryGetDevice(int deviceIndex, out Device device)
+        {
+            var devices = Devices;
+            device = devices?.Count > 0 ? devices.SingleOrDefault(x => x.Index == deviceIndex) : default;
+            return device != default;
         }
 
         private static int _dataBits;
@@ -1829,7 +1847,7 @@ namespace GS.Server.SkyTelescope
             AxisTrackingLimit = Properties.SkyTelescope.Default.AxisTrackingLimit;
             CameraHeight = Properties.SkyTelescope.Default.CameraHeight;
             CameraWidth = Properties.SkyTelescope.Default.CameraWidth;
-            ComPort = Properties.SkyTelescope.Default.ComPort;
+            DeviceIndex = Properties.SkyTelescope.Default.DeviceIndex;
             CustomDec360Steps = Properties.SkyTelescope.Default.CustomDec360Steps;
             CustomDecTrackingOffset = Properties.SkyTelescope.Default.CustomDecTrackingOffset;
             CustomDecWormTeeth = Properties.SkyTelescope.Default.CustomDecWormTeeth;

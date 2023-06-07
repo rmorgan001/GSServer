@@ -94,11 +94,11 @@ namespace GS.Server.Settings
                     Synthesizer.VoicePause = false;
 
                     // Theme Colors
-                    PrimaryColors = (IList<Swatch>) new SwatchesProvider().Swatches;
-                    var primaryColors = PrimaryColors as Swatch[] ?? PrimaryColors.ToArray();
+                    var swatches = new SwatchesProvider().Swatches;
+                    var primaryColors = PrimaryColors = swatches is IList<Swatch> list ? list : swatches.ToList();
                     AccentColors = primaryColors.Where(item => item.IsAccented).ToList();
-                    PrimaryColor = primaryColors.First(item => item.Name.Equals(Settings.PrimaryColor));
-                    AccentColor = primaryColors.First(item => item.Name.Equals(Settings.AccentColor));
+                    PrimaryColor = primaryColors.First(item => item.Name.Equals(Settings.PrimaryColor, StringComparison.InvariantCultureIgnoreCase));
+                    AccentColor = primaryColors.First(item => item.Name.Equals(Settings.AccentColor, StringComparison.InvariantCultureIgnoreCase));
 
                     var paletteHelper = new PaletteHelper();
                     var theme = paletteHelper.GetTheme();

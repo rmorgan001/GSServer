@@ -74,7 +74,7 @@ namespace GS.SkyWatcher
         /// <summary>
         /// Indicate whether the motor controller supports advanced command set (Firmware version 3.22.xx or above)
         /// </summary> 
-        public bool SupportAdvancedCommandSet;
+        public bool SupportAdvancedCommandSet { get; private set; }
 
         /// <summary>
         /// Indicate whether the advanced command set is allowed to be used
@@ -500,11 +500,25 @@ namespace GS.SkyWatcher
             }
             
             const int a = 0x032200; //205312
-            SupportAdvancedCommandSet = intVersion > a;
 
+            if (intVersion == 0x0325A5) // AZ GTI in EQ mode
+            {
+                SupportAdvancedCommandSet = false;
+            }
             // SW recommends no support for single axis trackers 0x07, 0x08, 0x0A, and 0x0F
             //"Star Adventurer Mount" advanced firmware 3.130.07 exclude
-            if (intVersion == 0x038207){SupportAdvancedCommandSet = false;}
+            else if (intVersion == 0x038207)
+            {
+                SupportAdvancedCommandSet = false;
+            }
+            else if (intVersion > a)
+            {
+                SupportAdvancedCommandSet = true;
+            }
+            else
+            {
+                SupportAdvancedCommandSet = false;
+            }
 
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $":{msg}|{axis}|{response}|{_axisStringVersion[(int)axis]}|Advanced:{SupportAdvancedCommandSet}" };
@@ -1496,7 +1510,7 @@ namespace GS.SkyWatcher
             //Serial.Transmit(commandStr.ToString());
             SkyQueue.Serial.Write(commandStr.ToString());
 
-            return $"{commandStr.ToString().Trim()}";
+            return commandStr.ToString().Trim();
         }
 
         ///// <summary>
@@ -1567,7 +1581,12 @@ namespace GS.SkyWatcher
             var StartReading = false;
 
             var sw = Stopwatch.StartNew();
-            while (sw.Elapsed.TotalMilliseconds < SkyQueue.Serial.ReadTimeout)
+#if DEBUG
+            var readTimeout = Debugger.IsAttached ? (int)TimeSpan.FromMinutes(10).TotalMilliseconds : SkyQueue.Serial.ReadTimeout;
+#else
+            var readTimeout = SkyQueue.Serial.ReadTimeout;
+#endif
+            while (sw.ElapsedMilliseconds < readTimeout)
             {
                 var data = SkyQueue.Serial.ReadExisting();
                 foreach (var byt in data)
@@ -1776,18 +1795,20 @@ namespace GS.SkyWatcher
         /// Converts a long to Hex command
         /// </summary>
         /// <param name="number"></param>
-        /// <returns></returns>
+        /// <returns>31 -> 1F0000</returns>
         private static string LongToHex(long number)
         {
-            // 31 -> 0F0000
-            var a = ((int)number & 0xFF).ToString("X").ToUpper();
-            var b = (((int)number & 0xFF00) / 256).ToString("X").ToUpper();
-            var c = (((int)number & 0xFF0000) / 256 / 256).ToString("X").ToUpper();
+            var chars = new char[6];
 
-            if (a.Length == 1) { a = "0" + a; }
-            if (b.Length == 1) { b = "0" + b; }
-            if (c.Length == 1) { c = "0" + c; }
-            return a + b + c;
+            for (var i = 0; i < chars.Length; i += 2)
+            {
+                var part = ((int)number & 0xFF).ToString("X2");
+                chars[i] = part[0];
+                chars[i + 1] = part[1];
+                number >>= 8;
+            }
+
+            return new string(chars);
         }
 
         /// <summary>

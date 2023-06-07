@@ -594,7 +594,7 @@ namespace ASCOM.GS.Sky.Telescope
                 var dec = SkyServer.DeclinationXForm;
 
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(dec, "° ", ":", "", 2)}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(dec, "\u00B0 ", ":", "", 2)}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 return dec;
@@ -602,14 +602,14 @@ namespace ASCOM.GS.Sky.Telescope
         }
 
         /// <summary>
-        /// The declination tracking rate (arc seconds per second, default = 0.0) 
+        /// The declination tracking rate (arc seconds per second, default = 0.0)
         /// </summary>
         public double DeclinationRate
         {
             get
             {
                 var r = SkyServer.RateDecOrg;
-                
+
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{r}" };
                 MonitorLog.LogToMonitor(monitorItem);
@@ -836,7 +836,7 @@ namespace ASCOM.GS.Sky.Telescope
         }
 
         /// <summary>
-        /// Move one axis at the given AxisRates(TelescopeAxes axis). 
+        /// Move one axis at the given AxisRates(TelescopeAxes axis).
         /// </summary>
         /// <param name="Axis"></param>
         /// <param name="Rate"></param>
@@ -962,7 +962,7 @@ namespace ASCOM.GS.Sky.Telescope
         /// <inheritdoc />
         /// <summary>
         /// The right ascension (hours) of the telescope's current equatorial coordinates,
-        /// in the coordinate system given by the EquatorialSystem property 
+        /// in the coordinate system given by the EquatorialSystem property
         /// </summary>
         public double RightAscension
         {
@@ -986,11 +986,11 @@ namespace ASCOM.GS.Sky.Telescope
 
         /// <inheritdoc />
         /// <summary>
-        /// The right ascension tracking rate offset from sidereal (seconds per sidereal second, default = 0.0) 
+        /// The right ascension tracking rate offset from sidereal (seconds per sidereal second, default = 0.0)
         /// This property, together with DeclinationRate, provides support for "offset tracking".
         /// Offset tracking is used primarily for tracking objects that move relatively slowly against
         /// the equatorial coordinate system. It also may be used by a software guiding system that
-        /// controls rates instead of using the PulseGuide method. 
+        /// controls rates instead of using the PulseGuide method.
         /// </summary>
         public double RightAscensionRate
         {
@@ -1036,7 +1036,7 @@ namespace ASCOM.GS.Sky.Telescope
 
             SkyServer.OpenSetupDialog = true;
             //check if window is minimized or not top most
-            NativeMethods.SetForegroundWindow("GS.Server"); //may cause flashing in task bar due to windows restrictions 
+            NativeMethods.SetForegroundWindow("GS.Server"); //may cause flashing in task bar due to windows restrictions
             //Calling app will destroy instance after the dialog is finished
             while (true)
             {
@@ -1202,7 +1202,7 @@ namespace ASCOM.GS.Sky.Telescope
             if (!SkyServer.AsComOn) return;
 
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(Azimuth, "° ", ":", "", 2)}|{_util.DegreesToDMS(Altitude, "° ", ":", "", 2)}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(Azimuth, "\u00B0 ", ":", "", 2)}|{_util.DegreesToDMS(Altitude, "\u00B0 ", ":", "", 2)}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             CheckCapability(SkySettings.CanSlewAltAz, "SlewToAltAz");
@@ -1224,7 +1224,7 @@ namespace ASCOM.GS.Sky.Telescope
             if (!SkyServer.AsComOn) return;
 
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(Azimuth, "° ", ":", "", 2)}|{_util.DegreesToDMS(Altitude, "° ", ":", "", 2)}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(Azimuth, "\u00B0 ", ":", "", 2)}|{_util.DegreesToDMS(Altitude, "\u00B0 ", ":", "", 2)}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             CheckCapability(SkySettings.CanSlewAltAzAsync, "SlewToAltAzAsync");
@@ -1240,7 +1240,7 @@ namespace ASCOM.GS.Sky.Telescope
             if (!SkyServer.AsComOn) return;
 
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.HoursToHMS(RightAscension, "h ", ":", "", 2)}|{_util.DegreesToDMS(Declination, "° ", ":", "", 2)}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.HoursToHMS(RightAscension, "h ", ":", "", 2)}|{_util.DegreesToDMS(Declination, "\u00B0 ", ":", "", 2)}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             CheckCapability(SkySettings.CanSlew, "SlewToCoordinates");
@@ -1266,9 +1266,9 @@ namespace ASCOM.GS.Sky.Telescope
             if (!SkyServer.AsComOn) return;
 
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.HoursToHMS(RightAscension, "h ", ":", "", 2)}|{_util.DegreesToDMS(Declination, "° ", ":", "", 2)}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.HoursToHMS(RightAscension, "h ", ":", "", 2)}|{_util.DegreesToDMS(Declination, "\u00B0 ", ":", "", 2)}" };
             MonitorLog.LogToMonitor(monitorItem);
-            
+
             CheckCapability(SkySettings.CanSlewAsync, "SlewToCoordinatesAsync");
             CheckRange(RightAscension, 0, 24, "SlewToCoordinatesAsync", "RightAscension");
             CheckRange(Declination, -90, 90, "SlewToCoordinatesAsync", "Declination");
@@ -1354,7 +1354,7 @@ namespace ASCOM.GS.Sky.Telescope
         public void SyncToAltAz(double Azimuth, double Altitude)
         {
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(Azimuth, "° ", ":", "", 2)}|{_util.DegreesToDMS(Altitude, "° ", ":", "", 2)}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(Azimuth, "\u00B0 ", ":", "", 2)}|{_util.DegreesToDMS(Altitude, "\u00B0 ", ":", "", 2)}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             CheckCapability(SkySettings.CanSyncAltAz, "SyncToAltAz");
@@ -1378,7 +1378,7 @@ namespace ASCOM.GS.Sky.Telescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{_util.HoursToHMS(RightAscension, "h ", ":", "", 2)}|{_util.DegreesToDMS(Declination, "° ", ":", "", 2)}"
+                Message = $"{_util.HoursToHMS(RightAscension, "h ", ":", "", 2)}|{_util.DegreesToDMS(Declination, "\u00B0 ", ":", "", 2)}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -1408,7 +1408,7 @@ namespace ASCOM.GS.Sky.Telescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{_util.HoursToHMS(SkyServer.TargetRa, "h ", ":", "", 2)}|{_util.DegreesToDMS(SkyServer.TargetDec, "° ", ":", "", 2)}"
+                Message = $"{_util.HoursToHMS(SkyServer.TargetRa, "h ", ":", "", 2)}|{_util.DegreesToDMS(SkyServer.TargetDec, "\u00B0 ", ":", "", 2)}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -1445,7 +1445,7 @@ namespace ASCOM.GS.Sky.Telescope
                 if (!SkyServer.AsComOn) return;
 
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(value, "° ", ":", "", 2)}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(value, "\u00B0 ", ":", "", 2)}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 CheckCapability(SkySettings.CanSlew, "TargetDeclination", true);

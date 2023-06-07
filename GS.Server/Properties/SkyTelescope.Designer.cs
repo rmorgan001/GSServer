@@ -38,12 +38,12 @@ namespace GS.Server.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public int ComPort {
+        public int DeviceIndex {
             get {
-                return ((int)(this["ComPort"]));
+                return ((int)(this["DeviceIndex"]));
             }
             set {
-                this["ComPort"] = value;
+                this["DeviceIndex"] = value;
             }
         }
         

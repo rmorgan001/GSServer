@@ -14,6 +14,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using GS.Shared;
+using GS.Shared.Transport;
 using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
@@ -27,10 +28,9 @@ namespace GS.Server.SkyTelescope
     public static class SkySystem
     {
         public static event PropertyChangedEventHandler StaticPropertyChanged;
-        private static readonly object GetIdLockObj = new object();
         private static long _idCount;
         private static readonly ConcurrentDictionary<long, bool> ConnectStates;
-        public static SerialPort Serial;
+        public static ISerialPort Serial { get; private set; }
 
         static SkySystem()
         {
@@ -90,49 +90,40 @@ namespace GS.Server.SkyTelescope
 
         public static bool ConnectSerial
         {
-            get => Serial != null && Serial.IsOpen;
+            get => Serial?.IsOpen == true;
             internal set
             {
                 try
                 {
-                    if (value)
+                    Serial?.Dispose();
+                    Serial = null;
+
+                    if (value && SkySettings.TryGetDevice(out var device))
                     {
-                        if (Serial != null)
+                        var readTimeout = TimeSpan.FromMilliseconds(SkySettings.ReadTimeout);
+                        if (device.Index > 0)
                         {
-                            if (Serial.IsOpen)
-                            {
-                                Serial.Close();
-                            }
-                            Serial.Dispose();
-                            Serial = null;
+                            var options = SerialOptions.DiscardNull
+                                | (SkySettings.DtrEnable ? SerialOptions.DtrEnable : SerialOptions.None)
+                                | (SkySettings.RtsEnable ? SerialOptions.RtsEnable : SerialOptions.None);
+
+                            Serial = new GSSerialPort(
+                                $"COM{device.Index}",
+                                (int)SkySettings.BaudRate,
+                                readTimeout,
+                                SkySettings.HandShake,
+                                Parity.None,
+                                StopBits.One,
+                                SkySettings.DataBits,
+                                options
+                            );
+                        }
+                        else if (device.Endpoint != null)
+                        {
+                            Serial = new SerialOverUdpPort(device.Endpoint, readTimeout);
                         }
 
-                        Serial = new SerialPort
-                        {
-                            PortName = $"COM{SkySettings.ComPort}",
-                            BaudRate = (int)SkySettings.BaudRate,
-                            ReadTimeout = SkySettings.ReadTimeout,
-                            StopBits = StopBits.One,
-                            DataBits = SkySettings.DataBits,
-                            DtrEnable = SkySettings.DtrEnable,
-                            RtsEnable = SkySettings.RtsEnable,
-                            Handshake = SkySettings.HandShake,
-                            Parity = Parity.None,
-                            DiscardNull = true,
-                        };
-                        Serial.Open();
-                    }
-                    else
-                    {
-                        if (Serial != null)
-                        {
-                            if (Serial.IsOpen)
-                            {
-                                Serial.Close();
-                            }
-                            Serial.Dispose();
-                            Serial = null;
-                        }
+                        Serial?.Open();
                     }
                     OnStaticPropertyChanged();
                 }
@@ -152,18 +143,14 @@ namespace GS.Server.SkyTelescope
 
                     Serial = null;
                 }
-
             }
         }
 
-        public static long GetId()
-        {
-            lock (GetIdLockObj)
-            {
-                Interlocked.Increment(ref _idCount); // Increment the counter in a threadsafe fashion
-                return _idCount;
-            }
-        }
+        /// <summary>
+        /// Get a thread-safe, unique ID.
+        /// </summary>
+        /// <returns></returns>
+        public static long GetId() => Interlocked.Increment(ref _idCount);
 
         /// <summary>
         /// called from the setter property.  Used to update UI elements.  propertyname is not required

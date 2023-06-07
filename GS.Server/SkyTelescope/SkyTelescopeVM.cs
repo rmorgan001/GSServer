@@ -51,6 +51,7 @@ using Color = System.Windows.Media.Color;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using NativeMethods = GS.Server.Helpers.NativeMethods;
 using Point = System.Windows.Point;
+using GS.Shared.Transport;
 
 namespace GS.Server.SkyTelescope
 {
@@ -85,8 +86,13 @@ namespace GS.Server.SkyTelescope
                     };
                     MonitorLog.LogToMonitor(monitorItem);
 
+
+                    // discovery service
+                    DiscoveryService = new DiscoveryService();
+
                     _skyTelescopeVM = this;
                     LoadImages();  // load front image
+
                     if (!Properties.Server.Default.SkyWatcher) return; // Show in Tab?
 
                     // Deals with applications trying to open the setup dialog more than once. 
@@ -135,9 +141,9 @@ namespace GS.Server.SkyTelescope
                     ParkSelectionSetting = ParkPositions.FirstOrDefault();
                     SetHCFlipsVisibility();
                     RightAscension = "00h 00m 00s";
-                    Declination = "00° 00m 00s";
-                    Azimuth = "00° 00m 00s";
-                    Altitude = "00° 00m 00s";
+                    Declination = "00\xb0 00m 00s";
+                    Azimuth = "00\xb0 00m 00s";
+                    Altitude = "00\xb0 00m 00s";
                     Lha = "00h 00m 00s";
                     Graphic = SkySettings.FrontGraphic;
                     SetTrackingIcon(SkySettings.TrackingRate);
@@ -720,30 +726,18 @@ namespace GS.Server.SkyTelescope
                 }
             }
         }
-        public IList<int> ComPorts
+
+        public IDiscoveryService DiscoveryService { get; }
+
+        public IList<Device> Devices => SkySettings.Devices;
+
+        public Device SelectedDevice
         {
-            get
-            {
-                var ports = new List<int>();
-                foreach (var item in System.IO.Ports.SerialPort.GetPortNames())
-                {
-                    if (string.IsNullOrEmpty(item)) continue;
-                    var tmp = Strings.GetNumberFromString(item);
-                    if (tmp.HasValue)
-                    {
-                        ports.Add((int)tmp);
-                    }
-                }
-                return ports;
-            }
-        }
-        public int ComPort
-        {
-            get => SkySettings.ComPort;
+            get => Devices.SingleOrDefault(device => device.Index == SkySettings.DeviceIndex);
             set
             {
-                if (value == SkySettings.ComPort) return;
-                SkySettings.ComPort = value;
+                if (value.Index == SkySettings.DeviceIndex) return;
+                SkySettings.DeviceIndex = value.Index;
                 OnPropertyChanged();
             }
         }
@@ -2119,12 +2113,20 @@ namespace GS.Server.SkyTelescope
             get => _openSetupDialog;
             set
             {
-                if (value == _openSetupDialog){return;}
+                if (value == _openSetupDialog) return;
+
                 _openSetupDialog = value;
-                if (!value) { ClickCloseSettings(); }
+
+                if (value)
+                {
+                    DiscoveryService.Discover();
+                }
+                else
+                {
+                    ClickCloseSettings();
+                }
+
                 OnPropertyChanged();
-                // forces the updating of the com ports
-                OnPropertyChanged($"ComPorts");
             }
         }
 
