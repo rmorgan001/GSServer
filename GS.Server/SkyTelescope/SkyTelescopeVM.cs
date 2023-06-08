@@ -2117,11 +2117,8 @@ namespace GS.Server.SkyTelescope
 
                 _openSetupDialog = value;
 
-                if (value)
-                {
-                    DiscoveryService.Discover();
-                }
-                else
+                DiscoveryService.Discover();
+                if (!value)
                 {
                     ClickCloseSettings();
                 }
