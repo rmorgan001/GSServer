@@ -22,6 +22,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using GS.Principles;
+using System.Windows.Threading;
 
 namespace GS.SkyWatcher
 {
@@ -767,7 +768,15 @@ namespace GS.SkyWatcher
             }
             else
             {
-                var response = CmdToMount(axis, 'j', null);
+                string response = null;
+                for (var i = 3; i > 0; i--)
+                {
+                    response = CmdToMount(axis, 'j', null, i > 0);
+                    if (response != null)
+                    {
+                        break;
+                    }
+                }
                 var iPosition = StringToLong(response);
                 iPosition -= 0x00800000;
                 return iPosition;
@@ -1581,11 +1590,7 @@ namespace GS.SkyWatcher
             var StartReading = false;
 
             var sw = Stopwatch.StartNew();
-#if DEBUG
-            var readTimeout = Debugger.IsAttached ? (int)TimeSpan.FromMinutes(10).TotalMilliseconds : SkyQueue.Serial.ReadTimeout;
-#else
             var readTimeout = SkyQueue.Serial.ReadTimeout;
-#endif
             while (sw.ElapsedMilliseconds < readTimeout)
             {
                 var data = SkyQueue.Serial.ReadExisting();

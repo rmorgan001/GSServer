@@ -40,7 +40,7 @@ namespace GS.Shared.Transport
 
         public void Open() => Connect(_remoteEndpoint);
 
-        public string ReadExisting() => _state?.Received ?? string.Empty;
+        public string ReadExisting() => _state?.Cts?.IsCancellationRequested == false && _state?.Received is string received ? received : string.Empty;
 
         public void Write(string data)
         {
@@ -50,7 +50,7 @@ namespace GS.Shared.Transport
                 bytes[i] = (byte)data[i];
             }
 
-            var newState = new SendReceiveState();
+            var newState = new SendReceiveState(ReadTimeout);
             var prevState = Interlocked.Exchange(ref _state, newState);
             prevState?.Cts?.Cancel(false);
 
@@ -91,9 +91,14 @@ namespace GS.Shared.Transport
 
     class SendReceiveState
     {
+        public SendReceiveState(int timeoutMS)
+        {
+            Cts = new CancellationTokenSource(timeoutMS);
+        }
+
         public string Received { get; set; }
 
-        public CancellationTokenSource Cts { get; } = new CancellationTokenSource();
+        public CancellationTokenSource Cts { get; }
     }
 }
 
