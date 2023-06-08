@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -59,9 +61,14 @@ namespace GS.Shared.Transport
         public event EventHandler<DiscoveryEventArgs> RemovedDeviceEvent;
 
         /// <summary>
-        /// Discovers all COM serial ports, if last discovery is longer than 2 seconds ago.
-        /// Sends <c>:e1\r</c> to all WiFi broadcast addresses (no NAT traversal).
-        /// Cleans up non-active and previously discovered devices.
+        /// General discovery process:
+        /// <list type="bullet">
+        ///   <item>Runs discovery if last discovery is longer than 2 seconds ago.</item>
+        ///   <item>Discovers all COM serial ports.</item>
+        ///   <item>Sends <c>:e1\r</c> to all WiFi broadcast addresses (no NAT traversal).</item>
+        ///   <item>Cleans up non-active and previously discovered devices.</item>
+        /// </list>
+        /// Step by step process:
         /// <list type="number">
         ///   <item>Initializes UDP clients for broadcast, one per network interface</item>
         ///   <item>Removes all UDP devices that where discovered previously but did not respond on last invocation of this method</item>
@@ -78,6 +85,17 @@ namespace GS.Shared.Transport
             }
 
             _lastDiscoverTime = Environment.TickCount;
+            var monitorItem = new MonitorEntry
+            {
+                Type = MonitorType.Information,
+                Category = MonitorCategory.Server,
+                Datetime = DateTime.UtcNow,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Device = MonitorDevice.Server,
+                Message = "Discovery|Started"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
 
             InitializeUdpClients();
             CleanupDirtyUdpDevices();
@@ -88,7 +106,7 @@ namespace GS.Shared.Transport
 
         void DiscoverSerialDevices()
         {
-            var allPorts = System.IO.Ports.SerialPort.GetPortNames();
+            var allPorts = SerialPort.GetPortNames();
             var portNumbers = new HashSet<int>();
             foreach (var port in allPorts)
             {
@@ -140,7 +158,7 @@ namespace GS.Shared.Transport
         /// </summary>
         void InitializeUdpClients()
         {
-            var networkIfaceIps = new HashSet<IPAddress>(
+            var networkIfaceIps = new SortedSet<IPAddress>(
                 from ni in NetworkInterface.GetAllNetworkInterfaces()
                 where ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211
                     && ni.OperationalStatus == OperationalStatus.Up
@@ -149,6 +167,18 @@ namespace GS.Shared.Transport
                 where ip.Address.AddressFamily == AddressFamily.InterNetwork
                 select ip.Address
             );
+
+            var monitorItem = new MonitorEntry
+            {
+                Type = MonitorType.Data,
+                Category = MonitorCategory.Server,
+                Datetime = DateTime.UtcNow,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Device = MonitorDevice.Server,
+                Message = $"Discovery|Network Interfaces|{string.Join(",", networkIfaceIps)}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
 
             var needRemoving = new HashSet<IPAddress>(_udpClients.Keys);
             needRemoving.ExceptWith(networkIfaceIps);
