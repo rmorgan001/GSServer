@@ -27,6 +27,8 @@ namespace GS.Shared.Transport
         private volatile int _deviceIndex = 0;
         private bool disposedValue;
 
+        private long _lastDiscoverTime = -1;
+
         public DiscoveryService(int remotePort = Device.DefaultPort)
         {
             _udpClients = new ConcurrentDictionary<IPAddress, Lazy<UdpClient>>();
@@ -57,7 +59,7 @@ namespace GS.Shared.Transport
         public event EventHandler<DiscoveryEventArgs> RemovedDeviceEvent;
 
         /// <summary>
-        /// Discovers all COM serial ports.
+        /// Discovers all COM serial ports, if last discovery is longer than 2 seconds ago.
         /// Sends <c>:e1\r</c> to all WiFi broadcast addresses (no NAT traversal).
         /// Cleans up non-active and previously discovered devices.
         /// <list type="number">
@@ -70,6 +72,13 @@ namespace GS.Shared.Transport
         /// </summary>
         public void Discover()
         {
+            if (Environment.TickCount - _lastDiscoverTime <= 2000)
+            {
+                return;
+            }
+
+            _lastDiscoverTime = Environment.TickCount;
+
             InitializeUdpClients();
             CleanupDirtyUdpDevices();
             MarkPreviouslyActiveDevicesAsDirty();

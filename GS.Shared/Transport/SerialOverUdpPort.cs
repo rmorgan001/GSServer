@@ -1,8 +1,6 @@
-﻿using GS.Principles;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Threading;
 
 namespace GS.Shared.Transport
@@ -11,9 +9,10 @@ namespace GS.Shared.Transport
     {
         private readonly IPEndPoint _remoteEndpoint;
 
+        private SendReceiveState _state;
+
         public SerialOverUdpPort(IPEndPoint remoteEndpoint, TimeSpan readTimeout)
         {
-            DontFragment = true;
             _remoteEndpoint = remoteEndpoint;
             ReadTimeout = (int)readTimeout.TotalMilliseconds;
         }
@@ -24,57 +23,24 @@ namespace GS.Shared.Transport
 
         public void DiscardInBuffer()
         {
-            if (IsOpen && Available > 0)
+            if (IsOpen)
             {
-                _ = ReadExisting();
+                var localState = _state;
+                if (localState != null)
+                {
+                    localState.Received = null;
+                }
             }
         }
 
         public void DiscardOutBuffer()
         {
-            // we can't control the underlying buffer
+            _state?.Cts?.Cancel(false);
         }
 
-        public void Open()
-        {
-            Connect(_remoteEndpoint);
-            Client.ReceiveTimeout = ReadTimeout;
-            Client.SendTimeout = ReadTimeout;
-        }
+        public void Open() => Connect(_remoteEndpoint);
 
-        public string ReadExisting()
-        {
-            IPEndPoint remoteEp = null;
-            try
-            {
-                var bytes = Receive(ref remoteEp);
-                if (bytes?.Length > 0)
-                {
-                    var chars = new char[bytes.Length];
-                    for (var i = 0; i < bytes.Length; i++)
-                    {
-                        chars[i] = (char)bytes[i];
-                    }
-                    return new string(chars);
-                }
-                return string.Empty;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Driver,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}|{ex.InnerException.Message}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-                return string.Empty;
-            }
-        }
+        public string ReadExisting() => _state?.Received ?? string.Empty;
 
         public void Write(string data)
         {
@@ -83,8 +49,51 @@ namespace GS.Shared.Transport
             {
                 bytes[i] = (byte)data[i];
             }
-            _ = Send(bytes, bytes.Length);
+
+            var newState = new SendReceiveState();
+            var prevState = Interlocked.Exchange(ref _state, newState);
+            prevState?.Cts?.Cancel(false);
+
+            _ = BeginSend(bytes, bytes.Length, EndSendCb, newState);
         }
+
+        void EndSendCb(IAsyncResult result)
+        {
+            if (result.IsCompleted
+                && result.AsyncState is SendReceiveState state
+                && !state.Cts.IsCancellationRequested
+                && EndSend(result) > 0
+            )
+            {
+                BeginReceive(EndReceiveCb, state);
+            }
+        }
+
+        void EndReceiveCb(IAsyncResult result)
+        {
+            if (result.IsCompleted && result.AsyncState is SendReceiveState state && !state.Cts.IsCancellationRequested)
+            {
+                IPEndPoint ep = null;
+                var bytes = EndReceive(result, ref ep);
+                if (bytes?.Length > 0)
+                {
+                    var chars = new char[bytes.Length];
+                    for (var i = 0; i < bytes.Length; i++)
+                    {
+                        chars[i] = (char)bytes[i];
+                    }
+
+                    state.Received = new string(chars);
+                }
+            }
+        }
+    }
+
+    class SendReceiveState
+    {
+        public string Received { get; set; }
+
+        public CancellationTokenSource Cts { get; } = new CancellationTokenSource();
     }
 }
 
