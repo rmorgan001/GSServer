@@ -48,12 +48,16 @@ namespace GS.Shared.Transport
             try
             {
                 var bytes = Receive(ref remoteEp);
-                var chars = new char[bytes.Length];
-                for (var i = 0; i < bytes.Length; i++)
+                if (bytes?.Length > 0)
                 {
-                    chars[i] = (char)bytes[i];
+                    var chars = new char[bytes.Length];
+                    for (var i = 0; i < bytes.Length; i++)
+                    {
+                        chars[i] = (char)bytes[i];
+                    }
+                    return new string(chars);
                 }
-                return new string(chars);
+                return string.Empty;
             }
             catch (Exception ex)
             {
