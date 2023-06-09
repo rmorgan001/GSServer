@@ -448,6 +448,7 @@ namespace GS.SkyWatcher
             MonitorLog.LogToMonitor(monitorItem);
         }
 
+        static readonly Version AZGTiAdvancedSupportedVersion = new Version(3, 40);
         /// <summary>
         /// e or X0005 Gets version of the axis
         /// </summary>
@@ -499,20 +500,20 @@ namespace GS.SkyWatcher
                 _axisVersion[1] = intVersion;
                 _axisModel[1] = MountModel;
             }
-            
-            const int a = 0x032200; //205312
 
-            if (intVersion == 0x0325A5) // AZ GTI in EQ mode
+            var version = new Version(first, second);
+            // Exclude AZ GTI in EQ mode prior version 3.40
+            if (MountModel == 165 && version < AZGTiAdvancedSupportedVersion)
             {
                 SupportAdvancedCommandSet = false;
             }
             // SW recommends no support for single axis trackers 0x07, 0x08, 0x0A, and 0x0F
-            //"Star Adventurer Mount" advanced firmware 3.130.07 exclude
+            // "Star Adventurer Mount" advanced firmware 3.130.07 exclude
             else if (intVersion == 0x038207)
             {
                 SupportAdvancedCommandSet = false;
             }
-            else if (intVersion > a)
+            else if (intVersion > 0x032200)  //205312
             {
                 SupportAdvancedCommandSet = true;
             }
