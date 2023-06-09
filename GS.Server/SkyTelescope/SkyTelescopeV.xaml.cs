@@ -18,12 +18,12 @@ namespace GS.Server.SkyTelescope
         private void SkyTelescopeV_OnLoaded(object sender, RoutedEventArgs e)
         {
             var ctx = DataContext as SkyTelescopeVM;
-            var udpDiscoverService = ctx?.DiscoveryService;
-            if (udpDiscoverService != null)
+            var discoveryService = ctx?.DiscoveryService;
+            if (discoveryService != null)
             {
-                udpDiscoverService.DiscoveredDeviceEvent += UdpDiscoveryService_DiscoveredDeviceEvent;
-                udpDiscoverService.RemovedDeviceEvent += UdpDiscoveryService_RemovedDeviceEvent;
-                udpDiscoverService.Discover();
+                discoveryService.DiscoveredDeviceEvent += UdpDiscoveryService_DiscoveredDeviceEvent;
+                discoveryService.RemovedDeviceEvent += UdpDiscoveryService_RemovedDeviceEvent;
+                discoveryService.StartAutoDiscovery();
             }
         }
 

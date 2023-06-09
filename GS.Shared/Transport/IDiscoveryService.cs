@@ -9,9 +9,14 @@ namespace GS.Shared.Transport
         IEnumerable<Device> ActiveDevices { get; }
 
         /// <summary>
-        /// Asynchronously sends UDP broadcast messages to discover all reachable devices.
+        /// Start periodic discovery if not already running.
         /// </summary>
-        void Discover();
+        void StartAutoDiscovery();
+
+        /// <summary>
+        /// Stops automatically discoverying devices.
+        /// </summary>
+        void StopAutoDiscovery();
 
         event EventHandler<DiscoveryEventArgs> DiscoveredDeviceEvent;
 

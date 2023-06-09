@@ -10,9 +10,18 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace GS.Shared.Transport
 {
+    /// <summary>
+    /// General discovery process:
+    /// <list type="bullet">
+    ///   <item>Discovers all COM serial ports.</item>
+    ///   <item>Sends <c>:e1\r</c> to all WiFi broadcast addresses (no NAT traversal).</item>
+    ///   <item>Cleans up non-active and previously discovered devices.</item>
+    /// </list>
+    /// </summary>
     public class DiscoveryService : IDiscoveryService
     {
         private readonly byte[] DiscoverMsg = Encode(":e1\r");
@@ -24,12 +33,11 @@ namespace GS.Shared.Transport
         private readonly ConcurrentDictionary<IPEndPoint, int> _dirtyUdpDevices;
         private readonly ConcurrentDictionary<IPEndPoint, int> _activeUdpDevices;
         private readonly ConcurrentDictionary<int, Device> _allDevices;
+        private readonly DispatcherTimer _timer;
         private readonly int _remotePort;
 
         private volatile int _deviceIndex = 0;
         private bool disposedValue;
-
-        private long _lastDiscoverTime = -1;
 
         public DiscoveryService(int remotePort = Device.DefaultPort)
         {
@@ -38,7 +46,14 @@ namespace GS.Shared.Transport
             _activeUdpDevices = new ConcurrentDictionary<IPEndPoint, int>();
             _allDevices = new ConcurrentDictionary<int, Device>();
             _remotePort = remotePort;
+            _timer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(2)
+            };
+            _timer.Tick += _timer_Tick;
         }
+
+        private void _timer_Tick(object sender, EventArgs e) => Discover();
 
         public IEnumerable<Device> AllDevices => _allDevices.Values;
 
@@ -60,15 +75,22 @@ namespace GS.Shared.Transport
 
         public event EventHandler<DiscoveryEventArgs> RemovedDeviceEvent;
 
+        /// <inheritdoc/>
+        public void StartAutoDiscovery()
+        {
+            if (_timer.IsEnabled)
+            {
+                return;
+            }
+
+            _timer.Start();
+        }
+
+        /// <inheritdoc/>
+        public void StopAutoDiscovery() => _timer.Stop();
+
         /// <summary>
-        /// General discovery process:
-        /// <list type="bullet">
-        ///   <item>Runs discovery if last discovery is longer than 2 seconds ago.</item>
-        ///   <item>Discovers all COM serial ports.</item>
-        ///   <item>Sends <c>:e1\r</c> to all WiFi broadcast addresses (no NAT traversal).</item>
-        ///   <item>Cleans up non-active and previously discovered devices.</item>
-        /// </list>
-        /// Step by step process:
+        /// Step by step discovery process:
         /// <list type="number">
         ///   <item>Initializes UDP clients for broadcast, one per network interface</item>
         ///   <item>Removes all UDP devices that where discovered previously but did not respond on last invocation of this method</item>
@@ -77,14 +99,8 @@ namespace GS.Shared.Transport
         ///   <item>Broadcasts and listens for responses</item>
         /// </list>
         /// </summary>
-        public void Discover()
+        void Discover()
         {
-            if (Environment.TickCount - _lastDiscoverTime <= 2000)
-            {
-                return;
-            }
-
-            _lastDiscoverTime = Environment.TickCount;
             var monitorItem = new MonitorEntry
             {
                 Type = MonitorType.Information,
@@ -302,6 +318,7 @@ namespace GS.Shared.Transport
                 _dirtyUdpDevices.Clear();
                 _activeUdpDevices.Clear();
                 _allDevices.Clear();
+                _timer.Stop();
 
                 disposedValue =true;
             }
