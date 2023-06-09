@@ -16,6 +16,7 @@
 using System;
 using System.Threading;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace GS.Shared
 {
@@ -45,13 +46,16 @@ namespace GS.Shared
         /// <param name="action"></param>
         public static void BeginInvokeOnUiThread(Action action)
         {
-            if (Application.Current.Dispatcher != null && Application.Current.Dispatcher.CheckAccess())
+            if (Application.Current?.Dispatcher is Dispatcher dispatcher)
             {
-                action();
-            }
-            else
-            {
-                if (Application.Current.Dispatcher != null) Application.Current.Dispatcher.BeginInvoke(action);
+                if (dispatcher.CheckAccess())
+                {
+                    action();
+                }
+                else
+                {
+                    dispatcher.BeginInvoke(action);
+                }
             }
         }
     }
