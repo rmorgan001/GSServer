@@ -623,7 +623,7 @@ namespace GS.SkyWatcher
             }
             else
             {
-                var response = CmdToMountWithRetryIgnoringWarnings(axis, 'j');
+                var response = CmdToMount(axis, 'j', null);
                 var iPosition = StringToLong(response);
                 iPosition -= 0x00800000;
                 _positions[(int)axis] = StepToAngle(axis, iPosition);
@@ -768,25 +768,11 @@ namespace GS.SkyWatcher
             }
             else
             {
-                var response = CmdToMountWithRetryIgnoringWarnings(axis, 'j');
+                var response = CmdToMount(axis, 'j', null);
                 var iPosition = StringToLong(response);
                 iPosition -= 0x00800000;
                 return iPosition;
             }
-        }
-
-        internal string CmdToMountWithRetryIgnoringWarnings(AxisId axis, char command, string cmdDataStr = null, int retries = 2)
-        {
-            for (var i = retries; i >= 0; i--)
-            {
-                var response = CmdToMount(axis, command, cmdDataStr, i > 0);
-                if (!string.IsNullOrEmpty(response))
-                {
-                    return response;
-                }
-            }
-
-            return null;
         }
 
         /// <summary>
@@ -1397,7 +1383,7 @@ namespace GS.SkyWatcher
                                 // serial issue stop axes
                                 SendRequest(AxisId.Axis1, 'K', null);
                                 SendRequest(AxisId.Axis2, 'K', null);
-                                throw new TimeoutException("Null Response");
+                                throw new TimeoutException($"Null Response for :{command}{(int)axis + 1} {cmdDataStr}".Trim());
                             }
                             MountConnected = true;
                             return responseString;
@@ -1407,9 +1393,7 @@ namespace GS.SkyWatcher
                             if (ignoreWarnings) { return null; }
 
                             MountConnected = false;
-                            throw axis == AxisId.Axis1
-                                ? new MountControlException(ErrorCode.ErrNoResponseAxis1, "Timeout", ex)
-                                : new MountControlException(ErrorCode.ErrNoResponseAxis2, "Timeout", ex);
+                            throw new MountControlException(axis == AxisId.Axis1 ? ErrorCode.ErrNoResponseAxis1 : ErrorCode.ErrNoResponseAxis2, "Timeout", ex);
                         }
                         catch (IOException ex)
                         {
