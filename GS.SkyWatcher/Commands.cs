@@ -13,6 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using GS.Principles;
 using GS.Shared;
 using System;
 using System.Diagnostics;
@@ -21,8 +22,6 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using GS.Principles;
-using System.Windows.Threading;
 
 namespace GS.SkyWatcher
 {
@@ -448,7 +447,7 @@ namespace GS.SkyWatcher
             MonitorLog.LogToMonitor(monitorItem);
         }
 
-        static readonly Version AZGTiAdvancedSupportedVersion = new Version(3, 40);
+        static readonly Version AZGTiAdvancedSetSupportedVersion = new Version(3, 40);
         /// <summary>
         /// e or X0005 Gets version of the axis
         /// </summary>
@@ -503,7 +502,7 @@ namespace GS.SkyWatcher
 
             var version = new Version(first, second);
             // Exclude AZ GTI in EQ mode prior version 3.40
-            if (MountModel == 165 && version < AZGTiAdvancedSupportedVersion)
+            if (MountModel == 165 && version < AZGTiAdvancedSetSupportedVersion)
             {
                 SupportAdvancedCommandSet = false;
             }
@@ -624,7 +623,7 @@ namespace GS.SkyWatcher
             }
             else
             {
-                var response = CmdToMount(axis, 'j', null);
+                var response = CmdToMountWithRetryIgnoringWarnings(axis, 'j');
                 var iPosition = StringToLong(response);
                 iPosition -= 0x00800000;
                 _positions[(int)axis] = StepToAngle(axis, iPosition);
@@ -769,19 +768,25 @@ namespace GS.SkyWatcher
             }
             else
             {
-                string response = null;
-                for (var i = 3; i > 0; i--)
-                {
-                    response = CmdToMount(axis, 'j', null, i > 0);
-                    if (response != null)
-                    {
-                        break;
-                    }
-                }
+                var response = CmdToMountWithRetryIgnoringWarnings(axis, 'j');
                 var iPosition = StringToLong(response);
                 iPosition -= 0x00800000;
                 return iPosition;
             }
+        }
+
+        internal string CmdToMountWithRetryIgnoringWarnings(AxisId axis, char command, string cmdDataStr = null, int retries = 2)
+        {
+            for (var i = retries; i >= 0; i--)
+            {
+                var response = CmdToMount(axis, command, cmdDataStr, i > 0);
+                if (!string.IsNullOrEmpty(response))
+                {
+                    return response;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
