@@ -13,6 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using GS.Principles;
 using GS.Shared;
 using System;
 using System.Diagnostics;
@@ -21,8 +22,6 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using GS.Principles;
-using System.Windows.Threading;
 
 namespace GS.SkyWatcher
 {
@@ -448,6 +447,7 @@ namespace GS.SkyWatcher
             MonitorLog.LogToMonitor(monitorItem);
         }
 
+        static readonly Version AZGTiAdvancedSetSupportedVersion = new Version(3, 40);
         /// <summary>
         /// e or X0005 Gets version of the axis
         /// </summary>
@@ -499,20 +499,20 @@ namespace GS.SkyWatcher
                 _axisVersion[1] = intVersion;
                 _axisModel[1] = MountModel;
             }
-            
-            const int a = 0x032200; //205312
 
-            if (intVersion == 0x0325A5) // AZ GTI in EQ mode
+            var version = new Version(first, second);
+            // Exclude AZ GTI in EQ mode prior version 3.40
+            if (MountModel == 165 && version < AZGTiAdvancedSetSupportedVersion)
             {
                 SupportAdvancedCommandSet = false;
             }
             // SW recommends no support for single axis trackers 0x07, 0x08, 0x0A, and 0x0F
-            //"Star Adventurer Mount" advanced firmware 3.130.07 exclude
+            // "Star Adventurer Mount" advanced firmware 3.130.07 exclude
             else if (intVersion == 0x038207)
             {
                 SupportAdvancedCommandSet = false;
             }
-            else if (intVersion > a)
+            else if (intVersion > 0x032200)  //205312
             {
                 SupportAdvancedCommandSet = true;
             }
@@ -768,15 +768,7 @@ namespace GS.SkyWatcher
             }
             else
             {
-                string response = null;
-                for (var i = 3; i > 0; i--)
-                {
-                    response = CmdToMount(axis, 'j', null, i > 0);
-                    if (response != null)
-                    {
-                        break;
-                    }
-                }
+                var response = CmdToMount(axis, 'j', null);
                 var iPosition = StringToLong(response);
                 iPosition -= 0x00800000;
                 return iPosition;
@@ -1391,7 +1383,7 @@ namespace GS.SkyWatcher
                                 // serial issue stop axes
                                 SendRequest(AxisId.Axis1, 'K', null);
                                 SendRequest(AxisId.Axis2, 'K', null);
-                                throw new TimeoutException("Null Response");
+                                throw new TimeoutException($"Null Response for :{command}{(int)axis + 1} {cmdDataStr}".Trim());
                             }
                             MountConnected = true;
                             return responseString;
@@ -1401,9 +1393,7 @@ namespace GS.SkyWatcher
                             if (ignoreWarnings) { return null; }
 
                             MountConnected = false;
-                            throw axis == AxisId.Axis1
-                                ? new MountControlException(ErrorCode.ErrNoResponseAxis1, "Timeout", ex)
-                                : new MountControlException(ErrorCode.ErrNoResponseAxis2, "Timeout", ex);
+                            throw new MountControlException(axis == AxisId.Axis1 ? ErrorCode.ErrNoResponseAxis1 : ErrorCode.ErrNoResponseAxis2, "Timeout", ex);
                         }
                         catch (IOException ex)
                         {

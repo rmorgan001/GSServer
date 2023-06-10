@@ -15,15 +15,18 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Markup;
 
 namespace GS.Shared.Domain
 {
     /// <summary>
-    /// Same as EnumBindingSourceExtention but returns the enum value not the name.
+    /// Same as <see cref="EnumBindingSourceExtention"/> but returns the enum value not the name.
     /// </summary>
-   public class EnumValueBindingSourceExtension : MarkupExtension
+    public class EnumValueBindingSourceExtension : MarkupExtension
     {
         private Type _enumType;
         public Type EnumType
@@ -58,13 +61,25 @@ namespace GS.Shared.Domain
             }
 
             var actualEnumType = Nullable.GetUnderlyingType(_enumType) ?? _enumType;
-            var enumValues = Enum.GetValues(actualEnumType);
 
             if (actualEnumType == _enumType)
-            {  return enumValues;}
+            {
+                var enumValues = new List<object>();
+                foreach (var field in actualEnumType.GetFields(BindingFlags.Public | BindingFlags.Static))
+                {
+                    var attr = EnumUtils.GetAttributes<ObsoleteAttribute>(field).FirstOrDefault();
+                    if (attr == null)
+                    {
+                        enumValues.Add(field.GetValue(null));
+                    }
+                }
 
-            var tempArray = Array.CreateInstance(actualEnumType, enumValues.Length + 1);
-            enumValues.CopyTo(tempArray, 1);
+                return enumValues;
+            }
+
+            var valueArray = Enum.GetValues(actualEnumType);
+            var tempArray = Array.CreateInstance(actualEnumType, valueArray.Length + 1);
+            valueArray.CopyTo(tempArray, 1);
             return tempArray;
         }
     }

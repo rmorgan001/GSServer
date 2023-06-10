@@ -10,81 +10,83 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace GS.Shared.Transport
 {
+    /// <summary>
+    /// General discovery process:
+    /// <list type="bullet">
+    ///   <item>Discovers all COM serial ports.</item>
+    ///   <item>Sends <c>:e1\r</c> to all WiFi broadcast addresses (no NAT traversal).</item>
+    /// </list>
+    /// </summary>
     public class DiscoveryService : IDiscoveryService
     {
+        const int DiscoveryIntervalMs = 2000;
+
         private readonly byte[] DiscoverMsg = Encode(":e1\r");
 
         static byte[] Encode(string msg) => Encoding.ASCII.GetBytes(msg);
         static string Decode(byte[] msg) => msg != null ? Encoding.ASCII.GetString(msg).Replace("\0", "").Trim() : "";
 
         private readonly ConcurrentDictionary<IPAddress, Lazy<UdpClient>> _udpClients;
-        private readonly ConcurrentDictionary<IPEndPoint, int> _dirtyUdpDevices;
-        private readonly ConcurrentDictionary<IPEndPoint, int> _activeUdpDevices;
-        private readonly ConcurrentDictionary<int, Device> _allDevices;
+        private readonly DispatcherTimer _timer;
         private readonly int _remotePort;
+        private readonly TimeSpan _broadcastTimeout;
 
-        private volatile int _deviceIndex = 0;
+        private CancellationTokenSource _cts;
         private bool disposedValue;
 
-        private long _lastDiscoverTime = -1;
-
-        public DiscoveryService(int remotePort = Device.DefaultPort)
+        public DiscoveryService(int remotePort = Device.DefaultPort, int discoveryIntervalMs = DiscoveryIntervalMs)
         {
             _udpClients = new ConcurrentDictionary<IPAddress, Lazy<UdpClient>>();
-            _dirtyUdpDevices = new ConcurrentDictionary<IPEndPoint, int>();
-            _activeUdpDevices = new ConcurrentDictionary<IPEndPoint, int>();
-            _allDevices = new ConcurrentDictionary<int, Device>();
             _remotePort = remotePort;
-        }
-
-        public IEnumerable<Device> AllDevices => _allDevices.Values;
-
-        public IEnumerable<Device> ActiveDevices
-        {
-            get
+            DiscoveryInterval = TimeSpan.FromMilliseconds(discoveryIntervalMs);
+            _broadcastTimeout =  TimeSpan.FromMilliseconds(Math.Max(discoveryIntervalMs - 200, 200));
+            _timer = new DispatcherTimer
             {
-                foreach (var activeDeviceId in _activeUdpDevices.Values)
-                {
-                    if (_allDevices.TryGetValue(activeDeviceId, out var device))
-                    {
-                        yield return device;
-                    }
-                }
-            }
+                Interval = DiscoveryInterval
+            };
+            _timer.Tick += TimerTick;
         }
+
+        private void TimerTick(object sender, EventArgs e) => Discover();
 
         public event EventHandler<DiscoveryEventArgs> DiscoveredDeviceEvent;
 
         public event EventHandler<DiscoveryEventArgs> RemovedDeviceEvent;
 
-        /// <summary>
-        /// General discovery process:
-        /// <list type="bullet">
-        ///   <item>Runs discovery if last discovery is longer than 2 seconds ago.</item>
-        ///   <item>Discovers all COM serial ports.</item>
-        ///   <item>Sends <c>:e1\r</c> to all WiFi broadcast addresses (no NAT traversal).</item>
-        ///   <item>Cleans up non-active and previously discovered devices.</item>
-        /// </list>
-        /// Step by step process:
-        /// <list type="number">
-        ///   <item>Initializes UDP clients for broadcast, one per network interface</item>
-        ///   <item>Removes all UDP devices that where discovered previously but did not respond on last invocation of this method</item>
-        ///   <item>Marks all currently active UDP devices as dirty</item>
-        ///   <item>Discovers all COM serial ports (synchronously)</item>
-        ///   <item>Broadcasts and listens for responses</item>
-        /// </list>
-        /// </summary>
-        public void Discover()
+        public TimeSpan DiscoveryInterval { get; }
+
+        /// <inheritdoc/>
+        public void StartAutoDiscovery()
         {
-            if (Environment.TickCount - _lastDiscoverTime <= 2000)
+            if (_timer.IsEnabled)
             {
                 return;
             }
 
-            _lastDiscoverTime = Environment.TickCount;
+            _timer.Start();
+        }
+
+        /// <inheritdoc/>
+        public void StopAutoDiscovery()
+        {
+            _cts?.Cancel();
+            _timer.Stop();
+        }
+
+        /// <summary>
+        /// Step by step discovery process:
+        /// <list type="number">
+        ///   <item>Initializes UDP clients for broadcast, one per network interface</item>
+        ///   <item>Discovers all COM serial ports (synchronously)</item>
+        ///   <item>Broadcasts to all active network interfaces and listens for responses</item>
+        /// </list>
+        /// </summary>
+        void Discover()
+        {
             var monitorItem = new MonitorEntry
             {
                 Type = MonitorType.Information,
@@ -98,8 +100,6 @@ namespace GS.Shared.Transport
             MonitorLog.LogToMonitor(monitorItem);
 
             InitializeUdpClients();
-            CleanupDirtyUdpDevices();
-            MarkPreviouslyActiveDevicesAsDirty();
             DiscoverSerialDevices();
             BroadcastDiscoverMessage();
         }
@@ -107,7 +107,7 @@ namespace GS.Shared.Transport
         void DiscoverSerialDevices()
         {
             var allPorts = SerialPort.GetPortNames();
-            var portNumbers = new HashSet<int>();
+            var portNumbers = new SortedSet<long>();
             foreach (var port in allPorts)
             {
                 if (string.IsNullOrEmpty(port)) continue;
@@ -118,37 +118,21 @@ namespace GS.Shared.Transport
                 }
             }
 
-            var added = new List<Device>();
-            foreach (var portNumber in portNumbers.OrderBy(x => x))
-            {
-                var device = new Device(portNumber);
-                if (_allDevices.TryAdd(portNumber, device))
-                {
-                    added.Add(device);
-                }
-            }
+            var serialDevices = portNumbers.Select(portNumber => new Device(portNumber)).ToList();
 
-            DiscoveredDeviceEvent?.Invoke(this, new DiscoveryEventArgs(added));
-
-            var removed = new List<Device>();
-            foreach (var deviceIndex in _allDevices.Keys)
-            {
-                if (deviceIndex > 0 && !portNumbers.Contains(deviceIndex) && _allDevices.TryRemove(deviceIndex, out var device))
-                {
-                    removed.Add(device);
-                }
-            }
-
-            RemovedDeviceEvent?.Invoke(this, new DiscoveryEventArgs(removed));
+            DiscoveredDeviceEvent?.Invoke(this, new DiscoveryEventArgs(serialDevices, isSynchronous: true));
         }
 
         void BroadcastDiscoverMessage()
         {
+            var oldCts = Interlocked.Exchange(ref _cts, new CancellationTokenSource(_broadcastTimeout));
+            oldCts?.Cancel();
+
             var broadCastIP = new IPEndPoint(IPAddress.Broadcast, _remotePort);
 
             Parallel.ForEach(
                 _udpClients,
-                kv => kv.Value.Value.BeginSend(DiscoverMsg, DiscoverMsg.Length, broadCastIP, EndSendCb, kv.Key)
+                kv => kv.Value.Value.BeginSend(DiscoverMsg, DiscoverMsg.Length, broadCastIP, EndSendCb, new DiscoveryState(kv.Key, _cts))
             );
         }
 
@@ -204,53 +188,22 @@ namespace GS.Shared.Transport
             }
         }
 
-        /// <summary>
-        /// Removes all devices that are currently dirty (as they have not been fully discovered last run).
-        /// </summary>
-        void CleanupDirtyUdpDevices()
-        {
-            var removed = new List<Device>();
-            foreach (var ep in _dirtyUdpDevices.Keys)
-            {
-                if (_dirtyUdpDevices.TryRemove(ep, out var deviceIndex) && _allDevices.TryRemove(deviceIndex, out var device))
-                {
-                    removed.Add(device);
-                }
-            }
-
-            RemovedDeviceEvent?.Invoke(this, new DiscoveryEventArgs(removed));
-        }
-
-        /// <summary>
-        /// Move currently active devices to the dirty list, and only if they are rediscovered move them back.
-        /// The remaining dirty devices will be cleaned up on <see cref="Dispose"/> or on <see cref="Discover"/>,
-        /// whichever comes first.
-        /// </summary>
-        void MarkPreviouslyActiveDevicesAsDirty()
-        {
-            foreach (var ep in _activeUdpDevices.Keys)
-            {
-                if (_activeUdpDevices.TryRemove(ep, out var device))
-                {
-                    _dirtyUdpDevices.AddOrUpdate(ep, device, (_, old) => device);
-                }
-            }
-        }
-
         void EndSendCb(IAsyncResult sendRes)
         {
-            var sender = sendRes.AsyncState as IPAddress;
-            if (sendRes.IsCompleted && sender != null && _udpClients.TryGetValue(sender, out var updClient))
+            var state = sendRes.AsyncState as DiscoveryState;
+            var sender = state?.InterfaceAddress;
+            if (sendRes.IsCompleted && sender != null && !state.Cts.IsCancellationRequested && _udpClients.TryGetValue(sender, out var updClient))
             {
                 _ = updClient.Value.EndSend(sendRes);
-                updClient.Value.BeginReceive(BeginReceiveEP1Cb, sender);
+                updClient.Value.BeginReceive(BeginReceiveEP1Cb, state);
             }
         }
 
         void BeginReceiveEP1Cb(IAsyncResult receiveRes)
         {
-            var sender = receiveRes.AsyncState as IPAddress;
-            if (receiveRes.IsCompleted && sender != null && _udpClients.TryGetValue(sender, out var updClient))
+            var state = receiveRes.AsyncState as DiscoveryState;
+            var sender = state?.InterfaceAddress;
+            if (receiveRes.IsCompleted && sender != null && !state.Cts.IsCancellationRequested && _udpClients.TryGetValue(sender, out var updClient))
             {
                 IPEndPoint remoteEP = null;
                 var response = Decode(updClient.Value.EndReceive(receiveRes, ref remoteEP));
@@ -263,23 +216,9 @@ namespace GS.Shared.Transport
 
         void OnUdpDeviceDiscovery(IPEndPoint remoteEP)
         {
-            int deviceId;
-            if (_dirtyUdpDevices.TryRemove(remoteEP, out var dirtyDeviceId))
-            {
-                deviceId = _activeUdpDevices.GetOrAdd(remoteEP, dirtyDeviceId);
-            }
-            else if (_activeUdpDevices.TryGetValue(remoteEP, out var activeDeviceId))
-            {
-                deviceId = activeDeviceId;
-            }
-            else
-            {
-                deviceId = _activeUdpDevices.GetOrAdd(remoteEP, _ => Interlocked.Decrement(ref _deviceIndex));
-            }
+            var deviceIndex = GetDeviceIndex(remoteEP);
 
-            var discoveredDevice = _allDevices.GetOrAdd(deviceId, new Device(deviceId, remoteEP));
-
-            DiscoveredDeviceEvent?.Invoke(this, new DiscoveryEventArgs(new[] { discoveredDevice }));
+            DiscoveredDeviceEvent?.Invoke(this, new DiscoveryEventArgs(new[] { new Device(deviceIndex, remoteEP) }));
         }
 
         static bool IsSuccessfulResponse(string response) => response?.Length > 2 && response[0] == '=';
@@ -299,9 +238,8 @@ namespace GS.Shared.Transport
                     }
                 }
 
-                _dirtyUdpDevices.Clear();
-                _activeUdpDevices.Clear();
-                _allDevices.Clear();
+                _cts?.Cancel();
+                _timer.Stop();
 
                 disposedValue =true;
             }
@@ -313,6 +251,37 @@ namespace GS.Shared.Transport
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
+        static long GetDeviceIndex(IPEndPoint endpoint)
+        {
+            var id = 0xFF & (long)endpoint.AddressFamily;
+            id <<= 32 + 16;
+            id |= (long)(0xff & endpoint.Port);
+            id <<= 32;
+            if (endpoint.AddressFamily == AddressFamily.InterNetwork)
+            {
+                id |= (long)BitConverter.ToInt32(endpoint.Address.GetAddressBytes(), 0);
+            }
+            else
+            {
+                throw new NotSupportedException($"Address familiy {endpoint.AddressFamily} is not supported");
+            }
+
+            return -Math.Abs(id);
+        }
+    }
+
+    class DiscoveryState
+    {
+        public DiscoveryState(IPAddress interfaceAddress, CancellationTokenSource cts)
+        {
+            InterfaceAddress = interfaceAddress;
+            Cts = cts;
+        }
+
+        public IPAddress InterfaceAddress { get; }
+
+        public CancellationTokenSource Cts { get; }
     }
 }
 

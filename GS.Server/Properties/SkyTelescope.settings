@@ -5,7 +5,7 @@
     <Setting Name="Version" Type="System.String" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="ComPort" Type="System.Int32" Scope="User">
+    <Setting Name="DeviceIndex" Type="System.Int64" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="BaudRate" Type="System.String" Scope="User">

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Threading;
 
 namespace GS.Shared.Transport
@@ -59,32 +60,66 @@ namespace GS.Shared.Transport
 
         void EndSendCb(IAsyncResult result)
         {
-            if (result.IsCompleted
-                && result.AsyncState is SendReceiveState state
-                && !state.Cts.IsCancellationRequested
-                && EndSend(result) > 0
-            )
+            try
             {
-                BeginReceive(EndReceiveCb, state);
+                if (result.IsCompleted
+                    && result.AsyncState is SendReceiveState state
+                    && !state.Cts.IsCancellationRequested
+                    && EndSend(result) > 0
+                )
+                {
+                    BeginReceive(EndReceiveCb, state);
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Type = MonitorType.Error,
+                    Category = MonitorCategory.Driver,
+                    Datetime = DateTime.UtcNow,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Device = MonitorDevice.Server,
+                    Message = $"SerialOverUdpPort|{_remoteEndpoint}|Send|{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
         void EndReceiveCb(IAsyncResult result)
         {
-            if (result.IsCompleted && result.AsyncState is SendReceiveState state && !state.Cts.IsCancellationRequested)
+            try
             {
-                IPEndPoint ep = null;
-                var bytes = EndReceive(result, ref ep);
-                if (bytes?.Length > 0)
+                if (result.IsCompleted && result.AsyncState is SendReceiveState state && !state.Cts.IsCancellationRequested)
                 {
-                    var chars = new char[bytes.Length];
-                    for (var i = 0; i < bytes.Length; i++)
+                    IPEndPoint ep = null;
+                    var bytes = EndReceive(result, ref ep);
+                    if (bytes?.Length > 0)
                     {
-                        chars[i] = (char)bytes[i];
-                    }
+                        var chars = new char[bytes.Length];
+                        for (var i = 0; i < bytes.Length; i++)
+                        {
+                            chars[i] = (char)bytes[i];
+                        }
 
-                    state.Received = new string(chars);
+                        state.Received = new string(chars);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Type = MonitorType.Error,
+                    Category = MonitorCategory.Driver,
+                    Datetime = DateTime.UtcNow,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Device = MonitorDevice.Server,
+                    Message = $"SerialOverUdpPort|{_remoteEndpoint}|Receive|{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
             }
         }
     }

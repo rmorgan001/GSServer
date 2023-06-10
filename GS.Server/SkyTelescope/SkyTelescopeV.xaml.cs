@@ -1,4 +1,7 @@
-﻿using System.Runtime.InteropServices;
+﻿using GS.Shared.Transport;
+using System;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -18,53 +21,46 @@ namespace GS.Server.SkyTelescope
         private void SkyTelescopeV_OnLoaded(object sender, RoutedEventArgs e)
         {
             var ctx = DataContext as SkyTelescopeVM;
-            var udpDiscoverService = ctx?.DiscoveryService;
-            if (udpDiscoverService != null)
+            var discoveryService = ctx?.DiscoveryService;
+            if (discoveryService != null)
             {
-                udpDiscoverService.DiscoveredDeviceEvent += UdpDiscoveryService_DiscoveredDeviceEvent;
-                udpDiscoverService.RemovedDeviceEvent += UdpDiscoveryService_RemovedDeviceEvent;
-                udpDiscoverService.Discover();
+                discoveryService.DiscoveredDeviceEvent += UdpDiscoveryService_DiscoveredDeviceEvent;
+                discoveryService.StartAutoDiscovery();
             }
         }
 
-        private void UdpDiscoveryService_DiscoveredDeviceEvent(object sender, Shared.Transport.DiscoveryEventArgs e)
+        private void UdpDiscoveryService_DiscoveredDeviceEvent(object sender, DiscoveryEventArgs e)
         {
             Dispatcher.InvokeAsync(() =>
             {
                 if (DataContext is SkyTelescopeVM ctx)
                 {
                     var hasChanges = false;
-
-                    foreach (var device in e.Devices)
+                    for (var i = 0; i < e.Devices.Count; i++)
                     {
-                        if (!ctx.Devices.Contains(device))
+                        var discoveredDevice = e.Devices[i];
+                        var existingIndex = SkySettings.Devices.IndexOf(discoveredDevice);
+                        if (existingIndex >= 0)
                         {
-                            ctx.Devices.Add(device);
+                            SkySettings.Devices[existingIndex].DiscoverTimeMs = discoveredDevice.DiscoverTimeMs;
+                        }
+                        else
+                        {
+                            SkySettings.Devices.Add(discoveredDevice);
                             hasChanges = true;
                         }
                     }
 
-                    if (hasChanges)
+                    var timeMs = Environment.TickCount;
+                    // discard anything not detected in two scans
+                    var discardOlderThanMs = ctx.DiscoveryService.DiscoveryInterval.TotalMilliseconds * 2;
+                    for (var i = SkySettings.Devices.Count - 1; i >= 0; i--)
                     {
-                        ctx.RaisePropertyChanged(nameof(SkyTelescopeVM.Devices));
-                        ctx.RaisePropertyChanged(nameof(SkyTelescopeVM.SelectedDevice));
-                    }
-                }
-            });
-        }
-
-        private void UdpDiscoveryService_RemovedDeviceEvent(object sender, Shared.Transport.DiscoveryEventArgs e)
-        {
-            Dispatcher.InvokeAsync(() =>
-            {
-                if (DataContext is SkyTelescopeVM ctx)
-                {
-                    var hasChanges = false;
-
-                    foreach (var device in e.Devices)
-                    {
-                        if (ctx.Devices.Remove(device))
+                        var existingDevice = SkySettings.Devices[i];
+                        // Do not remove UDP devices when doing asynchronous discovery
+                        if ((!e.IsSynchronous || existingDevice.Index > 0) && timeMs - existingDevice.DiscoverTimeMs > discardOlderThanMs)
                         {
+                            SkySettings.Devices.RemoveAt(i);
                             hasChanges = true;
                         }
                     }

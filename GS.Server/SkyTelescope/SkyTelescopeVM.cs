@@ -52,6 +52,7 @@ using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using NativeMethods = GS.Server.Helpers.NativeMethods;
 using Point = System.Windows.Point;
 using GS.Shared.Transport;
+using System.Collections.ObjectModel;
 
 namespace GS.Server.SkyTelescope
 {
@@ -85,10 +86,6 @@ namespace GS.Server.SkyTelescope
                         Message = "Loading SkyTelescopeVM"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
-
-
-                    // discovery service
-                    DiscoveryService = new DiscoveryService();
 
                     _skyTelescopeVM = this;
                     LoadImages();  // load front image
@@ -727,17 +724,17 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        public IDiscoveryService DiscoveryService { get; }
+        public IDiscoveryService DiscoveryService => SkySystem.DiscoveryService;
 
-        public IList<Device> Devices => SkySettings.Devices;
+        public ObservableCollection<Device> Devices => new ObservableCollection<Device>(SkySettings.Devices);
 
         public Device SelectedDevice
         {
             get => Devices.SingleOrDefault(device => device.Index == SkySettings.DeviceIndex);
             set
             {
-                if (value.Index == SkySettings.DeviceIndex) return;
-                SkySettings.DeviceIndex = value.Index;
+                if (value?.Index == SkySettings.DeviceIndex) return;
+                SkySettings.DeviceIndex = value?.Index ?? 0;
                 OnPropertyChanged();
             }
         }
@@ -2117,9 +2114,17 @@ namespace GS.Server.SkyTelescope
 
                 _openSetupDialog = value;
 
-                DiscoveryService.Discover();
-                if (!value)
+                if (value)
                 {
+                    // only start discovery if mount is not connected to not interfere with the WiFi communication
+                    if (!this.IsConnected)
+                    {
+                        DiscoveryService.StartAutoDiscovery();
+                    }
+                }
+                else
+                {
+                    DiscoveryService.StopAutoDiscovery();
                     ClickCloseSettings();
                 }
 
@@ -8519,6 +8524,7 @@ namespace GS.Server.SkyTelescope
             if (disposing)
             {
                 _util?.Dispose();
+                DiscoveryService?.Dispose();
             }
 
             // free native resources if there are any.

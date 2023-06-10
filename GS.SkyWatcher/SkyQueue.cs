@@ -20,7 +20,6 @@ using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO.Ports;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;

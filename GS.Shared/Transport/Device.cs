@@ -12,7 +12,7 @@ namespace GS.Shared.Transport
     {
         internal const int DefaultPort = 11880;
 
-        public Device(int index, IPEndPoint endpoint = null)
+        public Device(long index, IPEndPoint endpoint = null)
         {
             if (endpoint == null && index <= 0)
             {
@@ -21,18 +21,21 @@ namespace GS.Shared.Transport
 
             Index = index;
             Endpoint = endpoint;
+            DiscoverTimeMs = Environment.TickCount;
         }
 
         /// <summary>
         /// Unique index (-1 or lower) used in device discovery (see <see cref="DiscoveryService.Discover"/>).
         /// Will be the COM port number (1 or greater) if this is a serial device.
         /// </summary>
-        public int Index { get; }
+        public long Index { get; }
 
         /// <summary>
         /// IP Address and port if device is a UDP device, <see langword="null"/> otherwise.
         /// </summary>
         public IPEndPoint Endpoint { get; }
+
+        public long DiscoverTimeMs { get; set; }
 
         public override bool Equals(object obj)
         {
@@ -40,24 +43,11 @@ namespace GS.Shared.Transport
             return Equals(other);
         }
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hash = 1009;
-                if (Index > 0)
-                {
-                    hash = (hash * 9176) + Index.GetHashCode();
-                }
-                else if (Endpoint != null)
-                {
-                    hash = (hash * 9176) + Endpoint.GetHashCode();
-                }
-                return hash;
-            }
-        }
+        public override int GetHashCode() => Index.GetHashCode();
 
-        public bool Equals(Device other) => Index > 0 ? Index == other?.Index : object.Equals(Endpoint, other?.Endpoint);
+        public bool Equals(Device other) => Index == other?.Index;
+
+        public string Name => ToString();
 
         public override string ToString()
         {

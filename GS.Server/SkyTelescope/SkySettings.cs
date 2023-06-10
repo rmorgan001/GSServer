@@ -839,16 +839,10 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static IList<Device> _devices = new List<Device>();
+        public static IList<Device> Devices { get; } = new List<Device>();
 
-        public static IList<Device> Devices
-        {
-            get => _devices;
-            set => _devices = value ?? new List<Device>();
-        }
-
-        private static int _deviceIndex;
-        public static int DeviceIndex
+        private static long _deviceIndex;
+        public static long DeviceIndex
         {
             get => _deviceIndex;
             set
@@ -863,7 +857,7 @@ namespace GS.Server.SkyTelescope
 
         public static bool TryGetDevice(out Device device) => TryGetDevice(DeviceIndex, out device);
 
-        public static bool TryGetDevice(int deviceIndex, out Device device)
+        public static bool TryGetDevice(long deviceIndex, out Device device)
         {
             var devices = Devices;
             device = devices?.Count > 0 ? devices.SingleOrDefault(x => x.Index == deviceIndex) : default;

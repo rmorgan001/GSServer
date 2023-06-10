@@ -31,10 +31,12 @@ namespace GS.Server.SkyTelescope
         private static long _idCount;
         private static readonly ConcurrentDictionary<long, bool> ConnectStates;
         public static ISerialPort Serial { get; private set; }
+        public static IDiscoveryService DiscoveryService { get; }
 
         static SkySystem()
         {
             ConnectStates = new ConcurrentDictionary<long, bool>();
+            DiscoveryService = new DiscoveryService();
             _idCount = 0;
         }
 
