@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-
 namespace GS.Shared.Transport
 {
     public interface IDiscoveryService : IDisposable
     {
-        IEnumerable<Device> AllDevices { get; }
-        IEnumerable<Device> ActiveDevices { get; }
+        TimeSpan DiscoveryInterval { get; }
 
         /// <summary>
         /// Start periodic discovery if not already running.
@@ -19,8 +16,6 @@ namespace GS.Shared.Transport
         void StopAutoDiscovery();
 
         event EventHandler<DiscoveryEventArgs> DiscoveredDeviceEvent;
-
-        event EventHandler<DiscoveryEventArgs> RemovedDeviceEvent;
     }
 }
 

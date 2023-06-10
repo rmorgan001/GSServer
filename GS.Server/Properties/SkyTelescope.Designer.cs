@@ -38,9 +38,9 @@ namespace GS.Server.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public int DeviceIndex {
+        public long DeviceIndex {
             get {
-                return ((int)(this["DeviceIndex"]));
+                return ((long)(this["DeviceIndex"]));
             }
             set {
                 this["DeviceIndex"] = value;

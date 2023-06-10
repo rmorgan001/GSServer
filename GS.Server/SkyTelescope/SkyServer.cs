@@ -39,6 +39,7 @@ using GS.Server.Windows;
 using GS.Server.Alignment;
 using AxisStatus = GS.Simulator.AxisStatus;
 using Range = GS.Principles.Range;
+using GS.Shared.Transport;
 
 namespace GS.Server.SkyTelescope
 {
@@ -4032,8 +4033,9 @@ namespace GS.Server.SkyTelescope
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{SkySettings.Mount}" };
             MonitorLog.LogToMonitor(monitorItem);
 
-            // setup server defaults, connect serial port, start queues
+            // setup server defaults, stop auto-discovery, connect serial port, start queues
             Defaults();
+            SkySystem.DiscoveryService.StopAutoDiscovery();
             switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
