@@ -17,6 +17,7 @@
         <domain:ComparisonConverter x:Key="Compare" />
         <domain:InverseBooleanConverter x:Key="InvertBool" />
         <domain:EnumToVisibilityConverter x:Key="EnumToVis" />
+        <domain1:EnumValueToDescriptionConverter x:Key="EnumToDesc" />
     </UserControl.Resources>
     <md:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" CloseOnClickAway="True"  >
         <Grid MinWidth="800">
@@ -62,11 +63,16 @@
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
                             <ComboBox Grid.Row="1" Grid.Column="1" md:HintAssist.Hint="{StaticResource skyBaud}" MinWidth="10" Margin="10,0,0,0" VerticalAlignment="Center"  ToolTip="{StaticResource skyBaud}"
-                                      ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type enums:SerialSpeed}}}"
+                                      ItemsSource="{Binding Source={domain1:EnumValueBindingSourceExtension {x:Type enums:SerialSpeed}}}"
                                       Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                 <ComboBox.Text>
                                     <Binding Path="BaudRate" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
                                 </ComboBox.Text>
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Mode=OneTime, Converter={StaticResource EnumToDesc}}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
                                 <ComboBox.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <VirtualizingStackPanel />
@@ -74,8 +80,8 @@
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
                             <ComboBox Grid.Row="1" Grid.Column="3" md:HintAssist.Hint="{StaticResource skyEquatorial}" MinWidth="10" Margin="10,0,0,0" VerticalAlignment="Center"  ToolTip="{StaticResource skyEquatorial}"
-                                      ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type deviceInterface:EquatorialCoordinateType}}}" 
-                                      Style="{StaticResource MaterialDesignFloatingHintComboBox}"> 
+                                      ItemsSource="{Binding Source={domain1:EnumValueBindingSourceExtension {x:Type deviceInterface:EquatorialCoordinateType}}}" 
+                                      Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                 <ComboBox.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <VirtualizingStackPanel />
@@ -84,9 +90,14 @@
                                 <ComboBox.Text>
                                         <Binding Path="EquatorialCoordinateType" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
                                 </ComboBox.Text>
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Mode=OneTime, Converter={StaticResource EnumToDesc}}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
                             </ComboBox>
                             <ComboBox Grid.Row="1" Grid.Column="4" md:HintAssist.Hint="{StaticResource skyAlignment}" MinWidth="10" Margin="10,0,0,0" VerticalAlignment="Center"  ToolTip="{StaticResource skyAlignment}"
-                                      ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type deviceInterface:AlignmentModes}}}"
+                                      ItemsSource="{Binding Source={domain1:EnumValueBindingSourceExtension {x:Type deviceInterface:AlignmentModes}}}"
                                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEnabled="False">
                                 <ComboBox.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -96,6 +107,11 @@
                                 <ComboBox.Text>
                                     <Binding Path="AlignmentMode" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
                                 </ComboBox.Text>
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Mode=OneTime, Converter={StaticResource EnumToDesc}}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
                             </ComboBox>
                             <ComboBox Grid.Row="2" Grid.Column="0" md:HintAssist.Hint="{StaticResource skyRaGuiding}" MinWidth="10" Margin="0,0,0,0" VerticalAlignment="Center"  ToolTip="{StaticResource skyRaGuiding}"
                                       ItemsSource="{Binding GuideRateOffsetList}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
@@ -128,7 +144,7 @@
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
                             <ComboBox Grid.Row="1" Grid.Column="2" md:HintAssist.Hint="{StaticResource skyMount}" MinWidth="10" Margin="10,0,0,0" VerticalAlignment="Center"  ToolTip="{StaticResource skyMount}"
-                                      ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type skyTelescope:MountType}}}"
+                                      ItemsSource="{Binding Source={domain1:EnumValueBindingSourceExtension {x:Type skyTelescope:MountType}}}"
                                       Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                 <ComboBox.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -138,6 +154,11 @@
                                 <ComboBox.Text>
                                     <Binding Path="Mount" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
                                 </ComboBox.Text>
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Mode=OneTime, Converter={StaticResource EnumToDesc}}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
                             </ComboBox>
                             <ComboBox Grid.Row="2" Grid.Column="4" md:HintAssist.Hint="{StaticResource skyMaxSlew}" MinWidth="10" Margin="10,0,0,0" VerticalAlignment="Center"  ToolTip="{StaticResource skyMaxSlew}"
                                       ItemsSource="{Binding MaxSlewRates}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
@@ -200,7 +221,7 @@
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
                             <ComboBox Grid.Row="3" Grid.Column="2" md:HintAssist.Hint="{StaticResource skyTracking}" MinWidth="10" Margin="10,0,5,0" VerticalAlignment="Center"  ToolTip="{StaticResource skyTracking}"
-                                  ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type deviceInterface:DriveRates}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                                  ItemsSource="{Binding Source={domain1:EnumValueBindingSourceExtension {x:Type deviceInterface:DriveRates}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                 <ComboBox.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <VirtualizingStackPanel />
@@ -209,6 +230,11 @@
                                 <ComboBox.Text>
                                     <Binding Path="TrackingRate" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
                                 </ComboBox.Text>
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Mode=OneTime, Converter={StaticResource EnumToDesc}}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
                             </ComboBox>
                             <ComboBox Grid.Row="3" Grid.Column="3" md:HintAssist.Hint="{StaticResource skyPolarLedLevel}" MinWidth="10" Margin="10,0,0,0" VerticalAlignment="Center"  ToolTip="{StaticResource skyPolarLedLevel}" ItemsSource="{Binding PolarLedLevels}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEnabled="{Binding PolarLedLevelEnabled}">
                                     <ComboBox.SelectedItem>
@@ -692,7 +718,7 @@
                         </Grid>
                     <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center">
                         <controls:BottomStatusBar IsEnabled="{Binding ScreenEnabled}"/>
-                        <ComboBox md:HintAssist.Hint="{StaticResource skyMount}" IsEnabled="{Binding ScreenEnabled, Converter={StaticResource InvertBool}}"  Height="38" Margin="5,0,0,0" ToolTip="{StaticResource skyMount}" ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type skyTelescope:MountType}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <ComboBox md:HintAssist.Hint="{StaticResource skyMount}" IsEnabled="{Binding ScreenEnabled, Converter={StaticResource InvertBool}}"  Height="38" Margin="5,0,0,0" ToolTip="{StaticResource skyMount}" ItemsSource="{Binding Source={domain1:EnumValueBindingSourceExtension {x:Type skyTelescope:MountType}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <VirtualizingStackPanel />
@@ -701,6 +727,11 @@
                             <ComboBox.Text>
                                 <Binding Path="Mount" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
                             </ComboBox.Text>
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Mode=OneTime, Converter={StaticResource EnumToDesc}}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
                         </ComboBox>
                         <Button Margin="10,0,0,0" Height="30" ToolTip="{StaticResource skyConnectDis}" 
                                 Command="{Binding ClickConnectCommand}" Content="{Binding ConnectButtonContent}" Style="{StaticResource MaterialDesignRaisedDarkButton}"/>

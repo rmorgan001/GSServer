@@ -55,7 +55,6 @@ namespace GS.Shared.Domain
             }
 
             var actualEnumType = Nullable.GetUnderlyingType(_enumType) ?? _enumType;
-            //var enumValues = Enum.GetValues(actualEnumType);
             var enumValues = Enum.GetNames(actualEnumType);
 
             if (actualEnumType == _enumType)
