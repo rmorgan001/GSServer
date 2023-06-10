@@ -120,7 +120,7 @@ namespace GS.Shared.Transport
 
             var serialDevices = portNumbers.Select(portNumber => new Device(portNumber)).ToList();
 
-            DiscoveredDeviceEvent?.Invoke(this, new DiscoveryEventArgs(serialDevices));
+            DiscoveredDeviceEvent?.Invoke(this, new DiscoveryEventArgs(serialDevices, isSynchronous: true));
         }
 
         void BroadcastDiscoverMessage()
@@ -195,14 +195,15 @@ namespace GS.Shared.Transport
             if (sendRes.IsCompleted && sender != null && !state.Cts.IsCancellationRequested && _udpClients.TryGetValue(sender, out var updClient))
             {
                 _ = updClient.Value.EndSend(sendRes);
-                updClient.Value.BeginReceive(BeginReceiveEP1Cb, sender);
+                updClient.Value.BeginReceive(BeginReceiveEP1Cb, state);
             }
         }
 
         void BeginReceiveEP1Cb(IAsyncResult receiveRes)
         {
-            var sender = receiveRes.AsyncState as IPAddress;
-            if (receiveRes.IsCompleted && sender != null && _udpClients.TryGetValue(sender, out var updClient))
+            var state = receiveRes.AsyncState as DiscoveryState;
+            var sender = state?.InterfaceAddress;
+            if (receiveRes.IsCompleted && sender != null && !state.Cts.IsCancellationRequested && _udpClients.TryGetValue(sender, out var updClient))
             {
                 IPEndPoint remoteEP = null;
                 var response = Decode(updClient.Value.EndReceive(receiveRes, ref remoteEP));

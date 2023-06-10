@@ -52,11 +52,13 @@ namespace GS.Server.SkyTelescope
                     }
 
                     var timeMs = Environment.TickCount;
-                    var discardOlderThanMs = ctx.DiscoveryService.DiscoveryInterval.TotalMilliseconds;
+                    // discard anything not detected in two scans
+                    var discardOlderThanMs = ctx.DiscoveryService.DiscoveryInterval.TotalMilliseconds * 2;
                     for (var i = SkySettings.Devices.Count - 1; i >= 0; i--)
                     {
                         var existingDevice = SkySettings.Devices[i];
-                        if (!e.Devices.Contains(existingDevice) && timeMs - existingDevice.DiscoverTimeMs > discardOlderThanMs)
+                        // Do not remove UDP devices when doing asynchronous discovery
+                        if ((!e.IsSynchronous || existingDevice.Index > 0) && timeMs - existingDevice.DiscoverTimeMs > discardOlderThanMs)
                         {
                             SkySettings.Devices.RemoveAt(i);
                             hasChanges = true;
