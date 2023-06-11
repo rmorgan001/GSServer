@@ -55,7 +55,7 @@ namespace GS.Shared.Transport
 
         public event EventHandler<DiscoveryEventArgs> DiscoveredDeviceEvent;
 
-        public event EventHandler<DiscoveryEventArgs> RemovedDeviceEvent;
+        //public event EventHandler<DiscoveryEventArgs> RemovedDeviceEvent;
 
         public TimeSpan DiscoveryInterval { get; }
 
