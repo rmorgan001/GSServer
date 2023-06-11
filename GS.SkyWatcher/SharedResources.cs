@@ -115,7 +115,7 @@ namespace GS.SkyWatcher
         public bool SlewingForward;
         public bool HighSpeed;
         public bool Initialized;
-        public bool TrajectoryMode;
+        public bool TrajectoryMode; 
         public string StepSpeed;
         public string Response;
 

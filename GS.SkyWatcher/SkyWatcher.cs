@@ -978,7 +978,7 @@ namespace GS.SkyWatcher
             }
             var a = _commands.SetSnapPort(axis, on).Trim();
             return a == "=";
-        }
+        } 
 
         internal void SetTargetPosition(AxisId axis, double position)
         {
