@@ -535,6 +535,15 @@ namespace GS.SkyWatcher
         {
             var response = CmdToMount(axis, 'f', null);
 
+                //Debug.WriteLine("ADV " + axis + ": " + response);
+                //Debug.WriteLine("Initialized " + _axesStatus[(int)axis].Initialized);
+                //Debug.WriteLine("FullStop " + _axesStatus[(int)axis].FullStop);
+                //Debug.WriteLine("Slewing " + _axesStatus[(int)axis].Slewing);
+
+                return _axesStatus[(int)axis];
+            }
+ 
+            response = CmdToMount(axis, 'f', null);
             _axesStatus[(int)axis].Response = response;
 
             //check if at full stop = 1
