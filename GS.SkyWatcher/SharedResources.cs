@@ -115,6 +115,7 @@ namespace GS.SkyWatcher
         public bool SlewingForward;
         public bool HighSpeed;
         public bool Initialized;
+        public bool TrajectoryMode;
         public string StepSpeed;
         public string Response;
 
@@ -143,12 +144,12 @@ namespace GS.SkyWatcher
 
 
         //// Mask for axis status
-        //public const long AXIS_FULL_STOPPED = 0x0001;		// 該軸處於完全停止狀態
-        //public const long AXIS_SLEWING = 0x0002;			// 該軸處於恒速運行狀態
-        //public const long AXIS_SLEWING_TO = 0x0004;		    // 該軸處於運行到指定目標位置的過程中
-        //public const long AXIS_SLEWING_FORWARD = 0x0008;	// 該軸正向運轉
-        //public const long AXIS_SLEWING_HIGHSPEED = 0x0010;	// 該軸處於高速運行狀態
-        //public const long AXIS_NOT_INITIALIZED = 0x0020;    // MC控制器尚未初始化, axis is not initialized.
+        //public const long AXIS_FULL_STOPPED = 0x0001;		// The axis is at a complete stop
+        //public const long AXIS_SLEWING = 0x0002;			// The axis is running at a constant speed
+        //public const long AXIS_SLEWING_TO = 0x0004;		// The axis is in the process of traveling to the specified target position
+        //public const long AXIS_SLEWING_FORWARD = 0x0008;	// The shaft runs forward
+        //public const long AXIS_SLEWING_HIGHSPEED = 0x0010;// The axis is running at high speed
+        //public const long AXIS_NOT_INITIALIZED = 0x0020;  // MC controller has not been initialized
     }
     public enum AxisId { Axis1 = 0, Axis2 = 1 };
     public enum ErrorCode
