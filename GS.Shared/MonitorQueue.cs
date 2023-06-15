@@ -41,7 +41,7 @@ namespace GS.Shared
         private static readonly string _errorFile = Path.Combine(_logPath, "GSServer\\GSErrorLog");
         private static readonly string _sessionFile = Path.Combine(_logPath, "GSServer\\GSSessionLog");
         private static readonly SemaphoreSlim _lockFile = new SemaphoreSlim(1);
-        private const string fmt = "000000#";
+        private const string fmt = "0000#";
         #endregion
 
         #region Properties

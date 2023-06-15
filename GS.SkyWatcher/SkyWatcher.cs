@@ -369,6 +369,8 @@ namespace GS.SkyWatcher
                             return;
                         }
 
+                        Debug.WriteLine($"{axis}|{guideRate}|{duration}|{backlashSteps}|{MinPulseDurationRa}|{MinPulseDurationDec}|{DecPulseGoTo}");
+
                         AxisSlew(AxisId.Axis2, guideRate); // Send pulse to axis 
                         pulseEntry.StartTime = _commands.LastJ2RunTime; // last :J2 start time
                         var decPulseTime = Principles.HiResDateTime.UtcNow - pulseEntry.StartTime; // possible use for min pulse duration time

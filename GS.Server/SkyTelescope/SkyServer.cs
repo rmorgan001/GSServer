@@ -39,7 +39,6 @@ using GS.Server.Windows;
 using GS.Server.Alignment;
 using AxisStatus = GS.Simulator.AxisStatus;
 using Range = GS.Principles.Range;
-using GS.Shared.Transport;
 
 namespace GS.Server.SkyTelescope
 {

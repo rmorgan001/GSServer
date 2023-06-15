@@ -107,7 +107,7 @@ namespace GS.Server.Settings
 
 
                     //Performance
-                    IntervalList = new List<int>(Numbers.InclusiveIntRange(100, 500, 10));
+                    IntervalList = new List<int>(Numbers.InclusiveIntRange(50, 500, 2));
                     //Volume Range
                     VolumeList = new List<int>(Numbers.InclusiveIntRange(0, 100));
                     DurationList = new List<int>(Numbers.InclusiveIntRange(100, 2000, 100));
@@ -748,7 +748,7 @@ namespace GS.Server.Settings
         {
             try
             {
-                if (MonitorEntries.Count + 1 > 100000)
+                if (MonitorEntries.Count + 1 > 99998)
                 {
                     MonitorEntries.Clear();
                     MonitorLog.ResetIndex();
