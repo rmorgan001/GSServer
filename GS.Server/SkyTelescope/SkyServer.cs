@@ -201,6 +201,7 @@ namespace GS.Server.SkyTelescope
         private static bool _tracking; //off
         private static bool _snapPort1Result;
         private static bool _snapPort2Result;
+        private static double[] _steps;
         #endregion
 
         /// <summary>
@@ -1053,7 +1054,57 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         public static long[] StepsTimeFreq { get; private set; }
 
-        private static double[] Steps { get; set; }
+        /// <summary>
+        /// current micro steps, used to update SkyServer and UI
+        /// </summary>
+        private static double[] Steps
+        {
+            get => _steps;
+            set
+            {
+                _steps = value;
+                
+                //Implement Pec
+                PecCheck();
+
+                //Convert Positions to degrees
+                // double[] rawPositions = { ConvertStepsToDegrees(rawSteps[0], 0), ConvertStepsToDegrees(rawSteps[1], 1) };
+                var rawPositions = GetUnsyncedAxes(new[] { ConvertStepsToDegrees(_steps[0], 0), ConvertStepsToDegrees(_steps[1], 1) });
+
+
+                // UI diagnostics in degrees
+                ActualAxisX = rawPositions[0];
+                ActualAxisY = rawPositions[1];
+
+                // convert positions to local
+                var axes = Axes.AxesMountToApp(rawPositions);
+
+                // local to track positions
+                _mountAxes.X = axes[0];
+                _mountAxes.Y = axes[1];
+
+                // UI diagnostics
+                MountAxisX = axes[0];
+                MountAxisY = axes[1];
+
+                // Calculate mount Alt/Az
+                var altaz = Axes.AxesXYToAzAlt(axes);
+                Azimuth = altaz[0];
+                Altitude = altaz[1];
+
+                // Calculate top-o-centric Ra/Dec
+                var radec = Axes.AxesXYToRaDec(axes);
+                RightAscension = radec[0];
+                Declination = radec[1];
+
+                // Calculate EquatorialSystem Property Ra/Dec for UI
+                var xy = Transforms.InternalToCoordType(radec[0], radec[1]);
+                RightAscensionXForm = xy.X;
+                DeclinationXForm = xy.Y;
+
+                OnStaticPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Total worm teeth
@@ -3090,6 +3141,28 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
+        /// Main get for the Steps
+        /// </summary>
+        /// <returns></returns>
+        private static void UpdateSteps()
+        {
+            if (!IsMountRunning){ return; }
+
+            object _;
+            switch (SkySettings.Mount)
+            {
+                case MountType.Simulator:
+                    _ = new CmdAxesSteps(MountQueue.NewId);
+                    break;
+                case MountType.SkyWatcher:
+                    _ = new SkyUpdateSteps(SkyQueue.NewId);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        /// <summary>
         /// Gets current positions from the mount in steps
         /// </summary>
         /// <returns></returns>
@@ -4034,7 +4107,7 @@ namespace GS.Server.SkyTelescope
 
             // setup server defaults, stop auto-discovery, connect serial port, start queues
             Defaults();
-            SkySystem.DiscoveryService.StopAutoDiscovery();
+            //SkySystem.DiscoveryService.StopAutoDiscovery();
             switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
@@ -4075,6 +4148,8 @@ namespace GS.Server.SkyTelescope
             // Run mount default commands and start the UI updates
             if (MountConnect())
             {
+                SkySystem.DiscoveryService.StopAutoDiscovery();
+
                 // start with a stop
                 AxesStopValidate();
 
@@ -4156,7 +4231,10 @@ namespace GS.Server.SkyTelescope
                     switch (SkySettings.Mount)
                     {
                         case MountType.Simulator:
-                            decGuideRate = decGuideRate > 0 ? -Math.Abs(decGuideRate) : Math.Abs(decGuideRate);
+                            if (!SouthernHemisphere)
+                            {
+                                decGuideRate = decGuideRate > 0 ? -Math.Abs(decGuideRate) : Math.Abs(decGuideRate);
+                            }
                             _ = new CmdAxisPulse(0, Axis.Axis2, decGuideRate, duration);
                             break;
                         case MountType.SkyWatcher:
@@ -4582,8 +4660,6 @@ namespace GS.Server.SkyTelescope
                 Message = $"from|{ActualAxisX}|{ActualAxisY}|to|{targetPosition.X}|{targetPosition.Y}|SlewType|{slewState}"
             };
             MonitorLog.LogToMonitor(monitorItem);
-
-            //todo might be a good place to reject for axis limits
 
             HcResetPrevMove(MountAxis.Ra);
             HcResetPrevMove(MountAxis.Dec);
@@ -5036,6 +5112,9 @@ namespace GS.Server.SkyTelescope
                 case "IsPulseGuidingDec":
                     IsPulseGuidingDec = SkyQueue.IsPulseGuidingDec;
                     break;
+                case "Steps":
+                    Steps = SkyQueue.Steps;
+                    break;
             }
         }
         private static void PropertyChangedMountQueue(object sender, PropertyChangedEventArgs e)
@@ -5047,6 +5126,9 @@ namespace GS.Server.SkyTelescope
                     break;
                 case "IsPulseGuidingDec":
                     IsPulseGuidingDec = MountQueue.IsPulseGuidingDec;
+                    break;
+                case "Steps":
+                    Steps = MountQueue.Steps;
                     break;
             }
         }
@@ -5205,76 +5287,25 @@ namespace GS.Server.SkyTelescope
                     return;
                 }
 
-                // the time is?
-                SiderealTime = GetLocalSiderealTime();
+                SiderealTime = GetLocalSiderealTime(); // the time is?
 
-                // Get raw positions, some are non-responses from mount and are returned as NaN
-                var rawSteps = GetRawSteps(); //var rawPositions = GetRawDegrees();
-                if (rawSteps == null) { return; }
-                if (double.IsNaN(rawSteps[0]) || double.IsNaN(rawSteps[1])) { return; }
-
-
-                Steps = rawSteps;
-
-                //Implement Pec
-                PecCheck();
-
-                //Convert Positions to degrees
-                // double[] rawPositions = { ConvertStepsToDegrees(rawSteps[0], 0), ConvertStepsToDegrees(rawSteps[1], 1) };
-                var rawPositions = GetUnsyncedAxes(new[] { ConvertStepsToDegrees(rawSteps[0], 0), ConvertStepsToDegrees(rawSteps[1], 1) });
-
-
-                // UI diagnostics in degrees
-                ActualAxisX = rawPositions[0];
-                ActualAxisY = rawPositions[1];
-
-                // convert positions to local
-                var axes = Axes.AxesMountToApp(rawPositions);
-
-                // local to track positions
-                _mountAxes.X = axes[0];
-                _mountAxes.Y = axes[1];
-
-                // UI diagnostics
-                MountAxisX = axes[0];
-                MountAxisY = axes[1];
-
-                // Calculate mount Alt/Az
-                var altaz = Axes.AxesXYToAzAlt(axes);
-                Azimuth = altaz[0];
-                Altitude = altaz[1];
-
-                // Calculate top-o-centric Ra/Dec
-                var radec = Axes.AxesXYToRaDec(axes);
-                RightAscension = radec[0];
-                Declination = radec[1];
-
-                // Calculate EquatorialSystem Property Ra/Dec for UI
-                var xy = Transforms.InternalToCoordType(radec[0], radec[1]);
-                RightAscensionXForm = xy.X;
-                DeclinationXForm = xy.Y;
+                UpdateSteps(); // get step from the mount
 
                 Lha = Coordinate.Ra2Ha12(RightAscensionXForm, SiderealTime);
 
-                // Track slewing state
-                CheckSlewState();
+                CheckSlewState(); // Track slewing state
 
-                //used for warning light
-                CheckAxisLimits();
+                CheckAxisLimits(); //used for warning light
 
-                // reset spiral if moved too far
-                CheckSpiralLimit();
+                CheckSpiralLimit(); // reset spiral if moved too far
 
                 // Update UI 
                 CheckPecTraining();
                 IsHome = AtHome;
                 IsSideOfPier = SideOfPier;
 
-                // Event interval time set for UI performance
-                _mediaTimer.Period = SkySettings.DisplayInterval;
+                _mediaTimer.Period = SkySettings.DisplayInterval; // Event interval time set for UI performance
 
-                //var r = DetermineSideOfPier(RightAscension, Declination);
-                //Debug.WriteLine($"DSoP = {r}");
             }
             catch (Exception ex)
             {

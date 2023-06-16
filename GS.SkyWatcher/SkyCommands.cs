@@ -1206,6 +1206,37 @@ namespace GS.SkyWatcher
         }
     }
 
+    public class SkyUpdateSteps : ISkyCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; }
+
+        public SkyUpdateSteps(long id)
+        {
+            Id = id;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            Result = null;
+            SkyQueue.AddCommand(this);
+        }
+
+        public void Execute(SkyWatcher skyWatcher)
+        {
+            try
+            {
+                skyWatcher.UpdateSteps();
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
     public class SkyGetSiderealRate : ISkyCommand
     {
         public long Id { get; }

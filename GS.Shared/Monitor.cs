@@ -36,16 +36,16 @@ namespace GS.Shared
             _categoryCheckList = new List<MonitorCategory>();
             _typesCheckList = new List<MonitorType>();
             _deviceCheckList = new List<MonitorDevice>();
-            //Settings.Load();
-            Load_Settings();
+            //Load_Settings();
         }
 
         #region Settings
 
-        private static void Load_Settings()
+        public static void Load_Settings()
         {
             if (Settings.ServerDevice) DevicesToMonitor(MonitorDevice.Server, Settings.ServerDevice);
             if (Settings.Telescope) DevicesToMonitor(MonitorDevice.Telescope, Settings.Telescope);
+            if (Settings.Telescope) DevicesToMonitor(MonitorDevice.UI, Settings.Ui);
 
             if (Settings.Other) CategoriesToMonitor(MonitorCategory.Other, Settings.Other);
             if (Settings.Driver) CategoriesToMonitor(MonitorCategory.Driver, Settings.Driver);
@@ -62,7 +62,6 @@ namespace GS.Shared
             Settings.LogMonitor = Properties.Monitor.Default.LogMonitor;
             Settings.LogSession = Properties.Monitor.Default.LogSession;
             Settings.StartMonitor = Properties.Monitor.Default.StartMonitor;
-
         }
 
         private static void Save_MonitorDevice(MonitorDevice monitorDevice, bool value)
@@ -76,7 +75,7 @@ namespace GS.Shared
                     Settings.Telescope = value;
                     break;
                 case MonitorDevice.UI:
-                    Settings.Telescope = value;
+                    Settings.Ui = value;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(monitorDevice), monitorDevice, null);

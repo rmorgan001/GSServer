@@ -40,6 +40,7 @@ namespace GS.SkyWatcher
         private static long _id;
         private static bool _isPulseGuidingDec;
         private static bool _isPulseGuidingRa;
+        private static double[] _steps;
 
         #endregion
 
@@ -90,6 +91,18 @@ namespace GS.SkyWatcher
             }
         }
 
+        /// <summary>
+        /// current steps, main property used to update Server and UI
+        /// </summary>
+        public static double[] Steps
+        {
+            get => _steps;
+            set
+            {
+                _steps = value;
+                OnStaticPropertyChanged();
+            }
+        }
         #endregion
 
         #region Queues

@@ -29,7 +29,7 @@ namespace GS.Shared
 
         #endregion
 
-        #region Properties
+        #region  Properties Device
 
         private static bool _serverDevice;
         public static bool ServerDevice
@@ -59,61 +59,23 @@ namespace GS.Shared
             }
         }
 
-        private static bool _information;
-        public static bool Information
+        private static bool _uI;
+        public static bool Ui
         {
-            get => _information;
+            get => _uI;
             set
             {
-                if (_information == value) return;
-                _information = value;
-                Properties.Monitor.Default.Information = value;
+                if (_uI == value) return;
+                _uI = value;
+                Properties.Monitor.Default.Ui = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
 
-        private static bool _data;
-        public static bool Data
-        {
-            get => _data;
-            set
-            {
-                if (_data == value) return;
-                _data = value;
-                Properties.Monitor.Default.Data = value;
-                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
-                OnStaticPropertyChanged();
-            }
-        }
+        #endregion
 
-        private static bool _warning;
-        public static bool Warning
-        {
-            get => _warning;
-            set
-            {
-                if (_warning == value) return;
-                _warning = value;
-                Properties.Monitor.Default.Warning = value;
-                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
-                OnStaticPropertyChanged();
-            }
-        }
-
-        private static bool _error;
-        public static bool Error
-        {
-            get => _error;
-            set
-            {
-                if (_error == value) return;
-                _error = value;
-                Properties.Monitor.Default.Error = value;
-                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
-                OnStaticPropertyChanged();
-            }
-        }
+        #region  Properties Category
 
         private static bool _other;
         public static bool Other
@@ -199,6 +161,70 @@ namespace GS.Shared
             }
         }
 
+        #endregion
+
+        #region Properties Types
+
+        private static bool _information;
+        public static bool Information
+        {
+            get => _information;
+            set
+            {
+                if (_information == value) return;
+                _information = value;
+                Properties.Monitor.Default.Information = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static bool _data;
+        public static bool Data
+        {
+            get => _data;
+            set
+            {
+                if (_data == value) return;
+                _data = value;
+                Properties.Monitor.Default.Data = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static bool _warning;
+        public static bool Warning
+        {
+            get => _warning;
+            set
+            {
+                if (_warning == value) return;
+                _warning = value;
+                Properties.Monitor.Default.Warning = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static bool _error;
+        public static bool Error
+        {
+            get => _error;
+            set
+            {
+                if (_error == value) return;
+                _error = value;
+                Properties.Monitor.Default.Error = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        #endregion
+
+        #region Properties
+
         private static string _language;
         public static string Language
         {
@@ -240,8 +266,7 @@ namespace GS.Shared
                 OnStaticPropertyChanged();
             }
         }
-
-
+        
         /// <summary>
         /// starts sending entries to a file in my documents
         /// </summary>
@@ -283,6 +308,7 @@ namespace GS.Shared
 
             ServerDevice = Properties.Monitor.Default.ServerDevice;
             Server = Properties.Monitor.Default.Server;
+            Ui = Properties.Monitor.Default.Ui;
             Interface = Properties.Monitor.Default.Interface;
             Driver = Properties.Monitor.Default.Driver;
             Other = Properties.Monitor.Default.Other;
@@ -297,6 +323,7 @@ namespace GS.Shared
             Language = Properties.Monitor.Default.Language;
             LogCharting = Properties.Monitor.Default.LogCharting;
             LogSession = Properties.Monitor.Default.LogSession;
+            Alignment = Properties.Monitor.Default.Alignment;
         }
 
         /// <summary>

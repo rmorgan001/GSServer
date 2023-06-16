@@ -288,7 +288,10 @@ namespace GS.SkyWatcher
                     if (raspan > 0 && raspan < duration) // checking duration is met
                     {
                         var sw1 = Stopwatch.StartNew();
-                        while (sw1.Elapsed.TotalMilliseconds < raspan) { Thread.Sleep(1); } // loop while counting to duration
+                        while (sw1.Elapsed.TotalMilliseconds < raspan)
+                        {
+                            if (sw1.ElapsedMilliseconds % 200 == 0){UpdateSteps();} // Process positions while waiting
+                        } 
                     }
 
                     // Restore rate tracking
@@ -368,9 +371,7 @@ namespace GS.SkyWatcher
                             MonitorLog.LogToMonitor(pulseEntry);
                             return;
                         }
-
-                        Debug.WriteLine($"{axis}|{guideRate}|{duration}|{backlashSteps}|{MinPulseDurationRa}|{MinPulseDurationDec}|{DecPulseGoTo}");
-
+                        
                         AxisSlew(AxisId.Axis2, guideRate); // Send pulse to axis 
                         pulseEntry.StartTime = _commands.LastJ2RunTime; // last :J2 start time
                         var decPulseTime = Principles.HiResDateTime.UtcNow - pulseEntry.StartTime; // possible use for min pulse duration time
@@ -379,7 +380,10 @@ namespace GS.SkyWatcher
                         if (decspan > 0 && decspan < duration) // checking duration is met
                         {
                             var sw3 = Stopwatch.StartNew();
-                            while (sw3.Elapsed.TotalMilliseconds < decspan) { Thread.Sleep(1); } // do something while waiting;
+                            while (sw3.Elapsed.TotalMilliseconds < decspan)
+                            {
+                                if (sw3.ElapsedMilliseconds % 200 == 0){UpdateSteps(); } // Process positions while waiting
+                            } 
                         }
 
                         AxisStop(AxisId.Axis2);
@@ -647,6 +651,35 @@ namespace GS.SkyWatcher
             positions[1] = y;
 
             return positions;
+        }
+
+        /// <summary>
+        /// Get axis positions in steps and update the property
+        /// </summary>
+        /// <returns>array in steps</returns>
+        internal void UpdateSteps()
+        {
+            try
+            {
+                var positions = new double[] { 0, 0 };
+
+                var x = _commands.GetAxisStepsNaN(AxisId.Axis1);
+                positions[0] = x;
+
+                var y = _commands.GetAxisStepsNaN(AxisId.Axis2);
+                positions[1] = y;
+
+                if (double.IsNaN(positions[0]) || double.IsNaN(positions[1])){return;}
+
+                var a = new[] { positions[0], positions[1] };
+                SkyQueue.Steps = a;
+            }
+            catch (Exception e)
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{e.Message}" };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
         }
 
         /// <summary>

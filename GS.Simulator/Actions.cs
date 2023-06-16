@@ -49,24 +49,24 @@ namespace GS.Simulator
 
         #region Action Commands
 
-        /// <summary>
-        /// Angle to step
-        /// </summary>
-        /// <param name="axis"></param>
-        /// <param name="angle"></param>
-        /// <returns></returns>
-        internal long AngleToStep(Axis axis, double angle)
-        {
-            switch (axis)
-            {
-                case Axis.Axis1:
-                    return (long)(angle * 36000);
-                case Axis.Axis2:
-                    return (long)(angle * 36000);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
-            }
-        }
+        ///// <summary>
+        ///// Angle to step
+        ///// </summary>
+        ///// <param name="axis"></param>
+        ///// <param name="angle"></param>
+        ///// <returns></returns>
+        //internal long AngleToStep(Axis axis, double angle)
+        //{
+        //    switch (axis)
+        //    {
+        //        case Axis.Axis1:
+        //            return (long)(angle * 36000);
+        //        case Axis.Axis2:
+        //            return (long)(angle * 36000);
+        //        default:
+        //            throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
+        //    }
+        //}
 
         /// <summary>
         /// Get axes in degrees
@@ -93,6 +93,33 @@ namespace GS.Simulator
 
             var d = new[] { x, y };
             return d;
+        }
+
+        /// <summary>
+        /// Get axes in degrees
+        /// </summary>
+        /// <returns></returns>
+        internal void AxesSteps()
+        {
+            var z = FactorSteps();
+            var x = Convert.ToDouble(_ioSerial.Send($"degrees|{Axis.Axis1}")) * z;
+
+            //put in for capture tracking in charts
+            var stepsx = _ioSerial.Send($"steps|{Axis.Axis1}");
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps1|{null}|{stepsx}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            var y = Convert.ToDouble(_ioSerial.Send($"degrees|{Axis.Axis2}")) * z;
+
+            //put in for capture tracking in charts
+            var stepsy = _ioSerial.Send($"steps|{Axis.Axis2}");
+            monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps2|{null}|{stepsy}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            var d = new[] { x , y };
+            MountQueue.Steps = d;
         }
 
         /// <summary>
@@ -151,7 +178,6 @@ namespace GS.Simulator
                 pulseEntry.Duration = duration;
                 pulseEntry.Rate = guideRate;
                 pulseEntry.StartTime = HiResDateTime.UtcNow;
-                //todo change back to 20
                 if (duration < 20) pulseEntry.Rejected = true;
             }
 
@@ -160,7 +186,7 @@ namespace GS.Simulator
             var sw = Stopwatch.StartNew();
             while (sw.Elapsed.TotalMilliseconds < duration)
             {
-                //do something while waiting
+                if (sw.ElapsedMilliseconds % 200 == 0) { AxesSteps(); } // Process positions while waiting
             }
             sw.Reset();
             _ioSerial.Send($"pulse|{axis}|{0}");
@@ -185,15 +211,15 @@ namespace GS.Simulator
             _ioSerial.Send($"tracking|{axis}|{degrees}");
         }
 
-        /// <summary>
-        /// Slew an axis
-        /// </summary>
-        /// <param name="axis"></param>
-        /// <param name="degrees"></param>
-        internal void AxisSlew(Axis axis, double degrees)
-        {
-            _ioSerial.Send($"slew|{axis}|{degrees}");
-        }
+        ///// <summary>
+        ///// Slew an axis
+        ///// </summary>
+        ///// <param name="axis"></param>
+        ///// <param name="degrees"></param>
+        //internal void AxisSlew(Axis axis, double degrees)
+        //{
+        //    _ioSerial.Send($"slew|{axis}|{degrees}");
+        //}
 
         /// <summary>
         /// Get axis status
@@ -232,7 +258,7 @@ namespace GS.Simulator
         {
             var x = Convert.ToInt32(_ioSerial.Send($"steps|{Axis.Axis1}"));
             var y = Convert.ToInt32(_ioSerial.Send($"steps|{Axis.Axis2}"));
-            var i = new[] { x, y };
+            var i = new[] { x, y};
             return i;
         }
 

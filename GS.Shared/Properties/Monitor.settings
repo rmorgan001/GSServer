@@ -56,5 +56,11 @@
     <Setting Name="Alignment" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="Ui" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="test" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Test</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

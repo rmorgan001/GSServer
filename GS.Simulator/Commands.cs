@@ -107,7 +107,7 @@ namespace GS.Simulator
         public DateTime CreatedUtc { get; }
         public bool Successful { get; set; }
         public Exception Exception { get; set; }
-        public dynamic Result { get; set; }
+        public dynamic Result { get; private set; }
         private readonly int _rate;
         public CmdGotoSpeed(long id, int rate)
         {
@@ -134,42 +134,39 @@ namespace GS.Simulator
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public class CmdAxisSlew : IMountCommand
-    {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; }
-        private readonly Axis _axis;
-        private readonly double _rate;
-        public CmdAxisSlew(long id, Axis axis, double rate)
-        {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
-            _axis = axis;
-            _rate = rate;
-            Successful = false;
-            Result = null;
-            MountQueue.AddCommand(this);
-        }
-        public void Execute(Actions actions)
-        {
-            try
-            {
-                actions.AxisSlew(_axis, _rate);
-                Successful = true;
-            }
-            catch (Exception e)
-            {
-                Successful = false;
-                Exception = e;
-            }
-        }
-    }
+    //public class CmdAxisSlew : IMountCommand
+    //{
+    //    public long Id { get; }
+    //    public DateTime CreatedUtc { get; }
+    //    public bool Successful { get; set; }
+    //    public Exception Exception { get; set; }
+    //    public dynamic Result { get; }
+    //    private readonly Axis _axis;
+    //    private readonly double _rate;
+    //    public CmdAxisSlew(long id, Axis axis, double rate)
+    //    {
+    //        Id = id;
+    //        CreatedUtc = Principles.HiResDateTime.UtcNow;
+    //        _axis = axis;
+    //        _rate = rate;
+    //        Successful = false;
+    //        Result = null;
+    //        MountQueue.AddCommand(this);
+    //    }
+    //    public void Execute(Actions actions)
+    //    {
+    //        try
+    //        {
+    //            actions.AxisSlew(_axis, _rate);
+    //            Successful = true;
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            Successful = false;
+    //            Exception = e;
+    //        }
+    //    }
+    //}
 
     /// <summary>
     /// 
@@ -195,6 +192,38 @@ namespace GS.Simulator
             try
             {
                 Result = actions.AxesDegrees();
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
+    public class CmdAxesSteps : IMountCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; }
+
+        public CmdAxesSteps(long id)
+        {
+            Id = id;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            Successful = false;
+            Result = null;
+            MountQueue.AddCommand(this);
+        }
+
+        public void Execute(Actions actions)
+        {
+            try
+            {
+                actions.AxesSteps();
                 Successful = true;
             }
             catch (Exception e)
@@ -623,7 +652,7 @@ namespace GS.Simulator
         public DateTime CreatedUtc { get; }
         public bool Successful { get; set; }
         public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
+        public dynamic Result { get; }
         private readonly Axis _axis;
 
         public CmdHomeSensorReset(long id, Axis axis)
@@ -929,7 +958,7 @@ namespace GS.Simulator
         public DateTime CreatedUtc { get; }
         public bool Successful { get; set; }
         public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
+        public dynamic Result { get; }
         private readonly bool _on;
 
         public CmdSetMonitorPulse(long id, bool on)

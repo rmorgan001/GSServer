@@ -1,9 +1,8 @@
 ﻿using GS.Shared.Transport;
 using System;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Threading;
+
 
 namespace GS.Server.SkyTelescope
 {
@@ -22,7 +21,7 @@ namespace GS.Server.SkyTelescope
         {
             var ctx = DataContext as SkyTelescopeVM;
             var discoveryService = ctx?.DiscoveryService;
-            if (discoveryService != null)
+            if (discoveryService != null && SkyServer.IsMountRunning == false)
             {
                 discoveryService.DiscoveredDeviceEvent += UdpDiscoveryService_DiscoveredDeviceEvent;
                 discoveryService.StartAutoDiscovery();

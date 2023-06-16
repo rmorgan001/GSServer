@@ -70,6 +70,19 @@ namespace GS.Simulator
             }
         }
 
+        private static double[] _steps;
+        /// <summary>
+        /// current micro steps, used to update SkyServer and UI
+        /// </summary>
+        public static double[] Steps
+        {
+            get => _steps;
+            set
+            {
+                _steps = value;
+                OnStaticPropertyChanged();
+            }
+        }
         #endregion
 
         #region Queues

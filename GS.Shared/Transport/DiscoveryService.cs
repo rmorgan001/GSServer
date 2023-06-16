@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -66,7 +67,6 @@ namespace GS.Shared.Transport
             {
                 return;
             }
-
             _timer.Start();
         }
 
@@ -75,6 +75,18 @@ namespace GS.Shared.Transport
         {
             _cts?.Cancel();
             _timer.Stop();
+
+            var monitorItem = new MonitorEntry
+            {
+                Type = MonitorType.Information,
+                Category = MonitorCategory.Server,
+                Datetime = DateTime.UtcNow,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Device = MonitorDevice.Server,
+                Message = "AutoDiscovery|Stop"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
         }
 
         /// <summary>

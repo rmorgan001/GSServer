@@ -75,6 +75,7 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
+                    MonitorLog.Load_Settings();
                     var monitorItem = new MonitorEntry
                     {
                         Datetime = HiResDateTime.UtcNow,
