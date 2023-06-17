@@ -53,23 +53,14 @@ namespace GS.Shared.Transport
         {
             if (Index > 0)
             {
-                return string.Format("COM{0:d}", Index);
+                return $"COM{Index:d}";
             }
-            else if (Endpoint != null)
+
+            if (Endpoint != null)
             {
-                if (Endpoint.Port == DefaultPort)
-                {
-                    return Endpoint.Address.ToString();
-                }
-                else
-                {
-                    return Endpoint.ToString();
-                }
+                return Endpoint.Port == DefaultPort ? Endpoint.Address.ToString() : Endpoint.ToString();
             }
-            else
-            {
-                return $"{Index} <INVALID>";
-            }
+            return $"{Index} <INVALID>";
         }
     }
 }

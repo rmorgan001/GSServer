@@ -118,8 +118,8 @@ namespace GS.Shared.Transport
                 //DiscoverSerialDevices();
                 BroadcastDiscoverMessage();
             }
-
             DiscoverSerialDevices();
+
         }
 
         private void DiscoverSerialDevices()
