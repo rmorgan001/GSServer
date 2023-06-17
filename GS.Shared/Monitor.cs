@@ -43,21 +43,23 @@ namespace GS.Shared
 
         public static void Load_Settings()
         {
-            if (Settings.ServerDevice) DevicesToMonitor(MonitorDevice.Server, Settings.ServerDevice);
-            if (Settings.Telescope) DevicesToMonitor(MonitorDevice.Telescope, Settings.Telescope);
-            if (Settings.Telescope) DevicesToMonitor(MonitorDevice.UI, Settings.Ui);
-
-            if (Settings.Other) CategoriesToMonitor(MonitorCategory.Other, Settings.Other);
-            if (Settings.Driver) CategoriesToMonitor(MonitorCategory.Driver, Settings.Driver);
-            if (Settings.Interface) CategoriesToMonitor(MonitorCategory.Interface, Settings.Interface);
-            if (Settings.Server) CategoriesToMonitor(MonitorCategory.Server, Settings.Server);
-            if (Settings.Mount) CategoriesToMonitor(MonitorCategory.Mount, Settings.Mount);
-            if (Settings.Alignment) CategoriesToMonitor(MonitorCategory.Alignment, Settings.Alignment);
-
-            if (Settings.Information) TypesToMonitor(MonitorType.Information, Settings.Information);
-            if (Settings.Data) TypesToMonitor(MonitorType.Data, Settings.Data);
-            if (Settings.Warning) TypesToMonitor(MonitorType.Warning, Settings.Warning);
-            if (Settings.Error) TypesToMonitor(MonitorType.Error, Settings.Error);
+            //MonitorDevice
+            if (Settings.ServerDevice){DevicesToMonitor(MonitorDevice.Server, Settings.ServerDevice);}
+            if (Settings.Telescope){DevicesToMonitor(MonitorDevice.Telescope, Settings.Telescope);}
+            if (Settings.Telescope){DevicesToMonitor(MonitorDevice.UI, Settings.Ui);}
+            //MonitorCategory
+            if (Settings.Other){CategoriesToMonitor(MonitorCategory.Other, Settings.Other);}
+            if (Settings.Driver){CategoriesToMonitor(MonitorCategory.Driver, Settings.Driver);}
+            if (Settings.Interface){CategoriesToMonitor(MonitorCategory.Interface, Settings.Interface);}
+            if (Settings.Server){CategoriesToMonitor(MonitorCategory.Server, Settings.Server);}
+            if (Settings.Mount){CategoriesToMonitor(MonitorCategory.Mount, Settings.Mount);}
+            if (Settings.Alignment){CategoriesToMonitor(MonitorCategory.Alignment, Settings.Alignment);}
+            //MonitorType
+            if (Settings.Information){TypesToMonitor(MonitorType.Information, Settings.Information);}
+            if (Settings.Data){TypesToMonitor(MonitorType.Data, Settings.Data);}
+            if (Settings.Warning){TypesToMonitor(MonitorType.Warning, Settings.Warning);}
+            if (Settings.Error){TypesToMonitor(MonitorType.Error, Settings.Error);}
+            if (Settings.Debug){TypesToMonitor(MonitorType.Debug, Settings.Debug);}
 
             Settings.LogMonitor = Properties.Monitor.Default.LogMonitor;
             Settings.LogSession = Properties.Monitor.Default.LogSession;
@@ -68,13 +70,13 @@ namespace GS.Shared
         {
             switch (monitorDevice)
             {
-                case MonitorDevice.Server:
-                    Settings.ServerDevice = value;
+                case MonitorDevice.Server:              // general Server related
+                    Settings.ServerDevice = value;      
                     break;
-                case MonitorDevice.Telescope:
+                case MonitorDevice.Telescope:           // Ascom and api interfaces
                     Settings.Telescope = value;
                     break;
-                case MonitorDevice.UI:
+                case MonitorDevice.UI:                  // view and view models 
                     Settings.Ui = value;
                     break;
                 default:
@@ -86,22 +88,22 @@ namespace GS.Shared
         {
             switch (monitorCategory)
             {
-                case MonitorCategory.Other:
+                case MonitorCategory.Other:         // Support or shared projects
                     Settings.Other = value;
                     break;
-                case MonitorCategory.Driver:
+                case MonitorCategory.Driver:        // simulator and Sky watcher other data
                     Settings.Driver = value;
                     break;
                 case MonitorCategory.Interface:
                     Settings.Interface = value;
                     break;
-                case MonitorCategory.Server:
+                case MonitorCategory.Server:        // Core Server processes
                     Settings.Server = value;
                     break;
-                case MonitorCategory.Mount:
+                case MonitorCategory.Mount:         // simulator and Sky watcher commands
                     Settings.Mount = value;
                     break;
-                case MonitorCategory.Alignment:
+                case MonitorCategory.Alignment:     // Alignment related
                     Settings.Alignment = value;
                     break;
                 default:
@@ -113,17 +115,20 @@ namespace GS.Shared
         {
             switch (monitorType)
             {
-                case MonitorType.Information:
+                case MonitorType.Information:           // also written to session log
                     Settings.Information = value;
                     break;
-                case MonitorType.Data:
+                case MonitorType.Data:                  // Core Information 
                     Settings.Data = value;
                     break;
-                case MonitorType.Warning:
+                case MonitorType.Warning:               // also written to session log
                     Settings.Warning = value;
                     break;
-                case MonitorType.Error:
+                case MonitorType.Error:                 // also written to error and session logs
                     Settings.Error = value;
+                    break;
+                case MonitorType.Debug:                 // troubleshooting data
+                    Settings.Debug = value;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(monitorType), monitorType, null);
@@ -288,12 +293,14 @@ namespace GS.Shared
             {
                 case MonitorType.Warning:
                 case MonitorType.Error:
+                case MonitorType.Debug:
                 case MonitorType.Information:
                     MonitorQueue.AddEntry(entry);
                     break;
                 case MonitorType.Data:
                     if (GetJEntries || Settings.StartMonitor) MonitorQueue.AddEntry(entry);
                     break;
+                
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -331,7 +338,8 @@ namespace GS.Shared
         Information,
         Data,
         Warning,
-        Error
+        Error,
+        Debug
     }
 
     /// <summary>

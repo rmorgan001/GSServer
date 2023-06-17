@@ -1558,5 +1558,17 @@ namespace GS.Server.Properties {
                 this["AllowAdvancedCommandSet"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Wifi {
+            get {
+                return ((bool)(this["Wifi"]));
+            }
+            set {
+                this["Wifi"] = value;
+            }
+        }
     }
 }

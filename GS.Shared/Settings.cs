@@ -221,6 +221,20 @@ namespace GS.Shared
             }
         }
 
+        private static bool _debug;
+        public static bool Debug
+        {
+            get => _debug;
+            set
+            {
+                if (_debug == value) return;
+                _debug = value;
+                Properties.Monitor.Default.Debug = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Properties
@@ -324,6 +338,7 @@ namespace GS.Shared
             LogCharting = Properties.Monitor.Default.LogCharting;
             LogSession = Properties.Monitor.Default.LogSession;
             Alignment = Properties.Monitor.Default.Alignment;
+            Debug = Properties.Monitor.Default.Debug;
         }
 
         /// <summary>

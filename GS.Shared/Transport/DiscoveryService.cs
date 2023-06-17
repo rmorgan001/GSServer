@@ -7,7 +7,6 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Reflection;
-using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +21,7 @@ namespace GS.Shared.Transport
     ///   <item>Sends <c>:e1\r</c> to all WiFi broadcast addresses (no NAT traversal).</item>
     /// </list>
     /// </summary>
-    public class DiscoveryService : IDiscoveryService
+    public sealed class DiscoveryService : IDiscoveryService
     {
         const int DiscoveryIntervalMs = 2000;
 
@@ -59,6 +58,8 @@ namespace GS.Shared.Transport
         //public event EventHandler<DiscoveryEventArgs> RemovedDeviceEvent;
 
         public TimeSpan DiscoveryInterval { get; }
+
+        public bool Wifi { get; set; }
 
         /// <inheritdoc/>
         public void StartAutoDiscovery()
@@ -97,7 +98,7 @@ namespace GS.Shared.Transport
         ///   <item>Broadcasts to all active network interfaces and listens for responses</item>
         /// </list>
         /// </summary>
-        void Discover()
+        private void Discover()
         {
             var monitorItem = new MonitorEntry
             {
@@ -111,12 +112,17 @@ namespace GS.Shared.Transport
             };
             MonitorLog.LogToMonitor(monitorItem);
 
-            InitializeUdpClients();
+            if (Wifi)
+            {
+                InitializeUdpClients();
+                //DiscoverSerialDevices();
+                BroadcastDiscoverMessage();
+            }
+
             DiscoverSerialDevices();
-            BroadcastDiscoverMessage();
         }
 
-        void DiscoverSerialDevices()
+        private void DiscoverSerialDevices()
         {
             var allPorts = SerialPort.GetPortNames();
             var portNumbers = new SortedSet<long>();
@@ -135,7 +141,7 @@ namespace GS.Shared.Transport
             DiscoveredDeviceEvent?.Invoke(this, new DiscoveryEventArgs(serialDevices, isSynchronous: true));
         }
 
-        void BroadcastDiscoverMessage()
+        private void BroadcastDiscoverMessage()
         {
             var oldCts = Interlocked.Exchange(ref _cts, new CancellationTokenSource(_broadcastTimeout));
             oldCts?.Cancel();
@@ -152,7 +158,7 @@ namespace GS.Shared.Transport
         /// Enumerates all WiFi interfaces that are up and creates <see cref="UdpClient"/>s for each.
         /// Also disposes of any clients that are bound to interfaces that are down.
         /// </summary>
-        void InitializeUdpClients()
+        private void InitializeUdpClients()
         {
             var networkIfaceIps = new SortedSet<IPAddress>(
                 from ni in NetworkInterface.GetAllNetworkInterfaces()
@@ -200,7 +206,7 @@ namespace GS.Shared.Transport
             }
         }
 
-        void EndSendCb(IAsyncResult sendRes)
+        private void EndSendCb(IAsyncResult sendRes)
         {
             var state = sendRes.AsyncState as DiscoveryState;
             var sender = state?.InterfaceAddress;
@@ -211,7 +217,7 @@ namespace GS.Shared.Transport
             }
         }
 
-        void BeginReceiveEP1Cb(IAsyncResult receiveRes)
+        private void BeginReceiveEP1Cb(IAsyncResult receiveRes)
         {
             var state = receiveRes.AsyncState as DiscoveryState;
             var sender = state?.InterfaceAddress;
@@ -226,16 +232,16 @@ namespace GS.Shared.Transport
             }
         }
 
-        void OnUdpDeviceDiscovery(IPEndPoint remoteEP)
+        private void OnUdpDeviceDiscovery(IPEndPoint remoteEP)
         {
             var deviceIndex = GetDeviceIndex(remoteEP);
 
             DiscoveredDeviceEvent?.Invoke(this, new DiscoveryEventArgs(new[] { new Device(deviceIndex, remoteEP) }));
         }
 
-        static bool IsSuccessfulResponse(string response) => response?.Length > 2 && response[0] == '=';
+        private static bool IsSuccessfulResponse(string response) => response?.Length > 2 && response[0] == '=';
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
@@ -261,22 +267,23 @@ namespace GS.Shared.Transport
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(disposing: true);
+            // ReSharper disable once GCSuppressFinalizeForTypeWithoutDestructor
             GC.SuppressFinalize(this);
         }
 
-        static long GetDeviceIndex(IPEndPoint endpoint)
+        private static long GetDeviceIndex(IPEndPoint endpoint)
         {
             var id = 0xFF & (long)endpoint.AddressFamily;
             id <<= 32 + 16;
-            id |= (long)(0xff & endpoint.Port);
+            id |= (uint)(0xff & endpoint.Port);
             id <<= 32;
             if (endpoint.AddressFamily == AddressFamily.InterNetwork)
             {
-                id |= (long)BitConverter.ToInt32(endpoint.Address.GetAddressBytes(), 0);
+                id |= (uint)BitConverter.ToInt32(endpoint.Address.GetAddressBytes(), 0);
             }
             else
             {
-                throw new NotSupportedException($"Address familiy {endpoint.AddressFamily} is not supported");
+                throw new NotSupportedException($"Address family {endpoint.AddressFamily} is not supported");
             }
 
             return -Math.Abs(id);

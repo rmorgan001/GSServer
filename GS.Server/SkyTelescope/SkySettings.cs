@@ -1764,6 +1764,23 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static bool _wifi;
+        /// <summary>
+        /// Turns on/off the discovery process
+        /// Discovery should not scan for anything network related if false so the COM can start. 
+        /// </summary>
+        public static bool Wifi
+        {
+            get => _wifi;
+            set
+            {
+                if (_wifi == value) return;
+                _wifi = value;
+                Properties.SkyTelescope.Default.Wifi = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -1805,6 +1822,7 @@ namespace GS.Server.SkyTelescope
             NoSyncPastMeridian = Properties.SkyTelescope.Default.NoSyncPastMeridian;
             NumMoveAxis = Properties.SkyTelescope.Default.NumMoveAxis;
             VersionOne = Properties.SkyTelescope.Default.VersionOne;
+            Wifi = Properties.SkyTelescope.Default.Wifi;
 
             //Server
 

@@ -21,10 +21,11 @@ namespace GS.Server.SkyTelescope
         {
             var ctx = DataContext as SkyTelescopeVM;
             var discoveryService = ctx?.DiscoveryService;
-            if (discoveryService != null && SkyServer.IsMountRunning == false)
+            if (discoveryService != null)
             {
                 discoveryService.DiscoveredDeviceEvent += UdpDiscoveryService_DiscoveredDeviceEvent;
                 discoveryService.StartAutoDiscovery();
+                discoveryService.Wifi = SkySettings.Wifi;
             }
         }
 
@@ -72,5 +73,6 @@ namespace GS.Server.SkyTelescope
                 }
             });
         }
+
     }
 }

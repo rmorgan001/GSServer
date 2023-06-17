@@ -124,6 +124,10 @@
                                 <CheckBox IsChecked="{Binding Data}" Style="{StaticResource MaterialDesignCheckBox}"/>
                                 <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optData}"/>
                             </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding Debug}" Style="{StaticResource MaterialDesignCheckBox}" />
+                                <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="Debug" />
+                            </StackPanel>
                             <StackPanel Orientation="Horizontal" >
                                 <CheckBox IsChecked="{Binding Warning}" Style="{StaticResource MaterialDesignCheckBox}"/>
                                 <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optWarning}"/>

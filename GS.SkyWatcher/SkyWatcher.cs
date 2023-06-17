@@ -227,7 +227,7 @@ namespace GS.SkyWatcher
         {
             var datetime = Principles.HiResDateTime.UtcNow;
             var monitorItem = new MonitorEntry // setup to log the pulse
-            { Datetime = datetime, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{guideRate}|{duration}|{backlashSteps}|{MinPulseDurationRa}|{MinPulseDurationDec}|{DecPulseGoTo}" };
+            { Datetime = datetime, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{guideRate}|{duration}|{backlashSteps}|{MinPulseDurationRa}|{MinPulseDurationDec}|{DecPulseGoTo}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             var pulseEntry = new PulseEntry // setup to graph the pulse
@@ -430,7 +430,7 @@ namespace GS.SkyWatcher
         internal void AxisMoveSteps(AxisId axis, long movingSteps)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{movingSteps}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{movingSteps}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
@@ -497,7 +497,7 @@ namespace GS.SkyWatcher
         internal void AxisGoToTarget(AxisId axis, double targetPosition) 
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{targetPosition}" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{targetPosition}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)

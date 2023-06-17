@@ -7,7 +7,11 @@
                 <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource capCanSetPark}" IsChecked="{Binding CanSetPark, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource capCanSetPark}" />
              </StackPanel>
-            <Button Margin="10" IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding ClickOkCapDialogCmd}" Content="{StaticResource diaOk}"/>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10">
+                <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="Wifi" IsChecked="{Binding Wifi, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="Wifi" />
+            </StackPanel>
+            <Button Margin="10" IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding ClickOkCapDialogCmd}" Content="{StaticResource diaOk}" />
         </StackPanel>
     </GroupBox>
     </UserControl>

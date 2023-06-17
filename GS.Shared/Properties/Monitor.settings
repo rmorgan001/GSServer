@@ -59,8 +59,8 @@
     <Setting Name="Ui" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="test" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Test</Value>
+    <Setting Name="Debug" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

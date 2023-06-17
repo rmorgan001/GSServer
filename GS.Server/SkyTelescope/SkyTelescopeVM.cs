@@ -2118,7 +2118,7 @@ namespace GS.Server.SkyTelescope
                 if (value)
                 {
                     // only start discovery if mount is not connected to not interfere with the WiFi communication
-                    if (!this.IsConnected)
+                    if (!IsConnected && SkySettings.Wifi )
                     {
                         DiscoveryService.StartAutoDiscovery();
                     }
@@ -4990,6 +4990,17 @@ namespace GS.Server.SkyTelescope
             {
                 if (value == SkySettings.CanSetPark) return;
                 SkySettings.CanSetPark = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool Wifi
+        {
+            get => SkySettings.Wifi;
+            set
+            {
+                if (value == SkySettings.Wifi) return;
+                SkySettings.Wifi = value;
                 OnPropertyChanged();
             }
         }

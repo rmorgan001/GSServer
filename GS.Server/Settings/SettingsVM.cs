@@ -351,7 +351,7 @@ namespace GS.Server.Settings
         public string RenderCapability
         {
             get => _renderCapability;
-            set
+            private set
             {
                 if (_renderCapability == value) return;
                 _renderCapability = value;
@@ -772,19 +772,19 @@ namespace GS.Server.Settings
             }
         }
 
-        public bool ServerDevice
+        public static bool ServerDevice
         {
             get => MonitorLog.InDevices(MonitorDevice.Server);
             set => MonitorLog.DevicesToMonitor(MonitorDevice.Server, value);
         }
 
-        public bool Telescope
+        public static bool Telescope
         {
             get => MonitorLog.InDevices(MonitorDevice.Telescope);
             set => MonitorLog.DevicesToMonitor(MonitorDevice.Telescope, value);
         }
 
-        public bool UI
+        public static bool UI
         {
             get => MonitorLog.InDevices(MonitorDevice.UI);
             set => MonitorLog.DevicesToMonitor(MonitorDevice.UI, value);
@@ -842,6 +842,12 @@ namespace GS.Server.Settings
         {
             get => MonitorLog.InTypes(MonitorType.Error);
             set => MonitorLog.TypesToMonitor(MonitorType.Error, value);
+        }
+
+        public bool Debug
+        {
+            get => MonitorLog.InTypes(MonitorType.Debug);
+            set => MonitorLog.TypesToMonitor(MonitorType.Debug, value);
         }
 
         public bool SessionLog

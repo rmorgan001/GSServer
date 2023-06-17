@@ -11,9 +11,11 @@ namespace GS.Shared.Transport
         void StartAutoDiscovery();
 
         /// <summary>
-        /// Stops automatically discoverying devices.
+        /// Stops automatically discovering devices.
         /// </summary>
         void StopAutoDiscovery();
+
+        bool Wifi { get; set; }
 
         event EventHandler<DiscoveryEventArgs> DiscoveredDeviceEvent;
     }
