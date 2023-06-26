@@ -37,18 +37,6 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public long DeviceIndex {
-            get {
-                return ((long)(this["DeviceIndex"]));
-            }
-            set {
-                this["DeviceIndex"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("ps9600")]
         public string BaudRate {
             get {
@@ -1561,13 +1549,13 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool Wifi {
+        [global::System.Configuration.DefaultSettingValueAttribute("COM1")]
+        public string Port {
             get {
-                return ((bool)(this["Wifi"]));
+                return ((string)(this["Port"]));
             }
             set {
-                this["Wifi"] = value;
+                this["Port"] = value;
             }
         }
     }

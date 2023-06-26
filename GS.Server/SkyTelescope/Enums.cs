@@ -170,4 +170,11 @@ namespace GS.Server.SkyTelescope
         Model3D
     }
 
+    public enum ConnectType
+    {
+        None,
+        Com,
+        Wifi
+    }
+
 }

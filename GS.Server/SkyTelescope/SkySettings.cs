@@ -16,7 +16,6 @@
 using ASCOM.DeviceInterface;
 using ASCOM.Utilities;
 using GS.Shared;
-using GS.Shared.Transport;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -839,29 +838,19 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        public static IList<Device> Devices { get; } = new List<Device>();
 
-        private static long _deviceIndex;
-        public static long DeviceIndex
+        private static string _port;
+        public static string Port
         {
-            get => _deviceIndex;
+            get => _port;
             set
             {
-                if (_deviceIndex == value) return;
-                _deviceIndex = value;
-                Properties.SkyTelescope.Default.DeviceIndex = value;
-                LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
+                if (_port == value){return;}
+                _port = value;
+                Properties.SkyTelescope.Default.Port = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, value);
                 OnStaticPropertyChanged();
             }
-        }
-
-        public static bool TryGetDevice(out Device device) => TryGetDevice(DeviceIndex, out device);
-
-        public static bool TryGetDevice(long deviceIndex, out Device device)
-        {
-            var devices = Devices;
-            device = devices?.Count > 0 ? devices.SingleOrDefault(x => x.Index == deviceIndex) : default;
-            return device != default;
         }
 
         private static int _dataBits;
@@ -1764,22 +1753,6 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static bool _wifi;
-        /// <summary>
-        /// Turns on/off the discovery process
-        /// Discovery should not scan for anything network related if false so the COM can start. 
-        /// </summary>
-        public static bool Wifi
-        {
-            get => _wifi;
-            set
-            {
-                if (_wifi == value) return;
-                _wifi = value;
-                Properties.SkyTelescope.Default.Wifi = value;
-                OnStaticPropertyChanged();
-            }
-        }
 
         #endregion
 
@@ -1822,7 +1795,6 @@ namespace GS.Server.SkyTelescope
             NoSyncPastMeridian = Properties.SkyTelescope.Default.NoSyncPastMeridian;
             NumMoveAxis = Properties.SkyTelescope.Default.NumMoveAxis;
             VersionOne = Properties.SkyTelescope.Default.VersionOne;
-            Wifi = Properties.SkyTelescope.Default.Wifi;
 
             //Server
 
@@ -1859,7 +1831,7 @@ namespace GS.Server.SkyTelescope
             AxisTrackingLimit = Properties.SkyTelescope.Default.AxisTrackingLimit;
             CameraHeight = Properties.SkyTelescope.Default.CameraHeight;
             CameraWidth = Properties.SkyTelescope.Default.CameraWidth;
-            DeviceIndex = Properties.SkyTelescope.Default.DeviceIndex;
+            Port = Properties.SkyTelescope.Default.Port;
             CustomDec360Steps = Properties.SkyTelescope.Default.CustomDec360Steps;
             CustomDecTrackingOffset = Properties.SkyTelescope.Default.CustomDecTrackingOffset;
             CustomDecWormTeeth = Properties.SkyTelescope.Default.CustomDecWormTeeth;

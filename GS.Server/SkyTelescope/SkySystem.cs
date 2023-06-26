@@ -17,8 +17,11 @@ using GS.Shared;
 using GS.Shared.Transport;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO.Ports;
+using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -30,17 +33,36 @@ namespace GS.Server.SkyTelescope
         public static event PropertyChangedEventHandler StaticPropertyChanged;
         private static long _idCount;
         private static readonly ConcurrentDictionary<long, bool> ConnectStates;
-        public static ISerialPort Serial { get; private set; }
-        public static IDiscoveryService DiscoveryService { get; }
 
         static SkySystem()
         {
             ConnectStates = new ConcurrentDictionary<long, bool>();
-            DiscoveryService = new DiscoveryService();
             _idCount = 0;
+            DiscoverSerialDevices();
+        }
+
+        public static ISerialPort Serial { get; private set; }
+
+        private static IList<string> _devices;
+
+        /// <summary>
+        /// com and remote ip ports
+        /// </summary>
+        public static IList<string> Devices
+        {
+            get => _devices;
+            private set
+            {
+                _devices = value;
+                OnStaticPropertyChanged();
+            }
         }
 
         public static bool Connected => ConnectStates.Count > 0;
+
+        public static Exception Error { get; private set; }
+
+        public static ConnectType ConnType { get; private set; }
 
         public static void SetConnected(long id, bool value)
         {
@@ -81,14 +103,36 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        //public static void CloseConnected()
-        //{
-        //    if (ConnectStates.Count <= 0) return;
-        //    foreach (var cons in ConnectStates)
-        //    {
-        //        SetConnected(cons.Key, false);
-        //    }
-        //}
+        public static void DiscoverSerialDevices()
+        {
+            var list = new List<string>();
+            var allPorts = SerialPort.GetPortNames();
+            foreach (var port in allPorts)
+            {
+                if (string.IsNullOrEmpty(port)) continue;
+                var portNumber = Strings.GetNumberFromString(port);
+                if (!(portNumber >= 1)) continue;
+                if (!list.Contains(port))
+                {
+                    list.Add(port);
+                }
+            }
+
+            if (!list.Contains(SkySettings.Port))
+            {
+                list.Add(SkySettings.Port);
+            }
+            Devices = list;
+        }
+
+        public static void AddRemoteIp(string ip)
+        {
+            var list = Devices;
+            if (list.Contains(ip)) return;
+            list.Add(ip);
+            Devices = list;
+            SkySettings.Port = ip;
+        }
 
         public static bool ConnectSerial
         {
@@ -99,38 +143,41 @@ namespace GS.Server.SkyTelescope
                 {
                     Serial?.Dispose();
                     Serial = null;
+                    if(ConnType != ConnectType.None){ConnType = ConnectType.None;}
 
-                    if (value && SkySettings.TryGetDevice(out var device))
+                    if (value)
                     {
                         var readTimeout = TimeSpan.FromMilliseconds(SkySettings.ReadTimeout);
-                        if (device.Index > 0)
+                        if (SkySettings.Port.Contains("COM"))
                         {
                             var options = SerialOptions.DiscardNull
                                 | (SkySettings.DtrEnable ? SerialOptions.DtrEnable : SerialOptions.None)
                                 | (SkySettings.RtsEnable ? SerialOptions.RtsEnable : SerialOptions.None);
 
                             Serial = new GSSerialPort(
-                                $"COM{device.Index}",
+                                SkySettings.Port,
                                 (int)SkySettings.BaudRate,
                                 readTimeout,
                                 SkySettings.HandShake,
                                 Parity.None,
                                 StopBits.One,
                                 SkySettings.DataBits,
-                                options
-                            );
+                                options);
+                            ConnType = ConnectType.Com;
                         }
-                        else if (device.Endpoint != null)
+                        else
                         {
-                            Serial = new SerialOverUdpPort(device.Endpoint, readTimeout);
+                            var endpoint = CreateIPEndPoint(SkySettings.Port);
+                            Serial = new SerialOverUdpPort(endpoint, readTimeout);
+                            ConnType = ConnectType.Wifi;
                         }
-
                         Serial?.Open();
                     }
                     OnStaticPropertyChanged();
                 }
                 catch (Exception ex)
                 {
+                    Error = ex;
                     var monitorItem = new MonitorEntry
                     {
                         Datetime = Principles.HiResDateTime.UtcNow,
@@ -142,10 +189,40 @@ namespace GS.Server.SkyTelescope
                         Message = $"{ex.Message}|{ex.InnerException?.Message}"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
-
                     Serial = null;
+                    ConnType = ConnectType.None;
                 }
             }
+        }
+
+        /// <summary>
+        /// Handles IPv4 and IPv6 notation.
+        /// </summary>
+        /// <param name="endPoint"></param>
+        /// <returns></returns>
+        private static IPEndPoint CreateIPEndPoint(string endPoint)
+        {
+            var ep = endPoint.Split(':');
+            if (ep.Length < 2) {throw new FormatException("Invalid endpoint format");}
+            IPAddress ip;
+            if (ep.Length > 2)
+            {
+                if (!IPAddress.TryParse(string.Join(":", ep, 0, ep.Length - 1), out ip))
+                {
+                    throw new FormatException("Invalid ip-address");
+                }
+            }
+            else
+            {
+                if (!IPAddress.TryParse(ep[0], out ip))
+                {
+                    throw new FormatException("Invalid ip-address");
+                }
+            }
+
+            return !int.TryParse(ep[ep.Length - 1], NumberStyles.None, NumberFormatInfo.CurrentInfo, out var port)
+                ? throw new FormatException("Invalid port")
+                : new IPEndPoint(ip, port);
         }
 
         /// <summary>
@@ -153,11 +230,6 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         /// <returns></returns>
         public static long GetId() => Interlocked.Increment(ref _idCount);
-
-        /// <summary>
-        /// called from the setter property.  Used to update UI elements.  propertyname is not required
-        /// </summary>
-        /// <param name="propertyName"></param>
         private static void OnStaticPropertyChanged([CallerMemberName] string propertyName = null)
         {
             StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));

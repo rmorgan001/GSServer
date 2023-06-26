@@ -14,6 +14,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
@@ -97,6 +99,22 @@ namespace GS.Shared
             var parsed = int.Parse(response, NumberStyles.HexNumber);
             var a = parsed / divFactor;
             return a;
+        }
+
+        /// <summary>
+        /// convert collection to ObservableCollection
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="enumerable"></param>
+        /// <returns></returns>
+        public static ObservableCollection<T> ToObservableCollection<T>(IEnumerable<T> enumerable)
+        {
+            var col = new ObservableCollection<T>();
+            foreach (var cur in enumerable)
+            {
+                col.Add(cur);
+            }
+            return col;
         }
 
     }

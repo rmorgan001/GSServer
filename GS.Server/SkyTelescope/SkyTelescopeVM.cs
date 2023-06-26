@@ -26,15 +26,14 @@ using HelixToolkit.Wpf;
 using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Management;
-using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -52,7 +51,12 @@ using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using NativeMethods = GS.Server.Helpers.NativeMethods;
 using Point = System.Windows.Point;
 using GS.Shared.Transport;
-using System.Collections.ObjectModel;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using System.Reflection;
+using System.Text;
+using System.Threading;
 
 namespace GS.Server.SkyTelescope
 {
@@ -157,6 +161,8 @@ namespace GS.Server.SkyTelescope
                     SchedulerShow = true;
                     CustomGearing = SkySettings.CustomGearing;
                     PolarLedLevelEnabled = true;
+
+                    DiscoverySetup();
                 }
 
                 // check to make sure window is visible then connect if requested.
@@ -331,6 +337,9 @@ namespace GS.Server.SkyTelescope
                          break;
                      case "RaGaugeFlip":
                          RaGaugeFlip = SkySettings.RaGaugeFlip;
+                         break;
+                     case "Port":
+                         SelectedDevice = SkySettings.Port;
                          break;
                  }
              });
@@ -534,6 +543,9 @@ namespace GS.Server.SkyTelescope
                             case "ConnectSerial":
                                 IsConnected = SkySystem.ConnectSerial;
                                 break;
+                            case "Devices":
+                                Devices = Strings.ToObservableCollection(SkySystem.Devices);
+                                break;
                         }
                     });
             }
@@ -703,42 +715,6 @@ namespace GS.Server.SkyTelescope
 
         #region Drawer Settings 
 
-        // alternative listing of ports
-        public IList<string> AllComPorts
-        {
-            get
-            {
-                using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE Caption like '%(COM%'"))
-                {
-                    var portNames = System.IO.Ports.SerialPort.GetPortNames();
-                    var ports = searcher.Get().Cast<ManagementBaseObject>().ToList().Select(p => p["Caption"].ToString());
-
-                    var portList = portNames.Select(n => n + " - " + ports.FirstOrDefault(s => s.Contains(n))).ToList();
-
-                    foreach (var s in portList)
-                    {
-                        Console.WriteLine(s);
-                    }
-
-                    return portList;
-                }
-            }
-        }
-
-        public IDiscoveryService DiscoveryService => SkySystem.DiscoveryService;
-
-        public ObservableCollection<Device> Devices => new ObservableCollection<Device>(SkySettings.Devices);
-
-        public Device SelectedDevice
-        {
-            get => Devices.SingleOrDefault(device => device.Index == SkySettings.DeviceIndex);
-            set
-            {
-                if (value?.Index == SkySettings.DeviceIndex) return;
-                SkySettings.DeviceIndex = value?.Index ?? 0;
-                OnPropertyChanged();
-            }
-        }
         public SerialSpeed BaudRate
         {
             get => SkySettings.BaudRate;
@@ -1487,6 +1463,247 @@ namespace GS.Server.SkyTelescope
 
         #endregion
 
+        #region COM-Wifi
+
+        private const int DiscoveryIntervalMs = 2000;
+        private const int DefaultPort = 11880;
+        private int _remotePort;
+        private TimeSpan _broadcastTimeout;
+        private ConcurrentDictionary<IPAddress, Lazy<UdpClient>> _udpClients;
+        private readonly byte[] DiscoverMsg = Encode(":e1\r");
+        private CancellationTokenSource _cts;
+        
+        private static byte[] Encode(string msg) => Encoding.ASCII.GetBytes(msg);
+        private static string Decode(byte[] msg) => msg != null ? Encoding.ASCII.GetString(msg).Replace("\0", "").Trim() : "";
+
+        private ObservableCollection<string> _devices;
+        public ObservableCollection<string> Devices
+        {
+            get => _devices;
+            private set
+            {
+                _devices = value;
+                OnPropertyChanged();
+                OnPropertyChanged("SelectedDevice");
+            }
+        }
+
+        public string SelectedDevice
+        {
+            get => SkySettings.Port;
+            set
+            {
+                if (value == SkySettings.Port) { return; }
+                SkySettings.Port = value;
+                OnPropertyChanged();
+            }
+        }
+        private void DiscoverySetup(int remotePort = DefaultPort)
+        {
+            _udpClients = new ConcurrentDictionary<IPAddress, Lazy<UdpClient>>();
+            _remotePort = remotePort;
+        }
+
+        private ICommand _clickWifiCmd;
+        public ICommand ClickWifiCmd
+        {
+            get
+            {
+                var command = _clickWifiCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickWifiCmd = new RelayCommand(
+                    param => ClickWifi()
+                );
+            }
+        }
+        private void ClickWifi()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    Discover();
+                    Thread.Sleep(500);
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+
+        }
+
+        private ICommand _clickUsbCmd;
+        public ICommand ClickUsbCmd
+        {
+            get
+            {
+                var command = _clickUsbCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickUsbCmd = new RelayCommand(
+                    param => ClickUsb()
+                );
+            }
+        }
+        private void ClickUsb()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                   SkySystem.DiscoverSerialDevices();
+                   Thread.Sleep(500);
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+
+        }
+        private void Discover()
+        {
+            var monitorItem = new MonitorEntry
+            {
+                Type = MonitorType.Information,
+                Category = MonitorCategory.Server,
+                Datetime = DateTime.UtcNow,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Device = MonitorDevice.Server,
+                Message = "Discovery|Started"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            _broadcastTimeout = TimeSpan.FromMilliseconds(Math.Max(DiscoveryIntervalMs - 200, 200));
+
+            InitializeUdpClients();
+            BroadcastDiscoverMessage();
+        }
+        private void BroadcastDiscoverMessage()
+        {
+            var oldCts = Interlocked.Exchange(ref _cts, new CancellationTokenSource(_broadcastTimeout));
+            oldCts?.Cancel();
+
+            var broadCastIP = new IPEndPoint(IPAddress.Broadcast, _remotePort);
+
+            Parallel.ForEach(
+                _udpClients,
+                kv => kv.Value.Value.BeginSend(DiscoverMsg, DiscoverMsg.Length, broadCastIP, EndSendCb, new DiscoveryState(kv.Key, _cts))
+            );
+        }
+        private void EndSendCb(IAsyncResult sendRes)
+        {
+            var state = sendRes.AsyncState as DiscoveryState;
+            var sender = state?.InterfaceAddress;
+            if (sendRes.IsCompleted && sender != null && !state.Cts.IsCancellationRequested && _udpClients.TryGetValue(sender, out var updClient))
+            {
+                _ = updClient.Value.EndSend(sendRes);
+                updClient.Value.BeginReceive(BeginReceiveEP1Cb, state);
+            }
+        }
+        private void BeginReceiveEP1Cb(IAsyncResult receiveRes)
+        {
+            var state = receiveRes.AsyncState as DiscoveryState;
+            var sender = state?.InterfaceAddress;
+            if (receiveRes.IsCompleted && sender != null && !state.Cts.IsCancellationRequested && _udpClients.TryGetValue(sender, out var updClient))
+            {
+                IPEndPoint remoteEP = null;
+                var response = Decode(updClient.Value.EndReceive(receiveRes, ref remoteEP));
+                if (remoteEP != null && IsSuccessfulResponse(response))
+                {
+                    SkySystem.AddRemoteIp(remoteEP.ToString());
+                }
+            }
+        }
+        private static bool IsSuccessfulResponse(string response) => response?.Length > 2 && response[0] == '=';
+        
+        /// <summary>
+        /// Enumerates all WiFi interfaces that are up and creates <see cref="UdpClient"/>s for each.
+        /// Also disposes of any clients that are bound to interfaces that are down.
+        /// </summary>
+        private void InitializeUdpClients()
+        {
+            var networkIfaceIps = new SortedSet<IPAddress>(
+                from ni in NetworkInterface.GetAllNetworkInterfaces()
+                where ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211
+                    && ni.OperationalStatus == OperationalStatus.Up
+                    && !ni.IsReceiveOnly
+                from ip in ni.GetIPProperties().UnicastAddresses
+                where ip.Address.AddressFamily == AddressFamily.InterNetwork
+                select ip.Address
+            );
+
+            var monitorItem = new MonitorEntry
+            {
+                Type = MonitorType.Data,
+                Category = MonitorCategory.Server,
+                Datetime = DateTime.UtcNow,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Device = MonitorDevice.Server,
+                Message = $"Discovery|Network Interfaces|{string.Join(",", networkIfaceIps)}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            var needRemoving = new HashSet<IPAddress>(_udpClients.Keys);
+            needRemoving.ExceptWith(networkIfaceIps);
+            foreach (var toBeRemoved in needRemoving)
+            {
+                if (_udpClients.TryRemove(toBeRemoved, out var client) && client.IsValueCreated)
+                {
+                    client.Value.Dispose();
+                }
+            }
+
+            foreach (var toAdd in networkIfaceIps)
+            {
+                _ = _udpClients.AddOrUpdate(
+                    toAdd,
+                    ip => new Lazy<UdpClient>(() => new UdpClient(new IPEndPoint(ip, 0))
+                    {
+                        EnableBroadcast = true,
+                        DontFragment = true
+                    }, LazyThreadSafetyMode.ExecutionAndPublication),
+                    (_, existing) => existing
+                );
+            }
+        }
+
+        #endregion
+
         #region RaDec Gauge
         private void SetGraphics()
         {
@@ -2111,22 +2328,20 @@ namespace GS.Server.SkyTelescope
             get => _openSetupDialog;
             set
             {
-                if (value == _openSetupDialog) return;
+                if (value == _openSetupDialog)
+                {
+                    return;
+                }
 
                 _openSetupDialog = value;
-
-                if (value)
+                switch (value)
                 {
-                    // only start discovery if mount is not connected to not interfere with the WiFi communication
-                    if (!IsConnected && SkySettings.Wifi )
-                    {
-                        DiscoveryService.StartAutoDiscovery();
-                    }
-                }
-                else
-                {
-                    DiscoveryService.StopAutoDiscovery();
-                    ClickCloseSettings();
+                    case true:
+                        SkySystem.DiscoverSerialDevices();
+                        break;
+                    default:
+                        ClickCloseSettings();
+                        break;
                 }
 
                 OnPropertyChanged();
@@ -4990,17 +5205,6 @@ namespace GS.Server.SkyTelescope
             {
                 if (value == SkySettings.CanSetPark) return;
                 SkySettings.CanSetPark = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool Wifi
-        {
-            get => SkySettings.Wifi;
-            set
-            {
-                if (value == SkySettings.Wifi) return;
-                SkySettings.Wifi = value;
                 OnPropertyChanged();
             }
         }
@@ -8536,7 +8740,6 @@ namespace GS.Server.SkyTelescope
             if (disposing)
             {
                 _util?.Dispose();
-                DiscoveryService?.Dispose();
             }
 
             // free native resources if there are any.

@@ -5,9 +5,6 @@
     <Setting Name="Version" Type="System.String" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="DeviceIndex" Type="System.Int64" Scope="User">
-      <Value Profile="(Default)">1</Value>
-    </Setting>
     <Setting Name="BaudRate" Type="System.String" Scope="User">
       <Value Profile="(Default)">ps9600</Value>
     </Setting>
@@ -386,8 +383,8 @@
     <Setting Name="AllowAdvancedCommandSet" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="Wifi" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="Port" Type="System.String" Scope="User">
+      <Value Profile="(Default)">COM1</Value>
     </Setting>
   </Settings>
 </SettingsFile>

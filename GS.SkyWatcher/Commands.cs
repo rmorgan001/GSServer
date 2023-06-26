@@ -674,7 +674,7 @@ namespace GS.SkyWatcher
                 string response, msg;
                 if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
                 {
-                    response = CmdToMount(axis, 'X', "0003");
+                    response = CmdToMount(axis, 'X', "0003", true);
                     iPosition = String32ToInt(response, true, _resolutionFactor[(int)axis]);
                     // _positions[(int)axis] = StepToAngle(axis, iPosition);
                     msg = "X";
@@ -712,7 +712,7 @@ namespace GS.SkyWatcher
         {
             if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
-                var response = CmdToMount(axis, 'X', "0003");    // 0x03（’03’）: Position reading of the axis
+                var response = CmdToMount(axis, 'X', "0003", true);    // 0x03（’03’）: Position reading of the axis
                 if (string.IsNullOrEmpty(response)) return double.NaN;
                 try
                 {
@@ -760,7 +760,7 @@ namespace GS.SkyWatcher
             {
                 if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
                 {
-                    var response = CmdToMount(axis, 'X', "0003");    // 0x03（’03’）: Position reading of the axis
+                    var response = CmdToMount(axis, 'X', "0003", true);    // 0x03（’03’）: Position reading of the axis
                     if (string.IsNullOrEmpty(response)) return double.NaN;
                     var iPosition = String32ToInt(response, true, _resolutionFactor[(int)axis]);
                     return iPosition;
@@ -1368,7 +1368,7 @@ namespace GS.SkyWatcher
         private string CmdToMount(AxisId axis, char command, string cmdDataStr, bool ignoreWarnings = false)
         {
             MonitorEntry monitorItem;
-            for (var i = 0; i < 5; i++)
+            for (var i = 0; i <= 5; i++)
             {
                 var acquiredLock = false;
                 try
@@ -1380,7 +1380,7 @@ namespace GS.SkyWatcher
                         try
                         {
                             string responseString = null;
-                            for (var c = 0; c < 5; c++)
+                            for (var c = 0; c <= 10; c++)
                             {
                                 SkyQueue.Serial.DiscardInBuffer();
                                 SkyQueue.Serial.DiscardOutBuffer();
@@ -1434,6 +1434,7 @@ namespace GS.SkyWatcher
                             if (ignoreWarnings) { return null; }
 
                             MountConnected = false;
+                            Debug.WriteLine("OOPS: " + ex.Message);
                             throw new MountControlException(axis == AxisId.Axis1 ? ErrorCode.ErrNoResponseAxis1 : ErrorCode.ErrNoResponseAxis2, "Timeout", ex);
                         }
                         catch (IOException ex)

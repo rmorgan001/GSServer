@@ -17,7 +17,7 @@ namespace GS.Shared.Transport
         public GSSerialPort(
             string portName,
             int baudRate,
-            TimeSpan readTmeout,
+            TimeSpan readTimeout,
             Handshake handshake,
             Parity parity,
             StopBits stopBits,
@@ -28,7 +28,7 @@ namespace GS.Shared.Transport
             Encoding = System.Text.Encoding.ASCII;
             PortName = portName;
             BaudRate = baudRate;
-            ReadTimeout = (int)(readTmeout.TotalMilliseconds);
+            ReadTimeout = (int)readTimeout.TotalMilliseconds;
             StopBits = stopBits;
             DataBits = dataBits;
             Handshake = handshake;

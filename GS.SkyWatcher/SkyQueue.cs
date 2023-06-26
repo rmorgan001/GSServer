@@ -158,27 +158,41 @@ namespace GS.SkyWatcher
         /// <returns></returns>
         public static ISkyCommand GetCommandResult(ISkyCommand command)
         {
-            if (!IsRunning || _cts.IsCancellationRequested || _skyWatcher?.IsConnected != true)
+            try
             {
-                var a = "Queue | IsRunning:" + IsRunning + "| IsCancel:" + _cts.IsCancellationRequested + "| IsConnected:" + (_skyWatcher?.IsConnected == true);
-                if (command.Exception != null){a += "| Ex:" + command.Exception.Message;}
-                var e = new MountControlException(ErrorCode.ErrQueueFailed, a);
+                if (!IsRunning || _cts.IsCancellationRequested || _skyWatcher?.IsConnected != true)
+                {
+                    var a = "Queue | IsRunning:" + IsRunning + "| IsCancel:" + _cts.IsCancellationRequested + "| IsConnected:" + (_skyWatcher?.IsConnected == true);
+                    if (command.Exception != null) { a += "| Ex:" + command.Exception.Message; }
+                    var e = new MountControlException(ErrorCode.ErrQueueFailed, a);
+                    command.Exception = e;
+                    command.Successful = false;
+                    return command;
+                }
+                var sw = Stopwatch.StartNew();
+                while (sw.Elapsed.TotalMilliseconds < 40000)
+                {
+                    if (_resultsDictionary == null) break;
+                    var success = _resultsDictionary.TryRemove(command.Id, out var result);
+                    if (success) return result;
+                    Thread.Sleep(1);
+                }
+                var ex = new MountControlException(ErrorCode.ErrQueueFailed, $"Unable to Find Results {command.Id}, {command}, {sw.Elapsed.TotalMilliseconds}");
+                command.Exception = ex;
+                command.Successful = false;
+                return command;
+            }
+            catch (Exception e)
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{command.Id}|{e.Message}" };
+                MonitorLog.LogToMonitor(monitorItem);
+
                 command.Exception = e;
                 command.Successful = false;
                 return command;
             }
-            var sw = Stopwatch.StartNew();
-            while (sw.Elapsed.TotalMilliseconds < 40000)
-            {
-                if (_resultsDictionary == null) break;
-                var success = _resultsDictionary.TryRemove(command.Id, out var result);
-                if (success) return result;
-                Thread.Sleep(1);
-            }
-            var ex = new MountControlException(ErrorCode.ErrQueueFailed, $"Unable to Find Results {command.Id}, {command}, {sw.Elapsed.TotalMilliseconds}");
-            command.Exception = ex;
-            command.Successful = false;
-            return command;
+
         }
 
         /// <summary>

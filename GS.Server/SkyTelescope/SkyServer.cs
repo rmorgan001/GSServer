@@ -2268,6 +2268,10 @@ namespace GS.Server.SkyTelescope
 
         #endregion
 
+        #region Transport Devices
+        
+        #endregion
+
         #region Shared Mount Items
 
         /// <summary>
@@ -4107,7 +4111,6 @@ namespace GS.Server.SkyTelescope
 
             // setup server defaults, stop auto-discovery, connect serial port, start queues
             Defaults();
-            //SkySystem.DiscoveryService.StopAutoDiscovery();
             switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
@@ -4124,7 +4127,7 @@ namespace GS.Server.SkyTelescope
                     if (!SkySystem.ConnectSerial)
                     {
                         throw new SkyServerException(ErrorCode.ErrSerialFailed,
-                            $"Serial Failed {(SkySettings.TryGetDevice(out var device) ? device.ToString() : "(no device)")}");
+                            $"Connection Failed: {SkySystem.Error}");
                     }
                     // Start up, pass custom mount gearing if needed
                     var Custom360Steps = new[] { 0, 0 };
@@ -4148,8 +4151,6 @@ namespace GS.Server.SkyTelescope
             // Run mount default commands and start the UI updates
             if (MountConnect())
             {
-                SkySystem.DiscoveryService.StopAutoDiscovery();
-
                 // start with a stop
                 AxesStopValidate();
 
@@ -5470,6 +5471,7 @@ namespace GS.Server.SkyTelescope
         }
 
         private static Tuple<int, double, int> _pecBinNow;
+        
         /// <summary>
         /// Pec Currently used bin for Pec
         /// </summary>
