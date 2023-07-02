@@ -725,6 +725,18 @@ namespace GS.Server.SkyTelescope
                         Math.Abs(_parkSelected.Y - value.Y) < 0) { return; }
                 }
                 _parkSelected = value;
+
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{value.Name}|{value.X}|{value.Y}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
                 OnStaticPropertyChanged();
             }
         }
