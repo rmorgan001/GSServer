@@ -850,7 +850,7 @@ namespace GS.Server.SkyTelescope
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
-                        _ = new CmdMoveAxisRate(0, Axis.Axis1, _rateRaDec.X);
+                        _ = new CmdMoveAxisRate(0, Axis.Axis1, _rateMoveAxes.X);
                         break;
                     case MountType.SkyWatcher:
                         var rate = SkyGetRate();

@@ -67,8 +67,8 @@ namespace ASCOM.GS.Sky.Telescope
         }
 
         // The bulk of the clean-up code is implemented in Dispose(bool)
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "disposing")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
+        //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "disposing")]
+        //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
         private void Dispose(bool disposing)
         {
             // nothing to do?
@@ -91,9 +91,9 @@ namespace ASCOM.GS.Sky.Telescope
     // The ClassInterface/None attribute prevents an empty interface called
     // _AxisRates from being created and used as the [default] interface
     //
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1038:EnumeratorsShouldBeStronglyTyped")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1010:CollectionsShouldImplementGenericInterface")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
+    //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1038:EnumeratorsShouldBeStronglyTyped")]
+    //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1010:CollectionsShouldImplementGenericInterface")]
+    //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
     [ClassInterface(ClassInterfaceType.None), ComVisible(true)]
     public sealed class AxisRates : IAxisRates, IEnumerable, IEnumerator, IDisposable
     {
@@ -144,7 +144,7 @@ namespace ASCOM.GS.Sky.Telescope
             return this;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")]
+        //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")]
         public IRate this[int index]
         {
             get
@@ -211,9 +211,9 @@ namespace ASCOM.GS.Sky.Telescope
     // _TrackingRates from being created and used as the [default] interface
     //
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1038:EnumeratorsShouldBeStronglyTyped")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1010:CollectionsShouldImplementGenericInterface")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
+    //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1038:EnumeratorsShouldBeStronglyTyped")]
+    //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1010:CollectionsShouldImplementGenericInterface")]
+    //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
     [ClassInterface(ClassInterfaceType.None)]
     public sealed class TrackingRates : ITrackingRates, IEnumerable, IEnumerator, IDisposable
     {
@@ -245,7 +245,7 @@ namespace ASCOM.GS.Sky.Telescope
         }
 
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")]
+        //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")]
         public DriveRates this[int index]
         {
             get
@@ -291,7 +291,7 @@ namespace ASCOM.GS.Sky.Telescope
         }
 
         // The bulk of the clean-up code is implemented in Dispose(bool)
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
+        //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
         private void Dispose(bool disposing)
         {
             if (disposing)
@@ -309,9 +309,9 @@ namespace ASCOM.GS.Sky.Telescope
         #endregion
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1038:EnumeratorsShouldBeStronglyTyped")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1010:CollectionsShouldImplementGenericInterface")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix"), Guid("A657BEE8-83C1-4582-AEF4-6E96EC2F255C")]
+    //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1038:EnumeratorsShouldBeStronglyTyped")]
+    //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1010:CollectionsShouldImplementGenericInterface")]
+    //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix"), Guid("A657BEE8-83C1-4582-AEF4-6E96EC2F255C")]
     [ClassInterface(ClassInterfaceType.None)]
     public sealed class TrackingRatesSimple : ITrackingRates, IEnumerable, IEnumerator, IDisposable
     {
@@ -342,7 +342,7 @@ namespace ASCOM.GS.Sky.Telescope
             return this;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")]
+        //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")]
         public DriveRates this[int index]
         {
             get
@@ -388,7 +388,7 @@ namespace ASCOM.GS.Sky.Telescope
         }
 
         // The bulk of the clean-up code is implemented in Dispose(bool)
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
+        //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
         private void Dispose(bool disposing)
         {
             if (disposing)
