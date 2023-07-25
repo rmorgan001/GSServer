@@ -1651,16 +1651,14 @@ namespace GS.Server.SkyTelescope
         private static bool IsSuccessfulResponse(string response) => response?.Length > 2 && response[0] == '=';
         
         /// <summary>
-        /// Enumerates all WiFi interfaces that are up and creates <see cref="UdpClient"/>s for each.
+        /// Enumerates all network interfaces that are up and creates <see cref="UdpClient"/>s for each.
         /// Also disposes of any clients that are bound to interfaces that are down.
         /// </summary>
         private void InitializeUdpClients()
         {
             var networkIfaceIps = new SortedSet<IPAddress>(
                 from ni in NetworkInterface.GetAllNetworkInterfaces()
-                where ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211
-                    && ni.OperationalStatus == OperationalStatus.Up
-                    && !ni.IsReceiveOnly
+                where ni.OperationalStatus == OperationalStatus.Up && !ni.IsReceiveOnly
                 from ip in ni.GetIPProperties().UnicastAddresses
                 where ip.Address.AddressFamily == AddressFamily.InterNetwork
                 select ip.Address
