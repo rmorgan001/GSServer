@@ -1656,12 +1656,34 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         private void InitializeUdpClients()
         {
-            var networkIfaceIps = new SortedSet<IPAddress>(
-                from ni in NetworkInterface.GetAllNetworkInterfaces()
-                where ni.OperationalStatus == OperationalStatus.Up && !ni.IsReceiveOnly
-                from ip in ni.GetIPProperties().UnicastAddresses
-                where ip.Address.AddressFamily == AddressFamily.InterNetwork
-                select ip.Address
+            //Proposed
+            var networkIfaceIps = new SortedSet<IPAddress>(NetworkInterface.GetAllNetworkInterfaces()
+                    .Where(ni => ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet &&
+                                 ni.NetworkInterfaceType == NetworkInterfaceType.GigabitEthernet &&
+                                 ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 &&
+                                 ni.OperationalStatus == OperationalStatus.Up && !ni.IsReceiveOnly)
+                    .SelectMany(ni => ni.GetIPProperties().UnicastAddresses, (ni, ip) => new { ni, ip })
+                    .Where(@t => @t.ip.Address.AddressFamily == AddressFamily.InterNetwork)
+                    .Select(@t => @t.ip.Address)
+
+            //New
+            //var networkIfaceIps = new SortedSet<IPAddress>(
+            //    from ni in NetworkInterface.GetAllNetworkInterfaces()
+            //    where ni.OperationalStatus == OperationalStatus.Up && !ni.IsReceiveOnly
+            //    from ip in ni.GetIPProperties().UnicastAddresses
+            //    where ip.Address.AddressFamily == AddressFamily.InterNetwork
+            //    select ip.Address, 
+
+            //Original 
+            //var networkIfaceIps = new SortedSet<IPAddress>(
+            //from ni in NetworkInterface.GetAllNetworkInterfaces()
+            //where ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211
+            //    && ni.OperationalStatus == OperationalStatus.Up
+            //    && !ni.IsReceiveOnly
+            //from ip in ni.GetIPProperties().UnicastAddresses
+            //where ip.Address.AddressFamily == AddressFamily.InterNetwork
+            //select ip.Address
+
             );
 
             var monitorItem = new MonitorEntry
