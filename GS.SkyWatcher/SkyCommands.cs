@@ -696,11 +696,13 @@ namespace GS.SkyWatcher
         public Exception Exception { get; set; }
         public dynamic Result { get; private set; }
         private readonly AxisId _axis;
+        private readonly bool _raw;
 
-        public SkyGetAxisPositionCounter(long id, AxisId axis)
+        public SkyGetAxisPositionCounter(long id, AxisId axis, bool raw = false)
         {
             Id = id;
             _axis = axis;
+            _raw = raw;
             CreatedUtc = Principles.HiResDateTime.UtcNow;
             Successful = false;
             SkyQueue.AddCommand(this);
@@ -710,7 +712,7 @@ namespace GS.SkyWatcher
         {
             try
             {
-                Result = skyWatcher.GetAxisPositionCounter(_axis);
+                Result = skyWatcher.GetAxisPositionCounter(_axis, _raw);
                 Successful = true;
             }
             catch (Exception e)
@@ -1340,6 +1342,43 @@ namespace GS.SkyWatcher
             }
         }
     }
+
+    public class SkySetAxisPositionCounter : ISkyCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; }
+        private readonly AxisId _axis;
+        private readonly int _position;
+
+        public SkySetAxisPositionCounter(long id, AxisId axis, int position)
+        {
+            Id = id;
+            _axis = axis;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            _position = position;
+            Successful = false;
+            Result = null;
+            SkyQueue.AddCommand(this);
+        }
+
+        public void Execute(SkyWatcher skyWatcher)
+        {
+            try
+            {
+                skyWatcher.SetAxisPositionCounter(_axis, _position);
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
 
     public class SkyInitializeAxes : ISkyCommand
     {

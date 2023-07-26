@@ -318,11 +318,11 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
-        public long GetAxisPositionCounter(int axis)
+        public long GetAxisPositionCounter(int axis, bool raw)
         {
             ValidateMount();
             var validAxis = ValidateAxis(axis);
-            var command = new SkyGetAxisPositionCounter(SkyQueue.NewId, validAxis);
+            var command = new SkyGetAxisPositionCounter(SkyQueue.NewId, validAxis, raw);
             var results = GetResult(command);
             return results.Result;
         }
@@ -671,7 +671,7 @@ namespace GS.SkyApi
         }
         
         /// <inheritdoc />
-        public bool MountType
+        public string MountType
         {
             get
             {
@@ -764,6 +764,19 @@ namespace GS.SkyApi
             ValidateMount();
             var validAxis = ValidateAxis(axis);
             var command = new SkySetAxisPosition(SkyQueue.NewId, validAxis, position);
+            GetResult(command);
+        }
+
+        /// <inheritdoc />
+        public void SetAxisPositionCounter(int axis, int position)
+        {
+            var monitorItem = new MonitorEntry
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{position}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            ValidateMount();
+            var validAxis = ValidateAxis(axis);
+            var command = new SkySetAxisPositionCounter(SkyQueue.NewId, validAxis, position);
             GetResult(command);
         }
 
@@ -1202,12 +1215,14 @@ namespace GS.SkyApi
         /// <param name="axis">axis number 1 or 2</param>
         /// <returns>Get Current Axis position as double</returns>
         double GetAxisPosition(int axis);
+
         /// <summary>
         /// j Gets axis position counter
         /// </summary>
         /// <param name="axis">axis number 1 or 2</param>
+        /// <param name="raw">false to subtract 0x00800000</param>
         /// <returns>Cardinal encoder count as long</returns>
-        long GetAxisPositionCounter(int axis);
+        long GetAxisPositionCounter(int axis, bool raw = false);
         /// <summary>
         /// d Gets Axis Current Encoder count
         /// </summary>
@@ -1370,7 +1385,7 @@ namespace GS.SkyApi
         /// <summary>
         /// e Identify type of mount
         /// </summary>
-        bool MountType { get; }
+        string MountType { get; }
         /// <summary>
         /// e Identify board version
         /// </summary>
@@ -1394,6 +1409,12 @@ namespace GS.SkyApi
         /// <param name="axis">axis number 1 or 2</param>
         /// <param name="position">degrees</param>
         void SetAxisPosition(int axis, double position);
+        /// <summary>
+        /// E Reset the position of an axis
+        /// </summary>
+        /// <param name="axis">axis number 1 or 2</param>
+        /// <param name="position">degrees</param>
+        void SetAxisPositionCounter(int axis, int position);
         /// <summary>
         /// M Set the break point increment
         /// </summary>

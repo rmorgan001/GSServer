@@ -752,6 +752,16 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
+        /// reset the position of an axis
+        /// </summary>
+        /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
+        /// <param name="newValue">steps</param>
+        internal void SetAxisPositionCounter(AxisId axis, int newValue)
+        {
+            _commands.SetAxisPositionCounter(axis, newValue);
+        }
+
+        /// <summary>
         /// Turn on/off individual axis encoders
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
@@ -827,10 +837,11 @@ namespace GS.SkyWatcher
         /// j Gets axis position counter
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
+        /// <param name="raw">false to subtract 0x00800000</param>
         /// <returns>Cardinal encoder count</returns>
-        internal long GetAxisPositionCounter(AxisId axis)
+        internal long GetAxisPositionCounter(AxisId axis, bool raw = false)
         {
-            return _commands.GetAxisPositionCounter(axis);
+            return _commands.GetAxisPositionCounter(axis, raw);
         }
 
         /// <summary>

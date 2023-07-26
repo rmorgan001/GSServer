@@ -787,13 +787,15 @@ namespace GS.SkyWatcher
         /// j or X0003 Gets axis position steps
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
+        /// /// <param name="raw">false to subtract 0x00800000</param>
         /// <returns>Cardinal encoder count</returns>
-        internal long GetAxisPositionCounter(AxisId axis)
+        internal long GetAxisPositionCounter(AxisId axis, bool raw = false)
         {
             if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
                 var response = CmdToMount(axis, 'X', "0003");    // 0x03（’03’）: Position reading of the axis
-                var iPosition = String32ToInt(response, true, _resolutionFactor[(int)axis]);
+                var res = raw ? 1 : _resolutionFactor[(int)axis];
+                var iPosition = String32ToInt(response, true, res);
                 return iPosition;
             }
             else
@@ -808,7 +810,7 @@ namespace GS.SkyWatcher
                     }
                 }
                 var iPosition = StringToLong(response);
-                iPosition -= 0x00800000;
+                if(!raw){iPosition -= 0x00800000;}
                 return iPosition;
             }
         }
@@ -984,6 +986,26 @@ namespace GS.SkyWatcher
             }
 
             _positions[(int)axis] = radians;
+        }
+
+        /// <summary>
+        /// E or X01 Set the target axis position to the specify value
+        /// </summary>
+        /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
+        /// <param name="steps">radian value</param>
+        internal void SetAxisPositionCounter(AxisId axis, int steps)
+        {
+            if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
+            {
+                var szCmd = "01" + steps.ToString("X8");
+                CmdToMount(axis, 'X', szCmd);
+            }
+            else
+            {
+                //steps += 0x800000;
+                var szCmd = LongToHex(steps);
+                CmdToMount(axis, 'E', szCmd);
+            }
         }
 
         /// <summary>
