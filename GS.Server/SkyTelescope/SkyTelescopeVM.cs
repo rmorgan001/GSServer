@@ -1660,6 +1660,7 @@ namespace GS.Server.SkyTelescope
             var networkIfaceIps = new SortedSet<IPAddress>(NetworkInterface.GetAllNetworkInterfaces()
                     .Where(ni => ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet &&
                                  ni.NetworkInterfaceType == NetworkInterfaceType.GigabitEthernet &&
+                                 ni.NetworkInterfaceType == NetworkInterfaceType.Loopback &&
                                  ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 &&
                                  ni.OperationalStatus == OperationalStatus.Up && !ni.IsReceiveOnly)
                     .SelectMany(ni => ni.GetIPProperties().UnicastAddresses, (ni, ip) => new { ni, ip })
