@@ -1621,8 +1621,29 @@ namespace GS.Server.SkyTelescope
 
             Parallel.ForEach(
                 _udpClients,
-                kv => kv.Value.Value.BeginSend(DiscoverMsg, DiscoverMsg.Length, broadCastIP, EndSendCb, new DiscoveryState(kv.Key, _cts))
-            );
+                kv =>
+                {
+                    try
+                    {
+                        kv.Value.Value.BeginSend(DiscoverMsg, DiscoverMsg.Length, broadCastIP, EndSendCb,
+                            new DiscoveryState(kv.Key, _cts));
+                    }
+                    catch (SocketException ex)
+                    {
+                        Console.WriteLine(ex);
+                        var monitorItem = new MonitorEntry
+                        {
+                            Type = MonitorType.Warning,
+                            Category = MonitorCategory.Server,
+                            Datetime = DateTime.UtcNow,
+                            Method = MethodBase.GetCurrentMethod()?.Name,
+                            Thread = Thread.CurrentThread.ManagedThreadId,
+                            Device = MonitorDevice.Server,
+                            Message = $"Wifi|{kv.Key}|{ex.Message}"
+                        };
+                        MonitorLog.LogToMonitor(monitorItem);
+                    }
+                });
         }
         private void EndSendCb(IAsyncResult sendRes)
         {
@@ -1645,6 +1666,17 @@ namespace GS.Server.SkyTelescope
                 if (remoteEP != null && IsSuccessfulResponse(response))
                 {
                     SkySystem.AddRemoteIp(remoteEP.ToString());
+                    var monitorItem = new MonitorEntry
+                    {
+                        Type = MonitorType.Information,
+                        Category = MonitorCategory.Server,
+                        Device = MonitorDevice.Server,
+                        Datetime = DateTime.UtcNow,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"|{remoteEP}"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
                 }
             }
         }
@@ -1656,71 +1688,109 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         private void InitializeUdpClients()
         {
-            //Proposed
-            var networkIfaceIps = new SortedSet<IPAddress>(NetworkInterface.GetAllNetworkInterfaces()
-                    .Where(ni => ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet &&
-                                 ni.NetworkInterfaceType == NetworkInterfaceType.GigabitEthernet &&
-                                 ni.NetworkInterfaceType == NetworkInterfaceType.Loopback &&
-                                 ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 &&
+            string ips = null;
+            try
+            {
+                //Proposed
+                var networkIfaceIps = NetworkInterface.GetAllNetworkInterfaces()
+                    .Where(ni => ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||
+                                 ni.NetworkInterfaceType == NetworkInterfaceType.GigabitEthernet ||
+                                 ni.NetworkInterfaceType == NetworkInterfaceType.Loopback ||
+                                 ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 ||
                                  ni.OperationalStatus == OperationalStatus.Up && !ni.IsReceiveOnly)
                     .SelectMany(ni => ni.GetIPProperties().UnicastAddresses, (ni, ip) => new { ni, ip })
                     .Where(@t => @t.ip.Address.AddressFamily == AddressFamily.InterNetwork)
-                    .Select(@t => @t.ip.Address)
+                    .Select(@t => @t.ip.Address);
 
-            //New
-            //var networkIfaceIps = new SortedSet<IPAddress>(
-            //    from ni in NetworkInterface.GetAllNetworkInterfaces()
-            //    where ni.OperationalStatus == OperationalStatus.Up && !ni.IsReceiveOnly
-            //    from ip in ni.GetIPProperties().UnicastAddresses
-            //    where ip.Address.AddressFamily == AddressFamily.InterNetwork
-            //    select ip.Address, 
+                //.OrderBy(p => p, new Comparer())  if needed look in shared
 
-            //Original 
-            //var networkIfaceIps = new SortedSet<IPAddress>(
-            //from ni in NetworkInterface.GetAllNetworkInterfaces()
-            //where ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211
-            //    && ni.OperationalStatus == OperationalStatus.Up
-            //    && !ni.IsReceiveOnly
-            //from ip in ni.GetIPProperties().UnicastAddresses
-            //where ip.Address.AddressFamily == AddressFamily.InterNetwork
-            //select ip.Address
+                //var networkIfaceIps = new SortedSet<IPAddress>(NetworkInterface.GetAllNetworkInterfaces()
+                //        .Where(ni => ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet &&
+                //                     ni.NetworkInterfaceType == NetworkInterfaceType.GigabitEthernet &&
+                //                     ni.NetworkInterfaceType == NetworkInterfaceType.Loopback &&
+                //                     ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 &&
+                //                     ni.OperationalStatus == OperationalStatus.Up && !ni.IsReceiveOnly)
+                //        .SelectMany(ni => ni.GetIPProperties().UnicastAddresses, (ni, ip) => new { ni, ip })
+                //        .Where(@t => @t.ip.Address.AddressFamily == AddressFamily.InterNetwork)
+                //        .Select(@t => @t.ip.Address));
 
-            );
+                //New
+                //var networkIfaceIps = new SortedSet<IPAddress>(
+                //    from ni in NetworkInterface.GetAllNetworkInterfaces()
+                //    where ni.OperationalStatus == OperationalStatus.Up && !ni.IsReceiveOnly
+                //    from ip in ni.GetIPProperties().UnicastAddresses
+                //    where ip.Address.AddressFamily == AddressFamily.InterNetwork
+                //    select ip.Address, );
 
-            var monitorItem = new MonitorEntry
-            {
-                Type = MonitorType.Data,
-                Category = MonitorCategory.Server,
-                Datetime = DateTime.UtcNow,
-                Method = MethodBase.GetCurrentMethod()?.Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Device = MonitorDevice.Server,
-                Message = $"Discovery|Network Interfaces|{string.Join(",", networkIfaceIps)}"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
+                //Original 
+                //var networkIfaceIps = new SortedSet<IPAddress>(
+                //from ni in NetworkInterface.GetAllNetworkInterfaces()
+                //where ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211
+                //    && ni.OperationalStatus == OperationalStatus.Up
+                //    && !ni.IsReceiveOnly
+                //from ip in ni.GetIPProperties().UnicastAddresses
+                //where ip.Address.AddressFamily == AddressFamily.InterNetwork
+                //select ip.Address);
 
-            var needRemoving = new HashSet<IPAddress>(_udpClients.Keys);
-            needRemoving.ExceptWith(networkIfaceIps);
-            foreach (var toBeRemoved in needRemoving)
-            {
-                if (_udpClients.TryRemove(toBeRemoved, out var client) && client.IsValueCreated)
+                var monitorItem = new MonitorEntry
                 {
-                    client.Value.Dispose();
+                    Type = MonitorType.Data,
+                    Category = MonitorCategory.Server,
+                    Datetime = DateTime.UtcNow,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Device = MonitorDevice.Server,
+                    Message = $"Discovery|Network Interfaces|{string.Join(",", networkIfaceIps)}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                var needRemoving = new HashSet<IPAddress>(_udpClients.Keys);
+                needRemoving.ExceptWith(networkIfaceIps);
+                foreach (var toBeRemoved in needRemoving)
+                {
+                    ips = toBeRemoved.ToString();
+                    if (_udpClients.TryRemove(toBeRemoved, out var client) && client.IsValueCreated)
+                    {
+                        client.Value.Dispose();
+                    }
+                }
+
+                foreach (var toAdd in networkIfaceIps)
+                {
+                    ips = toAdd.ToString();
+                    _ = _udpClients.AddOrUpdate(
+                        toAdd,
+                        ip => new Lazy<UdpClient>(() => new UdpClient(new IPEndPoint(ip, 0))
+                        {
+                            EnableBroadcast = true,
+                            DontFragment = true
+                        }, LazyThreadSafetyMode.ExecutionAndPublication),
+                        (_, existing) => existing
+                    );
+
                 }
             }
-
-            foreach (var toAdd in networkIfaceIps)
+            catch (SocketException ex)
             {
-                _ = _udpClients.AddOrUpdate(
-                    toAdd,
-                    ip => new Lazy<UdpClient>(() => new UdpClient(new IPEndPoint(ip, 0))
-                    {
-                        EnableBroadcast = true,
-                        DontFragment = true
-                    }, LazyThreadSafetyMode.ExecutionAndPublication),
-                    (_, existing) => existing
-                );
+                Console.WriteLine(ex);
+                var monitorItem = new MonitorEntry
+                {
+                    Type = MonitorType.Warning,
+                    Category = MonitorCategory.Server,
+                    Device = MonitorDevice.Server,
+                    Datetime = DateTime.UtcNow,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"|{ips}|{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+           
         }
 
         #endregion
