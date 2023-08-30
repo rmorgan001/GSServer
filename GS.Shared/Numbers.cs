@@ -15,6 +15,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Windows.Media.Media3D;
 
 namespace GS.Shared
 {
@@ -80,6 +81,26 @@ namespace GS.Shared
         public static bool IsEqualTo(this double a, double b)
         {
             return Math.Abs(a - b) < double.Epsilon;
+        }
+
+        public static bool IsNaNVector3D(Vector3D vec)
+        {
+            return double.IsNaN(vec.X) || double.IsNaN(vec.Y) || double.IsNaN(vec.Z);
+        }
+
+        public static bool Is0Vector3D(Vector3D vec)
+        {
+            return vec.X == 0 || vec.Y == 0 || vec.Z == 0;
+        }
+
+        public static bool IsNaNPoint3D(Point3D pnt)
+        {
+            return double.IsNaN(pnt.X) || double.IsNaN(pnt.Y) || double.IsNaN(pnt.Z);
+        }
+
+        public static bool Is0Point3D(Point3D pnt)
+        {
+            return Math.Abs(pnt.X) < 0.00001 || Math.Abs(pnt.Y) < 0.00001 || Math.Abs(pnt.Z) < 0.00001;
         }
     }
 }

@@ -2302,6 +2302,21 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
+                if (Numbers.IsNaNVector3D(LookDirection) || Numbers.Is0Vector3D(LookDirection))
+                {
+                    Settings.Settings.ModelLookDirection2 = new Vector3D(-900, -1100, -400);
+                }
+
+                if (Numbers.IsNaNVector3D(UpDirection) || Numbers.Is0Vector3D(UpDirection))
+                {
+                    Settings.Settings.ModelUpDirection2 = new Vector3D(.35, .43, .82);
+                }
+
+                if (Numbers.IsNaNPoint3D(Position) || Numbers.Is0Point3D(Position))
+                {
+                    Settings.Settings.ModelPosition2 = new Point3D(900, 1100, 800);
+                }
+
                 LoadGEM();
             }
             catch (Exception ex)
