@@ -42,9 +42,9 @@ DisableWelcomePage=No
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Dirs]
-Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer"
-Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\SkyScripts"
-Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\Notes\NotesTemplates"
+Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\"
+Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\SkyScripts\"
+Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\Notes\NotesTemplates\"
 Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\Models"
 Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\LanguageFiles"
 Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\arm64"

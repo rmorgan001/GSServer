@@ -379,11 +379,11 @@ namespace GS.Server.SkyTelescope
                             {
                                 case "Altitude":
                                     Altitude = _util.DegreesToDMS(SkyServer.Altitude, "° ", ":", "", 2);
-                                    if (Graphic != FrontGraphic.None) {Alt = SkyServer.Altitude;}
+                                    if (Graphic != FrontGraphic.None){Alt = SkyServer.Altitude;}
                                     break;
                                 case "Azimuth":
                                     Azimuth = _util.DegreesToDMS(SkyServer.Azimuth, "° ", ":", "", 2);
-                                    if (Graphic != FrontGraphic.None) {Az = SkyServer.Azimuth;}
+                                    if (Graphic != FrontGraphic.None) {AzGauge = SkyServer.Azimuth;}
                                     break;
                                 case "CanPPec":
                                     PPecEnabled = SkyServer.CanPPec;
@@ -1805,13 +1805,24 @@ namespace GS.Server.SkyTelescope
                 case FrontGraphic.AltAz:
                     if (SkyServer.SouthernHemisphere)
                     {
-                        DecLabelRight = $"{Application.Current.Resources["lbNorth"]}";
-                        DecLabelLeft = $"{Application.Current.Resources["lbSouth"]}";
+                        RaLabelRight = $"{Application.Current.Resources["lbEast"]}";
+                        RaLabelLeft = $"{Application.Current.Resources["lbWest"]}";
                     }
                     else
                     {
                         RaLabelRight = $"{Application.Current.Resources["lbEast"]}";
                         RaLabelLeft = $"{Application.Current.Resources["lbWest"]}";
+                    }
+                    switch (SkyServer.Lha < 0)
+                    {
+                        case true:
+                            AltLabelRight = "0°";
+                            AltLabelLeft = "180°";
+                            break;
+                        default:
+                            AltLabelRight = "180°";
+                            AltLabelLeft = "0°";
+                            break;
                     }
                     break;
                 case FrontGraphic.RaDec:
@@ -1839,7 +1850,7 @@ namespace GS.Server.SkyTelescope
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
+        } 
 
         private string _raLabelRight;
         public string RaLabelRight
@@ -1946,6 +1957,7 @@ namespace GS.Server.SkyTelescope
                 SkySettings.RaGaugeFlip = value;
                 OnPropertyChanged();
                 RaGauge = ActualAxisX;
+                AzGauge = ActualAxisX;
             }
         }
 
@@ -1964,14 +1976,14 @@ namespace GS.Server.SkyTelescope
         #endregion
 
         #region AltAz Gauge
-        private double _az;
-        public double Az
+        private double _azGauge;
+        public double AzGauge
         {
-            get => _az;
+            get => _azGauge;
             private set
             {
-                if (Math.Abs(_az - value) < 0.01) { return; }
-                _az = value;
+                if (Math.Abs(_azGauge - value) < 0.01) { return; }
+                _azGauge = value;
                 OnPropertyChanged();
             }
         }
@@ -1984,7 +1996,7 @@ namespace GS.Server.SkyTelescope
             {
                 if (Math.Abs(_alt - value) < 0.01) { return; }
                 _alt = value;
-                AltGauge = SkyServer.Lha < 0 ? 270 - value : 90 + value; 
+                AltGauge = SkyServer.Lha < 0 ? 270 - value : 90 + value;
                 OnPropertyChanged();
             }
         }
@@ -2000,6 +2012,31 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
+
+        private string _altLabelRight;
+        public string AltLabelRight
+        {
+            get => _altLabelRight;
+            private set
+            {
+                if (_altLabelRight == value) { return; }
+                _altLabelRight = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _altLabelLeft;
+        public string AltLabelLeft
+        {
+            get => _altLabelLeft;
+            private set
+            {
+                if (_altLabelLeft == value) { return; }
+                _altLabelLeft = value;
+                OnPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Viewport3D

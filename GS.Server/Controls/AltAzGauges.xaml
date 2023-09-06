@@ -25,7 +25,7 @@
                 <LineGeometry StartPoint="0,1" EndPoint="1,1" />
             </Path.Data>
         </Path>
-        <wpf:AngularGauge Grid.Row="1" Value="{Binding Az}" TicksStrokeThickness="0" FontSize="1" FromValue="0" ToValue="360" Wedge="360" Margin="5" NeedleFill="{StaticResource SecondaryHueMidBrush}"  Foreground="{StaticResource  MaterialDesignTextFieldBoxHoverBackground}" SectionsInnerRadius=".6">
+        <wpf:AngularGauge Grid.Row="1" Value="{Binding AzGauge}" TicksStrokeThickness="0" FontSize="1" FromValue="0" ToValue="360" Wedge="360" Margin="5" NeedleFill="{StaticResource SecondaryHueMidBrush}"  Foreground="{StaticResource  MaterialDesignTextFieldBoxHoverBackground}" SectionsInnerRadius=".6">
             <wpf:AngularGauge.Sections>
                 <wpf:AngularSection FromValue="0" ToValue="360" Fill="{StaticResource MaterialDesignTextFieldBoxHoverBackground}" />
             </wpf:AngularGauge.Sections>
@@ -33,8 +33,10 @@
                 <RotateTransform CenterX="120" CenterY="73" Angle="180"></RotateTransform>
             </wpf:AngularGauge.RenderTransform>
         </wpf:AngularGauge>
-        <TextBlock Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0" Text="{Binding Az, StringFormat=N2}"/>
+        <TextBlock Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0" Text="{Binding AzGauge, StringFormat=N2}"/>
         <TextBlock Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10" Text="{StaticResource lbAz}"/>
+        <TextBlock Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0" Text="{Binding RaLabelRight}" />
+        <TextBlock Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding RaLabelLeft}" />
         <wpf:AngularGauge Grid.Row="2" Value="{Binding AltGauge}" TicksStrokeThickness="0" FontSize="1" FromValue="0" ToValue="360" Wedge="360" Margin="5" NeedleFill="{StaticResource SecondaryHueMidBrush}" Foreground="{StaticResource  MaterialDesignTextFieldBoxHoverBackground}" SectionsInnerRadius=".6">
             <wpf:AngularGauge.Sections>
                 <wpf:AngularSection FromValue="90" ToValue="270" Fill="{StaticResource MaterialDesignTextFieldBoxHoverBackground}" />
@@ -42,7 +44,7 @@
         </wpf:AngularGauge>
         <TextBlock Grid.Row="2" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0" Text="{Binding Alt, StringFormat=N}"/>
         <TextBlock Grid.Row="2" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10" Text="{StaticResource lbAlt}"/>
-        <TextBlock Grid.Row="2" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0" Text="{Binding RaLabelRight}"/>
-        <TextBlock Grid.Row="2" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding RaLabelLeft}"/>
+        <TextBlock Grid.Row="2" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0" Text="{Binding AltLabelRight}"/>
+        <TextBlock Grid.Row="2" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding AltLabelLeft}"/>
     </Grid>
 </UserControl>
