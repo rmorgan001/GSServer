@@ -3023,6 +3023,31 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private bool _isHomeDialogOpen;
+        public bool IsHomeDialogOpen
+        {
+            get => _isFlipDialogOpen;
+            set
+            {
+                if (_isHomeDialogOpen == value) return;
+                _isHomeDialogOpen = value;
+                CloseDialogs(value);
+                OnPropertyChanged();
+            }
+        }
+
+        private object _homeContent;
+        public object HomeContent
+        {
+            get => _homeContent;
+            set
+            {
+                if (_homeContent == value) return;
+                _homeContent = value;
+                OnPropertyChanged();
+            }
+        }
+
         private object _homeResetContent;
         public object HomeResetContent
         {
@@ -6432,7 +6457,227 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        #endregion  
+        #endregion
+
+        #region Home Dialog
+
+        private ICommand _openHomeDialogCmd;
+        public ICommand OpenHomeDialogCmd
+        {
+            get
+            {
+                var command = _openHomeDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openHomeDialogCmd = new RelayCommand(
+                    param => OpenHomeDialog()
+                );
+            }
+        }
+        private void OpenHomeDialog()
+        {
+            try
+            {
+                DialogContent = new HomeDialog();
+                IsDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+
+        }
+
+        private ICommand _acceptHomeDialogCmd;
+        public ICommand AcceptHomeDialogCmd
+        {
+            get
+            {
+                var command = _acceptHomeDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptHomeDialogCmd = new RelayCommand(
+                    param => AcceptHomeDialog()
+                );
+            }
+        }
+        private void AcceptHomeDialog()
+        {
+                IsDialogOpen = false;
+                ClickHome();
+        }
+        
+        private ICommand _cancelHomeDialogCmd;
+        public ICommand CancelHomeDialogCmd
+        {
+            get
+            {
+                var command = _cancelHomeDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelHomeDialogCmd = new RelayCommand(
+                    param => CancelHomeDialog()
+                );
+            }
+        }
+        private void CancelHomeDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
+
+        #region Park Dialog
+
+        private ICommand _openParkDialogCmd;
+        public ICommand OpenParkDialogCmd
+        {
+            get
+            {
+                var command = _openParkDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openParkDialogCmd = new RelayCommand(
+                    param => OpenParkDialog()
+                );
+            }
+        }
+        private void OpenParkDialog()
+        {
+            try
+            {
+                DialogContent = new ParkDialog();
+                IsDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+
+        }
+
+        private ICommand _acceptParkDialogCmd;
+        public ICommand AcceptParkDialogCmd
+        {
+            get
+            {
+                var command = _acceptParkDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptParkDialogCmd = new RelayCommand(
+                    param => AcceptParkDialog()
+                );
+            }
+        }
+        private void AcceptParkDialog()
+        {
+                IsDialogOpen = false;
+                ClickPark();
+        }
+
+        private ICommand _cancelParkDialogCmd;
+        public ICommand CancelParkDialogCmd
+        {
+            get
+            {
+                var command = _cancelParkDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelParkDialogCmd = new RelayCommand(
+                    param => CancelParkDialog()
+                );
+            }
+        }
+        private void CancelParkDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion 
 
         #region Sync Dialog
 

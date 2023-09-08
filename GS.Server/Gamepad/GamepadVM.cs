@@ -939,8 +939,7 @@ namespace GS.Server.GamePad
                         {
                             if (_homeCount == 0)
                             {
-                                if (_skyTelescopeVM.ClickHomeCommand.CanExecute(null))
-                                    _skyTelescopeVM.ClickHomeCommand.Execute(null);
+                                if (_skyTelescopeVM.ClickParkCommand.CanExecute(null)) { _skyTelescopeVM.ClickParkCommand.Execute(null); }
                             }
 
                             _homeCount++;

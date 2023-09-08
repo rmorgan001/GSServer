@@ -34,17 +34,19 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <md:Badged Badge="{Binding ParkBadgeContent}" BadgePlacementMode="Right">
-            <Button Margin="5,1,0,0" Width="100" Height="25" HorizontalAlignment="Left" Padding="-5"
-                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipPark}"
-                    Command="{Binding ClickParkCommand}" Content="{Binding ParkButtonContent}"/>
-        </md:Badged>
-        <md:Badged Badge="{Binding HomeBadgeContent}" BadgePlacementMode="Right">
-            <Button Margin="5,6,0,0" Height="25" Width="100" HorizontalAlignment="Left" Padding="-5"
-                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipHome}"
-                    Command="{Binding ClickHomeCommand}" Content="{StaticResource btnHome}">
-            </Button>
-        </md:Badged>
+        <md:DialogHost VerticalAlignment="Bottom" CloseOnClickAway="True" IsOpen="{Binding IsParkDialogOpen}" DialogContent="{Binding ParkContent}">
+            <md:Badged Badge="{Binding ParkBadgeContent}" BadgePlacementMode="Right">
+                <Button Margin="5,1,0,0" Width="100" Height="25" HorizontalAlignment="Left" Padding="-5"
+                        Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipPark}" Command="{Binding OpenParkDialogCmd}" Content="{Binding ParkButtonContent}"/>
+            </md:Badged>
+        </md:DialogHost>
+        <md:DialogHost VerticalAlignment="Bottom" CloseOnClickAway="True" IsOpen="{Binding IsHomeDialogOpen}" DialogContent="{Binding HomeContent}">
+            <md:Badged Badge="{Binding HomeBadgeContent}" BadgePlacementMode="Right">
+                <Button Margin="5,6,0,0" Height="25" Width="100" HorizontalAlignment="Left" Padding="-5"
+                        Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipHome}" Command="{Binding OpenHomeDialogCmd}" Content="{StaticResource btnHome}">
+                </Button>
+            </md:Badged>
+        </md:DialogHost>
         <Button Margin="5,6,0,0" Width="100" Height="25" HorizontalAlignment="Left" Padding="-5"
                 Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipStop}" 
                 Command="{Binding ClickStopCommand}" Content="{StaticResource btnStop}">
