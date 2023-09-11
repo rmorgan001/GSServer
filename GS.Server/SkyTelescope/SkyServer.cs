@@ -202,6 +202,7 @@ namespace GS.Server.SkyTelescope
         private static bool _snapPort1Result;
         private static bool _snapPort2Result;
         private static double[] _steps;
+        private static bool _flipOnNextGoto;
         #endregion
 
         /// <summary>
@@ -385,7 +386,7 @@ namespace GS.Server.SkyTelescope
         public static string Capabilities
         {
             get => _capabilities;
-            private set
+            set
             {
                 if (_capabilities == value) { return; }
                 _capabilities = value;
@@ -423,6 +424,32 @@ namespace GS.Server.SkyTelescope
         /// Factor to covert steps, Sky Watcher in rad
         /// </summary>
         private static double[] FactorStep { get; set; }
+
+        /// <summary>
+        /// UI Checkbox option to flip on the next goto
+        /// </summary>
+        public static bool FlipOnNextGoto
+        {
+            get => _flipOnNextGoto;
+            set
+            {
+                _flipOnNextGoto = value;
+
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{value}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OnStaticPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// The current Declination movement rate offset for telescope guiding (degrees/sec) 
@@ -2280,11 +2307,7 @@ namespace GS.Server.SkyTelescope
 
         #endregion
 
-        #region Transport Devices
-        
-        #endregion
-
-        #region Shared Mount Items
+         #region Shared Mount Items
 
         /// <summary>
         /// Abort Slew in a normal motion
@@ -4564,12 +4587,33 @@ namespace GS.Server.SkyTelescope
         /// <returns>axis position that is closest</returns>
         public static double[] CheckAlternatePosition(double[] position)
         {
-            // See if the target is within limits
+            // Check Forced flip for a goto
+            var flipGoto = FlipOnNextGoto;
+            FlipOnNextGoto = false;
+            
+            // See if the target is within flip angle limits
             if (!IsWithinFlipLimits(position)) { return null; }
             var alt = Axes.GetAltAxisPosition(position);
 
-            var cl = ChooseClosestPosition(ActualAxisX, position, alt);
+            var cl = ChooseClosestPosition(ActualAxisX, position, alt);  //choose the closest angle to slew 
+            if (flipGoto) // implement the forced flip for a goto
+            {
+                cl = cl == "a" ? "b" : "a"; //choose the farthest angle to slew which will flip
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"flip|{cl}|{ActualAxisX}|{position[0]}|{position[1]}|{alt[0]}|{alt[1]}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+            
             if (cl != "b") { return null; }
+
             switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
@@ -5184,6 +5228,9 @@ namespace GS.Server.SkyTelescope
 
             // Allows driver movements commands to process
             AsComOn = true;
+
+            //Next goto will flip
+            FlipOnNextGoto = false;
 
             // default guide rates
             SetGuideRates();

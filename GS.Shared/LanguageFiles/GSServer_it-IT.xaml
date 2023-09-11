@@ -715,6 +715,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--1.0.6.3 -->
     <system:String x:Key="btnContinueHome">Accetta di uccidere Home</system:String>
     <system:String x:Key="btnContinuePark">Accetta per Park</system:String>
+    <system:String x:Key="FlipOnNextGoto">Forza l'inversione alla mossa successiva</system:String>
 
 </ResourceDictionary>
  

@@ -717,5 +717,6 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--1.0.6.3 -->
     <system:String x:Key="btnContinueHome">Accepter se déplacer Home</system:String>
     <system:String x:Key="btnContinuePark">Accepter pour se garer</system:String>
+    <system:String x:Key="FlipOnNextGoto">Forcer le retournement au prochain coup</system:String>
 
 </ResourceDictionary>

@@ -444,6 +444,9 @@ namespace GS.Server.SkyTelescope
                                 case "Elevation":
                                     Elevation = SkySettings.Elevation;
                                     break;
+                                case "FlipOnNextGoto":
+                                    FlipOnGoto = SkyServer.FlipOnNextGoto;
+                                    break;
                                 case "IsSimulatorConnected":
                                     // no status kept for the simulator
                                     break;
@@ -3044,6 +3047,31 @@ namespace GS.Server.SkyTelescope
             {
                 if (_homeContent == value) return;
                 _homeContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isParkDialogOpen;
+        public bool IsParkDialogOpen
+        {
+            get => _isFlipDialogOpen;
+            set
+            {
+                if (_isParkDialogOpen == value) return;
+                _isParkDialogOpen = value;
+                CloseDialogs(value);
+                OnPropertyChanged();
+            }
+        }
+
+        private object _parkContent;
+        public object ParkContent
+        {
+            get => _parkContent;
+            set
+            {
+                if (_parkContent == value) return;
+                _parkContent = value;
                 OnPropertyChanged();
             }
         }
@@ -6453,6 +6481,47 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private bool _flipOnGoto;
+        public bool FlipOnGoto
+        {
+            get => _flipOnGoto;
+            set
+            {
+                _flipOnGoto = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _acceptFlipGoToDialogCmd;
+        public ICommand AcceptFlipGoToDialogCmd
+        {
+            get
+            {
+                var command = _acceptFlipGoToDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptFlipGoToDialogCmd = new RelayCommand(
+                    param => AcceptFlipGoToDialog()
+                );
+            }
+        }
+        private void AcceptFlipGoToDialog()
+        {
+            try
+            {
+                SkyServer.FlipOnNextGoto = FlipOnGoto;
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                IsDialogOpen = false;
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }

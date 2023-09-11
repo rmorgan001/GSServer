@@ -338,7 +338,8 @@ namespace GS.Server.SkyTelescope
                     return axes;
                 case AlignmentModes.algGermanPolar:
                     axes[0] = (lst - axes[0]) * 15.0;
-                    if (SkyServer.SouthernHemisphere) axes[1] = -axes[1];
+                    if (SkyServer.SouthernHemisphere){axes[1] = -axes[1];}
+
                     axes[0] = Range.Range360(axes[0]);
 
                     if (axes[0] > 180.0 || axes[0] < 0)
@@ -358,7 +359,7 @@ namespace GS.Server.SkyTelescope
                     return axes;
                 case AlignmentModes.algPolar:
                     axes[0] = (lst - axes[0]) * 15.0;
-                    axes[1] = (SkyServer.SouthernHemisphere) ? -axes[1] : axes[1];
+                    axes[1] = SkyServer.SouthernHemisphere ? -axes[1] : axes[1];
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
