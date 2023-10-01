@@ -719,4 +719,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnContinuePark">Accepter pour se garer</system:String>
     <system:String x:Key="FlipOnNextGoto">Forcer le retournement au prochain coup</system:String>
 
+    <!--1.0.6.4 -->
+    <system:String x:Key="optAlignmentWarningThreshold">Seuil d'avertissement</system:String>
+    <system:String x:Key="aliWarningThresholdTooltip">Le niveau auquel l'avertissement d'alignement est déclenché (multiple de la distance de décalage de synchronisation maximale enregistrée).</system:String>
+
+
 </ResourceDictionary>

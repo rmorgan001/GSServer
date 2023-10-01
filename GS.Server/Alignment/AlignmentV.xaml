@@ -16,67 +16,69 @@
             Converter={StaticResource ResourceKey=OrdinalConverter}}" HorizontalAlignment="Right" />
         </DataTemplate>
     </UserControl.Resources>-->
-    <Grid MinWidth="600">
-        <md:DialogHost CloseOnClickAway="True"
-                      IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}"/>
+    <md:DialogHost CloseOnClickAway="True"
+                      IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}">
+        <Grid MinWidth="800">
 
-        <md:DrawerHost HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0" 
+            <md:DrawerHost HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0" 
                        IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" 
                        BorderBrush="{StaticResource MaterialDesignDivider}">
-            <md:DrawerHost.LeftDrawerContent>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition Height="Auto" MinHeight="150"/>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="5"/>
-                        <ColumnDefinition Width="150" />
-                    </Grid.ColumnDefinitions>
-                    <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" Content="{StaticResource aliAlignmentSettings}"/>
-                    <ToggleButton Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" Margin="5" ToolTip="{StaticResource aliCloseTooltip}"
+                <md:DrawerHost.LeftDrawerContent>
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition Height="Auto" MinHeight="150"/>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="5"/>
+                                <ColumnDefinition Width="150" />
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" Content="{StaticResource aliAlignmentSettings}"/>
+                            <ToggleButton Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" Margin="5" ToolTip="{StaticResource aliCloseTooltip}"
                                   Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
                                   Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
                                   CommandParameter="{x:Static Dock.Left}"
                                   IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"/>
 
-                    <ComboBox Grid.Row="1" md:HintAssist.Hint="{StaticResource optAlignmentMode}" 
+                            <ComboBox Grid.Row="1" md:HintAssist.Hint="{StaticResource optAlignmentMode}" 
                               MinWidth="10" Margin="20,0,5,20" Width="200" 
                               HorizontalAlignment="Left" VerticalAlignment="Top" 
                               ToolTip="{StaticResource aliAlignmentModeTooltip}" 
                               ItemsSource="{Binding Source={domain:EnumValueBindingSource {x:Type alignment:AlignmentBehaviourEnum}}}" 
                               SelectedItem="{Binding AlignmentBehaviour}"
                               Style="{StaticResource MaterialDesignFloatingHintComboBox}">
-                        <ComboBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel />
-                            </ItemsPanelTemplate>
-                        </ComboBox.ItemsPanel>
-                    </ComboBox>
-                    <StackPanel Grid.Row="2" Grid.Column="0"  Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="20,0,5,20">
-                        <md:PopupBox  StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{StaticResource skyReset}">
-                            <Grid Width="150">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="30" />
-                                    <RowDefinition Height="40" />
-                                </Grid.RowDefinitions>
-                                <Label Grid.Row="0" HorizontalAlignment="Center" Content="{StaticResource SkyResetDef}"/>
-                                <Button Grid.Row="1" HorizontalAlignment="Center" Content="{StaticResource diaAccept}" 
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
+                            <StackPanel Grid.Row="2" Grid.Column="0"  Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="20,0,5,20">
+                                <md:PopupBox  StaysOpen="False" IsEnabled="true" VerticalAlignment="Bottom" Width="24" HorizontalAlignment="Left" ToolTip="{StaticResource skyReset}">
+                                    <Grid Width="150">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="40" />
+                                        </Grid.RowDefinitions>
+                                        <Label Grid.Row="0" HorizontalAlignment="Center" Content="{StaticResource SkyResetDef}"/>
+                                        <Button Grid.Row="1" HorizontalAlignment="Center" Content="{StaticResource diaAccept}" 
                                         Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ResetProximityLimit}"/>
-                            </Grid>
-                        </md:PopupBox>
-                        <TextBox Grid.Row="2" Grid.Column="0"  Width="110" IsReadOnly="True"
+                                    </Grid>
+                                </md:PopupBox>
+                                <TextBox Grid.Row="2" Grid.Column="0"  Width="110" IsReadOnly="True"
                                  md:HintAssist.Hint="{StaticResource optProximityLimit}" 
                                  Text="{Binding ProximityLimitArcSeconds}"
                                  ToolTip="{StaticResource aliProximityLimitTooltip}"
                                  Style="{StaticResource MaterialDesignFloatingHintTextBox}" domain:TextBoxMaskBehaviour.Mask="Decimal" />
-                    </StackPanel>
-                    <Slider Grid.Row="2" Grid.Column="2" Value="{Binding ProximityLimitArcSeconds}" 
+                            </StackPanel>
+                            <Slider Grid.Row="2" Grid.Column="2" Value="{Binding ProximityLimitArcSeconds}" 
                             Style="{StaticResource MaterialDesignDiscreteVerticalSlider}"
                             ToolTip="{StaticResource aliProximityLimitTooltip}"
                             Width="75"
@@ -85,144 +87,160 @@
                             TickFrequency="200"
                             TickPlacement="None" />
 
-                    <ComboBox Grid.Row="3" md:HintAssist.Hint="{StaticResource optActivePoints}" 
+                            <ComboBox Grid.Row="3" md:HintAssist.Hint="{StaticResource optActivePoints}" 
                               MinWidth="10" Margin="20,0,5,20" Width="200" 
                               HorizontalAlignment="Left" VerticalAlignment="Top" 
                               ToolTip="{StaticResource aliActivePointsTooltip}" 
                               ItemsSource="{Binding Source={domain:EnumValueBindingSource {x:Type alignment:ActivePointsEnum}}}" 
                               SelectedItem="{Binding ActivePoints}"
                               Style="{StaticResource MaterialDesignFloatingHintComboBox}">
-                        <ComboBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel />
-                            </ItemsPanelTemplate>
-                        </ComboBox.ItemsPanel>
-                    </ComboBox>
-                    <ComboBox Grid.Row="4" md:HintAssist.Hint="{StaticResource optThreePointAlgorithm}" 
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
+                            <ComboBox Grid.Row="4" md:HintAssist.Hint="{StaticResource optThreePointAlgorithm}" 
                               MinWidth="10" Margin="20,0,5,20" Width="200" 
                               HorizontalAlignment="Left" VerticalAlignment="Top" 
                               ToolTip="{StaticResource aliThreePointAlgorithmTooltip}" 
                               ItemsSource="{Binding Source={domain:EnumValueBindingSource {x:Type alignment:ThreePointAlgorithmEnum}}}"
                               SelectedItem="{Binding ThreePointAlgorithm}"
                               Style="{StaticResource MaterialDesignFloatingHintComboBox}">
-                        <ComboBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel />
-                            </ItemsPanelTemplate>
-                        </ComboBox.ItemsPanel>
-                    </ComboBox>
-                    <StackPanel Grid.Row="5" Grid.ColumnSpan="3" Grid.Column="0" Orientation="Horizontal" Margin="20,0,5,20">
-                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center"  Margin="12,0,0,0"  Width="25" Height="25" ToolTip="{StaticResource aliClearModelOnStartupTooltip}"
-                                      IsChecked="{Binding ClearModelOnStartup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource aliClearModelOnStartup}"/>
-                    </StackPanel>
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
+                            <ComboBox Grid.Row="5" md:HintAssist.Hint="{StaticResource optAlignmentWarningThreshold}" 
+                              MinWidth="10" Margin="20,0,5,0" 
+                              HorizontalAlignment="Left" VerticalAlignment="Top"  
+                              ToolTip="{StaticResource aliWarningThresholdTooltip}"
+                              ItemsSource="{Binding AlignmentWarningThresholdList}"
+                              SelectedItem="{Binding AlignmentWarningThreshold, UpdateSourceTrigger=PropertyChanged}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
 
-                </Grid>
-            </md:DrawerHost.LeftDrawerContent>
-            <Grid Margin="5,5" >
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="40" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
-                    <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False" x:Name="MenuToggleButton" ToolTip="{StaticResource aliOpenTooltip}" 
+                            <StackPanel Grid.Row="6" Grid.ColumnSpan="3" Grid.Column="0" Orientation="Horizontal" Margin="20,0,5,20">
+                                <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center"  Margin="12,0,0,0"  Width="25" Height="25" ToolTip="{StaticResource aliClearModelOnStartupTooltip}"
+                                      IsChecked="{Binding ClearModelOnStartup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource aliClearModelOnStartup}"/>
+                            </StackPanel>
+
+                        </Grid>
+                    </ScrollViewer>
+                </md:DrawerHost.LeftDrawerContent>
+                <Grid Margin="5,5" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+                        <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False" x:Name="MenuToggleButton" ToolTip="{StaticResource aliOpenTooltip}" 
                                   Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" IsHitTestVisible="True" 
                                   Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
-                    <StackPanel Orientation="Horizontal" Margin="10 0" Visibility="{Binding IsAlertOn, Converter={StaticResource InverseBoolToVisConverter}}" >
-                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}"
+                        <StackPanel Orientation="Horizontal" Margin="10 0" Visibility="{Binding IsAlertOn, Converter={StaticResource InverseBoolToVisConverter}}" >
+                            <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}"
                                   HorizontalAlignment="Center" Width="25" Height="25"  IsHitTestVisible="True"
                                   IsChecked="{Binding IsAlignmentOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   ToolTip="{StaticResource aliAlignmentOnTooltip}"/>
-                        <Label  VerticalAlignment="Center" Content="{StaticResource aliAlignmentOn}"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="10 0" Visibility="{Binding IsAlertOn, Converter={StaticResource BooleanToVisibilityConverter}}" >
-                        <Button Height="30"  Foreground="Gold"
+                            <Label  VerticalAlignment="Center" Content="{StaticResource aliAlignmentOn}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="10 0" Visibility="{Binding IsAlertOn, Converter={StaticResource BooleanToVisibilityConverter}}" >
+                            <Button Height="30"  Foreground="Gold"
                             ToolTip="{StaticResource aliCancelAlertTooltip}"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding CancelAlertCommand}"
                             Content="{StaticResource aliCancelAlert}"/>
-                    </StackPanel>
-                    <Button Margin="15,0,0,0" Height="30"
+                        </StackPanel>
+                        <Button Margin="15,0,0,0" Height="30"
                             ToolTip="{StaticResource aliClearAllTooltip}"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClearAllPointsCommand}"
                             Content="{StaticResource aliClearAll}"/>
-                    <Button Margin="10,0,0,0" Height="30" 
+                        <Button Margin="10,0,0,0" Height="30" 
                             ToolTip="{StaticResource aliDeleteTooltip}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding DeleteSelectedPointCommand}"
                             Content="{StaticResource aliDelete}"/>
-                </StackPanel>
-                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Margin="0,0,0,0" Height="30" HorizontalAlignment="Right"
+                    </StackPanel>
+                    <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Margin="0,0,0,0" Height="30" HorizontalAlignment="Right"
                                 ToolTip="{StaticResource aliExportTooltip}"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ExportCommand}"
                                 Content="{StaticResource aliExport}"/>
-                    <Button Margin="10,0,10,0" Height="30" HorizontalAlignment="Right"
+                        <Button Margin="10,0,10,0" Height="30" HorizontalAlignment="Right"
                                 ToolTip="{StaticResource aliImportTooltip}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ImportCommand}"
                                 Content="{StaticResource aliImport}"/>
 
-                </StackPanel>
-                <TabControl Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Stretch" Background="Transparent">
-                    <TabItem Header="Data" >
-                        <DataGrid 
+                    </StackPanel>
+                    <TabControl Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Stretch" Background="Transparent">
+                        <TabItem Header="Data" >
+                            <DataGrid 
                           ItemsSource="{Binding AlignmentPoints}" 
                           SelectedItem="{Binding DataContext.SelectedAlignmentPoint, RelativeSource={RelativeSource AncestorType=alignment:AlignmentV}}"
                           CanUserAddRows="False"
                           CanUserDeleteRows="False"
                           AutoGenerateColumns="False"
                           >
-                            <DataGrid.Resources>
-                                <Style x:Key="RightAlignedGridHeaderStyle" TargetType="DataGridColumnHeader" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
-                                    <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                                </Style>
-                            </DataGrid.Resources>
-                            <DataGrid.RowStyle>
-                                <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource MaterialDesignDataGridRow}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Selected}" Value="true">
-                                            <Setter Property="FontWeight" Value="ExtraBold"></Setter>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Selected}" Value="false">
-                                            <Setter Property="FontWeight" Value="Normal"></Setter>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </DataGrid.RowStyle>
-                            <DataGrid.CellStyle>
-                                <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource MaterialDesignDataGridCell}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding SelectedForGoto}" Value="true">
-                                            <Setter Property="Foreground" Value="{DynamicResource SecondaryHueMidBrush}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </DataGrid.CellStyle>
+                                <DataGrid.Resources>
+                                    <Style x:Key="RightAlignedGridHeaderStyle" TargetType="DataGridColumnHeader" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                                    </Style>
+                                </DataGrid.Resources>
+                                <DataGrid.RowStyle>
+                                    <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource MaterialDesignDataGridRow}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Selected}" Value="true">
+                                                <Setter Property="FontWeight" Value="ExtraBold"></Setter>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Selected}" Value="false">
+                                                <Setter Property="FontWeight" Value="Normal"></Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGrid.RowStyle>
+                                <DataGrid.CellStyle>
+                                    <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedForGoto}" Value="true">
+                                                <Setter Property="Foreground" Value="{DynamicResource SecondaryHueMidBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGrid.CellStyle>
 
-                            <DataGrid.Columns>
-                                <!-- Ordinal formatting left in for reference -->
-                                <!--<DataGridTemplateColumn Header="#" CellTemplate="{StaticResource OrdinalColumnDataTemplate}" HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>-->
-                                <DataGridTextColumn Header="###" Binding="{Binding Id, StringFormat='{}{0:D3}'}"  HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Unsynced RA" Binding="{Binding Unsynced[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
-                                <DataGridTextColumn Header="Unsynced Dec" Binding="{Binding Unsynced[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
-                                <DataGridTextColumn Header="Synced RA" Binding="{Binding Synced[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
-                                <DataGridTextColumn Header="Synced Dec" Binding="{Binding Synced[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
-                                <DataGridTextColumn Header="Diff" Binding="{Binding OffsetDistance, StringFormat='{}{0:F0}'}" IsReadOnly="True" />
-                                <DataGridTextColumn Header="Synched" Binding="{Binding SyncedTime}" IsReadOnly="True" />
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </TabItem>
-                    <TabItem Header="Chart" >
-                        <Grid>
-                            <lvc:CartesianChart Series="{Binding ChartData}"
+                                <DataGrid.Columns>
+                                    <!-- Ordinal formatting left in for reference -->
+                                    <!--<DataGridTemplateColumn Header="#" CellTemplate="{StaticResource OrdinalColumnDataTemplate}" HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>-->
+                                    <DataGridTextColumn Header="###" Binding="{Binding Id, StringFormat='{}{0:D3}'}"  HeaderStyle="{StaticResource RightAlignedGridHeaderStyle}" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Unsynced RA" Binding="{Binding Unsynced[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
+                                    <DataGridTextColumn Header="Unsynced Dec" Binding="{Binding Unsynced[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
+                                    <DataGridTextColumn Header="Synced RA" Binding="{Binding Synced[0], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
+                                    <DataGridTextColumn Header="Synced Dec" Binding="{Binding Synced[1], StringFormat='{}{0:F4}'}" IsReadOnly="True" />
+                                    <DataGridTextColumn Header="Diff" Binding="{Binding OffsetDistance, StringFormat='{}{0:F0}'}" IsReadOnly="True" />
+                                    <DataGridTextColumn Header="Synched" Binding="{Binding SyncedTime}" IsReadOnly="True" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </TabItem>
+                        <TabItem Header="Chart" >
+                            <Grid>
+                                <lvc:CartesianChart Series="{Binding ChartData}"
                                             XAxes="{Binding ChartXAxes}"
                                             YAxes="{Binding ChartYAxes}"
                                             DrawMargin="{Binding ChartMargin}"
                                             EasingFunction="{x:Null}"
                                             TooltipPosition="Hidden"
                                             ZoomMode="None">
-                            </lvc:CartesianChart>
-                        </Grid>
-                    </TabItem>
-                </TabControl>
-            </Grid>
-        </md:DrawerHost>
-    </Grid>
+                                </lvc:CartesianChart>
+                            </Grid>
+                        </TabItem>
+                    </TabControl>
+                </Grid>
+            </md:DrawerHost>
+        </Grid>
+    </md:DialogHost>
 </UserControl>
