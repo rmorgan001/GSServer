@@ -54,7 +54,7 @@ namespace GS.Server.Alignment
         {
             get => _isAlertOn;
             set
-            {
+            {   
                 if (_isAlertOn == value) return;
                 _isAlertOn = value;
                 if (_isAlertOn) 
@@ -144,6 +144,21 @@ namespace GS.Server.Alignment
 
         }
 
+        private static int _alignmentWarningThreshold;
+        public static int AlignmentWarningThreshold
+        {
+            get => _alignmentWarningThreshold;
+            set
+            {
+                if (_alignmentWarningThreshold == value) return;
+                _alignmentWarningThreshold = value;
+                Properties.Alignment.Default.AlignmentWarningThreshold = (int)value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+
+        }
+
         private static bool _clearModelOnStartup;
         public static bool ClearModelOnStartup
         {
@@ -176,6 +191,7 @@ namespace GS.Server.Alignment
             AlignmentBehaviour = (AlignmentBehaviourEnum)Properties.Alignment.Default.AlignmentBehaviour;
             ActivePoints = (ActivePointsEnum)Properties.Alignment.Default.ActivePoints;
             ThreePointAlgorithm = (ThreePointAlgorithmEnum)Properties.Alignment.Default.ThreePointAlgorithm;
+            AlignmentWarningThreshold = Properties.Alignment.Default.AlignmentWarningThreshold;
         }
 
         /// <summary>

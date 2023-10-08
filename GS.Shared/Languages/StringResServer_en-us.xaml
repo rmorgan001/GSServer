@@ -723,5 +723,11 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnContinueHome">Accept to slew Home</system:String>
     <system:String x:Key="btnContinuePark">Accept for Park</system:String>
     <system:String x:Key="FlipOnNextGoto">Force flip on next GoTo</system:String>
+    
+    <!--1.0.6.4 -->
+    <system:String x:Key="optAlignmentWarningThreshold">Warning Threshold</system:String>
+    <system:String x:Key="aliWarningThresholdTooltip">The level at which the alignment warning is trigged (multiplier of maximum synchronisation offset distance registered).</system:String>
+
+
 </ResourceDictionary>
  

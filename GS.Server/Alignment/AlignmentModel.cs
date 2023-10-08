@@ -18,7 +18,8 @@ namespace GS.Server.Alignment
         Information,
         Data,
         Warning,
-        Error
+        Error,
+        Debug
     }
 
     [TypeConverter(typeof(EnumTypeConverter))]
@@ -174,6 +175,7 @@ namespace GS.Server.Alignment
                 _alignmentBehaviour = value;
             }
         }
+
         private ThreePointAlgorithmEnum _threePointAlgorithm = ThreePointAlgorithmEnum.BestCentre;
         public ThreePointAlgorithmEnum ThreePointAlgorithm
         {
@@ -184,6 +186,18 @@ namespace GS.Server.Alignment
                 _threePointAlgorithm = value;
             }
         }
+
+        private int _alignmentWarningThreshold = 2;
+        public int AlignmentWarningThreshold
+        {
+            get => _alignmentWarningThreshold;
+            set
+            {
+                if (_alignmentWarningThreshold == value) return;
+                _alignmentWarningThreshold = value;
+            }
+        }
+
 
         public AxisPosition Home { get; private set; }
 
@@ -222,8 +236,8 @@ namespace GS.Server.Alignment
             {
                 if (AlignmentPoints.Any())
                 {
-                    double maxRa = Math.Abs(AlignmentPoints.Max(p => Math.Abs(p.Synced.RA) - Math.Abs(p.Unsynced.RA)));
-                    double maxDec = Math.Abs(AlignmentPoints.Max(p => Math.Abs(p.Synced.Dec) - Math.Abs(p.Unsynced.Dec)));
+                    double maxRa = Math.Abs(AlignmentPoints.Max(p => Math.Abs(p.Synced.RA - p.Unsynced.RA)));
+                    double maxDec = Math.Abs(AlignmentPoints.Max(p => Math.Abs(p.Synced.Dec - p.Unsynced.Dec)));
                     return new double[] { maxRa, maxDec };
                 }
                 else
@@ -284,6 +298,7 @@ namespace GS.Server.Alignment
             AlignmentBehaviour = AlignmentSettings.AlignmentBehaviour;
             ActivePoints = AlignmentSettings.ActivePoints;
             ThreePointAlgorithm = AlignmentSettings.ThreePointAlgorithm;
+            AlignmentWarningThreshold = AlignmentSettings.AlignmentWarningThreshold;
         }
         #endregion
 

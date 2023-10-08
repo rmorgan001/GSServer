@@ -116,7 +116,7 @@ namespace GS.Server.Alignment
 
         private Matrix GETLMN(Coord p1, Coord p2, Coord p3)
         {
-
+            RaiseNotification(NotificationType.Debug, "GETLMN", $"Coordinates\np1:({p1.x},{p1.y},{p1.z})\np2:({p2.x},{p2.y},{p2.z})\np3:({p3.x},{p3.y},{p3.z})");
             Matrix temp = Matrix.CreateInstance();
             Matrix UnitVect = Matrix.CreateInstance();
 
@@ -150,6 +150,7 @@ namespace GS.Server.Alignment
             temp.Element[2, 2] = UnitVect.Element[1, 2] * UnitVect.Element[0, 2];
 
 
+            RaiseNotification(NotificationType.Debug, "GETLMN", $"Matrix\n|{temp.Element[0,0]},{temp.Element[0, 1]},{temp.Element[0, 2]}|\n|{temp.Element[1, 0]},{temp.Element[1, 1]},{temp.Element[1, 2]}|\n|{temp.Element[2, 0]},{temp.Element[2, 1]},{temp.Element[2, 2]}|");
 
 
             return temp;

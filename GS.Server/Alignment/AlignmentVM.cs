@@ -159,6 +159,21 @@ namespace GS.Server.Alignment
 
         }
 
+        public IList<int> AlignmentWarningThresholdList { get; }
+
+
+        public int AlignmentWarningThreshold
+        {
+            get => AlignmentSettings.AlignmentWarningThreshold;
+            set
+            {
+                AlignmentSettings.AlignmentWarningThreshold = value;
+                OnPropertyChanged();
+                AlignmentSettings.Save();
+            }
+
+        }
+
 
         public bool ClearModelOnStartup
         {
@@ -280,6 +295,8 @@ namespace GS.Server.Alignment
 
         public AlignmentVM()
         {
+            AlignmentWarningThresholdList = new List<int>(Enumerable.Range(1, 10));
+
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,

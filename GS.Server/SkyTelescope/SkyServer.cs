@@ -1102,7 +1102,7 @@ namespace GS.Server.SkyTelescope
             set
             {
                 _steps = value;
-                
+
                 //Implement Pec
                 PecCheck();
 
@@ -1285,7 +1285,7 @@ namespace GS.Server.SkyTelescope
                 }
                 else
                 {
-                    if (TrackingSpeak && _trackingMode != TrackingMode.Off){Synthesizer.Speak(Application.Current.Resources["vceTrackingOff"].ToString());}
+                    if (TrackingSpeak && _trackingMode != TrackingMode.Off) { Synthesizer.Speak(Application.Current.Resources["vceTrackingOff"].ToString()); }
                     _trackingMode = TrackingMode.Off;
                     IsPulseGuidingDec = false; // Ensure pulses are off
                     IsPulseGuidingRa = false;
@@ -1307,7 +1307,7 @@ namespace GS.Server.SkyTelescope
         /// <returns></returns>
         private static int SimGoTo(double[] target, bool trackingState)
         {
-            
+
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
@@ -1749,9 +1749,9 @@ namespace GS.Server.SkyTelescope
 
             change += SkyTrackingRate; // Tracking
             change += SkyHCRate; // Hand controller
-            
+
             if (Math.Abs(RateMoveAxisRa) > 0)// MoveAxis RA absolute at the given rate
-            {change.X += RateMoveAxisRa; }
+            { change.X += RateMoveAxisRa; }
             else
             { change.X += GetRaRateDirection(RateRa); }
 
@@ -2307,7 +2307,7 @@ namespace GS.Server.SkyTelescope
 
         #endregion
 
-         #region Shared Mount Items
+        #region Shared Mount Items
 
         /// <summary>
         /// Abort Slew in a normal motion
@@ -2329,8 +2329,8 @@ namespace GS.Server.SkyTelescope
             MonitorLog.LogToMonitor(monitorItem);
 
             //IsSlewing = false;
-            _rateMoveAxes = new Vector(0,0);
-            _rateRaDec = new Vector(0,0);
+            _rateMoveAxes = new Vector(0, 0);
+            _rateRaDec = new Vector(0, 0);
             SlewState = SlewType.SlewNone;
             var tracking = Tracking;
             Tracking = false; //added back in for spec "Tracking is returned to its pre-slew state"
@@ -3021,7 +3021,7 @@ namespace GS.Server.SkyTelescope
 
             return rate;
         }
-        
+
         public static ParkPosition GetStoredParkPosition()
         {
             var p = new ParkPosition { Name = SkySettings.ParkName, X = SkySettings.ParkAxisX, Y = SkySettings.ParkAxisY };
@@ -3185,7 +3185,7 @@ namespace GS.Server.SkyTelescope
         /// <returns></returns>
         private static void UpdateSteps()
         {
-            if (!IsMountRunning){ return; }
+            if (!IsMountRunning) { return; }
 
             object _;
             switch (SkySettings.Mount)
@@ -4520,7 +4520,7 @@ namespace GS.Server.SkyTelescope
                     break;
                 case MountType.SkyWatcher:
                     SkyTrackingRate.X = rateChange;
-                    var rate =  SkyGetRate();
+                    var rate = SkyGetRate();
                     _ = new SkyAxisSlew(0, AxisId.Axis1, rate.X);
                     break;
                 default:
@@ -4590,7 +4590,7 @@ namespace GS.Server.SkyTelescope
             // Check Forced flip for a goto
             var flipGoto = FlipOnNextGoto;
             FlipOnNextGoto = false;
-            
+
             // See if the target is within flip angle limits
             if (!IsWithinFlipLimits(position)) { return null; }
             var alt = Axes.GetAltAxisPosition(position);
@@ -4611,7 +4611,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
-            
+
             if (cl != "b") { return null; }
 
             switch (SkySettings.Mount)
@@ -4748,8 +4748,8 @@ namespace GS.Server.SkyTelescope
             };
             MonitorLog.LogToMonitor(monitorItem);
 
-            _rateMoveAxes = new Vector(0,0);
-            _rateRaDec = new Vector(0,0);
+            _rateMoveAxes = new Vector(0, 0);
+            _rateRaDec = new Vector(0, 0);
             SlewState = SlewType.SlewNone;
 
             if (!AxesStopValidate())
@@ -5045,7 +5045,7 @@ namespace GS.Server.SkyTelescope
         /// <returns></returns>
         private static double[] GetSyncedAxes(double[] unsynced)
         {
-            if (AlignmentModel.IsAlignmentOn && SkyServer.SlewState== SlewType.SlewRaDec && !SkyServer.IsHome && !SkyServer.AtPark)
+            if (AlignmentModel.IsAlignmentOn && SkyServer.SlewState == SlewType.SlewRaDec && !SkyServer.IsHome && !SkyServer.AtPark)
             {
                 double[] synced = AlignmentModel.GetSyncedValue(unsynced);
                 var monitorItem = new MonitorEntry
@@ -5061,10 +5061,10 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 // For safety, check the difference is within the max unsynced/synched difference found in the alignment model.
-                var a = Math.Abs(unsynced[0]) - Math.Abs(synced[0]);
-                var b = Math.Abs(unsynced[1]) - Math.Abs(synced[1]);
+                var a = Math.Abs(unsynced[0] - synced[0]);
+                var b = Math.Abs(unsynced[1] - synced[1]);
                 double[] maxDelta = AlignmentModel.MaxDelta;
-                if (Math.Abs(a) > maxDelta[0] || Math.Abs(b) > maxDelta[1])
+                if (Math.Abs(a) > maxDelta[0] * AlignmentModel.AlignmentWarningThreshold || Math.Abs(b) > maxDelta[1] * AlignmentModel.AlignmentWarningThreshold)
                 {
                     // Log a warning message, switch off the alignment model and return the original calculated position.
                     monitorItem = new MonitorEntry
@@ -5075,7 +5075,7 @@ namespace GS.Server.SkyTelescope
                         Type = MonitorType.Warning,
                         Method = MethodBase.GetCurrentMethod()?.Name,
                         Thread = Thread.CurrentThread.ManagedThreadId,
-                        Message = $"{unsynced[0]}|{unsynced[1]}|{synced[0]}|{synced[1]}|{maxDelta[0]}|{maxDelta[1]}"
+                        Message = $"Large delta: {unsynced[0]}|{unsynced[1]}|{synced[0]}|{synced[1]}|{maxDelta[0]}|{maxDelta[1]}"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
                     AlignmentSettings.IsAlertOn = true;
@@ -5104,17 +5104,17 @@ namespace GS.Server.SkyTelescope
             if (AlignmentModel.IsAlignmentOn && SkyServer.SlewState != SlewType.SlewPark && SkyServer.SlewState != SlewType.SlewHome
                 && !SkyServer.IsHome && !SkyServer.AtPark)
             {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
-                    Category = MonitorCategory.Alignment,
-                    Type = MonitorType.Data,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Mapped synced axis angles: {synced[0]}/{synced[1]} to {unsynced[0]}/{unsynced[1]}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
+                //var monitorItem = new MonitorEntry
+                //{
+                //    Datetime = HiResDateTime.UtcNow,
+                //    Device = MonitorDevice.Server,
+                //    Category = MonitorCategory.Alignment,
+                //    Type = MonitorType.Data,
+                //    Method = MethodBase.GetCurrentMethod()?.Name,
+                //    Thread = Thread.CurrentThread.ManagedThreadId,
+                //    Message = $"Mapped synced axis angles: {synced[0]}/{synced[1]} to {unsynced[0]}/{unsynced[1]}"
+                //};
+                //MonitorLog.LogToMonitor(monitorItem);
                 return unsynced;
             }
 
@@ -5156,6 +5156,9 @@ namespace GS.Server.SkyTelescope
                     break;
                 case "ThreePointAlgorithm":
                     AlignmentModel.ThreePointAlgorithm = AlignmentSettings.ThreePointAlgorithm;
+                    break;
+                case "AlignmentWarningThreshold":
+                    AlignmentModel.AlignmentWarningThreshold = AlignmentSettings.AlignmentWarningThreshold;
                     break;
             }
         }
@@ -5216,8 +5219,8 @@ namespace GS.Server.SkyTelescope
             PecWormMaster = null;
 
             // reset any rates so slewing doesn't start
-            _rateRaDec = new Vector(0,0);
-            _rateMoveAxes = new Vector(0,0);
+            _rateRaDec = new Vector(0, 0);
+            _rateMoveAxes = new Vector(0, 0);
             SlewState = SlewType.SlewNone;
 
             // invalid any target positions
@@ -5530,7 +5533,7 @@ namespace GS.Server.SkyTelescope
         }
 
         private static Tuple<int, double, int> _pecBinNow;
-        
+
         /// <summary>
         /// Pec Currently used bin for Pec
         /// </summary>
