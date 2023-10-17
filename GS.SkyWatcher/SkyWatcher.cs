@@ -1088,6 +1088,11 @@ namespace GS.SkyWatcher
             return _commands.GetHighSpeedRatio();
         }
 
+        internal double Get_j(AxisId axis, bool raw = false)
+        {
+            return _commands.Get_j(axis, raw);
+        }
+
         internal long[] GetLowSpeedGotoMargin()
         {
             return _commands.GetLowSpeedGotoMargin();

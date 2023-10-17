@@ -338,6 +338,16 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
+        public double Get_j(int axis, bool raw)
+        {
+            ValidateMount();
+            var validAxis = ValidateAxis(axis);
+            var command = new SkyGet_j(SkyQueue.NewId, validAxis, raw);
+            var results = GetResult(command);
+            return results.Result;
+        }
+
+        /// <inheritdoc />
         public double GetFactorRadRateToInt(int axis)
         {
             ValidateMount();
@@ -1215,7 +1225,6 @@ namespace GS.SkyApi
         /// <param name="axis">axis number 1 or 2</param>
         /// <returns>Get Current Axis position as double</returns>
         double GetAxisPosition(int axis);
-
         /// <summary>
         /// j Gets axis position counter
         /// </summary>
@@ -1229,6 +1238,13 @@ namespace GS.SkyApi
         /// <param name="axis">axis number 1 or 2</param>
         /// <returns>count as double</returns>
         double GetEncoderCount(int axis);
+        /// <summary>
+        /// Get :j data only not dependent on the advanced set
+        /// </summary>
+        /// <param name="axis">axis number 1 or 2</param>
+        /// <param name="raw">false to subtract 0x00800000</param>
+        /// <returns>Cardinal encoder count as long</returns>
+        double Get_j(int axis, bool raw);
         /// <summary>
         /// Multiply the value of radians/second by this factor to get a 32-bit integer for the set speed used by the motor board.
         /// </summary>

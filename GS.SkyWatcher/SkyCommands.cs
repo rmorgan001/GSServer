@@ -917,6 +917,41 @@ namespace GS.SkyWatcher
         }
     }
 
+    public class SkyGet_j: ISkyCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; private set; }
+        private readonly AxisId _axis;
+        private readonly bool _raw;
+
+        public SkyGet_j(long id, AxisId axis, bool raw)
+        {
+            Id = id;
+            _axis = axis;
+            _raw = raw;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            Successful = false;
+            SkyQueue.AddCommand(this);
+        }
+
+        public void Execute(SkyWatcher skyWatcher)
+        {
+            try
+            {
+                Result = skyWatcher.Get_j(_axis, _raw);
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
     public class SkyGetLastGoToTarget : ISkyCommand
     {
         public long Id { get; }

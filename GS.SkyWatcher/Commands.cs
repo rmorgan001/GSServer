@@ -638,6 +638,21 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
+        /// Gets :j data or returns double.NaN for the given axis
+        /// </summary>
+        /// <param name="axis"></param>
+        /// <param name="raw"></param>
+        /// <returns></returns>
+        internal double Get_j(AxisId axis, bool raw = false)
+        {
+            var response = CmdToMount(axis, 'j', null, true);
+            if (string.IsNullOrEmpty(response)) return double.NaN;
+            var iPosition = StringToLong(response);
+            if (!raw) { iPosition -= 0x00800000; }
+            return iPosition;
+        }
+
+        /// <summary>
         /// j or X0003 Gets radians position of an axis
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
