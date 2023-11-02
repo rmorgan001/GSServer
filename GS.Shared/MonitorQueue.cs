@@ -313,6 +313,7 @@ namespace GS.Shared
                         //  WriteOutCmdj(entry);
                     }
                     break;
+                case "AxesSteps":
                 case "AxesDegrees":  // from simulator
                     if (entry.Message.Contains("steps1"))
                     {
