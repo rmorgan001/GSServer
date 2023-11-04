@@ -1395,6 +1395,36 @@ namespace GS.SkyWatcher
         #region SerialIO
 
         /// <summary>
+        /// Bypass for mount commands
+        /// </summary>
+        /// <param name="axis">1 or 2</param>
+        /// <param name="cmd">The command char set</param>
+        /// <param name="cmdData">The data need to send</param>
+        /// <param name="ignoreWarnings">to ignore serial response issues</param>
+        /// <returns>mount data, null for IsNullOrEmpty</returns>
+        /// <example>CmdToMount(1,"X","0003","true")</example>
+        internal string CmdToMount(int axis, string cmd, string cmdData, string ignoreWarnings)
+        {
+            AxisId a;
+            switch (axis)
+            {
+                case 1:
+                    a = AxisId.Axis1;
+                    break;
+                case 2:
+                    a = AxisId.Axis2;
+                    break;
+                default:
+                    throw new Exception("Invalid axis parameter");
+            }
+            var b = bool.Parse(ignoreWarnings.Trim());
+            var c = char.Parse(cmd.Trim());
+
+            var response = CmdToMount(a, c, cmdData.Trim(), b);
+            return response;
+        }
+
+        /// <summary>
         /// One communication between mount and client
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>

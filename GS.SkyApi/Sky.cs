@@ -251,6 +251,16 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
+        public string CmdToMount(int axis, string cmd, string cmdData, string ignoreWarnings)
+        {
+            ValidateMount();
+            ValidateAxis(axis);
+            var command = new SkyCmdToMount(SkyQueue.NewId, axis, cmd, cmdData, ignoreWarnings);
+            var results = GetResult(command);
+            return results.Result;
+        }
+
+        /// <inheritdoc />
         public int DecBacklash
         {
             get => SkySettings.DecBacklash;
@@ -1196,6 +1206,16 @@ namespace GS.SkyApi
         /// q Does mount support WiFi
         /// </summary>
         bool CanWifi { get; }
+        /// <summary>
+        /// Bypass for mount commands
+        /// </summary>
+        /// <param name="axis">1 or 2</param>
+        /// <param name="cmd">The command char set</param>
+        /// <param name="cmdData">The data need to send</param>
+        /// <param name="ignoreWarnings">ignore serial response issues?</param>
+        /// <returns>mount data, null for IsNullOrEmpty</returns>
+        /// <example>CmdToMount(1,"X","0003","true")</example>
+        string CmdToMount(int axis, string cmd, string cmdData, string ignoreWarnings);
         /// <summary>
         /// Sets the amount of steps added to Dec for reverse backlash pulse
         /// </summary>

@@ -558,6 +558,45 @@ namespace GS.SkyWatcher
         }
     }
 
+    public class SkyCmdToMount : ISkyCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; private set; }
+        private readonly int _axis;
+        private readonly string _cmd;
+        private readonly string _cmdData;
+        private readonly string _ignoreWarnings;
+
+        public SkyCmdToMount(long id, int axis, string cmd, string cmdData, string ignoreWarnings)
+        {
+            Id = id;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            Successful = false;
+            _axis = axis;
+            _cmd = cmd;
+            _cmdData = cmdData;
+            _ignoreWarnings = ignoreWarnings;
+            SkyQueue.AddCommand(this);
+        }
+
+        public void Execute(SkyWatcher skyWatcher)
+        {
+            try
+            {
+                Result = skyWatcher.CmdToMount(_axis, _cmd, _cmdData, _ignoreWarnings);
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
     public class SkyGetAdvancedCmdSupport : ISkyCommand
     {
         public long Id { get; }
