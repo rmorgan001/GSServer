@@ -6,7 +6,7 @@
         xmlns:controls="clr-namespace:GS.Server.Controls"
         xmlns:windows="clr-namespace:GS.Server.Windows"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes" mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanResizeWithGrip" WindowStyle="None" 
-        TextOptions.TextFormattingMode="Display" Height="220" Width="330" FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" 
+        TextOptions.TextFormattingMode="Display" Height="220" Width="340" FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" 
         Title="{StaticResource hcHc}" FontStretch="Normal" Topmost="{Binding TopMost}"
         d:DataContext="{d:DesignInstance windows:HandControlVM, IsDesignTimeCreatable=True}" 
         TextElement.Foreground="{DynamicResource MaterialDesignBody}" 

@@ -3597,7 +3597,7 @@ namespace GS.Server.SkyTelescope
             try
             {
                 var currentspeed = HcSpeed;
-                if (currentspeed > 0)
+                if (currentspeed > 1)
                 {
                     HcSpeed--;
                 }
