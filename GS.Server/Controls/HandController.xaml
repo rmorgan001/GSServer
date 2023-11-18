@@ -186,7 +186,7 @@
                         <Button Margin="3,0,0,0" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding HcSpeedupCommand}" Width="18" Height="18">
                             <md:PackIcon Kind="Plus" />
                         </Button>
-                        <Border Margin="5,0,0,0"  Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}">
+                        <Border Margin="5,0,0,0" BorderThickness="1" BorderBrush="{StaticResource  SecondaryHueMidBrush}">
                             <TextBlock Margin="3,0,3,0"  Text="{Binding HcSpeed}" />
                         </Border>
                         <Button Margin="5,0,0,0" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding HcSpeedDownCommand}" Width="18" Height="18">
