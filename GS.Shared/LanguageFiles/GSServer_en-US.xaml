@@ -721,6 +721,5 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="optAlignmentWarningThreshold">Warning Threshold</system:String>
     <system:String x:Key="aliWarningThresholdTooltip">The level at which the alignment warning is triggered (multiplier of maximum synchronisation offset distance registered).</system:String>
 
-
 </ResourceDictionary>
  
