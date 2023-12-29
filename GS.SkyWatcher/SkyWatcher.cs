@@ -609,9 +609,23 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// Supports the new advanced command set
+        /// Bypass for mount commands
         /// </summary>
-        /// <returns></returns>
+        /// <param name="axis">1 or 2</param>
+        /// <param name="cmd">The command char set</param>
+        /// <param name="cmdData">The data need to send</param>
+        /// <param name="ignoreWarnings">ignore serial response issues?</param>
+        /// <returns>mount data, null for IsNullOrEmpty</returns>
+        /// <example>CmdToMount(1,"X","0003","true")</example>
+        internal string CmdToMount(int axis, string cmd, string cmdData, string ignoreWarnings)
+        {
+           return  _commands.CmdToMount(axis, cmd, cmdData, ignoreWarnings);
+        }
+        
+        /// <summary>
+            /// Supports the new advanced command set
+            /// </summary>
+            /// <returns></returns>
         internal bool GetAdvancedCmdSupport()
         {
             return _commands.SupportAdvancedCommandSet;
@@ -1086,6 +1100,11 @@ namespace GS.SkyWatcher
         internal long[] GetHighSpeedRatio()
         {
             return _commands.GetHighSpeedRatio();
+        }
+
+        internal double Get_j(AxisId axis, bool raw = false)
+        {
+            return _commands.Get_j(axis, raw);
         }
 
         internal long[] GetLowSpeedGotoMargin()

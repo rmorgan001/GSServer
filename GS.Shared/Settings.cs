@@ -284,7 +284,7 @@ namespace GS.Shared
         /// <summary>
         /// starts sending entries to a file in my documents
         /// </summary>
-        private static bool _logSession;
+        private static bool _logSession = true;
         public static bool LogSession
         {
             get => _logSession;

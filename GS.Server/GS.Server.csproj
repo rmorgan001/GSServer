@@ -46,8 +46,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>greenswamp1.ico</ApplicationIcon>
-    <Copyright>Copyright © GreenSwamp Software 2019-2021</Copyright>
-    <NoWin32Manifest>true</NoWin32Manifest>
+    <Copyright>Copyright © Green Swamp Software 2019-2024</Copyright>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>

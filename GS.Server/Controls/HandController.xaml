@@ -116,7 +116,6 @@
                     </Canvas>
                 </Button>
             </md:DialogHost>-->
-
             <!--Mouse Lock-->
             <Button Grid.Row="2" Grid.Column="0" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource 1018LockMouse}" Width="40" Padding="0">
                 <md:PackIcon Kind="MouseVariant" Foreground="{StaticResource SecondaryHueMidBrush}" Height="25" Width="25" >
@@ -142,6 +141,7 @@
                     </b:EventTrigger>
                 </b:Interaction.Triggers>
             </Button>
+            <!--options-->
             <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="3" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Top" >
                 <!--Mode-->
                 <ComboBox Margin="0,5,0,0"  md:HintAssist.Hint="{StaticResource hcMode}" ToolTip="{StaticResource hcTipMode}" 
@@ -177,10 +177,22 @@
                     <Label VerticalAlignment="Bottom" Content="{StaticResource hcDec}" FontSize="12" />
                 </StackPanel>
             </StackPanel>
-            <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="4" Grid.RowSpan="3" VerticalAlignment="Top">
-                <StackPanel Orientation="Vertical"  Margin="0,5,0,0">
-                    <Slider MinHeight="150"  HorizontalAlignment="Center" IsSnapToTickEnabled="True" TickFrequency="1" TickPlacement="Both" Orientation="Vertical" Minimum="1" Maximum="8" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" Value="{Binding HcSpeed, Mode=TwoWay, Delay=800}" ToolTip="{StaticResource hcTipSpeed}" />
-                    <Label Content="{StaticResource hcSpeed}" HorizontalAlignment="Center" FontSize="12"/>
+            <!--Speed-->
+            <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="4" Grid.RowSpan="3" >
+                <StackPanel Orientation="Vertical">
+                    <Label Content="{StaticResource hcSpeed}" HorizontalAlignment="Center" FontSize="12" />
+                    <Slider MinHeight="127"  HorizontalAlignment="Center" IsSnapToTickEnabled="True" TickFrequency="1" TickPlacement="Both"  Orientation="Vertical" Minimum="1" Maximum="8" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" Value="{Binding HcSpeed, Mode=TwoWay, Delay=800}" ToolTip="{StaticResource hcTipSpeed}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                        <Button Margin="3,0,0,0" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding HcSpeedupCommand}" Width="18" Height="18">
+                            <md:PackIcon Kind="Plus" />
+                        </Button>
+                        <Border Margin="5,0,0,0" BorderThickness="1" BorderBrush="{StaticResource  SecondaryHueMidBrush}">
+                            <TextBlock Margin="3,0,3,0"  Text="{Binding HcSpeed}" />
+                        </Border>
+                        <Button Margin="5,0,0,0" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding HcSpeedDownCommand}" Width="18" Height="18">
+                        <md:PackIcon Kind="minus" />
+                        </Button>
+                    </StackPanel>
                 </StackPanel>
             </StackPanel>
         </Grid>

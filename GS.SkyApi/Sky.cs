@@ -251,6 +251,16 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
+        public string CmdToMount(int axis, string cmd, string cmdData, string ignoreWarnings)
+        {
+            ValidateMount();
+            ValidateAxis(axis);
+            var command = new SkyCmdToMount(SkyQueue.NewId, axis, cmd, cmdData, ignoreWarnings);
+            var results = GetResult(command);
+            return results.Result;
+        }
+
+        /// <inheritdoc />
         public int DecBacklash
         {
             get => SkySettings.DecBacklash;
@@ -333,6 +343,16 @@ namespace GS.SkyApi
             ValidateMount();
             var validAxis = ValidateAxis(axis);
             var command = new SkyGetEncoderCount(SkyQueue.NewId, validAxis);
+            var results = GetResult(command);
+            return results.Result;
+        }
+
+        /// <inheritdoc />
+        public double Get_j(int axis, bool raw)
+        {
+            ValidateMount();
+            var validAxis = ValidateAxis(axis);
+            var command = new SkyGet_j(SkyQueue.NewId, validAxis, raw);
             var results = GetResult(command);
             return results.Result;
         }
@@ -1187,6 +1207,16 @@ namespace GS.SkyApi
         /// </summary>
         bool CanWifi { get; }
         /// <summary>
+        /// Bypass for mount commands
+        /// </summary>
+        /// <param name="axis">1 or 2</param>
+        /// <param name="cmd">The command char set</param>
+        /// <param name="cmdData">The data need to send</param>
+        /// <param name="ignoreWarnings">ignore serial response issues?</param>
+        /// <returns>mount data, null for IsNullOrEmpty</returns>
+        /// <example>CmdToMount(1,"X","0003","true")</example>
+        string CmdToMount(int axis, string cmd, string cmdData, string ignoreWarnings);
+        /// <summary>
         /// Sets the amount of steps added to Dec for reverse backlash pulse
         /// </summary>
         int DecBacklash { get; set; }
@@ -1215,7 +1245,6 @@ namespace GS.SkyApi
         /// <param name="axis">axis number 1 or 2</param>
         /// <returns>Get Current Axis position as double</returns>
         double GetAxisPosition(int axis);
-
         /// <summary>
         /// j Gets axis position counter
         /// </summary>
@@ -1229,6 +1258,13 @@ namespace GS.SkyApi
         /// <param name="axis">axis number 1 or 2</param>
         /// <returns>count as double</returns>
         double GetEncoderCount(int axis);
+        /// <summary>
+        /// Get :j data only not dependent on the advanced set
+        /// </summary>
+        /// <param name="axis">axis number 1 or 2</param>
+        /// <param name="raw">false to subtract 0x00800000</param>
+        /// <returns>Cardinal encoder count as long</returns>
+        double Get_j(int axis, bool raw);
         /// <summary>
         /// Multiply the value of radians/second by this factor to get a 32-bit integer for the set speed used by the motor board.
         /// </summary>

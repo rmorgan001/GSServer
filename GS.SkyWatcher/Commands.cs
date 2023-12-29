@@ -638,6 +638,21 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
+        /// Gets :j data or returns double.NaN for the given axis
+        /// </summary>
+        /// <param name="axis"></param>
+        /// <param name="raw"></param>
+        /// <returns></returns>
+        internal double Get_j(AxisId axis, bool raw = false)
+        {
+            var response = CmdToMount(axis, 'j', null, true);
+            if (string.IsNullOrEmpty(response)) return double.NaN;
+            var iPosition = StringToLong(response);
+            if (!raw) { iPosition -= 0x00800000; }
+            return iPosition;
+        }
+
+        /// <summary>
         /// j or X0003 Gets radians position of an axis
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
@@ -1378,6 +1393,36 @@ namespace GS.SkyWatcher
         #endregion
 
         #region SerialIO
+
+        /// <summary>
+        /// Bypass for mount commands
+        /// </summary>
+        /// <param name="axis">1 or 2</param>
+        /// <param name="cmd">The command char set</param>
+        /// <param name="cmdData">The data need to send</param>
+        /// <param name="ignoreWarnings">to ignore serial response issues</param>
+        /// <returns>mount data, null for IsNullOrEmpty</returns>
+        /// <example>CmdToMount(1,"X","0003","true")</example>
+        internal string CmdToMount(int axis, string cmd, string cmdData, string ignoreWarnings)
+        {
+            AxisId a;
+            switch (axis)
+            {
+                case 1:
+                    a = AxisId.Axis1;
+                    break;
+                case 2:
+                    a = AxisId.Axis2;
+                    break;
+                default:
+                    throw new Exception("Invalid axis parameter");
+            }
+            var b = bool.Parse(ignoreWarnings.Trim());
+            var c = char.Parse(cmd.Trim());
+
+            var response = CmdToMount(a, c, cmdData.Trim(), b);
+            return response;
+        }
 
         /// <summary>
         /// One communication between mount and client
