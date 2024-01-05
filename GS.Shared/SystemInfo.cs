@@ -14,7 +14,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Principal;
+using System.Management;
 
 namespace GS.Shared
 {
@@ -28,6 +32,39 @@ namespace GS.Shared
                 var principal = new WindowsPrincipal(identity);
                 return principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
+        }
+
+        // alternative listing of ports
+        public IList<string> GetManagedComPorts()
+        {
+            using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE Caption like '%(COM%'"))
+            {
+                var portNames = System.IO.Ports.SerialPort.GetPortNames();
+                var ports = searcher.Get().Cast<ManagementBaseObject>().ToList().Select(p => p["Caption"].ToString());
+
+                var portList = portNames.Select(n => n + " - " + ports.FirstOrDefault(s => s.Contains(n))).ToList();
+
+                foreach (var s in portList)
+                {
+                    Console.WriteLine(s);
+                }
+
+                return portList;
+            }
+        }
+        public IList<int> GetComPorts()
+        {
+                var ports = new List<int>();
+                foreach (var item in System.IO.Ports.SerialPort.GetPortNames())
+                {
+                    if (string.IsNullOrEmpty(item)) continue;
+                    var tmp = Strings.GetNumberFromString(item);
+                    if (tmp.HasValue)
+                    {
+                        ports.Add((int)tmp);
+                    }
+                }
+                return ports;
         }
     }
 }

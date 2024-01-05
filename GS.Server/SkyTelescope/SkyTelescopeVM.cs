@@ -34,7 +34,6 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -7621,6 +7620,15 @@ namespace GS.Server.SkyTelescope
 
         #region GPS Dialog
 
+        public IList<int> ComPorts
+        {
+            get
+            {
+                var si = new SystemInfo();
+                return si.GetComPorts(); ;
+            }
+        }
+
         public List<int> GpsTimeoutRange { get; set; }
 
         private bool _allowTimeChange;
@@ -7629,7 +7637,7 @@ namespace GS.Server.SkyTelescope
             get => _allowTimeChange;
             set
             {
-                if (_allowTimeChange == value) return;
+                if (_allowTimeChange == value){return;}
                 _allowTimeChange = value;
                 OnPropertyChanged();
             }
@@ -7641,7 +7649,7 @@ namespace GS.Server.SkyTelescope
             get => _allowTimeVis;
             set
             {
-                if (_allowTimeVis == value) return;
+                if (_allowTimeVis == value) {return;}
                 _allowTimeVis = value;
                 OnPropertyChanged();
             }
@@ -7653,7 +7661,7 @@ namespace GS.Server.SkyTelescope
             get => _gpsGga;
             set
             {
-                if (_gpsGga == value) return;
+                if (_gpsGga == value) {return;}
                 _gpsGga = value;
                 OnPropertyChanged();
             }
@@ -7665,7 +7673,7 @@ namespace GS.Server.SkyTelescope
             get => _gpsRmc;
             set
             {
-                if (_gpsRmc == value) return;
+                if (_gpsRmc == value) {return;}
                 _gpsRmc = value;
                 OnPropertyChanged();
             }
@@ -7677,7 +7685,7 @@ namespace GS.Server.SkyTelescope
             get => _gpsPcTime;
             set
             {
-                if (_gpsPcTime == value) return;
+                if (_gpsPcTime == value) {return;}
                 _gpsPcTime = value;
                 OnPropertyChanged();
             }
@@ -7689,7 +7697,7 @@ namespace GS.Server.SkyTelescope
             get => _gpsTime;
             set
             {
-                if (_gpsTime == value) return;
+                if (_gpsTime == value) {return;}
                 _gpsTime = value;
                 OnPropertyChanged();
             }
@@ -7701,7 +7709,7 @@ namespace GS.Server.SkyTelescope
             get => _gpsSpan;
             set
             {
-                if (_gpsSpan == value) return;
+                if (_gpsSpan == value) {return;}
                 _gpsSpan = value;
                 OnPropertyChanged();
             }
@@ -7713,7 +7721,7 @@ namespace GS.Server.SkyTelescope
             get => _nmeaTag;
             set
             {
-                if (_nmeaTag == value) return;
+                if (_nmeaTag == value) {return;}
                 _nmeaTag = value;
                 OnPropertyChanged();
             }
@@ -7725,7 +7733,7 @@ namespace GS.Server.SkyTelescope
             get => _hasGpsData;
             set
             {
-                if (_hasGpsData == value) return;
+                if (_hasGpsData == value) {return;}
                 _hasGpsData = value;
                 OnPropertyChanged();
             }
@@ -7737,7 +7745,7 @@ namespace GS.Server.SkyTelescope
             get => _gpsLatString;
             set
             {
-                if (value == _gpsLatString) return;
+                if (value == _gpsLatString) {return;}
                 _gpsLatString = value;
                 OnPropertyChanged();
             }
@@ -7749,7 +7757,7 @@ namespace GS.Server.SkyTelescope
             get => _gpsLongString;
             set
             {
-                if (value == _gpsLongString) return;
+                if (value == _gpsLongString) {return;}
                 _gpsLongString = value;
                 OnPropertyChanged();
             }
@@ -7760,7 +7768,7 @@ namespace GS.Server.SkyTelescope
             get => _gpsElevation;
             set
             {
-                if (Math.Abs(value - _gpsElevation) < 0.00001) return;
+                if (Math.Abs(value - _gpsElevation) < 0.00001) {return;}
                 _gpsElevation = value;
                 OnPropertyChanged();
             }

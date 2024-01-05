@@ -57,7 +57,7 @@ namespace GS.Principles
                     startTime.Value = DateTime.UtcNow;
                     return startTime.Value;
                 }
-                catch (ObjectDisposedException e)
+                catch (ObjectDisposedException)
                 {
                     return DateTime.UtcNow;
                 }

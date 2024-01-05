@@ -64,7 +64,7 @@ namespace GS.Server.Gps
         {
             GpsRunning = false;
         }
-        
+
         /// <summary>
         /// Data read from the GPS 
         /// </summary>
@@ -146,7 +146,7 @@ namespace GS.Server.Gps
             if (!Gga && !Rmc) return;
             if (!IsConnected) return;
             var _stopwatch = Stopwatch.StartNew();
-            while (_stopwatch.Elapsed.Milliseconds < _readTimeout * 1000)
+            while (_stopwatch.Elapsed.TotalMilliseconds < _readTimeout * 1000)
             {
                 ClearProperties();
                 HasData = false;
