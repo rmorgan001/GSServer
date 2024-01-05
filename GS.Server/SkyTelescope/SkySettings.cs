@@ -910,7 +910,7 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static double _elevation;
+        private static double _elevation = double.NaN;
         public static double Elevation
         {
             get => _elevation;
@@ -1092,7 +1092,7 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static double _homeAxisX;
+        private static double _homeAxisX = double.NaN;
         public static double HomeAxisX
         {
             get => _homeAxisX;
@@ -1106,7 +1106,7 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static double _homeAxisY;
+        private static double _homeAxisY = double.NaN;
         public static double HomeAxisY
         {
             get => _homeAxisY;
@@ -1120,7 +1120,7 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static double _hourAngleLimit;
+        private static double _hourAngleLimit = double.NaN;
         public static double HourAngleLimit
         {
             get => _hourAngleLimit;
@@ -1306,7 +1306,7 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static double _parkAxisX;
+        private static double _parkAxisX = double.NaN;
         public static double ParkAxisX
         {
             get => _parkAxisX;
@@ -1320,7 +1320,7 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static double _parkAxisY;
+        private static double _parkAxisY = double.NaN;
         public static double ParkAxisY
         {
             get => _parkAxisY;
@@ -1753,6 +1753,61 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static int _AltAzTrackingUpdateInterval;
+        public static int AltAzTrackingUpdateInterval
+        {
+            get => _AltAzTrackingUpdateInterval;
+            set
+            {
+                if (_AltAzTrackingUpdateInterval == value) return;
+                _AltAzTrackingUpdateInterval = value;
+                Properties.SkyTelescope.Default.AltAzTrackingUpdateInterval = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static bool _AltAxisLimitOn;
+        public static bool AltAxisLimitOn
+        {
+            get => _AltAxisLimitOn;
+            set
+            {
+                if (_AltAxisLimitOn == value) return;
+                _AltAxisLimitOn = value;
+                Properties.SkyTelescope.Default.AltAxisLimitOn = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static double _AltAxisUpperLimit;
+        public static double AltAxisUpperLimit
+        {
+            get => _AltAxisUpperLimit;
+            set
+            {
+                if (_AltAxisUpperLimit == value) return;
+                _AltAxisUpperLimit = value;
+                Properties.SkyTelescope.Default.AltAxisUpperLimit = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static double _AltAxisLowerLimit;
+        public static double AltAxisLowerLimit
+        {
+            get => _AltAxisLowerLimit;
+            set
+            {
+                if (_AltAxisLowerLimit == value) return;
+                _AltAxisLowerLimit = value;
+                Properties.SkyTelescope.Default.AltAxisLowerLimit = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
 
         #endregion
 
@@ -1872,8 +1927,8 @@ namespace GS.Server.SkyTelescope
             MaxSlewRate = Properties.SkyTelescope.Default.MaximumSlewRate;
             MinPulseDec = Properties.SkyTelescope.Default.MinPulseDec;
             MinPulseRa = Properties.SkyTelescope.Default.MinPulseRa;
-            ParkAxisX = Properties.SkyTelescope.Default.ParkAxisX;
-            ParkAxisY = Properties.SkyTelescope.Default.ParkAxisY;
+            ParkAxisX = (AlignmentMode == AlignmentModes.algAltAz) ? 0 : Properties.SkyTelescope.Default.ParkAxisX;
+            ParkAxisY = (AlignmentMode == AlignmentModes.algAltAz) ? 0 : Properties.SkyTelescope.Default.ParkAxisY;
             ParkName = Properties.SkyTelescope.Default.ParkName;
             ParkLimitName = Properties.SkyTelescope.Default.ParkLimitName;
             PecOn = Properties.SkyTelescope.Default.PecOn;
@@ -1899,6 +1954,24 @@ namespace GS.Server.SkyTelescope
             SyncLimit = Properties.SkyTelescope.Default.SyncLimit;
             SyncLimitOn = Properties.SkyTelescope.Default.SyncLimitOn;
             Temperature = Properties.SkyTelescope.Default.Temperature;
+            AltAxisLimitOn = Properties.SkyTelescope.Default.AltAxisLimitOn;
+            AltAxisLowerLimit = Properties.SkyTelescope.Default.AltAxisLowerLimit;
+            AltAxisUpperLimit = Properties.SkyTelescope.Default.AltAxisUpperLimit;
+            AltAzTrackingUpdateInterval = Properties.SkyTelescope.Default.AltAzTrackingUpdateInterval;
+
+            //set CanSetPierSide to false if AltAz or polar alignment
+            switch (AlignmentMode)
+            {
+                case AlignmentModes.algAltAz:
+                    CanSetPierSide = false;
+                    break;
+                case AlignmentModes.algPolar:
+                case AlignmentModes.algGermanPolar:
+                    CanSetPierSide = true;
+                    break;
+                default:
+                    break;
+            }
             //UTCDateOffset = Properties.SkyTelescope.Default.UTCOffset;
 
             //first time load from old park positions
@@ -1906,7 +1979,7 @@ namespace GS.Server.SkyTelescope
             if (string.IsNullOrEmpty(pp))
             {
                 var pp1 = new ParkPosition { Name = "Default", X = ParkAxisX, Y = ParkAxisY };
-                var pp2 = new ParkPosition { Name = "Home", X = 90, Y = 90 };
+                var pp2 = new ParkPosition { Name = "Home", X = (SkySettings.AlignmentMode == AlignmentModes.algAltAz) ? 0 : 90, Y = (SkySettings.AlignmentMode == AlignmentModes.algAltAz) ? 0 : 90 };
                 var pps = new List<ParkPosition> { pp1, pp2 };
                 pp = JsonConvert.SerializeObject(pps);
                 Properties.SkyTelescope.Default.ParkPositions = pp;

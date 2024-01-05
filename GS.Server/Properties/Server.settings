@@ -122,5 +122,8 @@
     <Setting Name="BeepDur" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">200</Value>
     </Setting>
+    <Setting Name="YAxisCentre" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">-102</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

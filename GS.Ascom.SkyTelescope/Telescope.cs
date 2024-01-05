@@ -1216,7 +1216,13 @@ namespace ASCOM.GS.Sky.Telescope
                 Thread.Sleep(1);
                 DoEvents();
             }
-            DelayInterval();
+            // DelayInterval();
+            // Wait for updated mount position before returning
+            SkyServer.MountPositionUpdated = false;
+            while (!SkyServer.MountPositionUpdated)
+            {
+                Thread.Sleep(10);
+            }
         }
 
         public void SlewToAltAzAsync(double Azimuth, double Altitude)
@@ -1258,7 +1264,13 @@ namespace ASCOM.GS.Sky.Telescope
                 Thread.Sleep(1);
                 DoEvents();
             }
-            DelayInterval();
+            // DelayInterval();
+            // Wait for updated mount position before returning
+            SkyServer.MountPositionUpdated = false;
+            while (!SkyServer.MountPositionUpdated)
+            {
+                Thread.Sleep(10);
+            }
         }
 
         public void SlewToCoordinatesAsync(double RightAscension, double Declination)
@@ -1313,7 +1325,13 @@ namespace ASCOM.GS.Sky.Telescope
                 Thread.Sleep(1);
                 DoEvents();
             }
-            DelayInterval();
+            // DelayInterval();
+            // Wait for updated mount position before returning
+            SkyServer.MountPositionUpdated = false;
+            while (!SkyServer.MountPositionUpdated)
+            {
+                Thread.Sleep(10);
+            }
         }
 
         public void SlewToTargetAsync()
@@ -1365,7 +1383,13 @@ namespace ASCOM.GS.Sky.Telescope
             CheckAltAzSync(Altitude, Azimuth, "SyncToAltAz");
             SkyServer.AtPark = false;
             SkyServer.SyncToAltAzm(Azimuth, Altitude);
-            DelayInterval();
+            // DelayInterval(); RightAscension and Declination wait for latest update
+            // Wait for updated mount position before returning
+            SkyServer.MountPositionUpdated = false;
+            while (!SkyServer.MountPositionUpdated)
+            {
+                Thread.Sleep(10);
+            }
         }
 
         public void SyncToCoordinates(double RightAscension, double Declination)
@@ -1395,7 +1419,13 @@ namespace ASCOM.GS.Sky.Telescope
 
             SkyServer.AtPark = false;
             SkyServer.SyncToTargetRaDec();
-            DelayInterval();
+            // DelayInterval(); RightAscension and Declination wait for latest update
+            // Wait for updated mount position before returning
+            SkyServer.MountPositionUpdated = false;
+            while (!SkyServer.MountPositionUpdated)
+            {
+                Thread.Sleep(10);
+            }
         }
 
         public void SyncToTarget()
@@ -1423,7 +1453,13 @@ namespace ASCOM.GS.Sky.Telescope
 
             SkyServer.AtPark = false;
             SkyServer.SyncToTargetRaDec();
-            DelayInterval();
+            // DelayInterval(); RightAscension and Declination wait for latest update
+            // Wait for updated mount position before returning
+            SkyServer.MountPositionUpdated = false;
+            while (!SkyServer.MountPositionUpdated)
+            {
+                Thread.Sleep(10);
+            }
         }
 
         public double TargetDeclination
@@ -1586,7 +1622,7 @@ namespace ASCOM.GS.Sky.Telescope
         {
             CheckCapability(SkySettings.CanUnPark, "UnPark");
             SkyServer.AtPark = false;
-            SkyServer.Tracking = true;
+            SkyServer.Tracking = (AlignmentMode != AlignmentModes.algAltAz);
 
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Finished" };

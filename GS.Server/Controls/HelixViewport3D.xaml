@@ -19,23 +19,23 @@
             </h:HelixViewport3D.Camera>
             <h:SunLight />
             <h:GridLinesVisual3D Fill="Black" Width="5000" Length="5000" MajorDistance="1000" MinorDistance="1000" Thickness="4" Visible="True" />
-            <h:BoxVisual3D Height="50" Width="100" Length="50" Center="0,-50,500" Fill="Black" />
+            <h:BoxVisual3D Height="50" Width="100" Length="50" Center="0,-50,500" Fill="Black" Visible="{Binding GemBlockVisible}" />
             <h:BoxVisual3D Height="520" Width="50" Length="50" Center="0,0,265" Fill="Black" />
                 <h:HelixVisual3D Content="{Binding Model}">
                 <h:HelixVisual3D.Transform>
                     <Transform3DGroup>
                         <TranslateTransform3D OffsetX="1" OffsetY="0" OffsetZ="0" />
-                        <RotateTransform3D CenterX="0" CenterY="-104" CenterZ="525">
+                        <RotateTransform3D CenterX="0" CenterY="{Binding YAxisCentre}" CenterZ="525">
                             <RotateTransform3D.Rotation>
                                 <AxisAngleRotation3D Axis="1 0 2000" Angle="{Binding XAxisOffset}" />
                             </RotateTransform3D.Rotation>
                         </RotateTransform3D>
-                        <RotateTransform3D CenterX="0" CenterY="-102" CenterZ="525">
+                        <RotateTransform3D CenterX="0" CenterY="{Binding YAxisCentre}" CenterZ="525">
                             <RotateTransform3D.Rotation>
                                     <AxisAngleRotation3D Axis="0 1 0" Angle="{Binding YAxisOffset}" />
                             </RotateTransform3D.Rotation>
                         </RotateTransform3D>
-                        <RotateTransform3D CenterX="0" CenterY="-102" CenterZ="525">
+                        <RotateTransform3D CenterX="0" CenterY="{Binding YAxisCentre}" CenterZ="525">
                             <RotateTransform3D.Rotation>
                                     <AxisAngleRotation3D Axis="2000 0 1" Angle="{Binding ZAxisOffset}" />
                             </RotateTransform3D.Rotation>

@@ -32,7 +32,7 @@ namespace GS.Server.SkyTelescope
         private static readonly Transform xForm = new Transform();
 
         /// <summary>
-        /// Convert RA and DEC to Azimuth and Altitude using Transform
+        /// Convert RA and DEC from "from type" to "to type" using Transform
         /// </summary>
         /// <param name="rightAscension"></param>
         /// <param name="declination"></param>

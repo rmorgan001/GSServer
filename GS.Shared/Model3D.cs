@@ -21,7 +21,7 @@ namespace GS.Shared
     public static class Model3D
     {
         private static readonly string _directoryPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase) + "\\Models\\";
-        public static string GetModelFile(Model3DType modelType)
+        public static string GetModelFile(Model3DType modelType, String altAz = "")
         {
             string gpModel;
             switch (modelType)
@@ -47,34 +47,43 @@ namespace GS.Shared
                 default:
                     throw new ArgumentOutOfRangeException(nameof(modelType), modelType, null);
             }
-            var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(), gpModel);
+            var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(),
+                gpModel.Replace(".obj", altAz + ".obj"));
             var file = new Uri(filePath).LocalPath;
             return file;
         }
-        public static string GetCompassFile(bool southernHemisphere)
+        public static string GetCompassFile(bool southernHemisphere, bool altAz)
         {
             const string compassN = @"CompassN.png";
             const string compassS = @"CompassS.png";
-            var compassFile = southernHemisphere ? compassS : compassN;
+            var compassFile = southernHemisphere && !altAz ? compassS : compassN;
             var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(), compassFile);
             var file = new Uri(filePath).LocalPath;
             return file;
         }
-        public static double[] RotateModel(string mountType, double ax, double ay, bool southernHemisphere)
+        public static double[] RotateModel(string mountType, double ax, double ay, bool southernHemisphere, bool altAz)
         {
             var axes = new[] { 0.0, 0.0 };
-            switch (mountType)
+            if (altAz)
             {
-                case "Simulator":
-                    axes[0] = Math.Round(ax, 3);
-                    axes[1] = southernHemisphere ? Math.Round(ay - 180, 3) : Math.Round(ay * -1.0, 3);
-                    break;
-                case "SkyWatcher":
-                    axes[0] = Math.Round(ax, 3);
-                    axes[1] = Math.Round(ay - 180, 3);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                axes[0] = Math.Round(ax, 3);
+                axes[1] = Math.Round(ay * -1.0, 3);
+            }
+            else
+            {
+                switch (mountType)
+                {
+                    case "Simulator":
+                        axes[0] = Math.Round(ax, 3);
+                        axes[1] = southernHemisphere ? Math.Round(ay - 180, 3) : Math.Round(ay * -1.0, 3);
+                        break;
+                    case "SkyWatcher":
+                        axes[0] = Math.Round(ax, 3);
+                        axes[1] = Math.Round(ay - 180, 3);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
 
             return axes;

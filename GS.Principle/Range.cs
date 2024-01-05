@@ -98,7 +98,7 @@ namespace GS.Principles
         }
 
         /// <summary>
-        /// Returns double in the range 0 to 360
+        /// Returns double in the range [0 to 360)
         /// </summary>
         /// <param name="d">590.169444444444451</param>
         /// <returns>230.16944444444448</returns>
@@ -109,6 +109,7 @@ namespace GS.Principles
                 if (d < 0.0) d += 360.0;
                 if (d >= 360.0) d -= 360.0;
             }
+            if (d == 360.0) d = 0.0;
             return d;
         }
 

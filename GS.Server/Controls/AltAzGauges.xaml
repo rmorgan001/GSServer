@@ -37,9 +37,12 @@
         <TextBlock Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10" Text="{StaticResource lbAz}"/>
         <TextBlock Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0" Text="{Binding RaLabelRight}" />
         <TextBlock Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding RaLabelLeft}" />
-        <wpf:AngularGauge Grid.Row="2" Value="{Binding AltGauge}" TicksStrokeThickness="0" FontSize="1" FromValue="0" ToValue="360" Wedge="360" Margin="5" NeedleFill="{StaticResource SecondaryHueMidBrush}" Foreground="{StaticResource  MaterialDesignTextFieldBoxHoverBackground}" SectionsInnerRadius=".6">
+        <wpf:AngularGauge Grid.Row="2" Value="{Binding AltGauge}" TicksStrokeThickness="0" FontSize="1" FromValue="-90" ToValue="90" Wedge="180" Margin="5" NeedleFill="{StaticResource SecondaryHueMidBrush}" Foreground="{StaticResource  MaterialDesignTextFieldBoxHoverBackground}" SectionsInnerRadius=".6" RenderTransformOrigin="0.5,0.5">
+            <wpf:AngularGauge.RenderTransform>
+                    <RotateTransform Angle="90"/>
+            </wpf:AngularGauge.RenderTransform>
             <wpf:AngularGauge.Sections>
-                <wpf:AngularSection FromValue="90" ToValue="270" Fill="{StaticResource MaterialDesignTextFieldBoxHoverBackground}" />
+                <wpf:AngularSection FromValue="-90" ToValue="90" Fill="{StaticResource MaterialDesignTextFieldBoxHoverBackground}" />
             </wpf:AngularGauge.Sections>
         </wpf:AngularGauge>
         <TextBlock Grid.Row="2" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0" Text="{Binding Alt, StringFormat=N}"/>

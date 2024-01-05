@@ -31,18 +31,21 @@ namespace GS.Server.SkyTelescope
         /// <returns></returns>
         public static double[] MountAxis2Mount()
         {
-            var a = new[] { 0.0, 0.0 };
-            if (SkyServer.SouthernHemisphere)
-            {
-                a[0] = SkyServer.MountAxisX + 180;
-                a[1] = 180 - SkyServer.MountAxisY;
-            }
-            else
-            {
-                a[0] = SkyServer.MountAxisX;
-                a[1] = SkyServer.MountAxisY;
-            }
+            var a = new[] { SkyServer.MountAxisX, SkyServer.MountAxisY };
+            if (SkySettings.AlignmentMode != AlignmentModes.algAltAz)
+                {
+                if (SkyServer.SouthernHemisphere)
+                {
+                    a[0] = SkyServer.MountAxisX + 180;
+                    a[1] = 180 - SkyServer.MountAxisY;
+                }
+                else
+                {
+                    a[0] = SkyServer.MountAxisX;
+                    a[1] = SkyServer.MountAxisY;
+                }
 
+            }
             return a;
         }
 
@@ -54,30 +57,40 @@ namespace GS.Server.SkyTelescope
         internal static double[] AxesAppToMount(double[] axes)
         {
             var a = new[] { axes[0], axes[1] };
-            switch (SkySettings.Mount)
+            switch (SkySettings.AlignmentMode)
             {
-                case MountType.Simulator:
-                    if (SkyServer.SouthernHemisphere)
-                    {
-                        a[0] = 180 - a[0];
-                        a[1] = a[1];
-                    }
-                    else
-                    {
-                        a[0] = a[0];
-                        a[1] = a[1];
-                    }
+                case AlignmentModes.algAltAz:
                     break;
-                case MountType.SkyWatcher:
-                    if (SkyServer.SouthernHemisphere)
+                case AlignmentModes.algGermanPolar:
+                case AlignmentModes.algPolar:
+                    switch (SkySettings.Mount)
                     {
-                        a[0] = 180 - a[0];
-                        a[1] = a[1];
-                    }
-                    else
-                    {
-                        a[0] = a[0];
-                        a[1] = 180 - a[1];
+                        case MountType.Simulator:
+                            if (SkyServer.SouthernHemisphere)
+                            {
+                                a[0] = 180 - a[0];
+                                a[1] = a[1];
+                            }
+                            else
+                            {
+                                a[0] = a[0];
+                                a[1] = a[1];
+                            }
+                            break;
+                        case MountType.SkyWatcher:
+                            if (SkyServer.SouthernHemisphere)
+                            {
+                                a[0] = 180 - a[0];
+                                a[1] = a[1];
+                            }
+                            else
+                            {
+                                a[0] = a[0];
+                                a[1] = 180 - a[1];
+                            }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
                     break;
                 default:
@@ -90,43 +103,46 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Converts axes positions from Mount to Local 
+        /// Converts axes positions from Mount to App ha/dec or alt/az) 
         /// </summary>
         /// <param name="axes"></param>
         /// <returns></returns>
         internal static double[] AxesMountToApp(double[] axes)
         {
             var a = new[] { axes[0], axes[1] };
-            switch (SkySettings.Mount)
+            if (SkySettings.AlignmentMode != AlignmentModes.algAltAz)
             {
-                case MountType.Simulator:
-                    if (SkyServer.SouthernHemisphere)
-                    {
-                        a[0] = a[0] * -1.0;
-                        a[1] = 180 - a[1];
-                    }
-                    else
-                    {
-                        a[0] = a[0];
-                        a[1] = a[1];
-                    }
+                switch (SkySettings.Mount)
+                {
+                    case MountType.Simulator:
+                        if (SkyServer.SouthernHemisphere)
+                        {
+                            a[0] = a[0] * -1.0;
+                            a[1] = 180 - a[1];
+                        }
+                        else
+                        {
+                            a[0] = a[0];
+                            a[1] = a[1];
+                        }
 
-                    break;
-                case MountType.SkyWatcher:
-                    if (SkyServer.SouthernHemisphere)
-                    {
-                        a[0] = a[0] * -1.0;
-                        a[1] = 180 - a[1];
-                    }
-                    else
-                    {
-                        a[0] = a[0];
-                        a[1] = 180 - a[1];
-                    }
+                        break;
+                    case MountType.SkyWatcher:
+                        if (SkyServer.SouthernHemisphere)
+                        {
+                            a[0] = a[0] * -1.0;
+                            a[1] = 180 - a[1];
+                        }
+                        else
+                        {
+                            a[0] = a[0];
+                            a[1] = 180 - a[1];
+                        }
 
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
             return a;
         }
@@ -271,15 +287,13 @@ namespace GS.Server.SkyTelescope
         /// <param name="axes"></param>
         /// <param name="localSiderealTime"></param>
         /// <returns></returns>
-        private static double[] AxesXYToRaDec(IReadOnlyList<double> axes, double localSiderealTime)
+        internal static double[] AxesXYToRaDec(IReadOnlyList<double> axes, double localSiderealTime)
         {
             var raDec = new[] { axes[0], axes[1] };
             switch (SkySettings.AlignmentMode)
             {
                 case AlignmentModes.algAltAz:
-                    var radec = Coordinate.AltAz2RaDec(SkyServer.Altitude, SkyServer.Azimuth, SkySettings.Latitude, localSiderealTime);
-                    raDec[0] = Coordinate.Ra2Ha12(radec[0], localSiderealTime) * 15.0; // ha in degrees
-                    raDec[1] = radec[1];
+                    raDec = Coordinate.AltAz2RaDec(axes[1], axes[0], SkySettings.Latitude, localSiderealTime);
                     break;
                 case AlignmentModes.algGermanPolar:
                 case AlignmentModes.algPolar:
@@ -327,14 +341,15 @@ namespace GS.Server.SkyTelescope
         /// <param name="raDec"></param>
         /// <param name="lst">Local Sidereal Time</param>
         /// <returns></returns>
-        private static double[] RaDecToAxesXY(IReadOnlyList<double> raDec, double lst)
+        internal static double[] RaDecToAxesXY(IReadOnlyList<double> raDec, double lst)
         {
             var axes = new[] { raDec[0], raDec[1] };
             switch (SkySettings.AlignmentMode)
             {
                 case AlignmentModes.algAltAz:
-                    axes = Range.RangeAzAlt(axes);
                     axes = Coordinate.RaDec2AltAz(axes[0], axes[1], lst, SkySettings.Latitude);
+                    Array.Reverse(axes);
+                    axes = Range.RangeAzAlt(axes);
                     return axes;
                 case AlignmentModes.algGermanPolar:
                     axes[0] = (lst - axes[0]) * 15.0;

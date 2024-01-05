@@ -34,6 +34,7 @@ using System.Windows.Media.Media3D;
 using GS.Server.Controls.Dialogs;
 using GS.Server.Windows;
 using GS.Shared.Command;
+using ASCOM.DeviceInterface;
 
 namespace GS.Server.Model3D
 {
@@ -638,6 +639,29 @@ namespace GS.Server.Model3D
             }
         }
 
+        private double _yAxisCentre;
+
+        public double YAxisCentre
+        {
+            get => _yAxisCentre;
+            set
+            {
+                _yAxisCentre = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _gemBlockVisible;
+        public bool GemBlockVisible
+        {
+            get => _gemBlockVisible;
+            set
+            {
+                _gemBlockVisible = value;
+                OnPropertyChanged();
+            }
+        }
+
         private Model3DType _modelType;
         public Model3DType ModelType
         {
@@ -673,20 +697,43 @@ namespace GS.Server.Model3D
                 UpDirection = Settings.Settings.ModelUpDirection1;
                 Position = Settings.Settings.ModelPosition1;
 
-                //offset for model to match start position
-                xAxisOffset = 90;
-                yAxisOffset = -90;
-                zAxisOffset = 0;
+                switch (SkySettings.AlignmentMode)
+                {
+                    case AlignmentModes.algPolar:
+                    case AlignmentModes.algGermanPolar:
+                        //offset for model to match start position
+                        xAxisOffset = 90;
+                        yAxisOffset = -90;
+                        zAxisOffset = 0;
 
-                //start position
-                XAxis = -90;
-                YAxis = 90;
-                ZAxis = Math.Round(Math.Abs(SkySettings.Latitude),2);
+                        //start position
+                        XAxis = -90;
+                        YAxis = 90;
+                        ZAxis = Math.Round(Math.Abs(SkySettings.Latitude), 2);
+                        YAxisCentre = Settings.Settings.YAxisCentre;
+                        GemBlockVisible = true;
+                        break;
+                    case AlignmentModes.algAltAz:
+                        //offset for model to match start position
+                        xAxisOffset = 0;
+                        yAxisOffset = 90;
+                        zAxisOffset = 0;
+                        //start position
+                        XAxis = -90;
+                        YAxis = 90;
+                        ZAxis = 90;
+                        YAxisCentre = 0;
+                        GemBlockVisible = false;
+                        break;
+                    default:
+                        break;
+                }
 
                 //load model and compass
                 var import = new ModelImporter();
-                var model = import.Load(Shared.Model3D.GetModelFile(Settings.Settings.ModelType));
-                Compass = MaterialHelper.CreateImageMaterial(Shared.Model3D.GetCompassFile(SkyServer.SouthernHemisphere), 100);
+                var altAz = (SkySettings.AlignmentMode == AlignmentModes.algAltAz) ? "AltAz" : String.Empty;
+                var model = import.Load(Shared.Model3D.GetModelFile(Settings.Settings.ModelType, altAz));
+                Compass = MaterialHelper.CreateImageMaterial(Shared.Model3D.GetCompassFile(SkyServer.SouthernHemisphere, SkySettings.AlignmentMode == AlignmentModes.algAltAz), 100);
 
                 //color OTA
                 var accentColor = Settings.Settings.AccentColor;
@@ -704,12 +751,15 @@ namespace GS.Server.Model3D
                     }
                 }
                 //color weights
-                var materialweights = MaterialHelper.CreateMaterial(new SolidColorBrush(Color.FromRgb(64, 64, 64)));
-                if (model.Children[1] is GeometryModel3D weights) weights.Material = materialweights;
-                //color bar
-                var materialbar = MaterialHelper.CreateMaterial(Brushes.Gainsboro);
-                if (model.Children[2] is GeometryModel3D bar) bar.Material = materialbar;
+                if (SkySettings.AlignmentMode != AlignmentModes.algAltAz)
+                {
+                    var materialweights = MaterialHelper.CreateMaterial(new SolidColorBrush(Color.FromRgb(64, 64, 64)));
+                    if (model.Children[1] is GeometryModel3D weights) weights.Material = materialweights;
+                    //color bar
+                    var materialbar = MaterialHelper.CreateMaterial(Brushes.Gainsboro);
+                    if (model.Children[2] is GeometryModel3D bar) bar.Material = materialbar;
 
+                }
                 Model = model;
             }
             catch (Exception ex)
@@ -731,7 +781,7 @@ namespace GS.Server.Model3D
         private void Rotate()
         {
             var axes = Shared.Model3D.RotateModel(SkySettings.Mount.ToString(), SkyServer.ActualAxisX,
-                SkyServer.ActualAxisY, SkyServer.SouthernHemisphere);
+               SkyServer.ActualAxisY, SkyServer.SouthernHemisphere, SkySettings.AlignmentMode == AlignmentModes.algAltAz);
 
             YAxis = axes[0];
             XAxis = axes[1];

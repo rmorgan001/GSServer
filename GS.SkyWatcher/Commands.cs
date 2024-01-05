@@ -1697,6 +1697,7 @@ namespace GS.SkyWatcher
                 {
                     // this code order is important
                     if (byt == '=' || byt == '!' || byt == _endChar) StartReading = true;
+                    if ((byt == _endChar) && (mBuffer.Length == 0)) continue;
                     if (StartReading) mBuffer.Append(byt);
                     if (byt != _endChar) continue;
                     if (!StartReading) continue;

@@ -29,14 +29,14 @@ namespace GS.Shared
         /// <param name="token"></param>
         public static void InvokeOnUiThread(Action action, CancellationToken token = default)
         {
-            if (Application.Current.Dispatcher != null && Application.Current.Dispatcher.CheckAccess())
+            if (Application.Current?.Dispatcher != null && Application.Current.Dispatcher.CheckAccess())
             {
                 action();
             }
             else
             {
                 if (token.IsCancellationRequested) return;
-                if (Application.Current.Dispatcher != null) Application.Current.Dispatcher.Invoke(action);
+                if (Application.Current?.Dispatcher != null) Application.Current.Dispatcher.Invoke(action);
             }
         }
 
