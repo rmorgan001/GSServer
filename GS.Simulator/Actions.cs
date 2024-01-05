@@ -87,7 +87,7 @@ namespace GS.Simulator
             //put in for capture tracking in charts
             var stepsy = _ioSerial.Send($"steps|{Axis.Axis2}");
             monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps2|{null}|{stepsy}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps2|{null}|{stepsy}" };
             MonitorLog.LogToMonitor(monitorItem);
 
 
@@ -107,7 +107,7 @@ namespace GS.Simulator
             //put in for capture tracking in charts
             var stepsx = _ioSerial.Send($"steps|{Axis.Axis1}");
             var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps1|{null}|{stepsx}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps1|{null}|{stepsx}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             var y = Convert.ToDouble(_ioSerial.Send($"degrees|{Axis.Axis2}")) * z;
@@ -115,7 +115,7 @@ namespace GS.Simulator
             //put in for capture tracking in charts
             var stepsy = _ioSerial.Send($"steps|{Axis.Axis2}");
             monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps2|{null}|{stepsy}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps2|{null}|{stepsy}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             var d = new[] { x , y };

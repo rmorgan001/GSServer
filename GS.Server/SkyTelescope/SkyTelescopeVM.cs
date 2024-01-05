@@ -34,6 +34,7 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -134,7 +135,7 @@ namespace GS.Server.SkyTelescope
                     RaBacklashList = RaBacklashList.Concat(extendedlist);
                     DecBacklashList = DecBacklashList.Concat(extendedlist);
                     AxisTrackingLimits = new List<double>(Numbers.InclusiveRange(0, 15, 1));
-                    
+
                     // defaults
                     AtPark = SkyServer.AtPark;
                     ConnectButtonContent = Application.Current.Resources["skyConnect"].ToString();
@@ -152,7 +153,19 @@ namespace GS.Server.SkyTelescope
                     SetParkLimitSelection(SkySettings.ParkLimitName);
                     TrackingRate = SkySettings.TrackingRate;
                     PolarLedLevel = SkySettings.PolarLedLevel;
-                    SkySettings.CanSetPierSide = SkySettings.HourAngleLimit != 0;
+                    //set CanSetPierSide to false if AltAz alignment
+                    switch (AlignmentMode)
+                    {
+                        case AlignmentModes.algAltAz:
+                            SkySettings.CanSetPierSide = false;
+                            break;
+                        case AlignmentModes.algPolar:
+                        case AlignmentModes.algGermanPolar:
+                            SkySettings.CanSetPierSide = SkySettings.HourAngleLimit != 0;
+                            break;
+                        default:
+                            break;
+                    }
 
                     HcWinVisibility = true;
                     ModelWinVisibility = true;
@@ -828,7 +841,18 @@ namespace GS.Server.SkyTelescope
             set
             {
                 SkySettings.HourAngleLimit = value;
-                SkySettings.CanSetPierSide = value != 0;
+                switch (AlignmentMode)
+                {
+                    case AlignmentModes.algAltAz:
+                        SkySettings.CanSetPierSide = false;
+                        break;
+                    case AlignmentModes.algPolar:
+                    case AlignmentModes.algGermanPolar:
+                        SkySettings.CanSetPierSide = value != 0;
+                        break;
+                    default:
+                        break;
+                }
                 OnPropertyChanged();
             }
         }
@@ -848,6 +872,21 @@ namespace GS.Server.SkyTelescope
             set
             {
                 SkySettings.AlignmentMode = value;
+                //disable CanSetPierSide if AltAz alignment
+                switch (AlignmentMode)
+                {
+                    case AlignmentModes.algAltAz:
+                        SkySettings.CanSetPierSide = false;
+                        break;
+                    case AlignmentModes.algPolar:
+                    case AlignmentModes.algGermanPolar:
+                        SkySettings.CanSetPierSide = true;
+                        break;
+                    default:
+                        break;
+                }
+                //reset 3D view for alignment type
+                OpenResetView();
                 OnPropertyChanged();
 
             }
@@ -1816,16 +1855,24 @@ namespace GS.Server.SkyTelescope
                         RaLabelRight = $"{Application.Current.Resources["lbEast"]}";
                         RaLabelLeft = $"{Application.Current.Resources["lbWest"]}";
                     }
-                    switch (SkyServer.Lha < 0)
+                    if (SkySettings.AlignmentMode != AlignmentModes.algAltAz)
                     {
-                        case true:
-                            AltLabelRight = "0°";
-                            AltLabelLeft = "180°";
-                            break;
-                        default:
-                            AltLabelRight = "180°";
-                            AltLabelLeft = "0°";
-                            break;
+                        switch (SkyServer.Lha < 0)
+                        {
+                            case true:
+                                AltLabelRight = "0°";
+                                AltLabelLeft = "180°";
+                                break;
+                            default:
+                                AltLabelRight = "180°";
+                                AltLabelLeft = "0°";
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        AltLabelRight = "0°";
+                        AltLabelLeft = "";
                     }
                     break;
                 case FrontGraphic.RaDec:
@@ -1999,7 +2046,19 @@ namespace GS.Server.SkyTelescope
             {
                 if (Math.Abs(_alt - value) < 0.01) { return; }
                 _alt = value;
-                AltGauge = SkyServer.Lha < 0 ? 270 - value : 90 + value;
+                switch (SkySettings.AlignmentMode)
+                {
+                    case AlignmentModes.algAltAz:
+                        AltGauge = -_alt;
+                        break;
+                    case AlignmentModes.algPolar:
+                    case AlignmentModes.algGermanPolar:
+                        AltGauge = _alt;
+                        AltGauge = SkyServer.Lha < 0 ? 270 - value : 90 + value;
+                        break;
+                    default:
+                        break;
+                }
                 OnPropertyChanged();
             }
         }
@@ -2189,6 +2248,29 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private double _yAxisCentre;
+
+        public double YAxisCentre
+        {
+            get => _yAxisCentre;
+            set
+            {
+                _yAxisCentre = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _gemBlockVisible;
+        public bool GemBlockVisible
+        {
+            get => _gemBlockVisible;
+            set
+            {
+                _gemBlockVisible = value;
+                OnPropertyChanged();
+            }
+         }
+
         private Material _compass;
         public Material Compass
         {
@@ -2210,20 +2292,43 @@ namespace GS.Server.SkyTelescope
                 UpDirection = Settings.Settings.ModelUpDirection2;
                 Position = Settings.Settings.ModelPosition2;
 
-                //offset for model to match start position
-                xAxisOffset = 90;
-                yAxisOffset = -90;
-                zAxisOffset = 0;
+                switch (SkySettings.AlignmentMode)
+                {
+                    case AlignmentModes.algPolar:
+                    case AlignmentModes.algGermanPolar:
+                        //offset for model to match start position
+                        xAxisOffset = 90;
+                        yAxisOffset = -90;
+                        zAxisOffset = 0;
 
-                //start position
-                XAxis = -90;
-                YAxis = 90;
-                ZAxis = Math.Round(Math.Abs(SkySettings.Latitude), 2);
+                        //start position
+                        XAxis = -90;
+                        YAxis = 90;
+                        ZAxis = Math.Round(Math.Abs(SkySettings.Latitude), 2);
+                        YAxisCentre = Settings.Settings.YAxisCentre;
+                        GemBlockVisible = true;
+                        break;
+                    case AlignmentModes.algAltAz:
+                        //offset for model to match start position
+                        xAxisOffset = 0;
+                        yAxisOffset = 90;
+                        zAxisOffset = 0;
+                        //start position
+                        XAxis = -90;
+                        YAxis = 90;
+                        ZAxis = 90;
+                        YAxisCentre = 0;
+                        GemBlockVisible = false;
+                        break;
+                    default:
+                        break;
+                }
 
                 //load model and compass
                 var import = new ModelImporter();
-                var model = import.Load(Shared.Model3D.GetModelFile(Settings.Settings.ModelType));
-                Compass = MaterialHelper.CreateImageMaterial(Shared.Model3D.GetCompassFile(SkyServer.SouthernHemisphere), 100);
+                var altAz = (SkySettings.AlignmentMode == AlignmentModes.algAltAz) ? "AltAz" : String.Empty;
+                var model = import.Load(Shared.Model3D.GetModelFile(Settings.Settings.ModelType, altAz));
+                Compass = MaterialHelper.CreateImageMaterial(Shared.Model3D.GetCompassFile(SkyServer.SouthernHemisphere, SkySettings.AlignmentMode == AlignmentModes.algAltAz), 100);
 
                 //color OTA
                 var accentColor = Settings.Settings.AccentColor;
@@ -2241,12 +2346,15 @@ namespace GS.Server.SkyTelescope
                     }
                 }
                 //color weights
-                var materialweights = MaterialHelper.CreateMaterial(new SolidColorBrush(Color.FromRgb(64, 64, 64)));
+                if (SkySettings.AlignmentMode != AlignmentModes.algAltAz)
+                {
+                    var materialweights = MaterialHelper.CreateMaterial(new SolidColorBrush(Color.FromRgb(64, 64, 64)));
                 if (model.Children[1] is GeometryModel3D weights){ weights.Material = materialweights;}
                 //color bar
                 var materialbar = MaterialHelper.CreateMaterial(Brushes.Gainsboro);
                 if (model.Children[2] is GeometryModel3D bar){ bar.Material = materialbar;}
 
+                }
                 Model = model;
             }
             catch (Exception ex)
@@ -2270,7 +2378,7 @@ namespace GS.Server.SkyTelescope
             if (Graphic != FrontGraphic.Model3D) { return; }
 
             var axes = Shared.Model3D.RotateModel(SkySettings.Mount.ToString(), SkyServer.ActualAxisX,
-               SkyServer.ActualAxisY, SkyServer.SouthernHemisphere);
+               SkyServer.ActualAxisY, SkyServer.SouthernHemisphere, SkySettings.AlignmentMode == AlignmentModes.algAltAz);
 
             YAxis = axes[0];
             XAxis = axes[1];
@@ -2622,7 +2730,7 @@ namespace GS.Server.SkyTelescope
                     if (parked)
                     {
                         SkyServer.AtPark = false;
-                        SkyServer.Tracking = true;
+                        SkyServer.Tracking = AlignmentMode != AlignmentModes.algAltAz;
                     }
                     else
                     {
@@ -2833,6 +2941,7 @@ namespace GS.Server.SkyTelescope
                     {
                         SkyServer.AtPark = false;
                     }
+                    SkyServer.IsTrackingClickActive = true;
                     SkyServer.Tracking = !SkyServer.Tracking;
                 }
             }
@@ -5187,15 +5296,13 @@ namespace GS.Server.SkyTelescope
             switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
-                    msg = Application.Current.Resources["skyHome1"].ToString();
-                    msg += Environment.NewLine + Application.Current.Resources["skyHome2"];
-                    //msg += Environment.NewLine + Application.Current.Resources["skyHome3"];
-                    OpenDialog(msg);
-                    break;
                 case MountType.SkyWatcher:
                     switch (SkySettings.AlignmentMode)
                     {
                         case AlignmentModes.algAltAz:
+                            msg = Application.Current.Resources["skyHome1"].ToString();
+                            msg += Environment.NewLine + Application.Current.Resources["skyHome2AltAz"];
+                            OpenDialog(msg);
                             break;
                         case AlignmentModes.algPolar:
                             break;
@@ -7001,6 +7108,11 @@ namespace GS.Server.SkyTelescope
                     }
 
                     var radec = Transforms.CoordTypeToInternal(GoToRa, GoToDec);
+                    if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
+                    {
+                        SkyServer.TargetRa = GoToRa;
+                        SkyServer.TargetDec = GoToDec;
+                    }
                     var monitorItem = new MonitorEntry
                     {
                         Datetime = HiResDateTime.UtcNow,

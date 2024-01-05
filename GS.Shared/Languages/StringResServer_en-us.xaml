@@ -1,4 +1,4 @@
-﻿<!--/* Copyright(C) 2019-2022 Rob Morgan (robert.morgan.e@gmail.com)
+<!--/* Copyright(C) 2019-2022 Rob Morgan (robert.morgan.e@gmail.com)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published
@@ -383,6 +383,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skyDisconnect">Disconnect</system:String>
     <system:String x:Key="skyHome1">When starting normally place the mount in the 'Home' position.</system:String>
     <system:String x:Key="skyHome2">Home Position is counterweight down and declination pointing towards the pole.</system:String>
+    <system:String x:Key="skyHome2AltAz">Home Position is telescope tube horizontal pointing true North.</system:String>
     <system:String x:Key="skyParkNewName">Add new park position</system:String>
     <system:String x:Key="skyParkDelete">Delete park position?</system:String>
     <system:String x:Key="skyLat0">North or South</system:String>
@@ -727,6 +728,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--1.0.6.4 -->
     <system:String x:Key="optAlignmentWarningThreshold">Warning Threshold</system:String>
     <system:String x:Key="aliWarningThresholdTooltip">The level at which the alignment warning is triggered (multiplier of maximum synchronisation offset distance registered).</system:String>
+
 
 </ResourceDictionary>
  

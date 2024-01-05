@@ -1,13 +1,13 @@
 <Project>
- <PropertyGroup>
-	<Authors>Rob Morgan</Authors>
-	<Company>GS Server</Company>
-	<Trademark>GS Server</Trademark>
-	<NeutralLanguage>en</NeutralLanguage>
-	<Copyright>Copyright © GreenSwamp Software 2019-2023</Copyright>
-    	<AssemblyVersion>1.0.6.5</AssemblyVersion>
-    	<FileVersion>1.0.6.5</FileVersion>
-	<ProductVersion>1.0.6.5</ProductVersion>
-	<Version>1.0.6.5</Version>
- </PropertyGroup>
+	<PropertyGroup>
+		<Authors>Rob Morgan</Authors>
+		<Company>GS Server</Company>
+		<Trademark>GS Server</Trademark>
+		<NeutralLanguage>en</NeutralLanguage>
+		<Copyright>Copyright © GreenSwamp Software 2019-2024</Copyright>
+		<AssemblyVersion>1.0.7.4</AssemblyVersion>
+		<FileVersion>1.0.7.4</FileVersion>
+		<ProductVersion>1.0.7.4</ProductVersion>
+		<Version>1.0.7.4</Version>
+	</PropertyGroup>
 </Project>

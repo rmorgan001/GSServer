@@ -381,6 +381,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skyDisconnect">Disconnetti</system:String>
     <system:String x:Key="skyHome1">Quando si parte normalmente posizionre la montatura in 'Home'.</system:String>
     <system:String x:Key="skyHome2">La Posizione di home è con il contrappeso basso e la declinazione punta verso il Polo.</system:String>
+    <system:String x:Key="skyHome2AltAz">La Posizione di home è il telescopio orizzontale che punta verso il nord geografico.</system:String>
     <system:String x:Key="skyHome3">Clicca 'Imposta Home' prima o dopo aver fatto un allineamento polare.</system:String>
     <system:String x:Key="skyParkNewName">Aggiungi posizione di parcheggio</system:String>
     <system:String x:Key="skyParkDelete">Eliminare la posizione di parcheggio?</system:String>

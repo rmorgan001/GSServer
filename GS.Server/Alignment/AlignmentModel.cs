@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,7 +8,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Linq;
+using ASCOM.DeviceInterface;
 using GS.Server.Helpers;
+using GS.Server.SkyTelescope;
 using GS.Shared.Domain;
 
 namespace GS.Server.Alignment
@@ -212,7 +214,20 @@ namespace GS.Server.Alignment
         /// GSS uses the axis positions of 90 and 90 for home. This constant represents 90 on the
         /// linear scale the same as in EQMOD.
         /// </summary>
-        public long[] ScaleCenter { get; } = {9003008, 9003008};
+        public long[] ScaleCenter
+        {
+            get
+            {
+                if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
+                {
+                    return new long[] { 0, 0 };
+                }
+                else
+                {
+                    return new long[] { 9003008, 9003008 };
+                }
+            }
+        }
 
         private ActivePointsEnum _activePoints;
         public ActivePointsEnum ActivePoints
@@ -242,7 +257,7 @@ namespace GS.Server.Alignment
                 }
                 else
                 {
-                    return new double[] { 0d, 0d };
+                    return new double[] { 1.0e-6d / 3600, 1.0e-6d / 3600 }; // allow for get sync/unsync rounding
                 }
             }
         }

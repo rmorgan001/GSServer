@@ -82,6 +82,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Windows.Media.Converters;
 using GS.Simulator;
+using ASCOM.DeviceInterface;
 
 namespace GS.Server.Alignment
 {
@@ -1205,8 +1206,8 @@ namespace GS.Server.Alignment
             var axes = Axes.AxesMountToApp(spherical);
 
             SphericalCoord result = new SphericalCoord();
-            double[] azAlt = Axes.AxesXYToAzAlt(axes);
-
+            double[] azAlt = (SkySettings.AlignmentMode != AlignmentModes.algAltAz) ? 
+                Axes.AxesXYToAzAlt(axes) : new[] { spherical.RA, spherical.Dec };
 
             result.x = (((azAlt[0] - 180d) / 360d) * StepsPerRev[0]) + ScaleCenter[0];
             result.y = (((azAlt[1] + 90d) / 180d) * StepsPerRev[1]) + ScaleCenter[1];
@@ -1232,6 +1233,12 @@ namespace GS.Server.Alignment
             if (pos.weightsUp)
             {
                 result = Axes.GetAltAxisPosition(result);
+            }
+
+            if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
+            {
+                result.RA = az;
+                result.Dec = alt;
             }
 
             return result;

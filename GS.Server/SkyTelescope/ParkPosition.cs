@@ -13,12 +13,14 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using ASCOM.DeviceInterface;
+
 namespace GS.Server.SkyTelescope
 {
     public class ParkPosition
     {
         public string Name { get; set; } = "Blank";
-        public double X { get; set; } = 90;
-        public double Y { get; set; } = 90;
+        public double X { get; set; } = (SkySettings.AlignmentMode == AlignmentModes.algAltAz) ?  0 : 90;
+        public double Y { get; set; } = (SkySettings.AlignmentMode == AlignmentModes.algAltAz) ? 0 : 90;
     }
 }

@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019-2022 Rob Morgan (robert.morgan.e@gmail.com)
+/* Copyright(C) 2019-2022 Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -23,6 +23,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media.Media3D;
+using GS.Principles;
 
 namespace GS.Server.Settings
 {
@@ -558,6 +559,20 @@ namespace GS.Server.Settings
             }
         }
 
+        private static double _yAxisCentre;
+        public static double YAxisCentre
+        {
+            get => _yAxisCentre;
+            set
+            {
+                if (Math.Abs(_yAxisCentre - value) < 0.1) return;
+                _yAxisCentre = value;
+                Properties.Server.Default.YAxisCentre = value;
+                // LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Methods      
@@ -606,6 +621,7 @@ namespace GS.Server.Settings
             WindowLeft = Properties.Server.Default.WindowLeft;
             WindowTop = Properties.Server.Default.WindowTop;
             AlignmentTabVisible = Properties.Server.Default.AlignmentTabVisible;
+            YAxisCentre = Properties.Server.Default.YAxisCentre;
 
             Enum.TryParse<Model3DType>(Properties.Server.Default.ModelType, true, out var aparse);
             ModelType = aparse;

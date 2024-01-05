@@ -13,6 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using ASCOM.DeviceInterface;
 using GS.Principles;
 using GS.Server.SkyTelescope;
 using GS.Shared;
@@ -348,13 +349,13 @@ namespace GS.Server.AutoHome
             {
                 case AxisId.Axis1:
                     var d = Axes.AxesMountToApp(new[] { c, 0 }); // Convert to local
-                    if (SkyServer.SouthernHemisphere) d[0] = d[0] + 180;
+                    if ((SkySettings.AlignmentMode != AlignmentModes.algAltAz) && (SkyServer.SouthernHemisphere)) d[0] = d[0] + 180;
 
                     SkyServer.SlewAxes(d[0], positions[1], SlewType.SlewMoveAxis);
                     break;
                 case AxisId.Axis2:
                     var e = Axes.AxesMountToApp(new[] { 0, c }); // Convert to local
-                    if (SkyServer.SouthernHemisphere) e[1] = 180 - e[1];
+                    if ((SkySettings.AlignmentMode != AlignmentModes.algAltAz) && (SkyServer.SouthernHemisphere)) e[1] = 180 - e[1];
 
                     SkyServer.SlewAxes(positions[0], e[1], SlewType.SlewMoveAxis);
                     break;
@@ -396,12 +397,14 @@ namespace GS.Server.AutoHome
             {
                 case AxisId.Axis1:
                     degrees = direction ? Math.Abs(degrees) : -Math.Abs(degrees);
-                    if (SkyServer.SouthernHemisphere) degrees = direction ? -Math.Abs(degrees) : Math.Abs(degrees);
+                    if ((SkySettings.AlignmentMode != AlignmentModes.algAltAz) && (SkyServer.SouthernHemisphere))
+                        degrees = direction ? -Math.Abs(degrees) : Math.Abs(degrees);
                     SkyServer.SlewAxes(positions[0] + degrees, positions[1], SlewType.SlewMoveAxis);
                     break;
                 case AxisId.Axis2:
                     degrees = direction ? -Math.Abs(degrees) : Math.Abs(degrees);
-                    if (SkyServer.SouthernHemisphere) degrees = direction ? Math.Abs(degrees) : -Math.Abs(degrees);
+                    if ((SkySettings.AlignmentMode != AlignmentModes.algAltAz) && (SkyServer.SouthernHemisphere))
+                        degrees = direction ? Math.Abs(degrees) : -Math.Abs(degrees);
                     SkyServer.SlewAxes(positions[0], positions[1] + degrees, SlewType.SlewMoveAxis);
                     break;
                 default:

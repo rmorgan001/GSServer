@@ -47,12 +47,20 @@ namespace GS.Principles
                     NativeMethods.GetSystemTimePreciseAsFileTime(out var preciseTime);
                     return DateTime.FromFileTimeUtc(preciseTime);
                 }
-                double endTimestamp = Stopwatch.GetTimestamp();
-                var durationInTicks = (endTimestamp - startTimestamp.Value) / Stopwatch.Frequency * TicksMultiplier;
-                if (!(durationInTicks >= maxIdle)) return startTime.Value.AddTicks((long)durationInTicks);
-                startTimestamp.Value = Stopwatch.GetTimestamp();
-                startTime.Value = DateTime.UtcNow;
-                return startTime.Value;
+
+                try
+                {
+                    double endTimestamp = Stopwatch.GetTimestamp();
+                    var durationInTicks = (endTimestamp - startTimestamp.Value) / Stopwatch.Frequency * TicksMultiplier;
+                    if (!(durationInTicks >= maxIdle)) return startTime.Value.AddTicks((long)durationInTicks);
+                    startTimestamp.Value = Stopwatch.GetTimestamp();
+                    startTime.Value = DateTime.UtcNow;
+                    return startTime.Value;
+                }
+                catch (ObjectDisposedException e)
+                {
+                    return DateTime.UtcNow;
+                }
             }
         }
 

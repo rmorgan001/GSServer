@@ -481,6 +481,16 @@ namespace GS.SkyWatcher
                 }
 
                 _commands.SetMotionMode(axis, 2, direction, SouthernHemisphere); // G: '2' low  speed GOTO mode, '0'  +CW  and Nth Hemisphere
+                // Skywatcher Discovery AzAlt mount seems not to move in either direction if steps is less than 10 - not backlash?
+                // Lookup table maps steps in range 0 to 18 to values that will move the mount
+                var model = _commands.GetModel();
+                if ((movingSteps < 19) && (model[(int)axis] == (int)McModel.StarDiscovery))
+                {
+                    {
+                        int[] lookup = { 0, 10, 10, 10, 10, 10, 11, 12, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18 };
+                        movingSteps = lookup[movingSteps];
+                    }
+                }
                 _commands.SetGotoTargetIncrement(axis, movingSteps); // H:
                 _commands.SetBreakPointIncrement(axis, 0); // M: send 0 steps
                 _commands.StartMotion(axis); // J: Start moving
@@ -596,7 +606,16 @@ namespace GS.SkyWatcher
                     _commands.SetMotionMode(axis, 2, direction, SouthernHemisphere); // :G low speed GOTO slewing
                     highspeed = false;
                 }
-                
+                // Skywatcher Discovery AzAlt mount seems not to move in either direction if steps is less than 10 - not backlash?
+                // Lookup table maps steps in range 0 to 18 to values that will move the mount
+                var model =_commands.GetModel();
+                if ((movingSteps < 19) && (model[(int)axis] == (int)McModel.StarDiscovery))
+                {
+                    {
+                        int[] lookup = { 0, 10, 10, 10, 10, 10, 11, 12, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18 };
+                        movingSteps = lookup[movingSteps];
+                    }
+                }
                 _commands.SetGotoTargetIncrement(axis, movingSteps); // :H
                 _commands.SetBreakPointIncrement(axis, _breakSteps[(int)axis]); // :M
                 _commands.StartMotion(axis); // :J
@@ -619,13 +638,13 @@ namespace GS.SkyWatcher
         /// <example>CmdToMount(1,"X","0003","true")</example>
         internal string CmdToMount(int axis, string cmd, string cmdData, string ignoreWarnings)
         {
-           return  _commands.CmdToMount(axis, cmd, cmdData, ignoreWarnings);
+            return  _commands.CmdToMount(axis, cmd, cmdData, ignoreWarnings);
         }
-        
+
         /// <summary>
-            /// Supports the new advanced command set
-            /// </summary>
-            /// <returns></returns>
+        /// Supports the new advanced command set
+        /// </summary>
+        /// <returns></returns>
         internal bool GetAdvancedCmdSupport()
         {
             return _commands.SupportAdvancedCommandSet;
