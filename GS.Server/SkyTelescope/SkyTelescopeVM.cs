@@ -160,9 +160,8 @@ namespace GS.Server.SkyTelescope
                             break;
                         case AlignmentModes.algPolar:
                         case AlignmentModes.algGermanPolar:
-                            SkySettings.CanSetPierSide = SkySettings.HourAngleLimit != 0;
-                            break;
                         default:
+                            SkySettings.CanSetPierSide = SkySettings.HourAngleLimit != 0;
                             break;
                     }
 
@@ -847,9 +846,8 @@ namespace GS.Server.SkyTelescope
                         break;
                     case AlignmentModes.algPolar:
                     case AlignmentModes.algGermanPolar:
-                        SkySettings.CanSetPierSide = value != 0;
-                        break;
                     default:
+                        SkySettings.CanSetPierSide = value != 0;
                         break;
                 }
                 OnPropertyChanged();
@@ -879,9 +877,8 @@ namespace GS.Server.SkyTelescope
                         break;
                     case AlignmentModes.algPolar:
                     case AlignmentModes.algGermanPolar:
-                        SkySettings.CanSetPierSide = true;
-                        break;
                     default:
+                        SkySettings.CanSetPierSide = true;
                         break;
                 }
                 //reset 3D view for alignment type
@@ -1743,36 +1740,8 @@ namespace GS.Server.SkyTelescope
                     .Where(@t => @t.ip.Address.AddressFamily == AddressFamily.InterNetwork)
                     .Select(@t => @t.ip.Address);
 
-                //.OrderBy(p => p, new Comparer())  if needed look in shared
 
-                //var networkIfaceIps = new SortedSet<IPAddress>(NetworkInterface.GetAllNetworkInterfaces()
-                //        .Where(ni => ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet &&
-                //                     ni.NetworkInterfaceType == NetworkInterfaceType.GigabitEthernet &&
-                //                     ni.NetworkInterfaceType == NetworkInterfaceType.Loopback &&
-                //                     ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 &&
-                //                     ni.OperationalStatus == OperationalStatus.Up && !ni.IsReceiveOnly)
-                //        .SelectMany(ni => ni.GetIPProperties().UnicastAddresses, (ni, ip) => new { ni, ip })
-                //        .Where(@t => @t.ip.Address.AddressFamily == AddressFamily.InterNetwork)
-                //        .Select(@t => @t.ip.Address));
-
-                //New
-                //var networkIfaceIps = new SortedSet<IPAddress>(
-                //    from ni in NetworkInterface.GetAllNetworkInterfaces()
-                //    where ni.OperationalStatus == OperationalStatus.Up && !ni.IsReceiveOnly
-                //    from ip in ni.GetIPProperties().UnicastAddresses
-                //    where ip.Address.AddressFamily == AddressFamily.InterNetwork
-                //    select ip.Address, );
-
-                //Original 
-                //var networkIfaceIps = new SortedSet<IPAddress>(
-                //from ni in NetworkInterface.GetAllNetworkInterfaces()
-                //where ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211
-                //    && ni.OperationalStatus == OperationalStatus.Up
-                //    && !ni.IsReceiveOnly
-                //from ip in ni.GetIPProperties().UnicastAddresses
-                //where ip.Address.AddressFamily == AddressFamily.InterNetwork
-                //select ip.Address);
-
+                var ipAddresses = networkIfaceIps.ToList();
                 var monitorItem = new MonitorEntry
                 {
                     Type = MonitorType.Data,
@@ -1781,12 +1750,12 @@ namespace GS.Server.SkyTelescope
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Device = MonitorDevice.Server,
-                    Message = $"Discovery|Network Interfaces|{string.Join(",", networkIfaceIps)}"
+                    Message = $"Discovery|Network Interfaces|{string.Join(",", ipAddresses)}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 var needRemoving = new HashSet<IPAddress>(_udpClients.Keys);
-                needRemoving.ExceptWith(networkIfaceIps);
+                needRemoving.ExceptWith(ipAddresses);
                 foreach (var toBeRemoved in needRemoving)
                 {
                     ips = toBeRemoved.ToString();
@@ -1796,7 +1765,7 @@ namespace GS.Server.SkyTelescope
                     }
                 }
 
-                foreach (var toAdd in networkIfaceIps)
+                foreach (var toAdd in ipAddresses)
                 {
                     ips = toAdd.ToString();
                     _ = _udpClients.AddOrUpdate(
@@ -2052,10 +2021,9 @@ namespace GS.Server.SkyTelescope
                         break;
                     case AlignmentModes.algPolar:
                     case AlignmentModes.algGermanPolar:
+                    default:
                         AltGauge = _alt;
                         AltGauge = SkyServer.Lha < 0 ? 270 - value : 90 + value;
-                        break;
-                    default:
                         break;
                 }
                 OnPropertyChanged();
@@ -2293,20 +2261,6 @@ namespace GS.Server.SkyTelescope
 
                 switch (SkySettings.AlignmentMode)
                 {
-                    case AlignmentModes.algPolar:
-                    case AlignmentModes.algGermanPolar:
-                        //offset for model to match start position
-                        xAxisOffset = 90;
-                        yAxisOffset = -90;
-                        zAxisOffset = 0;
-
-                        //start position
-                        XAxis = -90;
-                        YAxis = 90;
-                        ZAxis = Math.Round(Math.Abs(SkySettings.Latitude), 2);
-                        YAxisCentre = Settings.Settings.YAxisCentre;
-                        GemBlockVisible = true;
-                        break;
                     case AlignmentModes.algAltAz:
                         //offset for model to match start position
                         xAxisOffset = 0;
@@ -2319,7 +2273,20 @@ namespace GS.Server.SkyTelescope
                         YAxisCentre = 0;
                         GemBlockVisible = false;
                         break;
+                    case AlignmentModes.algPolar:
+                    case AlignmentModes.algGermanPolar:
                     default:
+                        //offset for model to match start position
+                        xAxisOffset = 90;
+                        yAxisOffset = -90;
+                        zAxisOffset = 0;
+
+                        //start position
+                        XAxis = -90;
+                        YAxis = 90;
+                        ZAxis = Math.Round(Math.Abs(SkySettings.Latitude), 2);
+                        YAxisCentre = Settings.Settings.YAxisCentre;
+                        GemBlockVisible = true;
                         break;
                 }
 
@@ -7625,7 +7592,7 @@ namespace GS.Server.SkyTelescope
             get
             {
                 var si = new SystemInfo();
-                return si.GetComPorts(); ;
+                return si.GetComPorts(); 
             }
         }
 

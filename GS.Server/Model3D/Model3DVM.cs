@@ -699,20 +699,6 @@ namespace GS.Server.Model3D
 
                 switch (SkySettings.AlignmentMode)
                 {
-                    case AlignmentModes.algPolar:
-                    case AlignmentModes.algGermanPolar:
-                        //offset for model to match start position
-                        xAxisOffset = 90;
-                        yAxisOffset = -90;
-                        zAxisOffset = 0;
-
-                        //start position
-                        XAxis = -90;
-                        YAxis = 90;
-                        ZAxis = Math.Round(Math.Abs(SkySettings.Latitude), 2);
-                        YAxisCentre = Settings.Settings.YAxisCentre;
-                        GemBlockVisible = true;
-                        break;
                     case AlignmentModes.algAltAz:
                         //offset for model to match start position
                         xAxisOffset = 0;
@@ -725,7 +711,20 @@ namespace GS.Server.Model3D
                         YAxisCentre = 0;
                         GemBlockVisible = false;
                         break;
+                    case AlignmentModes.algPolar:
+                    case AlignmentModes.algGermanPolar:
                     default:
+                        //offset for model to match start position
+                        xAxisOffset = 90;
+                        yAxisOffset = -90;
+                        zAxisOffset = 0;
+
+                        //start position
+                        XAxis = -90;
+                        YAxis = 90;
+                        ZAxis = Math.Round(Math.Abs(SkySettings.Latitude), 2);
+                        YAxisCentre = Settings.Settings.YAxisCentre;
+                        GemBlockVisible = true;
                         break;
                 }
 

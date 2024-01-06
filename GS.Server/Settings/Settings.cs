@@ -23,7 +23,6 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media.Media3D;
-using GS.Principles;
 
 namespace GS.Server.Settings
 {

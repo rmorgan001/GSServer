@@ -1787,7 +1787,7 @@ namespace GS.Server.SkyTelescope
             get => _AltAxisUpperLimit;
             set
             {
-                if (_AltAxisUpperLimit == value) return;
+                if (Math.Abs(_AltAxisUpperLimit - value) < 0.000001) return;
                 _AltAxisUpperLimit = value;
                 Properties.SkyTelescope.Default.AltAxisUpperLimit = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
@@ -1801,7 +1801,7 @@ namespace GS.Server.SkyTelescope
             get => _AltAxisLowerLimit;
             set
             {
-                if (_AltAxisLowerLimit == value) return;
+                if (Math.Abs(_AltAxisLowerLimit - value) < 0.000001) return;
                 _AltAxisLowerLimit = value;
                 Properties.SkyTelescope.Default.AltAxisLowerLimit = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
@@ -1967,9 +1967,8 @@ namespace GS.Server.SkyTelescope
                     break;
                 case AlignmentModes.algPolar:
                 case AlignmentModes.algGermanPolar:
-                    CanSetPierSide = true;
-                    break;
                 default:
+                    CanSetPierSide = true;
                     break;
             }
             //UTCDateOffset = Properties.SkyTelescope.Default.UTCOffset;

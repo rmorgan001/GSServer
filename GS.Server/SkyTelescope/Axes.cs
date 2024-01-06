@@ -33,7 +33,7 @@ namespace GS.Server.SkyTelescope
         {
             var a = new[] { SkyServer.MountAxisX, SkyServer.MountAxisY };
             if (SkySettings.AlignmentMode != AlignmentModes.algAltAz)
-                {
+            {
                 if (SkyServer.SouthernHemisphere)
                 {
                     a[0] = SkyServer.MountAxisX + 180;
@@ -44,7 +44,6 @@ namespace GS.Server.SkyTelescope
                     a[0] = SkyServer.MountAxisX;
                     a[1] = SkyServer.MountAxisY;
                 }
-
             }
             return a;
         }

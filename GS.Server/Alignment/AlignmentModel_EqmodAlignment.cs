@@ -1,5 +1,4 @@
 ﻿// This file contains code that is based on the logi from the EQMOD Alignment code.
-using System;
 using System.Linq;
 
 namespace GS.Server.Alignment
