@@ -60,6 +60,7 @@ namespace GS.Server.Windows
                     PecShow = SkyServer.PecShow;
                     PecOn = SkyServer.PecOn;
                     SchedulerShow = false;
+                    EnableFlipSOP = SkySettings.CanSetPierSide;
                 }
 
             }
@@ -175,6 +176,9 @@ namespace GS.Server.Windows
                          break;
                      case "HcSpeed":
                          //HcSpeed = (double)SkySettings.HcSpeed;
+                         break;
+                     case "CanSetPierSide":
+                         EnableFlipSOP = SkySettings.CanSetPierSide;
                          break;
                  }
              });
@@ -1110,7 +1114,19 @@ namespace GS.Server.Windows
             }
         }
 
-       
+
+        private bool _enableFlipSOP;
+        public bool EnableFlipSOP
+        {
+            get => _enableFlipSOP;
+            set
+            {
+                if (_enableFlipSOP == value) return;
+                _enableFlipSOP = value;
+                OnPropertyChanged();
+            }
+        }
+
         private bool _isFlipDialogOpen;
         public bool IsFlipDialogOpen
         {
