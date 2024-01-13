@@ -56,6 +56,7 @@ namespace GS.Server.Model3D
 
             SkyServer.StaticPropertyChanged += PropertyChangedSkyServer;
             Settings.Settings.StaticPropertyChanged += PropertyChangedSettings;
+            SkySettings.StaticPropertyChanged += PropertyChangedSkySettings;
 
             LookDirection = Settings.Settings.ModelLookDirection1;
             UpDirection = Settings.Settings.ModelUpDirection1;
@@ -189,6 +190,45 @@ namespace GS.Server.Model3D
 
                 SkyServer.AlertState = true;
                 OpenDialog(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Property changes from settings
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PropertyChangedSkySettings(object sender, PropertyChangedEventArgs e)
+        {
+            try
+            {
+                ThreadContext.BeginInvokeOnUiThread(
+             delegate
+             {
+                 switch (e.PropertyName)
+                 {
+                     case "AlignmentMode":
+                         OpenResetView();
+                         break;
+                 }
+             });
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 

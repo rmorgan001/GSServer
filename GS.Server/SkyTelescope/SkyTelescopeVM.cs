@@ -164,6 +164,7 @@ namespace GS.Server.SkyTelescope
                             SkySettings.CanSetPierSide = SkySettings.HourAngleLimit != 0;
                             break;
                     }
+                    EnableFlipSOP = SkySettings.CanSetPierSide;
 
                     HcWinVisibility = true;
                     ModelWinVisibility = true;
@@ -351,6 +352,9 @@ namespace GS.Server.SkyTelescope
                          break;
                      case "Port":
                          SelectedDevice = SkySettings.Port;
+                         break;
+                     case "CanSetPierSide":
+                         EnableFlipSOP = SkySettings.CanSetPierSide;
                          break;
                  }
              });
@@ -2907,7 +2911,6 @@ namespace GS.Server.SkyTelescope
                     {
                         SkyServer.AtPark = false;
                     }
-                    SkyServer.IsTrackingClickActive = true;
                     SkyServer.Tracking = !SkyServer.Tracking;
                 }
             }
@@ -3072,6 +3075,18 @@ namespace GS.Server.SkyTelescope
             {
                 if (_autoHomeContent == value) return;
                 _autoHomeContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _enableFlipSOP;
+        public bool EnableFlipSOP
+        {
+            get => _enableFlipSOP;
+            set
+            {
+                if (_enableFlipSOP == value) return;
+                _enableFlipSOP = value;
                 OnPropertyChanged();
             }
         }

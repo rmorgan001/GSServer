@@ -387,7 +387,7 @@
       <Value Profile="(Default)">COM1</Value>
     </Setting>
     <Setting Name="AltAzTrackingUpdateInterval" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">2000</Value>
+      <Value Profile="(Default)">2500</Value>
     </Setting>
     <Setting Name="AltAxisLimitOn" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -396,7 +396,7 @@
       <Value Profile="(Default)">80</Value>
     </Setting>
     <Setting Name="AltAxisLowerLimit" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">-10</Value>
     </Setting>
   </Settings>
 </SettingsFile>
