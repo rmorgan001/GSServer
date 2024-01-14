@@ -811,8 +811,11 @@ namespace GS.Server.SkyTelescope
                 _rateMoveAxes.Y = value;
                 if (Math.Abs(value) > 0)
                 {
-                    //if (Tracking){_MoveAxisPrevTracking = true;}
-                    //Tracking = false;
+                    if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
+                    {
+                        _MoveAxisPrevTracking = Tracking;
+                        Tracking = false;
+                    }
                     IsSlewing = true;
                     SlewState = SlewType.SlewMoveAxis;
                 }
@@ -820,11 +823,14 @@ namespace GS.Server.SkyTelescope
                 {
                     IsSlewing = false;
                     SlewState = SlewType.SlewNone;
-                    //if (_MoveAxisPrevTracking)
-                    //{
-                    //    Tracking = true;
-                    //    _MoveAxisPrevTracking = false;
-                    //}
+                    if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
+                    {
+                        if (_MoveAxisPrevTracking)
+                        {
+                            Tracking = true;
+                            _MoveAxisPrevTracking = false;
+                        }
+                    }
                 }
 
                 object _;
@@ -866,7 +872,7 @@ namespace GS.Server.SkyTelescope
                 _rateMoveAxes.X = value;
                 if (Math.Abs(value) > 0)
                 {
-                    if (Tracking) { _MoveAxisPrevTracking = true; }
+                    _MoveAxisPrevTracking = Tracking;
                     Tracking = false;
                     IsSlewing = true;
                     SlewState = SlewType.SlewMoveAxis;
@@ -875,11 +881,8 @@ namespace GS.Server.SkyTelescope
                 {
                     IsSlewing = false;
                     SlewState = SlewType.SlewNone;
-                    if (_MoveAxisPrevTracking)
-                    {
-                        Tracking = true;
-                        _MoveAxisPrevTracking = false;
-                    }
+                    Tracking = _MoveAxisPrevTracking;
+                    _MoveAxisPrevTracking = false;
                 }
 
                 object _;
@@ -2389,7 +2392,7 @@ namespace GS.Server.SkyTelescope
             }
 
             TrackingSpeak = false;
-            Tracking = tracking;
+            Tracking = tracking || _MoveAxisPrevTracking; //handle case when move axis was in progress
             TrackingSpeak = true;
 
             if (speak) { Synthesizer.Speak(Application.Current.Resources["vceAbortSlew"].ToString()); }
