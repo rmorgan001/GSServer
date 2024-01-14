@@ -3579,6 +3579,42 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        public string HcToolTipN
+        {
+            get
+            {
+                var toolTipRes = SkySettings.AlignmentMode == AlignmentModes.algAltAz ? "hcTipU" : "hcTipN";
+                return Application.Current.Resources[toolTipRes].ToString();
+            }
+        }
+
+        public string HcToolTipE
+        {
+            get
+            {
+                var toolTipRes = SkySettings.AlignmentMode == AlignmentModes.algAltAz ? "hcTipR" : "hcTipE";
+                return Application.Current.Resources[toolTipRes].ToString();
+            }
+        }
+
+        public string HcToolTipS
+        {
+            get
+            {
+                var toolTipRes = SkySettings.AlignmentMode == AlignmentModes.algAltAz ? "hcTipD" : "hcTipS";
+                return Application.Current.Resources[toolTipRes].ToString();
+            }
+        }
+
+        public string HcToolTipW
+        {
+            get
+            {
+                var toolTipRes = SkySettings.AlignmentMode == AlignmentModes.algAltAz ? "hcTipL" : "hcTipW";
+                return Application.Current.Resources[toolTipRes].ToString();
+            }
+        }
+
         private bool _hcWinVisibility;
         public bool HcWinVisibility
         {

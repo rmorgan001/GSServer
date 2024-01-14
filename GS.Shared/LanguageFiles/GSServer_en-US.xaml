@@ -99,6 +99,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="hcTipN">N</system:String>
     <system:String x:Key="hcTipE">E</system:String>
     <system:String x:Key="hcTipS">S</system:String>
+    <system:String x:Key="hcTipL">Left</system:String>
+    <system:String x:Key="hcTipU">Up</system:String>
+    <system:String x:Key="hcTipR">Right</system:String>
+    <system:String x:Key="hcTipD">Down</system:String>
     <system:String x:Key="hcTipStop">Stop</system:String>
     <system:String x:Key="hcSpeed">Speed</system:String>
     <system:String x:Key="hcTipSpeed">Slew Speed</system:String>
