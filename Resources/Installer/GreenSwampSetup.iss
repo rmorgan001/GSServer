@@ -27,6 +27,7 @@ OutputDir="."
 Compression=lzma
 SetupIconFile="greenswamp2.ico"       
 SetupLogging=yes
+ShowLanguageDialog=auto
 SolidCompression=yes
 ; Put there by Platform if Driver Installer Support selected
 WizardImageFile="WizardImage1.bmp"
@@ -40,6 +41,9 @@ DisableWelcomePage=No
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
+Name: "french"; MessagesFile: "compiler:Languages\French.isl"
+Name: "german"; MessagesFile: "compiler:Languages\German.isl"
+Name: "italian"; MessagesFile: "compiler:Languages\Italian.isl"
 
 [Dirs]
 Name: "{cf}\ASCOM\Uninstall\Telescope\GSServer\"
@@ -65,13 +69,11 @@ Source: "..\..\Builds\Release\x86\*.*"; DestDir: "{app}\x86";
 Source: "..\Manuals\GSS Manual.pdf"; DestDir: "{app}"; DestName:"{#ManualName}"; Flags: isreadme
 ; TODO: Add other files needed by your driver here (add subfolders above)
 
-[Languages]
-Name: "fr"; MessagesFile: "compiler:Languages\French.isl"
-Name: "en"; MessagesFile: "compiler:Default.isl"
-
 [Messages]
-en.WelcomeLabel2={#MyAppName} {#MyAppVersion}%n%nThis will install {#MyAppName} {#MyAppVersion} on your computer.%n%nIt is recommended that you close all other applications that may be currently using {#MyAppName}
-fr.WelcomeLabel2={#MyAppName} {#MyAppVersion}%n%nCela installera {#MyAppName} {#MyAppVersion} sur votre ordinateur.%n%nIl est recommandé de fermer toutes les autres applications qui utilisent actuellement {#MyAppName}
+english.WelcomeLabel2={#MyAppName} {#MyAppVersion}%n%nThis will install {#MyAppName} {#MyAppVersion} on your computer.%n%nIt is recommended that you close all other applications that may be currently using {#MyAppName}
+french.WelcomeLabel2={#MyAppName} {#MyAppVersion}%n%nCela installera {#MyAppName} {#MyAppVersion} sur votre ordinateur.%n%nIl est recommandé de fermer toutes les autres applications qui utilisent actuellement {#MyAppName}
+german.WelcomeLabel2={#MyAppName} {#MyAppVersion}%n%nThis will install {#MyAppName} {#MyAppVersion} auf deinem Computer.%n%nEs wird empfohlen, alle anderen Anwendungen zu schließen, die derzeit möglicherweise verwendet werden {#MyAppName}
+italian.WelcomeLabel2={#MyAppName} {#MyAppVersion}%n%nThis will install {#MyAppName} {#MyAppVersion} sul tuo computer.%n%nSi consiglia di chiudere tutte le altre applicazioni attualmente in uso {#MyAppName}
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; \

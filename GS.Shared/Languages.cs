@@ -35,7 +35,7 @@ namespace GS.Shared
 
         static Languages()
         {
-            var langs = new List<string>(){ "en-US","fr-FR","it-IT" };
+            var langs = new List<string>(){ "en-US","de-DE","fr-FR","it-IT" };
             SupportedLanguages = langs;
             Settings.Load();
         }

@@ -1,0 +1,50 @@
+﻿<!--/* Copyright(C) 2019-2022 Rob Morgan (robert.morgan.e@gmail.com)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see<https://www.gnu.org/licenses/> .
+*/-->
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!--Dialog -->
+    <system:String x:Key="diaAccept">Akzeptieren</system:String>
+    <system:String x:Key="diaCancel">Abbrechen</system:String>
+    <system:String x:Key="diaOk">Ok</system:String>
+    <system:String x:Key="diaStart">Start</system:String>
+    <system:String x:Key="diaStop">Stop</system:String>
+
+    <!--Converters -->
+    <system:String x:Key="cvtInvNumber">Ungültige Nummer</system:String>
+    <system:String x:Key="cvtColorToBrush">ColorToBrushConverter unterstützt nur die Konvertierung von Farbe und Zeichenfolge</system:String>
+    <system:String x:Key="cvtEnumErr1">Typ muss für einen Aufzählungstyp sein</system:String>
+    <system:String x:Key="cvtEnumErr2">Der Aufzählungstyp (EnumType) muss angegeben werden</system:String>
+    <system:String x:Key="cvtInvIP">Ungültige IP</system:String>
+    <system:String x:Key="cvtRequired">Erforderlich</system:String>
+
+    <!--ChartViewer -->
+    <system:String x:Key="chtNumber">#</system:String>
+    <system:String x:Key="chtStart">Start</system:String>
+    <system:String x:Key="chtEnd">Ende</system:String>
+    <system:String x:Key="chtLength">Länge</system:String>
+    <system:String x:Key="chtType">Typ</system:String>
+    <system:String x:Key="chtOpen">Datei öffnen</system:String>
+    <system:String x:Key="chtQuality">Qualität</system:String>
+    <system:String x:Key="chtViewLog">Log anzeigen</system:String>
+    <system:String x:Key="chtZoom">Vergrößern:</system:String>
+    <system:String x:Key="chtNoValidRecords">Keine gültigen Einträge gefunden</system:String>
+
+    <system:String x:Key="optLanguage">Sprachen</system:String>
+</ResourceDictionary>
+ 
