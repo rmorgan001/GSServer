@@ -193,6 +193,21 @@ namespace GS.Server.Settings
             }
         }
 
+        private static int _modelIntFactor;
+        public static int ModelIntFactor
+        {
+            get => _modelIntFactor;
+            set
+            {
+                if (value < 1 || value > 20) { return; }
+                if (_modelIntFactor == value) { return; }
+                _modelIntFactor = value;
+                Properties.Server.Default.ModelIntFactor = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static Vector3D _modelLookDirection1;
         public static Vector3D ModelLookDirection1
         {
@@ -593,6 +608,7 @@ namespace GS.Server.Settings
             Notes = Properties.Server.Default.Notes;
             SkyWatcher = Properties.Server.Default.SkyWatcher;
             Model3D = Properties.Server.Default.Model3D;
+            ModelIntFactor = Properties.Server.Default.ModelIntFactor;
             ModelLookDirection1 = Vector3D.Parse(Properties.Server.Default.ModelLookDirection1);
             ModelPosition1 = Point3D.Parse(Properties.Server.Default.ModelPosition1);
             ModelUpDirection1 = Vector3D.Parse(Properties.Server.Default.ModelUpDirection1);

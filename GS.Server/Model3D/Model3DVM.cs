@@ -23,6 +23,7 @@ using HelixToolkit.Wpf;
 using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -66,6 +67,8 @@ namespace GS.Server.Model3D
             LoadGEM();
             Rotate();
 
+            FactorList = new List<int>(Enumerable.Range(1, 21));
+
             ActualAxisX = "--.--";
             ActualAxisY = "--.--";
             CameraVis = false;
@@ -79,6 +82,9 @@ namespace GS.Server.Model3D
             ScreenEnabled = SkyServer.IsMountRunning;
             ModelWinVisibility = true;
             ModelType = Settings.Settings.ModelType;
+            Interval = SkySettings.DisplayInterval;
+            ModelFactor = Settings.Settings.ModelIntFactor;
+
         }
 
         #region ViewModel
@@ -91,6 +97,7 @@ namespace GS.Server.Model3D
         {
             try
             {
+                if (!Settings.Settings.Model3D){return;}
                 ThreadContext.BeginInvokeOnUiThread(
              delegate
              {
@@ -113,6 +120,8 @@ namespace GS.Server.Model3D
                          break;
                      case "RightAscensionXForm":
                          RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
+                         break;
+                     case "Rotate3DModel":
                          Rotate();
                          break;
                      case "IsMountRunning":
@@ -171,6 +180,9 @@ namespace GS.Server.Model3D
                                 ModelType = Settings.Settings.ModelType;
                                 LoadGEM();
                                 break;
+                            case "ModelIntFactor":
+                                ModelFactor = Settings.Settings.ModelIntFactor;
+                                break;
                         }
                     });
             }
@@ -209,6 +221,9 @@ namespace GS.Server.Model3D
                  {
                      case "AlignmentMode":
                          OpenResetView();
+                         break;
+                     case "DisplayInterval":
+                         Interval = SkySettings.DisplayInterval;
                          break;
                  }
              });
@@ -711,6 +726,47 @@ namespace GS.Server.Model3D
                 if (_modelType == value) return;
                 _modelType = value;
                 Settings.Settings.ModelType = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public IList<int> FactorList { get; }
+
+        private int _modelFactor;
+        public int ModelFactor
+        {
+            get => _modelFactor;
+            set
+            {
+                if (_modelFactor == value) {return;}
+                _modelFactor = value;
+                Settings.Settings.ModelIntFactor = value;
+                OnPropertyChanged();
+                IntervalTotal = Interval * value;
+            }
+        }
+
+        private int _Interval;
+        public int Interval
+        {
+            get => SkySettings.DisplayInterval;
+            set
+            {
+                if (value == _Interval) {return;}
+                _Interval = value;
+                OnPropertyChanged();
+                _Interval = value;
+                IntervalTotal = value * ModelFactor;
+            }
+        }
+
+        private double _IntervalTotal;
+        public double IntervalTotal
+        {
+            get => _IntervalTotal;
+            set
+            {
+                _IntervalTotal = value;
                 OnPropertyChanged();
             }
         }

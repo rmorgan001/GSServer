@@ -417,8 +417,10 @@ namespace GS.Server.SkyTelescope
                                     break;
                                 case "RightAscensionXForm":
                                     RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
-                                    Rotate();
                                     SetGraphics();
+                                    break;
+                                case "Rotate3DModel":
+                                    Rotate();
                                     break;
                                 case "IsHome":
                                     IsHome = SkyServer.IsHome;

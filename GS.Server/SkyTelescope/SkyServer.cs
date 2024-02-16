@@ -58,6 +58,7 @@ namespace GS.Server.SkyTelescope
         private static readonly Util _util = new Util();
         private static readonly object _timerLock = new object();
         private static MediaTimer _mediaTimer;
+        private static double _intervalCounter;
         private static MediaTimer _altAzTrackingTimer;
 
         // Slew and HC speeds
@@ -195,6 +196,7 @@ namespace GS.Server.SkyTelescope
         private static bool _MoveAxisPrevTracking;
         private static Vector _rateRaDec;
         private static double _rightAscensionXForm;
+        private static bool _rotate3DModel;
         private static double _slewSettleTime;
         private static double _siderealTime;
         private static bool _spiralChanged;
@@ -1047,6 +1049,19 @@ namespace GS.Server.SkyTelescope
             private set
             {
                 _rightAscensionXForm = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Trigger to rotate the 3D model
+        /// </summary>
+        public static bool Rotate3DModel
+        {
+            get => _rotate3DModel;
+            set
+            {
+                _rotate3DModel = value;
                 OnStaticPropertyChanged();
             }
         }
@@ -5615,6 +5630,8 @@ namespace GS.Server.SkyTelescope
                     return;
                 }
 
+                _intervalCounter++; // increment counter
+
                 SiderealTime = GetLocalSiderealTime(); // the time is?
 
                 UpdateSteps(); // get step from the mount
@@ -5632,8 +5649,13 @@ namespace GS.Server.SkyTelescope
                 IsHome = AtHome;
                 IsSideOfPier = SideOfPier;
 
-                _mediaTimer.Period = SkySettings.DisplayInterval; // Event interval time set for UI performance
+                var t = SkySettings.DisplayInterval; // Event interval time set for UI performance 
+                _mediaTimer.Period = t;
 
+                if (_intervalCounter % Settings.Settings.ModelIntFactor == 0)
+                {
+                    Rotate3DModel = true;
+                }
             }
             catch (Exception ex)
             {

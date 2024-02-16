@@ -6,15 +6,17 @@
         <Grid>
         <md:DrawerHost HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0" IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" BorderBrush="{StaticResource MaterialDesignDivider}">
             <md:DrawerHost.LeftDrawerContent>
-                <Grid Width="300">
+                <Grid Width="300" >
                     <Grid.RowDefinitions>
                         <RowDefinition Height="40" />
-                        <RowDefinition />
-                        <RowDefinition />
+                        <RowDefinition Height="70" />
+                        <RowDefinition Height="30" />
+                        <RowDefinition Height="30" />
+                            <RowDefinition />
                     </Grid.RowDefinitions>
                     <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" Content="{StaticResource 3dSettings}" />
                     <ToggleButton Grid.Row="0" HorizontalAlignment="Right" Margin="5" ToolTip="{StaticResource optClose}" Style="{StaticResource MaterialDesignHamburgerToggleButton}" Command="{x:Static md:DrawerHost.CloseDrawerCommand}" CommandParameter="{x:Static Dock.Left}" IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}" />
-                    <ComboBox Grid.Row="1" md:HintAssist.Hint="{StaticResource 3dModelType}" MinWidth="10" Margin="20,0,5,20" Width="200" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="{StaticResource 3dModelType}" ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type enums:Model3DType}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                    <ComboBox Grid.Row="1" md:HintAssist.Hint="{StaticResource 3dModelType}" MinWidth="10" Margin="20,0,5,20" Width="200" HorizontalAlignment="Left" ToolTip="{StaticResource 3dModelType}" ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type enums:Model3DType}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         <ComboBox.Text>
                             <Binding Path="ModelType" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
                         </ComboBox.Text>
@@ -24,7 +26,28 @@
                             </ItemsPanelTemplate>
                         </ComboBox.ItemsPanel>
                     </ComboBox>
-                    <StackPanel Grid.Row="1" Orientation="Vertical" Visibility="Hidden" Margin="10,0,0,0">
+                    <Label Grid.Row="2" HorizontalAlignment="Left" Margin="15,0,0,0" Content="{StaticResource optDisplayInterval}" />
+                    <StackPanel Grid.Row="3" Orientation="Horizontal" Visibility="Visible" Margin="20,0,0,0">
+                            <Label Content="{Binding Interval}" />
+                            <Label Margin="5,0,0,0" Content="*" />
+                            <ComboBox Margin="5,0,0,0" ItemsSource="{Binding FactorList}" Style="{StaticResource MaterialDesignComboBox}">
+                            <ComboBox.SelectedItem>
+                                    <Binding Path="ModelFactor" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </ComboBox.SelectedItem>
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                        </ComboBox>
+                            <Label Margin="5,0,0,0" Content="=" />
+                            <Label Margin="5,0,0,0" Content="{Binding IntervalTotal}"/>
+                        </StackPanel>
+                    <StackPanel Grid.Row="4" Orientation="Vertical" Visibility="Hidden" Margin="20,0,0,0">
                         <StackPanel Orientation="Horizontal">
                             <Label Content="X" />
                             <Slider Width="200" HorizontalAlignment="Left" Delay="1" Minimum="-360" Maximum="360" IsEnabled="False" Value="{Binding XAxis}" />

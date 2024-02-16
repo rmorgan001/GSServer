@@ -12,7 +12,7 @@ namespace GS.Server.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.7.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.10.0.0")]
     internal sealed partial class Server : global::System.Configuration.ApplicationSettingsBase {
         
         private static Server defaultInstance = ((Server)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Server())));
@@ -512,6 +512,18 @@ namespace GS.Server.Properties {
             }
             set {
                 this["YAxisCentre"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int ModelIntFactor {
+            get {
+                return ((int)(this["ModelIntFactor"]));
+            }
+            set {
+                this["ModelIntFactor"] = value;
             }
         }
     }
