@@ -67,7 +67,7 @@ jobs:
           dotnet nuget locals all --clear
           
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 #v3 to v4
         with:
           fetch-depth: 0
           
@@ -78,13 +78,13 @@ jobs:
 
     # Install the .NET Core workload
       - name: Install .NET Core
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4 #v3 to v4
         with:
           dotnet-version: 3.1.x
 
     # Add MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1 #2008f912f56e61277eefaac6d1888b750582aa16
+        uses: microsoft/setup-msbuild@v2 #2008f912f56e61277eefaac6d1888b750582aa16 v1.1 to v2
         
     # Restore the application to populate the obj folder with RuntimeIdentifiers
       - name: Restore the application
