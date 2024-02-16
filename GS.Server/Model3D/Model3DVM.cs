@@ -97,7 +97,7 @@ namespace GS.Server.Model3D
         {
             try
             {
-                if (!Settings.Settings.Model3D){return;}
+                if (!IsCurrentViewModel()){return;}
                 ThreadContext.BeginInvokeOnUiThread(
              delegate
              {
@@ -170,6 +170,7 @@ namespace GS.Server.Model3D
         {
             try
             {
+                if (!IsCurrentViewModel()) { return; }
                 ThreadContext.BeginInvokeOnUiThread(
                     delegate
                     {
@@ -214,6 +215,7 @@ namespace GS.Server.Model3D
         {
             try
             {
+                if (!IsCurrentViewModel()) { return; }
                 ThreadContext.BeginInvokeOnUiThread(
              delegate
              {
@@ -415,6 +417,16 @@ namespace GS.Server.Model3D
         
         }
 
+        /// <summary>
+        /// Checks Selected Tab
+        /// </summary>
+        /// <returns></returns>
+        private bool IsCurrentViewModel()
+        {
+            if (SkyServer.SelectedTab.Uid != 4) { return false; }
+            ScreenEnabled = SkyServer.IsMountRunning;
+            return true;
+        }
         #endregion
 
         #region Viewport3D

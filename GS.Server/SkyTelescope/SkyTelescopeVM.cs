@@ -420,6 +420,7 @@ namespace GS.Server.SkyTelescope
                                     SetGraphics();
                                     break;
                                 case "Rotate3DModel":
+                                    if (SkyServer.SelectedTab.Uid != 0) { return; }
                                     Rotate();
                                     break;
                                 case "IsHome":
@@ -2348,7 +2349,7 @@ namespace GS.Server.SkyTelescope
         private void Rotate()
         {
             if (Graphic != FrontGraphic.Model3D) { return; }
-
+            
             var axes = Shared.Model3D.RotateModel(SkySettings.Mount.ToString(), SkyServer.ActualAxisX,
                SkyServer.ActualAxisY, SkyServer.SouthernHemisphere, SkySettings.AlignmentMode == AlignmentModes.algAltAz);
 

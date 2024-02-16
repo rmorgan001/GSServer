@@ -211,6 +211,7 @@ namespace GS.Server.SkyTelescope
         private static bool _mountPositionUpdated;
         private static readonly object _mountPositionUpdatedLock = new object();
         private static bool _hcTrackingState;
+
         #endregion
 
         /// <summary>
@@ -479,11 +480,15 @@ namespace GS.Server.SkyTelescope
             get => _guideRate.X;
             set => _guideRate.X = value;
         }
-
         /// <summary>
-        /// Checks if the auto home async process is running
+        /// Current Tab being viewed by the user
         /// </summary>
-        public static bool IsAutoHomeRunning
+        public static Main.IPageVM SelectedTab { get; set; }
+        
+        /// <summary>
+    /// Checks if the auto home async process is running
+    /// </summary>
+    public static bool IsAutoHomeRunning
         {
             get => _isAutoHomeRunning;
             private set
@@ -5522,7 +5527,6 @@ namespace GS.Server.SkyTelescope
             TrackingSpeak = true;
 
             StepsTimeFreq = new long[2];
-
         }
 
         /// <summary>
