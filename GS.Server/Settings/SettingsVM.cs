@@ -1236,6 +1236,52 @@ namespace GS.Server.Settings
             }
         }
 
+        private ICommand _openFolderDialogCmd;
+
+        public ICommand OpenFolderDialogCmd
+        {
+            get
+            {
+                var command = _openFolderDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openFolderDialogCmd = new RelayCommand(
+                    param => OpenFolderDialog()
+                );
+            }
+        }
+
+        private void OpenFolderDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    var path = GSFile.GetLogPath();
+                    var folder = GSFile.GetFolderName(path);
+                    GSFile.SaveLogPath(folder);
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message);
+            }
+        }
         #endregion
 
         #region Dialog

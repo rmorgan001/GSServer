@@ -36,10 +36,6 @@ namespace GS.Shared
         private static int _sessionIndex;
         private static int _monitorIndex;
         private static readonly string _instanceFileName;
-        private static readonly string _logPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        private static readonly string _monitorFile = Path.Combine(_logPath, "GSServer\\GSMonitorLog");
-        private static readonly string _errorFile = Path.Combine(_logPath, "GSServer\\GSErrorLog");
-        private static readonly string _sessionFile = Path.Combine(_logPath, "GSServer\\GSSessionLog");
         private static readonly SemaphoreSlim _lockFile = new SemaphoreSlim(1);
         private const string fmt = "0000#";
         #endregion
@@ -137,10 +133,10 @@ namespace GS.Shared
         static MonitorQueue()
         {
             _instanceFileName = $"{DateTime.Now:yyyy-MM-dd-HH}.txt";
-            DeleteFiles("GSSessionLog", 7, _logPath);
-            DeleteFiles("GSErrorLog", 7, _logPath);
-            DeleteFiles("GSChartingLog", 7, _logPath);
-            DeleteFiles("GSMonitorLog", 7, _logPath);
+            DeleteFiles("GSSessionLog", 7, GSFile.GetLogPath());
+            DeleteFiles("GSErrorLog", 7, GSFile.GetLogPath());
+            DeleteFiles("GSChartingLog", 7, GSFile.GetLogPath());
+            DeleteFiles("GSMonitorLog", 7, GSFile.GetLogPath());
 
 
             _monitorBlockingCollection = new BlockingCollection<MonitorEntry>();
@@ -349,7 +345,7 @@ namespace GS.Shared
             {
                 if (!Settings.LogSession) return;
                 ++_sessionIndex;
-                FileWriteAsync(_sessionFile + _instanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{_sessionIndex.ToString(fmt)}|{entry.Device}|{entry.Category}|{entry.Type}|{entry.Thread}|{entry.Method}|{entry.Message}");
+                FileWriteAsync(Path.Combine(GSFile.GetLogPath(), "GSSessionLog") + _instanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{_sessionIndex.ToString(fmt)}|{entry.Device}|{entry.Category}|{entry.Type}|{entry.Thread}|{entry.Method}|{entry.Message}");
             }
             catch (Exception e)
             {
@@ -367,7 +363,7 @@ namespace GS.Shared
             try
             {
                 ++_errIndex;
-                FileWriteAsync(_errorFile + _instanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{_errIndex.ToString(fmt)}|{entry.Device}|{entry.Category}|{entry.Type}|{entry.Thread}|{entry.Method}|{entry.Message}");
+                FileWriteAsync(Path.Combine(GSFile.GetLogPath(), "GSErrorLog") + _instanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{_errIndex.ToString(fmt)}|{entry.Device}|{entry.Category}|{entry.Type}|{entry.Thread}|{entry.Method}|{entry.Message}");
             }
             catch (Exception e)
             {
@@ -385,7 +381,7 @@ namespace GS.Shared
             try
             {
                 if (!Settings.LogMonitor) return;
-                FileWriteAsync(_monitorFile + _instanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{entry.Index.ToString(fmt)}|{entry.Device}|{entry.Category}|{entry.Type}|{entry.Thread}|{entry.Method}|{entry.Message}"); //YYYY-MM-DD HH:MM:SS.fff
+                FileWriteAsync(Path.Combine(GSFile.GetLogPath(), "GSMonitorLog") + _instanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{entry.Index.ToString(fmt)}|{entry.Device}|{entry.Category}|{entry.Type}|{entry.Thread}|{entry.Method}|{entry.Message}"); //YYYY-MM-DD HH:MM:SS.fff
             }
             catch (Exception e)
             {

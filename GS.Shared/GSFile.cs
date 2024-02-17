@@ -16,7 +16,8 @@
 using System;
 using System.IO;
 using System.Threading;
-using Microsoft.Win32;
+using System.Windows.Forms;
+using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
 namespace GS.Shared
 {
@@ -24,6 +25,13 @@ namespace GS.Shared
     {
         private static readonly SemaphoreSlim _lockFile = new SemaphoreSlim(1);
 
+        /// <summary>
+        /// Uses the file dialog to retrieve a file path
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="dir"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
         public static string GetFileName(string name, string dir, string filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*")
         {
             var openFileDialog = new OpenFileDialog
@@ -35,7 +43,39 @@ namespace GS.Shared
             };
             return openFileDialog.ShowDialog() != true ? null : openFileDialog.FileName;
         }
-
+        /// <summary>
+        /// uses the Folder Browser Dialog to retrieve a folder path
+        /// </summary>
+        /// <remarks>needs system.windows.forms</remarks>
+        /// <param name="startDir"></param>
+        /// <param name="showNew"></param>
+        /// <returns>Folder Path</returns>
+        public static string GetFolderName(string startDir, bool showNew = false)
+        {
+            using (var folderDlg = new FolderBrowserDialog())
+            {
+                folderDlg.ShowNewFolderButton = showNew;
+                folderDlg.SelectedPath = startDir;
+                return folderDlg.ShowDialog() != DialogResult.OK ? null : folderDlg.SelectedPath;
+            }
+        }
+        /// <summary>
+        /// saves logging path or a default path to settings
+        /// </summary>
+        /// <param name="path"></param>
+        public static void SaveLogPath(string path)
+        {
+            Settings.LogPath = Directory.Exists(path) ? path : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "GSServer");
+        }
+        /// <summary>
+        /// Get the logging path or a default path from settings
+        /// </summary>
+        /// <returns>logPath</returns>
+        public static string GetLogPath()
+        {
+            var path = Settings.LogPath;
+            return Directory.Exists(path) ? path : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),"GSServer");
+        }
         /// <summary>
         /// Send entries to a file async
         /// </summary>

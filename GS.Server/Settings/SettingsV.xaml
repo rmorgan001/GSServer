@@ -141,11 +141,14 @@
                             <ItemsControl FontFamily="Segoe UI" FontSize="8" Foreground="DarkSeaGreen" ItemsSource="{Binding Path=MonitorEntries}" Style="{StaticResource LogViewerStyle}"/>
                         </Border>
                         <StackPanel Orientation="Horizontal" Grid.Row="5" VerticalAlignment="Top" HorizontalAlignment="Center">
-                            <StackPanel Orientation="Horizontal" >
+                            <Button Margin="5,0,5,0" Command="{Binding OpenFolderDialogCmd}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource optLogPath}" Padding="5">
+                                <md:PackIcon Kind="FolderEdit" Width="29" Height="29"/>
+                            </Button>
+                            <StackPanel Orientation="Horizontal" Margin="5,0,5,0">
                                 <CheckBox IsChecked="{Binding SessionLog}" Style="{StaticResource MaterialDesignCheckBox}"/>
                                 <TextBlock Width="Auto" ToolTip="{StaticResource optSessionLog}" Margin="5 0" VerticalAlignment="Center" Text="{StaticResource optSessionLog}"/>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" >
+                            <StackPanel Orientation="Horizontal" Margin="5,0,5,0">
                                 <CheckBox IsChecked="{Binding MonitorToFile}" Style="{StaticResource MaterialDesignCheckBox}"/>
                                 <TextBlock Width="Auto" Margin="5 0" VerticalAlignment="Center" ToolTip="{StaticResource optWriteFile}" Text="{StaticResource optLogFile}"/>
                             </StackPanel>

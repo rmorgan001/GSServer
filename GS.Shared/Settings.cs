@@ -280,7 +280,21 @@ namespace GS.Shared
                 OnStaticPropertyChanged();
             }
         }
-        
+
+        private static string _logPath;
+        public static string LogPath
+        {
+            get => _logPath;
+            set
+            {
+                if (_logPath == value) return;
+                _logPath = value;
+                Properties.Monitor.Default.LogPath = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         /// <summary>
         /// starts sending entries to a file in my documents
         /// </summary>
@@ -333,6 +347,7 @@ namespace GS.Shared
             Telescope = Properties.Monitor.Default.Telescope;
             Mount = Properties.Monitor.Default.Mount;
             LogMonitor = Properties.Monitor.Default.LogMonitor;
+            LogPath = Properties.Monitor.Default.LogPath;
             StartMonitor = Properties.Monitor.Default.StartMonitor;
             Language = Properties.Monitor.Default.Language;
             LogCharting = Properties.Monitor.Default.LogCharting;

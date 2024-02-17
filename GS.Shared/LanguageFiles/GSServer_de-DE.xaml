@@ -719,5 +719,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--1.0.6.4 -->
     <system:String x:Key="optAlignmentWarningThreshold">Warnung Schwellenwert</system:String>
     <system:String x:Key="aliWarningThresholdTooltip">Der Wert, bei dem die Ausrichtungswarnung ausgelöst wird (Multiplikation des maximal registrierten Synchronisationsabstands).</system:String>
+    <!--1.0.7.8 -->
+    <system:String x:Key="optLogPath">Protokollpfad</system:String>
+
 </ResourceDictionary>
  
