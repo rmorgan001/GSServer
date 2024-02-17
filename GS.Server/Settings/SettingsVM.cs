@@ -1260,9 +1260,9 @@ namespace GS.Server.Settings
             {
                 using (new WaitCursor())
                 {
-                    var path = GSFile.GetLogPath();
-                    var folder = GSFile.GetFolderName(path);
-                    GSFile.SaveLogPath(folder);
+                    var folder = GSFile.GetFolderName(GSFile.GetLogPath());
+                    if(string.IsNullOrEmpty(folder)){ return; }
+                    if (Directory.Exists(folder)) { GSFile.SaveLogPath(folder); }
                 }
             }
             catch (Exception ex)
