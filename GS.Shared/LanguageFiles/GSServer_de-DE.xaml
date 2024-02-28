@@ -87,7 +87,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="botTipSOP">Seite des Piers</system:String>
     <system:String x:Key="botTipAxisLimit">Achsenbegrenzung, für Optionen anklicken</system:String>
     <system:String x:Key="botTipWarnings">Warnungen, zum Zurücksetzen anklicken</system:String>
-    <system:String x:Key="botTipErrors">Fehler, zum Zurücksetzen anklicken </system:String>
+    <system:String x:Key="botTipErrors">Fehler, zum Zurücksetzen anklicken</system:String>
     <system:String x:Key="botTipVoice">Stimme</system:String>
     <system:String x:Key="botTipMonitor">Monitor</system:String>
     <system:String x:Key="botTipConnected">Für Informationen zur Montierung anklicken</system:String>
@@ -99,6 +99,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="hcTipN">N</system:String>
     <system:String x:Key="hcTipE">O</system:String>
     <system:String x:Key="hcTipS">S</system:String>
+    <system:String x:Key="hcTipL">Links</system:String>
+    <system:String x:Key="hcTipU">Rauf</system:String>
+    <system:String x:Key="hcTipR">Rechts</system:String>
+    <system:String x:Key="hcTipD">Runter</system:String>
     <system:String x:Key="hcTipStop">Stop</system:String>
     <system:String x:Key="hcSpeed">Tempo</system:String>
     <system:String x:Key="hcTipSpeed">Drehgeschwindigkeit Speed</system:String>
@@ -629,7 +633,6 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="mntCustomOffsetDec">Benutzerdefinierter Versatz Dek:</system:String>
     <system:String x:Key="mntFreqRa">Frequenz Ra:</system:String>
     <system:String x:Key="mntFreqDec">Frequenz Dek:</system:String>
-
 
     <!--1.0.3.4 -->
     <system:String x:Key="btnReSyncEnc">ReSync Enkoder</system:String>
