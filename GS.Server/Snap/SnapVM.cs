@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019-2021-2021  Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2024  Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -27,9 +27,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using GS.Server.Controls.Dialogs;
+using GS.Server.Phd;
 using GS.Server.SkyTelescope;
 using GS.Server.Windows;
 using GS.Shared.Command;
+using Newtonsoft.Json.Linq;
 
 namespace GS.Server.Snap
 {
@@ -43,7 +45,7 @@ namespace GS.Server.Snap
 
         private CancellationTokenSource ctsSnap1;
         private CancellationTokenSource ctsSnap2;
-        
+
         #endregion
 
         public SnapVM()
@@ -113,8 +115,8 @@ namespace GS.Server.Snap
                 }
                 else
                 {
-                    ctsSnap1?.Cancel();
-                    ctsSnap2?.Cancel();
+                    Snap1Stop();
+                    Snap2Stop();
                     Thread.Sleep(500);
                     SkyServer.SnapPort1Result = false;
                     SkyServer.SnapPort2Result = false;
@@ -131,18 +133,32 @@ namespace GS.Server.Snap
 
         private void SetDefaults()
         {
-            Snap1Enabled = SkyServer.SnapPort1Result;
-            Snap2Enabled = SkyServer.SnapPort2Result;
+            //Common
+            PhdHostText = "LocalHost";
+            PHD_DitherPixels = 1;
+            PHD_SettlePixels = 1;
+            PHD_SettleTime = 20;
+            PHD_SettleTimeout = 60;
 
-            Snap1Loops = 1;
-            Snap2Loops = 1;
-            Snap1Timer = 1;
-            Snap2Timer = 1;
+            //Snap1
+            Dither1_On = false;
             Snap1Delay = 1;
-            Snap2Delay = 1;
-
+            Snap1Timer = 1;
+            Snap1Loops = 1;
+            Dither1_Mod = 1;
+            Snap1Pause = false;
             Snap1GaugeValue = 0;
+            Snap1Enabled = SkyServer.SnapPort1Result;
+
+            //Snap2
+            Dither2_On = false;
+            Snap2Delay = 1;
+            Snap2Timer = 1;
+            Snap2Loops = 1;
+            Dither2_Mod = 1;
+            Snap2Pause = false;
             Snap2GaugeValue = 0;
+            Snap2Enabled = SkyServer.SnapPort2Result;
         }
 
         /// <summary>
@@ -160,10 +176,7 @@ namespace GS.Server.Snap
                  switch (e.PropertyName)
                  {
                      case "IsMountRunning":
-                         if (!SkyServer.IsMountRunning)
-                         {
-                             SnapEnabled = false;
-                         }
+                         if (!SkyServer.IsMountRunning) {SnapEnabled = false; }
                          break;
                      case "SnapPort1Result":
                          Snap1Enabled = SkyServer.SnapPort1Result;
@@ -193,6 +206,309 @@ namespace GS.Server.Snap
             }
         }
 
+        #endregion
+
+        #region Dither
+        //Common PHD
+        private double _pHD_DitherPixels;
+        public double PHD_DitherPixels
+        {
+            get => _pHD_DitherPixels;
+            set
+            {
+                _pHD_DitherPixels = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        private double _pHD_SettlePixels;
+        public double PHD_SettlePixels
+        {
+            get => _pHD_SettlePixels;
+            set
+            {
+                _pHD_SettlePixels = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        private double _pHD_SettleTime;
+        public double PHD_SettleTime
+        {
+            get => _pHD_SettleTime;
+            set
+            {
+                _pHD_SettleTime = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        private double _pHD_SettleTimeout;
+        public double PHD_SettleTimeout
+        {
+            get => _pHD_SettleTimeout;
+            set
+            {
+                _pHD_SettleTimeout = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _phdHostText;
+        public string PhdHostText
+        {
+            get => _phdHostText;
+            set
+            {
+                if (_phdHostText == value) { return; }
+                _phdHostText = value;
+                OnPropertyChanged();
+            }
+        }
+
+        //Dither 1
+        private string _snap1DitherBadgeContent;
+        public string Snap1DitherBadgeContent
+        {
+            get => _snap1DitherBadgeContent;
+            set
+            {
+                _snap1DitherBadgeContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _dither1_On;
+        public bool Dither1_On
+        {
+            get => _dither1_On;
+            set
+            {
+                _dither1_On = value;
+                Snap1DitherBadgeContent = value ? Application.Current.Resources["snpDitherOn"].ToString() : "";
+                OnPropertyChanged();
+            }
+        }
+
+        private int _dither1_Mod;
+        public int Dither1_Mod
+        {
+            get => _dither1_Mod;
+            set
+            {
+                _dither1_Mod = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _clickSnap1DitherCmd;
+        public ICommand ClickSnap1DitherCmd
+        {
+            get
+            {
+                var command = _clickSnap1DitherCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickSnap1DitherCmd = new RelayCommand(
+                    param => ClickSnap1Dither()
+                );
+            }
+        }
+        private void ClickSnap1Dither()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    DialogContent = new Snap1DitherDialog();
+                    DialogCaption = Application.Current.Resources["snpDither"].ToString(); 
+                    IsDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _clickSnap1DitherDialogCmd;
+        public ICommand ClickSnap1DitherDialogCmd
+        {
+            get
+            {
+                var command = _clickSnap1DitherDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickSnap1DitherDialogCmd = new RelayCommand(
+                    param => ClickSnap1DitherDialog()
+                );
+            }
+        }
+        private void ClickSnap1DitherDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        //Dither 2
+        private bool _dither2_On;
+        public bool Dither2_On
+        {
+            get => _dither2_On;
+            set
+            {
+                _dither2_On = value;
+                Snap2DitherBadgeContent = value ? Application.Current.Resources["snpDitherOn"].ToString() : "";
+                OnPropertyChanged();
+            }
+        }
+
+        private int _dither2_Mod;
+        public int Dither2_Mod
+        {
+            get => _dither2_Mod;
+            set
+            {
+                _dither2_Mod = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _snap2DitherBadgeContent;
+        public string Snap2DitherBadgeContent
+        {
+            get => _snap2DitherBadgeContent;
+            set
+            {
+                _snap2DitherBadgeContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _clickSnap2DitherCmd;
+        public ICommand ClickSnap2DitherCmd
+        {
+            get
+            {
+                var command = _clickSnap2DitherCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickSnap2DitherCmd = new RelayCommand(
+                    param => ClickSnap2Dither()
+                );
+            }
+        }
+        private void ClickSnap2Dither()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    DialogContent = new Snap2DitherDialog();
+                    DialogCaption = Application.Current.Resources["snpDither"].ToString();
+                    IsDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _clickSnap2DitherDialogCmd;
+        public ICommand ClickSnap2DitherDialogCmd
+        {
+            get
+            {
+                var command = _clickSnap2DitherDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickSnap2DitherDialogCmd = new RelayCommand(
+                    param => ClickSnap2DitherDialog()
+                );
+            }
+        }
+        private void ClickSnap2DitherDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
         #endregion
 
         #region Snap1
@@ -338,7 +654,7 @@ namespace GS.Server.Snap
                             Type = MonitorType.Information,
                             Method = MethodBase.GetCurrentMethod()?.Name,
                             Thread = Thread.CurrentThread.ManagedThreadId,
-                            Message = $"Snap 1|{SkyServer.SnapPort1Result}|{Snap1Timer}|{Snap1Loops}|{Snap1Delay}"
+                            Message = $"Snap 1|{SkyServer.SnapPort1Result}|{Snap1Timer}|{Snap1Loops}|{Snap1Delay}|{Dither2_On}"
                         };
                         MonitorLog.LogToMonitor(monitorItem);
                         Snap1LoopAsync();
@@ -377,7 +693,7 @@ namespace GS.Server.Snap
                     param => ClickSnap1Pause()
                 );
             }
-        }
+        } 
         private void ClickSnap1Pause()
         {
             try
@@ -421,6 +737,7 @@ namespace GS.Server.Snap
             Snap1Pause = false;
             Snap1StartBadgeContent = "";
             Snap1PauseBadgeContent = "";
+            Snap1Running = false;
         }
 
         private void Snap1Start()
@@ -464,7 +781,7 @@ namespace GS.Server.Snap
                 {
                     Snap1Start();
                     var KeepRunning = true;
-                    Snap1GaugeValue = 0;
+                    Snap1GaugeValue = 1;
                     while (KeepRunning)
                     {
                         if (ct.IsCancellationRequested)
@@ -485,7 +802,7 @@ namespace GS.Server.Snap
                             break;
                         }
 
-                        if (Snap1GaugeValue >= Snap1Loops)
+                        if (Snap1GaugeValue > Snap1Loops)
                         {
                             ctsSnap1.Cancel();
                             break;
@@ -510,7 +827,6 @@ namespace GS.Server.Snap
 
                             Thread.Sleep(10);
                         }
-
                         Snap1Trigger(false);
 
                         // Delay
@@ -526,6 +842,79 @@ namespace GS.Server.Snap
                             Thread.Sleep(100);
                         }
 
+
+                        //Run PHD Dither
+                        if (Dither1_On && Snap1GaugeValue % Dither1_Mod == 0)
+                        {
+                            Debug.WriteLine(Snap1GaugeValue);
+                            var ctsPhd = new CancellationTokenSource();
+                            var phd = new GuiderImpl(PhdHostText, 1, ctsPhd);
+
+                            try
+                            {
+                                phd.Connect();
+                                phd.DoWork();
+                                //var version = phd.Version;
+                                //var subver = phd.PHDSubver;
+                                phd.Dither(PHD_DitherPixels, PHD_SettlePixels, PHD_SettleTime, PHD_SettleTimeout);
+
+                                var swDith1 = Stopwatch.StartNew();
+                                while (swDith1.Elapsed.TotalSeconds <= PHD_SettleTimeout)
+                                {
+                                    if (ctsPhd.IsCancellationRequested) { break; }
+                                    phd.DoWork();
+
+                                    // check for any errors events
+                                    if (phd.Response != null && phd.Response.ContainsKey("jsonrpc"))
+                                    {
+                                        var error = (JObject)phd.Response["error"];
+                                        var code = (int)error["code"];
+                                        var message = (string)error["message"];
+                                        if (code > 0) { throw new Exception($"PHD2: {code}, {message}"); }
+                                    }
+
+                                    //keep checking settle status until timeout 
+                                    if (phd.IsSettling()) { continue; }
+                                    var settle = phd.SettleProgress;
+                                    if (settle == null) { continue; }
+
+                                    Debug.WriteLine($"{swDith1.Elapsed.TotalSeconds}, {settle.Done}, {settle.Status}, {settle.Error}, {settle.SettleTime}");
+
+                                    if (settle.Done && settle.Status != 0)
+                                    {
+                                        throw new Exception($"{settle.Status} {settle.Error}");
+                                    }
+                                    if (settle.Done && settle.Status == 0) { break; }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                var monitorItem = new MonitorEntry
+                                {
+                                    Datetime = HiResDateTime.UtcNow,
+                                    Device = MonitorDevice.UI,
+                                    Category = MonitorCategory.Server,
+                                    Type = MonitorType.Warning,
+                                    Method = MethodBase.GetCurrentMethod()?.Name,
+                                    Thread = Thread.CurrentThread.ManagedThreadId,
+                                    Message = $"{ex.Message}"
+                                };
+                                MonitorLog.LogToMonitor(monitorItem);
+                                ThreadContext.InvokeOnUiThread(delegate { OpenDialog(ex.Message); }, ct);
+                            }
+                            finally
+                            {
+                                ctsPhd.Cancel();
+                                phd.Dispose();
+                            }
+                        }
+
+                        //Increment Loop
+                        if (Snap1GaugeValue >= Snap1Loops)
+                        {
+                            ctsSnap1.Cancel();
+                            break;
+                        }
                         Snap1GaugeValue++;
                     }
                 }, ct);
@@ -555,9 +944,10 @@ namespace GS.Server.Snap
             }
             finally
             {
-                Snap1Running = false;
+                Snap1Stop();
             }
         }
+
 
         #endregion
 
@@ -705,7 +1095,7 @@ namespace GS.Server.Snap
                             Type = MonitorType.Information,
                             Method = MethodBase.GetCurrentMethod()?.Name,
                             Thread = Thread.CurrentThread.ManagedThreadId,
-                            Message = $"Snap 2|{SkyServer.SnapPort2Result}|{Snap2Timer}|{Snap2Loops}|{Snap2Delay}"
+                            Message = $"Snap 2|{SkyServer.SnapPort2Result}|{Snap2Timer}|{Snap2Loops}|{Snap2Delay}|{Dither2_On}"
                         };
                         MonitorLog.LogToMonitor(monitorItem);
                         Snap2LoopAsync();
@@ -788,6 +1178,7 @@ namespace GS.Server.Snap
             Snap2Pause = false;
             Snap2StartBadgeContent = "";
             Snap2PauseBadgeContent = "";
+            Snap2Running = false;
         }
 
         private void Snap2Start()
@@ -829,42 +1220,42 @@ namespace GS.Server.Snap
                 var ct = ctsSnap2.Token;
                 var task = Task.Run(() =>
                 {
-                    Snap2Start();
-                    var KeepRunning = true;
-                    Snap2GaugeValue = 0;
+                    Snap2Start(); // Set defaults
+                    var KeepRunning = true; //local
+                    Snap2GaugeValue = 1; //local
                     while (KeepRunning)
                     {
-                        if (ct.IsCancellationRequested)
+                        if (ct.IsCancellationRequested) //Cancel Snap
                         {
                             //  KeepRunning = false;
                             break;
                         }
 
-                        if (!Snap2Running)
+                        if (!Snap2Running) //Snap 2 running?
                         {
                             ctsSnap2.Cancel();
                             break;
                         }
 
-                        if (!Snap2Enabled)
+                        if (!Snap2Enabled) //Snap 2 enabled?
                         {
                             ctsSnap2.Cancel();
                             break;
                         }
 
-                        if (Snap2GaugeValue >= Snap2Loops)
+                        if (Snap2GaugeValue > Snap2Loops) //End of loops
                         {
                             ctsSnap2.Cancel();
                             break;
                         }
 
-                        if (Snap2Pause)
+                        if (Snap2Pause) //Pause button on
                         {
                             Thread.Sleep(500);
                             continue;
                         }
 
-                        // take snap
+                        //Run snap on then turn off
                         Snap2Trigger(true);
                         var swSnap = Stopwatch.StartNew();
                         while (swSnap.Elapsed.TotalMilliseconds < TimeSpan.FromSeconds(Snap2Timer).TotalMilliseconds)
@@ -874,13 +1265,11 @@ namespace GS.Server.Snap
                                 KeepRunning = false;
                                 break;
                             }
-
                             Thread.Sleep(10);
                         }
-
                         Snap2Trigger(false);
 
-                        // Delay
+                        //Run any wanted delay
                         var swD = Stopwatch.StartNew();
                         while (swD.Elapsed.TotalMilliseconds < TimeSpan.FromSeconds(Snap2Delay).TotalMilliseconds)
                         {
@@ -889,20 +1278,87 @@ namespace GS.Server.Snap
                                 KeepRunning = false;
                                 break;
                             }
-
                             Thread.Sleep(100);
                         }
 
+                        //Run PHD Dither
+                        if (Dither2_On && Snap2GaugeValue % Dither2_Mod == 0)
+                        {
+                            Debug.WriteLine(Snap2GaugeValue);
+                            var ctsPhd = new CancellationTokenSource();
+                            var phd = new GuiderImpl(PhdHostText, 1, ctsPhd);
+
+                            try
+                            {
+                                phd.Connect();
+                                phd.DoWork();
+                                //var version = phd.Version;
+                                //var subver = phd.PHDSubver;
+                                phd.Dither(PHD_DitherPixels, PHD_SettlePixels, PHD_SettleTime, PHD_SettleTimeout);
+
+                                var swDith2 = Stopwatch.StartNew();
+                                while (swDith2.Elapsed.TotalSeconds <= PHD_SettleTimeout)
+                                {
+                                    if (ctsPhd.IsCancellationRequested) { break; }
+                                    phd.DoWork();
+
+                                    // check for any errors events
+                                    if (phd.Response != null && phd.Response.ContainsKey("jsonrpc") )
+                                    {
+                                        var error = (JObject)phd.Response["error"];
+                                        var code = (int)error["code"];
+                                        var message = (string)error["message"];
+                                        if (code > 0) { throw new Exception($"PHD2: {code}, {message}"); }
+                                    }
+
+                                    //keep checking settle status until timeout 
+                                    if (phd.IsSettling()) { continue; }
+                                    var settle = phd.SettleProgress; 
+                                    if (settle == null) { continue; }
+
+                                    Debug.WriteLine($"{swDith2.Elapsed.TotalSeconds}, {settle.Done}, {settle.Status}, {settle.Error}, {settle.SettleTime}");
+
+                                    if (settle.Done && settle.Status != 0)
+                                    {
+                                        throw new Exception($"{settle.Status} {settle.Error}");
+                                    }
+                                    if (settle.Done && settle.Status == 0) { break; }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                var monitorItem = new MonitorEntry
+                                {
+                                    Datetime = HiResDateTime.UtcNow,
+                                    Device = MonitorDevice.UI,
+                                    Category = MonitorCategory.Server,
+                                    Type = MonitorType.Warning,
+                                    Method = MethodBase.GetCurrentMethod()?.Name,
+                                    Thread = Thread.CurrentThread.ManagedThreadId,
+                                    Message = $"{ex.Message}"
+                                };
+                                MonitorLog.LogToMonitor(monitorItem);
+                                ThreadContext.InvokeOnUiThread(delegate { OpenDialog(ex.Message); }, ct);
+                            }
+                            finally
+                            {
+                                ctsPhd.Cancel();
+                                phd.Dispose();
+                            }
+                        }
+
+                        //Increment Loop
+                        if (Snap2GaugeValue >= Snap2Loops)
+                        {
+                            ctsSnap2.Cancel();
+                            break;
+                        }
                         Snap2GaugeValue++;
                     }
                 }, ct);
                 await task;
                 task.Wait(ct);
-                if (SkyServer.SnapPort2)
-                {
-                    Snap2Trigger(false);
-                }
-
+                if (SkyServer.SnapPort2) {Snap2Trigger(false);}
                 Snap2Stop();
             }
             catch (Exception ex)
@@ -923,6 +1379,7 @@ namespace GS.Server.Snap
             }
             finally
             {
+                Snap2Stop();
                 Snap2Running = false;
             }
         }

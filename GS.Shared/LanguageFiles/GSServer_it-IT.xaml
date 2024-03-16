@@ -1,4 +1,4 @@
-﻿<!--/* Copyright(C) 2019-2022 Rob Morgan (robert.morgan.e@gmail.com)
+﻿<!--/* Copyright(C) 2019-2024 Rob Morgan (robert.morgan.e@gmail.com)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published
@@ -728,5 +728,16 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!--1.0.7.8 -->
     <system:String x:Key="optLogPath">Percorso del registro</system:String>
+
+    <!--1.0.7.9 -->
+    <system:String x:Key="snpDither">Dither</system:String>
+    <system:String x:Key="snpDitherOn">Su</system:String>
+    <system:String x:Key="snpPhdOnOff">Acceso spento</system:String>
+    <system:String x:Key="snpIntLoops">Loop di intervallo</system:String>
+    <system:String x:Key="snpHostIp">Ospite/IP</system:String>
+    <system:String x:Key="snpDitPix">Pixel di dithering</system:String>
+    <system:String x:Key="snpSetPix">Sistema i pixel</system:String>
+    <system:String x:Key="snpSetSec">Regola i secondi</system:String>
+    <system:String x:Key="snpTimeSec">Secondi di timeout</system:String>
 </ResourceDictionary>
  

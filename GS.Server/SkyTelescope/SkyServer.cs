@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019-2022 Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2024 Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -1715,7 +1715,7 @@ namespace GS.Server.SkyTelescope
                             break;
                         case MountTaskName.SetSnapPort1:
                             _ = new CmdSnapPort(0, 1, SnapPort1);
-                            SnapPort1Result = false;
+                            SnapPort1Result = true;
                             break;
                         case MountTaskName.SetSnapPort2:
                             _ = new CmdSnapPort(0, 2, SnapPort2);

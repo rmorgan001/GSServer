@@ -36,6 +36,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
                 <Label Grid.Row="1" Grid.Column="0" Content="{StaticResource snap1}" VerticalAlignment="Bottom"/>
                 <TextBox Grid.Row="1" Grid.Column="1" Margin="20,0,0,0" Width="50" ToolTip="{StaticResource edSeconds}" md:HintAssist.Hint="{StaticResource snapTimer}" VerticalAlignment="Bottom" Style="{StaticResource MaterialDesignFloatingHintTextBox}" >
@@ -65,13 +66,16 @@
                         </Binding>
                     </TextBox.Text>
                 </TextBox>
-                <md:Badged Grid.Row="1" Grid.Column="4" VerticalAlignment="Bottom" Badge="{Binding Snap1StartBadgeContent}">
+                <md:Badged Grid.Row="1" Grid.Column="4" VerticalAlignment="Bottom" Badge="{Binding Snap1DitherBadgeContent}">
+                    <Button Margin="20,0,0,0" Height="30" ToolTip="Dither" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSnap1DitherCmd}" Content="{StaticResource snpDither}" />
+                </md:Badged>
+                <md:Badged Grid.Row="1" Grid.Column="5" VerticalAlignment="Bottom" Badge="{Binding Snap1StartBadgeContent}">
                     <Button Margin="20,0,0,0" Height="30" ToolTip="{StaticResource diaStart}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSnap1StartCmd}" Content="{StaticResource diaStart}" />
-            </md:Badged>
-                <md:Badged Grid.Row="1" Grid.Column="5" VerticalAlignment="Bottom" Badge="{Binding Snap1PauseBadgeContent}" >
+                </md:Badged>
+                <md:Badged Grid.Row="1" Grid.Column="6" VerticalAlignment="Bottom" Badge="{Binding Snap1PauseBadgeContent}" >
                     <Button Margin="20,0,0,0" Height="30" ToolTip="{StaticResource snapPause}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSnap1PauseCmd}" Content="{StaticResource snapPause}" />
-            </md:Badged>
-                <wpf:Gauge Grid.Row="1" Grid.Column="6" Margin="30,0,0,-5" From="0" To="{Binding Snap1GaugeMax}" Value="{Binding Snap1GaugeValue}" Width="80" Height="50" LabelsVisibility="Collapsed" VerticalAlignment="Bottom" GaugeBackground="{StaticResource SecondaryHueMidForegroundBrush}"  GaugeActiveFill="{StaticResource SecondaryHueMidBrush}">
+                </md:Badged>
+                <wpf:Gauge Grid.Row="1" Grid.Column="7" Margin="30,0,0,-5" From="0" To="{Binding Snap1GaugeMax}" Value="{Binding Snap1GaugeValue}" Width="80" Height="50" LabelsVisibility="Collapsed" VerticalAlignment="Bottom" GaugeBackground="{StaticResource SecondaryHueMidForegroundBrush}"  GaugeActiveFill="{StaticResource SecondaryHueMidBrush}">
                 <wpf:Gauge.Style>
                     <Style TargetType="wpf:Gauge">
                         <Style.Triggers>
@@ -94,6 +98,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
@@ -131,13 +136,16 @@
                         </Binding>
                     </TextBox.Text>
                 </TextBox>
-                <md:Badged Grid.Row="1" Grid.Column="4" VerticalAlignment="Bottom" Badge="{Binding Snap2StartBadgeContent}">
+                <md:Badged Grid.Row="1" Grid.Column="4" VerticalAlignment="Bottom" Badge="{Binding Snap2DitherBadgeContent}">
+                    <Button Margin="20,0,0,0" Height="30" ToolTip="Dither" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSnap2DitherCmd}" Content="{StaticResource snpDither}"/>
+                </md:Badged>
+                <md:Badged Grid.Row="1" Grid.Column="5" VerticalAlignment="Bottom" Badge="{Binding Snap2StartBadgeContent}">
                     <Button Margin="20,0,0,0" Height="30" ToolTip="{StaticResource diaStart}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSnap2StartCmd}" Content="{StaticResource diaStart}" />
                 </md:Badged>
-                <md:Badged Grid.Row="1" Grid.Column="5" VerticalAlignment="Bottom" Badge="{Binding Snap2PauseBadgeContent}">
+                <md:Badged Grid.Row="1" Grid.Column="6" VerticalAlignment="Bottom" Badge="{Binding Snap2PauseBadgeContent}">
                     <Button Margin="20,0,0,0" Height="30" ToolTip="{StaticResource snapPause}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSnap2PauseCmd}" Content="{StaticResource snapPause}" />
                 </md:Badged>
-                <wpf:Gauge Grid.Row="1" Grid.Column="6" Margin="30,0,0,-5" From="0" To="{Binding Snap2GaugeMax}" Value="{Binding Snap2GaugeValue}" Width="80" Height="50" LabelsVisibility="Collapsed" VerticalAlignment="Bottom" GaugeBackground="{StaticResource SecondaryHueMidForegroundBrush}" GaugeActiveFill="{StaticResource SecondaryHueMidBrush}">
+                <wpf:Gauge Grid.Row="1" Grid.Column="7" Margin="30,0,0,-5" From="0" To="{Binding Snap2GaugeMax}" Value="{Binding Snap2GaugeValue}" Width="80" Height="50" LabelsVisibility="Collapsed" VerticalAlignment="Bottom" GaugeBackground="{StaticResource SecondaryHueMidForegroundBrush}" GaugeActiveFill="{StaticResource SecondaryHueMidBrush}">
                     <wpf:Gauge.Style>
                         <Style TargetType="wpf:Gauge">
                             <Style.Triggers>

@@ -164,18 +164,58 @@ namespace GS.Server.Phd
         private Thread m_worker;
         private bool m_terminate;
         private readonly object m_sync = new object();
-        private JObject m_response;
         private readonly Accum accum_ra = new Accum();
         private readonly Accum accum_dec = new Accum();
         private bool accum_active;
         private double settle_px;
-        private string AppState;
         private double AvgDist;
         private GuideStats Stats;
-        //private string Version;
-        //private string PHDSubver;
-        private SettleProgress mSettle;
         public double LastPixelScale { get; private set; }
+
+
+        private JObject _response;
+        public JObject Response
+        {
+            get => _response;
+            private set
+            {
+                _response = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _version;
+        public string Version
+        {
+            get => _version;
+            private set
+            {
+                _version = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _pHDSubver;
+        public string PHDSubver
+        {
+            get => _pHDSubver;
+            private set
+            {
+                _pHDSubver = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _appState;
+        public string AppState
+        {
+            get => _appState;
+            private set
+            {
+                _appState = value;
+                OnPropertyChanged();
+            }
+        }
 
         private GuideStep _phdGuideStep;
         public GuideStep PhdGuideStep
@@ -184,6 +224,17 @@ namespace GS.Server.Phd
             private set
             {
                 _phdGuideStep = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private SettleProgress _mSettle;
+        public SettleProgress SettleProgress
+        {
+            get => _mSettle;
+            private set
+            {
+                _mSettle = value;
                 OnPropertyChanged();
             }
         }
@@ -295,7 +346,7 @@ namespace GS.Server.Phd
                 Debug.WriteLine($"R: {line}");
                 lock (m_sync)
                 {
-                    m_response = j;
+                    Response = j;
                     Monitor.Pulse(m_sync);
                 }
             }
@@ -315,140 +366,153 @@ namespace GS.Server.Phd
         {
             var e = (string)ev["Event"];
 
-            if (e == "AppState")
+            switch (e)
             {
-                lock (m_sync)
+                //States:  Stopped | Selected |Calibrating | Guiding | LostLock | Paused | Looping 
+                case "AppState":
                 {
-                    AppState = (string)ev["State"];
-                    if (Is_guiding(AppState))
-                        AvgDist = 0.0;   // until we get a GuideStep event
+                    lock (m_sync)
+                    {
+                        AppState = (string)ev["State"];
+                        if (Is_guiding(AppState))
+                            AvgDist = 0.0;   // until we get a GuideStep event
+                    }
+                    break;
                 }
-            }
-            else if (e == "Version")
-            {
-                lock (m_sync)
+                case "Version":
                 {
-                    //Version = (string)ev["PHDVersion"];
-                    //PHDSubver = (string)ev["PHDSubver"];
+                    lock (m_sync)
+                    {
+                        Version = (string)ev["PHDVersion"];
+                        PHDSubver = (string)ev["PHDSubver"];
+                    }
+                    break;
                 }
-            }
-            else if (e == "StartGuiding")
-            {
-                accum_active = true;
-                accum_ra.Reset();
-                accum_dec.Reset();
+                case "StartGuiding":
+                {
+                    accum_active = true;
+                    accum_ra.Reset();
+                    accum_dec.Reset();
 
-                var stats = Accum_get_stats(accum_ra, accum_dec);
+                    var stats = Accum_get_stats(accum_ra, accum_dec);
+                    //GuideStartTime = DateTime.Now;
+                    // LastPixelScale = PixelScale();
 
-                //GuideStartTime = DateTime.Now;
-                // LastPixelScale = PixelScale();
+                    lock (m_sync)
+                    {
+                        Stats = stats;
 
-                lock (m_sync)
+                    }
+                    break;
+                }
+                case "GuideStep":
                 {
-                    Stats = stats;
+                    GuideStats stats = null;
+                    if (accum_active)
+                    {
+                        accum_ra.Add((double)ev["RADistanceRaw"]);
+                        accum_dec.Add((double)ev["DECDistanceRaw"]);
+                        stats = Accum_get_stats(accum_ra, accum_dec);
+                    }
 
-                }
-            }
-            else if (e == "GuideStep")
-            {
-                GuideStats stats = null;
-                if (accum_active)
-                {
-                    accum_ra.Add((double)ev["RADistanceRaw"]);
-                    accum_dec.Add((double)ev["DECDistanceRaw"]);
-                    stats = Accum_get_stats(accum_ra, accum_dec);
-                }
+                    lock (m_sync)
+                    {
+                        AppState = "Guiding";
+                        AvgDist = (double)ev["AvgDist"];
+                        if (accum_active) Stats = stats;
+                    }
 
-                lock (m_sync)
-                {
-                    AppState = "Guiding";
-                    AvgDist = (double)ev["AvgDist"];
-                    if (accum_active) Stats = stats;
+                    //send to UI
+                    ProcessGuideStep(ev);
+                    break;
                 }
+                case "SettleBegin":
+                    accum_active = false;  // exclude GuideStep messages from stats while settling
+                    break;
+                case "Settling":
+                {
+                    var s = new SettleProgress
+                    {
+                        Done = false,
+                        Distance = (double)ev["Distance"],
+                        SettlePx = settle_px,
+                        Time = (double)ev["Time"],
+                        SettleTime = (double)ev["SettleTime"],
+                        Status = 0
+                    };
+                    lock (m_sync)
+                    {
+                        SettleProgress = s;
+                    }
+                    break;
+                }
+                case "SettleDone":
+                {
+                    accum_active = true;
+                    accum_ra.Reset();
+                    accum_dec.Reset();
 
-                //send to UI
-                ProcessGuideStep(ev);
-            }
-            else if (e == "SettleBegin")
-            {
-                accum_active = false;  // exclude GuideStep messages from stats while settling
-            }
-            else if (e == "Settling")
-            {
-                var s = new SettleProgress
-                {
-                    Done = false,
-                    Distance = (double)ev["Distance"],
-                    SettlePx = settle_px,
-                    Time = (double)ev["Time"],
-                    SettleTime = (double)ev["SettleTime"],
-                    Status = 0
-                };
-                lock (m_sync)
-                {
-                    mSettle = s;
-                }
-            }
-            else if (e == "SettleDone")
-            {
-                accum_active = true;
-                accum_ra.Reset();
-                accum_dec.Reset();
+                    var stats = Accum_get_stats(accum_ra, accum_dec);
 
-                var stats = Accum_get_stats(accum_ra, accum_dec);
+                    var s = new SettleProgress
+                    {
+                        Done = true,
+                        Status = (int)ev["Status"],
+                        Error = (string)ev["Error"]
+                    };
 
-                var s = new SettleProgress
-                {
-                    Done = true,
-                    Status = (int)ev["Status"],
-                    Error = (string)ev["Error"]
-                };
-
-                lock (m_sync)
-                {
-                    mSettle = s;
-                    Stats = stats;
+                    lock (m_sync)
+                    {
+                        SettleProgress = s;
+                        Stats = stats;
+                    }
+                    break;
                 }
-            }
-            else if (e == "Paused")
-            {
-                lock (m_sync)
+                case "Paused":
                 {
-                    AppState = "Paused";
+                    lock (m_sync)
+                    {
+                        AppState = "Paused";
+                    }
+                    break;
                 }
-            }
-            else if (e == "StartCalibration")
-            {
-                lock (m_sync)
+                case "StartCalibration":
                 {
-                    AppState = "Calibrating";
+                    lock (m_sync)
+                    {
+                        AppState = "Calibrating";
+                    }
+                    break;
                 }
-            }
-            else if (e == "LoopingExposures")
-            {
-                lock (m_sync)
+                case "LoopingExposures":
                 {
-                    AppState = "Looping";
+                    lock (m_sync)
+                    {
+                        AppState = "Looping";
+                    }
+                    break;
                 }
-            }
-            else if (e == "LoopingExposuresStopped" || e == "GuidingStopped")
-            {
-                lock (m_sync)
+                case "LoopingExposuresStopped":
+                case "GuidingStopped":
                 {
-                    AppState = "Stopped";
+                    lock (m_sync)
+                    {
+                        AppState = "Stopped";
+                    }
+                    break;
                 }
-            }
-            else if (e == "StarLost")
-            {
-                lock (m_sync)
+                case "StarLost":
                 {
-                    AppState = "LostLock";
-                    AvgDist = (double)ev["AvgDist"];
+                    lock (m_sync)
+                    {
+                        AppState = "LostLock";
+                        AvgDist = (double)ev["AvgDist"];
+                    }
+                    break;
                 }
-            }
-            else
-            {
-                Debug.WriteLine($"todo: handle event {e}");
+                default:
+                    Debug.WriteLine($"todo: handle event {e}");
+                    break;
             }
         }
 
@@ -562,13 +626,13 @@ namespace GS.Server.Phd
             var stopwatch = Stopwatch.StartNew();
             while (stopwatch.Elapsed.TotalMilliseconds < 5000)
             {
-                if (m_response == null)
+                if (Response == null)
                 {
                     //Thread.Sleep(10);
                     continue;
                 }
-                response = m_response;
-                m_response = null;
+                response = Response;
+                Response = null;
                 break;
             }
 
@@ -577,8 +641,9 @@ namespace GS.Server.Phd
             //    while (m_response == null)
             //        Monitor.Wait(m_sync);
 
-            //    var response = m_response;
+            //    response = m_response;
             //    m_response = null;
+            //}
 
 
             if (response != null)
@@ -629,9 +694,9 @@ namespace GS.Server.Phd
 
             lock (m_sync)
             {
-                if (mSettle != null)
+                if (SettleProgress != null)
                     throw new GuiderException(ErrorCode.GuidingError, "cannot guide while settling");
-                mSettle = s;
+                SettleProgress = s;
             }
 
             try
@@ -647,7 +712,7 @@ namespace GS.Server.Phd
                 // failed - remove the settle state
                 lock (m_sync)
                 {
-                    mSettle = null;
+                    SettleProgress = null;
                 }
                 throw;
             }
@@ -671,10 +736,10 @@ namespace GS.Server.Phd
 
             lock (m_sync)
             {
-                if (mSettle != null)
+                if (SettleProgress != null)
                     throw new GuiderException(ErrorCode.GuidingError, "cannot dither while settling");
 
-                mSettle = s;
+                SettleProgress = s;
             }
 
             try
@@ -689,7 +754,7 @@ namespace GS.Server.Phd
                 // call failed - remove the settle state
                 lock (m_sync)
                 {
-                    mSettle = null;
+                    SettleProgress = null;
                 }
                 throw;
             }
@@ -702,7 +767,7 @@ namespace GS.Server.Phd
 
             lock (m_sync)
             {
-                if (mSettle != null)
+                if (SettleProgress != null)
                 {
                     return true;
                 }
@@ -728,8 +793,8 @@ namespace GS.Server.Phd
                 };
                 lock (m_sync)
                 {
-                    if (mSettle == null)
-                        mSettle = s;
+                    if (SettleProgress == null)
+                        SettleProgress = s;
                 }
             }
 
@@ -745,25 +810,25 @@ namespace GS.Server.Phd
 
             lock (m_sync)
             {
-                if (mSettle == null)
+                if (SettleProgress == null)
                     throw new GuiderException(ErrorCode.GuidingError, "not settling");
 
-                if (mSettle.Done)
+                if (SettleProgress.Done)
                 {
                     // settle is done
                     ret.Done = true;
-                    ret.Status = mSettle.Status;
-                    ret.Error = mSettle.Error;
-                    mSettle = null;
+                    ret.Status = SettleProgress.Status;
+                    ret.Error = SettleProgress.Error;
+                    SettleProgress = null;
                 }
                 else
                 {
                     // settle in progress
                     ret.Done = false;
-                    ret.Distance = mSettle.Distance;
+                    ret.Distance = SettleProgress.Distance;
                     ret.SettlePx = settle_px;
-                    ret.Time = mSettle.Time;
-                    ret.SettleTime = mSettle.SettleTime;
+                    ret.Time = SettleProgress.Time;
+                    ret.SettleTime = SettleProgress.SettleTime;
                 }
             }
 
