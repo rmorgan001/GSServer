@@ -725,14 +725,14 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--1.0.7.8 -->
     <system:String x:Key="optLogPath">Protokollpfad</system:String>
     <!--1.0.7.9 -->
-    <system:String x:Key="snpDither">Zittern</system:String>
+    <system:String x:Key="snpDither">Dither</system:String>
     <system:String x:Key="snpDitherOn">An</system:String>
-    <system:String x:Key="snpPhdOnOff">An aus</system:String>
+    <system:String x:Key="snpPhdOnOff">An/Aus</system:String>
     <system:String x:Key="snpIntLoops">Intervallschleifen</system:String>
     <system:String x:Key="snpHostIp">Host / IP</system:String>
     <system:String x:Key="snpDitPix">Dither-Pixel</system:String>
-    <system:String x:Key="snpSetPix">Pixel begleichen</system:String>
-    <system:String x:Key="snpSetSec">Sekunden regeln</system:String>
-    <system:String x:Key="snpTimeSec">Timeout-Sekunden</system:String>
+    <system:String x:Key="snpSetPix">Pixel abgleichen</system:String>
+    <system:String x:Key="snpSetSec">Sekunden abgleichen</system:String>
+    <system:String x:Key="snpTimeSec">Zeitüberschreitung Sekunden</system:String>
 </ResourceDictionary>
  
