@@ -176,12 +176,18 @@ namespace GS.SkyWatcher
                 SetRates(axis, rate);
 
                 var axesstatus = _commands.GetAxisStatus(axis); // Get axis status
+
+                var rateChangeOnly = axesstatus.Slewing && // In motion slewing
+                                     (axesstatus.HighSpeed == highspeed) && // Not in high speed
+                                     !highspeed && // High speed not required
+                                     (axesstatus.SlewingForward == forward); // No direction change
+
                 if (axesstatus.FullStop || // Already stopped
                     (axesstatus.HighSpeed != highspeed) || // Change high speed
                     highspeed ||
                     (axesstatus.SlewingForward && !forward) || // Change direction 
                     (!axesstatus.SlewingForward && forward) // Change direction
-                )
+                   )
                 {
                     if (!axesstatus.FullStop)
                     {
@@ -208,8 +214,11 @@ namespace GS.SkyWatcher
                 }
 
                 _commands.SetStepSpeed(axis, speedInt); // I Set the axis step count
-                _commands.StartMotion(axis); // J Start motion
-                _commands.SetSlewing((int)axis, forward, highspeed); // Set the axis status
+                if (!rateChangeOnly)
+                {
+                    _commands.StartMotion(axis); // J Start motion
+                    _commands.SetSlewing((int)axis, forward, highspeed); // Set the axis status
+                }
             }
 
             _slewingSpeed[(int)axis] = rate; //store axis rate
@@ -224,7 +233,7 @@ namespace GS.SkyWatcher
         /// <param name="duration">length of pulse in milliseconds, always positive numbers</param>
         /// <param name="backlashSteps">Positive micro steps added for backlash</param>
         internal void AxisPulse(AxisId axis, double guideRate, int duration, int backlashSteps = 0)
-        {
+            {
             var datetime = Principles.HiResDateTime.UtcNow;
             var monitorItem = new MonitorEntry // setup to log the pulse
             { Datetime = datetime, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{guideRate}|{duration}|{backlashSteps}|{MinPulseDurationRa}|{MinPulseDurationDec}|{DecPulseGoTo}" };
@@ -394,6 +403,119 @@ namespace GS.SkyWatcher
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
             }
+
+            if (!MonitorPulse) return;
+            pulseEntry.Duration = duration;
+            MonitorLog.LogToMonitor(pulseEntry);//send to monitor
+        }
+
+        /// <summary>
+        /// Directs Ra or Dec pulse guide command to Alt and Az axes at calculated rates, adding tracking rates
+        /// </summary>
+        /// <param name="axis">Ra or Dec axis</param>
+        /// <param name="guideRateAz">Guide rate degrees per second, negative value denotes direction</param>
+        /// <param name="guideRateAlt">Guide rate degrees per negative value denotes direction</param>
+        /// <param name="duration">length of pulse in milliseconds, always positive numbers</param>
+        /// <param name="backlashSteps">Positive micro steps added for backlash</param>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        internal void AxisPulse(AxisId axis, double guideRateAz, double guideRateAlt, int duration,
+            int backlashSteps = 0)
+        {
+            var datetime = Principles.HiResDateTime.UtcNow;
+            var monitorItem = new MonitorEntry // setup to log the pulse
+            {
+                Datetime = datetime,
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Mount,
+                Type = MonitorType.Debug,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message =
+                    $"Az|{guideRateAz}|Alt|{guideRateAlt}|{duration}|{backlashSteps}|{MinPulseDurationRa}|{MinPulseDurationDec}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            var guideRate = Math.Sqrt(guideRateAz * guideRateAz + guideRateAlt * guideRateAlt);
+            var pulseEntry = new PulseEntry // setup to graph the pulse
+            { Axis = (int)axis, Duration = duration, Rate = guideRate, Rejected = false, StartTime = datetime, };
+
+            backlashSteps = Math.Abs(backlashSteps);
+
+            SkyQueue.IsPulseGuidingRa = true;
+            SkyQueue.IsPulseGuidingDec = true;
+
+            if (backlashSteps > 0) // Convert lash to extra pulse duration in milliseconds
+            {
+                var lashduration =
+                    Convert.ToInt32(backlashSteps / _stepsPerSecond[1] / 3600 / Math.Abs(guideRateAz) * 1000);
+                // PHD will error if pulse doesn't return within 2 seconds.
+                if (lashduration > 1000)
+                {
+                    lashduration = 1000;
+                }
+
+                duration += lashduration; // add the lash time to duration
+            }
+
+            if (duration < MinPulseDurationRa || duration < MinPulseDurationDec)
+            {
+                SkyQueue.IsPulseGuidingRa = false;
+                SkyQueue.IsPulseGuidingDec = false;
+
+                if (!MonitorPulse)
+                {
+                    return;
+                }
+
+                pulseEntry.Rejected = true;
+                MonitorLog.LogToMonitor(pulseEntry);
+                return;
+            }
+
+            if (_pPecOn && AlternatingPPec) { SetPPec(AxisId.Axis1, false); } // implements the alternating pPEC 
+
+            // Change speed of the Az and Alt axes
+            if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
+            {
+                _commands.AxisSlew_Advanced(AxisId.Axis1, BasicMath.DegToRad(guideRateAz));
+                _commands.AxisSlew_Advanced(AxisId.Axis2, BasicMath.DegToRad(guideRateAlt));
+            }
+            else
+            {
+                AxisSlew(AxisId.Axis1, guideRateAz);
+                AxisSlew(AxisId.Axis2, guideRateAlt);
+            }
+
+            pulseEntry.StartTime = _commands.LastI1RunTime; // get the last :I start time
+
+            var pulseTime = Principles.HiResDateTime.UtcNow - pulseEntry.StartTime; // possible use for min pulse duration time
+            var span = duration - pulseTime.TotalMilliseconds;
+
+            if (span > 0 && span < duration) // checking duration is met
+            {
+                var sw1 = Stopwatch.StartNew();
+                while (sw1.Elapsed.TotalMilliseconds < span)
+                {
+                    if (sw1.ElapsedMilliseconds % 200 == 0) { UpdateSteps(); } // Process positions while waiting
+                }
+            }
+
+            // Restore rate tracking
+            if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
+            {
+                _commands.AxisSlew_Advanced(AxisId.Axis1, _trackingRates[0]);
+                _commands.AxisSlew_Advanced(AxisId.Axis2, _trackingRates[1]);
+            }
+            else
+            {
+                AxisSlew(AxisId.Axis1, BasicMath.RadToDeg(_trackingRates[0]));
+                AxisSlew(AxisId.Axis2, BasicMath.RadToDeg(_trackingRates[1]));
+            }
+
+            if (_pPecOn && AlternatingPPec) { SetPPec(AxisId.Axis1, true); } // implements the alternating pPEC
+
+            SkyQueue.IsPulseGuidingDec = false;
+            SkyQueue.IsPulseGuidingRa = false;
 
             if (!MonitorPulse) return;
             pulseEntry.Duration = duration;

@@ -12,7 +12,7 @@ namespace GS.Server.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.8.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.9.0.0")]
     internal sealed partial class SkyTelescope : global::System.Configuration.ApplicationSettingsBase {
         
         private static SkyTelescope defaultInstance = ((SkyTelescope)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new SkyTelescope())));
@@ -1010,12 +1010,12 @@ namespace GS.Server.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string ParkPositions {
+        public string ParkPositionsEQ {
             get {
-                return ((string)(this["ParkPositions"]));
+                return ((string)(this["ParkPositionsEQ"]));
             }
             set {
-                this["ParkPositions"] = value;
+                this["ParkPositionsEQ"] = value;
             }
         }
         
@@ -1585,6 +1585,54 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double ParkAxisAz {
+            get {
+                return ((double)(this["ParkAxisAz"]));
+            }
+            set {
+                this["ParkAxisAz"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double ParkAxisAlt {
+            get {
+                return ((double)(this["ParkAxisAlt"]));
+            }
+            set {
+                this["ParkAxisAlt"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ParkPositionsAltAz {
+            get {
+                return ((string)(this["ParkPositionsAltAz"]));
+            }
+            set {
+                this["ParkPositionsAltAz"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public string AltAzAxesLimitOn {
+            get {
+                return ((string)(this["AltAzAxesLimitOn"]));
+            }
+            set {
+                this["AltAzAxesLimitOn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("80")]
         public double AltAxisUpperLimit {
             get {
@@ -1604,6 +1652,18 @@ namespace GS.Server.Properties {
             }
             set {
                 this["AltAxisLowerLimit"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("15")]
+        public double AzSlewLimit {
+            get {
+                return ((double)(this["AzSlewLimit"]));
+            }
+            set {
+                this["AzSlewLimit"] = value;
             }
         }
     }
