@@ -137,6 +137,7 @@ namespace GS.Server.SkyTelescope
 
                     // defaults
                     AtPark = SkyServer.AtPark;
+                    ParkPositions = SkySettings.ParkPositions;
                     ConnectButtonContent = Application.Current.Resources["skyConnect"].ToString();
                     VoiceState = Settings.Settings.VoiceActive;
                     ParkSelection = AtPark ? SkyServer.GetStoredParkPosition() : ParkPositions.FirstOrDefault();
@@ -310,7 +311,9 @@ namespace GS.Server.SkyTelescope
                      case "Elevation":
                          Elevation = SkySettings.Elevation;
                          break;
-                     case "ParkPositions":
+//                     case "ParkPositions":
+                     case "ParkPositionsEQ":
+                     case "ParkPositionsAltAz":
                          // ReSharper disable ExplicitCallerInfoArgument
                          OnPropertyChanged($"ParkPositions");
                          break;
@@ -355,6 +358,13 @@ namespace GS.Server.SkyTelescope
                          break;
                      case "CanSetPierSide":
                          EnableFlipSOP = SkySettings.CanSetPierSide;
+                         break;
+                     case "AlignmentMode":
+                         ParkPositions = SkySettings.ParkPositions;
+                         ParkSelection = ParkPositions.FirstOrDefault();
+                         ParkSelectionSetting = ParkSelection;
+                         // ReSharper disable ExplicitCallerInfoArgument
+                         OnPropertyChanged($"ParkPositions");
                          break;
                  }
              });
@@ -2865,6 +2875,7 @@ namespace GS.Server.SkyTelescope
                 using (new WaitCursor())
                 {
                     if (!SkyServer.IsMountRunning) {return;}
+                    SkyPredictor.Set(SkyServer.RightAscensionXForm, SkyServer.DeclinationXForm);
                     SkyServer.StopAxes();
                 }
             }
@@ -7128,11 +7139,6 @@ namespace GS.Server.SkyTelescope
                     }
 
                     var radec = Transforms.CoordTypeToInternal(GoToRa, GoToDec);
-                    if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
-                    {
-                        SkyServer.TargetRa = GoToRa;
-                        SkyServer.TargetDec = GoToDec;
-                    }
                     var monitorItem = new MonitorEntry
                     {
                         Datetime = HiResDateTime.UtcNow,
@@ -7144,6 +7150,12 @@ namespace GS.Server.SkyTelescope
                         Message = $"From|{SkyServer.ActualAxisX}|{SkyServer.ActualAxisY}|to|{radec.X}|{radec.Y}"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
+                    if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
+                    {
+                        SkyServer.TargetRa = GoToRa;
+                        SkyServer.TargetDec = GoToDec;
+                        SkyServer.Tracking = true;
+                    }
                     SkyServer.SlewRaDec(radec.X, radec.Y);
                     IsDialogOpen = false;
                 }

@@ -248,7 +248,7 @@
     <Setting Name="HCMode" Type="System.String" Scope="User">
       <Value Profile="(Default)">Axes</Value>
     </Setting>
-    <Setting Name="ParkPositions" Type="System.String" Scope="User">
+    <Setting Name="ParkPositionsEQ" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="ParkName" Type="System.String" Scope="User">
@@ -392,11 +392,26 @@
     <Setting Name="AltAxisLimitOn" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="ParkAxisAz" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="ParkAxisAlt" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="ParkPositionsAltAz" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="AltAzAxesLimitOn" Type="System.String" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
     <Setting Name="AltAxisUpperLimit" Type="System.Double" Scope="User">
       <Value Profile="(Default)">80</Value>
     </Setting>
     <Setting Name="AltAxisLowerLimit" Type="System.Double" Scope="User">
       <Value Profile="(Default)">-10</Value>
+    </Setting>
+    <Setting Name="AzSlewLimit" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">15</Value>
     </Setting>
   </Settings>
 </SettingsFile>

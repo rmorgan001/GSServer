@@ -180,6 +180,13 @@ namespace GS.Server.Windows
                      case "CanSetPierSide":
                          EnableFlipSOP = SkySettings.CanSetPierSide;
                          break;
+                     case "AlignmentMode":
+                         ParkPositions = SkySettings.ParkPositions;
+                         ParkSelection = ParkPositions.FirstOrDefault();
+                         ParkSelectionSetting = ParkSelection;
+                         // ReSharper disable ExplicitCallerInfoArgument
+                         OnPropertyChanged($"ParkPositions");
+                         break;
                  }
              });
             }

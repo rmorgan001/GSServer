@@ -19,6 +19,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO.Ports;
 using System.Net;
@@ -71,8 +72,18 @@ namespace GS.Server.SkyTelescope
             {
                 var notAlreadyPresent = ConnectStates.TryAdd(id, true);
 
-                if (Connected){ if (!SkyServer.IsMountRunning) {SkyServer.IsMountRunning = true;}}
-
+                if (Connected)
+                {
+                    if (!SkyServer.IsMountRunning)
+                    {
+                        SkyServer.IsMountRunning = true;
+                        Stopwatch connectionTimer = Stopwatch.StartNew();
+                        // Wait for two server event loop updates or 5 second timeout
+                        while (SkyServer.LoopCounter < 2 && connectionTimer.ElapsedMilliseconds < 5000)
+                            Thread.Sleep(100);
+                    }
+                }
+     
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = Principles.HiResDateTime.UtcNow,

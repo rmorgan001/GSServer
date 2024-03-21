@@ -85,6 +85,10 @@ namespace GS.SkyApi
 
             ValidateMount();
             var validAxis = ValidateAxis(axis);
+            if (validAxis == AxisId.Axis1)
+            {
+                targetPosition = SkyServer.ConvertToAzEastWest(targetPosition);
+            }
             var command = new SkyAxisGoToTarget(SkyQueue.NewId, validAxis, targetPosition);
             GetResult(command);
         }

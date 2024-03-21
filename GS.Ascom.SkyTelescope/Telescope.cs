@@ -945,8 +945,14 @@ namespace ASCOM.GS.Sky.Telescope
 
                 CheckCapability(SkySettings.CanPulseGuide, "PulseGuide");
                 CheckRange(Duration, 0, 30000, "PulseGuide", "Duration");
+                DateTime startTime = HiResDateTime.UtcNow;
                 SkyServer.PulseGuide(Direction, Duration);
-                if (!SkySettings.CanDualAxisPulseGuide) { Thread.Sleep(Duration); } // Must be synchronous so wait out the pulse guide duration here
+                // If synchronous (must be for Alt Az) wait out the remaining pulse guide duration here
+                if (!SkySettings.CanDualAxisPulseGuide || SkySettings.AlignmentMode == AlignmentModes.algAltAz) 
+                {
+                    var sleepTime = Duration - (int)(HiResDateTime.UtcNow - startTime).TotalMilliseconds;
+                    Thread.Sleep(sleepTime > 0 ? sleepTime : 0);
+                }
             }
             catch (Exception e)
             {
@@ -1216,13 +1222,8 @@ namespace ASCOM.GS.Sky.Telescope
                 Thread.Sleep(1);
                 DoEvents();
             }
-            // DelayInterval();
+            DelayInterval();
             // Wait for updated mount position before returning
-            SkyServer.MountPositionUpdated = false;
-            while (!SkyServer.MountPositionUpdated)
-            {
-                Thread.Sleep(10);
-            }
         }
 
         public void SlewToAltAzAsync(double Azimuth, double Altitude)
@@ -1255,8 +1256,8 @@ namespace ASCOM.GS.Sky.Telescope
             CheckParked("SlewToCoordinates");
             CheckTracking(true, "SlewToCoordinates");
 
-            SkyServer.TargetRa = RightAscension;
-            SkyServer.TargetDec = Declination;
+            TargetRightAscension = RightAscension;
+            TargetDeclination = Declination;
             var radec = Transforms.CoordTypeToInternal(RightAscension, Declination);
             SkyServer.SlewRaDec(radec.X, radec.Y);
             while (SkyServer.SlewState == SlewType.SlewRaDec || SkyServer.SlewState == SlewType.SlewSettle)
@@ -1264,13 +1265,8 @@ namespace ASCOM.GS.Sky.Telescope
                 Thread.Sleep(1);
                 DoEvents();
             }
-            // DelayInterval();
+            DelayInterval();
             // Wait for updated mount position before returning
-            SkyServer.MountPositionUpdated = false;
-            while (!SkyServer.MountPositionUpdated)
-            {
-                Thread.Sleep(10);
-            }
         }
 
         public void SlewToCoordinatesAsync(double RightAscension, double Declination)
@@ -1286,9 +1282,9 @@ namespace ASCOM.GS.Sky.Telescope
             CheckRange(Declination, -90, 90, "SlewToCoordinatesAsync", "Declination");
             CheckParked("SlewToCoordinatesAsync");
 
-            CycleOnTracking(true);
-            SkyServer.TargetRa = RightAscension;
-            SkyServer.TargetDec = Declination;
+            SkyServer.CycleOnTracking(true);
+            TargetRightAscension = RightAscension;
+            TargetDeclination = Declination;
             var radec = Transforms.CoordTypeToInternal(RightAscension, Declination);
             SkyServer.SlewRaDec(radec.X, radec.Y);
         }
@@ -1297,8 +1293,8 @@ namespace ASCOM.GS.Sky.Telescope
         {
             if (!SkyServer.AsComOn) return;
 
-            var ra = SkyServer.TargetRa;
-            var dec = SkyServer.TargetDec;
+            var ra = TargetRightAscension;
+            var dec = TargetDeclination;
 
             var monitorItem = new MonitorEntry
             {
@@ -1325,21 +1321,16 @@ namespace ASCOM.GS.Sky.Telescope
                 Thread.Sleep(1);
                 DoEvents();
             }
-            // DelayInterval();
+            DelayInterval();
             // Wait for updated mount position before returning
-            SkyServer.MountPositionUpdated = false;
-            while (!SkyServer.MountPositionUpdated)
-            {
-                Thread.Sleep(10);
-            }
         }
 
         public void SlewToTargetAsync()
         {
             if (!SkyServer.AsComOn) return;
 
-            var ra = SkyServer.TargetRa;
-            var dec = SkyServer.TargetDec;
+            var ra = TargetRightAscension;
+            var dec = TargetDeclination;
 
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{ra}|{dec}") };
@@ -1905,21 +1896,6 @@ namespace ASCOM.GS.Sky.Telescope
             var sw = Stopwatch.StartNew();
             while (sw.Elapsed.TotalMilliseconds < delay) { }
             sw.Stop();
-        }
-
-        /// <summary>
-        /// Cycles tracking
-        /// </summary>
-        /// <param name="silence">turns off voice</param>
-        /// <remarks>planetarium programs fix which doesn't turn on tracking before a goto</remarks>
-        private static void CycleOnTracking(bool silence)
-        {
-            if (silence) { SkyServer.TrackingSpeak = false; }
-
-            SkyServer.Tracking = false;
-            SkyServer.Tracking = true;
-
-            if (silence) { SkyServer.TrackingSpeak = true; }
         }
 
         #endregion

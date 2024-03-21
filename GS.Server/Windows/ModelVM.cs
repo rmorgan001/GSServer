@@ -464,6 +464,8 @@ namespace GS.Server.Windows
                         YAxisCentre = Settings.Settings.YAxisCentre;
                         GemBlockVisible = true;
                         break;
+                    default:
+                        break;
                 }
 
                 //load model and compass

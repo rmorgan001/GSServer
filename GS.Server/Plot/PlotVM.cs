@@ -27,6 +27,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using ASCOM.DeviceInterface;
 using GS.Server.Controls.Dialogs;
 using GS.Server.SkyTelescope;
 using GS.Server.Windows;
@@ -281,14 +282,14 @@ namespace GS.Server.Plot
 
             Scale = ChartScale.Arcsecs;
 
-            Values1Title = "Ra";
+            Values1Title = SkySettings.AlignmentMode != AlignmentModes.algAltAz ? "Ra" : "Az";
             Values1Series = ChartSeriesType.GLineSeries;
             Values1PtSz = 1;
             Values1Toggle = true;
             Values1Invert = false;
             Values1Color = "CadetBlue";
 
-            Values2Title = "Dec";
+            Values2Title = SkySettings.AlignmentMode != AlignmentModes.algAltAz ? "Dec" : "Alt";
             Values2Series = ChartSeriesType.GLineSeries;
             Values2PtSz = 1;
             Values2Toggle = true;
