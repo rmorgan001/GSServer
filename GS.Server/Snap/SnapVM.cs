@@ -88,7 +88,7 @@ namespace GS.Server.Snap
             set
             {
                 if (_snapEnabled == value) return;
-                
+
                 if (value)
                 {
                     if (!SkyServer.IsMountRunning)
@@ -125,8 +125,8 @@ namespace GS.Server.Snap
                 _snapEnabled = value;
                 OnPropertyChanged();
 
-               var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Snap|{value}|{SkyServer.SnapPort1Result}|{SkyServer.SnapPort2Result}" };
+                var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Snap|{value}|{SkyServer.SnapPort1Result}|{SkyServer.SnapPort2Result}" };
                 MonitorLog.LogToMonitor(monitorItem);
             }
         }
@@ -176,7 +176,7 @@ namespace GS.Server.Snap
                  switch (e.PropertyName)
                  {
                      case "IsMountRunning":
-                         if (!SkyServer.IsMountRunning) {SnapEnabled = false; }
+                         if (!SkyServer.IsMountRunning) { SnapEnabled = false; }
                          break;
                      case "SnapPort1Result":
                          Snap1Enabled = SkyServer.SnapPort1Result;
@@ -220,7 +220,7 @@ namespace GS.Server.Snap
                 OnPropertyChanged();
             }
         }
-        
+
         private double _pHD_SettlePixels;
         public double PHD_SettlePixels
         {
@@ -231,7 +231,7 @@ namespace GS.Server.Snap
                 OnPropertyChanged();
             }
         }
-        
+
         private double _pHD_SettleTime;
         public double PHD_SettleTime
         {
@@ -242,7 +242,7 @@ namespace GS.Server.Snap
                 OnPropertyChanged();
             }
         }
-        
+
         private double _pHD_SettleTimeout;
         public double PHD_SettleTimeout
         {
@@ -324,7 +324,7 @@ namespace GS.Server.Snap
                 using (new WaitCursor())
                 {
                     DialogContent = new Snap1DitherDialog();
-                    DialogCaption = Application.Current.Resources["snpDither"].ToString(); 
+                    DialogCaption = Application.Current.Resources["snpDither"].ToString();
                     IsDialogOpen = true;
                 }
             }
@@ -599,7 +599,7 @@ namespace GS.Server.Snap
                 OnPropertyChanged();
             }
         }
-        
+
         private string _snap1PauseBadgeContent;
         public string Snap1PauseBadgeContent
         {
@@ -654,7 +654,7 @@ namespace GS.Server.Snap
                             Type = MonitorType.Information,
                             Method = MethodBase.GetCurrentMethod()?.Name,
                             Thread = Thread.CurrentThread.ManagedThreadId,
-                            Message = $"Snap 1|{SkyServer.SnapPort1Result}|{Snap1Timer}|{Snap1Loops}|{Snap1Delay}|{Dither2_On}"
+                            Message = $"Snap 1|{SkyServer.SnapPort1Result}|{Snap1Timer}|{Snap1Loops}|{Snap1Delay}|{Dither1_On}|{Dither1_Mod}|{PHD_DitherPixels}|{PHD_SettlePixels}|{PHD_SettleTime}|{PHD_SettleTimeout}"
                         };
                         MonitorLog.LogToMonitor(monitorItem);
                         Snap1LoopAsync();
@@ -693,7 +693,7 @@ namespace GS.Server.Snap
                     param => ClickSnap1Pause()
                 );
             }
-        } 
+        }
         private void ClickSnap1Pause()
         {
             try
@@ -865,7 +865,7 @@ namespace GS.Server.Snap
                                     phd.DoWork();
 
                                     // check for any errors events
-                                    if (phd.Response != null && phd.Response.ContainsKey("jsonrpc"))
+                                    if (phd.Response != null && phd.Response.ContainsKey("jsonrpc") && phd.Response.ContainsKey("error"))
                                     {
                                         var error = (JObject)phd.Response["error"];
                                         var code = (int)error["code"];
@@ -874,9 +874,35 @@ namespace GS.Server.Snap
                                     }
 
                                     //keep checking settle status until timeout 
-                                    if (phd.IsSettling()) { continue; }
                                     var settle = phd.SettleProgress;
-                                    if (settle == null) { continue; }
+                                    MonitorEntry monitorItem;
+                                    if (settle == null)
+                                    {
+                                        monitorItem = new MonitorEntry
+                                        {
+                                            Datetime = HiResDateTime.UtcNow,
+                                            Device = MonitorDevice.UI,
+                                            Category = MonitorCategory.Server,
+                                            Type = MonitorType.Information,
+                                            Method = MethodBase.GetCurrentMethod()?.Name,
+                                            Thread = Thread.CurrentThread.ManagedThreadId,
+                                            Message = $"SettleProgress:Null"
+                                        };
+                                        MonitorLog.LogToMonitor(monitorItem);
+                                        continue;
+                                    }
+
+                                    monitorItem = new MonitorEntry
+                                    {
+                                        Datetime = HiResDateTime.UtcNow,
+                                        Device = MonitorDevice.UI,
+                                        Category = MonitorCategory.Server,
+                                        Type = MonitorType.Information,
+                                        Method = MethodBase.GetCurrentMethod()?.Name,
+                                        Thread = Thread.CurrentThread.ManagedThreadId,
+                                        Message = $"SettleProgress:{settle.Done},{settle.Status}"
+                                    };
+                                    MonitorLog.LogToMonitor(monitorItem);
 
                                     Debug.WriteLine($"{swDith1.Elapsed.TotalSeconds}, {settle.Done}, {settle.Status}, {settle.Error}, {settle.SettleTime}");
 
@@ -884,6 +910,7 @@ namespace GS.Server.Snap
                                     {
                                         throw new Exception($"{settle.Status} {settle.Error}");
                                     }
+
                                     if (settle.Done && settle.Status == 0) { break; }
                                 }
                             }
@@ -897,7 +924,7 @@ namespace GS.Server.Snap
                                     Type = MonitorType.Warning,
                                     Method = MethodBase.GetCurrentMethod()?.Name,
                                     Thread = Thread.CurrentThread.ManagedThreadId,
-                                    Message = $"{ex.Message}"
+                                    Message = $"{ex.Message},{ex.Source},{ex.StackTrace}"
                                 };
                                 MonitorLog.LogToMonitor(monitorItem);
                                 ThreadContext.InvokeOnUiThread(delegate { OpenDialog(ex.Message); }, ct);
@@ -936,7 +963,7 @@ namespace GS.Server.Snap
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
+                    Message = $"{ex.Message},{ex.Source},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 Snap1Stop();
@@ -945,9 +972,20 @@ namespace GS.Server.Snap
             finally
             {
                 Snap1Stop();
+                Snap1Running = false;
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"Snap1 Complete"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
             }
         }
-
 
         #endregion
 
@@ -1095,7 +1133,7 @@ namespace GS.Server.Snap
                             Type = MonitorType.Information,
                             Method = MethodBase.GetCurrentMethod()?.Name,
                             Thread = Thread.CurrentThread.ManagedThreadId,
-                            Message = $"Snap 2|{SkyServer.SnapPort2Result}|{Snap2Timer}|{Snap2Loops}|{Snap2Delay}|{Dither2_On}"
+                            Message = $"Snap 2|{SkyServer.SnapPort2Result}|{Snap2Timer}|{Snap2Loops}|{Snap2Delay}|{Dither2_On}|{Dither2_Mod}|{PHD_DitherPixels}|{PHD_SettlePixels}|{PHD_SettleTime}|{PHD_SettleTimeout}"
                         };
                         MonitorLog.LogToMonitor(monitorItem);
                         Snap2LoopAsync();
@@ -1303,7 +1341,7 @@ namespace GS.Server.Snap
                                     phd.DoWork();
 
                                     // check for any errors events
-                                    if (phd.Response != null && phd.Response.ContainsKey("jsonrpc") )
+                                    if (phd.Response != null && phd.Response.ContainsKey("jsonrpc") && phd.Response.ContainsKey("error"))
                                     {
                                         var error = (JObject)phd.Response["error"];
                                         var code = (int)error["code"];
@@ -1311,10 +1349,35 @@ namespace GS.Server.Snap
                                         if (code > 0) { throw new Exception($"PHD2: {code}, {message}"); }
                                     }
 
-                                    //keep checking settle status until timeout 
-                                    if (phd.IsSettling()) { continue; }
-                                    var settle = phd.SettleProgress; 
-                                    if (settle == null) { continue; }
+                                    var settle = phd.SettleProgress;
+                                    MonitorEntry monitorItem;
+                                    if (settle == null)
+                                    {
+                                        monitorItem = new MonitorEntry
+                                        {
+                                            Datetime = HiResDateTime.UtcNow,
+                                            Device = MonitorDevice.UI,
+                                            Category = MonitorCategory.Server,
+                                            Type = MonitorType.Information,
+                                            Method = MethodBase.GetCurrentMethod()?.Name,
+                                            Thread = Thread.CurrentThread.ManagedThreadId,
+                                            Message = $"SettleProgress:Null"
+                                        };
+                                        MonitorLog.LogToMonitor(monitorItem);
+                                        continue;
+                                    }
+
+                                    monitorItem = new MonitorEntry
+                                    {
+                                        Datetime = HiResDateTime.UtcNow,
+                                        Device = MonitorDevice.UI,
+                                        Category = MonitorCategory.Server,
+                                        Type = MonitorType.Information,
+                                        Method = MethodBase.GetCurrentMethod()?.Name,
+                                        Thread = Thread.CurrentThread.ManagedThreadId,
+                                        Message = $"SettleProgress:{settle.Done},{settle.Status}"
+                                    };
+                                    MonitorLog.LogToMonitor(monitorItem);
 
                                     Debug.WriteLine($"{swDith2.Elapsed.TotalSeconds}, {settle.Done}, {settle.Status}, {settle.Error}, {settle.SettleTime}");
 
@@ -1335,7 +1398,7 @@ namespace GS.Server.Snap
                                     Type = MonitorType.Warning,
                                     Method = MethodBase.GetCurrentMethod()?.Name,
                                     Thread = Thread.CurrentThread.ManagedThreadId,
-                                    Message = $"{ex.Message}"
+                                    Message = $"{ex.Message},{ex.Source},{ex.StackTrace}"
                                 };
                                 MonitorLog.LogToMonitor(monitorItem);
                                 ThreadContext.InvokeOnUiThread(delegate { OpenDialog(ex.Message); }, ct);
@@ -1358,7 +1421,7 @@ namespace GS.Server.Snap
                 }, ct);
                 await task;
                 task.Wait(ct);
-                if (SkyServer.SnapPort2) {Snap2Trigger(false);}
+                if (SkyServer.SnapPort2) { Snap2Trigger(false); }
                 Snap2Stop();
             }
             catch (Exception ex)
@@ -1371,7 +1434,7 @@ namespace GS.Server.Snap
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}"
+                    Message = $"{ex.Message},{ex.Source},{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 Snap2Stop();
@@ -1381,6 +1444,17 @@ namespace GS.Server.Snap
             {
                 Snap2Stop();
                 Snap2Running = false;
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"Snap2 Complete"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
