@@ -40,7 +40,6 @@ using GS.Server.Alignment;
 using AxisStatus = GS.Simulator.AxisStatus;
 using Range = GS.Principles.Range;
 using static System.Math;
-using ASCOM.DriverAccess;
 
 namespace GS.Server.SkyTelescope
 {
@@ -1606,7 +1605,7 @@ namespace GS.Server.SkyTelescope
                         // convert to internal Ra and Dec
                         var internalRaDec = Transforms.CoordTypeToInternal(predictorRaDec[0], predictorRaDec[1]);
                         // get alt az target
-                        simTarget = Axes.RaDecToAxesXY(new double[] { internalRaDec.X, internalRaDec.Y }, GetLocalSiderealTime(nextTime));
+                        simTarget = Axes.RaDecToAxesXY(new[] { internalRaDec.X, internalRaDec.Y }, GetLocalSiderealTime(nextTime));
                         simTarget = GetSyncedAxes(Axes.AxesAppToMount(simTarget));
                     }
                     else
@@ -1715,7 +1714,7 @@ namespace GS.Server.SkyTelescope
                     // convert to internal Ra and Dec
                     var internalRaDec = Transforms.CoordTypeToInternal(predictorRaDec[0], predictorRaDec[1]);
                     // get alt az target
-                    simTarget = Axes.RaDecToAxesXY(new double[] { internalRaDec.X, internalRaDec.Y }, GetLocalSiderealTime(nextTime));
+                    simTarget = Axes.RaDecToAxesXY(new[] { internalRaDec.X, internalRaDec.Y }, GetLocalSiderealTime(nextTime));
                     simTarget = GetSyncedAxes(Axes.AxesAppToMount(simTarget));
                     // add back in sidereal or equivalent - subtracted in Ra rate in predictor
                     trackingRate = ConvertRateToAltAz(CurrentTrackingRate(), 0.0, predictorRaDec[1]);
@@ -2171,7 +2170,7 @@ namespace GS.Server.SkyTelescope
                         var predictorRaDec = SkyPredictor.GetRaDecAtTime(nextTime);
                         // get required target position in topo coordinates
                         var internalRaDec = Transforms.CoordTypeToInternal(predictorRaDec[0], predictorRaDec[1]);
-                        skyTarget = Axes.RaDecToAxesXY(new double[] { internalRaDec.X, internalRaDec.Y }, GetLocalSiderealTime(nextTime));
+                        skyTarget = Axes.RaDecToAxesXY(new[] { internalRaDec.X, internalRaDec.Y }, GetLocalSiderealTime(nextTime));
                         skyTarget = GetSyncedAxes(skyTarget);
                     }
                     else
@@ -2292,7 +2291,7 @@ namespace GS.Server.SkyTelescope
                     // convert to internal Ra and Dec
                     var internalRaDec = Transforms.CoordTypeToInternal(predictorRaDec[0], predictorRaDec[1]);
                     // get alt az target
-                    skyTarget = Axes.RaDecToAxesXY(new double[] { internalRaDec.X, internalRaDec.Y }, GetLocalSiderealTime(nextTime));
+                    skyTarget = Axes.RaDecToAxesXY(new[] { internalRaDec.X, internalRaDec.Y }, GetLocalSiderealTime(nextTime));
                     skyTarget = GetSyncedAxes(skyTarget);
                 }
                 // Calculate error
@@ -3102,16 +3101,24 @@ namespace GS.Server.SkyTelescope
             SpiralChanged = true;
         }
 
+        ///// <summary>
+        ///// Convert the move rate in hour angle and declination to a move rate in altitude and azimuth
+        ///// </summary>
+        ///// <param name="haRate">The ha rate.</param>
+        ///// <param name="decRate">The dec rate </param>
+        ///// <returns></returns>
+        //private static Vector ConvertRateToAltAz(double haRate, double decRate)
+        //{
+        //    return ConvertRateToAltAz(haRate, decRate, TargetDec);
+        //}
+
         /// <summary>
         /// Convert the move rate in hour angle and declination to a move rate in altitude and azimuth
         /// </summary>
         /// <param name="haRate">The ha rate.</param>
         /// <param name="decRate">The dec rate </param>
+        /// <param name="targetDec"></param>
         /// <returns></returns>
-        private static Vector ConvertRateToAltAz(double haRate, double decRate)
-        {
-            return ConvertRateToAltAz(haRate, decRate, TargetDec);
-        }
         private static Vector ConvertRateToAltAz(double haRate, double decRate, double targetDec)
         {
             var change = new Vector();
@@ -3240,7 +3247,7 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         private static bool AltAzTimerIsRunning { get => _altAzTrackingTimer.IsRunning; }
 
-        private static double[] _lastAltAzTarget = new[] { double.NaN, Double.NaN, };
+        //private static double[] _lastAltAzTarget = new[] { double.NaN, double.NaN, };
 
         /// <summary>
         /// Update AltAz tracking rates including delta for tracking error
@@ -3261,8 +3268,8 @@ namespace GS.Server.SkyTelescope
                 var internalRaDec = Transforms.CoordTypeToInternal(raDec[0], raDec[1]);
                 var skyTarget = Axes.RaDecToAxesXY(new []{ internalRaDec.X, internalRaDec.Y }, GetLocalSiderealTime(nextTime));
                 skyTarget = GetSyncedAxes(skyTarget);
-                var rawPositions = new double[] { ConvertStepsToDegrees(steps[0], 0), ConvertStepsToDegrees(steps[1], 1) };
-                _lastAltAzTarget = skyTarget;
+                var rawPositions = new[] { ConvertStepsToDegrees(steps[0], 0), ConvertStepsToDegrees(steps[1], 1) };
+                //_lastAltAzTarget = skyTarget;
                 delta[0] = Range.Range180((skyTarget[0] - rawPositions[0]));
                 delta[1] = Range.Range180((skyTarget[1] - rawPositions[1]));
                 const double milliSecond = 0.001;
@@ -3904,7 +3911,7 @@ namespace GS.Server.SkyTelescope
                             _trackingMode = TrackingMode.AltAz;
                             SetTracking();
                             // wait before completing async slew
-                            Thread.Sleep((int)(2 * SkySettings.AltAzTrackingUpdateInterval));
+                            Thread.Sleep(2 * SkySettings.AltAzTrackingUpdateInterval);
                         }
                         break;
                     case SlewType.SlewAltAz:

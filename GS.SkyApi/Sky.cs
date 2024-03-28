@@ -689,8 +689,8 @@ namespace GS.SkyApi
         {
             get
             {
-                var error = SkyServer.LastAutoHomeError.Message;
-                return string.IsNullOrEmpty(error) ? string.Empty : error;
+                if (string.IsNullOrEmpty(SkyServer.LastAutoHomeError.Message)) return string.Empty;
+                return SkyServer.LastAutoHomeError.Message;
             }
         }
         
