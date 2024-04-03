@@ -17,6 +17,7 @@
         xmlns:pec="clr-namespace:GS.Server.Pec" 
         xmlns:snap="clr-namespace:GS.Server.Snap" 
         xmlns:alignment="clr-namespace:GS.Server.Alignment"
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanResizeWithGrip" WindowStyle="None" TextOptions.TextFormattingMode="Display" FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" 
         ContentRendered="MainWindow_OnContentRendered" Closed="MainWindow_OnClosed" Topmost="{Binding TopMost}" 
         d:DataContext="{d:DesignInstance main:MainWindowVM, IsDesignTimeCreatable=True}" 

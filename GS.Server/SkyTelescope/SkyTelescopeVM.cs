@@ -30,6 +30,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -57,6 +58,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
 namespace GS.Server.SkyTelescope
 {
@@ -4263,26 +4265,40 @@ namespace GS.Server.SkyTelescope
         }
 
         private ICommand _pressKeyDownCmd;
-        public ICommand PressAnyKeyDownCmd
+        public ICommand PressKeyDownCmd
         {
             get
             {
                 var cmd = _pressKeyDownCmd;
-                if (cmd != null)
-                {
-                    return cmd;
-                }
-
-                return (_pressKeyDownCmd = new RelayCommand(
-                    param => PressAnyKeyDown()
-                ));
+                if (cmd != null) { return cmd; }
+                return _pressKeyDownCmd = new RelayCommand(param => PressKeyDown((KeyEventArgs)param));
             }
         }
-        private void PressAnyKeyDown()
+        private void PressKeyDown(KeyEventArgs param)
         {
             try
             {
                 LockOn = false;
+                switch (param.Key)
+                {
+                    case Key.A:
+                        HcMouseDownLeft();
+                        Debug.WriteLine("A - Down");
+                        break;
+                    case Key.D:
+                        HcMouseDownRight();
+                        Debug.WriteLine("D - Down");
+                        break;
+                    case Key.W:
+                        HcMouseDownUp();
+                        Debug.WriteLine("W - Down");
+                        break;
+                    case Key.S:
+                        HcMouseDownDown();
+                        Debug.WriteLine("S - Down");
+                        break;
+                }
+
             }
             catch (Exception ex)
             {
@@ -4300,6 +4316,60 @@ namespace GS.Server.SkyTelescope
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
+
+        private ICommand _pressKeyReleaseCmd;
+        public ICommand PressKeyReleaseCmd
+        {
+            get
+            {
+                var cmd = _pressKeyReleaseCmd;
+                if (cmd != null) { return cmd; }
+                return _pressKeyReleaseCmd = new RelayCommand(param => PressKeyRelease((KeyEventArgs)param));
+            }
+        }
+        private void PressKeyRelease(KeyEventArgs param)
+        {
+            try
+            {
+                LockOn = false;
+                switch (param.Key)
+                {
+                    case Key.A:
+                        HcMouseUpLeft();
+                        Debug.WriteLine("A - Up");
+                        break;
+                    case Key.D:
+                        HcMouseUpRight();
+                        Debug.WriteLine("D - Up");
+                        break;
+                    case Key.W:
+                        HcMouseUpUp();
+                        Debug.WriteLine("W - Up");
+                        break;
+                    case Key.S:
+                        HcMouseUpDown();
+                        Debug.WriteLine("S - Up");
+                        break;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
 
         private ICommand _clickLockedMouseDownCmd;
         public ICommand ClickLockedMouseDownCmd

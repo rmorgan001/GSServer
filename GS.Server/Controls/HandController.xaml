@@ -7,12 +7,15 @@
              xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
              xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors" mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
-    <b:Interaction.Triggers>
-        <!--Stop Mouse Lock-->
+    <!--<b:Interaction.Triggers>
+        --><!--Stop Mouse Lock--><!--
         <b:EventTrigger EventName="PreviewKeyDown">
-            <b:InvokeCommandAction Command="{Binding PressAnyKeyDownCmd}" CommandParameter="stop" />
+            <b:InvokeCommandAction Command="{Binding PressKeyDownCmd}" PassEventArgsToCommand="True" />
         </b:EventTrigger>
-    </b:Interaction.Triggers>
+        <b:EventTrigger EventName="PreviewKeyUp">
+            <b:InvokeCommandAction Command="{Binding PressKeyReleaseCmd}" PassEventArgsToCommand="True" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>-->
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>

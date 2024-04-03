@@ -10,8 +10,17 @@
              xmlns:deviceInterface="clr-namespace:ASCOM.DeviceInterface;assembly=ASCOM.DeviceInterfaces"
              xmlns:controls="clr-namespace:GS.Server.Controls"
              xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="PreviewKeyDown">
+            <b:InvokeCommandAction Command="{Binding PressKeyDownCmd}" PassEventArgsToCommand="True" />
+        </b:EventTrigger>
+        <b:EventTrigger EventName="PreviewKeyUp">
+            <b:InvokeCommandAction Command="{Binding PressKeyReleaseCmd}" PassEventArgsToCommand="True" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
     <UserControl.Resources>
         <domain:ComparisonConverter x:Key="Compare" />
         <domain:InverseBooleanConverter x:Key="InvertBool" />
