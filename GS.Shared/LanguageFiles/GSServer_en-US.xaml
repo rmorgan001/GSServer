@@ -61,6 +61,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnTipSetHome">Reset axis positions to home</system:String>
     <system:String x:Key="btnFlip">Flip SOP</system:String>
     <system:String x:Key="btnTipFlip">Flip Side of Pier</system:String>
+    <system:String x:Key="btnFlipAzDir">Flip Az Side</system:String>
+    <system:String x:Key="btnTipFlipAzDir">Flip azimuth slew direction</system:String>
     <!--<system:String x:Key="btnHomeReset">Accept to reset mount position to the Home position</system:String>-->
     <system:String x:Key="btnContinueFlip">Accept to flip mount</system:String>
     <system:String x:Key="btnTipParkPos">Park Positions</system:String>

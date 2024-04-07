@@ -61,8 +61,11 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnTipSetHome">Faire de la position actuelle, la position Home</system:String>
     <system:String x:Key="btnFlip">Retournement</system:String>
     <system:String x:Key="btnTipFlip">Retournement méridien vers l'autre côté du pied</system:String>
+    <system:String x:Key="btnFlipAzDir">Changer côté Az</system:String>
+    <system:String x:Key="btnTipFlipAzDir">Inverser le sens de rotation de l'azimut</system:String>
     <!--<system:String x:Key="btnHomeReset">Valider la réinitialisation de la position actuelle de la monture comme position Home?</system:String>-->
     <system:String x:Key="btnContinueFlip">Valider le retournement?</system:String>
+    <system:String x:Key="btnContinueFlipAzDir">Acceptez d'échanger le côté de l'azimut. La monture pivotera à 360 degrés</system:String>
     <system:String x:Key="btnTipParkPos">Positions de parking</system:String>
     <system:String x:Key="btnAutoHome">AutoHome</system:String>
     <system:String x:Key="btnAutoHomeComplete">AutoHome Complet</system:String>
@@ -147,6 +150,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="goAcpCoords">Accepter les coordonnées?</system:String>
     <system:String x:Key="goRa">AD:</system:String>
     <system:String x:Key="goDec">Dec:</system:String>
+    <system:String x:Key="goAz">Az:</system:String>
+    <system:String x:Key="goAlt">Alt:</system:String>
     <system:String x:Key="goCopy">Copier</system:String>
     <system:String x:Key="goTipCopy">Actualiser avec les coordonnées actuelles</system:String>
     <system:String x:Key="goGoTo">GoTo</system:String>
@@ -156,6 +161,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="goSyncWarning">Alerte: vérifier les coordonnées!</system:String>
     <system:String x:Key="goSlewing">La monture est en déplacement</system:String>
     <system:String x:Key="goOutLimits">Hors des limites de synchronisation</system:String>
+    <system:String x:Key="goChangeToRaDec">Faites un clic droit pour entrer les coordonnées de Ra Dec</system:String>
+    <system:String x:Key="goChangeToAzAlt">Faites un clic droit pour entrer les coordonnées de Az Alt</system:String>
 
     <!--Backlash -->
     <system:String x:Key="bacDecLash">Backlash en Dec</system:String>

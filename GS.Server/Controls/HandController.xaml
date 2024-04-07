@@ -31,7 +31,7 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition />
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <!--<md:DialogHost HorizontalAlignment="Center" CloseOnClickAway="True" IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" Background="Transparent" />-->
             <Button Grid.Row="0" Grid.Column="0" Width="20" Height="20" ToolTip="{StaticResource hcOpenWin}" Command="{Binding OpenHCWindowCmd}" Style="{StaticResource MaterialDesignRaisedAccentButton}" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" 

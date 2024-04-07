@@ -61,6 +61,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnTipSetHome">Reset posizione assi a Home</system:String>
     <system:String x:Key="btnFlip">Inv. Meridiano</system:String>
     <system:String x:Key="btnTipFlip">Inversione del Meridiano</system:String>
+    <system:String x:Key="btnFlipAzDir">Inv. Az Lato</system:String>
+    <system:String x:Key="btnTipFlipAzDir">Invertire la direzione di rotazione dell'azimut</system:String>
     <!--<system:String x:Key="btnHomeReset">Accept to reset mount position to the Home position</system:String>-->
     <system:String x:Key="btnContinueFlip">Accetta Inversione del Meridiano</system:String>
     <system:String x:Key="btnTipParkPos">Posizione di Parcheggio</system:String>
@@ -141,12 +143,14 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="mntHomeSensor">Sensore di Home:</system:String>
     <system:String x:Key="mntRaSteps">Ra Steps/Arcsec:</system:String>
     <system:String x:Key="mntDecSteps">Dec Steps/Arcsec:</system:String>
-    <system:String x:Key="mntInfo">informazioni Montatura</system:String>
+    <system:String x:Key="mntInfo">Informazioni Montatura</system:String>
 
     <!--GoTo bar-->
     <system:String x:Key="goAcpCoords">Accetto le Coordinate?</system:String>
     <system:String x:Key="goRa">RA:</system:String>
     <system:String x:Key="goDec">Dec:</system:String>
+    <system:String x:Key="goAz">Az:</system:String>
+    <system:String x:Key="goAlt">Alt:</system:String>
     <system:String x:Key="goCopy">Copy</system:String>
     <system:String x:Key="goTipCopy">Utilizza la posizione Corrente</system:String>
     <system:String x:Key="goGoTo">GoTo</system:String>
@@ -155,7 +159,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="goSync">Sync</system:String>
     <system:String x:Key="goSyncWarning">Attenzione: verifica le coordinate!</system:String>
     <system:String x:Key="goSlewing">La Montatura si sta muovendo</system:String>
-    <system:String x:Key="goOutLimits">Outside of Sync limits</system:String>
+    <system:String x:Key="goOutLimits">Al di fuori dei limiti di sincronizzazione</system:String>
+    <system:String x:Key="goChangeToRaDec">Fare clic con il tasto destro per inserire le coordinate Ra Dec</system:String>
+    <system:String x:Key="goChangeToAzAlt">Fare clic con il tasto destro per inserire le coordinate Az Alt</system:String>
 
     <!--Backlash -->
     <system:String x:Key="bacDecLash">Dec Backlash</system:String>
@@ -646,7 +652,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliExport">Esporta</system:String>
     <system:String x:Key="aliExportTooltip">Clicca questo bottone per esportale questo modello di puntamento.</system:String>
     <system:String x:Key="aliImport">Importa</system:String>
-    <system:String x:Key="aliImportTooltip">Click this button import a point model that was previously exported.</system:String>
+    <system:String x:Key="aliImportTooltip">Clicca questo bottone per importare un modello di puntamento precedentemente esportato.</system:String>
     <system:String x:Key="aliConfirmClearAllCaption">Elimina punti di Allineamento</system:String>
     <system:String x:Key="aliConfirmClearAllMessage">Accetta di eliminare tutti i punti di Allineamento.</system:String>
     <system:String x:Key="aliConfirmDeleteCaption">Elimina punto di Allineamento</system:String>
@@ -673,7 +679,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="focuserDisconnect">Disconnetti</system:String>
     <system:String x:Key="focuserDisconnectTooltip">Disconnetti Focheggiatore</system:String>
     <system:String x:Key="focuserStepSizeHint">Dimensione Passo</system:String>
-    <system:String x:Key="focuserStepSizeTooltip">The focuser position increment for each button press</system:String>
+    <system:String x:Key="focuserStepSizeTooltip">L'incremento della posizione del focheggiatore per ogni pressione del pulsante</system:String>
     <system:String x:Key="focuserSelectTooltip">Seleziona Focheggiatore da connettere</system:String>
     <system:String x:Key="focuserSelectHint">Focheggiatore</system:String>
 
@@ -713,9 +719,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!-- 1.0.?.? -->
     <system:String x:Key="aliAlertTooltip">Alignment modeling has been switched off due to an unexpectedly large offset.</system:String>
-    <system:String x:Key="aliCancelAlert">Cancel Alignment Alert</system:String>
+    <system:String x:Key="aliCancelAlert">Annulla avviso di allineamento</system:String>
     <system:String x:Key="aliCancelAlertTooltip">Click this button cancel the alignment alert.</system:String>
-    <system:String x:Key="vceAlignmentAlert">Alignment Alert</system:String>
+    <system:String x:Key="vceAlignmentAlert">Avviso di allineamento</system:String>
 
     <!--1.0.6.3 -->
     <system:String x:Key="btnContinueHome">Accetta di uccidere Home</system:String>

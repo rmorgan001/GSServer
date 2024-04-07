@@ -78,8 +78,15 @@
         <md:DialogHost VerticalAlignment="Bottom" CloseOnClickAway="True" IsOpen="{Binding IsFlipDialogOpen}" DialogContent="{Binding FlipContent}">
             <Button Margin="5,6,0,0" Width="100" Height="25"  HorizontalAlignment="Left" Padding="-5"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipFlip}"
-                    IsEnabled="{Binding EnableFlipSOP}"
+                    IsEnabled="{Binding EnableFlipSOP}" Visibility="{Binding FlipSopShow, Converter={StaticResource BoolToClap}}"
                     Command="{Binding OpenFlipDialogCommand}" Content="{StaticResource btnFlip}">
+            </Button>
+        </md:DialogHost>
+        <md:DialogHost VerticalAlignment="Bottom" CloseOnClickAway="True" IsOpen="{Binding IsFlipAzDirDialogOpen}" DialogContent="{Binding FlipContent}">
+            <Button Margin="5,6,0,0" Width="100" Height="25"  HorizontalAlignment="Left" Padding="-5"
+                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipFlipAzDir}"
+                    IsEnabled="{Binding EnableFlipAzDir}"  Visibility="{Binding FlipAzDirShow, Converter={StaticResource BoolToClap}}"
+                    Command="{Binding OpenFlipAzDirDialogCmd}" Content="{StaticResource btnFlipAzDir}">
             </Button>
         </md:DialogHost>
         <md:DialogHost VerticalAlignment="Bottom" IsOpen="{Binding IsAutoHomeDialogOpen}" DialogContent="{Binding AutoHomeContent}">

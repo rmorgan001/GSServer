@@ -61,6 +61,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnTipSetHome">Zurücksetzen der Achsen auf Home</system:String>
     <system:String x:Key="btnFlip">SdP wechseln</system:String>
     <system:String x:Key="btnTipFlip">Seite des Piers wechseln</system:String>
+    <system:String x:Key="btnFlipAzDir">Flip Az Side</system:String>
+    <system:String x:Key="btnTipFlipAzDir">Azimut-Schwenkrichtung umkehren</system:String>
     <!--<system:String x:Key="btnHomeReset">Akzeptieren, um die Position der Montierung auf die Home-Position zurückzusetzen</system:String>-->
     <system:String x:Key="btnContinueFlip">Akzeptieren, um die Montierung zu umzukehren</system:String>
     <system:String x:Key="btnTipParkPos">Park Position</system:String>
@@ -147,6 +149,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="goAcpCoords">Koordinaten akzeptieren?</system:String>
     <system:String x:Key="goRa">RA:</system:String>
     <system:String x:Key="goDec">Dek:</system:String>
+    <system:String x:Key="goAz">Az:</system:String>
+    <system:String x:Key="goAlt">Alt:</system:String>
     <system:String x:Key="goCopy">Kopieren</system:String>
     <system:String x:Key="goTipCopy">Mit den aktuellen Koordinaten aktualisieren</system:String>
     <system:String x:Key="goGoTo">GoTo</system:String>
@@ -156,6 +160,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="goSyncWarning">Warnung: bitte Koordinaten überprüfen!</system:String>
     <system:String x:Key="goSlewing">Montierung bewegt sich</system:String>
     <system:String x:Key="goOutLimits">Außerhalb der Sync-Grenzen</system:String>
+    <system:String x:Key="goChangeToRaDec">Klicken Sie mit der rechten Maustaste, um die Ra Dek-Koordinaten einzugeben</system:String>
+    <system:String x:Key="goChangeToAzAlt">Klicken Sie mit der rechten Maustaste, um die Az Alt-Koordinaten einzugebens</system:String>
 
     <!--Backlash -->
     <system:String x:Key="bacDecLash">Dek Backlash</system:String>
