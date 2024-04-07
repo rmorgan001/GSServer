@@ -124,6 +124,7 @@ namespace GS.Server.SkyTelescope
                     CustomMountOffset = new List<int>(Enumerable.Range(-5, 11));
                     Hours = new List<int>(Enumerable.Range(0, 24));
                     Range60 = new List<int>(Enumerable.Range(0, 60));
+                    AzRange = new List<int>(Enumerable.Range(0, 360));
                     PolarLedLevels = new List<int>(Enumerable.Range(-1, 256));
                     St4GuideRates = new List<double> { 1.0, 0.75, 0.50, 0.25, 0.125 };
                     Temperatures = new List<double>(Numbers.InclusiveRange(-50, 60, 1.0));
@@ -155,16 +156,27 @@ namespace GS.Server.SkyTelescope
                     SetParkLimitSelection(SkySettings.ParkLimitName);
                     TrackingRate = SkySettings.TrackingRate;
                     PolarLedLevel = SkySettings.PolarLedLevel;
-                    //set CanSetPierSide to false if AltAz alignment
+                    //set CanSetPierSide to false, hide Side of Pier status and enable Az direction if AltAz alignment
+                    AzDirection = "East";
                     switch (AlignmentMode)
                     {
                         case AlignmentModes.algAltAz:
                             SkySettings.CanSetPierSide = false;
+                            SopShow = false;
+                            FlipSopShow = false;
+                            AzDirShow = true;
+                            FlipAzDirShow = true;
+                            AltRange = new List<int>(Enumerable.Range((int)SkySettings.AltAxisLowerLimit, (int) SkySettings.AltAxisUpperLimit));
                             break;
                         case AlignmentModes.algPolar:
                         case AlignmentModes.algGermanPolar:
                         default:
                             SkySettings.CanSetPierSide = SkySettings.HourAngleLimit != 0;
+                            SopShow = true;
+                            FlipSopShow = true;
+                            AzDirShow = false;
+                            FlipAzDirShow = false;
+                            AltRange = Range90;
                             break;
                     }
                     EnableFlipSOP = SkySettings.CanSetPierSide;
@@ -172,10 +184,13 @@ namespace GS.Server.SkyTelescope
                     HcWinVisibility = true;
                     ModelWinVisibility = true;
                     ButtonsWinVisibility = true;
+                    SopShow = SkySettings.AlignmentMode != AlignmentModes.algAltAz;
                     PecShow = SkyServer.PecShow;
                     SchedulerShow = true;
                     CustomGearing = SkySettings.CustomGearing;
                     PolarLedLevelEnabled = true;
+                    RaDecDialogActive = true;
+                    AltAzDialogActive = false;
 
                     DiscoverySetup();
                 }
@@ -287,6 +302,30 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private bool _raDecDialogActive;
+        public bool RaDecDialogActive
+        {
+            get => _raDecDialogActive;
+            set
+            {
+                if (_raDecDialogActive == value) return;
+                _raDecDialogActive = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _altAzDialogActive;
+        public bool AltAzDialogActive
+        {
+            get => _altAzDialogActive;
+            set
+            {
+                if (_altAzDialogActive == value) return;
+                _altAzDialogActive = value;
+                OnPropertyChanged();
+            }
+        }
+
         /// <summary>
         /// Property changes from settings
         /// </summary>
@@ -365,6 +404,27 @@ namespace GS.Server.SkyTelescope
                          ParkPositions = SkySettings.ParkPositions;
                          ParkSelection = ParkPositions.FirstOrDefault();
                          ParkSelectionSetting = ParkSelection;
+                         switch (AlignmentMode)
+                         {
+                             case AlignmentModes.algAltAz:
+                                 SkySettings.CanSetPierSide = false;
+                                 SopShow = false;
+                                 FlipSopShow = false;
+                                 AzDirShow = true;
+                                 FlipAzDirShow = true;
+                                 AltRange = new List<int>(Enumerable.Range((int)SkySettings.AltAxisLowerLimit, (int)SkySettings.AltAxisUpperLimit));
+                                 break;
+                             case AlignmentModes.algPolar:
+                             case AlignmentModes.algGermanPolar:
+                             default:
+                                 SkySettings.CanSetPierSide = SkySettings.HourAngleLimit != 0;
+                                 SopShow = true;
+                                 FlipSopShow = true;
+                                 AzDirShow = false;
+                                 FlipAzDirShow = false;
+                                 AltRange = Range90;
+                                 break;
+                         }
                          // ReSharper disable ExplicitCallerInfoArgument
                          OnPropertyChanged($"ParkPositions");
                          break;
@@ -501,6 +561,12 @@ namespace GS.Server.SkyTelescope
                                     PPecOn = SkyServer.PPecOn;
                                     if (SkyServer.PPecOn) { PecState = true; }
                                     if (!SkyServer.PPecOn && !SkyServer.PecOn) { PecState = false; }
+                                    break;
+                                case "AzSlewMotion":
+                                    AzDirection = SkyServer.AzSlewMotion.ToString();
+                                    break;
+                                case "CanFlipAzimuthSide":
+                                    EnableFlipAzDir = SkyServer.CanFlipAzimuthSide;
                                     break;
                             }
                         });
@@ -3132,10 +3198,35 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private bool _enableFlipAzDir;
+        public bool EnableFlipAzDir
+        {
+            get => _enableFlipAzDir;
+            set
+            {
+                if (_enableFlipAzDir == value) return;
+                _enableFlipAzDir = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isFlipAzDirDialogOpen;
+        public bool IsFlipAzDirDialogOpen
+        {
+            get => _isFlipAzDirDialogOpen;
+            set
+            {
+                if (_isFlipAzDirDialogOpen == value) return;
+                _isFlipAzDirDialogOpen = value;
+                CloseDialogs(value);
+                OnPropertyChanged();
+            }
+        }
+
         private bool _isHomeDialogOpen;
         public bool IsHomeDialogOpen
         {
-            get => _isFlipDialogOpen;
+            get => _isHomeDialogOpen;
             set
             {
                 if (_isHomeDialogOpen == value) return;
@@ -3160,7 +3251,7 @@ namespace GS.Server.SkyTelescope
         private bool _isParkDialogOpen;
         public bool IsParkDialogOpen
         {
-            get => _isFlipDialogOpen;
+            get => _isParkDialogOpen;
             set
             {
                 if (_isParkDialogOpen == value) return;
@@ -3452,6 +3543,170 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
+
+        #region Az Coord GoTo Control
+        public IList<int> AzRange { get; }
+
+        private double _azDecimal;
+        public double AzDecimal
+        {
+            get => _azDecimal;
+            set
+            {
+                _azDecimal = Math.Abs(value);
+                OnPropertyChanged();
+            }
+        }
+
+        private double _azDegrees;
+        public double AzDegrees
+        {
+            get => _azDegrees;
+            set
+            {
+                if (Math.Abs(value - _azDegrees) < 0.00001) { return; }
+                _azDegrees = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _azMinutes;
+        public double AzMinutes
+        {
+            get => _azMinutes;
+            set
+            {
+                if (Math.Abs(value - _azMinutes) < 0.00001) return;
+                _azMinutes = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _azSeconds;
+        public double AzSeconds
+        {
+            get => _azSeconds;
+            set
+            {
+                if (Math.Abs(value - _azSeconds) < 0.00001) return;
+                _azSeconds = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _altDecimal;
+        public double AltDecimal
+        {
+            get => _altDecimal;
+            set
+            {
+                _altDecimal = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private IList<int> _altRange;
+        public IList<int> AltRange
+        {
+            get => _altRange;
+            set
+            {
+                _altRange = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _altDegrees;
+        public double AltDegrees
+        {
+            get => _altDegrees;
+            set
+            {
+                if (Math.Abs(value - _altDegrees) < 0.00001) return;
+                _altDegrees = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _altMinutes;
+        public double AltMinutes
+        {
+            get => _altMinutes;
+            set
+            {
+                if (Math.Abs(value - _altMinutes) < 0.00001) return;
+                _altMinutes = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _altSeconds;
+        public double AltSeconds
+        {
+            get => _altSeconds;
+            set
+            {
+                if (Math.Abs(value - _altSeconds) < 0.00001) return;
+                _altSeconds = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _populateGoToAzAlt;
+        public ICommand PopulateGoToAzAltCommand
+        {
+            get
+            {
+                var alt = _populateGoToAzAlt;
+                if (alt != null)
+                {
+                    return alt;
+                }
+
+                return _populateGoToAzAlt = new RelayCommand(
+                    param => PopulateGoToAzAlt()
+                );
+            }
+        }
+        private void PopulateGoToAzAlt()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    var az = _util.HoursToHMS(SkyServer.Azimuth, ":", ":", ":", 3);
+                    var azs = az.Split(':');
+                    AzDegrees = Convert.ToDouble(azs[0]);
+                    AzMinutes = Convert.ToDouble(azs[1]);
+                    AzSeconds = Convert.ToDouble(azs[2]);
+
+                    var alt = _util.HoursToHMS(SkyServer.Altitude, ":", ":", ":", 3);
+                    var alts = alt.Split(':');
+                    AltDegrees = Convert.ToDouble(alts[0]);
+                    AltMinutes = Convert.ToDouble(alts[1]);
+                    AltSeconds = Convert.ToDouble(alts[2]);
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
@@ -5157,6 +5412,66 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private bool _sopShow;
+
+        public bool SopShow
+        {
+            get => _sopShow;
+            set
+            {
+                _sopShow = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _flipSopShow;
+
+        public bool FlipSopShow
+        {
+            get => _flipSopShow;
+            set
+            {
+                _flipSopShow = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _azDirShow;
+
+        public bool AzDirShow
+        {
+            get => _azDirShow;
+            set
+            {
+                _azDirShow = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _flipAzDirShow;
+
+        public bool FlipAzDirShow
+        {
+            get => _flipAzDirShow;
+            set
+            {
+                _flipAzDirShow = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private String _azDirection;
+
+        public String AzDirection
+        {
+            get => _azDirection;
+            set
+            {
+                _azDirection = "Az\u2192" + $"{Application.Current.Resources["lb" + value]}";
+                OnPropertyChanged();
+            }
+        }
+
         private bool _limitAlarm;
         public bool LimitAlarm
         {
@@ -6736,29 +7051,29 @@ namespace GS.Server.SkyTelescope
 
         #endregion
 
-        #region Home Dialog
+        #region Flip Azimuth Direction Dialog
 
-        private ICommand _openHomeDialogCmd;
-        public ICommand OpenHomeDialogCmd
+        private ICommand _openFlipAzDirDialogCmd;
+        public ICommand OpenFlipAzDirDialogCmd
         {
             get
             {
-                var command = _openHomeDialogCmd;
+                var command = _openFlipAzDirDialogCmd;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _openHomeDialogCmd = new RelayCommand(
-                    param => OpenHomeDialog()
+                return _openFlipAzDirDialogCmd = new RelayCommand(
+                    param => OpenFlipAzDirDialog()
                 );
             }
         }
-        private void OpenHomeDialog()
+        private void OpenFlipAzDirDialog()
         {
             try
             {
-                DialogContent = new HomeDialog();
+                DialogContent = new FlipAzDirDialog();
                 IsDialogOpen = true;
             }
             catch (Exception ex)
@@ -6781,45 +7096,54 @@ namespace GS.Server.SkyTelescope
 
         }
 
-        private ICommand _acceptHomeDialogCmd;
-        public ICommand AcceptHomeDialogCmd
+        private ICommand _acceptFlipAzDirDialogCmd;
+        public ICommand AcceptFlipAzDirDialogCmd
         {
             get
             {
-                var command = _acceptHomeDialogCmd;
+                var command = _acceptFlipAzDirDialogCmd;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _acceptHomeDialogCmd = new RelayCommand(
-                    param => AcceptHomeDialog()
+                return _acceptFlipAzDirDialogCmd = new RelayCommand(
+                    param => AcceptFlipAzDirDialog()
                 );
             }
         }
-        private void AcceptHomeDialog()
+        private void AcceptFlipAzDirDialog()
         {
+            try
+            {
+                if (!SkyServer.IsMountRunning) return;
+                SkyServer.FlipAzimuthPosition();
                 IsDialogOpen = false;
-                ClickHome();
+            }
+            catch (Exception ex)
+            {
+                IsDialogOpen = false;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
         }
-        
-        private ICommand _cancelHomeDialogCmd;
-        public ICommand CancelHomeDialogCmd
+
+        private ICommand _cancelFlipAzDirDialogCmd;
+        public ICommand CancelFlipAzDirDialogCmd
         {
             get
             {
-                var command = _cancelHomeDialogCmd;
+                var command = _cancelFlipAzDirDialogCmd;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _cancelHomeDialogCmd = new RelayCommand(
-                    param => CancelHomeDialog()
+                return _cancelFlipAzDirDialogCmd = new RelayCommand(
+                    param => CancelFlipAzDirDialog()
                 );
             }
         }
-        private void CancelHomeDialog()
+        private void CancelFlipAzDirDialog()
         {
             try
             {
@@ -6955,6 +7279,116 @@ namespace GS.Server.SkyTelescope
         }
 
         #endregion 
+
+        #region Home Dialog
+
+        private ICommand _openHomeDialogCmd;
+        public ICommand OpenHomeDialogCmd
+        {
+            get
+            {
+                var command = _openHomeDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openHomeDialogCmd = new RelayCommand(
+                    param => OpenHomeDialog()
+                );
+            }
+        }
+        private void OpenHomeDialog()
+        {
+            try
+            {
+                DialogContent = new HomeDialog();
+                IsDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+
+        }
+
+        private ICommand _acceptHomeDialogCmd;
+        public ICommand AcceptHomeDialogCmd
+        {
+            get
+            {
+                var command = _acceptHomeDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptHomeDialogCmd = new RelayCommand(
+                    param => AcceptHomeDialog()
+                );
+            }
+        }
+        private void AcceptHomeDialog()
+        {
+            IsDialogOpen = false;
+            ClickHome();
+        }
+
+        private ICommand _cancelHomeDialogCmd;
+        public ICommand CancelHomeDialogCmd
+        {
+            get
+            {
+                var command = _cancelHomeDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelHomeDialogCmd = new RelayCommand(
+                    param => CancelHomeDialog()
+                );
+            }
+        }
+        private void CancelHomeDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
 
         #region Sync Dialog
 
@@ -7120,7 +7554,7 @@ namespace GS.Server.SkyTelescope
 
         #endregion
 
-        #region GoTo Dialog
+        #region GoTo RA Dec Dialog
         public double GoToDec => Principles.Units.Deg2Dou(DecDegrees, DecMinutes, DecSeconds);
         public double GoToRa => Principles.Units.Ra2Dou(RaHours, RaMinutes, RaSeconds);
         public string GoToDecString => _util.DegreesToDMS(GoToDec, "° ", "m ", "s", 3);
@@ -7205,6 +7639,7 @@ namespace GS.Server.SkyTelescope
                     if (AtPark)
                     {
                         BlinkParked();
+                        IsDialogOpen = false;
                         return;
                     }
 
@@ -7548,6 +7983,450 @@ namespace GS.Server.SkyTelescope
                     DecDegrees = Convert.ToDouble(ras[0]);
                     DecMinutes = Convert.ToDouble(ras[1]);
                     DecSeconds = Convert.ToDouble(ras[2]);
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+        #endregion
+
+        #region GoTo Az Alt Dialog
+        public double GoToAlt => Principles.Units.Deg2Dou(AltDegrees, AltMinutes, AltSeconds);
+        public double GoToAz => Principles.Units.Deg2Dou(AzDegrees, AzMinutes, AzSeconds);
+        public string GoToAltString => _util.DegreesToDMS(GoToAlt, "° ", "m ", "s", 3);
+        public string GoToAzString => _util.DegreesToDMS(GoToAz, "° ", "m ", "s", 3);
+
+        private ICommand _openAzGoToDialogCommand;
+        public ICommand OpenAzGoToDialogCommand
+        {
+            get
+            {
+                var command = _openAzGoToDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openAzGoToDialogCommand = new RelayCommand(
+                    param => OpenAzGoToDialog()
+                );
+            }
+        }
+        private void OpenAzGoToDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    var altLimit = SkySettings.AlignmentMode == AlignmentModes.algAltAz
+                        ? SkySettings.AltAxisLowerLimit : 0;
+                    if (GoToAlt < altLimit)
+                    {
+                        OpenDialog($"{Application.Current.Resources["goTargetBelow"]}: {GoToAz} Alt: {GoToAlt}");
+                        return;
+                    }
+
+                    DialogContent = new AzGoToDialog();
+                    IsDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _acceptAzGoToDialogCommand;
+        public ICommand AcceptAzGoToDialogCommand
+        {
+            get
+            {
+                var command = _acceptAzGoToDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptAzGoToDialogCommand = new RelayCommand(
+                    param => AcceptAzGoToDialog()
+                );
+            }
+        }
+        private void AcceptAzGoToDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (!SkySettings.CanSlewAsync) return;
+                    if (AtPark)
+                    {
+                        BlinkParked();
+                        IsDialogOpen = false;
+                        return;
+                    }
+                    var monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.UI,
+                        Category = MonitorCategory.Interface,
+                        Type = MonitorType.Information,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"From|{SkyServer.Azimuth}|{SkyServer.Altitude}|to|{GoToAz}|{GoToAlt}"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
+                    SkyServer.SlewAltAz(GoToAlt, GoToAz);
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelAzGoToDialogCommand;
+        public ICommand CancelAzGoToDialogCommand
+        {
+            get
+            {
+                var command = _cancelAzGoToDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelAzGoToDialogCommand = new RelayCommand(
+                    param => CancelAzGoToDialog()
+                );
+            }
+        }
+        private void CancelAzGoToDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _openAzDecimalDialogCmd;
+        public ICommand OpenAzDecimalDialogCmd
+        {
+            get
+            {
+                var command = _openAzDecimalDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openAzDecimalDialogCmd = new RelayCommand(
+                    param => OpenAzDecimalDialog()
+                );
+            }
+        }
+        private void OpenAzDecimalDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    AzDecimal = _util.HMSToHours($"{AzDegrees}:{AzMinutes}:{AzSeconds}");
+                    DialogContent = new AzGoToDecimalDialog();
+                    IsDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelAzDecimalDialogCmd;
+        public ICommand CancelAzDecimalDialogCmd
+        {
+            get
+            {
+                var command = _cancelAzDecimalDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelAzDecimalDialogCmd = new RelayCommand(
+                    param => CancelAzDecimalDialog()
+                );
+            }
+        }
+        private void CancelAzDecimalDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _acceptAzDecimalDialogCmd;
+        public ICommand AcceptAzDecimalDialogCmd
+        {
+            get
+            {
+                var command = _acceptAzDecimalDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptAzDecimalDialogCmd = new RelayCommand(
+                    param => AcceptAzDecimalDialog()
+                );
+            }
+        }
+        private void AcceptAzDecimalDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (AzDecimal <= 0.0 || AzDecimal >= 360.0)
+                    {
+                        throw new Exception($"{Application.Current.Resources["exError"]}");
+                    }
+                    var az = _util.DegreesToDMS(AzDecimal, ":", ":", ":", 3);
+                    var azs = az.Split(':');
+                    AzDegrees = Convert.ToDouble(azs[0]);
+                    AzMinutes = Convert.ToDouble(azs[1]);
+                    AzSeconds = Convert.ToDouble(azs[2]);
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _openAltDecimalDialogCmd;
+        public ICommand OpenAltDecimalDialogCmd
+        {
+            get
+            {
+                var command = _openAltDecimalDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openAltDecimalDialogCmd = new RelayCommand(
+                    param => OpenAltDecimalDialog()
+                );
+            }
+        }
+        private void OpenAltDecimalDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    AltDecimal = _util.DMSToDegrees($"{AltDegrees}:{AltMinutes}:{AltSeconds}");
+                    DialogContent = new AltGoToDecimalDialog();
+                    IsDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelAltDecimalDialogCmd;
+        public ICommand CancelAltDecimalDialogCmd
+        {
+            get
+            {
+                var command = _cancelAltDecimalDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelAltDecimalDialogCmd = new RelayCommand(
+                    param => CancelAltDecimalDialog()
+                );
+            }
+        }
+        private void CancelAltDecimalDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _acceptAltDecimalDialogCmd;
+        public ICommand AcceptAltDecimalDialogCmd
+        {
+            get
+            {
+                var command = _acceptAltDecimalDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptAltDecimalDialogCmd = new RelayCommand(
+                    param => AcceptAltDecimalDialog()
+                );
+            }
+        }
+        private void AcceptAltDecimalDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (AltDecimal <= -91.0 || AltDecimal >= 91.0)
+                    {
+                        throw new Exception($"{Application.Current.Resources["exError"]}");
+                    }
+                    var alt = _util.DegreesToDMS(AltDecimal, ":", ":", ":", 3);
+                    var alts = alt.Split(':');
+                    AltDegrees = Convert.ToDouble(alts[0]);
+                    AltMinutes = Convert.ToDouble(alts[1]);
+                    AltSeconds = Convert.ToDouble(alts[2]);
                     IsDialogOpen = false;
                 }
             }

@@ -210,6 +210,7 @@ namespace GS.Server.SkyTelescope
         private static readonly object _mountPositionUpdatedLock = new object();
         private static bool _hcTrackingState;
         private static AzSlewMotionType _azSlewMotion;
+        private static bool _canFlipAzimuthSide;
         #endregion
 
         /// <summary>
@@ -391,6 +392,22 @@ namespace GS.Server.SkyTelescope
                 if (_azSlewMotion == value) { return; }
                 _azSlewMotion = value;
                 OnStaticPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Can flip azimuth side state
+        /// </summary>
+        public static bool CanFlipAzimuthSide
+        {
+            get => _canFlipAzimuthSide;
+            set
+            {
+                if (_canFlipAzimuthSide != value)
+                {
+                    _canFlipAzimuthSide = value;
+                    OnStaticPropertyChanged();
+                }
             }
         }
 
@@ -3432,11 +3449,11 @@ namespace GS.Server.SkyTelescope
             AzSlewMotionType azSlewMotion = AzSlewMotion;
             if (_actualAxisX >= 0.0)
             {
-                azSlewMotion = AzSlewMotionType.Eastwards;
+                azSlewMotion = AzSlewMotionType.East;
             }
             if (_actualAxisX < 0.0)
             {
-                azSlewMotion = AzSlewMotionType.Westwards;
+                azSlewMotion = AzSlewMotionType.West;
             }
             return azSlewMotion;
         }
@@ -5430,6 +5447,34 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
+        /// Execute azimuth flip about South direction with tracking state maintained
+        /// </summary>
+        public static void FlipAzimuthPosition()
+        {
+            var tracking = Tracking;
+            var azimuth = Azimuth;
+            Tracking = false;
+            switch (AzSlewMotion)
+            {
+                case AzSlewMotionType.East:
+                    azimuth -= 360.0;
+                    break;
+                case AzSlewMotionType.West:
+                    azimuth += 360.0;
+                    break;
+            }
+            Task flipAzDirTask = Task.Run( () => 
+                {
+                        SlewAltAz(Altitude, azimuth);
+                        while (IsSlewing)
+                        {
+                            Thread.Sleep(SkySettings.DisplayInterval);
+                        }
+                        Tracking = tracking;
+                });
+        }
+
+        /// <summary>
         /// Starts slew with alt/az coordinates
         /// </summary>
         /// <param name="altitude"></param>
@@ -5437,6 +5482,22 @@ namespace GS.Server.SkyTelescope
         public static void SlewAltAz(double altitude, double azimuth)
         {
             SlewAltAz(new Vector(azimuth, altitude));
+        }
+
+        /// <summary>
+        /// Checks if current azimuth position can be reached from opposite direction
+        /// within slew limit
+        /// </summary>
+        /// <returns></returns>
+        private static bool CheckFlipAzimuth()
+        {
+            var result = false;
+            if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
+            {
+                result = (Range.Range360(ActualAxisX) < 180 + SkySettings.AzSlewLimit)
+                         && (Range.Range360(ActualAxisX) > 180 - SkySettings.AzSlewLimit);
+            }
+            return result;
         }
 
         /// <summary>
@@ -5774,13 +5835,13 @@ namespace GS.Server.SkyTelescope
             {
                 switch (AzSlewMotion)
                 {
-                    case AzSlewMotionType.Eastwards:
+                    case AzSlewMotionType.East:
                         if (az > 180 + SkySettings.AzSlewLimit)
                         {
                             az -= 360.0;
                         }
                         break;
-                    case AzSlewMotionType.Westwards:
+                    case AzSlewMotionType.West:
                         if (az > 180 - SkySettings.AzSlewLimit)
                         {
                             az -= 360.0;
@@ -5804,10 +5865,10 @@ namespace GS.Server.SkyTelescope
             {
                 switch (GetAzSlewMotion())
                 {
-                    case AzSlewMotionType.Eastwards:
+                    case AzSlewMotionType.East:
                         atLimit = (az > 180.0 + SkySettings.AzSlewLimit);
                         break;
-                    case AzSlewMotionType.Westwards:
+                    case AzSlewMotionType.West:
                         atLimit = az < (-180.0 - SkySettings.AzSlewLimit);
                         break;
                 }
@@ -5828,10 +5889,10 @@ namespace GS.Server.SkyTelescope
             {
                 switch (GetAzSlewMotion())
                 {
-                    case AzSlewMotionType.Eastwards:
+                    case AzSlewMotionType.East:
                         atLimit = (az > 180.0 + SkySettings.AzSlewLimit + SkySettings.AxisTrackingLimit);
                         break;
-                    case AzSlewMotionType.Westwards:
+                    case AzSlewMotionType.West:
                         atLimit = (az < -180.0 - SkySettings.AzSlewLimit - SkySettings.AxisTrackingLimit);
                         break;
                 }
@@ -6245,8 +6306,12 @@ namespace GS.Server.SkyTelescope
                 CheckPecTraining();
                 IsHome = AtHome;
                 IsSideOfPier = SideOfPier;
-                AzSlewMotion = GetAzSlewMotion();
-
+                // Update Azimuth slewing information
+                if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
+                {
+                    AzSlewMotion = GetAzSlewMotion();
+                    CanFlipAzimuthSide = CheckFlipAzimuth();
+                }
                 var t = SkySettings.DisplayInterval; // Event interval time set for UI performance 
                 _mediaTimer.Period = t;
 

@@ -179,7 +179,7 @@ namespace GS.Server.SkyTelescope
 
     public enum AzSlewMotionType
     {
-        Eastwards,
-        Westwards
+        East,
+        West
     }
 }

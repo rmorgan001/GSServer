@@ -25,6 +25,7 @@
         <domain:ComparisonConverter x:Key="Compare" />
         <domain:InverseBooleanConverter x:Key="InvertBool" />
         <domain:EnumToVisibilityConverter x:Key="EnumToVis" />
+        <domain:BoolToVisClapConverter x:Key="BoolToVisClap"/>
         <domain1:EnumValueToDescriptionConverter x:Key="EnumToDesc" />
     </UserControl.Resources>
     <md:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" CloseOnClickAway="True"  >
@@ -690,7 +691,8 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0">
-                            <controls:RaDecGoTo />
+                            <controls:RaDecGoTo x:Name="RaDecGoTo" Visibility="{Binding RaDecDialogActive, Converter={StaticResource BoolToVisClap}}" MouseRightButtonDown="GoToDialog_OnMouseRightButtonDown"/>
+                            <controls:AltAzGoTo x:Name="AltAzGoTo" Visibility="{Binding AltAzDialogActive, Converter={StaticResource BoolToVisClap}}" MouseRightButtonDown="GoToDialog_OnMouseRightButtonDown"/>
                             <controls:HandController Margin="0,5,10,0"  />
                             <controls:Backlash />
                             <controls:PPecBar/>

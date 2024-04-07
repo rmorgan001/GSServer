@@ -60,6 +60,22 @@ namespace GS.Server.Windows
                     PecShow = SkyServer.PecShow;
                     PecOn = SkyServer.PecOn;
                     SchedulerShow = false;
+                    switch (SkySettings.AlignmentMode)
+                    {
+                        case AlignmentModes.algAltAz:
+                            SkySettings.CanSetPierSide = false;
+                            FlipSopShow = false;
+                            FlipAzDirShow = true;
+                            EnableFlipAzDir = SkyServer.CanFlipAzimuthSide;
+                            break;
+                        case AlignmentModes.algPolar:
+                        case AlignmentModes.algGermanPolar:
+                        default:
+                            SkySettings.CanSetPierSide = SkySettings.HourAngleLimit != 0;
+                            FlipSopShow = true;
+                            FlipAzDirShow = false;
+                            break;
+                    }
                     EnableFlipSOP = SkySettings.CanSetPierSide;
                 }
 
@@ -140,6 +156,9 @@ namespace GS.Server.Windows
                      case "PecOn":
                          PecOn = SkyServer.PecOn;
                          break;
+                     case "CanFlipAzimuthSide":
+                         EnableFlipAzDir = SkyServer.CanFlipAzimuthSide;
+                         break;
                  }
              });
             }
@@ -184,6 +203,21 @@ namespace GS.Server.Windows
                          ParkPositions = SkySettings.ParkPositions;
                          ParkSelection = ParkPositions.FirstOrDefault();
                          ParkSelectionSetting = ParkSelection;
+                         switch (SkySettings.AlignmentMode)
+                         {
+                             case AlignmentModes.algAltAz:
+                                 SkySettings.CanSetPierSide = false;
+                                 FlipSopShow = false;
+                                 FlipAzDirShow = true;
+                                 break;
+                             case AlignmentModes.algPolar:
+                             case AlignmentModes.algGermanPolar:
+                             default:
+                                 SkySettings.CanSetPierSide = SkySettings.HourAngleLimit != 0;
+                                 FlipSopShow = true;
+                                 FlipAzDirShow = false;
+                                 break;
+                         }
                          // ReSharper disable ExplicitCallerInfoArgument
                          OnPropertyChanged($"ParkPositions");
                          break;
@@ -546,6 +580,138 @@ namespace GS.Server.Windows
                 _parkName = value;
                 SkySettings.ParkName = value;
                 OnPropertyChanged();
+            }
+        }
+
+        private bool _isParkDialogOpen;
+        public bool IsParkDialogOpen
+        {
+            get => _isParkDialogOpen;
+            set
+            {
+                if (_isParkDialogOpen == value) return;
+                _isParkDialogOpen = value;
+                CloseDialogs(value);
+                OnPropertyChanged();
+            }
+        }
+
+        private object _parkContent;
+        public object ParkContent
+        {
+            get => _parkContent;
+            set
+            {
+                if (_parkContent == value) return;
+                _parkContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openParkDialogCmd;
+        public ICommand OpenParkDialogCmd
+        {
+            get
+            {
+                var command = _openParkDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openParkDialogCmd = new RelayCommand(
+                    param => OpenParkDialog()
+                );
+            }
+        }
+
+        private void OpenParkDialog()
+        {
+            try
+            {
+                DialogContent = new ParkDialog();
+                IsDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _acceptParkDialogCmd;
+        public ICommand AcceptParkDialogCmd
+        {
+            get
+            {
+                var command = _acceptParkDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptParkDialogCmd = new RelayCommand(
+                    param => AcceptParkDialog()
+                );
+            }
+        }
+        private void AcceptParkDialog()
+        {
+            IsDialogOpen = false;
+            ClickPark();
+        }
+
+        private ICommand _cancelParkDialogCmd;
+        public ICommand CancelParkDialogCmd
+        {
+            get
+            {
+                var command = _cancelParkDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelParkDialogCmd = new RelayCommand(
+                    param => CancelParkDialog()
+                );
+            }
+        }
+
+        private void CancelParkDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -1134,158 +1300,27 @@ namespace GS.Server.Windows
             }
         }
 
-        private bool _isFlipDialogOpen;
-        public bool IsFlipDialogOpen
+        private bool _flipSopShow;
+
+        public bool FlipSopShow
         {
-            get => _isFlipDialogOpen;
+            get => _flipSopShow;
             set
             {
-                if (_isFlipDialogOpen == value) return;
-                _isFlipDialogOpen = value;
-                _skyTelescopeVM.CloseDialogs(value);
-                CloseDialogs(value);
+                _flipSopShow = value;
                 OnPropertyChanged();
             }
         }
 
-        private object _flipContent;
-        public object FlipContent
+        private bool _flipAzDirShow;
+
+        public bool FlipAzDirShow
         {
-            get => _flipContent;
+            get => _flipAzDirShow;
             set
             {
-                if (_flipContent == value) return;
-                _flipContent = value;
+                _flipAzDirShow = value;
                 OnPropertyChanged();
-            }
-        }
-
-        private ICommand _openFlipDialogCommand;
-        public ICommand OpenFlipDialogCommand
-        {
-            get
-            {
-                var command = _openFlipDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _openFlipDialogCommand = new RelayCommand(
-                    param => OpenFlipDialog()
-                );
-            }
-        }
-        private void OpenFlipDialog()
-        {
-            try
-            {
-                FlipContent = new FlipDialog();
-                IsFlipDialogOpen = true;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}|{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-
-        }
-
-        private ICommand _acceptFlipDialogCommand;
-        public ICommand AcceptFlipDialogCommand
-        {
-            get
-            {
-                var command = _acceptFlipDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _acceptFlipDialogCommand = new RelayCommand(
-                    param => AcceptFlipDialog()
-                );
-            }
-        }
-        private void AcceptFlipDialog()
-        {
-            try
-            {
-                if (!SkyServer.IsMountRunning) return;
-                var sop = SkyServer.SideOfPier;
-                switch (sop)
-                {
-                    case PierSide.pierEast:
-                        SkyServer.SideOfPier = PierSide.pierWest;
-                        break;
-                    case PierSide.pierUnknown:
-                        OpenDialog($"PierSide: {PierSide.pierUnknown}");
-                        break;
-                    case PierSide.pierWest:
-                        SkyServer.SideOfPier = PierSide.pierEast;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-                IsFlipDialogOpen = false;
-            }
-            catch (Exception ex)
-            {
-                IsFlipDialogOpen = false;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _cancelFlipDialogCommand;
-        public ICommand CancelFlipDialogCommand
-        {
-            get
-            {
-                var command = _cancelFlipDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _cancelFlipDialogCommand = new RelayCommand(
-                    param => CancelFlipDialog()
-                );
-            }
-        }
-        private void CancelFlipDialog()
-        {
-            try
-            {
-                IsFlipDialogOpen = false;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}|{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -1301,6 +1336,7 @@ namespace GS.Server.Windows
             }
         }
 
+        #region Scheduler dialog
         private bool _isSchedulerDialogOpen;
         public bool IsSchedulerDialogOpen
         {
@@ -1501,7 +1537,7 @@ namespace GS.Server.Windows
                 OnPropertyChanged();
             }
         }
-
+        #endregion
 
         private ICommand _clickPecOnCmd;
         public ICommand ClickPecOnCmd
@@ -1764,7 +1800,9 @@ namespace GS.Server.Windows
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
-        
+        #endregion
+
+        #region Home Dialog
 
         private bool _isHomeResetDialogOpen;
         public bool IsHomeResetDialogOpen
@@ -1928,6 +1966,124 @@ namespace GS.Server.Windows
         //    }
         //}
 
+        private bool _isHomeDialogOpen;
+        public bool IsHomeDialogOpen
+        {
+            get => _isHomeDialogOpen;
+            set
+            {
+                if (_isHomeDialogOpen == value) return;
+                _isHomeDialogOpen = value;
+                CloseDialogs(value);
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openHomeDialogCmd;
+        public ICommand OpenHomeDialogCmd
+        {
+            get
+            {
+                var command = _openHomeDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openHomeDialogCmd = new RelayCommand(
+                    param => OpenHomeDialog()
+                );
+            }
+        }
+        private void OpenHomeDialog()
+        {
+            try
+            {
+                DialogContent = new HomeDialog();
+                IsDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+
+        }
+
+        private ICommand _acceptHomeDialogCmd;
+        public ICommand AcceptHomeDialogCmd
+        {
+            get
+            {
+                var command = _acceptHomeDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptHomeDialogCmd = new RelayCommand(
+                    param => AcceptHomeDialog()
+                );
+            }
+        }
+        private void AcceptHomeDialog()
+        {
+            IsDialogOpen = false;
+            ClickHome();
+        }
+
+        private ICommand _cancelHomeDialogCmd;
+        public ICommand CancelHomeDialogCmd
+        {
+            get
+            {
+                var command = _cancelHomeDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelHomeDialogCmd = new RelayCommand(
+                    param => CancelHomeDialog()
+                );
+            }
+        }
+        private void CancelHomeDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
 
         #endregion
 
@@ -2378,6 +2534,307 @@ namespace GS.Server.Windows
                     IsAutoHomeDialogOpen = false;
 
                 }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
+
+        #region Flip SOP Direction Dialog
+
+        private bool _isFlipDialogOpen;
+        public bool IsFlipDialogOpen
+        {
+            get => _isFlipDialogOpen;
+            set
+            {
+                if (_isFlipDialogOpen == value) return;
+                _isFlipDialogOpen = value;
+                _skyTelescopeVM.CloseDialogs(value);
+                CloseDialogs(value);
+                OnPropertyChanged();
+            }
+        }
+
+        private object _flipContent;
+        public object FlipContent
+        {
+            get => _flipContent;
+            set
+            {
+                if (_flipContent == value) return;
+                _flipContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openFlipDialogCommand;
+        public ICommand OpenFlipDialogCommand
+        {
+            get
+            {
+                var command = _openFlipDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openFlipDialogCommand = new RelayCommand(
+                    param => OpenFlipDialog()
+                );
+            }
+        }
+        private void OpenFlipDialog()
+        {
+            try
+            {
+                FlipContent = new FlipDialog();
+                IsFlipDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+
+        }
+
+        private ICommand _acceptFlipDialogCommand;
+        public ICommand AcceptFlipDialogCommand
+        {
+            get
+            {
+                var command = _acceptFlipDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptFlipDialogCommand = new RelayCommand(
+                    param => AcceptFlipDialog()
+                );
+            }
+        }
+        private void AcceptFlipDialog()
+        {
+            try
+            {
+                if (!SkyServer.IsMountRunning) return;
+                var sop = SkyServer.SideOfPier;
+                switch (sop)
+                {
+                    case PierSide.pierEast:
+                        SkyServer.SideOfPier = PierSide.pierWest;
+                        break;
+                    case PierSide.pierUnknown:
+                        OpenDialog($"PierSide: {PierSide.pierUnknown}");
+                        break;
+                    case PierSide.pierWest:
+                        SkyServer.SideOfPier = PierSide.pierEast;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                IsFlipDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                IsFlipDialogOpen = false;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelFlipDialogCommand;
+        public ICommand CancelFlipDialogCommand
+        {
+            get
+            {
+                var command = _cancelFlipDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelFlipDialogCommand = new RelayCommand(
+                    param => CancelFlipDialog()
+                );
+            }
+        }
+        private void CancelFlipDialog()
+        {
+            try
+            {
+                IsFlipDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+        #endregion
+
+        #region Flip Az Direction Dialog
+        private bool _enableFlipAzDir;
+        public bool EnableFlipAzDir
+        {
+            get => _enableFlipAzDir;
+            set
+            {
+                if (_enableFlipAzDir == value) return;
+                _enableFlipAzDir = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isFlipAzDirDialogOpen;
+        public bool IsFlipAzDirDialogOpen
+        {
+            get => _isFlipAzDirDialogOpen;
+            set
+            {
+                if (_isFlipAzDirDialogOpen == value) return;
+                _isFlipAzDirDialogOpen = value;
+                CloseDialogs(value);
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openFlipAzDirDialogCmd;
+        public ICommand OpenFlipAzDirDialogCmd
+        {
+            get
+            {
+                var command = _openFlipAzDirDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openFlipAzDirDialogCmd = new RelayCommand(
+                    param => OpenFlipAzDirDialog()
+                );
+            }
+        }
+        private void OpenFlipAzDirDialog()
+        {
+            try
+            {
+                DialogContent = new FlipAzDirDialog();
+                IsDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+
+        }
+
+        private ICommand _acceptFlipAzDirDialogCmd;
+        public ICommand AcceptFlipAzDirDialogCmd
+        {
+            get
+            {
+                var command = _acceptFlipAzDirDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptFlipAzDirDialogCmd = new RelayCommand(
+                    param => AcceptFlipAzDirDialog()
+                );
+            }
+        }
+        private void AcceptFlipAzDirDialog()
+        {
+            try
+            {
+                if (!SkyServer.IsMountRunning) return;
+                SkyServer.FlipAzimuthPosition();
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                IsDialogOpen = false;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelFlipAzDirDialogCmd;
+        public ICommand CancelFlipAzDirDialogCmd
+        {
+            get
+            {
+                var command = _cancelFlipAzDirDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelFlipAzDirDialogCmd = new RelayCommand(
+                    param => CancelFlipAzDirDialog()
+                );
+            }
+        }
+        private void CancelFlipAzDirDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
             }
             catch (Exception ex)
             {

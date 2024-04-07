@@ -107,7 +107,7 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <TextBlock Grid.Column="4" Margin="3 0" VerticalAlignment="Center" ToolTip="{StaticResource botTipSOP}" Text="{Binding IsSideOfPier}" Foreground="DimGray" FontSize="15">
+        <TextBlock Grid.Column="4" Margin="3 0" VerticalAlignment="Center" ToolTip="{StaticResource botTipSOP}" Visibility="{Binding SopShow, Converter={StaticResource BoolToClap}}" Text="{Binding IsSideOfPier}" Foreground="DimGray" FontSize="15">
             <TextBlock.Style>
                 <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
                     <Style.Triggers>
@@ -121,7 +121,7 @@
                             <DataTrigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard RepeatBehavior="5x">
-                                    <ColorAnimation To="Transparent" Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)" 
+                                        <ColorAnimation To="Transparent" Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)" 
                                                         Duration="0:0:0.15" BeginTime="0:0:0"/>
                                         <ColorAnimation To="DimGray" Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)" 
                                                         Duration="0:0:0.15" BeginTime="0:0:0.15"/>
@@ -129,6 +129,17 @@
                                 </BeginStoryboard>
                             </DataTrigger.EnterActions>
                         </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+        <TextBlock Grid.Column="4" Margin="3 0" VerticalAlignment="Center" Text="{Binding AzDirection}" ToolTip="{StaticResource botTipAzDir}" Visibility="{Binding AzDirShow, Converter={StaticResource BoolToClap}}" FontSize="15" Foreground="{StaticResource SecondaryHueMidBrush}">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
+                    <Style.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </Trigger>
                     </Style.Triggers>
                 </Style>
             </TextBlock.Style>
