@@ -4533,7 +4533,9 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
+                if (IsDialogOpen) { return; }
                 LockOn = false;
+                
                 switch (param.Key)
                 {
                     case Key.A:
@@ -4586,7 +4588,9 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
+                if (IsDialogOpen) { return; }
                 LockOn = false;
+                
                 switch (param.Key)
                 {
                     case Key.A:
@@ -4606,7 +4610,6 @@ namespace GS.Server.SkyTelescope
                         Debug.WriteLine("S - Up");
                         break;
                 }
-
             }
             catch (Exception ex)
             {
