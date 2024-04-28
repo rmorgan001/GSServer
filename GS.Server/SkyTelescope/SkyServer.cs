@@ -3882,18 +3882,36 @@ namespace GS.Server.SkyTelescope
             IsSlewing = true;
 
             var returncode = 1;
-            switch (SkySettings.Mount)
+            try
             {
-                case MountType.Simulator:
-                    returncode = await Task.Run(() => SimGoTo(target, trackingState, slewState));
-                    break;
-                case MountType.SkyWatcher:
-                    returncode = await Task.Run(() => SkyGoTo(target, trackingState, slewState));
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                switch (SkySettings.Mount)
+                {
+                    case MountType.Simulator:
+                        returncode = await Task.Run(() => SimGoTo(target, trackingState, slewState));
+                        break;
+                    case MountType.SkyWatcher:
+                        returncode = await Task.Run(() => SkyGoTo(target, trackingState, slewState));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
-
+            catch (Exception)
+            {
+                SlewState = SlewType.SlewNone;
+                StopAxes();
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Warning,
+                    Method = "GoToAsync",
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = "GoTo failed, axes stopped"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
             TrackingSpeak = false;
 
             if (returncode == 0)
