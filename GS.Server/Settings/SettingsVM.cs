@@ -105,6 +105,8 @@ namespace GS.Server.Settings
                     theme.SetBaseTheme(Settings.DarkTheme ? Theme.Dark : Theme.Light);
                     paletteHelper.SetTheme(theme);
 
+                    
+
 
                     //Performance
                     IntervalList = new List<int>(Numbers.InclusiveIntRange(50, 500, 2));
