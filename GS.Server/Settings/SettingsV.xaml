@@ -229,7 +229,7 @@
                                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource tabFocuser}"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Width="Auto">
-                                    <CheckBox Height="25" Width="25" IsChecked="{Binding AlignmentTabVisible}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource aliAlignment}"/>
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding AlignmentTabVisible}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource aliAlignment}" IsEnabled="{Binding AlignmentOptionEnabled}"/>
                                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource aliAlignment}"/>
                                 </StackPanel>
                             </StackPanel>

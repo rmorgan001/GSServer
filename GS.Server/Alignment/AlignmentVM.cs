@@ -41,6 +41,7 @@ using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 using System.Diagnostics.Eventing.Reader;
 using System.Windows.Threading;
+using ASCOM.DeviceInterface;
 
 namespace GS.Server.Alignment
 {
@@ -93,7 +94,7 @@ namespace GS.Server.Alignment
 
         public bool IsAlignmentOn
         {
-            get => AlignmentSettings.IsAlignmentOn;
+            get => SkySettings.AlignmentMode != AlignmentModes.algAltAz && AlignmentSettings.IsAlignmentOn;
             set
             {
                 AlignmentSettings.IsAlignmentOn = value;
