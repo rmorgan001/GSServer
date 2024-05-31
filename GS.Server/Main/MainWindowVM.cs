@@ -41,6 +41,7 @@ using GS.Server.Snap;
 using GS.Server.Alignment;
 using MaterialDesignColors;
 using System.Threading.Tasks;
+using ASCOM.DeviceInterface;
 
 namespace GS.Server.Main
 {
@@ -386,7 +387,7 @@ namespace GS.Server.Main
                     }
                     break;
                 case "Alignment":
-                    if (Settings.Settings.AlignmentTabVisible)
+                    if (SkySettings.AlignmentMode != AlignmentModes.algAltAz && Settings.Settings.AlignmentTabVisible)
                     {
                         if (!PageViewModels.Contains(_alignmentVM))
                         {
