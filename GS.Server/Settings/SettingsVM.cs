@@ -37,6 +37,7 @@ using GS.Principles;
 using GS.Server.Controls.Dialogs;
 using GS.Server.Windows;
 using GS.Shared.Command;
+using ASCOM.DeviceInterface;
 
 namespace GS.Server.Settings
 {
@@ -453,10 +454,21 @@ namespace GS.Server.Settings
 
         public bool AlignmentTabVisible
         {
-            get => Settings.AlignmentTabVisible;
+            get => SkySettings.AlignmentMode != AlignmentModes.algAltAz && Settings.AlignmentTabVisible;
             set
             {
                 Settings.AlignmentTabVisible = value;
+                _mainWindowVm.UpdateTabViewModel("Alignment");
+                OnPropertyChanged();
+            }
+        }
+
+        public bool AlignmentOptionEnabled
+        {
+            get => (SkySettings.AlignmentMode != AlignmentModes.algAltAz);
+            set
+            {
+                Settings.AlignmentTabVisible = (SkySettings.AlignmentMode != AlignmentModes.algAltAz);
                 _mainWindowVm.UpdateTabViewModel("Alignment");
                 OnPropertyChanged();
             }
