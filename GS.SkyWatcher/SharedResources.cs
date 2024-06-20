@@ -208,12 +208,13 @@ namespace GS.SkyWatcher
         [Description("EQ6-R(MC015)")] EQ6R = 35,
         [Description("NEQ6 PRO(MC015)")] NEQ6PRO = 36,
         [Description("CQ350(MC015)")] CQ350 = 37,
-        [Description("DOB 18(MC015)")] DOB18 = 183,
         [Description("EQ3(MC019)")] EQ_3 = 48,
         [Description("EQ5(MC019)")] EQ_5 = 49,
         [Description("EQM35(MC019)")] EQM_35 = 50,
         [Description("Prototyping(MC019)")] Prototyping = 55,
         [Description("HEQ5(MC020)")] HEQ5a = 56,
+        [Description("Wave 100i(MC030)")] Wave100I = 68,
+        [Description("Wave 150i(MC030)")] Wave150I = 69,
         [Description("SynTrek hand control")] SynTrekHC = 127,
         [Description("80GT(MC001)")] a80GT = 128,
         [Description("Multi-Function mount Bushnell(MC001)")] MultiFunctionBushnell = 129,
@@ -242,7 +243,8 @@ namespace GS.SkyWatcher
         [Description("DOB 14/16 Clutch(MC014)")] DOB14_16 = 172,
         [Description("SynScan 80GT(MC014)")] SynScan80GT = 173,
         [Description("Dob14 StarGate(MC007)")] Dob14StarGate = 182,
+        [Description("DOB 18(MC015)")] DOB18 = 183,
+        [Description("Fusion-120i(MC029)")] Fusion120I = 192,
         [Description("Undefined")] Undefined = 999,
-
     }
 }
