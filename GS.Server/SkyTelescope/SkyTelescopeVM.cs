@@ -4539,25 +4539,28 @@ namespace GS.Server.SkyTelescope
             {
                 if (IsDialogOpen) { return; }
                 LockOn = false;
-                
-                switch (param.Key)
+
+                if (("ADWS".IndexOf(param.Key.ToString()) > -1) && !param.IsRepeat)
                 {
-                    case Key.A:
-                        HcMouseDownLeft();
-                        Debug.WriteLine("A - Down");
-                        break;
-                    case Key.D:
-                        HcMouseDownRight();
-                        Debug.WriteLine("D - Down");
-                        break;
-                    case Key.W:
-                        HcMouseDownUp();
-                        Debug.WriteLine("W - Down");
-                        break;
-                    case Key.S:
-                        HcMouseDownDown();
-                        Debug.WriteLine("S - Down");
-                        break;
+                    switch (param.Key)
+                    {
+                        case Key.A:
+                            HcMouseDownLeft();
+                            Debug.WriteLine("A - Down");
+                            break;
+                        case Key.D:
+                            HcMouseDownRight();
+                            Debug.WriteLine("D - Down");
+                            break;
+                        case Key.W:
+                            HcMouseDownUp();
+                            Debug.WriteLine("W - Down");
+                            break;
+                        case Key.S:
+                            HcMouseDownDown();
+                            Debug.WriteLine("S - Down");
+                            break;
+                    }
                 }
 
             }
