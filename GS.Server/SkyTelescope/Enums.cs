@@ -182,4 +182,10 @@ namespace GS.Server.SkyTelescope
         East,
         West
     }
+
+    public enum AltAzTrackingType
+    {
+        Predictor,
+        Rate
+    }
 }
