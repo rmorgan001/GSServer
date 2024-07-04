@@ -4195,7 +4195,7 @@ namespace GS.Server.SkyTelescope
                             break;
                         case SlewDirection.SlewSouth:
                         case SlewDirection.SlewDown:
-                            if (SkySettings.AlignmentMode != AlignmentModes.algAltAz)
+                            if (!altAzSet)
                             {
                                 switch (SkySettings.Mount)
                                 {
@@ -4216,11 +4216,25 @@ namespace GS.Server.SkyTelescope
                             break;
                         case SlewDirection.SlewEast:
                         case SlewDirection.SlewLeft:
-                            change[0] = SouthernHemisphere && !altAzSet ? delta : -delta;
+                            if (!altAzSet)
+                            {
+                                change[0] = SouthernHemisphere ? delta : -delta;
+                            }
+                            else
+                            {
+                                change[0] = delta;
+                            }
                             break;
                         case SlewDirection.SlewWest:
                         case SlewDirection.SlewRight:
-                            change[0] = SouthernHemisphere && !altAzSet ? -delta : delta;
+                            if (!altAzSet)
+                            {
+                                change[0] = SouthernHemisphere ? -delta : delta;
+                            }
+                            else
+                            {
+                                change[0] = -delta;
+                            }
                             break;
                         case SlewDirection.SlewNoneRa:
                             if (HcPrevMoveRa != null)
@@ -4501,12 +4515,34 @@ namespace GS.Server.SkyTelescope
             {
                 if ((change[0] == 0.0) && (change[1] == 0.0) && Tracking)
                 {
+                    monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Server,
+                        Category = MonitorCategory.Server,
+                        Type = MonitorType.Information,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"|RaDec SlewNone entry|{RightAscensionXForm}|{DeclinationXForm}"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
                     // Update mount position
                     MountPositionUpdated = false;
                     UpdateSteps();
                     while (!MountPositionUpdated) Thread.Sleep(10);
                     SkyPredictor.Set(RightAscensionXForm, DeclinationXForm, 0, 0);
                     AltAzTrackingMode = AltAzTrackingType.Predictor;
+                    monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Server,
+                        Category = MonitorCategory.Server,
+                        Type = MonitorType.Information,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"|RaDec SlewNone exit|{RightAscensionXForm}|{DeclinationXForm}"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
                 }
             }
         }
