@@ -36,7 +36,7 @@ namespace GS.SkyWatcher
 
         private readonly Commands _commands;
         // 128.9 steps per sidereal second * rads per second = steps per rad second
-        private const double _lowSpeedMargin = (128 * Constant.SiderealRate);
+        private const double LowSpeedMargin = (128 * Constant.SiderealRate);
         private readonly double[] _slewingSpeed = { 0, 0 }; // store for last used speed in radians
         private readonly double[] _targetPositions = { 0, 0 }; //  Store for last used target coordinate 
         private readonly double[] _trackingRates = { 0, 0 };
@@ -124,6 +124,18 @@ namespace GS.SkyWatcher
         /// <param name="rate">Rate in degrees per arc sec</param>
         internal void AxisSlew(AxisId axis, double rate)
         {
+            var monitorItem = new MonitorEntry // Log the slew
+            {
+                Datetime = Principles.HiResDateTime.UtcNow,
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Mount,
+                Type = MonitorType.Debug,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{axis}|{rate}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
             rate = Principles.Units.Deg2Rad1(rate);
 
             if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
@@ -165,7 +177,7 @@ namespace GS.SkyWatcher
                 }
 
                 // Calculate and set step period. 
-                if (internalSpeed > _lowSpeedMargin)
+                if (internalSpeed > LowSpeedMargin)
                 {
                     internalSpeed /= _highSpeedRatio[(int)axis]; // High speed adjustment
                     highspeed = true;
