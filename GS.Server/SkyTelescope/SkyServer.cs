@@ -2133,6 +2133,7 @@ namespace GS.Server.SkyTelescope
             MonitorLog.LogToMonitor(monitorItem);
             #endregion
 
+            if (token.IsCancellationRequested) { return returnCode; }
             #region Final precision slew
             if (stopwatch.Elapsed.TotalSeconds <= timer)
             {
@@ -2705,6 +2706,7 @@ namespace GS.Server.SkyTelescope
             SlewState = SlewType.SlewNone;
             var tracking = Tracking;
             Tracking = false; //added back in for spec "Tracking is returned to its pre-slew state"
+            if (_ctsGoTo != null) Thread.Sleep(100); // wait for any pending GoTo operations to wake up and cancel
 
             switch (SkySettings.Mount)
             {
@@ -3871,7 +3873,11 @@ namespace GS.Server.SkyTelescope
         private static async void GoToAsync(double[] target, SlewType slewState)
         {
             if (!IsMountRunning) { return; }
-            _ctsGoTo?.Cancel();
+            if (_ctsGoTo != null)
+            {
+                _ctsGoTo?.Cancel();
+                Thread.Sleep(100); // wait for any pending GoTo operations to wake up and cancel
+            }
             if (IsSlewing)
             {
                 SlewState = SlewType.SlewNone;
