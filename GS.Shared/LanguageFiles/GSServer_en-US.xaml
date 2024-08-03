@@ -65,6 +65,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnTipFlipAzDir">Flip azimuth slew direction</system:String>
     <!--<system:String x:Key="btnHomeReset">Accept to reset mount position to the Home position</system:String>-->
     <system:String x:Key="btnContinueFlip">Accept to flip mount</system:String>
+    <system:String x:Key="btnContinueFlipAzDir">Accept to swap azimuth side. Mount will slew 360 degrees</system:String>
     <system:String x:Key="btnTipParkPos">Park Positions</system:String>
     <system:String x:Key="btnAutoHome">AutoHome</system:String>
     <system:String x:Key="btnAutoHomeComplete">Auto Home Complete</system:String>
@@ -87,6 +88,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="botTracking">Tracking</system:String>
     <system:String x:Key="botTipTracking">Tracking</system:String>
     <system:String x:Key="botTipSOP">Side of Pier</system:String>
+    <system:String x:Key="botTipAzDir">Azimuth slew direction</system:String>
     <system:String x:Key="botTipAxisLimit">Axis limit, click for options</system:String>
     <system:String x:Key="botTipWarnings">Warnings, click to reset</system:String>
     <system:String x:Key="botTipErrors">Errors, click to reset</system:String>
@@ -149,6 +151,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="goAcpCoords">Accept Coordinates?</system:String>
     <system:String x:Key="goRa">RA:</system:String>
     <system:String x:Key="goDec">Dec:</system:String>
+    <system:String x:Key="goAz">Az:</system:String>
+    <system:String x:Key="goAlt">Alt:</system:String>
     <system:String x:Key="goCopy">Copy</system:String>
     <system:String x:Key="goTipCopy">Fill with current position</system:String>
     <system:String x:Key="goGoTo">GoTo</system:String>
@@ -158,6 +162,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="goSyncWarning">Warning: please verify coordinates!</system:String>
     <system:String x:Key="goSlewing">Mount is slewing</system:String>
     <system:String x:Key="goOutLimits">Outside of Sync limits</system:String>
+    <system:String x:Key="goChangeToRaDec">Right click to enter Ra Dec coordinates</system:String>
+    <system:String x:Key="goChangeToAzAlt">Right click to enter Az Alt coordinates</system:String>
 
     <!--Backlash -->
     <system:String x:Key="bacDecLash">Dec Backlash</system:String>
@@ -382,13 +388,11 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skySolarRate">Solar Rate</system:String>
     <system:String x:Key="skyLunarRate">Lunar Rate</system:String>
     <system:String x:Key="skyKingRate">King Rate</system:String>
-    <system:String x:Key="skyStopMount">Stop mount before setting home position</system:String>
     <system:String x:Key="skyConnect">Connect</system:String>
     <system:String x:Key="skyDisconnect">Disconnect</system:String>
     <system:String x:Key="skyHome1">When starting normally place the mount in the 'Home' position.</system:String>
     <system:String x:Key="skyHome2">Home Position is counterweight down and declination pointing towards the pole.</system:String>
     <system:String x:Key="skyHome2AltAz">Home Position is telescope tube horizontal pointing true North.</system:String>
-    <system:String x:Key="skyHome3">Click the 'Set Home' button before or after obtaining a polar alignment.</system:String>
     <system:String x:Key="skyParkNewName">Add new park position</system:String>
     <system:String x:Key="skyParkDelete">Delete park position?</system:String>
     <system:String x:Key="skyLat0">North or South</system:String>
@@ -609,6 +613,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliProximityLimitTooltip">How near to each other can sync points be before they replace earlier points (arc seconds).</system:String>
     <system:String x:Key="aliSampleSizeTooltip">How many nearby sync points should be used when calculating positions.</system:String>
     <system:String x:Key="aliNearbyLimitTooltip">How close should sync points be before they are used in calculations (degrees).</system:String>
+    <system:String x:Key="aliThreePointAlgorithmTooltip">How to pick the three points, triangle with closest points or the triangle with the centre nearest.</system:String>
     <system:String x:Key="aliClearModelOnStartupTooltip">Tick if you want to create a fresh model every time you reconnect.</system:String>
     <system:String x:Key="aliClearAll">Clear All</system:String>
     <system:String x:Key="aliClearAllTooltip">Click this button to clear all alignment points from the model.</system:String>
@@ -616,8 +621,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliDeleteTooltip">Click this button to delete the selected alignment point.</system:String>
     <system:String x:Key="optAlignment">Alignment</system:String>
     <system:String x:Key="optProximityLimit">Proximity Limit</system:String>
-    <system:String x:Key="optSampleSize">Sample Size</system:String>
-    <system:String x:Key="optNearbyLimit">Near by Limit</system:String>
+    <system:String x:Key="optAlignmentMode">Alignment Behaviour</system:String>
+    <system:String x:Key="optActivePoints">Point Filter</system:String>
+    <system:String x:Key="optThreePointAlgorithm">Three Point Selection</system:String>
 
     <!--1.0.3.2 -->
     <system:String x:Key="customGears">Custom Gears</system:String>
@@ -636,13 +642,16 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="mntFreqRa">Frequency Ra:</system:String>
     <system:String x:Key="mntFreqDec">Frequency Dec:</system:String>
 
-
     <!--1.0.3.4 -->
     <system:String x:Key="btnReSyncEnc">ReSync Encoders</system:String>
     <system:String x:Key="btnReSyncHome">Home Position</system:String>
     <system:String x:Key="btnReSyncAccept">Accept to reset the mount position</system:String>
     <system:String x:Key="btnReSync">ReSync</system:String>
     <system:String x:Key="vceSync">Synced</system:String>
+    <system:String x:Key="skyGlobalStopOn">Global Stop (esc)</system:String>
+    <system:String x:Key="btnCap">External Capabilities</system:String>
+    <system:String x:Key="capCanSetPark">Can Set Park</system:String>
+    <system:String x:Key="skyStopMount">Mount must be stopped</system:String>
 
     <!-- 1.0.3.8 -->
     <system:String x:Key="aliExport">Export</system:String>

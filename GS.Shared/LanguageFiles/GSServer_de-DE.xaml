@@ -65,6 +65,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnTipFlipAzDir">Azimut-Schwenkrichtung umkehren</system:String>
     <!--<system:String x:Key="btnHomeReset">Akzeptieren, um die Position der Montierung auf die Home-Position zurückzusetzen</system:String>-->
     <system:String x:Key="btnContinueFlip">Akzeptieren, um die Montierung zu umzukehren</system:String>
+    <system:String x:Key="btnContinueFlipAzDir">Accept to swap azimuth side. Mount will slew 360 degrees</system:String>
     <system:String x:Key="btnTipParkPos">Park Position</system:String>
     <system:String x:Key="btnAutoHome">AutoHome</system:String>
     <system:String x:Key="btnAutoHomeComplete">Auto Home komplett</system:String>
@@ -87,6 +88,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="botTracking">Nachführung</system:String>
     <system:String x:Key="botTipTracking">Nachführung</system:String>
     <system:String x:Key="botTipSOP">Seite des Piers</system:String>
+    <system:String x:Key="botTipAzDir">Azimuth slew direction</system:String>
     <system:String x:Key="botTipAxisLimit">Achsenbegrenzung, für Optionen anklicken</system:String>
     <system:String x:Key="botTipWarnings">Warnungen, zum Zurücksetzen anklicken</system:String>
     <system:String x:Key="botTipErrors">Fehler, zum Zurücksetzen anklicken</system:String>
@@ -386,13 +388,11 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skySolarRate">Solar Rate</system:String>
     <system:String x:Key="skyLunarRate">Lunar Rate</system:String>
     <system:String x:Key="skyKingRate">King Rate</system:String>
-    <system:String x:Key="skyStopMount">Stoppen der Montierung vor dem Einstellen der Homepositionn</system:String>
     <system:String x:Key="skyConnect">Verbinden</system:String>
     <system:String x:Key="skyDisconnect">Trennen</system:String>
     <system:String x:Key="skyHome1">Stellen Sie die Montierung beim Start normalerweise in die Homeposition.</system:String>
     <system:String x:Key="skyHome2">Die Homeposition ist das Gegengewicht nach unten und die Deklination zum Pol.</system:String>
     <system:String x:Key="skyHome2AltAz">Die Homeposition ist die horizontale Ausrichtung des Teleskops auf den geografischen Norden.</system:String>
-    <system:String x:Key="skyHome3">Klicken Sie auf die Schaltfläche "Homeposition festlegen" bevor oder nachdem eine Polarausrichtung durchgeführt wurde.</system:String>
     <system:String x:Key="skyParkNewName">Neue Parkposition hinzufügen</system:String>
     <system:String x:Key="skyParkDelete">Parkposition löschen?</system:String>
     <system:String x:Key="skyLat0">Nord oder Süd</system:String>
@@ -611,8 +611,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliClearModelOnStartup">Modell beim Starten löschen</system:String>
     <system:String x:Key="aliAlignmentSettings">Einstellungen</system:String>
     <system:String x:Key="aliProximityLimitTooltip">Wie nahe können Synchronisationspunkte beieinander liegen, bevor sie vorherige Punkte ersetzen (Bogensekunden).</system:String>
-    <system:String x:Key="aliSampleSizeTooltip">Wie viele nahegelegene Synchronisationspunkte bei der Positionsberechnung verwendet werden sollen.</system:String>
-    <system:String x:Key="aliNearbyLimitTooltip">Wie nahe sollten Synchronisationspunkte beieinander liegen, bevor sie in Berechnungen verwendet werden (Grad).</system:String>
+    <system:String x:Key="aliAlignmentModeTooltip">Choose whether to use the nearest point or the nearest three points</system:String>
+    <system:String x:Key="aliActivePointsTooltip">Choose whether to consider all points, just points on the same side of the pier or just points in the local quadrant or</system:String>
+    <system:String x:Key="aliThreePointAlgorithmTooltip">How to pick the three points, triangle with closest points or the triangle with the centre nearest.</system:String>
     <system:String x:Key="aliClearModelOnStartupTooltip">Aktivieren Sie diese Option, wenn Sie bei jeder erneuten Verbindung ein neues Modell erstellen möchten.</system:String>
     <system:String x:Key="aliClearAll">Alle löschen</system:String>
     <system:String x:Key="aliClearAllTooltip">Klicken Sie auf diese Schaltfläche, um alle Ausrichtungspunkte aus dem Modell zu löschen.</system:String>
@@ -620,8 +621,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliDeleteTooltip">Klicken Sie auf diese Schaltfläche, um den ausgewählten Ausrichtungspunkt zu löschen.</system:String>
     <system:String x:Key="optAlignment">Ausrichtung</system:String>
     <system:String x:Key="optProximityLimit">Annäherungsgrenze</system:String>
-    <system:String x:Key="optSampleSize">Größe der Samples</system:String>
-    <system:String x:Key="optNearbyLimit">Grenzwert in der Nähe</system:String>
+    <system:String x:Key="optAlignmentMode">Alignment Behaviour</system:String>
+    <system:String x:Key="optActivePoints">Point Filter</system:String>
+    <system:String x:Key="optThreePointAlgorithm">Three Point Selection</system:String>
 
     <!--1.0.3.2 -->
     <system:String x:Key="customGears">Benutzerdefinierte Zahnräder</system:String>
@@ -646,6 +648,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnReSyncAccept">Akzeptieren, um die Montierungsposition zurückzusetzen</system:String>
     <system:String x:Key="btnReSync">ReSync</system:String>
     <system:String x:Key="vceSync">Synchronisiert</system:String>
+    <system:String x:Key="skyGlobalStopOn">Global Stop (esc)</system:String>
+    <system:String x:Key="btnCap">External Capabilities</system:String>
+    <system:String x:Key="capCanSetPark">Can Set Park</system:String>
+    <system:String x:Key="skyStopMount">Mount must be stopped</system:String>
 
     <!-- 1.0.3.8 -->
     <system:String x:Key="aliExport">Export</system:String>
@@ -721,15 +727,19 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliCancelAlert">Ausrichtungswarnung abbrechen</system:String>
     <system:String x:Key="aliCancelAlertTooltip">Klicken Sie auf diese Schaltfläche, um die Ausrichtungswarnung abzubrechen.</system:String>
     <system:String x:Key="vceAlignmentAlert">Ausrichtungswarnung</system:String>
+    
     <!--1.0.6.3 -->
     <system:String x:Key="btnContinueHome">Akzeptieren, um zur Homeposition zu bewegen</system:String>
     <system:String x:Key="btnContinuePark">Akzeptieren für Parkposition</system:String>
     <system:String x:Key="FlipOnNextGoto">Erzwungene Umkehrung beim nächsten GoTo</system:String>
+    
     <!--1.0.6.4 -->
     <system:String x:Key="optAlignmentWarningThreshold">Warnung Schwellenwert</system:String>
     <system:String x:Key="aliWarningThresholdTooltip">Der Wert, bei dem die Ausrichtungswarnung ausgelöst wird (Multiplikation des maximal registrierten Synchronisationsabstands).</system:String>
+    
     <!--1.0.7.8 -->
     <system:String x:Key="optLogPath">Protokollpfad</system:String>
+    
     <!--1.0.7.9 -->
     <system:String x:Key="snpDither">Dither</system:String>
     <system:String x:Key="snpDitherOn">An</system:String>

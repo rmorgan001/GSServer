@@ -88,6 +88,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="botTracking">Suivi</system:String>
     <system:String x:Key="botTipTracking">Suivi en cours</system:String>
     <system:String x:Key="botTipSOP">Côté du pied</system:String>
+    <system:String x:Key="botTipAzDir">Azimuth slew direction</system:String>
     <system:String x:Key="botTipAxisLimit">Limites d'axes, cliquer pour ajuster</system:String>
     <system:String x:Key="botTipWarnings">Alerte, cliquer pour reset</system:String>
     <system:String x:Key="botTipErrors">Erreurs, cliquer pour reset</system:String>
@@ -610,9 +611,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliAlignmentOnTooltip">Activer la modélisation de l'alignement des étoiles</system:String>
     <system:String x:Key="aliAlignmentSettings">Paramètres</system:String>
     <system:String x:Key="aliProximityLimitTooltip">À quelle distance les uns des autres peuvent être synchronisés les points avant qu'ils ne remplacent les points précédents (Secondes d'arc).</system:String>
+    <system:String x:Key="aliAlignmentModeTooltip">Choose whether to use the nearest point or the nearest three points</system:String>
     <system:String x:Key="aliSampleSizeTooltip">Combien de points de synchronisation à proximité doivent être utilisés lors du calcul des positions.</system:String>
     <system:String x:Key="aliNearbyLimitTooltip">À quelle distance les points de synchronisation doivent-ils être avant d’être utilisés dans les calculs (degrés).</system:String>
-    <system:String x:Key="aliClearModelOnStartup">Modèle clair au démarrage</system:String>
     <system:String x:Key="aliClearModelOnStartupTooltip">Cochez si vous souhaitez créer un nouveau modèle chaque fois que vous vous reconnectez.</system:String>
     <system:String x:Key="aliClearAll">Tout effacer</system:String>
     <system:String x:Key="aliClearAllTooltip">Cliquez sur ce bouton pour effacer tous les points d'alignement du modèle.</system:String>
@@ -620,8 +621,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliDeleteTooltip">Cliquez sur ce bouton pour supprimer le point d'alignement sélectionné.</system:String>
     <system:String x:Key="optAlignment">Alignement</system:String>
     <system:String x:Key="optProximityLimit">Limite de proximité</system:String>
-    <system:String x:Key="optSampleSize">Taille de l'échantillon</system:String>
-    <system:String x:Key="optNearbyLimit">Limite à proximité</system:String>
+    <system:String x:Key="optAlignmentMode">Alignment Behaviour</system:String>
+    <system:String x:Key="optActivePoints">Point Filter</system:String>
+    <system:String x:Key="optThreePointAlgorithm">Three Point Selection</system:String>
 
     <!--1.0.3.2 -->
     <system:String x:Key="customGears">Engrenages personnalisés</system:String>
