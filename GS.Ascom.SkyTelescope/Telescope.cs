@@ -945,14 +945,13 @@ namespace ASCOM.GS.Sky.Telescope
 
                 CheckCapability(SkySettings.CanPulseGuide, "PulseGuide");
                 CheckRange(Duration, 0, 30000, "PulseGuide", "Duration");
-                DateTime startTime = HiResDateTime.UtcNow;
+
+                var startTime = HiResDateTime.UtcNow;
                 SkyServer.PulseGuide(Direction, Duration);
                 // If synchronous (must be for Alt Az) wait out the remaining pulse guide duration here
-                if (!SkySettings.CanDualAxisPulseGuide || SkySettings.AlignmentMode == AlignmentModes.algAltAz) 
-                {
-                    var sleepTime = Duration - (int)(HiResDateTime.UtcNow - startTime).TotalMilliseconds;
-                    Thread.Sleep(sleepTime > 0 ? sleepTime : 0);
-                }
+                if (SkySettings.AlignmentMode != AlignmentModes.algAltAz) return;
+                var sleepTime = Duration - (int)(HiResDateTime.UtcNow - startTime).TotalMilliseconds;
+                Thread.Sleep(sleepTime > 0 ? sleepTime : 0);
             }
             catch (Exception e)
             {

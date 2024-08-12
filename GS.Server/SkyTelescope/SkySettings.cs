@@ -80,19 +80,19 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static bool _canDualAxisPulseGuide;
-        public static bool CanDualAxisPulseGuide
-        {
-            get => _canDualAxisPulseGuide;
-            private set
-            {
-                if (_canDualAxisPulseGuide == value) return;
-                _canDualAxisPulseGuide = value;
-                Properties.SkyTelescope.Default.CanDualAxisPulseGuide = value;
-                LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
-                OnStaticPropertyChanged();
-            }
-        }
+        //private static bool _canDualAxisPulseGuide;
+        //public static bool CanDualAxisPulseGuide
+        //{
+        //    get => _canDualAxisPulseGuide;
+        //    private set
+        //    {
+        //        if (_canDualAxisPulseGuide == value) return;
+        //        _canDualAxisPulseGuide = value;
+        //        Properties.SkyTelescope.Default.CanDualAxisPulseGuide = value;
+        //        LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
+        //        OnStaticPropertyChanged();
+        //    }
+        //}
 
         private static bool _canEquatorial;
         public static bool CanEquatorial
@@ -810,6 +810,20 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static double _axisHzTrackingLimit;
+        public static double AxisHzTrackingLimit
+        {
+            get => _axisHzTrackingLimit;
+            set
+            {
+                if (Math.Abs(_axisHzTrackingLimit - value) < 0.0000000000001) return;
+                _axisHzTrackingLimit = value;
+                Properties.SkyTelescope.Default.AxisHzTrackingLimit = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static double _cameraHeight;
         public static double CameraHeight
         {
@@ -1147,6 +1161,38 @@ namespace GS.Server.SkyTelescope
                 OnStaticPropertyChanged();
             }
         }
+
+
+        private static bool _HzlimitTracking;
+        public static bool HzLimitTracking
+        {
+            get => _HzlimitTracking;
+            set
+            {
+                if (_HzlimitTracking == value) return;
+                _HzlimitTracking = value;
+                Properties.SkyTelescope.Default.HzLimitTracking = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static bool _HzlimitPark;
+        public static bool HzLimitPark
+        {
+            get => _HzlimitPark;
+            set
+            {
+                if (_HzlimitPark == value) return;
+                _HzlimitPark = value;
+                Properties.SkyTelescope.Default.HzLimitPark = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+
+
 
         private static string _instrumentDescription;
         public static string InstrumentDescription
@@ -1835,6 +1881,20 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static string _parkHzLimitName;
+        public static string ParkHzLimitName
+        {
+            get => _parkHzLimitName;
+            set
+            {
+                if (_parkHzLimitName == value) return;
+                _parkHzLimitName = value;
+                Properties.SkyTelescope.Default.ParkHzLimitName = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static int _AltAzTrackingUpdateInterval;
         public static int AltAzTrackingUpdateInterval
         {
@@ -1920,7 +1980,7 @@ namespace GS.Server.SkyTelescope
             CanAlignMode = Properties.SkyTelescope.Default.CanAlignMode;
             CanAltAz = Properties.SkyTelescope.Default.CanAltAz;
             CanDoesRefraction = Properties.SkyTelescope.Default.CanDoesRefraction;
-            CanDualAxisPulseGuide = Properties.SkyTelescope.Default.CanDualAxisPulseGuide;
+            //CanDualAxisPulseGuide = Properties.SkyTelescope.Default.CanDualAxisPulseGuide;
             CanEquatorial = Properties.SkyTelescope.Default.CanEquatorial;
             CanFindHome = Properties.SkyTelescope.Default.CanFindHome;
             CanLatLongElev = Properties.SkyTelescope.Default.CanLatLongElev;
@@ -1980,6 +2040,7 @@ namespace GS.Server.SkyTelescope
             AtPark = Properties.SkyTelescope.Default.AtPark;
             AutoTrack = Properties.SkyTelescope.Default.AutoTrack;
             AxisTrackingLimit = Properties.SkyTelescope.Default.AxisTrackingLimit;
+            AxisHzTrackingLimit = Properties.SkyTelescope.Default.AxisHzTrackingLimit;
             CameraHeight = Properties.SkyTelescope.Default.CameraHeight;
             CameraWidth = Properties.SkyTelescope.Default.CameraWidth;
             Port = Properties.SkyTelescope.Default.Port;
@@ -2012,6 +2073,8 @@ namespace GS.Server.SkyTelescope
             HomeAxisY = Properties.SkyTelescope.Default.HomeAxisY;
             HourAngleLimit = Properties.SkyTelescope.Default.HourAngleLimit;
             HomeWarning = Properties.SkyTelescope.Default.HomeWarning;
+            HzLimitTracking = Properties.SkyTelescope.Default.HzLimitTracking;
+            HzLimitPark = Properties.SkyTelescope.Default.HzLimitPark;
             InstrumentDescription = Properties.SkyTelescope.Default.InstrumentDescription;
             InstrumentName = Properties.SkyTelescope.Default.InstrumentName;
             KingRate = Properties.SkyTelescope.Default.KingRate;
@@ -2029,6 +2092,7 @@ namespace GS.Server.SkyTelescope
             ParkAxisAlt = Properties.SkyTelescope.Default.ParkAxisAlt;
             ParkName = Properties.SkyTelescope.Default.ParkName;
             ParkLimitName = Properties.SkyTelescope.Default.ParkLimitName;
+            ParkHzLimitName = Properties.SkyTelescope.Default.ParkHzLimitName;
             PecOn = Properties.SkyTelescope.Default.PecOn;
             PecOffSet = Properties.SkyTelescope.Default.PecOffSet;
             PPecOn = Properties.SkyTelescope.Default.PpecOn;
@@ -2056,7 +2120,7 @@ namespace GS.Server.SkyTelescope
             AltAxisLowerLimit = Properties.SkyTelescope.Default.AltAxisLowerLimit;
             AltAxisUpperLimit = Properties.SkyTelescope.Default.AltAxisUpperLimit;
             AzSlewLimit = Properties.SkyTelescope.Default.AzSlewLimit;
-//            AzTrackLimitOffset = Properties.SkyTelescope.Default.AzTrackLimitOffset;
+            // AzTrackLimitOffset = Properties.SkyTelescope.Default.AzTrackLimitOffset;
             AltAzTrackingUpdateInterval = Properties.SkyTelescope.Default.AltAzTrackingUpdateInterval;
 
             //set CanSetPierSide to false if AltAz or polar alignment

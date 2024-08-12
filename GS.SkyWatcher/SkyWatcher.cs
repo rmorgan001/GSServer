@@ -413,6 +413,8 @@ namespace GS.SkyWatcher
                     SkyQueue.IsPulseGuidingDec = false;
                     break;
                 default:
+                    SkyQueue.IsPulseGuidingRa = false;
+                    SkyQueue.IsPulseGuidingDec = false;
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
             }
 

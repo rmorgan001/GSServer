@@ -137,6 +137,7 @@ namespace GS.Server.SkyTelescope
                     RaBacklashList = RaBacklashList.Concat(extendedlist);
                     DecBacklashList = DecBacklashList.Concat(extendedlist);
                     AxisTrackingLimits = new List<double>(Numbers.InclusiveRange(0, 15, 1));
+                    AxisHzTrackingLimits = new List<double>(Numbers.InclusiveRange(-20, 20, 1));
 
                     // defaults
                     AtPark = SkyServer.AtPark;
@@ -378,6 +379,9 @@ namespace GS.Server.SkyTelescope
                          break;
                      case "ParkLimitName":
                          SetParkLimitSelection(SkySettings.ParkLimitName);
+                         break;
+                     case "ParkHzLimitName":
+                         SetParkHzLimitSelection(SkySettings.ParkHzLimitName);
                          break;
                      case "HcFlipEW":
                          FlipEW = SkySettings.HcFlipEW;
@@ -949,6 +953,16 @@ namespace GS.Server.SkyTelescope
             set
             {
                 SkySettings.AxisTrackingLimit = value;
+                OnPropertyChanged();
+            }
+        }
+        public IList<double> AxisHzTrackingLimits { get; }
+        public double AxisHzTrackingLimit
+        {
+            get => SkySettings.AxisHzTrackingLimit;
+            set
+            {
+                SkySettings.AxisHzTrackingLimit = value;
                 OnPropertyChanged();
             }
         }
@@ -8461,6 +8475,8 @@ namespace GS.Server.SkyTelescope
         #endregion
 
         #region Limit Dialog
+
+        // Meridian Limits Options
         private void SetParkLimitSelection(string name)
         {
             var found = ParkPositions.Find(x => x.Name == name);
@@ -8515,6 +8531,62 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        // Horizon Limits Options
+        private void SetParkHzLimitSelection(string name)
+        {
+            var found = ParkPositions.Find(x => x.Name == name);
+            ParkHzLimitSelection = found ?? ParkPositions.FirstOrDefault();
+        }
+
+        private bool _HzlimitTracking;
+        public bool HzLimitTracking
+        {
+            get => _HzlimitTracking;
+            set
+            {
+                _HzlimitTracking = value;
+                SkySettings.HzLimitTracking = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _HzlimitPark;
+        public bool HzLimitPark
+        {
+            get => _HzlimitPark;
+            set
+            {
+                _HzlimitPark = value;
+                SkySettings.HzLimitPark = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ParkPosition _parkHzLimitSelection;
+        public ParkPosition ParkHzLimitSelection
+        {
+            get => _parkHzLimitSelection;
+            set
+            {
+                if (_parkHzLimitSelection == value) return;
+                _parkHzLimitSelection = value;
+                SkySettings.ParkHzLimitName = value.Name;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _HzlimitNothing;
+        public bool HzLimitNothing
+        {
+            get => _HzlimitNothing;
+            set
+            {
+                _HzlimitNothing = value;
+                OnPropertyChanged();
+            }
+        }
+
+        // Commands
         private ICommand _openLimitDialogCommand;
         public ICommand OpenLimitDialogCommand
         {
@@ -8537,11 +8609,19 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
+                    //Meridian
                     LimitTracking = SkySettings.LimitTracking;
                     LimitPark = SkySettings.LimitPark;
                     SetParkLimitSelection(SkySettings.ParkLimitName);
                     if (!LimitPark && !LimitTracking) { LimitNothing = true; }
                     if (LimitPark || LimitTracking) { LimitNothing = false; }
+                    //Horizon
+                    HzLimitTracking = SkySettings.HzLimitTracking;
+                    HzLimitPark = SkySettings.HzLimitPark;
+                    SetParkHzLimitSelection(SkySettings.ParkHzLimitName);
+                    if (!HzLimitPark && !HzLimitTracking) { HzLimitNothing = true; }
+                    if (HzLimitPark || HzLimitTracking) { HzLimitNothing = false; }
+
                     DialogContent = new LimitDialog();
                     IsDialogOpen = true;
                 }

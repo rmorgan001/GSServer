@@ -40,6 +40,7 @@ using GS.Server.Alignment;
 using AxisStatus = GS.Simulator.AxisStatus;
 using Range = GS.Principles.Range;
 using static System.Math;
+using MaterialDesignThemes.Wpf;
 
 namespace GS.Server.SkyTelescope
 {
@@ -2979,11 +2980,24 @@ namespace GS.Server.SkyTelescope
         private static void CheckAxisLimits()
         {
             var limitHit = false;
-            var trackingLimit = false;
-            //combine flip angle and tracking limit for a total limit passed meridian
+            var meridianLimit = false;
+            var horizonLimit = false;
+            var msg = string.Empty;
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Warning,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = string.Empty
+            };
+
+            //Meridian Limit Test,  combine flip angle and tracking limit for a total limit passed meridian
             var totLimit = SkySettings.HourAngleLimit + SkySettings.AxisTrackingLimit;
-            // check the ranges of the axes
-            // primary axis must be in the range 0 to 360 for AltAz or Polar
+
+            // check the ranges of the axes primary axis must be in the range 0 to 360 for AltAz or Polar
             // and -hourAngleLimit to 180 + hourAngleLimit for german polar
             switch (SkySettings.AlignmentMode)
             {
@@ -2996,14 +3010,17 @@ namespace GS.Server.SkyTelescope
                     if (SkySettings.AltAzAxesLimitOn)
                     {
                         // Check altitude
-                        if ((_mountAxes.Y < SkySettings.AltAxisLowerLimit - 1.0) || (_mountAxes.Y > SkySettings.AltAxisUpperLimit + 1.0))
+                        if ((_mountAxes.Y < SkySettings.AltAxisLowerLimit - 1.0) ||
+                            (_mountAxes.Y > SkySettings.AltAxisUpperLimit + 1.0))
                         {
                             limitHit = true;
-                            trackingLimit = true;
+                            meridianLimit = true;
                         }
+
                         limitHit = limitHit || AzEastWestSlewAtLimit(_mountAxes.X);
-                        trackingLimit = trackingLimit || AzEastWestTrackAtLimit(_mountAxes.X);
+                        meridianLimit = meridianLimit || AzEastWestTrackAtLimit(_mountAxes.X);
                     }
+
                     break;
                 case AlignmentModes.algGermanPolar:
                     // the primary axis needs to be in the range -180 to +180 to correspond with hour angles of -12 to 12.
@@ -3015,10 +3032,11 @@ namespace GS.Server.SkyTelescope
                         {
                             limitHit = true;
                         }
+
                         // Check tracking limit
                         if (_mountAxes.X >= totLimit || _mountAxes.X <= -totLimit - 180)
                         {
-                            trackingLimit = true;
+                            meridianLimit = true;
                         }
                     }
                     else
@@ -3028,10 +3046,11 @@ namespace GS.Server.SkyTelescope
                         {
                             limitHit = true;
                         }
+
                         //Check Tracking Limit
                         if (_mountAxes.X >= totLimit + 180 || _mountAxes.X <= -totLimit)
                         {
-                            trackingLimit = true;
+                            meridianLimit = true;
                         }
                     }
 
@@ -3044,27 +3063,79 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
 
-            // secondary must be in the range -90 to 0 to +90 for normal 
-            // and +90 to 180 to 270 for through the pole.
-            // rotation is continuous
-            //_mountAxes.X = Range.Range270(_mountAxes.X);
-
-            LimitAlarm = limitHit;
-            if (!trackingLimit) return;
-
-            if (Tracking && SkySettings.LimitTracking) { Tracking = false; } // turn off tracking
-
-            if (SkySettings.LimitPark && SlewState != SlewType.SlewPark) // only hit this once while in limit
+            // Horizon Limit Test
+            if (SkySettings.HzLimitPark || SkySettings.HzLimitTracking) // Skip all if set to do nothing
             {
-                var found = SkySettings.ParkPositions.Find(x => x.Name == SkySettings.ParkLimitName);
-                if (found == null)
+                switch (SkySettings.AlignmentMode)
                 {
-                    StopAxes();
+                    case AlignmentModes.algAltAz:
+                        break;
+                    case AlignmentModes.algGermanPolar:
+                        if (SideOfPier == PierSide.pierEast && Altitude <= SkySettings.AxisHzTrackingLimit && Tracking)
+                        {
+                            limitHit = true;
+                            horizonLimit = true;
+                        }
+
+                        break;
+                    case AlignmentModes.algPolar:
+                        break;
                 }
-                else
+            }
+
+            // Set the warning indicator light
+            LimitAlarm = limitHit;
+
+            // Meridian Triggers
+            if (meridianLimit)
+            {
+                monitorItem.Message =
+                    $"Meridian Limit Alarm: Park: {SkySettings.LimitPark} | Position: {SkySettings.ParkLimitName} | Stop Tracking: {SkySettings.LimitTracking}";
+                MonitorLog.LogToMonitor(monitorItem);
+
+                if (Tracking && SkySettings.LimitTracking)
                 {
-                    ParkSelected = found;
-                    GoToPark();
+                    Tracking = false;
+                } // turn off tracking
+
+                if (SkySettings.LimitPark && SlewState != SlewType.SlewPark) // only hit this once while in limit
+                {
+                    var found = SkySettings.ParkPositions.Find(x => x.Name == SkySettings.ParkLimitName);
+                    if (found == null)
+                    {
+                        StopAxes();
+                    }
+                    else
+                    {
+                        ParkSelected = found;
+                        GoToPark();
+                    }
+                }
+            }
+            // Horizon Triggers
+            if (horizonLimit)
+            {
+                monitorItem.Message =
+                    $"Horizon Limit Alarm: Park: {SkySettings.HzLimitPark} | Position:{SkySettings.ParkHzLimitName} | Stop Tracking:{SkySettings.HzLimitTracking}";
+                MonitorLog.LogToMonitor(monitorItem);
+
+                if (Tracking && SkySettings.HzLimitTracking)
+                {
+                    Tracking = false;
+                } // turn off tracking
+
+                if (SkySettings.HzLimitPark && SlewState != SlewType.SlewPark) // only hit this once while in limit
+                {
+                    var found = SkySettings.ParkPositions.Find(x => x.Name == SkySettings.ParkHzLimitName);
+                    if (found == null)
+                    {
+                        StopAxes();
+                    }
+                    else
+                    {
+                        ParkSelected = found;
+                        GoToPark();
+                    }
                 }
             }
         }

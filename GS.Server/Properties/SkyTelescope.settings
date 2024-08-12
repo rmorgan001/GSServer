@@ -413,5 +413,17 @@
     <Setting Name="AzSlewLimit" Type="System.Double" Scope="User">
       <Value Profile="(Default)">15</Value>
     </Setting>
+    <Setting Name="HzLimitTracking" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ParkHzLimitName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="HzLimitPark" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="AxisHzTrackingLimit" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

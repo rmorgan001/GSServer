@@ -750,5 +750,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="snpSetPix">Pixel abgleichen</system:String>
     <system:String x:Key="snpSetSec">Sekunden abgleichen</system:String>
     <system:String x:Key="snpTimeSec">Zeitüberschreitung Sekunden</system:String>
+
+    <!--1.0.8.5 -->
+    <system:String x:Key="Meridian">Meridian</system:String>
+    <system:String x:Key="Horizon">Horizont</system:String>
 </ResourceDictionary>
  
