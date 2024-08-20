@@ -41,6 +41,8 @@ SOFTWARE.
 using System;
 using System.Reflection;
 using System.Threading;
+using GS.Principles;
+using GS.Server.Properties;
 using GS.Shared;
 using XInputDotNetPure;
 
@@ -72,6 +74,18 @@ namespace GS.Server.GamePad
             {
                 gamePadState = XInputDotNetPure.GamePad.GetState(PlayerIndex.One, DeadZone);
                 _IsAvailable = gamePadState.IsConnected;
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"|XInput|{_IsAvailable}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
             }
             catch (Exception ex)
             {

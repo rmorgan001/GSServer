@@ -33,6 +33,7 @@ using GS.Server.Windows;
 using GS.Shared.Command;
 using GS.Server.Focuser;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace GS.Server.GamePad
 {
@@ -507,6 +508,18 @@ namespace GS.Server.GamePad
                         ThreadContext.InvokeOnUiThread(
                             delegate { windowHandle = Process.GetCurrentProcess().MainWindowHandle; }, ct);
                         _gamePad = new GamePadDirectX(windowHandle);
+
+                        var monitorItem = new MonitorEntry
+                        {
+                            Datetime = HiResDateTime.UtcNow,
+                            Device = MonitorDevice.UI,
+                            Category = MonitorCategory.Server,
+                            Type = MonitorType.Error,
+                            Method = MethodBase.GetCurrentMethod()?.Name,
+                            Thread = Thread.CurrentThread.ManagedThreadId,
+                            Message = $"GamePad Handle Available|{_gamePad.IsAvailable}"
+                        };
+                        MonitorLog.LogToMonitor(monitorItem);
                     }
                     LoadTextboxes();
                     ResetCounts();
@@ -1372,6 +1385,19 @@ namespace GS.Server.GamePad
         /// <param name="val"></param>
         private void DoGamePadSetKey(string key, string val)
         {
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.UI,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{key}|{val}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
             if (!(val != null || key != null)) return;
 
             switch (key)
@@ -1601,6 +1627,18 @@ namespace GS.Server.GamePad
         {
             try
             {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"|Parameter|{parameter}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
                 _focusTextBox = parameter.ToString().Trim().ToLower();
             }
             catch (Exception ex)
@@ -1642,6 +1680,18 @@ namespace GS.Server.GamePad
         {
             try
             {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"|Parameter|{parameter}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
                 if (_gamePad == null) return;
                 var key = parameter.ToString().Trim().ToLower();
                 var update = true;

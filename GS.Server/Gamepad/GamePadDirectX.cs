@@ -19,6 +19,7 @@ using GS.Shared;
 using System.Reflection;
 using System.Threading;
 using System.Linq;
+using GS.Principles;
 
 namespace GS.Server.GamePad
 {
@@ -75,6 +76,17 @@ namespace GS.Server.GamePad
                 if (joystickGuid == Guid.Empty)
                 {
                     _IsAvailable = false;
+                    var monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.UI,
+                        Category = MonitorCategory.Server,
+                        Type = MonitorType.Information,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"|DirectX|{_IsAvailable}"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
                     return;
                 }
 
