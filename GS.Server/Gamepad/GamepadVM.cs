@@ -33,7 +33,7 @@ using GS.Server.Windows;
 using GS.Shared.Command;
 using GS.Server.Focuser;
 using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
+
 
 namespace GS.Server.GamePad
 {
@@ -514,7 +514,7 @@ namespace GS.Server.GamePad
                             Datetime = HiResDateTime.UtcNow,
                             Device = MonitorDevice.UI,
                             Category = MonitorCategory.Server,
-                            Type = MonitorType.Error,
+                            Type = MonitorType.Information,
                             Method = MethodBase.GetCurrentMethod()?.Name,
                             Thread = Thread.CurrentThread.ManagedThreadId,
                             Message = $"GamePad Handle Available|{_gamePad.IsAvailable}"
@@ -560,6 +560,20 @@ namespace GS.Server.GamePad
                         var gamepadButtons = _gamePad.Buttons;
                         if (gamepadButtons != null && gamepadButtons.Length > 0)
                         {
+                            //use this to test which buttons have been pressed from the game pad
+                            //var buts = string.Join(", ", gamepadButtons.Select(b => b.ToString()).ToArray());
+                            //var monitorItem = new MonitorEntry
+                            //{
+                            //    Datetime = HiResDateTime.UtcNow,
+                            //    Device = MonitorDevice.UI,
+                            //    Category = MonitorCategory.Server,
+                            //    Type = MonitorType.Information,
+                            //    Method = MethodBase.GetCurrentMethod()?.Name,
+                            //    Thread = Thread.CurrentThread.ManagedThreadId,
+                            //    Message = $"ButtonLength|{gamepadButtons.Length}|buttons|{buts}|Key|{key}"
+                            //};
+                            //MonitorLog.LogToMonitor(monitorItem);
+                            
                             if (buttontocheck > -1)
                             {
                                 if (String.IsNullOrEmpty(key))
