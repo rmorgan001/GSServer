@@ -423,7 +423,7 @@ namespace GS.Server.Model3D
         /// <returns></returns>
         private bool IsCurrentViewModel()
         {
-            if (SkyServer.SelectedTab.Uid != 4) { return false; }
+            if (SkyServer.SelectedTab?.Uid != 4) { return false; }
             ScreenEnabled = SkyServer.IsMountRunning;
             return true;
         }
