@@ -626,8 +626,7 @@ namespace GS.Server.SkyTelescope
         /// Pulse reporting to driver
         /// Alt Az uses both axes so always synchronous pulse guiding on one of Ra or Dec
         /// </summary>
-        public static bool IsPulseGuiding => (IsPulseGuidingDec || IsPulseGuidingRa)
-                                                && (SkySettings.AlignmentMode != AlignmentModes.algAltAz);
+        public static bool IsPulseGuiding => (IsPulseGuidingDec || IsPulseGuidingRa);
 
         /// <summary>
         /// Checks if the auto home async process is running
@@ -1714,16 +1713,17 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Performs a pulse guiding slew of the axes to target
+        /// Performs a precision slew of axes to pulse target defined by RaDec predictor
         /// </summary>
-        private static void SimPulseGoto()
+        /// <param name="duration">Pulse guide time in milliseconds</param>
+        private static void SimPulseGoto(int duration)
         {
             var maxtries = 0;
             double[] deltaDegree = { 0.0, 0.0 };
             double[] gotoPrecision = { ConvertStepsToDegrees(2, 0), ConvertStepsToDegrees(2, 1) };
             const double milliSeconds = 0.001;
             var deltaTime = 75 * milliSeconds; // 75mS for simulator slew
-
+            var pulseStartTime = HiResDateTime.UtcNow;
             while (true)
             {
                 if (maxtries > 5) { break; }
@@ -1797,7 +1797,18 @@ namespace GS.Server.SkyTelescope
                     if (axis1stopped && axis2stopped) { break; }
                 }
                 stopwatch1.Stop();
-                deltaTime = stopwatch1.Elapsed.Milliseconds * milliSeconds;
+            }
+            // pulse movement finished so resume tracking
+            SetTracking();
+            // wait for pulse duration so completion variable IsPulseGuiding remains true 
+            var waitTime = (int)(pulseStartTime.AddMilliseconds(duration) - HiResDateTime.UtcNow).TotalMilliseconds;
+            if (waitTime > 0)
+            {
+                var stopwatch1 = Stopwatch.StartNew();
+                while (stopwatch1.Elapsed.TotalMilliseconds < waitTime)
+                {
+                    if (stopwatch1.ElapsedMilliseconds % 200 == 0) { UpdateSteps(); } // Process positions while waiting
+                }
             }
         }
 
@@ -2285,10 +2296,11 @@ namespace GS.Server.SkyTelescope
             return returnCode;
         }
 
-    /// <summary>
-    /// Performs a precision slew of axes to pulse target defined by RaDec predictor
-    /// </summary>
-    private static void SkyPulseGoto()
+        /// <summary>
+        /// Performs a precision slew of axes to pulse target defined by RaDec predictor
+        /// </summary>
+        /// <param name="duration">Pulse guide time in milliseconds</param>
+        private static void SkyPulseGoto(int duration)
         {
             var maxtries = 0;
             double[] deltaDegree = { 0.0, 0.0 };
@@ -2298,6 +2310,7 @@ namespace GS.Server.SkyTelescope
             // double[] gotoPrecision = { ConvertStepsToDegrees(2, 0), ConvertStepsToDegrees(2, 1) };
             double[] gotoPrecision = { SkySettings.GotoPrecision, SkySettings.GotoPrecision };
             long loopTime = 400;
+            var pulseStartTime = HiResDateTime.UtcNow;
             while (true)
             {
                 // start loop timer
@@ -2374,6 +2387,18 @@ namespace GS.Server.SkyTelescope
                 }
                 loopTimer.Stop();
                 loopTime = loopTimer.ElapsedMilliseconds;
+            }
+            // pulse movement finished so resume tracking
+            SetTracking();
+            // wait for pulse duration so completion variable IsPulseGuiding remains true 
+            var waitTime = (int)(pulseStartTime.AddMilliseconds(duration) - HiResDateTime.UtcNow).TotalMilliseconds;
+            if (waitTime > 0)
+            {
+                var stopwatch = Stopwatch.StartNew();
+                while (stopwatch.Elapsed.TotalMilliseconds < waitTime)
+                {
+                    if (stopwatch.ElapsedMilliseconds % 200 == 0) { UpdateSteps(); } // Process positions while waiting
+                }
             }
         }
 
@@ -4980,9 +5005,6 @@ namespace GS.Server.SkyTelescope
         {
             if (!IsMountRunning) { throw new Exception("Mount not running"); }
 
-            // Turn off updates whilst pulse guiding
-            if (SkySettings.AlignmentMode == AlignmentModes.algAltAz) StopAltAzTrackingTimer();
-
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{direction}|{duration}" };
             MonitorLog.LogToMonitor(monitorItem);
@@ -5025,31 +5047,33 @@ namespace GS.Server.SkyTelescope
                     {
                         case MountType.Simulator:
                             if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
-                            {
-                                StopAltAzTrackingTimer();
-                                // get predictor current Ra and Dec
+                                Task.Run(() =>
+                                {
+                                    StopAltAzTrackingTimer();
+                                    // get predictor current Ra and Dec
                                 var raDec = new[] { RightAscensionXForm, DeclinationXForm };
-                                // set predictor Ra and Dec ready for tracking
-                                SkyPredictor.Set(raDec[0], raDec[1] + duration * decGuideRate * 0.001);
-                                // setup to log and graph the pulse
-                                var pulseEntry = new PulseEntry();
-                                if (MonitorPulse)
-                                {
-                                    pulseEntry.Axis = (int)Axis.Axis2;
-                                    pulseEntry.Duration = duration;
-                                    pulseEntry.Rate = decGuideRate;
-                                    pulseEntry.StartTime = HiResDateTime.UtcNow;
-                                }
-                                // execute pulse
-                                SimPulseGoto();
-                                // log and graph pulse
-                                if (MonitorPulse)
-                                {
-                                    MonitorLog.LogToMonitor(pulseEntry);
-                                }
-                                SetTracking();
+                                    // set predictor Ra and Dec ready for tracking
+                                    SkyPredictor.Set(SkyPredictor.Ra, SkyPredictor.Dec + duration * decGuideRate * 0.001);
+                                    // setup to log and graph the pulse
+                                    var pulseEntry = new PulseEntry();
+                                    if (MonitorPulse)
+                                    {
+                                        pulseEntry.Axis = (int)Axis.Axis2;
+                                        pulseEntry.Duration = duration;
+                                        pulseEntry.Rate = decGuideRate;
+                                        pulseEntry.StartTime = HiResDateTime.UtcNow;
+                                    }
+                                    // execute pulse
+                                    SimPulseGoto(duration);
+                                    IsPulseGuidingDec = false;
+                                    // log and graph pulse
+                                    if (MonitorPulse)
+                                    {
+                                        MonitorLog.LogToMonitor(pulseEntry);
+                                    }
 
-                            }
+                                }
+                            );
                             else
                             {
                                 if (!SouthernHemisphere)
@@ -5061,30 +5085,34 @@ namespace GS.Server.SkyTelescope
                             break;
                         case MountType.SkyWatcher:
                             if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
-                            {
-                                StopAltAzTrackingTimer();
-                                // get predictor current Ra and Dec
-                                var raDec = new[] { RightAscensionXForm, DeclinationXForm };
-                                // set predictor Ra and Dec ready for tracking
-                                SkyPredictor.Set(raDec[0], raDec[1] + duration * decGuideRate * 0.001);
-                                // setup to log and graph the pulse
-                                var pulseEntry = new PulseEntry();
-                                if (MonitorPulse)
-                                {
-                                    pulseEntry.Axis = (int)AxisId.Axis2;
-                                    pulseEntry.Duration = duration;
-                                    pulseEntry.Rate = decGuideRate;
-                                    pulseEntry.StartTime = HiResDateTime.UtcNow;
-                                }
-                                // execute pulse
-                                SkyPulseGoto();
-                                // log and graph pulse
-                                if (MonitorPulse)
-                                {
-                                    MonitorLog.LogToMonitor(pulseEntry);
-                                }
-                                SetTracking();
-                            }
+                                Task.Run(() =>
+                                    {
+                                        {
+                                            StopAltAzTrackingTimer();
+                                            // get predictor current Ra and Dec
+                                            // set predictor Ra and Dec ready for tracking
+                                            SkyPredictor.Set(SkyPredictor.Ra, SkyPredictor.Dec + duration * decGuideRate * 0.001);
+                                            // SkyPredictor.Set(raDec[0], raDec[1] + duration * decGuideRate * 0.001);
+                                            // setup to log and graph the pulse
+                                            var pulseEntry = new PulseEntry();
+                                            if (MonitorPulse)
+                                            {
+                                                pulseEntry.Axis = (int)AxisId.Axis2;
+                                                pulseEntry.Duration = duration;
+                                                pulseEntry.Rate = decGuideRate;
+                                                pulseEntry.StartTime = HiResDateTime.UtcNow;
+                                            }
+                                            // execute pulse
+                                            SkyPulseGoto(duration);
+                                            IsPulseGuidingDec = false;
+                                            // log and graph pulse
+                                            if (MonitorPulse)
+                                            {
+                                                MonitorLog.LogToMonitor(pulseEntry);
+                                            }
+                                        }
+                                    }
+                                );
                             else
                             {
                                 _ = new SkyAxisPulse(0, AxisId.Axis2, decGuideRate, duration, decbacklashamount);
@@ -5125,30 +5153,31 @@ namespace GS.Server.SkyTelescope
                     {
                         case MountType.Simulator:
                             if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
-                            {
-                                StopAltAzTrackingTimer();
-                                // get predictor current Ra and Dec
-                                var raDec = new[] {RightAscensionXForm, DeclinationXForm };
-                                // set predictor Ra and Dec ready for tracking
-                                SkyPredictor.Set(raDec[0] - duration * 0.001 * raGuideRate / _siderealRate, raDec[1]);
-                                // setup to log and graph the pulse
-                                var pulseEntry = new PulseEntry();
-                                if (MonitorPulse)
+                                Task.Run(() =>
                                 {
-                                    pulseEntry.Axis = (int)Axis.Axis1;
-                                    pulseEntry.Duration = duration;
-                                    pulseEntry.Rate = raGuideRate;
-                                    pulseEntry.StartTime = HiResDateTime.UtcNow;
+                                    StopAltAzTrackingTimer();
+                                    // get predictor current Ra and Dec
+                                    // set predictor Ra and Dec ready for tracking
+                                    SkyPredictor.Set(SkyPredictor.Ra - duration * 0.001 * raGuideRate / _siderealRate, SkyPredictor.Dec);
+                                    // setup to log and graph the pulse
+                                    var pulseEntry = new PulseEntry();
+                                    if (MonitorPulse)
+                                    {
+                                        pulseEntry.Axis = (int)Axis.Axis1;
+                                        pulseEntry.Duration = duration;
+                                        pulseEntry.Rate = raGuideRate;
+                                        pulseEntry.StartTime = HiResDateTime.UtcNow;
+                                    }
+                                    // execute pulse
+                                    SimPulseGoto(duration);
+                                    IsPulseGuidingRa = false;
+                                    // log and graph pulse
+                                    if (MonitorPulse)
+                                    {
+                                        MonitorLog.LogToMonitor(pulseEntry);
+                                    }
                                 }
-                                // execute pulse
-                                SkyPulseGoto();
-                                // log and graph pulse
-                                if (MonitorPulse)
-                                {
-                                    MonitorLog.LogToMonitor(pulseEntry);
-                                }
-                                SetTracking();
-                            }
+                            );
                             else
                             {
                                 _ = new CmdAxisPulse(0, Axis.Axis1, raGuideRate, duration);
@@ -5157,30 +5186,31 @@ namespace GS.Server.SkyTelescope
                             break;
                         case MountType.SkyWatcher:
                             if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
-                            {
-                                StopAltAzTrackingTimer();
-                                // get predictor current Ra and Dec
-                                var raDec = new[] {RightAscensionXForm, DeclinationXForm };
-                                // set predictor Ra and Dec ready for tracking
-                                SkyPredictor.Set(raDec[0] - duration * 0.001 * raGuideRate / _siderealRate, raDec[1]);
-                                // setup to log and graph the pulse
-                                var pulseEntry = new PulseEntry();
-                                if (MonitorPulse)
-                                {
-                                    pulseEntry.Axis = (int)AxisId.Axis1;
-                                    pulseEntry.Duration = duration;
-                                    pulseEntry.Rate = raGuideRate;
-                                    pulseEntry.StartTime = HiResDateTime.UtcNow;
-                                }
-                                // execute pulse
-                                SkyPulseGoto();
-                                // log and graph pulse
-                                if (MonitorPulse)
-                                {
-                                    MonitorLog.LogToMonitor(pulseEntry);
-                                }
-                                SetTracking();
-                            }
+                                Task.Run(() =>
+                                    {
+                                        StopAltAzTrackingTimer();
+                                        // get predictor current Ra and Dec
+                                        // set predictor Ra and Dec ready for tracking
+                                        SkyPredictor.Set(SkyPredictor.Ra - duration * 0.001 * raGuideRate / _siderealRate, SkyPredictor.Dec);
+                                        // setup to log and graph the pulse
+                                        var pulseEntry = new PulseEntry();
+                                        if (MonitorPulse)
+                                        {
+                                            pulseEntry.Axis = (int)AxisId.Axis1;
+                                            pulseEntry.Duration = duration;
+                                            pulseEntry.Rate = raGuideRate;
+                                            pulseEntry.StartTime = HiResDateTime.UtcNow;
+                                        }
+                                        // execute pulse
+                                        SkyPulseGoto(duration);
+                                        // log and graph pulse
+                                        IsPulseGuidingRa = false;
+                                        if (MonitorPulse)
+                                        {
+                                            MonitorLog.LogToMonitor(pulseEntry);
+                                        }
+                                    }
+                                );
                             else
                             {
                                 _ = new SkyAxisPulse(0, AxisId.Axis1, raGuideRate, duration);
