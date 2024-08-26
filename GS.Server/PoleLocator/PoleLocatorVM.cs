@@ -183,7 +183,7 @@ namespace GS.Server.PoleLocator
             {
                 // don't run if on a different viewmodel
                 if (_mainWindowVM == null) return;
-                if (_mainWindowVM.CurrentPageViewModel.Uid != 5) return;
+                if (_mainWindowVM.CurrentPageViewModel?.Uid != 5) return;
 
                 Update();
                 SetHemisphere();

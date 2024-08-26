@@ -496,7 +496,7 @@ namespace GS.Server.SkyTelescope
                                     SetGraphics();
                                     break;
                                 case "Rotate3DModel":
-                                    if (SkyServer.SelectedTab.Uid != 0) { return; }
+                                    if (SkyServer.SelectedTab?.Uid != 0) { return; }
                                     Rotate();
                                     break;
                                 case "IsHome":
