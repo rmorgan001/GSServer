@@ -624,6 +624,10 @@ namespace ASCOM.GS.Sky.Telescope
 
                 CheckCapability(SkySettings.CanSetEquRates, "DeclinationRate", true);
                 CheckRate(value);
+                if (TrackingRate != DriveRates.driveSidereal)
+                {
+                    throw new InvalidOperationException(" DeclinationRate - cannot set rate because TrackingRate is not Sidereal");
+                }
                 SkyServer.RateDecOrg = value;
                 SkyServer.RateDec = Conversions.ArcSec2Deg(value);
             }
@@ -919,6 +923,8 @@ namespace ASCOM.GS.Sky.Telescope
         {
             try
             {
+                if (IsPulseGuiding && SkySettings.AlignmentMode == AlignmentModes.algAltAz)
+                    throw new InvalidOperationException("Alt Az mode does not support dual axis pulse guiding");
                 switch (Direction)
                 {
                     case GuideDirections.guideNorth:
@@ -1018,6 +1024,10 @@ namespace ASCOM.GS.Sky.Telescope
 
                 CheckCapability(SkySettings.CanSetEquRates, "RightAscensionRate ", true);
                 CheckRate(value);
+                if (TrackingRate != DriveRates.driveSidereal)
+                {
+                    throw new InvalidOperationException(" RightAscensionRate - cannot set rate because TrackingRate is not Sidereal");
+                }
                 SkyServer.RateRaOrg = value;
                 SkyServer.RateRa = Conversions.ArcSec2Deg(Conversions.SideSec2ArcSec(value));
             }
@@ -1555,6 +1565,13 @@ namespace ASCOM.GS.Sky.Telescope
 
                 CheckVersionOne("TrackingRate", true);
                 CheckTrackingRate("TrackingRate", value);
+                if (value != DriveRates.driveSidereal)
+                {
+                    SkyServer.RateDecOrg = 0;
+                    SkyServer.RateDec = 0;
+                    SkyServer.RateRaOrg = 0;
+                    SkyServer.RateRa = 0;
+                }
                 SkySettings.TrackingRate = value;
             }
         }
