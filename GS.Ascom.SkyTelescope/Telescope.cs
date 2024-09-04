@@ -734,16 +734,17 @@ namespace ASCOM.GS.Sky.Telescope
             if (!SkyServer.AsComOn) return;
             CheckCapability(SkySettings.CanFindHome, "FindHome");
             CheckParked("FindHome");
+
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Started" };
+            MonitorLog.LogToMonitor(monitorItem);
+
             SkyServer.GoToHome();
             while (SkyServer.SlewState == SlewType.SlewHome || SkyServer.SlewState == SlewType.SlewSettle)
             {
                 Thread.Sleep(1);
                 DoEvents();
             }
-
-            var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Finished" };
-            MonitorLog.LogToMonitor(monitorItem);
         }
 
         public double FocalLength
@@ -896,27 +897,31 @@ namespace ASCOM.GS.Sky.Telescope
         public void Park()
         {
             if (!SkyServer.AsComOn) return;
-            MonitorEntry monitorItem;
             CheckCapability(SkySettings.CanPark, "Park");
+
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Started" };
             if (SkyServer.AtPark)
             {
-                monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "At Park" };
+                monitorItem.Message = "Already Parked";
                 MonitorLog.LogToMonitor(monitorItem);
-
                 return;
             }
+
+            //if (SkyServer.SlewState == SlewType.SlewPark) // uncomment to avoid multiple calls
+            //{
+            //    monitorItem.Message = "Park In Progress, Use AbortSlew first";
+            //    MonitorLog.LogToMonitor(monitorItem);
+            //    return;
+            //} 
+
+            MonitorLog.LogToMonitor(monitorItem);
             SkyServer.GoToPark();
             //while (SkyServer.SlewState == SlewType.SlewPark)
             //{
             //    Thread.Sleep(1);
             //    DoEvents();
             //}
-
-            monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Parking" };
-            MonitorLog.LogToMonitor(monitorItem);
-
         }
 
         public void PulseGuide(GuideDirections Direction, int Duration)

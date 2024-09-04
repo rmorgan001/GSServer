@@ -3976,7 +3976,7 @@ namespace GS.Server.SkyTelescope
             }
             if (IsSlewing)
             {
-                SlewState = SlewType.SlewNone;
+                //SlewState = SlewType.SlewNone; removed for Park issue and so state will remain the same
                 var stopped = AxesStopValidate();
                 if (!stopped)
                 {
@@ -4128,7 +4128,7 @@ namespace GS.Server.SkyTelescope
         public static void GoToHome()
         {
             Tracking = false;
-            StopAxes();
+            StopAxes(false);
 
             var monitorItem = new MonitorEntry
             {
@@ -4150,7 +4150,7 @@ namespace GS.Server.SkyTelescope
         public static void GoToPark()
         {
             Tracking = false;
-            StopAxes();
+            StopAxes(false);
 
             // get position selected could be set from UI or AsCom
             var ps = ParkSelected;
@@ -5233,6 +5233,7 @@ namespace GS.Server.SkyTelescope
         {
             if (!IsMountRunning) { return; }
             Tracking = false;
+             
             StopAxes();
 
             //set to home position
@@ -5728,7 +5729,7 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Stop Axes in a normal motion
         /// </summary>
-        public static void StopAxes()
+        public static void StopAxes(bool setSlewState = true)
         {
             if (!IsMountRunning) { return; }
 
@@ -5749,7 +5750,7 @@ namespace GS.Server.SkyTelescope
             _ctsGoTo?.Cancel();
             _rateMoveAxes = new Vector(0, 0);
             _rateRaDec = new Vector(0, 0);
-            SlewState = SlewType.SlewNone;
+            if(setSlewState){SlewState = SlewType.SlewNone;} //optional so Slewing isn't to false
 
             if (!AxesStopValidate())
             {
