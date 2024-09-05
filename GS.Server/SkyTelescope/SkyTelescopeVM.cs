@@ -432,6 +432,9 @@ namespace GS.Server.SkyTelescope
                          // ReSharper disable ExplicitCallerInfoArgument
                          OnPropertyChanged($"ParkPositions");
                          break;
+                     case "Refraction":
+                         Refraction = SkySettings.Refraction;
+                         break;
                  }
              });
             }

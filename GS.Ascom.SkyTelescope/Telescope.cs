@@ -664,7 +664,7 @@ namespace ASCOM.GS.Sky.Telescope
         {
             get
             {
-                var r = SkySettings.CanDoesRefraction;
+                var r = SkySettings.Refraction;
                 CheckVersionOne("DoesRefraction", false);
 
                 var monitorItem = new MonitorEntry
@@ -680,7 +680,7 @@ namespace ASCOM.GS.Sky.Telescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 CheckVersionOne("DoesRefraction", true);
-                SkySettings.CanDoesRefraction = value;
+                SkySettings.Refraction = value;
             }
         }
 

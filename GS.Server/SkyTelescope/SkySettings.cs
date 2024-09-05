@@ -66,19 +66,20 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static bool _canDoesRefraction;
-        public static bool CanDoesRefraction
-        {
-            get => _canDoesRefraction;
-            set
-            {
-                if (_canDoesRefraction == value) return;
-                _canDoesRefraction = value;
-                Properties.SkyTelescope.Default.CanDoesRefraction = value;
-                LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
-                OnStaticPropertyChanged();
-            }
-        }
+        //private static bool _canDoesRefraction;  moved to Refraction property
+        //public static bool CanDoesRefraction
+        //{
+        //    get => _canDoesRefraction;
+        //    set
+        //    {
+        //        if (_canDoesRefraction == value) return;
+        //        _canDoesRefraction = value;
+        //        Properties.SkyTelescope.Default.CanDoesRefraction = value;
+        //        Properties.SkyTelescope.Default.Refraction = value;
+        //        LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
+        //        OnStaticPropertyChanged();
+        //    }
+        //}
 
         //private static bool _canDualAxisPulseGuide;
         //public static bool CanDualAxisPulseGuide
@@ -1979,7 +1980,7 @@ namespace GS.Server.SkyTelescope
             //capabilities
             CanAlignMode = Properties.SkyTelescope.Default.CanAlignMode;
             CanAltAz = Properties.SkyTelescope.Default.CanAltAz;
-            CanDoesRefraction = Properties.SkyTelescope.Default.CanDoesRefraction;
+            //CanDoesRefraction = Properties.SkyTelescope.Default.CanDoesRefraction;
             //CanDualAxisPulseGuide = Properties.SkyTelescope.Default.CanDualAxisPulseGuide;
             CanEquatorial = Properties.SkyTelescope.Default.CanEquatorial;
             CanFindHome = Properties.SkyTelescope.Default.CanFindHome;
