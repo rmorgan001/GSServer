@@ -206,7 +206,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="gpsLong">Longitude:</system:String>
     <system:String x:Key="gpsEle">Elevation:</system:String>
     <system:String x:Key="gpsAccept">Accept Coordinates?</system:String>
-    <system:String x:Key="gpsNoData">Missing or invalid data found on COM port</system:String>
+    <system:String x:Key="gpsNoData">Missing or invalid data found</system:String>
     <system:String x:Key="gpsGGA">GGA</system:String>
     <system:String x:Key="gpsRMC">RMC</system:String>
     <system:String x:Key="gpsLocal">Local Time Discrepancy</system:String>

@@ -8695,12 +8695,15 @@ namespace GS.Server.SkyTelescope
 
         #region GPS Dialog
 
-        public IList<int> ComPorts
+        public IList<string> ComPorts
         {
             get
             {
-                var si = new SystemInfo();
-                return si.GetComPorts(); 
+                //var si = new SystemInfo();
+                //return si.GetComPorts();
+
+                SkySystem.DiscoverSerialDevices();
+                return Devices;
             }
         }
 
@@ -8848,7 +8851,7 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-        public int GpsComPort
+        public string GpsComPort
         {
             get => SkySettings.GpsComPort;
             set
@@ -8968,6 +8971,7 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
+                    SkySystem.DiscoverSerialDevices();
                     HasGSPData = false;
                     NmeaTag = "N/A";
                     GpsLong = 0.0;
@@ -8984,7 +8988,7 @@ namespace GS.Server.SkyTelescope
                     GpsTimeout = 20;
                     AllowTimeChange = false;
                     AllowTimeVis = SystemInfo.IsAdministrator();
-
+                    
                     DialogContent = new GpsDialog();
                     IsDialogOpen = true;
                 }
@@ -9130,7 +9134,7 @@ namespace GS.Server.SkyTelescope
                     else
                     {
                         gpsHardware.GpsOff();
-                        OpenDialog($"{Application.Current.Resources["gpsNoData"]}{GpsComPort}{Environment.NewLine}{gpsHardware.NmEaSentence}");
+                        OpenDialog($"{Application.Current.Resources["gpsNoData"]} {GpsComPort}{Environment.NewLine}{gpsHardware.NmEaSentence}");
                     }
                 }
             }

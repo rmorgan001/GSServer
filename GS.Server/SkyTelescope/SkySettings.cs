@@ -588,16 +588,18 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static int _gpsComPort;
-        public static int GpsComPort
+        private static string _gpsComPort;
+        public static string GpsComPort
         {
             get => _gpsComPort;
             set
             {
                 if (_gpsComPort == value) return;
                 _gpsComPort = value;
-                Properties.SkyTelescope.Default.GpsPort = value;
-                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                var i = Strings.GetNumberFromString(value);
+                var vi = i ?? 0;
+                Properties.SkyTelescope.Default.GpsPort = vi;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{vi}");
                 OnStaticPropertyChanged();
             }
         }
@@ -2067,7 +2069,7 @@ namespace GS.Server.SkyTelescope
             HcFlipNS = Properties.SkyTelescope.Default.HcFlipNS;
             GlobalStopOn = Properties.SkyTelescope.Default.GlobalStopOn;
             GotoPrecision = Properties.SkyTelescope.Default.GotoPrecision;
-            GpsComPort = Properties.SkyTelescope.Default.GpsPort;
+            GpsComPort = "COM" + Properties.SkyTelescope.Default.GpsPort;
             GuideRateOffsetY = Properties.SkyTelescope.Default.GuideRateOffsetY;
             GuideRateOffsetX = Properties.SkyTelescope.Default.GuideRateOffsetX;
             HomeAxisX = Properties.SkyTelescope.Default.HomeAxisX;

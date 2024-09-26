@@ -13,8 +13,8 @@
     </UserControl.Resources>
     <GroupBox Header="{StaticResource skyGPS}" Margin="5">
         <StackPanel Orientation="Vertical">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,10">
-                <ComboBox md:HintAssist.Hint="{StaticResource gpsCom}" ToolTip="{StaticResource gpsCom}" ItemsSource="{Binding ComPorts}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,10">
+                <ComboBox md:HintAssist.Hint="{StaticResource gpsCom}" Margin="0,0,5,0" ToolTip="{StaticResource gpsCom}" ItemsSource="{Binding ComPorts}" MinWidth="80" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                     <ComboBox.SelectedItem>
                         <Binding Path="GpsComPort" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
@@ -28,7 +28,7 @@
                         </ItemsPanelTemplate>
                     </ComboBox.ItemsPanel>
                 </ComboBox>
-                <ComboBox md:HintAssist.Hint="{StaticResource gpsBaud}" MinWidth="10" Margin="10,0,0,0" VerticalAlignment="Center" ToolTip="{StaticResource gpsBaud}" 
+                <ComboBox md:HintAssist.Hint="{StaticResource gpsBaud}" MinWidth="50" Margin="10,0,0,0" VerticalAlignment="Center" ToolTip="{StaticResource gpsBaud}" 
                           ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type enums:SerialSpeed}}}" 
                           Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                     <ComboBox.Text>
