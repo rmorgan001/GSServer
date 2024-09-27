@@ -251,6 +251,10 @@
                                     <CheckBox Height="25" Width="25" IsChecked="{Binding HomeWarning}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optHomeWarning}"/>
                                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optHomeWarning}"/>
                                 </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding HomeDialog}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optHomeWarning}"/>
+                                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource HomeDialog}"/>
+                                </StackPanel>
                             </StackPanel>
                             <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Left">
                                 <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optVoice}"/>

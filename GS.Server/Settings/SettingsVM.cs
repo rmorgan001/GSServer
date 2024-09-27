@@ -656,6 +656,17 @@ namespace GS.Server.Settings
             }
         }
 
+        public bool HomeDialog
+        {
+            get => SkySettings.HomeDialog;
+            set
+            {
+                if (HomeDialog == value) return;
+                SkySettings.HomeDialog = value;
+                OnPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Time

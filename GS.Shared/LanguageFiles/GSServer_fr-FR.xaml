@@ -754,4 +754,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--1.0.8.5 -->
     <system:String x:Key="Meridian">Méridien</system:String>
     <system:String x:Key="Horizon">Horizon</system:String>
+
+    <!--1.0.8.6 -->
+    <system:String x:Key="HomeDialog">Alerte Home dialogue</system:String>
 </ResourceDictionary>

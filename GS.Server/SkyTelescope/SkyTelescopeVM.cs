@@ -7329,8 +7329,13 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
-                DialogContent = new HomeDialog();
-                IsDialogOpen = true;
+                if (SkySettings.HomeDialog)
+                {
+                    DialogContent = new HomeDialog();
+                    IsDialogOpen = true;
+                    return;
+                }
+                AcceptHomeDialogCmd.Execute(null);
             }
             catch (Exception ex)
             {

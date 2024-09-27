@@ -3162,7 +3162,7 @@ namespace GS.Server.SkyTelescope
                         GoToPark();
                     }
                 }
-            }
+            } 
         }
 
         /// <summary>

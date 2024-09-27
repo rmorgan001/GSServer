@@ -1151,6 +1151,20 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static bool _homeDialog;
+        public static bool HomeDialog
+        {
+            get => _homeDialog;
+            set
+            {
+                if (_homeDialog == value) return;
+                _homeDialog = value;
+                Properties.SkyTelescope.Default.HomeDialog = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static bool _homeWarning;
         public static bool HomeWarning
         {
@@ -1164,8 +1178,7 @@ namespace GS.Server.SkyTelescope
                 OnStaticPropertyChanged();
             }
         }
-
-
+        
         private static bool _HzlimitTracking;
         public static bool HzLimitTracking
         {
@@ -2076,6 +2089,7 @@ namespace GS.Server.SkyTelescope
             HomeAxisY = Properties.SkyTelescope.Default.HomeAxisY;
             HourAngleLimit = Properties.SkyTelescope.Default.HourAngleLimit;
             HomeWarning = Properties.SkyTelescope.Default.HomeWarning;
+            HomeDialog = Properties.SkyTelescope.Default.HomeDialog;
             HzLimitTracking = Properties.SkyTelescope.Default.HzLimitTracking;
             HzLimitPark = Properties.SkyTelescope.Default.HzLimitPark;
             InstrumentDescription = Properties.SkyTelescope.Default.InstrumentDescription;
