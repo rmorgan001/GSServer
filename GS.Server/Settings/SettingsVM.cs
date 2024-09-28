@@ -667,6 +667,17 @@ namespace GS.Server.Settings
             }
         }
 
+        public bool ParkDialog
+        {
+            get => SkySettings.ParkDialog;
+            set
+            {
+                if (ParkDialog == value) return;
+                SkySettings.ParkDialog = value;
+                OnPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Time

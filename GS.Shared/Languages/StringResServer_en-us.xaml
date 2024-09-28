@@ -757,5 +757,6 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!--1.0.8.6 -->
     <system:String x:Key="HomeDialog">Home Dialog On</system:String>
+    <system:String x:Key="ParkDialog">Park Dialog On</system:String>
 </ResourceDictionary>
  

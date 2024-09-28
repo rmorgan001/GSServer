@@ -7219,8 +7219,13 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
-                DialogContent = new ParkDialog();
-                IsDialogOpen = true;
+                if (SkySettings.ParkDialog)
+                {
+                    DialogContent = new ParkDialog();
+                    IsDialogOpen = true;
+                    return;
+                }
+                AcceptParkDialogCmd.Execute(null);
             }
             catch (Exception ex)
             {

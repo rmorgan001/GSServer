@@ -1726,5 +1726,17 @@ namespace GS.Server.Properties {
                 this["HomeDialog"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ParkDialog {
+            get {
+                return ((bool)(this["ParkDialog"]));
+            }
+            set {
+                this["ParkDialog"] = value;
+            }
+        }
     }
 }

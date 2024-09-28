@@ -1206,10 +1206,7 @@ namespace GS.Server.SkyTelescope
                 OnStaticPropertyChanged();
             }
         }
-
-
-
-
+        
         private static string _instrumentDescription;
         public static string InstrumentDescription
         {
@@ -1423,6 +1420,21 @@ namespace GS.Server.SkyTelescope
                 OnStaticPropertyChanged();
             }
         }
+
+        private static bool _parkDialog;
+        public static bool ParkDialog
+        {
+            get => _parkDialog;
+            set
+            {
+                if (_parkDialog == value) return;
+                _parkDialog = value;
+                Properties.SkyTelescope.Default.ParkDialog = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
 
         private static bool _pecOn;
         public static bool PecOn
@@ -2107,6 +2119,7 @@ namespace GS.Server.SkyTelescope
             ParkAxisY = Properties.SkyTelescope.Default.ParkAxisY;
             ParkAxisAz = Properties.SkyTelescope.Default.ParkAxisAz;
             ParkAxisAlt = Properties.SkyTelescope.Default.ParkAxisAlt;
+            ParkDialog = Properties.SkyTelescope.Default.ParkDialog;
             ParkName = Properties.SkyTelescope.Default.ParkName;
             ParkLimitName = Properties.SkyTelescope.Default.ParkLimitName;
             ParkHzLimitName = Properties.SkyTelescope.Default.ParkHzLimitName;

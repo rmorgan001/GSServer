@@ -252,8 +252,12 @@
                                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optHomeWarning}"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal">
-                                    <CheckBox Height="25" Width="25" IsChecked="{Binding HomeDialog}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource optHomeWarning}"/>
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding HomeDialog}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource HomeDialog}"/>
                                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource HomeDialog}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Height="25" Width="25" IsChecked="{Binding ParkDialog}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource ParkDialog}"/>
+                                    <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource ParkDialog}"/>
                                 </StackPanel>
                             </StackPanel>
                             <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Left">
