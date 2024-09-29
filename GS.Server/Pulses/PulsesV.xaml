@@ -17,11 +17,11 @@
         <domain:InverseBooleanConverter x:Key="InvBol"/>
     </UserControl.Resources>
     <md:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" CloseOnClickAway="True">
-        <Grid MinWidth="600">
+        <Grid MinWidth="650">
         <md:DrawerHost BorderThickness="0" IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" BorderBrush="{StaticResource MaterialDesignDivider}" >
-        <md:DrawerHost.LeftDrawerContent>
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MinWidth="510">
-                <Grid>
+        <md:DrawerHost.LeftDrawerContent >
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MinWidth="700"  >
+                <Grid Margin="5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="40" />
                         <RowDefinition Height="Auto"/>
@@ -35,7 +35,7 @@
                             CommandParameter="{x:Static Dock.Left}"
                             IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"/>
                     </Grid>
-                    <Grid Grid.Row="1" Background="{StaticResource MaterialDesignPaper}" Margin="10,0,0,0" IsEnabled="{Binding Path=IsPulsing, Converter={StaticResource InvBol}}">
+                    <Grid Grid.Row="1" Margin="5" Background="{StaticResource MaterialDesignPaper}" IsEnabled="{Binding Path=IsPulsing, Converter={StaticResource InvBol}}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30"/>
                             <RowDefinition Height="30"/>
@@ -49,12 +49,12 @@
                             <RowDefinition Height="30"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock  Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center">Capture</TextBlock>
@@ -394,22 +394,20 @@
                         </ComboBox>
                         <CheckBox Grid.Row="8" Grid.Column="5" Margin="10,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Style="{StaticResource MaterialDesignCheckBox}" IsChecked="{Binding DecPhdInvert}" />
                     </Grid>
-                    <Grid Grid.Row="2" Background="{StaticResource MaterialDesignPaper}" Margin="10,20,0,0" IsEnabled="{Binding Path=IsPulsing, Converter={StaticResource InvBol}}">
+                    <Grid Grid.Row="2" Background="{StaticResource MaterialDesignPaper}" IsEnabled="{Binding Path=IsPulsing, Converter={StaticResource InvBol}}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="40"/>
-                            <RowDefinition Height="10"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="10,0,0,0" md:HintAssist.Hint="Chart Scale" Width="100" VerticalAlignment="Bottom"
+                        <ComboBox Grid.Row="0" Grid.Column="0" Margin="10,0,0,0" md:HintAssist.Hint="Chart Scale" Width="70" VerticalAlignment="Bottom"
                                   ItemsSource="{Binding ScaleList}"  Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.SelectedItem>
                                 <Binding Path="Scale" UpdateSourceTrigger="PropertyChanged">
@@ -424,7 +422,7 @@
                                 </ItemsPanelTemplate>
                             </ComboBox.ItemsPanel>
                         </ComboBox>
-                        <ComboBox Grid.Row="0" Grid.Column="2" Margin="10,0,0,0"  md:HintAssist.Hint="Quality" MinWidth="70" ToolTip="Quality"
+                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="10,0,0,0"  md:HintAssist.Hint="Quality" MinWidth="50" ToolTip="Quality"
                                   ItemsSource="{Binding Source={domain1:EnumBindingSource {x:Type enums:Quality}}}"
                                   Style="{StaticResource MaterialDesignFloatingHintComboBox}" HorizontalAlignment="Left">
                             <ComboBox.Text>
@@ -436,7 +434,7 @@
                                 </ItemsPanelTemplate>
                             </ComboBox.ItemsPanel>
                         </ComboBox>
-                        <ComboBox Grid.Row="0" Grid.Column="3" md:HintAssist.Hint="Animation (ms)" ToolTip="Higher is slower" MinWidth="10" Margin="5,0,0,0" VerticalAlignment="Bottom" HorizontalAlignment="Center" 
+                        <ComboBox Grid.Row="0" Grid.Column="2" md:HintAssist.Hint="Animation (ms)" ToolTip="Higher is slower" MinWidth="90" Margin="5,0,0,0" VerticalAlignment="Bottom" HorizontalAlignment="Center" 
                                   ItemsSource="{Binding AnimationTimes}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.SelectedItem>
                                 <Binding Path="AnimationTime" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -451,7 +449,7 @@
                                 </ItemsPanelTemplate>
                             </ComboBox.ItemsPanel>
                         </ComboBox>
-                        <ComboBox Grid.Row="0" Grid.Column="4" md:HintAssist.Hint="Smoothness"  MinWidth="10" Margin="10,0,0,0" VerticalAlignment="Bottom" HorizontalAlignment="Center" 
+                        <ComboBox Grid.Row="0" Grid.Column="3" md:HintAssist.Hint="Smooth"  MinWidth="60" Margin="10,0,0,0" VerticalAlignment="Bottom" HorizontalAlignment="Center" 
                                   ItemsSource="{Binding Smoothness}" ToolTip="Higher lines round more" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.SelectedItem>
                                 <Binding Path="LineSmoothness" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -466,7 +464,7 @@
                                 </ItemsPanelTemplate>
                             </ComboBox.ItemsPanel>
                         </ComboBox>
-                        <ComboBox Grid.Row="0" Grid.Column="5" md:HintAssist.Hint="X Scale"  MinWidth="15" Margin="10,0,0,0" VerticalAlignment="Bottom" HorizontalAlignment="Center" 
+                        <ComboBox Grid.Row="0" Grid.Column="4" md:HintAssist.Hint="X Scale"  MinWidth="50" Margin="10,0,0,0" VerticalAlignment="Bottom" HorizontalAlignment="Center" 
                                   ItemsSource="{Binding AxisMinSecondsRange}" ToolTip="Seconds to view on charts" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.SelectedItem>
                                 <Binding Path="AxisXSeconds" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -481,7 +479,7 @@
                                 </ItemsPanelTemplate>
                             </ComboBox.ItemsPanel>
                         </ComboBox>
-                        <ComboBox Grid.Row="0" Grid.Column="6" md:HintAssist.Hint="Max Points"  MinWidth="15" Margin="10,0,0,0" VerticalAlignment="Bottom" HorizontalAlignment="Center" 
+                        <ComboBox Grid.Row="0" Grid.Column="5" md:HintAssist.Hint="Max Points"  MinWidth="70" Margin="10,0,0,0" VerticalAlignment="Bottom" HorizontalAlignment="Center" 
                                   ItemsSource="{Binding MaxPointsRange}" ToolTip="Total number of points" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <ComboBox.SelectedItem>
                                 <Binding Path="MaxPoints" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -496,7 +494,7 @@
                                 </ItemsPanelTemplate>
                             </ComboBox.ItemsPanel>
                         </ComboBox>
-                        <TextBox Grid.Row="0" Grid.Column="7" md:HintAssist.Hint="PHD2 Host IP" Width="100" Margin="10,0,0,0" ToolTip="Address to PHD2 server" Style="{StaticResource MaterialDesignFloatingHintTextBox}" >
+                        <TextBox Grid.Row="0" Grid.Column="6" md:HintAssist.Hint="PHD2 Host IP" Width="100" Margin="10,0,0,0" ToolTip="Address to PHD2 server" Style="{StaticResource MaterialDesignFloatingHintTextBox}" >
                             <TextBox.Text>
                                 <Binding Path="PhdHostText" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
                                     <Binding.ValidationRules>
