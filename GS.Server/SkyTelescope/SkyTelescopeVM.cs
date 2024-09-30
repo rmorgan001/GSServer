@@ -375,7 +375,9 @@ namespace GS.Server.SkyTelescope
                          Graphic = SkySettings.FrontGraphic;
                          break;
                      case "TrackingRate":
-                         TrackingRate = SkySettings.TrackingRate;
+                         _trackingRate = SkySettings.TrackingRate;
+                         SetTrackingIcon(SkySettings.TrackingRate);
+                         OnPropertyChanged("TrackingRate");
                          break;
                      case "ParkLimitName":
                          SetParkLimitSelection(SkySettings.ParkLimitName);
@@ -510,9 +512,10 @@ namespace GS.Server.SkyTelescope
                                     break;
                                 case "IsSlewing":
                                     IsSlewing = SkyServer.IsSlewing;
+                                    IsTracking = SkyServer.Tracking || SkyServer.SlewState == SlewType.SlewRaDec;
                                     break;
                                 case "Tracking":
-                                    IsTracking = SkyServer.Tracking;
+                                    IsTracking = SkyServer.Tracking || SkyServer.SlewState == SlewType.SlewRaDec;
                                     break;
                                 case "IsSideOfPier":
                                     IsSideOfPier = SkyServer.IsSideOfPier;
@@ -6680,7 +6683,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.UI,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Information,
-                    Method = "ScheduleAction",
+                    Method = MonitorLog.GetCurrentMethod(),
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{action.Method}"
                 };
@@ -6701,7 +6704,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.UI,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Information,
-                    Method = "ScheduleAction",
+                    Method = MonitorLog.GetCurrentMethod(),
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}|{ex.StackTrace}"
                 };
@@ -6715,7 +6718,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.UI,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Information,
-                    Method = "ScheduleAction",
+                    Method = MonitorLog.GetCurrentMethod(),
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}|{ex.StackTrace}"
                 };

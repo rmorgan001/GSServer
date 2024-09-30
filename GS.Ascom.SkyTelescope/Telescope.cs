@@ -952,17 +952,19 @@ namespace ASCOM.GS.Sky.Telescope
                 if (SkyServer.AtPark) { throw new ParkedException(); }
 
                 if (SkyServer.IsSlewing) { throw new InvalidValueException("Pulse rejected when slewing"); }
-                //if (!SkyServer.Tracking) { throw new InvalidValueException("Pulse rejected when tracking is off"); }
+
+                if (!SkyServer.Tracking) { throw new InvalidValueException("Pulse rejected when tracking is off"); }
 
                 CheckCapability(SkySettings.CanPulseGuide, "PulseGuide");
                 CheckRange(Duration, 0, 30000, "PulseGuide", "Duration");
 
                 var startTime = HiResDateTime.UtcNow;
                 SkyServer.PulseGuide(Direction, Duration);
-                // If synchronous (must be for Alt Az) wait out the remaining pulse guide duration here
+                // If synchronous (must be for Alt Az ASCOM V3) wait out the remaining pulse guide duration here
                 if (SkySettings.AlignmentMode != AlignmentModes.algAltAz) return;
-                var sleepTime = Duration - (int)(HiResDateTime.UtcNow - startTime).TotalMilliseconds;
-                Thread.Sleep(sleepTime > 0 ? sleepTime : 0);
+                // Wait for pulse guiding completion
+                // Async operation may be active, sleep timers are not precise across threads
+                while (IsPulseGuiding) Thread.Sleep(10);
             }
             catch (Exception e)
             {
@@ -1296,11 +1298,10 @@ namespace ASCOM.GS.Sky.Telescope
             CheckRange(Declination, -90, 90, "SlewToCoordinatesAsync", "Declination");
             CheckParked("SlewToCoordinatesAsync");
 
-            SkyServer.CycleOnTracking(true);
             TargetRightAscension = RightAscension;
             TargetDeclination = Declination;
             var radec = Transforms.CoordTypeToInternal(RightAscension, Declination);
-            SkyServer.SlewRaDec(radec.X, radec.Y);
+            SkyServer.SlewRaDec(radec.X, radec.Y, true);
         }
 
         public void SlewToTarget()
@@ -1529,7 +1530,7 @@ namespace ASCOM.GS.Sky.Telescope
         {
             get
             {
-                var r = SkyServer.Tracking;
+                var r = SkyServer.Tracking || SkyServer.SlewState == SlewType.SlewRaDec;
 
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{r}" };
@@ -1541,8 +1542,10 @@ namespace ASCOM.GS.Sky.Telescope
             {
                 if (!SkyServer.AsComOn) return;
 
+                CheckParked("Cannot enable tracking at park");
+
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.Tracking = value;

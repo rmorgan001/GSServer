@@ -15,6 +15,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace GS.Shared
 {
@@ -312,6 +313,16 @@ namespace GS.Shared
         public static void LogToMonitor(PulseEntry entry)
         {
             MonitorQueue.AddPulse(entry);
+        }
+
+        /// <summary>
+        /// Get name of current method using compile time function for async methods
+        /// </summary>
+        /// <param name="methodName">Method name</param>
+        /// <returns></returns>
+        public static string GetCurrentMethod([CallerMemberName] string methodName = "")
+        {
+            return methodName;
         }
 
         #endregion

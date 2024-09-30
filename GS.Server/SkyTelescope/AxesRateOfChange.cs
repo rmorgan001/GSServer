@@ -36,7 +36,7 @@ namespace GS.Server.SkyTelescope
                     var deltaTime = (double)(_currentTicks - _previousTicks) / TimeSpan.TicksPerSecond;
                     return (_currentAxisAngles - _previousAxisAngles) / deltaTime;
                 }
-                return new Vector(0.0, 0.0);
+                return new Vector(999, 999);
             }
         }
 
@@ -57,7 +57,7 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// 
         /// </summary>
-        private static void Reset()
+        public static void Reset()
         {
             _currentAxisAngles = new Vector(0.0, 0.0);
             _previousAxisAngles = new Vector(0.0, 0.0);

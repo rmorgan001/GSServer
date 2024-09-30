@@ -145,11 +145,12 @@ namespace GS.Simulator
         /// <summary>
         /// Send pulse
         /// </summary>
-        /// <param name="axis"></param>
-        /// <param name="guideRate"></param>
-        /// <param name="duration"></param>
+        /// <param name="axis">Axis 1 or 2</param>
+        /// <param name="guideRate">>Guide rate degrees, 15.041/3600*.5, negative value denotes direction</param>
+        /// <param name="duration">length of pulse in milliseconds, always positive numbers</param>
+        /// <param name="token">Token source used to cancel pulse guide operation</param>
         /// <returns></returns>
-        internal bool AxisPulse(Axis axis, double guideRate, int duration)
+        internal bool AxisPulse(Axis axis, double guideRate, int duration, CancellationToken token)
         {
             if (axis == Axis.Axis1)
             {
@@ -162,8 +163,8 @@ namespace GS.Simulator
                 MountQueue.IsPulseGuidingRa = false;
             }
 
-            var arcsecs = duration / 1000.0 * Conversions.Deg2ArcSec(Math.Abs(guideRate));
-            if (arcsecs < .0002)
+            var arcSecs = duration / 1000.0 * Conversions.Deg2ArcSec(Math.Abs(guideRate));
+            if (arcSecs < .0002)
             {
                 MountQueue.IsPulseGuidingRa = false;
                 MountQueue.IsPulseGuidingDec = false;

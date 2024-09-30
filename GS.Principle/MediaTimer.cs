@@ -313,10 +313,14 @@ namespace GS.Principles
                 {
                     throw new ArgumentOutOfRangeException($"Period", value, "Multimedia Timer period out of range.");
                 }
-                _period = value;
-                if (!IsRunning) return;
-                Stop();
-                Start();
+
+                if (_period != value)
+                {
+                    _period = value;
+                    if (!IsRunning) return;
+                    Stop();
+                    Start();
+                }
             }
         }
 
@@ -453,6 +457,12 @@ namespace GS.Principles
 
             OnDisposed(EventArgs.Empty);
         }
+
+        /// <summary>
+        /// Internal timer ID
+        /// </summary>
+        public int TimerID => _timerID;
+
     }
 
     /// <summary>

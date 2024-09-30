@@ -115,7 +115,7 @@ namespace GS.SkyApi
 
             ValidateMount();
             var validAxis = ValidateAxis(axis);
-            var command = new SkyAxisPulse(SkyQueue.NewId, validAxis, guideRate, duration, backlashSteps);
+            var command = new SkyAxisPulse(SkyQueue.NewId, validAxis, guideRate, duration, backlashSteps, new CancellationToken());
             GetResult(command);
         }
 
