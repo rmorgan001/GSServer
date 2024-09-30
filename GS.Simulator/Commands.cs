@@ -14,6 +14,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using System;
+using System.Threading;
 
 namespace GS.Simulator
 {
@@ -574,10 +575,11 @@ namespace GS.Simulator
         private readonly Axis _axis;
         private readonly double _guideRate;
         private readonly int _duration;
+        private readonly CancellationToken _token;
         //private readonly int _backlash;
         //private readonly double _declination;
 
-        public CmdAxisPulse(long id, Axis axis, double guideRate, int duration)
+        public CmdAxisPulse(long id, Axis axis, double guideRate, int duration, CancellationToken token)
         {
             Id = id;
             //_backlash = backlash;
@@ -586,6 +588,7 @@ namespace GS.Simulator
             _axis = axis;
             _guideRate = guideRate;
             _duration = duration;
+            _token = token;
             Successful = false;
             Result = null;
             MountQueue.AddCommand(this);
@@ -595,7 +598,7 @@ namespace GS.Simulator
         {
             try
             {
-                Result = actions.AxisPulse(_axis, _guideRate, _duration);
+                Result = actions.AxisPulse(_axis, _guideRate, _duration, _token);
                 Successful = true;
             }
             catch (Exception e)

@@ -49,7 +49,7 @@ namespace GS.Server.Windows
                     ParkSelectionSetting = ParkPositions.FirstOrDefault();
                     AtPark = SkyServer.AtPark;
                     IsHome = SkyServer.IsHome;
-                    IsTracking = SkyServer.Tracking;
+                    IsTracking = SkyServer.Tracking || SkyServer.SlewState == SlewType.SlewRaDec;
                     TrackingRate = SkySettings.TrackingRate;
                     _skyTelescopeVM.TrackingRate = SkySettings.TrackingRate;
 
@@ -148,7 +148,7 @@ namespace GS.Server.Windows
                          ScreenEnabled = SkyServer.IsMountRunning;
                          break;
                      case "Tracking":
-                         IsTracking = SkyServer.Tracking;
+                         IsTracking = SkyServer.Tracking || SkyServer.SlewState == SlewType.SlewRaDec;
                          break;
                      case "ParkSelected":
                          ParkSelection = SkyServer.ParkSelected;
@@ -1975,6 +1975,18 @@ namespace GS.Server.Windows
                 if (_isHomeDialogOpen == value) return;
                 _isHomeDialogOpen = value;
                 CloseDialogs(value);
+                OnPropertyChanged();
+            }
+        }
+
+        private object _homeContent;
+        public object HomeContent
+        {
+            get => _homeContent;
+            set
+            {
+                if (_homeContent == value) return;
+                _homeContent = value;
                 OnPropertyChanged();
             }
         }

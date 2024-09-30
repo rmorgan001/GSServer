@@ -25,6 +25,7 @@ using GS.SkyWatcher;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.Linq.SqlClient;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -41,6 +42,7 @@ using AxisStatus = GS.Simulator.AxisStatus;
 using Range = GS.Principles.Range;
 using static System.Math;
 using MaterialDesignThemes.Wpf;
+using ASCOM.DriverAccess;
 
 namespace GS.Server.SkyTelescope
 {
@@ -86,8 +88,10 @@ namespace GS.Server.SkyTelescope
         // AlignmentModel
         public static readonly AlignmentModel AlignmentModel;
 
-        // Cancellation token for go to operations
+        // Cancellation token sources for go to and pulse guide async operations
         private static CancellationTokenSource _ctsGoTo;
+        private static CancellationTokenSource _ctsPulseGuideRa;
+        private static CancellationTokenSource _ctsPulseGuideDec;
 
         #endregion Fields 
 
@@ -179,6 +183,8 @@ namespace GS.Server.SkyTelescope
         private static Vector _guideRate;
         private static bool _isAutoHomeRunning;
         private static bool _isHome;
+        private static bool _isPulseGuidingDec;
+        private static bool _isPulseGuidingRa;
         private static PierSide _isSideOfPier;
         private static bool _isSlewing;
         private static Exception _lastAutoHomeError;
@@ -626,7 +632,7 @@ namespace GS.Server.SkyTelescope
         /// Pulse reporting to driver
         /// Alt Az uses both axes so always synchronous pulse guiding on one of Ra or Dec
         /// </summary>
-        public static bool IsPulseGuiding => (IsPulseGuidingDec || IsPulseGuidingRa);
+        public static bool IsPulseGuiding => (IsPulseGuidingDec || IsPulseGuidingRa); 
 
         /// <summary>
         /// Checks if the auto home async process is running
@@ -827,12 +833,44 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Is Dec pulse guiding
         /// </summary>
-        public static bool IsPulseGuidingDec { get; set; }
+        public static bool IsPulseGuidingDec
+        {
+            get => _isPulseGuidingDec;
+            set
+            {
+                if (_isPulseGuidingDec != value)
+                {
+                    _isPulseGuidingDec = value;
+                    // reset Dec pulse guiding cancellation token source
+                    if (!_isPulseGuidingDec && _ctsPulseGuideDec != null)
+                    {
+                        _ctsPulseGuideDec?.Dispose();
+                        _ctsPulseGuideDec = null;
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Is Ra pulse guiding
         /// </summary>
-        public static bool IsPulseGuidingRa { get; set; }
+        public static bool IsPulseGuidingRa
+        {
+            get => _isPulseGuidingRa;
+            set
+            {
+                if (_isPulseGuidingRa != value)
+                {
+                    _isPulseGuidingRa = value;
+                    // reset Ra pulse guiding cancellation token source
+                    if (!_isPulseGuidingRa && _ctsPulseGuideRa != null)
+                    {
+                        _ctsPulseGuideRa?.Dispose();
+                        _ctsPulseGuideRa = null;
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Positions converted from mount
@@ -856,6 +894,7 @@ namespace GS.Server.SkyTelescope
             set
             {
                 _rateMoveAxes.Y = value;
+                CancelAllAsync();
                 if (Math.Abs(value) > 0)
                 {
                     IsSlewing = true;
@@ -904,6 +943,7 @@ namespace GS.Server.SkyTelescope
             set
             {
                 _rateMoveAxes.X = value;
+                CancelAllAsync();
                 if (Math.Abs(value) > 0)
                 {
                     if (Tracking) { _MoveAxisPrevTracking = true; }
@@ -1499,7 +1539,6 @@ namespace GS.Server.SkyTelescope
         /// <returns></returns>
         private static int SimGoTo(double[] target, bool trackingState, SlewType slewType, CancellationToken token)
         {
-
             const int returnCode = 0;
             var monitorItem = new MonitorEntry
             {
@@ -1512,8 +1551,8 @@ namespace GS.Server.SkyTelescope
                 Message = $"from|{ActualAxisX}|{ActualAxisY}|to|{target[0]}|{target[1]}|tracking|{trackingState}"
             };
             MonitorLog.LogToMonitor(monitorItem);
-            if (token.IsCancellationRequested) { return returnCode; } // check for a stop
 
+            token.ThrowIfCancellationRequested(); // check for a stop
             double[] simTarget;
             // convert target to axis for Ra / Dec slew
             if (slewType == SlewType.SlewRaDec)
@@ -1531,7 +1570,7 @@ namespace GS.Server.SkyTelescope
             SimTasks(MountTaskName.StopAxes);
 
             #region First Slew
-            if (token.IsCancellationRequested) { return returnCode; } // check for a stop
+            token.ThrowIfCancellationRequested(); // check for a stop
             // time could be off a bit may need to deal with each axis separate
             // Convert az to plus / minus slew - AltAzAlignment mode only
             object _ = new CmdAxisGoToTarget(0, Axis.Axis1, ConvertToAzEastWest(simTarget[0]));
@@ -1539,11 +1578,15 @@ namespace GS.Server.SkyTelescope
 
             while (stopwatch.Elapsed.TotalSeconds <= timer)
             {
-                Thread.Sleep(100);
-                if (token.IsCancellationRequested) { break; }
+                Thread.Sleep(50);
+                token.ThrowIfCancellationRequested(); // check for a stop
+
                 var statusx = new CmdAxisStatus(MountQueue.NewId, Axis.Axis1);
                 var axis1Status = (AxisStatus)MountQueue.GetCommandResult(statusx).Result;
                 var axis1Stopped = axis1Status.Stopped;
+
+                Thread.Sleep(50);
+                token.ThrowIfCancellationRequested(); // check for a stop
 
                 var statusy = new CmdAxisStatus(MountQueue.NewId, Axis.Axis2);
                 var axis2Status = (AxisStatus)MountQueue.GetCommandResult(statusy).Result;
@@ -1572,14 +1615,10 @@ namespace GS.Server.SkyTelescope
             #endregion
 
             #region Final precision slew
+            token.ThrowIfCancellationRequested(); // check for a stop
             if (stopwatch.Elapsed.TotalSeconds <= timer)
-            {
-                //Task decTask = Task.Run(() => SimPrecisionGotoDec(simTarget[1]));
-                //Task raTask = Task.Run(() => SimPrecisionGoToRA(target, trackingState, stopwatch));
-                //Task.WaitAll(decTask, raTask);
                 Task.Run(() => SimPrecisionGoto(target, slewType, token)).Wait();
-            }
-            #endregion
+    #endregion
 
             SimTasks(MountTaskName.StopAxes);//make sure all axes are stopped
             return returnCode;
@@ -1615,7 +1654,7 @@ namespace GS.Server.SkyTelescope
 
             while (true)
             {
-                if (token.IsCancellationRequested) { break; } // check for a stop
+                token.ThrowIfCancellationRequested(); // check for a stop
                 if (maxtries > 5) { break; }
                 maxtries++;
                 double[] simTarget;
@@ -1655,14 +1694,14 @@ namespace GS.Server.SkyTelescope
                 var axis2AtTarget = Math.Abs(deltaDegree[1]) < gotoPrecision[1];
                 if (axis1AtTarget && axis2AtTarget) { break; }
 
-                if (token.IsCancellationRequested) { break; } // check for a stop
+                token.ThrowIfCancellationRequested(); // check for a stop
                 if (!axis1AtTarget)
                 {
                     // Convert az to plus / minus slew - AltAzAlignment mode only
                     simTarget[0] = ConvertToAzEastWest(simTarget[0]);
                     object _ = new CmdAxisGoToTarget(0, Axis.Axis1, simTarget[0]); //move to target RA / Az
                 }
-                if (token.IsCancellationRequested) { break; } // check for a stop
+                token.ThrowIfCancellationRequested(); // check for a stop
                 if (!axis2AtTarget)
                 {
                     object _ = new CmdAxisGoToTarget(0, Axis.Axis2, simTarget[1]); //move to target Dec / Alt
@@ -1677,7 +1716,7 @@ namespace GS.Server.SkyTelescope
                 while (stopwatch1.Elapsed.TotalMilliseconds < 3000)
                 {
                     Thread.Sleep(20);
-                    if (token.IsCancellationRequested) { break; } // check for a stop
+                    token.ThrowIfCancellationRequested(); // check for a stop
                     if (!axis1stopped)
                     {
                         var status1 = new CmdAxisStatus(MountQueue.NewId, Axis.Axis1);
@@ -1685,7 +1724,7 @@ namespace GS.Server.SkyTelescope
                         axis1stopped = axis1Status.Stopped;
                     }
                     Thread.Sleep(20);
-                    if (token.IsCancellationRequested) { break; } // check for a stop
+                    token.ThrowIfCancellationRequested(); // check for a stop
                     if (!axis2stopped)
                     {
                         var status2 = new CmdAxisStatus(MountQueue.NewId, Axis.Axis2);
@@ -1716,99 +1755,86 @@ namespace GS.Server.SkyTelescope
         /// Performs a precision slew of axes to pulse target defined by RaDec predictor
         /// </summary>
         /// <param name="duration">Pulse guide time in milliseconds</param>
-        private static void SimPulseGoto(int duration)
+        private static void SimPulseGoto(CancellationToken token)
         {
             var maxtries = 0;
             double[] deltaDegree = { 0.0, 0.0 };
+            var axis1AtTarget = false;
+            var axis2AtTarget = false;
             double[] gotoPrecision = { ConvertStepsToDegrees(2, 0), ConvertStepsToDegrees(2, 1) };
-            const double milliSeconds = 0.001;
-            var deltaTime = 75 * milliSeconds; // 75mS for simulator slew
-            var pulseStartTime = HiResDateTime.UtcNow;
-            while (true)
+            long loopTime = 75; // 75mS for simulator slew
+            try
             {
-                if (maxtries > 5) { break; }
-                maxtries++;
-                Vector trackingRate = new Vector(0, 0);
-                double[] simTarget = {0.0, 0.0};
-
-                // convert target to axis for Ra / Dec slew and calculate tracking rates
-                if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
+                while (true)
                 {
-                    var nextTime = HiResDateTime.UtcNow.AddMilliseconds(deltaTime);
-                    // get predicted RA and Dec at update time
-                    var predictorRaDec = SkyPredictor.GetRaDecAtTime(nextTime);
-                    // convert to internal Ra and Dec
-                    var internalRaDec = Transforms.CoordTypeToInternal(predictorRaDec[0], predictorRaDec[1]);
-                    // get alt az target
-                    simTarget = Axes.RaDecToAxesXY(new[] { internalRaDec.X, internalRaDec.Y }, GetLocalSiderealTime(nextTime));
-                    simTarget = GetSyncedAxes(Axes.AxesAppToMount(simTarget));
-                    // add back in sidereal or equivalent - subtracted in Ra rate in predictor
-                    trackingRate = ConvertRateToAltAz(CurrentTrackingRate(), 0.0, predictorRaDec[1]);
-                }
+                    if (maxtries > 5) { break; }
+                    maxtries++;
+                    double[] simTarget = {0.0, 0.0};
 
-                // Calculate error
-                var rawPositions = GetRawDegrees();
-                if (rawPositions == null || double.IsNaN(rawPositions[0]) || double.IsNaN(rawPositions[1])) { break; }
-                deltaDegree[0] = Range.Range180(simTarget[0] - rawPositions[0]);
-                deltaDegree[1] = Range.Range180(simTarget[1] - rawPositions[1]);
+                    // convert target to axis for Ra / Dec slew and calculate tracking rates
+                    if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
+                    {
+                        var nextTime = HiResDateTime.UtcNow.AddMilliseconds(loopTime);
+                        // get predicted RA and Dec at update time
+                        var predictorRaDec = SkyPredictor.GetRaDecAtTime(nextTime);
+                        // convert to internal Ra and Dec
+                        var internalRaDec = Transforms.CoordTypeToInternal(predictorRaDec[0], predictorRaDec[1]);
+                        // get alt az target
+                        simTarget = Axes.RaDecToAxesXY(new[] { internalRaDec.X, internalRaDec.Y }, GetLocalSiderealTime(nextTime));
+                        simTarget = GetSyncedAxes(Axes.AxesAppToMount(simTarget));
+                    }
 
-                var axis1AtTarget = Math.Abs(deltaDegree[0]) < gotoPrecision[0];
-                var axis2AtTarget = Math.Abs(deltaDegree[1]) < gotoPrecision[1];
-                if (axis1AtTarget && axis2AtTarget) { break; }
+                    // Calculate error
+                    var rawPositions = GetRawDegrees();
+                    if (rawPositions == null || double.IsNaN(rawPositions[0]) || double.IsNaN(rawPositions[1])) { break; }
+                    deltaDegree[0] = Range.Range180(simTarget[0] - rawPositions[0]);
+                    deltaDegree[1] = Range.Range180(simTarget[1] - rawPositions[1]);
 
-                if (!axis1AtTarget)
-                {
-                    simTarget[0] += trackingRate.X * deltaTime;
-                    // Convert az to plus / minus slew - AltAzAlignment mode only
-                    simTarget[0] = ConvertToAzEastWest(simTarget[0]);
-                    object _ = new CmdAxisGoToTarget(0, Axis.Axis1, simTarget[0]); //move to target RA / Az
-                }
-                if (!axis2AtTarget)
-                {
-                    simTarget[1] += trackingRate.Y * deltaTime;
-                    object _ = new CmdAxisGoToTarget(0, Axis.Axis2, simTarget[1]); //move to target Dec / Alt
-                }
+                    axis1AtTarget = Math.Abs(deltaDegree[0]) < gotoPrecision[0] || axis1AtTarget;
+                    axis2AtTarget = Math.Abs(deltaDegree[1]) < gotoPrecision[1] || axis2AtTarget;
+                    if (axis1AtTarget && axis2AtTarget) { break; }
+                    if (!axis1AtTarget)
+                    {
+                        simTarget[0] = ConvertToAzEastWest(simTarget[0]);
+                        token.ThrowIfCancellationRequested();
+                        object _ = new CmdAxisGoToTarget(0, Axis.Axis1, simTarget[0]); //move to target RA / Az
+                    }
+                    if (!axis2AtTarget)
+                    {
+                        token.ThrowIfCancellationRequested();
+                        object _ = new CmdAxisGoToTarget(0, Axis.Axis2, simTarget[1]); //move to target Dec / Alt
+                    }
 
-                // track movement until axes are stopped
-                var stopwatch1 = Stopwatch.StartNew();
+                    // track movement until axes are stopped
+                    var stopwatch1 = Stopwatch.StartNew();
 
                 var axis1stopped = false;
                 var axis2stopped = false;
 
-                if (SlewState == SlewType.SlewNone) break;
-
-                while (stopwatch1.Elapsed.TotalMilliseconds < 1000)
-                {
-                    if (SlewState == SlewType.SlewNone) { break; }
-                    Thread.Sleep(20);
-                    if (!axis1stopped)
+                while (stopwatch1.Elapsed.TotalMilliseconds < 500)
                     {
-                        var status1 = new CmdAxisStatus(MountQueue.NewId, Axis.Axis1);
-                        var axis1Status = (AxisStatus)MountQueue.GetCommandResult(status1).Result;
-                        axis1stopped = axis1Status.Stopped;
+                        token.ThrowIfCancellationRequested();
+                        Thread.Sleep(100);
+                        if (!axis1stopped)
+                            {
+                                var status1 = new CmdAxisStatus(MountQueue.NewId, Axis.Axis1);
+                                var axis1Status = (AxisStatus)MountQueue.GetCommandResult(status1).Result;
+                                axis1stopped = axis1Status.Stopped;
+                            }
+                        Thread.Sleep(100);
+                        if (!axis2stopped)
+                            {
+                                var status2 = new CmdAxisStatus(MountQueue.NewId, Axis.Axis2);
+                                var axis2Status = (AxisStatus)MountQueue.GetCommandResult(status2).Result;
+                                axis2stopped = axis2Status.Stopped;
+                            }
+                        if (axis1stopped && axis2stopped) { break; }
                     }
-                    Thread.Sleep(20);
-                    if (!axis2stopped)
-                    {
-                        var status2 = new CmdAxisStatus(MountQueue.NewId, Axis.Axis2);
-                        var axis2Status = (AxisStatus)MountQueue.GetCommandResult(status2).Result;
-                        axis2stopped = axis2Status.Stopped;
-                    }
-                    if (axis1stopped && axis2stopped) { break; }
+                    stopwatch1.Stop();
                 }
-                stopwatch1.Stop();
             }
-            // pulse movement finished so resume tracking
-            SetTracking();
-            // wait for pulse duration so completion variable IsPulseGuiding remains true 
-            var waitTime = (int)(pulseStartTime.AddMilliseconds(duration) - HiResDateTime.UtcNow).TotalMilliseconds;
-            if (waitTime > 0)
+            catch (OperationCanceledException)
             {
-                var stopwatch1 = Stopwatch.StartNew();
-                while (stopwatch1.Elapsed.TotalMilliseconds < waitTime)
-                {
-                    if (stopwatch1.ElapsedMilliseconds % 200 == 0) { UpdateSteps(); } // Process positions while waiting
-                }
             }
         }
 
@@ -2081,7 +2107,7 @@ namespace GS.Server.SkyTelescope
                 Message = $"from|{ActualAxisX}|{ActualAxisY}|to|{target[0]}|{target[1]}|tracking|{trackingState}|slewing|{slewType}"
             };
             MonitorLog.LogToMonitor(monitorItem);
-            if (token.IsCancellationRequested) { return returnCode; }
+            token.ThrowIfCancellationRequested(); // check for a stop
 
             double[] skyTarget;
             // convert target to axis for Ra / Dec slew
@@ -2100,7 +2126,7 @@ namespace GS.Server.SkyTelescope
             SkyTasks(MountTaskName.StopAxes);
 
             #region First Slew
-            if (token.IsCancellationRequested) { return returnCode; } // check for a stop
+            token.ThrowIfCancellationRequested(); // check for a stop
             // time could be off a bit may need to deal with each axis separate
             // Convert az to plus / minus slew - AltAzAlignment mode only
             object _ = new SkyAxisGoToTarget(0, AxisId.Axis1, ConvertToAzEastWest(skyTarget[0]));
@@ -2109,14 +2135,14 @@ namespace GS.Server.SkyTelescope
             while (stopwatch.Elapsed.TotalSeconds <= timer)
             {
                 Thread.Sleep(50);
-                if (token.IsCancellationRequested) { break; }
+                token.ThrowIfCancellationRequested(); // check for a stop
 
                 var statusx = new SkyIsAxisFullStop(SkyQueue.NewId, AxisId.Axis1);
                 var x = SkyQueue.GetCommandResult(statusx);
                 var axis1Stopped = Convert.ToBoolean(x.Result);
 
                 Thread.Sleep(50);
-                if (token.IsCancellationRequested) { break; }
+                token.ThrowIfCancellationRequested(); // check for a stop
 
                 var statusy = new SkyIsAxisFullStop(SkyQueue.NewId, AxisId.Axis2);
                 var y = SkyQueue.GetCommandResult(statusy);
@@ -2145,15 +2171,10 @@ namespace GS.Server.SkyTelescope
             MonitorLog.LogToMonitor(monitorItem);
             #endregion
 
-            if (token.IsCancellationRequested) { return returnCode; }
             #region Final precision slew
+            token.ThrowIfCancellationRequested(); // check for a stop
             if (stopwatch.Elapsed.TotalSeconds <= timer)
-            {
-                //Task decTask = Task.Run(() => SkyPrecisionGotoDec(skyTarget[1]));
-                //Task raTask = Task.Run(() => SkyPrecisionGoToRA(target, trackingState, stopwatch));
-                //Task.WaitAll(decTask, raTask);
                 Task.Run(() => SkyPrecisionGoto(target, slewType, token)).Wait();
-            }
             #endregion
 
             SkyTasks(MountTaskName.StopAxes); //make sure all axes are stopped
@@ -2193,7 +2214,7 @@ namespace GS.Server.SkyTelescope
             long loopTime = 800;
             while (true)
             {
-                if (token.IsCancellationRequested) { break; } // check for a stop
+                token.ThrowIfCancellationRequested(); // check for a stop
                 // start loop timer
                 var loopTimer = Stopwatch.StartNew();
                 // Update mount position
@@ -2236,7 +2257,7 @@ namespace GS.Server.SkyTelescope
                 axis2AtTarget = Math.Abs(deltaDegree[1]) < gotoPrecision[1] || axis2AtTarget;
                 if (axis1AtTarget && axis2AtTarget) { break; }
 
-                if (token.IsCancellationRequested) { break; } // check for a stop
+                token.ThrowIfCancellationRequested(); // check for a stop
                 if (!axis1AtTarget)
                 {
                     skyTarget[0] += 0.25 * deltaDegree[0];
@@ -2260,14 +2281,14 @@ namespace GS.Server.SkyTelescope
                 if (!axis2AtTarget)
                 {
                     skyTarget[1] += 0.1 * deltaDegree[1];
-                    if (token.IsCancellationRequested) { break; } // check for a stop
+                    token.ThrowIfCancellationRequested(); // check for a stop
                     object _ = new SkyAxisGoToTarget(0, AxisId.Axis2, skyTarget[1]); //move to target Dec / Alt
                 }
                 var axis2Done = axis2AtTarget;
                 while (loopTimer.Elapsed.TotalMilliseconds < 3000)
                 {
                     Thread.Sleep(30);
-                    if (token.IsCancellationRequested) { break; } // check for a stop
+                    token.ThrowIfCancellationRequested(); // check for a stop
                     if (!axis2Done)
                     {
                         var status2 = new SkyIsAxisFullStop(SkyQueue.NewId, AxisId.Axis2);
@@ -2300,7 +2321,7 @@ namespace GS.Server.SkyTelescope
         /// Performs a precision slew of axes to pulse target defined by RaDec predictor
         /// </summary>
         /// <param name="duration">Pulse guide time in milliseconds</param>
-        private static void SkyPulseGoto(int duration)
+        private static void SkyPulseGoto(CancellationToken token)
         {
             var maxtries = 0;
             double[] deltaDegree = { 0.0, 0.0 };
@@ -2310,95 +2331,93 @@ namespace GS.Server.SkyTelescope
             // double[] gotoPrecision = { ConvertStepsToDegrees(2, 0), ConvertStepsToDegrees(2, 1) };
             double[] gotoPrecision = { SkySettings.GotoPrecision, SkySettings.GotoPrecision };
             long loopTime = 400;
-            var pulseStartTime = HiResDateTime.UtcNow;
-            while (true)
+            try
             {
-                // start loop timer
-                var loopTimer = Stopwatch.StartNew();
-                // Update mount position
-                MountPositionUpdated = false;
-                UpdateSteps();
-                while (!MountPositionUpdated) Thread.Sleep(10);
-                // Check for maxtries or no change and exit
-                if (maxtries >= 5) { break; }
-                maxtries++;
-               double[] skyTarget = {0.0, 0.0};
-
-                // convert target to axis for Ra / Dec slew and calculate tracking rates
-                if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
+                while (true)
                 {
-                    var nextTime = HiResDateTime.UtcNow.AddMilliseconds(loopTime);
-                    // get predicted RA and Dec at update time
-                    var predictorRaDec = SkyPredictor.GetRaDecAtTime(nextTime);
-                    // convert to internal Ra and Dec
-                    var internalRaDec = Transforms.CoordTypeToInternal(predictorRaDec[0], predictorRaDec[1]);
-                    // get alt az target
-                    skyTarget = Axes.RaDecToAxesXY(new[] { internalRaDec.X, internalRaDec.Y }, GetLocalSiderealTime(nextTime));
-                    skyTarget = GetSyncedAxes(skyTarget);
-                }
-                // Calculate error
-                var rawPositions = GetRawDegrees();
-                if (rawPositions == null || double.IsNaN(rawPositions[0]) || double.IsNaN(rawPositions[1])) { break; }
-                deltaDegree[0] = skyTarget[0] - rawPositions[0];
-                deltaDegree[1] = skyTarget[1] - rawPositions[1];
+                    // start loop timer
+                    var loopTimer = Stopwatch.StartNew();
+                    // Update mount position
+                    MountPositionUpdated = false;
+                    UpdateSteps();
+                    while (!MountPositionUpdated) Thread.Sleep(10);
+                    // Check for maxtries or no change and exit
+                    if (maxtries >= 5) { break; }
+                    maxtries++;
+                    double[] skyTarget = {0.0, 0.0};
 
-                axis1AtTarget = Math.Abs(deltaDegree[0]) < gotoPrecision[0] || axis1AtTarget;
-                axis2AtTarget = Math.Abs(deltaDegree[1]) < gotoPrecision[1] || axis2AtTarget;
-                if (axis1AtTarget && axis2AtTarget) { break; }
-
-                if (!axis1AtTarget)
-                {
-                    // skyTarget[0] += trackingRate.X * loopTime;
-                    // Convert az to plus / minus slew - AltAzAlignment mode only
-                    skyTarget[0] = ConvertToAzEastWest(skyTarget[0]);// no 0.1*deltaDegree[0]
-                    object _ = new SkyAxisGoToTarget(0, AxisId.Axis1, skyTarget[0]); //move to target RA / Az
-                }
-                var axis1Done = axis1AtTarget;
-                while (loopTimer.Elapsed.TotalMilliseconds < 3000)
-                {
-                    if (SlewState == SlewType.SlewNone) { break; }
-
-                    Thread.Sleep(30);
-
-                    if (!axis1Done)
+                    // convert target to axis for Ra / Dec slew and calculate tracking rates
+                    if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
                     {
-                        var status1 = new SkyIsAxisFullStop(SkyQueue.NewId, AxisId.Axis1);
-                        axis1Done = Convert.ToBoolean(SkyQueue.GetCommandResult(status1).Result);
+                        var nextTime = HiResDateTime.UtcNow.AddMilliseconds(loopTime);
+                        // get predicted RA and Dec at update time
+                        var predictorRaDec = SkyPredictor.GetRaDecAtTime(nextTime);
+                        // convert to internal Ra and Dec
+                        var internalRaDec = Transforms.CoordTypeToInternal(predictorRaDec[0], predictorRaDec[1]);
+                        // get alt az target
+                        skyTarget = Axes.RaDecToAxesXY(new[] { internalRaDec.X, internalRaDec.Y }, GetLocalSiderealTime(nextTime));
+                        skyTarget = GetSyncedAxes(skyTarget);
                     }
-                    if (axis1Done) { break; }
-                }
+                    // Calculate error
+                    var rawPositions = GetRawDegrees();
+                    if (rawPositions == null || double.IsNaN(rawPositions[0]) || double.IsNaN(rawPositions[1])) { break; }
+                    deltaDegree[0] = skyTarget[0] - rawPositions[0];
+                    deltaDegree[1] = skyTarget[1] - rawPositions[1];
 
-                if (!axis2AtTarget)
-                {
-                    object _ = new SkyAxisGoToTarget(0, AxisId.Axis2, skyTarget[1]); //move to target Dec / Alt // no 0.1*deltaDegree[0]
-                }
-                var axis2Done = axis2AtTarget;
-                while (loopTimer.Elapsed.TotalMilliseconds < 3000)
-                {
-                    if (SlewState == SlewType.SlewNone) { break; }
+                    axis1AtTarget = Math.Abs(deltaDegree[0]) < gotoPrecision[0] || axis1AtTarget;
+                    axis2AtTarget = Math.Abs(deltaDegree[1]) < gotoPrecision[1] || axis2AtTarget;
+                    if (axis1AtTarget && axis2AtTarget) { break; }
 
-                    Thread.Sleep(30);
-                    if (!axis2Done)
+                    if (!axis1AtTarget)
                     {
-                        var status2 = new SkyIsAxisFullStop(SkyQueue.NewId, AxisId.Axis2);
-                        axis2Done = Convert.ToBoolean(SkyQueue.GetCommandResult(status2).Result);
+                        // skyTarget[0] += trackingRate.X * loopTime;
+                        // Convert az to plus / minus slew - AltAzAlignment mode only
+                        skyTarget[0] = ConvertToAzEastWest(skyTarget[0]);// no 0.1*deltaDegree[0]
+                        token.ThrowIfCancellationRequested();
+                        object _ = new SkyAxisGoToTarget(0, AxisId.Axis1, skyTarget[0]); //move to target RA / Az
                     }
-                    if (axis2Done) { break; }
+                    var axis1Done = axis1AtTarget;
+                    while (loopTimer.Elapsed.TotalMilliseconds < 3000)
+                    {
+                        if (SlewState == SlewType.SlewNone) { break; }
+
+                        Thread.Sleep(30);
+                        token.ThrowIfCancellationRequested();
+
+                        if (!axis1Done)
+                        {
+                            var status1 = new SkyIsAxisFullStop(SkyQueue.NewId, AxisId.Axis1);
+                            axis1Done = Convert.ToBoolean(SkyQueue.GetCommandResult(status1).Result);
+                        }
+                        if (axis1Done) { break; }
+                    }
+
+                    if (!axis2AtTarget)
+                    {
+                        token.ThrowIfCancellationRequested();
+                        object _ = new SkyAxisGoToTarget(0, AxisId.Axis2, skyTarget[1]); //move to target Dec / Alt // no 0.1*deltaDegree[0]
+                    }
+                    var axis2Done = axis2AtTarget;
+                    while (loopTimer.Elapsed.TotalMilliseconds < 3000)
+                    {
+                        if (SlewState == SlewType.SlewNone) { break; }
+
+                        Thread.Sleep(30);
+                        token.ThrowIfCancellationRequested();
+
+                        if (!axis2Done)
+                        {
+                            var status2 = new SkyIsAxisFullStop(SkyQueue.NewId, AxisId.Axis2);
+                            axis2Done = Convert.ToBoolean(SkyQueue.GetCommandResult(status2).Result);
+                        }
+                        if (axis2Done) { break; }
+                    }
+                    loopTimer.Stop();
+                    loopTime = loopTimer.ElapsedMilliseconds;
                 }
-                loopTimer.Stop();
-                loopTime = loopTimer.ElapsedMilliseconds;
             }
-            // pulse movement finished so resume tracking
-            SetTracking();
-            // wait for pulse duration so completion variable IsPulseGuiding remains true 
-            var waitTime = (int)(pulseStartTime.AddMilliseconds(duration) - HiResDateTime.UtcNow).TotalMilliseconds;
-            if (waitTime > 0)
+            catch (OperationCanceledException)
             {
-                var stopwatch = Stopwatch.StartNew();
-                while (stopwatch.Elapsed.TotalMilliseconds < waitTime)
-                {
-                    if (stopwatch.ElapsedMilliseconds % 200 == 0) { UpdateSteps(); } // Process positions while waiting
-                }
             }
         }
 
@@ -2726,13 +2745,12 @@ namespace GS.Server.SkyTelescope
             MonitorLog.LogToMonitor(monitorItem);
 
             //IsSlewing = false;
-            _ctsGoTo?.Cancel();
+            var tracking = Tracking || SlewState == SlewType.SlewRaDec;
+            Tracking = false; //added back in for spec "Tracking is returned to its pre-slew state"
+            CancelAllAsync();
             _rateMoveAxes = new Vector(0, 0);
             _rateRaDec = new Vector(0, 0);
             SlewState = SlewType.SlewNone;
-            var tracking = Tracking;
-            Tracking = false; //added back in for spec "Tracking is returned to its pre-slew state"
-            if (_ctsGoTo != null) Thread.Sleep(100); // wait for any pending GoTo operations to wake up and cancel
 
             switch (SkySettings.Mount)
             {
@@ -2745,12 +2763,22 @@ namespace GS.Server.SkyTelescope
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            if (SkySettings.AlignmentMode == AlignmentModes.algAltAz) 
+            if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
             {
+                AxesStopValidate();
+                // wait for the movment to stop - physical overrun
+                var trackingRate = SkyGetRate();
+                AxesRateOfChange.Reset();
+                do
+                {
+                    // Update mount velocity
+                    MountPositionUpdated = false;
+                    UpdateSteps();
+                    while (!MountPositionUpdated) Thread.Sleep(50);
+                    AxesRateOfChange.Update(_actualAxisX, _actualAxisY, HiResDateTime.UtcNow);
+                } while (AxesRateOfChange.AxisVelocity.Length > 0);
                 SkyPredictor.Set(RightAscensionXForm, DeclinationXForm);
             }
-            _ctsGoTo?.Dispose();
-            _ctsGoTo = null;
             TrackingSpeak = false;
             Tracking = tracking;
             TrackingSpeak = true;
@@ -2774,7 +2802,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = "AutoHomeAsync",
+                    Method = MonitorLog.GetCurrentMethod(),
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = "Started"
                 };
@@ -2869,7 +2897,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Information,
-                    Method = "AutoHomeAsync",
+                    Method = MonitorLog.GetCurrentMethod(),
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"Complete: {returncode1}|{returncode2}"
                 };
@@ -2905,7 +2933,7 @@ namespace GS.Server.SkyTelescope
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
-                    Method = "AutoHomeAsync",
+                    Method = MonitorLog.GetCurrentMethod(),
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}|{ex.StackTrace}"
                 };
@@ -3333,7 +3361,7 @@ namespace GS.Server.SkyTelescope
         {
             if (silence) { TrackingSpeak = false; }
 
-            Tracking = false;
+            // Tracking = false;
             Tracking = true;
 
             if (silence) { TrackingSpeak = true; }
@@ -3344,8 +3372,20 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         private static void AltAzTrackingTimerEvent(object sender, EventArgs e)
         {
-            // start tracking again with updated rates
-            SetTracking();
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Debug,
+                Method = MonitorLog.GetCurrentMethod(),
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"TimerID|{_altAzTrackingTimer?.TimerID}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+            // handle timer race condition triggering handler after AltAzTimer has been stopped
+            if(AltAzTimerIsRunning) 
+                SetTracking();
         }
 
         /// <summary>
@@ -3353,9 +3393,26 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         private static void StopAltAzTrackingTimer()
         {
-            if (_altAzTrackingTimer.IsRunning)
+            var monitorItem = new MonitorEntry
             {
-                _altAzTrackingTimer.Stop();
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MonitorLog.GetCurrentMethod(),
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"TimerID|{_altAzTrackingTimer?.TimerID}|Running|{_altAzTrackingTimer?.IsRunning}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+            if (_altAzTrackingTimer != null)
+            {
+                _altAzTrackingTimer.Tick -= AltAzTrackingTimerEvent;
+                if (_altAzTrackingTimer.IsRunning)
+                {
+                    _altAzTrackingTimer.Stop();
+                }
+                _altAzTrackingTimer.Dispose();
+                _altAzTrackingTimer = null;
             }
         }
 
@@ -3364,16 +3421,28 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         private static void StartAltAzTrackingTimer()
         {
-            if (!_altAzTrackingTimer.IsRunning)
+            var timerID = _altAzTrackingTimer?.TimerID;
+            _altAzTrackingTimer = new MediaTimer();
+            _altAzTrackingTimer.Period = SkySettings.AltAzTrackingUpdateInterval;
+            _altAzTrackingTimer.Tick += AltAzTrackingTimerEvent;
+            _altAzTrackingTimer.Start();
+            var monitorItem = new MonitorEntry
             {
-                _altAzTrackingTimer.Start();
-            }
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MonitorLog.GetCurrentMethod(),
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"TimerID on entry|{timerID}|TimerID|{_altAzTrackingTimer?.TimerID}|Running|{_altAzTrackingTimer?.IsRunning}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
         }
 
         /// <summary>
         /// Alt Az timer is running property
         /// </summary>
-        private static bool AltAzTimerIsRunning { get => _altAzTrackingTimer.IsRunning; }
+        private static bool AltAzTimerIsRunning { get => _altAzTrackingTimer?.IsRunning == true; }
 
         //private static double[] _lastAltAzTarget = new[] { double.NaN, double.NaN, };
 
@@ -3400,24 +3469,23 @@ namespace GS.Server.SkyTelescope
                         var skyTarget = Axes.RaDecToAxesXY(new[] { internalRaDec.X, internalRaDec.Y }, GetLocalSiderealTime(nextTime));
                         skyTarget = GetSyncedAxes(skyTarget);
                         var rawPositions = new[] { ConvertStepsToDegrees(steps[0], 0), ConvertStepsToDegrees(steps[1], 1) };
-                        //_lastAltAzTarget = skyTarget;
                         delta[0] = Range.Range180((skyTarget[0] - rawPositions[0]));
                         delta[1] = Range.Range180((skyTarget[1] - rawPositions[1]));
                         const double milliSecond = 0.001;
                         SkyTrackingRate.X = delta[0] / (SkySettings.AltAzTrackingUpdateInterval * milliSecond);
                         SkyTrackingRate.Y = delta[1] / (SkySettings.AltAzTrackingUpdateInterval * milliSecond);
-                    }
-                    var monitorItem = new MonitorEntry
-                    {
-                        Datetime = HiResDateTime.UtcNow,
-                        Device = MonitorDevice.Server,
-                        Category = MonitorCategory.Server,
+                        var monitorItem = new MonitorEntry
+                        {
+                            Datetime = HiResDateTime.UtcNow,
+                            Device = MonitorDevice.Server,
+                            Category = MonitorCategory.Server,
                         Type = MonitorType.Data,
-                        Method = MethodBase.GetCurrentMethod()?.Name,
-                        Thread = Thread.CurrentThread.ManagedThreadId,
-                        Message = $"Ra:{TargetRa}|Dec:{TargetDec}|Azimuth delta:{delta[0]}|Altitude delta:{delta[1]}"
-                    };
-                    MonitorLog.LogToMonitor(monitorItem);
+                            Method = MethodBase.GetCurrentMethod()?.Name,
+                            Thread = Thread.CurrentThread.ManagedThreadId,
+                            Message = $"Ra:{internalRaDec.X}|Dec:{internalRaDec.Y}|Azimuth delta:{delta[0]}|Altitude delta:{delta[1]}"
+                        };
+                        MonitorLog.LogToMonitor(monitorItem);
+                    }
                     break;
                 case AltAzTrackingType.Rate:
                     SkyTrackingRate = ConvertRateToAltAz(CurrentTrackingRate(), 0.0, DeclinationXForm);
@@ -3428,10 +3496,26 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Calculates the current RA tracking rate used in arc seconds per second
+        /// Cancel all currently executing async operations
         /// </summary>
-        /// <returns></returns>
-        public static double CurrentTrackingRate()
+        public static void CancelAllAsync()
+        {
+            if (_ctsGoTo != null || _ctsPulseGuideDec != null || _ctsPulseGuideRa != null)
+            {
+                _ctsGoTo?.Cancel();
+                _ctsPulseGuideDec?.Cancel();
+                _ctsPulseGuideRa?.Cancel();
+                var sw = Stopwatch.StartNew();
+                while (_ctsGoTo != null &&_ctsPulseGuideDec != null && _ctsPulseGuideRa != null && sw.ElapsedMilliseconds< 2000)
+                    Thread.Sleep(200); // wait for any pending pulse guide operations to wake up and cancel
+            }
+        }
+
+/// <summary>
+/// Calculates the current RA tracking rate used in arc seconds per second
+/// </summary>
+/// <returns></returns>
+public static double CurrentTrackingRate()
         {
             double rate;
             switch (SkySettings.TrackingRate)
@@ -3966,28 +4050,32 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         /// <param name="target"></param>
         /// <param name="slewState"></param>
-        private static async void GoToAsync(double[] target, SlewType slewState)
+        private static async void GoToAsync(double[] target, SlewType slewState, bool tracking = false)
         {
-            if (!IsMountRunning) { return; }
-            if (_ctsGoTo != null)
+            bool cancelled = false;
+            Stopwatch sw;
+            MonitorEntry monitorItem;
+            if (!IsMountRunning)
             {
-                _ctsGoTo?.Cancel();
-                Thread.Sleep(100); // wait for any pending GoTo operations to wake up and cancel
+                return;
             }
+
+            CancelAllAsync();
+            while (_ctsGoTo != null) Thread.Sleep(10);
             if (IsSlewing)
             {
-                //SlewState = SlewType.SlewNone; removed for Park issue and so state will remain the same
+                SlewState = SlewType.SlewNone;
                 var stopped = AxesStopValidate();
                 if (!stopped)
                 {
                     AbortSlew(true);
-                    var monitorItem = new MonitorEntry
+                    monitorItem = new MonitorEntry
                     {
                         Datetime = HiResDateTime.UtcNow,
                         Device = MonitorDevice.Server,
                         Category = MonitorCategory.Server,
                         Type = MonitorType.Warning,
-                        Method = "GoToAsync",
+                        Method = MonitorLog.GetCurrentMethod(),
                         Thread = Thread.CurrentThread.ManagedThreadId,
                         Message = "Timeout stopping axes"
                     };
@@ -3998,7 +4086,8 @@ namespace GS.Server.SkyTelescope
 
             SlewState = slewState;
             var startingState = slewState;
-            var trackingState = Tracking;
+            // Planetarium fix to set Tracking for non-ASCOM compliant programs - set true by GoToCoordinatesAsync()
+            var trackingState = tracking ? tracking : Tracking;
             TrackingSpeak = false;
             Tracking = false;
             if (slewState == SlewType.SlewRaDec)
@@ -4007,6 +4096,7 @@ namespace GS.Server.SkyTelescope
             }
             IsSlewing = true;
 
+            // Assume fail
             var returncode = 1;
             try
             {
@@ -4022,104 +4112,163 @@ namespace GS.Server.SkyTelescope
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+
+                TrackingSpeak = false;
+
+                if (returncode == 0)
+                {
+                    if (SlewState == SlewType.SlewNone)
+                    {
+                        Tracking = trackingState;
+                        TrackingSpeak = true;
+                        return;
+                    }
+
+                    switch (startingState)
+                    {
+                        case SlewType.SlewNone:
+                            break;
+                        case SlewType.SlewSettle:
+                            break;
+                        case SlewType.SlewMoveAxis:
+                            break;
+                        case SlewType.SlewRaDec:
+                            if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
+                            {
+                                // update TargetRa and TargetDec after slewing with offset rates as per ASCOM spec
+                                if (SkyPredictor.RatesSet)
+                                {
+                                    var targetRaDec = SkyPredictor.GetRaDecAtTime(HiResDateTime.UtcNow);
+                                    TargetRa = targetRaDec[0];
+                                    TargetDec = targetRaDec[1];
+                                }
+
+                                // use tracking to complete slew for Alt Az mounts
+                                SkyPredictor.Set(TargetRa, TargetDec);
+                                _tracking = true;
+                                _trackingMode = TrackingMode.AltAz;
+                                SetTracking();
+                                sw = Stopwatch.StartNew();
+                                // wait before completing async slew
+                                while (sw.ElapsedMilliseconds < 4 * SkySettings.AltAzTrackingUpdateInterval)
+                                {
+                                    if (_ctsGoTo?.IsCancellationRequested == true)
+                                    {
+                                        // Stop current Alt Az tracking timed action
+                                        StopAltAzTrackingTimer();
+                                        // Prevent re-enabling by this thread
+                                        trackingState = false;
+                                        // Stop tracking motion 
+                                        StopAxes();
+                                        break;
+                                    }
+                                    else
+                                        Thread.Sleep(100);
+                                }
+                            }
+
+                            break;
+                        case SlewType.SlewAltAz:
+                            break;
+                        case SlewType.SlewPark:
+                            trackingState = false;
+                            AtPark = true;
+                            SkyPredictor.Reset();
+                            break;
+                        case SlewType.SlewHome:
+                            trackingState = false;
+                            SkyPredictor.Reset();
+                            break;
+                        case SlewType.SlewHandpad:
+                            // ensure tracking if enabled has the correct target
+                            SkyPredictor.Set(RightAscensionXForm, DeclinationXForm);
+                            break;
+                        case SlewType.SlewComplete:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+
+                    monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Server,
+                        Category = MonitorCategory.Server,
+                        Type = MonitorType.Information,
+                        Method = MonitorLog.GetCurrentMethod(),
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message =
+                            $"{SlewState} finished|code|{returncode}|{_util.HoursToHMS(RightAscensionXForm, "h ", ":", "", 2)}|{_util.DegreesToDMS(DeclinationXForm, "° ", ":", "", 2)}|Actual|{ActualAxisX}|{ActualAxisY}"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
+                    SlewState = SlewType.SlewNone;
+                    SpeakSlewEnd(startingState);
+                    Tracking = trackingState;
+                    TrackingSpeak = true;
+                }
+                else
+                {
+                    // Handle can't slew    
+                    monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Server,
+                        Category = MonitorCategory.Server,
+                        Type = MonitorType.Warning,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = "GoTo coordinates outside axes limits"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
+                    SlewState = SlewType.SlewNone;
+                    SpeakSlewEnd(startingState);
+                    Tracking = false;
+                    TrackingSpeak = true;
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                SlewState = SlewType.SlewNone;
-                StopAxes();
-                var monitorItem = new MonitorEntry
+                // OperationCanceledException thrown by SimGoTo or SkyGoTo
+                // AggregateException with base OperationCanceledException thrown by PrecisionGoTo
+                cancelled = ex is OperationCanceledException || ex.GetBaseException() is OperationCanceledException;
+                monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Warning,
-                    Method = "GoToAsync",
+                    Method = MonitorLog.GetCurrentMethod(),
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = "GoTo failed, axes stopped"
+                    Message = cancelled ? "GoTo cancelled by command" : "GoTo failed, axes stopped"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-            }
-            TrackingSpeak = false;
-
-            if (returncode == 0)
-            {
-                _ctsGoTo?.Dispose();
-                _ctsGoTo = null;
-                if (SlewState == SlewType.SlewNone)
+                // Reset rates and axis movement
+                _rateMoveAxes = new Vector(0, 0);
+                _rateRaDec = new Vector(0, 0);
+                // Stop axes
+                switch (SkySettings.Mount)
                 {
-                    Tracking = trackingState;
-                    TrackingSpeak = true;
-                    return;
-                }
-                switch (startingState)
-                {
-                    case SlewType.SlewNone:
+                    case MountType.Simulator:
+                        SimTasks(MountTaskName.StopAxes);
                         break;
-                    case SlewType.SlewSettle:
-                        break;
-                    case SlewType.SlewMoveAxis:
-                        break;
-                    case SlewType.SlewRaDec:
-                        if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
-                        {
-                            // update TargetRa and TargetDec after slewing with offset rates as per ASCOM spec
-                            if (SkyPredictor.RatesSet)
-                            {
-                                var targetRaDec = SkyPredictor.GetRaDecAtTime(HiResDateTime.UtcNow);
-                                TargetRa = targetRaDec[0];
-                                TargetDec = targetRaDec[1];
-                            }
-                            // use tracking to complete slew for Alt Az mounts
-                            SkyPredictor.Set(TargetRa, TargetDec);
-                            _tracking = true;
-                            _trackingMode = TrackingMode.AltAz;
-                            SetTracking();
-                            // wait before completing async slew
-                            Thread.Sleep(2 * SkySettings.AltAzTrackingUpdateInterval);
-                        }
-                        break;
-                    case SlewType.SlewAltAz:
-                        break;
-                    case SlewType.SlewPark:
-                        trackingState = false;
-                        AtPark = true;
-                        SkyPredictor.Reset();
-                        break;
-                    case SlewType.SlewHome:
-                        trackingState = false;
-                        SkyPredictor.Reset();
-                        break;
-                    case SlewType.SlewHandpad:
-                        // ensure tracking if enabled has the correct target
-                        SkyPredictor.Set(RightAscensionXForm, DeclinationXForm);
-                        break;
-                    case SlewType.SlewComplete:
+                    case MountType.SkyWatcher:
+                        SkyTasks(MountTaskName.StopAxes);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
 
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
-                    Category = MonitorCategory.Server,
-                    Type = MonitorType.Information,
-                    Method = "GoToAsync",
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{SlewState} finished|code|{returncode}|{_util.HoursToHMS(RightAscensionXForm, "h ", ":", "", 2)}|{_util.DegreesToDMS(DeclinationXForm, "° ", ":", "", 2)}|Actual|{ActualAxisX}|{ActualAxisY}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
                 SlewState = SlewType.SlewNone;
-                SpeakSlewEnd(startingState);
                 Tracking = trackingState;
-                TrackingSpeak = true;
-
-                return;
+                // Some unknown exception
+                if (!cancelled)
+                    MountError = new Exception($"GoTo Async Error|{ex.Message}");
             }
-            Tracking = trackingState;
-            AbortSlew(true);
-            MountError = new Exception($"GoTo Async Error|{returncode}");
+            finally
+            {
+                _ctsGoTo?.Dispose();
+                _ctsGoTo = null;
+            }
         }
 
         /// <summary>
@@ -4128,7 +4277,7 @@ namespace GS.Server.SkyTelescope
         public static void GoToHome()
         {
             Tracking = false;
-            StopAxes(false);
+            StopAxes();
 
             var monitorItem = new MonitorEntry
             {
@@ -4150,7 +4299,7 @@ namespace GS.Server.SkyTelescope
         public static void GoToPark()
         {
             Tracking = false;
-            StopAxes(false);
+            StopAxes();
 
             // get position selected could be set from UI or AsCom
             var ps = ParkSelected;
@@ -4495,7 +4644,8 @@ namespace GS.Server.SkyTelescope
                     {
                         Direction = direction,
                         StartDate = HiResDateTime.UtcNow,
-                        Delta = change[1]
+                        Delta = change[1],
+                        StepStart = GetRawSteps(1),
                     };
                     break;
                 case SlewDirection.SlewEast:
@@ -4520,8 +4670,8 @@ namespace GS.Server.SkyTelescope
             // For Alt / Az mode swap to alt / az rate tracking whilst slewing
             if ((altAzModeSet) && (change[0] != 0.0 || change[1] != 0.0) && Tracking)
             {
-                SetAltAzTrackingRates(AltAzTrackingType.Rate);
                 if (AltAzTimerIsRunning) _altAzTrackingTimer.Stop();
+                SetAltAzTrackingRates(AltAzTrackingType.Rate);
             }
 
             // Send to mount
@@ -4625,32 +4775,38 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
             // start alt / az predictive tracking again if on before hc move
-            if (altAzModeSet)
+            if (altAzModeSet && (change[0] == 0.0) && (change[1] == 0.0) && Tracking)
                 // execute on new thread to allow responsive UI updates and ASCOM transactions
                 Task.Run(() =>
                     {
-                        if ((change[0] == 0.0) && (change[1] == 0.0) && Tracking)
+                        // wait for the movment to stop
+                        var trackingRate = SkyGetRate();
+                        AxesRateOfChange.Reset();
+                        do
                         {
-                            // Wait for mount to slow down to tracking slew rate - waiting for stop doesn't work!
-                            var trackingRate = SkyGetRate();
-                            while ((AxesRateOfChange.AxisVelocity - trackingRate).Length > 2.0 * CurrentTrackingRate())
-                            {
-                                Thread.Sleep(SkySettings.DisplayInterval/2);
-                            }
-                            SkyPredictor.Set(RightAscensionXForm, DeclinationXForm, 0, 0);
-                            SetTracking();
-                            monitorItem = new MonitorEntry
-                            {
-                                Datetime = HiResDateTime.UtcNow,
-                                Device = MonitorDevice.Server,
-                                Category = MonitorCategory.Server,
-                                Type = MonitorType.Information,
-                                Method = MethodBase.GetCurrentMethod()?.Name,
-                                Thread = Thread.CurrentThread.ManagedThreadId,
-                                Message = $"|RaDec SlewNone tracking|{RightAscensionXForm}|{DeclinationXForm}"
-                            };
-                            MonitorLog.LogToMonitor(monitorItem);
-                        }
+                            // Update mount velocity
+                            UpdateSteps();
+                            while (!MountPositionUpdated) Thread.Sleep(50);
+                            AxesRateOfChange.Update(_actualAxisX, _actualAxisY, HiResDateTime.UtcNow);
+                        } while ((AxesRateOfChange.AxisVelocity - trackingRate).Length > 1.1 * CurrentTrackingRate());
+                        // resume tracking
+                        // Update mount position
+                        MountPositionUpdated = false;
+                        UpdateSteps();
+                        while (!MountPositionUpdated) Thread.Sleep(50);
+                        SkyPredictor.Set(RightAscensionXForm, DeclinationXForm, 0, 0);
+                        SetTracking();
+                        monitorItem = new MonitorEntry
+                        {
+                            Datetime = HiResDateTime.UtcNow,
+                            Device = MonitorDevice.Server,
+                            Category = MonitorCategory.Server,
+                            Type = MonitorType.Information,
+                            Method = MethodBase.GetCurrentMethod()?.Name,
+                            Thread = Thread.CurrentThread.ManagedThreadId,
+                            Message = $"|RaDec SlewNone tracking|{RightAscensionXForm}|{DeclinationXForm}"
+                        };
+                        MonitorLog.LogToMonitor(monitorItem);
                     }
                 );
         }
@@ -4960,7 +5116,7 @@ namespace GS.Server.SkyTelescope
                 _mediaTimer.Start();
 
                 // Event to update AltAz tracking rate
-                _altAzTrackingTimer = new MediaTimer { Period = SkySettings.AltAzTrackingUpdateInterval, Resolution = 25 };
+                _altAzTrackingTimer = new MediaTimer { Period = SkySettings.AltAzTrackingUpdateInterval, Resolution = 5 };
                 _altAzTrackingTimer.Tick += AltAzTrackingTimerEvent;
             }
             else
@@ -4978,6 +5134,8 @@ namespace GS.Server.SkyTelescope
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{SkySettings.Mount}" };
             MonitorLog.LogToMonitor(monitorItem);
 
+            // Stop all asynchronous operations
+            CancelAllAsync();
             AxesStopValidate();
             if (_mediaTimer != null) { _mediaTimer.Tick -= UpdateServerEvent; }
             _mediaTimer?.Stop();
@@ -4994,6 +5152,92 @@ namespace GS.Server.SkyTelescope
             if (!SkyQueue.IsRunning) return;
             SkyQueue.Stop();
             SkySystem.ConnectSerial = false;
+        }
+
+        /// <summary>
+        /// Execute single axis pulse guide for AltAz using predictor
+        /// </summary>
+        /// <param name="axis"></param>
+        /// <param name="guideRate"></param>
+        /// <param name="duration"></param>
+        /// <param name="pulseGoTo"></param>
+        /// <param name="token"></param>
+        private static void PulseGuideAltAz(int axis, double guideRate, int duration, Action<CancellationToken> pulseGoTo, CancellationToken token)
+        {
+            Task.Run(() =>
+            {
+                var pulseStartTime = HiResDateTime.UtcNow;
+                StopAltAzTrackingTimer();
+                // set predictor Ra and Dec ready for pulse go to action
+                switch (axis)
+                {
+                    case 0:
+                        SkyPredictor.Set(SkyPredictor.Ra - duration * 0.001 * guideRate / _siderealRate, SkyPredictor.Dec);
+                        break;
+                    case 1:
+                        SkyPredictor.Set(SkyPredictor.Ra, SkyPredictor.Dec + duration * guideRate * 0.001);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
+                }
+                // setup to log and graph the pulse
+                var pulseEntry = new PulseEntry();
+                if (MonitorPulse)
+                {
+                    pulseEntry.Axis = axis;
+                    pulseEntry.Duration = duration;
+                    pulseEntry.Rate = guideRate;
+                    pulseEntry.StartTime = pulseStartTime;
+                }
+                // execute pulse
+                pulseGoTo(token);
+                // pulse movement finished or cancelled so resume tracking
+                SetTracking();
+                // wait for pulse duration so completion variable IsPulseGuiding remains true 
+                var waitTime = (int)(pulseStartTime.AddMilliseconds(duration) - HiResDateTime.UtcNow).TotalMilliseconds;
+                if (waitTime > 0)
+                {
+                    var stopwatch = Stopwatch.StartNew();
+                    while (stopwatch.Elapsed.TotalMilliseconds < waitTime && !token.IsCancellationRequested)
+                    {
+                        if (stopwatch.ElapsedMilliseconds % 200 == 0)
+                        {
+                            UpdateSteps();
+                        } // Process positions while waiting
+                    }
+                }
+                // log and graph pulse
+                if (MonitorPulse)
+                {
+                    MonitorLog.LogToMonitor(pulseEntry);
+                }
+                if (token.IsCancellationRequested)
+                {
+                    var monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Server,
+                        Category = MonitorCategory.Server,
+                        Type = MonitorType.Warning,
+                        Method = MonitorLog.GetCurrentMethod(),
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"Axis|{axis}|Async operation cancelled"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
+                }
+                // set pulse guiding status
+                switch (axis)
+                {
+                    case 0:
+                        IsPulseGuidingRa = false;
+                        break;
+                    case 1:
+                        IsPulseGuidingDec = false;
+                        break;
+                    default:
+                        break;
+                }
+            });
         }
 
         /// <summary>
@@ -5042,80 +5286,32 @@ namespace GS.Server.SkyTelescope
                     var decbacklashamount = 0;
                     if (direction != LastDecDirection) decbacklashamount = SkySettings.DecBacklash;
                     LastDecDirection = direction;
+                    _ctsPulseGuideDec = new CancellationTokenSource();
 
                     switch (SkySettings.Mount)
                     {
                         case MountType.Simulator:
                             if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
-                                Task.Run(() =>
-                                {
-                                    StopAltAzTrackingTimer();
-                                    // get predictor current Ra and Dec
-                                var raDec = new[] { RightAscensionXForm, DeclinationXForm };
-                                    // set predictor Ra and Dec ready for tracking
-                                    SkyPredictor.Set(SkyPredictor.Ra, SkyPredictor.Dec + duration * decGuideRate * 0.001);
-                                    // setup to log and graph the pulse
-                                    var pulseEntry = new PulseEntry();
-                                    if (MonitorPulse)
-                                    {
-                                        pulseEntry.Axis = (int)Axis.Axis2;
-                                        pulseEntry.Duration = duration;
-                                        pulseEntry.Rate = decGuideRate;
-                                        pulseEntry.StartTime = HiResDateTime.UtcNow;
-                                    }
-                                    // execute pulse
-                                    SimPulseGoto(duration);
-                                    IsPulseGuidingDec = false;
-                                    // log and graph pulse
-                                    if (MonitorPulse)
-                                    {
-                                        MonitorLog.LogToMonitor(pulseEntry);
-                                    }
-
-                                }
-                            );
+                            {
+                                PulseGuideAltAz((int)Axis.Axis2, decGuideRate, duration, SimPulseGoto, _ctsPulseGuideDec.Token);
+                            }
                             else
                             {
                                 if (!SouthernHemisphere)
                                 {
                                     decGuideRate = decGuideRate > 0 ? -Math.Abs(decGuideRate) : Math.Abs(decGuideRate);
                                 }
-                                _ = new CmdAxisPulse(0, Axis.Axis2, decGuideRate, duration);
+                                _ = new CmdAxisPulse(0, Axis.Axis2, decGuideRate, duration, _ctsPulseGuideDec.Token);
                             }
                             break;
                         case MountType.SkyWatcher:
                             if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
-                                Task.Run(() =>
-                                    {
-                                        {
-                                            StopAltAzTrackingTimer();
-                                            // get predictor current Ra and Dec
-                                            // set predictor Ra and Dec ready for tracking
-                                            SkyPredictor.Set(SkyPredictor.Ra, SkyPredictor.Dec + duration * decGuideRate * 0.001);
-                                            // SkyPredictor.Set(raDec[0], raDec[1] + duration * decGuideRate * 0.001);
-                                            // setup to log and graph the pulse
-                                            var pulseEntry = new PulseEntry();
-                                            if (MonitorPulse)
-                                            {
-                                                pulseEntry.Axis = (int)AxisId.Axis2;
-                                                pulseEntry.Duration = duration;
-                                                pulseEntry.Rate = decGuideRate;
-                                                pulseEntry.StartTime = HiResDateTime.UtcNow;
-                                            }
-                                            // execute pulse
-                                            SkyPulseGoto(duration);
-                                            IsPulseGuidingDec = false;
-                                            // log and graph pulse
-                                            if (MonitorPulse)
-                                            {
-                                                MonitorLog.LogToMonitor(pulseEntry);
-                                            }
-                                        }
-                                    }
-                                );
+                            {
+                                PulseGuideAltAz((int)AxisId.Axis2, decGuideRate, duration, SkyPulseGoto, _ctsPulseGuideDec.Token);
+                            }
                             else
                             {
-                                _ = new SkyAxisPulse(0, AxisId.Axis2, decGuideRate, duration, decbacklashamount);
+                                _ = new SkyAxisPulse(0, AxisId.Axis2, decGuideRate, duration, decbacklashamount, _ctsPulseGuideDec.Token);
                             }
 
                             break;
@@ -5149,71 +5345,28 @@ namespace GS.Server.SkyTelescope
                         if (direction == GuideDirections.guideEast) { raGuideRate = -raGuideRate; }
                     }
 
+                    _ctsPulseGuideRa = new CancellationTokenSource();
                     switch (SkySettings.Mount)
                     {
                         case MountType.Simulator:
                             if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
-                                Task.Run(() =>
-                                {
-                                    StopAltAzTrackingTimer();
-                                    // get predictor current Ra and Dec
-                                    // set predictor Ra and Dec ready for tracking
-                                    SkyPredictor.Set(SkyPredictor.Ra - duration * 0.001 * raGuideRate / _siderealRate, SkyPredictor.Dec);
-                                    // setup to log and graph the pulse
-                                    var pulseEntry = new PulseEntry();
-                                    if (MonitorPulse)
-                                    {
-                                        pulseEntry.Axis = (int)Axis.Axis1;
-                                        pulseEntry.Duration = duration;
-                                        pulseEntry.Rate = raGuideRate;
-                                        pulseEntry.StartTime = HiResDateTime.UtcNow;
-                                    }
-                                    // execute pulse
-                                    SimPulseGoto(duration);
-                                    IsPulseGuidingRa = false;
-                                    // log and graph pulse
-                                    if (MonitorPulse)
-                                    {
-                                        MonitorLog.LogToMonitor(pulseEntry);
-                                    }
-                                }
-                            );
+                            {
+                                PulseGuideAltAz((int)Axis.Axis1, raGuideRate, duration, SimPulseGoto, _ctsPulseGuideRa.Token);
+                            }
                             else
                             {
-                                _ = new CmdAxisPulse(0, Axis.Axis1, raGuideRate, duration);
+                                _ = new CmdAxisPulse(0, Axis.Axis1, raGuideRate, duration, _ctsPulseGuideRa.Token);
                             }
 
                             break;
                         case MountType.SkyWatcher:
                             if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
-                                Task.Run(() =>
-                                    {
-                                        StopAltAzTrackingTimer();
-                                        // get predictor current Ra and Dec
-                                        // set predictor Ra and Dec ready for tracking
-                                        SkyPredictor.Set(SkyPredictor.Ra - duration * 0.001 * raGuideRate / _siderealRate, SkyPredictor.Dec);
-                                        // setup to log and graph the pulse
-                                        var pulseEntry = new PulseEntry();
-                                        if (MonitorPulse)
-                                        {
-                                            pulseEntry.Axis = (int)AxisId.Axis1;
-                                            pulseEntry.Duration = duration;
-                                            pulseEntry.Rate = raGuideRate;
-                                            pulseEntry.StartTime = HiResDateTime.UtcNow;
-                                        }
-                                        // execute pulse
-                                        SkyPulseGoto(duration);
-                                        // log and graph pulse
-                                        IsPulseGuidingRa = false;
-                                        if (MonitorPulse)
-                                        {
-                                            MonitorLog.LogToMonitor(pulseEntry);
-                                        }
-                                    }
-                                );
+                            {
+                                PulseGuideAltAz((int)AxisId.Axis1, raGuideRate, duration, SkyPulseGoto, _ctsPulseGuideRa.Token);
+                            }
                             else
                             {
-                                _ = new SkyAxisPulse(0, AxisId.Axis1, raGuideRate, duration);
+                                _ = new SkyAxisPulse(0, AxisId.Axis1, raGuideRate, duration, 0, _ctsPulseGuideRa.Token);
                             }
                             break;
                         default:
@@ -5233,7 +5386,6 @@ namespace GS.Server.SkyTelescope
         {
             if (!IsMountRunning) { return; }
             Tracking = false;
-             
             StopAxes();
 
             //set to home position
@@ -5527,12 +5679,12 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         /// <param name="rightAscension"></param>
         /// <param name="declination"></param>
-        public static void SlewRaDec(double rightAscension, double declination)
+        public static void SlewRaDec(double rightAscension, double declination, bool tracking = false)
         {
             //// convert RA/Dec to polar or GEM axis
             //var a = Axes.RaDecToAxesXY(new[] { rightAscension, declination });
             //_targetAxes = (SkySettings.AlignmentMode == AlignmentModes.algAltAz) ? new Vector(rightAscension, declination) : new Vector(a[0], a[1]);
-            SlewMount(new Vector(rightAscension, declination), SlewType.SlewRaDec);
+            SlewMount(new Vector(rightAscension, declination), SlewType.SlewRaDec, tracking);
         }
 
         /// <summary>
@@ -5701,7 +5853,7 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         /// <param name="targetPosition">The position.</param>
         /// <param name="slewState"></param>
-        private static void SlewMount(Vector targetPosition, SlewType slewState)
+        private static void SlewMount(Vector targetPosition, SlewType slewState, bool tracking = false)
         {
             if (!IsMountRunning) { return; }
 
@@ -5723,7 +5875,7 @@ namespace GS.Server.SkyTelescope
             _targetAxes = targetPosition;
             AtPark = false;
             SpeakSlewStart(slewState);
-            GoToAsync(new[] { _targetAxes.X, _targetAxes.Y }, slewState);
+            GoToAsync(new[] { _targetAxes.X, _targetAxes.Y }, slewState, tracking);
         }
 
         /// <summary>
@@ -5747,10 +5899,9 @@ namespace GS.Server.SkyTelescope
             };
             MonitorLog.LogToMonitor(monitorItem);
 
-            _ctsGoTo?.Cancel();
+            CancelAllAsync();
             _rateMoveAxes = new Vector(0, 0);
             _rateRaDec = new Vector(0, 0);
-            if(setSlewState){SlewState = SlewType.SlewNone;} //optional so Slewing isn't to false
 
             if (!AxesStopValidate())
             {
@@ -5767,8 +5918,7 @@ namespace GS.Server.SkyTelescope
                 }
             }
 
-            _ctsGoTo?.Dispose();
-            _ctsGoTo = null;
+            SlewState = SlewType.SlewNone;
             Tracking = false;
             Synthesizer.Speak(Application.Current.Resources["vceStop"].ToString());
         }
@@ -6466,8 +6616,6 @@ namespace GS.Server.SkyTelescope
                 SiderealTime = GetLocalSiderealTime(); // the time is?
 
                 UpdateSteps(); // get step from the mount
-
-                AxesRateOfChange.Update(_actualAxisX, _actualAxisY, HiResDateTime.UtcNow);
 
                 Lha = Coordinate.Ra2Ha12(RightAscensionXForm, SiderealTime);
 

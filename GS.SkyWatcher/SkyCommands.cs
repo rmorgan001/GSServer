@@ -14,6 +14,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using System;
+using System.Threading;
 
 namespace GS.SkyWatcher
 {
@@ -108,15 +109,17 @@ namespace GS.SkyWatcher
         private readonly double _guideRate;
         private readonly int _duration;
         private readonly int _backlashSteps;
+        private readonly CancellationToken _token;
         //private readonly double _declination;
 
-        public SkyAxisPulse(long id, AxisId axis, double guideRate, int duration, int backlashSteps = 0)
+        public SkyAxisPulse(long id, AxisId axis, double guideRate, int duration, int backlashSteps, CancellationToken token)
         {
             Id = id;
             _axis = axis;
             _guideRate = guideRate;
             _duration = duration;
             _backlashSteps = backlashSteps;
+            _token = token;
             //_declination = declination;
             CreatedUtc = Principles.HiResDateTime.UtcNow;
             Successful = false;
@@ -128,7 +131,7 @@ namespace GS.SkyWatcher
         {
             try
             {
-                skyWatcher.AxisPulse(_axis, _guideRate, _duration, _backlashSteps);
+                skyWatcher.AxisPulse(_axis, _guideRate, _duration, _backlashSteps, _token);
                 Successful = true;
             }
             catch (Exception e)
