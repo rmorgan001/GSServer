@@ -128,7 +128,7 @@ namespace GS.SkyWatcher
         {
             var monitorItem = new MonitorEntry // Log the slew
             {
-                Datetime = Principles.HiResDateTime.UtcNow,
+                Datetime = HiResDateTime.UtcNow,
                 Device = MonitorDevice.Telescope,
                 Category = MonitorCategory.Mount,
                 Type = MonitorType.Debug,
@@ -138,7 +138,7 @@ namespace GS.SkyWatcher
             };
             MonitorLog.LogToMonitor(monitorItem);
 
-            rate = Principles.Units.Deg2Rad1(rate);
+            rate = Units.Deg2Rad1(rate);
 
             if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
             {
@@ -251,7 +251,7 @@ namespace GS.SkyWatcher
         {
             Task.Run(() =>
             {
-                var datetime = Principles.HiResDateTime.UtcNow;
+                var datetime = HiResDateTime.UtcNow;
                 var monitorItem = new MonitorEntry // setup to log the pulse
                 { Datetime = datetime, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MonitorLog.GetCurrentMethod(), Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{guideRate}|{duration}|{backlashSteps}|{MinPulseDurationRa}|{MinPulseDurationDec}|{DecPulseGoTo}" };
                 MonitorLog.LogToMonitor(monitorItem);
@@ -313,7 +313,7 @@ namespace GS.SkyWatcher
 
                             pulseEntry.StartTime = _commands.LastI1RunTime; // get the last :I start time
 
-                            var raPulseTime = Principles.HiResDateTime.UtcNow - pulseEntry.StartTime; // possible use for min pulse duration time
+                            var raPulseTime = HiResDateTime.UtcNow - pulseEntry.StartTime; // possible use for min pulse duration time
                             var raSpan = duration - raPulseTime.TotalMilliseconds;
 
                             if (raSpan > 0 && raSpan < duration) // checking duration is met
@@ -390,7 +390,7 @@ namespace GS.SkyWatcher
                                     stepsNeeded = -stepsNeeded;
                                 }
 
-                                pulseEntry.StartTime = Principles.HiResDateTime.UtcNow;
+                                pulseEntry.StartTime = HiResDateTime.UtcNow;
 
                                 // check for cancellation
                                 token.ThrowIfCancellationRequested();
@@ -455,7 +455,7 @@ namespace GS.SkyWatcher
                                 token.ThrowIfCancellationRequested();
                                 AxisSlew(AxisId.Axis2, guideRate); // Send pulse to axis 
                                 pulseEntry.StartTime = _commands.LastJ2RunTime; // last :J2 start time
-                                var decPulseTime = Principles.HiResDateTime.UtcNow - pulseEntry.StartTime; // possible use for min pulse duration time
+                                var decPulseTime = HiResDateTime.UtcNow - pulseEntry.StartTime; // possible use for min pulse duration time
                                 var decSpan = duration - decPulseTime.TotalMilliseconds;
 
                                 if (decSpan > 0 && decSpan < duration) // checking duration is met
@@ -499,7 +499,7 @@ namespace GS.SkyWatcher
                 if (!MonitorPulse) return;
                 pulseEntry.Duration = duration;
                 MonitorLog.LogToMonitor(pulseEntry);//send to monitor
-            });
+            }, token);
         }
 
         /// <summary>
@@ -532,7 +532,7 @@ namespace GS.SkyWatcher
         internal void AxisMoveSteps(AxisId axis, long movingSteps)
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{movingSteps}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{movingSteps}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
@@ -609,7 +609,7 @@ namespace GS.SkyWatcher
         internal void AxisGoToTarget(AxisId axis, double targetPosition) 
         {
             var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{targetPosition}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{targetPosition}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
@@ -617,7 +617,7 @@ namespace GS.SkyWatcher
                 var curPosition = _commands.GetAxisPosition(axis);
                 monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Mount,
                     Type = MonitorType.Information,
@@ -644,7 +644,7 @@ namespace GS.SkyWatcher
 
                 monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Telescope,
                     Category = MonitorCategory.Mount,
                     Type = MonitorType.Information,
@@ -761,11 +761,11 @@ namespace GS.SkyWatcher
             var positions = new double[] { 0, 0 };
 
             var x = _commands.GetAxisPositionNaN(AxisId.Axis1);
-            if (!double.IsNaN(x)) { x = Principles.Units.Rad2Deg1(x); }
+            if (!double.IsNaN(x)) { x = Units.Rad2Deg1(x); }
             positions[0] = x;
 
             var y = _commands.GetAxisPositionNaN(AxisId.Axis2);
-            if (!double.IsNaN(y)) { y = Principles.Units.Rad2Deg1(y); }
+            if (!double.IsNaN(y)) { y = Units.Rad2Deg1(y); }
             positions[1] = y;
 
             return positions;
@@ -812,7 +812,7 @@ namespace GS.SkyWatcher
             catch (Exception e)
             {
                 var monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{e.Message}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{e.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
             }
         }
@@ -826,7 +826,7 @@ namespace GS.SkyWatcher
             var ret = _commands.GetAxisStringVersions();
 
             var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ret[0]}|{ret[1]}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ret[0]}|{ret[1]}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             return ret;
@@ -841,7 +841,7 @@ namespace GS.SkyWatcher
             var ret = _commands.GetAxisVersions();
 
             var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ret[0]}|{ret[1]}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ret[0]}|{ret[1]}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             return ret;
@@ -965,7 +965,7 @@ namespace GS.SkyWatcher
         /// <returns>Degrees</returns>
         internal double GetAxisPosition(AxisId axis)
         {
-            return Principles.Units.Rad2Deg1(_commands.GetAxisPosition(axis));
+            return Units.Rad2Deg1(_commands.GetAxisPosition(axis));
         }
 
         /// <summary>
@@ -990,10 +990,10 @@ namespace GS.SkyWatcher
             {
                 case AxisId.Axis1:
                     return new Tuple<double?, DateTime>(_commands.GetAxisPositionCounter(axis),
-                        _commands.Last_j1RunTime);
+                        _commands.LastJ1RunTime);
                 case AxisId.Axis2:
                     return new Tuple<double?, DateTime>(_commands.GetAxisPositionCounter(axis),
-                        _commands.Last_j2RunTime);
+                        _commands.LastJ2ARunTime);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
             }
@@ -1054,7 +1054,7 @@ namespace GS.SkyWatcher
             }
 
             var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{MountType}|{MountVersion}|{MountNum}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{MountType}|{MountVersion}|{MountNum}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             return MountVersion;
@@ -1301,7 +1301,7 @@ namespace GS.SkyWatcher
             if (result == null || result.Contains("!") || result.Length < 3 || !result.Contains("="))
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{result}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{result}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 return;
             }

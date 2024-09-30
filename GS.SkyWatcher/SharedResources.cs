@@ -74,30 +74,30 @@ namespace GS.SkyWatcher
     internal static class BasicMath
     {
         //public const double Rad1 = Math.PI / 180;
-        public static double AngleDistance(double ang1, double ang2)
-        {
-            ang1 = UniformAngle(ang1);
-            ang2 = UniformAngle(ang2);
-            var d = ang2 - ang1;
-            return UniformAngle(d);
-        }
+        //public static double AngleDistance(double ang1, double ang2)
+        //{
+        //    ang1 = UniformAngle(ang1);
+        //    ang2 = UniformAngle(ang2);
+        //    var d = ang2 - ang1;
+        //    return UniformAngle(d);
+        //}
 
-        private static double UniformAngle(double source)
-        {
-            source %= (Math.PI * 2);
-            if (source > Math.PI)
-                return source - 2 * Math.PI;
-            if (source < -Math.PI)
-                return source + 2 * Math.PI;
-            return source;
-        }
+        //private static double UniformAngle(double source)
+        //{
+        //    source %= (Math.PI * 2);
+        //    if (source > Math.PI)
+        //        return source - 2 * Math.PI;
+        //    if (source < -Math.PI)
+        //        return source + 2 * Math.PI;
+        //    return source;
+        //}
 
         internal static double DegToRad(double degree) { return (degree / 180.0 * Math.PI); }
-        internal static double RadToDeg(double rad) { return (rad / Math.PI * 180.0); }
-        internal static double RadToMin(double rad) { return (rad / Math.PI * 180.0 * 60.0); }
-        internal static double RadToSec(double rad) { return (rad / Math.PI * 180.0 * 60.0 * 60.0); }
-        internal static double SecToRad(double sec) { return (sec * Math.PI / 180.0 * 60.0 * 60.0); }
-        internal static double MilToRad(int millisecond) { return SecToRad(Convert.ToDouble(millisecond / 1000)); }
+        //internal static double RadToDeg(double rad) { return (rad / Math.PI * 180.0); }
+        //internal static double RadToMin(double rad) { return (rad / Math.PI * 180.0 * 60.0); }
+        //internal static double RadToSec(double rad) { return (rad / Math.PI * 180.0 * 60.0 * 60.0); }
+        //internal static double SecToRad(double sec) { return (sec * Math.PI / 180.0 * 60.0 * 60.0); }
+        //internal static double MilToRad(int millisecond) { return SecToRad(Convert.ToDouble(millisecond / 1000)); }
     }
     public struct AxisStatus
     {
@@ -188,62 +188,64 @@ namespace GS.SkyWatcher
         IdStarseeker80 = 10,                // NexStarGT-80 mount
         IdStarseeker114 = 11,			// NexStarGT-114 mount
     }
+
+    
     public enum McModel
     {
-        [Description("EQ6(EQ6 MC)")] EQ6 = 0,
-        [Description("HEQ5(HEQ5 MC)")] HEQ5 = 1,
-        [Description("EQ5 Goto mount(MC002)")] EQ5 = 2,
-        [Description("EQ3 Goto mount(MC002)")] EQ3 = 3,
-        [Description("EQ8(MC009)")] EQ8 = 4,
-        [Description("AZ-EQ6 and EQ6-R(MC007)")] AzEQ6EQ6R = 5,
-        [Description("AZ-EQ5 (MC0011)")] AzEQ5 = 6,
+        [Description("EQ6(EQ6 MC)")] Eq6 = 0,
+        [Description("HEQ5(HEQ5 MC)")] Heq5 = 1,
+        [Description("EQ5 Goto mount(MC002)")] Eq52 = 2,
+        [Description("EQ3 Goto mount(MC002)")] Eq32 = 3,
+        [Description("EQ8(MC009)")] Eq8 = 4,
+        [Description("AZ-EQ6 and EQ6-R(MC007)")] AzEq6Eq6R = 5,
+        [Description("AZ-EQ5 (MC0011)")] AzEq5 = 6,
         [Description("Star Adventurer(MC012)")] StarAdventurer = 7,
         [Description("Star Adventurer Mini(MC013)")] StarAdventurerMini = 8,
         [Description("Avant(MC018)")] AvAnt = 11,
         [Description("Star Adventurer GTi(MC021)")] StarAdventurerGTi = 12,
-        [Description("EQM35(MC002)")] EQM35 = 26,
-        [Description("EQ8-R(MC015)")] EQ8R = 32,
-        [Description("EQ8(MC015)")] EQ8a = 33,
-        [Description("AZ-EQ6(MC015)")] AzEQ6 = 34,
-        [Description("EQ6-R(MC015)")] EQ6R = 35,
-        [Description("NEQ6 PRO(MC015)")] NEQ6PRO = 36,
-        [Description("CQ350(MC015)")] CQ350 = 37,
-        [Description("EQ3(MC019)")] EQ_3 = 48,
-        [Description("EQ5(MC019)")] EQ_5 = 49,
-        [Description("EQM35(MC019)")] EQM_35 = 50,
+        [Description("EQM35(MC002)")] Eqm35 = 26,
+        [Description("EQ8-R(MC015)")] Eq8R = 32,
+        [Description("EQ8(MC015)")] Eq8A = 33,
+        [Description("AZ-EQ6(MC015)")] AzEq6 = 34,
+        [Description("EQ6-R(MC015)")] Eq6R = 35,
+        [Description("NEQ6 PRO(MC015)")] Neq6Pro = 36,
+        [Description("CQ350(MC015)")] Cq350 = 37,
+        [Description("EQ3(MC019)")] Eq3 = 48,
+        [Description("EQ5(MC019)")] Eq5 = 49,
+        [Description("EQM35(MC019)")] EQm35 = 50,
         [Description("Prototyping(MC019)")] Prototyping = 55,
-        [Description("HEQ5(MC020)")] HEQ5a = 56,
+        [Description("HEQ5(MC020)")] Heq5A = 56,
         [Description("Wave 100i(MC030)")] Wave100I = 68,
         [Description("Wave 150i(MC030)")] Wave150I = 69,
-        [Description("SynTrek hand control")] SynTrekHC = 127,
-        [Description("80GT(MC001)")] a80GT = 128,
+        [Description("SynTrek hand control")] SynTrekHc = 127,
+        [Description("80GT(MC001)")] A80Gt = 128,
         [Description("Multi-Function mount Bushnell(MC001)")] MultiFunctionBushnell = 129,
-        [Description("114GT(MC001)")] a114GT = 130,
-        [Description("80GT(MC001)")] b80GT = 131,
+        [Description("114GT(MC001)")] A114Gt = 130,
+        [Description("80GT(MC001)")] B80Gt = 131,
         [Description("Multi-Function mount Merlin(MC001)")] MultiFunctionMerlin = 132,
-        [Description("114GT(MC001)")] b114GT = 133,
-        [Description("80GTSLT (MC001)")] c80GtSLT = 134,
-        [Description("114GT SynScan AZ 360(MC001)")] c114GTSlt = 135,
-        [Description("Dob Tracking 8 to 12(MC003)")] DobTracking8to12 = 144,
-        [Description("Dob Goto 8 to 12(MC003)")] DobGoto8to12 = 145,
-        [Description("Dob Goto 8 to 12 Clutchless)(MC004)")] DobGoto8to12cl = 152,
-        [Description("Dob Goto 14 to 16(MC004)")] DobGoto14to16 = 153,
-        [Description("Dob Goto 8 to 12 Clutch(MC003)")] DobGoto8to12c = 154,
+        [Description("114GT(MC001)")] B114Gt = 133,
+        [Description("80GTSLT (MC001)")] C80GtSlt = 134,
+        [Description("114GT SynScan AZ 360(MC001)")] C114GtSlt = 135,
+        [Description("Dob Tracking 8 to 12(MC003)")] DobTracking8To12 = 144,
+        [Description("Dob Goto 8 to 12(MC003)")] DobGoto8To12 = 145,
+        [Description("Dob Goto 8 to 12 Clutchless)(MC004)")] DobGoto8To12Cl = 152,
+        [Description("Dob Goto 14 to 16(MC004)")] DobGoto14To16 = 153,
+        [Description("Dob Goto 8 to 12 Clutch(MC003)")] DobGoto8To12C = 154,
         [Description("AllView(MC005)")] AllView = 160,
         [Description("DobMini Tracking(MC006)")] DobMini = 161,
         [Description("Star Discovery(MC006)")] StarDiscovery = 162,
         [Description("Dob 18 StarGate(MC009)")] Dob18StarGate = 164,
-        [Description("AZ-GTi(MC014)")] AZGTi = 165,
+        [Description("AZ-GTi(MC014)")] AzGti = 165,
         [Description("Discovery(MC014)")] DiscoverySolar = 166,
         [Description("Merlin(MC014)")] Merlin = 167,
-        [Description("SynScan AZ 130GT(MC014)")] SynScanAZ130GT = 168,
-        [Description("DOB 18/20(MC014)")] DOB18_20 = 169,
-        [Description("DOB 8/10/12 Clutch(MC014)")] DOB8_10_12c = 170,
-        [Description("DOB 8/10/12 Clutchless(MC014)")] DOB8_10_12cl = 171,
-        [Description("DOB 14/16 Clutch(MC014)")] DOB14_16 = 172,
-        [Description("SynScan 80GT(MC014)")] SynScan80GT = 173,
+        [Description("SynScan AZ 130GT(MC014)")] SynScanAz130Gt = 168,
+        [Description("DOB 18/20(MC014)")] Dob1820 = 169,
+        [Description("DOB 8/10/12 Clutch(MC014)")] Dob81012C = 170,
+        [Description("DOB 8/10/12 Clutchless(MC014)")] Dob81012Cl = 171,
+        [Description("DOB 14/16 Clutch(MC014)")] Dob1416 = 172,
+        [Description("SynScan 80GT(MC014)")] SynScan80Gt = 173,
         [Description("Dob14 StarGate(MC007)")] Dob14StarGate = 182,
-        [Description("DOB 18(MC015)")] DOB18 = 183,
+        [Description("DOB 18(MC015)")] Dob18 = 183,
         [Description("Fusion-120i(MC029)")] Fusion120I = 192,
         [Description("Undefined")] Undefined = 999,
     }

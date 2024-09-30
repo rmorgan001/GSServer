@@ -131,15 +131,15 @@ namespace GS.SkyWatcher
         {
             if (!IsRunning || _cts.IsCancellationRequested || _skyWatcher?.IsConnected != true) return;
             if (_resultsDictionary.IsEmpty) return;
-            var recordscount = _resultsDictionary.Count;
-            if (recordscount == 0) return;
+            var recordsCount = _resultsDictionary.Count;
+            if (recordsCount == 0) return;
             if (count == 0 && seconds == 0)
             {
                 _resultsDictionary.Clear();
                 return;
             }
 
-            if (recordscount < count) return;
+            if (recordsCount < count) return;
             var now = HiResDateTime.UtcNow;
             foreach (var result in _resultsDictionary)
             {

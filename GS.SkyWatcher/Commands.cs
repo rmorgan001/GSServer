@@ -34,7 +34,7 @@ namespace GS.SkyWatcher
     {
         #region Fields
 
-        private const char _endChar = (char)13;                         // Tailing character of command and response.
+        private const char EndChar = (char)13;                         // Tailing character of command and response.
         private readonly AxisStatus[] _axesStatus = new AxisStatus[2];  // Status and state information for each axis
         private readonly double[] _positions = { 0, 0 };
         private readonly double[] _factorStepToRad = { 0, 0 };          // radians per step based on gear ratio
@@ -49,7 +49,7 @@ namespace GS.SkyWatcher
         private readonly string[] _axisStringVersion = new string[2];   // Readable string version format
         private readonly int[] _axisModel = new int[2];                 // Mount Model Number
         private readonly long[] _highSpeedRatio = new long[2];          // HiSpeed multiplier  EQ6Pro, AZEeQ5, EQ8 = 16   AZeQ6 = 32
-        private const int _threadLockTimeout = 50;                      // milliseconds
+        private const int ThreadLockTimeout = 50;                      // milliseconds
         private readonly object _syncObject = new object();
         private int _conErrCnt;                                         // Number of continuous errors
         private const int ConErrMax = 50;                               // Max number of allowed continuous errors
@@ -61,8 +61,8 @@ namespace GS.SkyWatcher
         #region Properties
 
         public DateTime LastI1RunTime { get; private set; }
-        public DateTime Last_j1RunTime { get; private set; }
-        public DateTime Last_j2RunTime { get; private set; }
+        public DateTime LastJ1RunTime { get; private set; }
+        public DateTime LastJ2ARunTime { get; private set; }
         public DateTime LastJ2RunTime { get; private set; }
         private bool MountConnected { get; set; }
 
@@ -312,7 +312,7 @@ namespace GS.SkyWatcher
             if (_resolutionFactor[0] == 0) { _resolutionFactor[0] = 1; } //make sure its not 0
 
             if (revOld[1] > 0) { _resolutionFactor[1] = (int)(revNew[1] / revOld[1]); }
-            if (_resolutionFactor[1] == 0) { _resolutionFactor[1] = 1; } //make sure its not 0
+            if (_resolutionFactor[1] == 0) { _resolutionFactor[1] = 1; } //make sure it's not 0
 
             // log
             monitorItem = new MonitorEntry
@@ -447,15 +447,15 @@ namespace GS.SkyWatcher
             MonitorLog.LogToMonitor(monitorItem);
         }
 
-        static readonly Version AZGTiAdvancedSetSupportedVersion = new Version(3, 40);
+        private static readonly Version AzgTiAdvancedSetSupportedVersion = new Version(3, 40);
         /// <summary>
         /// e or X0005 Gets version of the axis
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         internal void GetAxisVersion(AxisId axis)
         {
-            string response, MountVersion, msg;
-            int intVersion, first, second, MountModel;
+            string response, mountVersion, msg;
+            int intVersion, first, second, mountModel;
 
             if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
             {
@@ -470,8 +470,8 @@ namespace GS.SkyWatcher
                 // + 00
                 first = int.Parse(response.Substring(3, 2), NumberStyles.HexNumber);
                 second = int.Parse(response.Substring(5, 2), NumberStyles.HexNumber);
-                MountModel = int.Parse(response.Substring(1, 2), NumberStyles.HexNumber);
-                MountVersion = $"{first}.{second:D2}";
+                mountModel = int.Parse(response.Substring(1, 2), NumberStyles.HexNumber);
+                mountVersion = $"{first}.{second:D2}";
                 msg = "X0005";
             }
             else
@@ -482,27 +482,27 @@ namespace GS.SkyWatcher
                 //example =032723
                 first = int.Parse(response.Substring(1, 2), NumberStyles.HexNumber);
                 second = int.Parse(response.Substring(3, 2), NumberStyles.HexNumber);
-                MountModel = int.Parse(response.Substring(5, 2), NumberStyles.HexNumber);
-                MountVersion = $"{first}.{second:D2}";
+                mountModel = int.Parse(response.Substring(5, 2), NumberStyles.HexNumber);
+                mountVersion = $"{first}.{second:D2}";
                 msg = "e";
             }
 
             if (axis == AxisId.Axis1)
             {
-                _axisStringVersion[0] = MountVersion;
+                _axisStringVersion[0] = mountVersion;
                 _axisVersion[0] = intVersion;
-                _axisModel[0] = MountModel;
+                _axisModel[0] = mountModel;
             }
             else
             {
-                _axisStringVersion[1] = MountVersion;
+                _axisStringVersion[1] = mountVersion;
                 _axisVersion[1] = intVersion;
-                _axisModel[1] = MountModel;
+                _axisModel[1] = mountModel;
             }
 
             var version = new Version(first, second);
             // Exclude AZ GTI in EQ mode prior version 3.40
-            if (MountModel == 165 && version < AZGTiAdvancedSetSupportedVersion)
+            if (mountModel == 165 && version < AzgTiAdvancedSetSupportedVersion)
             {
                 SupportAdvancedCommandSet = false;
             }
@@ -619,12 +619,12 @@ namespace GS.SkyWatcher
         /// i or X0007 Get last "slew" speed
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
-        /// <param name="old_i">force old i: command</param>
-        internal long GetLastSlewSpeed(AxisId axis, bool old_i = true)
+        /// <param name="oldI">force old i: command</param>
+        internal long GetLastSlewSpeed(AxisId axis, bool oldI = true)
         {
             string response;
             long iSpeed;
-            if (SupportAdvancedCommandSet && AllowAdvancedCommandSet && !old_i)
+            if (SupportAdvancedCommandSet && AllowAdvancedCommandSet && !oldI)
             {
                 response = CmdToMount(axis, 'X', "0007");    // 0x07（’07’）: Current slewing speed in ticks /1024 seconds
                 iSpeed = String32ToInt(response, true, _resolutionFactor[(int)axis]);
@@ -1440,7 +1440,7 @@ namespace GS.SkyWatcher
                 var acquiredLock = false;
                 try
                 {
-                    Monitor.TryEnter(_syncObject, _threadLockTimeout, ref acquiredLock);
+                    Monitor.TryEnter(_syncObject, ThreadLockTimeout, ref acquiredLock);
                     if (acquiredLock)
                     {
                         // Code that accesses resources that are protected by the lock.
@@ -1561,7 +1561,7 @@ namespace GS.SkyWatcher
             commandStr.Append(axis == AxisId.Axis1 ? '1' : '2');// 2: Target Axis
             // Copy command data to buffer
             commandStr.Append(cmdDataStr);
-            commandStr.Append(_endChar);                         // CR Character            
+            commandStr.Append(EndChar);                         // CR Character            
 
             var dt = HiResDateTime.UtcNow;
             var monitorItem = new MonitorEntry
@@ -1572,10 +1572,10 @@ namespace GS.SkyWatcher
             {
                 // store time for any measurements
                 case 'j' when axis == AxisId.Axis1:
-                    Last_j1RunTime = dt;
+                    LastJ1RunTime = dt;
                     break;
                 case 'j' when axis == AxisId.Axis2:
-                    Last_j2RunTime = dt;
+                    LastJ2ARunTime = dt;
                     break;
                 case 'J' when axis == AxisId.Axis2:
                     LastJ2RunTime = dt;
@@ -1589,10 +1589,10 @@ namespace GS.SkyWatcher
                         switch (axis)
                         {
                             case AxisId.Axis1:
-                                Last_j1RunTime = dt;
+                                LastJ1RunTime = dt;
                                 break;
                             case AxisId.Axis2:
-                                Last_j2RunTime = dt;
+                                LastJ2ARunTime = dt;
                                 break;
                             default:
                                 throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
@@ -1686,7 +1686,7 @@ namespace GS.SkyWatcher
         {
             // format "::e1\r=020883\r"
             var mBuffer = new StringBuilder(15);
-            var StartReading = false;
+            var startReading = false;
 
             var sw = Stopwatch.StartNew();
             var readTimeout = SkyQueue.Serial.ReadTimeout;
@@ -1696,11 +1696,11 @@ namespace GS.SkyWatcher
                 foreach (var byt in data)
                 {
                     // this code order is important
-                    if (byt == '=' || byt == '!' || byt == _endChar) StartReading = true;
-                    if ((byt == _endChar) && (mBuffer.Length == 0)) continue;
-                    if (StartReading) mBuffer.Append(byt);
-                    if (byt != _endChar) continue;
-                    if (!StartReading) continue;
+                    if (byt == '=' || byt == '!' || byt == EndChar) startReading = true;
+                    if ((byt == EndChar) && (mBuffer.Length == 0)) continue;
+                    if (startReading) mBuffer.Append(byt);
+                    if (byt != EndChar) continue;
+                    if (!startReading) continue;
                     return mBuffer.ToString();
                 }
                 Thread.Sleep(1);

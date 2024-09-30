@@ -356,7 +356,7 @@ namespace GS.SkyApi
         {
             ValidateMount();
             var validAxis = ValidateAxis(axis);
-            var command = new SkyGet_j(SkyQueue.NewId, validAxis, raw);
+            var command = new SkyGetJ(SkyQueue.NewId, validAxis, raw);
             var results = GetResult(command);
             return results.Result;
         }
