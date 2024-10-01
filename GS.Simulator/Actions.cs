@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace GS.Simulator
 {
@@ -150,56 +151,82 @@ namespace GS.Simulator
         /// <param name="duration">length of pulse in milliseconds, always positive numbers</param>
         /// <param name="token">Token source used to cancel pulse guide operation</param>
         /// <returns></returns>
-        internal bool AxisPulse(Axis axis, double guideRate, int duration, CancellationToken token)
+        internal void AxisPulse(Axis axis, double guideRate, int duration, CancellationToken token)
         {
-            if (axis == Axis.Axis1)
+            Task.Run(() =>
             {
-                MountQueue.IsPulseGuidingRa = true;
-                MountQueue.IsPulseGuidingDec = false;
-            }
-            else
-            {
-                MountQueue.IsPulseGuidingDec = true;
-                MountQueue.IsPulseGuidingRa = false;
-            }
+                if (axis == Axis.Axis1)
+                {
+                    MountQueue.IsPulseGuidingRa = true;
+                    MountQueue.IsPulseGuidingDec = false;
+                }
+                else
+                {
+                    MountQueue.IsPulseGuidingDec = true;
+                    MountQueue.IsPulseGuidingRa = false;
+                }
 
-            var arcSecs = duration / 1000.0 * Conversions.Deg2ArcSec(Math.Abs(guideRate));
-            if (arcSecs < .0002)
-            {
-                MountQueue.IsPulseGuidingRa = false;
-                MountQueue.IsPulseGuidingDec = false;
-                return false;
-            }
+                var arcSecs = duration / 1000.0 * Conversions.Deg2ArcSec(Math.Abs(guideRate));
+                if (arcSecs < .0002)
+                {
+                    MountQueue.IsPulseGuidingRa = false;
+                    MountQueue.IsPulseGuidingDec = false;
+                }
 
-            // setup to log and graph the pulse
-            var pulseEntry = new PulseEntry();
-            if (MonitorPulse)
-            {
-                pulseEntry.Axis = (int)axis;
-                pulseEntry.Duration = duration;
-                pulseEntry.Rate = guideRate;
-                pulseEntry.StartTime = HiResDateTime.UtcNow;
-                if (duration < 20) pulseEntry.Rejected = true;
-            }
+                // check for cancellation
+                token.ThrowIfCancellationRequested();
 
-            // execute pulse
-            _ioSerial.Send($"pulse|{axis}|{guideRate}");
-            var sw = Stopwatch.StartNew();
-            while (sw.Elapsed.TotalMilliseconds < duration)
-            {
-                if (sw.ElapsedMilliseconds % 200 == 0) { AxesSteps(); } // Process positions while waiting
-            }
-            sw.Reset();
-            _ioSerial.Send($"pulse|{axis}|{0}");
+                // setup to log and graph the pulse
+                var pulseEntry = new PulseEntry();
+                if (MonitorPulse)
+                {
+                    pulseEntry.Axis = (int)axis;
+                    pulseEntry.Duration = duration;
+                    pulseEntry.Rate = guideRate;
+                    pulseEntry.StartTime = HiResDateTime.UtcNow;
+                    if (duration < 20) pulseEntry.Rejected = true;
+                }
 
-            MountQueue.IsPulseGuidingRa = false;
-            MountQueue.IsPulseGuidingDec = false;
-            
-            if (MonitorPulse)
-            {
-                MonitorLog.LogToMonitor(pulseEntry);
-            }
-            return false;
+                // execute pulse
+                var sw = Stopwatch.StartNew();
+                try
+                {
+                    _ioSerial.Send($"pulse|{axis}|{guideRate}");
+                    while (sw.Elapsed.TotalMilliseconds < duration)
+                    {
+                        // check for cancellation
+                        token.ThrowIfCancellationRequested();
+                        if (sw.ElapsedMilliseconds % 200 == 0) { AxesSteps(); } // Process positions while waiting
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    var monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Server,
+                        Category = MonitorCategory.Server,
+                        Type = MonitorType.Warning,
+                        Method = MonitorLog.GetCurrentMethod(),
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"{axis}|Async operation cancelled"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
+                }
+                finally
+                {
+                    sw.Reset();
+                    _ioSerial.Send($"pulse|{axis}|{0}");
+
+                    MountQueue.IsPulseGuidingRa = false;
+                    MountQueue.IsPulseGuidingDec = false;
+
+                    if (MonitorPulse)
+                    {
+                        MonitorLog.LogToMonitor(pulseEntry);
+                    }
+                }
+            }, token);
         }
 
         /// <summary>
