@@ -598,7 +598,7 @@ namespace GS.Simulator
         {
             try
             {
-                Result = actions.AxisPulse(_axis, _guideRate, _duration, _token);
+                actions.AxisPulse(_axis, _guideRate, _duration, _token);
                 Successful = true;
             }
             catch (Exception e)
