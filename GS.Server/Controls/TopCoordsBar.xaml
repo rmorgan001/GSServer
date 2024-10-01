@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
     <Grid VerticalAlignment="Center">
         <Grid.ColumnDefinitions>
@@ -19,7 +20,13 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Label Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontWeight="Bold" FontSize="16" Foreground="{StaticResource SecondaryHueMidBrush}" Content="{StaticResource topRaShort}"/>
-        <Label Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontWeight="Bold" FontSize="16" Content="{Binding RightAscension, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontWeight="Bold" FontSize="16" Content="{Binding RightAscension, UpdateSourceTrigger=PropertyChanged}" >
+            <b:Interaction.Triggers>
+                <b:EventTrigger EventName="PreviewMouseDoubleClick">
+                    <b:InvokeCommandAction Command="{Binding RaDoubleClickCommand}"/>
+                </b:EventTrigger>
+            </b:Interaction.Triggers>
+        </Label>
         <Label Grid.Column="2" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontWeight="Bold" FontSize="16" Foreground="{StaticResource SecondaryHueMidBrush}" Content="{StaticResource topDecShort}"/>
         <Label Grid.Column="3" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontWeight="Bold" FontSize="16" Content="{Binding Declination, UpdateSourceTrigger=PropertyChanged}"/>
         <Label Grid.Column="4" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontWeight="Bold" FontSize="16" Foreground="{StaticResource SecondaryHueMidBrush}" Content="{StaticResource topAz}"/>

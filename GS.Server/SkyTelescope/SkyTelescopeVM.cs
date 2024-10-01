@@ -497,7 +497,13 @@ namespace GS.Server.SkyTelescope
                                     Lha = _util.HoursToHMS(SkyServer.Lha, "h ", ":", "", 2);
                                     break;
                                 case "RightAscensionXForm":
-                                    RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
+                                    var ra = _util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
+                                    if (RaInDegrees) 
+                                        RightAscension = _util.DegreesToDMS(_util.HMSToDegrees(ra), "° ", ":", "", 2);
+                                    else
+                                    {
+                                        RightAscension = ra;
+                                    }
                                     SetGraphics();
                                     break;
                                 case "Rotate3DModel":
@@ -2677,6 +2683,18 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private string _siderealTime;
+        public string SiderealTime
+        {
+            get => _siderealTime;
+            set
+            {
+                if (value == _siderealTime) return;
+                _siderealTime = value;
+                OnPropertyChanged();
+            }
+        }
+
         private string _rightAscension;
         public string RightAscension
         {
@@ -2689,15 +2707,46 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private string _siderealTime;
-        public string SiderealTime
+        private bool RaInDegrees;
+
+        private ICommand _raDoubleClickCommand;
+
+        public ICommand RaDoubleClickCommand
         {
-            get => _siderealTime;
-            set
+            get
             {
-                if (value == _siderealTime) return;
-                _siderealTime = value;
-                OnPropertyChanged();
+                var command = _raDoubleClickCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _raDoubleClickCommand = new RelayCommand(
+                    ClickRaDoubleClickCommand
+                );
+            }
+        }
+
+        private void ClickRaDoubleClickCommand(object parameter)
+        {
+            try
+            {
+                RaInDegrees = !RaInDegrees;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message);
             }
         }
 
