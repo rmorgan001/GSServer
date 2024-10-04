@@ -48,21 +48,21 @@ namespace GS.Principles
             return a;
         }
 
-        /// <summary>
-        /// Double to Dec coordinate string
-        /// </summary>
-        /// <param name="coord">90.169444444444451</param>
-        /// <returns>"90:10:10"</returns>
-        public static string Dou2Deg(double coord)
-        {
-            var a = (int)Math.Round(coord * 3600);
-            var b = a / 3600;
-            a = Math.Abs(a % 3600);
-            var c = a / 60;
-            a %= 60;
-            var d = $"{b}:{c}:{a}";
-            return d;
-        }
+        ///// <summary>
+        ///// Double to Dec coordinate string
+        ///// </summary>
+        ///// <param name="cord">90.169444444444451</param>
+        ///// <returns>"90:10:10"</returns>
+        //public static string Dou2Deg(double cord)
+        //{
+        //    var a = (int)Math.Round(cord * 3600);
+        //    var b = a / 3600;
+        //    a = Math.Abs(a % 3600);
+        //    var c = a / 60;
+        //    a %= 60;
+        //    var d = $"{b}:{c}:{a}";
+        //    return d;
+        //}
 
         /// <summary>
         /// Radians to Degrees
@@ -124,49 +124,49 @@ namespace GS.Principles
             return b;
         }
 
-        /// <summary>
-        /// Degrees to radians
-        /// </summary>
-        /// <param name="degrees">90.169444444444451</param>
-        /// <returns>1.5737536902496649</returns>
-        public static double Deg2Rad2(double degrees)
-        {
-            var b = degrees * 0.01745329251994329576923690768489;
-            return b;
-        }
+        ///// <summary>
+        ///// Degrees to radians
+        ///// </summary>
+        ///// <param name="degrees">90.169444444444451</param>
+        ///// <returns>1.5737536902496649</returns>
+        //public static double Deg2Rad2(double degrees)
+        //{
+        //    var b = degrees * 0.01745329251994329576923690768489;
+        //    return b;
+        //}
 
-        /// <summary>
-        /// Datetime total hours to degrees
-        /// </summary>
-        /// <param name="dateTime">{1/1/2000 12:00:00 AM}</param>
-        /// <returns>0</returns>
-        public static double Date2Deg(DateTime dateTime)
-        {
-            var a = dateTime.TimeOfDay.TotalHours * 360 / 24;
-            return a;
-        }
+        ///// <summary>
+        ///// Datetime total hours to degrees
+        ///// </summary>
+        ///// <param name="dateTime">{1/1/2000 12:00:00 AM}</param>
+        ///// <returns>0</returns>
+        //public static double Date2Deg(DateTime dateTime)
+        //{
+        //    var a = dateTime.TimeOfDay.TotalHours * 360 / 24;
+        //    return a;
+        //}
 
-        /// <summary>
-        /// Hour angles to degrees
-        /// </summary>
-        /// <param name="hours">23</param>
-        /// <returns>345</returns>
-        public static double Hrs2Deg(double hours)
-        {
-            var a = hours * 15;
-            return a;
-        }
+        ///// <summary>
+        ///// Hour angles to degrees
+        ///// </summary>
+        ///// <param name="hours">23</param>
+        ///// <returns>345</returns>
+        //public static double Hrs2Deg(double hours)
+        //{
+        //    var a = hours * 15;
+        //    return a;
+        //}
 
-        /// <summary>
-        /// Degrees to Hours
-        /// </summary>
-        /// <param name="degrees">345</param>
-        /// <returns>23</returns>
-        public static double Deg2Hrs(double degrees)
-        {
-            var a = degrees / 15;
-            return a;
-        }
+        ///// <summary>
+        ///// Degrees to Hours
+        ///// </summary>
+        ///// <param name="degrees">345</param>
+        ///// <returns>23</returns>
+        //public static double Deg2Hrs(double degrees)
+        //{
+        //    var a = degrees / 15;
+        //    return a;
+        //}
 
         /// <summary>
         /// Hour angles to radians

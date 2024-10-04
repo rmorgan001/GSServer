@@ -3,4 +3,5 @@
 	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=55DB5C05460C744AA099A7FA59CDF951/RelativePath/@EntryValue">..\GSResharper.DotSettings</s:String>
 	<s:Boolean x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=55DB5C05460C744AA099A7FA59CDF951/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=File55DB5C05460C744AA099A7FA59CDF951/@KeyIndexDefined">True</s:Boolean>
-	<s:Double x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=File55DB5C05460C744AA099A7FA59CDF951/RelativePriority/@EntryValue">1</s:Double></wpf:ResourceDictionary>
+	<s:Double x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=File55DB5C05460C744AA099A7FA59CDF951/RelativePriority/@EntryValue">1</s:Double>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Meeus/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

@@ -9111,7 +9111,7 @@ namespace GS.Server.SkyTelescope
                         }
                         else
                         {
-                            var msg = Time.SetSystemUTCTime(HiResDateTime.UtcNow.ToLocalTime().Add(GpsSpan));
+                            var msg = Time.SetSystemUtcTime(HiResDateTime.UtcNow.ToLocalTime().Add(GpsSpan));
                             if (msg != string.Empty) OpenDialog($"{Application.Current.Resources["gpsTimeError"]}: {msg}");
                         }
                     }

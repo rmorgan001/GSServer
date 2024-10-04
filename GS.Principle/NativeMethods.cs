@@ -37,7 +37,7 @@ namespace GS.Principles
         internal static extern int TimeKillEvent(int id);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        internal static extern bool SetLocalTime(ref Time.SYSTEMTIME time);
+        internal static extern bool SetLocalTime(ref Time.SystemTime time);
 
         #endregion
 
