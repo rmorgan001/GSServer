@@ -219,7 +219,7 @@ namespace GS.Server.SkyTelescope
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            axes = Range.RangeAxesXY(axes);
+            axes = Range.RangeAxesXy(axes);
 
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Range:{axes[0]}|{axes[1]}" };
@@ -362,7 +362,7 @@ namespace GS.Server.SkyTelescope
                         axes[0] += 180;
                         axes[1] = 180 - axes[1];
                     }
-                    axes = Range.RangeAxesXY(axes);
+                    axes = Range.RangeAxesXy(axes);
 
                     //check for alternative position within Flip Angle limits
                     var b = AxesAppToMount(axes);
@@ -378,7 +378,7 @@ namespace GS.Server.SkyTelescope
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            axes = Range.RangeAxesXY(axes);
+            axes = Range.RangeAxesXy(axes);
             return axes;
         }
 
@@ -408,7 +408,7 @@ namespace GS.Server.SkyTelescope
                         axes[1] = 180 - axes[1];
                     }
 
-                    axes = Range.RangeAxesXY(axes);
+                    axes = Range.RangeAxesXy(axes);
 
                     //check if within Flip Angle
                     var b = AxesAppToMount(axes);
