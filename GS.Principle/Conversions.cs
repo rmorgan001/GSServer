@@ -14,56 +14,56 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System;
+//using System;
 
 namespace GS.Principles
 {
     public static class Conversions
     {
-        /// <summary>
-        /// Milliseconds to seconds per arcSeconds
-        /// </summary>
-        /// <param name="millSeconds"></param>
-        /// <param name="rate">Degrees per second</param>
-        /// <param name="prate">Percentage of rate</param>
-        /// <returns></returns>
-        public static double Ms2ArcSec(double millSeconds, double rate, double prate)
-        {
-            if (Math.Abs(prate) < 0.01) prate = 1;
-             var a = millSeconds / 1000.0;
-            var b = GuideRate(rate, prate);
-            var c = a * b * 3600;
-            return c;
-        }
+        ///// <summary>
+        ///// Milliseconds to seconds per arcSeconds
+        ///// </summary>
+        ///// <param name="millSeconds"></param>
+        ///// <param name="rate">Degrees per second</param>
+        ///// <param name="prate">Percentage of rate</param>
+        ///// <returns></returns>
+        //public static double Ms2ArcSec(double millSeconds, double rate, double prate)
+        //{
+        //    if (Math.Abs(prate) < 0.01) prate = 1;
+        //     var a = millSeconds / 1000.0;
+        //    var b = GuideRate(rate, prate);
+        //    var c = a * b * 3600;
+        //    return c;
+        //}
 
-        /// <summary>
-        /// Calculate guideRate from rate in arcSeconds per second
-        /// </summary>
-        /// <param name="rate">Degrees per second</param>
-        /// <param name="prate">Percentage of rate 0-1.0</param>
-        /// <returns></returns>
-        public static double GuideRate(double rate, double prate)
-        {
-            if (Math.Abs(prate) < 0.01) prate = 1;
-            var a = ArcSec2Deg(rate);
-            var b = a * prate;
-            return b;
-        }
+        ///// <summary>
+        ///// Calculate guideRate from rate in arcSeconds per second
+        ///// </summary>
+        ///// <param name="rate">Degrees per second</param>
+        ///// <param name="prate">Percentage of rate 0-1.0</param>
+        ///// <returns></returns>
+        //public static double GuideRate(double rate, double prate)
+        //{
+        //    if (Math.Abs(prate) < 0.01) prate = 1;
+        //    var a = ArcSec2Deg(rate);
+        //    var b = a * prate;
+        //    return b;
+        //}
 
-        /// <summary>
-        /// Steps in arcSeconds per second
-        /// </summary>
-        /// <param name="prate">Percentage of rate 0-1.0</param>
-        /// <param name="totalSteps"></param>
-        /// <param name="milliseconds"></param>
-        /// <param name="rate">in arcSeconds</param>
-        /// <returns></returns>
-        public static double Rate2Steps(double milliseconds, double rate, double prate, double totalSteps)
-        {
-            var a = StepPerArcSec(totalSteps);
-            var b = a * Ms2ArcSec(milliseconds, rate, prate);
-            return b;
-        }
+        ///// <summary>
+        ///// Steps in arcSeconds per second
+        ///// </summary>
+        ///// <param name="prate">Percentage of rate 0-1.0</param>
+        ///// <param name="totalSteps"></param>
+        ///// <param name="milliseconds"></param>
+        ///// <param name="rate">in arcSeconds</param>
+        ///// <returns></returns>
+        //public static double Rate2Steps(double milliseconds, double rate, double prate, double totalSteps)
+        //{
+        //    var a = StepPerArcSec(totalSteps);
+        //    var b = a * Ms2ArcSec(milliseconds, rate, prate);
+        //    return b;
+        //}
 
         /// <summary>
         /// Calculates steps per arcSecond
@@ -96,35 +96,35 @@ namespace GS.Principles
             return degrees * 3600.0;
         }
 
-        /// <summary>
-        /// Seconds to Degrees
-        /// </summary>
-        /// <param name="degrees">Degrees per second</param>
-        /// <returns></returns>
-        public static double Sec2Deg(double degrees)
-        {
-            return degrees / 360.0;
-        }
+        ///// <summary>
+        ///// Seconds to Degrees
+        ///// </summary>
+        ///// <param name="degrees">Degrees per second</param>
+        ///// <returns></returns>
+        //public static double Sec2Deg(double degrees)
+        //{
+        //    return degrees / 360.0;
+        //}
 
-        /// <summary>
-        /// Seconds to ArcSeconds
-        /// </summary>
-        /// <param name="seconds">seconds in time</param>
-        /// <returns>ArcSeconds</returns>
-        public static double Sec2ArcSec(double seconds)
-        {
-            return seconds * 15;
-        }
+        ///// <summary>
+        ///// Seconds to ArcSeconds
+        ///// </summary>
+        ///// <param name="seconds">seconds in time</param>
+        ///// <returns>ArcSeconds</returns>
+        //public static double Sec2ArcSec(double seconds)
+        //{
+        //    return seconds * 15;
+        //}
 
-        /// <summary>
-        /// ArcSeconds to Seconds
-        /// </summary>
-        /// <param name="arcSecs">seconds in arc</param>
-        /// <returns>seconds</returns>
-        public static double ArcSec2Sec(double arcSecs)
-        {
-            return arcSecs / 15;
-        }
+        ///// <summary>
+        ///// ArcSeconds to Seconds
+        ///// </summary>
+        ///// <param name="arcSecs">seconds in arc</param>
+        ///// <returns>seconds</returns>
+        //public static double ArcSec2Sec(double arcSecs)
+        //{
+        //    return arcSecs / 15;
+        //}
 
         /// <summary>
         /// Seconds per sidereal second to Arc seconds per second
@@ -136,13 +136,13 @@ namespace GS.Principles
         }
 
 
-        /// <summary>
-        /// Arc seconds per second to Seconds per sidereal second
-        /// </summary>
-        /// <param name="seconds">arc seconds per second</param>
-        public static double ArcSec2SideSec(double seconds)
-        {
-            return seconds * 0.9972695677;
-        }
+        ///// <summary>
+        ///// Arc seconds per second to Seconds per sidereal second
+        ///// </summary>
+        ///// <param name="seconds">arc seconds per second</param>
+        //public static double ArcSec2SideSec(double seconds)
+        //{
+        //    return seconds * 0.9972695677;
+        //}
     }
 }

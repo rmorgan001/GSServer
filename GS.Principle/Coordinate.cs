@@ -33,8 +33,8 @@ namespace GS.Principles
         public static double Ra2Ha12(double rightAscension, double localSiderealTime)
         {
             var a = localSiderealTime - rightAscension;
-            var Ra2Ha = Range.Range12(a);
-            return Ra2Ha;
+            var ra2Ha = Range.Range12(a);
+            return ra2Ha;
         }
 
         /// <summary>
@@ -51,8 +51,8 @@ namespace GS.Principles
         public static double Ra2Ha24(double rightAscension, double localSiderealTime)
         {
             var a = localSiderealTime - rightAscension;
-            var Ra2Ha = Range.Range24(a);
-            return Ra2Ha;
+            var ra2Ha = Range.Range24(a);
+            return ra2Ha;
         }
 
         /// <summary>
@@ -67,8 +67,8 @@ namespace GS.Principles
         public static double[] RaDec2AltAz(double rightAscension, double declination, double localSiderealTime, double latitude)
         {
             var a = Ra2Ha12(rightAscension, localSiderealTime);
-            var RaDec2AltAz = HaDec2AltAz(a, declination, latitude);
-            return RaDec2AltAz;
+            var raDec2AltAz = HaDec2AltAz(a, declination, latitude);
+            return raDec2AltAz;
         }
 
         /// <summary>
@@ -98,59 +98,59 @@ namespace GS.Principles
             var o = Units.Rad2Deg(Math.Atan2(l, m));
             var p = Range.Range360(n);
             var q = Range.Range90(o);
-            var HaDec2AltAz = new[] { q, p };
-            return HaDec2AltAz;
+            var haDec2AltAz = new[] { q, p };
+            return haDec2AltAz;
         }
 
-        /// <summary>
-        /// Hour Angles and Declination to Azimuth
-        /// Adopted from AsCom
-        /// </summary>
-        /// <param name="hourAngle">In Decimal Hours</param>
-        /// <param name="declination">In decimal degrees</param>
-        /// <param name="latitude">In decimal degrees</param>
-        /// <returns>Azimuth in decimal degrees</returns>
-        public static double HaDec2Azm(double hourAngle, double declination, double latitude)
-        {
-            var a = Units.Hrs2Rad(hourAngle);
-            var b = Units.Deg2Rad(declination);
-            var c = Units.Deg2Rad(latitude);
-            var d = Math.Sin(a);
-            var e = Math.Cos(a);
-            var f = Math.Sin(b);
-            var g = Math.Cos(b);
-            var h = Math.Sin(c);
-            var i = Math.Cos(c);
-            var j = f * i - e * g * h;
-            var k = -(d * g);
-            var n = Units.Rad2Deg(Math.Atan2(k, j));
-            var HaDec2Azm = Range.Range360(n);
-            return HaDec2Azm;
-        }
+        ///// <summary>
+        ///// Hour Angles and Declination to Azimuth
+        ///// Adopted from AsCom
+        ///// </summary>
+        ///// <param name="hourAngle">In Decimal Hours</param>
+        ///// <param name="declination">In decimal degrees</param>
+        ///// <param name="latitude">In decimal degrees</param>
+        ///// <returns>Azimuth in decimal degrees</returns>
+        //public static double HaDec2Azm(double hourAngle, double declination, double latitude)
+        //{
+        //    var a = Units.Hrs2Rad(hourAngle);
+        //    var b = Units.Deg2Rad(declination);
+        //    var c = Units.Deg2Rad(latitude);
+        //    var d = Math.Sin(a);
+        //    var e = Math.Cos(a);
+        //    var f = Math.Sin(b);
+        //    var g = Math.Cos(b);
+        //    var h = Math.Sin(c);
+        //    var i = Math.Cos(c);
+        //    var j = f * i - e * g * h;
+        //    var k = -(d * g);
+        //    var n = Units.Rad2Deg(Math.Atan2(k, j));
+        //    var haDec2Azm = Range.Range360(n);
+        //    return haDec2Azm;
+        //}
 
-        /// <summary>
-        /// Hour Angles and Declination to Altitude
-        /// Adopted from AsCom
-        /// </summary>
-        /// <param name="hourAngle">In Decimal Hours</param>
-        /// <param name="declination">In decimal degrees</param>
-        /// <param name="latitude">In decimal degrees</param>
-        /// <returns>Altitude in decimal degrees</returns>
-        public static double HaDec2Alt(double hourAngle, double declination, double latitude)
-        {
-            var a = Units.Hrs2Rad(hourAngle);
-            var b = Units.Deg2Rad(declination);
-            var c = Units.Deg2Rad(latitude);
-            //var d = Math.Sin(a);
-            var e = Math.Cos(a);
-            var f = Math.Sin(b);
-            var g = Math.Cos(b);
-            var h = Math.Sin(c);
-            var i = Math.Cos(c);
-            var j = f * h + g * i * e;
-            var HaDec2Alt = Units.Rad2Deg(Math.Asin(j));
-            return HaDec2Alt;
-        }
+        ///// <summary>
+        ///// Hour Angles and Declination to Altitude
+        ///// Adopted from AsCom
+        ///// </summary>
+        ///// <param name="hourAngle">In Decimal Hours</param>
+        ///// <param name="declination">In decimal degrees</param>
+        ///// <param name="latitude">In decimal degrees</param>
+        ///// <returns>Altitude in decimal degrees</returns>
+        //public static double HaDec2Alt(double hourAngle, double declination, double latitude)
+        //{
+        //    var a = Units.Hrs2Rad(hourAngle);
+        //    var b = Units.Deg2Rad(declination);
+        //    var c = Units.Deg2Rad(latitude);
+        //    //var d = Math.Sin(a);
+        //    var e = Math.Cos(a);
+        //    var f = Math.Sin(b);
+        //    var g = Math.Cos(b);
+        //    var h = Math.Sin(c);
+        //    var i = Math.Cos(c);
+        //    var j = f * h + g * i * e;
+        //    var haDec2Alt = Units.Rad2Deg(Math.Asin(j));
+        //    return haDec2Alt;
+        //}
 
         /// <summary>
         /// Azimuth and Altitude to Right Ascension and Declination
@@ -164,8 +164,8 @@ namespace GS.Principles
         {
             var a = AltAz2Ra(altitude, azimuth, latitude, lst);
             var b = AltAz2Dec(altitude, azimuth, latitude);
-            var AltAz2RaDec = new[] { a, b };
-            return AltAz2RaDec;
+            var altAz2RaDec = new[] { a, b };
+            return altAz2RaDec;
         }
 
         /// <summary>
@@ -189,8 +189,8 @@ namespace GS.Principles
             var i = Math.Cos(c);
             var j = e * i * g + h * f;
             var k = Units.Rad2Deg2(Math.Asin(j));
-            var AltAz2Dec = Range.Range90(k);
-            return AltAz2Dec;
+            var altAz2Dec = Range.Range90(k);
+            return altAz2Dec;
         }
 
         /// <summary>
@@ -216,8 +216,8 @@ namespace GS.Principles
             var j = -d * g;
             var k = -e * h * g + f * i;
             var l = Units.Rad2Hrs(Math.Atan2(j, k));
-            var AltAz2Ra = Range.Range24(lst - l);
-            return AltAz2Ra;
+            var altAz2Ra = Range.Range24(lst - l);
+            return altAz2Ra;
         }
     }
 }

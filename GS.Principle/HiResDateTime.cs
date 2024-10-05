@@ -24,10 +24,10 @@ namespace GS.Principles
     /// </summary>
     public static class HiResDateTime
     {
-        private static readonly long maxIdle = TimeSpan.FromSeconds(10).Ticks;
+        private static readonly long MaxIdle = TimeSpan.FromSeconds(10).Ticks;
         private const long TicksMultiplier = 1000 * TimeSpan.TicksPerMillisecond;
-        private static readonly ThreadLocal<DateTime> startTime = new ThreadLocal<DateTime>(() => DateTime.UtcNow, false);
-        private static readonly ThreadLocal<double> startTimestamp = new ThreadLocal<double>(() => Stopwatch.GetTimestamp(), false);
+        private static readonly ThreadLocal<DateTime> StartTime = new ThreadLocal<DateTime>(() => DateTime.UtcNow, false);
+        private static readonly ThreadLocal<double> StartTimestamp = new ThreadLocal<double>(() => Stopwatch.GetTimestamp(), false);
 
         /// <summary>
         /// High resolution supported
@@ -51,11 +51,11 @@ namespace GS.Principles
                 try
                 {
                     double endTimestamp = Stopwatch.GetTimestamp();
-                    var durationInTicks = (endTimestamp - startTimestamp.Value) / Stopwatch.Frequency * TicksMultiplier;
-                    if (!(durationInTicks >= maxIdle)) return startTime.Value.AddTicks((long)durationInTicks);
-                    startTimestamp.Value = Stopwatch.GetTimestamp();
-                    startTime.Value = DateTime.UtcNow;
-                    return startTime.Value;
+                    var durationInTicks = (endTimestamp - StartTimestamp.Value) / Stopwatch.Frequency * TicksMultiplier;
+                    if (!(durationInTicks >= MaxIdle)) return StartTime.Value.AddTicks((long)durationInTicks);
+                    StartTimestamp.Value = Stopwatch.GetTimestamp();
+                    StartTime.Value = DateTime.UtcNow;
+                    return StartTime.Value;
                 }
                 catch (ObjectDisposedException)
                 {
