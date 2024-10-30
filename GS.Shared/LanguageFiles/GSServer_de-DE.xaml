@@ -20,7 +20,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="titleApps">Verbundene Anwendungen:</system:String>
     <system:String x:Key="titleCloseApps">Die Anwendung(en) ist/sind noch verbunden. Trotzdem schließen?</system:String>
     <system:String x:Key="titleDescription">GreenSwamp Server</system:String>
-    <system:String x:Key="titleClose">GS Server scließen</system:String>
+    <system:String x:Key="titleClose">GS Server schließen</system:String>
 
     <!--Tab bar-->
     <system:String x:Key="tabSkyWatcher">SkyWatcher</system:String>
