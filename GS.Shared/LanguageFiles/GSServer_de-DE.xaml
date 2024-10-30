@@ -20,7 +20,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="titleApps">Verbundene Anwendungen:</system:String>
     <system:String x:Key="titleCloseApps">Die Anwendung(en) ist/sind noch verbunden. Trotzdem schließen?</system:String>
     <system:String x:Key="titleDescription">GreenSwamp Server</system:String>
-    <system:String x:Key="titleClose">GS Server beenden</system:String>
+    <system:String x:Key="titleClose">GS Server scließen</system:String>
 
     <!--Tab bar-->
     <system:String x:Key="tabSkyWatcher">SkyWatcher</system:String>
@@ -33,7 +33,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="tabPulses">Impulse</system:String>
     <system:String x:Key="tabAlignment">Ausrichtung</system:String>
     <system:String x:Key="tabPlot">Graph</system:String>
-    <system:String x:Key="tabWindowFlip">Fenstergröße ändern</system:String>
+    <system:String x:Key="tabWindowFlip">Größe des Umkehrfensters</system:String>
 
     <!--Top bar-->
     <system:String x:Key="topRa">Rektaszension:</system:String>
@@ -59,13 +59,13 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnHintTracking">Ein</system:String>
     <!--<system:String x:Key="btnSetHome">Home-Position festlegen</system:String>-->
     <system:String x:Key="btnTipSetHome">Zurücksetzen der Achsen auf Home</system:String>
-    <system:String x:Key="btnFlip">SdP wechseln</system:String>
-    <system:String x:Key="btnTipFlip">Seite des Piers wechseln</system:String>
-    <system:String x:Key="btnFlipAzDir">Az Seite wechseln</system:String>
+    <system:String x:Key="btnFlip">SdP umkehren</system:String>
+    <system:String x:Key="btnTipFlip">Umkehrung des Piers</system:String>
+    <system:String x:Key="btnFlipAzDir">Az Seite umkehren</system:String>
     <system:String x:Key="btnTipFlipAzDir">Azimut-Schwenkrichtung umkehren</system:String>
     <!--<system:String x:Key="btnHomeReset">Akzeptieren, um die Position der Montierung auf die Home-Position zurückzusetzen</system:String>-->
     <system:String x:Key="btnContinueFlip">Akzeptieren, um die Montierung zu umzukehren</system:String>
-    <system:String x:Key="btnContinueFlipAzDir">Akzeptieren um die AZ Seite zu wechseln. Montierung wird sich um 360° bewegen</system:String>
+    <system:String x:Key="btnContinueFlipAzDir">Akzeptieren um die AZ Seite umzukehren. Montierung wird sich um 360° bewegen</system:String>
     <system:String x:Key="btnTipParkPos">Park Positionen</system:String>
     <system:String x:Key="btnAutoHome">AutoHome</system:String>
     <system:String x:Key="btnAutoHomeComplete">Auto Home komplett</system:String>
@@ -112,7 +112,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="hcTipSpeed">Drehgeschwindigkeit Speed</system:String>
     <system:String x:Key="hcTipFlipNS">N/S-Richtung umkehren</system:String>
     <system:String x:Key="hcFlipNS">N/S</system:String>
-    <system:String x:Key="hcFlip">Richtung umdrehen</system:String>
+    <system:String x:Key="hcFlip">Richtung umkehren</system:String>
     <system:String x:Key="hcTipFlipEW">O/W-Richtung umkehren</system:String>
     <system:String x:Key="hcFlipEW">O/W</system:String>
     <system:String x:Key="hcMode">Modus</system:String>
@@ -536,7 +536,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="polLong">Längengrad:</system:String>
     <system:String x:Key="polLST">Sternzeit:</system:String>
     <system:String x:Key="polHADeg">Stundenwinkel:</system:String>
-    <system:String x:Key="polHAFlipDeg">SW umdrehen:</system:String>
+    <system:String x:Key="polHAFlipDeg">SW umkehren:</system:String>
     <system:String x:Key="polLDate">Örtliches Datum:</system:String>
     <system:String x:Key="polLTime">Ortszeit:</system:String>
     <system:String x:Key="polMirrorFlip">Ansicht wechslen</system:String>
@@ -569,7 +569,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="1021Camera">Kamera</system:String>
     <system:String x:Key="1021Width">Weite</system:String>
     <system:String x:Key="1021Height">Höhe</system:String>
-    <system:String x:Key="1021FlipLimit">Grenzwert wchseln</system:String>
+    <system:String x:Key="1021FlipLimit">Grenzwert umkehren</system:String>
     <system:String x:Key="1021NoHomeSensor">Die Montierung unterstützt keinen Homesensor</system:String>
     <system:String x:Key="1021Center">Mittelpunkt</system:String>
     <system:String x:Key="1021End">Ende</system:String>
@@ -717,7 +717,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="InvCord">Ungültige Koordinaten</system:String>
 
     <!--1.0.4.8 -->
-    <system:String x:Key="skyFlipAng">Drehwinkel (Grad)</system:String>
+    <system:String x:Key="skyFlipAng">Umkehrungswinkel (Grad)</system:String>
     <system:String x:Key="lbAxisTrackingLimit">Nachführgrenze (Grad)</system:String>
     <system:String x:Key="mntCap">Fähigkeiten:</system:String>
     <system:String x:Key="mntAdv">Erweiterte Funkt.</system:String>
