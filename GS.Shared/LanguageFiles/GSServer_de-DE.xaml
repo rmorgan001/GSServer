@@ -119,7 +119,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="hcTipMode">Richtungs-Modus</system:String>
     <system:String x:Key="hcBacklash">Anti-Lash</system:String>
     <system:String x:Key="hcTipHcAntiBacklash">Anti-Backlash</system:String>
-    <system:String x:Key="hcRa">E/W</system:String>
+    <system:String x:Key="hcRa">O/W</system:String>
     <system:String x:Key="hcDec">N/S</system:String>
     <system:String x:Key="hcHc">GSS Handsteuerung</system:String>
     <system:String x:Key="hcOpenWin">Fenster öffnen</system:String>
