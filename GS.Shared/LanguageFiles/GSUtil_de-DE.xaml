@@ -1,4 +1,4 @@
-﻿<!--/* Copyright(C) 2019-2022 Rob Morgan (robert.morgan.e@gmail.com)
+<!--/* Copyright(C) 2019-2022 Rob Morgan (robert.morgan.e@gmail.com)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published
@@ -29,7 +29,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="cvtInvNumber">Ungültige Nummer</system:String>
     <system:String x:Key="cvtColorToBrush">ColorToBrushConverter unterstützt nur die Konvertierung von Farbe und Zeichenfolge</system:String>
     <system:String x:Key="cvtEnumErr1">Typ muss für eine Enum sein</system:String>
-    <system:String x:Key="cvtEnumErr2">Der EnumType muss angegeben werden</system:String>
+    <system:String x:Key="cvtEnumErr2">Der EnumTyp muss angegeben werden</system:String>
     <system:String x:Key="cvtInvIP">Ungültige IP</system:String>
     <system:String x:Key="cvtRequired">Erforderlich</system:String>
 
@@ -54,7 +54,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="utilStop">Stop</system:String>
     <system:String x:Key="utilSerial">Serieller Test:</system:String>
     <system:String x:Key="utilComPort">ComPort</system:String>
-    <system:String x:Key="utilTimeout">Aufgetretene Zeitüberschreitung Ereignis #</system:String>
+    <system:String x:Key="utilTimeout">Zeitüberschreitung aufgetretene Ereignis #</system:String>
     <system:String x:Key="utilProcessName">Prozess Name:</system:String>
     <system:String x:Key="utilId">Id:</system:String>
     <system:String x:Key="utilLocks">Sperren:</system:String>
