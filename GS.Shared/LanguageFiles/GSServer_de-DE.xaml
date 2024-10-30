@@ -1,4 +1,4 @@
-﻿<!--/* Copyright(C) 2019-2024 Rob Morgan (robert.morgan.e@gmail.com)
+<!--/* Copyright(C) 2019-2024 Rob Morgan (robert.morgan.e@gmail.com)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published
@@ -18,13 +18,13 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--Title bar-->
     <system:String x:Key="titleName">GS Server</system:String>
     <system:String x:Key="titleApps">Verbundene Anwendungen:</system:String>
-    <system:String x:Key="titleCloseApps">Die Anwendung(en) ist/sind noch verbunden. Trotzdem beenden?</system:String>
+    <system:String x:Key="titleCloseApps">Die Anwendung(en) ist/sind noch verbunden. Trotzdem schließen?</system:String>
     <system:String x:Key="titleDescription">GreenSwamp Server</system:String>
     <system:String x:Key="titleClose">GS Server beenden</system:String>
 
     <!--Tab bar-->
     <system:String x:Key="tabSkyWatcher">SkyWatcher</system:String>
-    <system:String x:Key="tabFocuser">Fokussierer</system:String>
+    <system:String x:Key="tabFocuser">Auszug</system:String>
     <system:String x:Key="tabNotes">Notizen</system:String>
     <system:String x:Key="tabOptions">Optionen</system:String>
     <system:String x:Key="tabGamePad">Gamepad</system:String>
@@ -61,12 +61,12 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnTipSetHome">Zurücksetzen der Achsen auf Home</system:String>
     <system:String x:Key="btnFlip">SdP wechseln</system:String>
     <system:String x:Key="btnTipFlip">Seite des Piers wechseln</system:String>
-    <system:String x:Key="btnFlipAzDir">Flip Az Side</system:String>
+    <system:String x:Key="btnFlipAzDir">Az Seite wechseln</system:String>
     <system:String x:Key="btnTipFlipAzDir">Azimut-Schwenkrichtung umkehren</system:String>
     <!--<system:String x:Key="btnHomeReset">Akzeptieren, um die Position der Montierung auf die Home-Position zurückzusetzen</system:String>-->
     <system:String x:Key="btnContinueFlip">Akzeptieren, um die Montierung zu umzukehren</system:String>
-    <system:String x:Key="btnContinueFlipAzDir">Accept to swap azimuth side. Mount will slew 360 degrees</system:String>
-    <system:String x:Key="btnTipParkPos">Park Position</system:String>
+    <system:String x:Key="btnContinueFlipAzDir">Akzeptieren um die AZ Seite zu wechseln. Montierung wird sich um 360° bewegen</system:String>
+    <system:String x:Key="btnTipParkPos">Park Positionen</system:String>
     <system:String x:Key="btnAutoHome">AutoHome</system:String>
     <system:String x:Key="btnAutoHomeComplete">Auto Home komplett</system:String>
     <system:String x:Key="btnAutoHomeStart">Start</system:String>
@@ -88,14 +88,14 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="botTracking">Nachführung</system:String>
     <system:String x:Key="botTipTracking">Nachführung</system:String>
     <system:String x:Key="botTipSOP">Seite des Piers</system:String>
-    <system:String x:Key="botTipAzDir">Azimuth slew direction</system:String>
+    <system:String x:Key="botTipAzDir">Azimutale Drehrichtung</system:String>
     <system:String x:Key="botTipAxisLimit">Achsenbegrenzung, für Optionen anklicken</system:String>
     <system:String x:Key="botTipWarnings">Warnungen, zum Zurücksetzen anklicken</system:String>
     <system:String x:Key="botTipErrors">Fehler, zum Zurücksetzen anklicken</system:String>
     <system:String x:Key="botTipVoice">Stimme</system:String>
     <system:String x:Key="botTipMonitor">Monitor</system:String>
     <system:String x:Key="botTipConnected">Für Informationen zur Montierung anklicken</system:String>
-    <system:String x:Key="botLimitOptions">Optionen für Grenzen</system:String>
+    <system:String x:Key="botLimitOptions">Optionen begrenzen</system:String>
     <system:String x:Key="botLimitTracking">Nachführung ausschalten</system:String>
 
     <!--Hand Controller-->
@@ -112,20 +112,20 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="hcTipSpeed">Drehgeschwindigkeit Speed</system:String>
     <system:String x:Key="hcTipFlipNS">N/S-Richtung umkehren</system:String>
     <system:String x:Key="hcFlipNS">N/S</system:String>
-    <system:String x:Key="hcFlip">Richtung umkehren</system:String>
+    <system:String x:Key="hcFlip">Richtung umdrehen</system:String>
     <system:String x:Key="hcTipFlipEW">O/W-Richtung umkehren</system:String>
     <system:String x:Key="hcFlipEW">O/W</system:String>
     <system:String x:Key="hcMode">Modus</system:String>
-    <system:String x:Key="hcTipMode">Richtung</system:String>
-    <system:String x:Key="hcBacklash">Backlash</system:String>
-    <system:String x:Key="hcTipHcAntiBacklash">Richtung, in der Backlash aktiviert werden soll</system:String>
-    <system:String x:Key="hcRa">O/W</system:String>
+    <system:String x:Key="hcTipMode">Richtungs-Modus</system:String>
+    <system:String x:Key="hcBacklash">Anti-Lash</system:String>
+    <system:String x:Key="hcTipHcAntiBacklash">Anti-Backlash</system:String>
+    <system:String x:Key="hcRa">E/W</system:String>
     <system:String x:Key="hcDec">N/S</system:String>
     <system:String x:Key="hcHc">GSS Handsteuerung</system:String>
     <system:String x:Key="hcOpenWin">Fenster öffnen</system:String>
 
     <!--pPEC bar-->
-    <system:String x:Key="ppStartTraining">Akzeptieren, um mit dem Training zu beginnen</system:String>
+    <system:String x:Key="ppStartTraining">Akzeptieren zum Start des Trainings</system:String>
     <system:String x:Key="ppStartTrainingMode">PPEC-Trainingsmodus starten</system:String>
     <system:String x:Key="ppOnOff">PPEC Ein/Aus</system:String>
     <system:String x:Key="ppPec">PPEC</system:String>
@@ -136,7 +136,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!--Mount Info-->
     <system:String x:Key="mntSupported">Unterstützt</system:String>
-    <system:String x:Key="mntNotSupported">Nicht unterstützt</system:String>
+    <system:String x:Key="mntNotSupported">NichtUnterstützt</system:String>
     <system:String x:Key="mntMount">Montierung:</system:String>
     <system:String x:Key="mntVersion">Version:</system:String>
     <system:String x:Key="mntStepsRa">RA Schritte:</system:String>
@@ -154,13 +154,13 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="goAz">Az:</system:String>
     <system:String x:Key="goAlt">Alt:</system:String>
     <system:String x:Key="goCopy">Kopieren</system:String>
-    <system:String x:Key="goTipCopy">Mit den aktuellen Koordinaten aktualisieren</system:String>
+    <system:String x:Key="goTipCopy">Mit aktueller Position versehen</system:String>
     <system:String x:Key="goGoTo">GoTo</system:String>
-    <system:String x:Key="goTipGoTo">Zu den Koordinaten bewegen</system:String>
+    <system:String x:Key="goTipGoTo">Auf Koordinaten schwenken</system:String>
     <system:String x:Key="goTargetBelow">Ziel unter dem Horizont</system:String>
     <system:String x:Key="goSync">Synchr.</system:String>
     <system:String x:Key="goSyncWarning">Warnung: bitte Koordinaten überprüfen!</system:String>
-    <system:String x:Key="goSlewing">Montierung bewegt sich</system:String>
+    <system:String x:Key="goSlewing">Montierung schwenkt</system:String>
     <system:String x:Key="goOutLimits">Außerhalb der Sync-Grenzen</system:String>
     <system:String x:Key="goChangeToRaDec">Klicken Sie mit der rechten Maustaste, um die Ra Dek-Koordinaten einzugeben</system:String>
     <system:String x:Key="goChangeToAzAlt">Klicken Sie mit der rechten Maustaste, um die Az Alt-Koordinaten einzugebens</system:String>
@@ -170,7 +170,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="bacLashComp">Backlash kompensieren:</system:String>
     <system:String x:Key="bacDec">Dek</system:String>
     <system:String x:Key="bacRa">Ra</system:String>
-    <system:String x:Key="bacRaLash">RA Backlash</system:String>
+    <system:String x:Key="bacRaLash">Ra Backlash</system:String>
 
     <!--Debug bar-->
     <system:String x:Key="bugSiderealTime">Sternzeit:</system:String>
@@ -209,13 +209,13 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="gpsNoData">Fehlende oder ungültige Daten</system:String>
     <system:String x:Key="gpsGGA">GGA</system:String>
     <system:String x:Key="gpsRMC">RMC</system:String>
-    <system:String x:Key="gpsLocal">Abweichung von der Ortszeit</system:String>
+    <system:String x:Key="gpsLocal">Abweichung der Ortszeit</system:String>
     <system:String x:Key="gpsPC">PC:</system:String>
     <system:String x:Key="gpsGPS">GPS:</system:String>
     <system:String x:Key="gpsDeviation">Abweichung:</system:String>
     <system:String x:Key="gpsChangeTime">Systemzeit aktualisieren?</system:String>
     <system:String x:Key="gpsTimeLimit">Außerhalb der veränderbaren Zeitspanne</system:String>
-    <system:String x:Key="gpsTimeError">Fehler bei der Zeitangabe</system:String>
+    <system:String x:Key="gpsTimeError">Zeitlicher Fehler</system:String>
 
     <!--CdC -->
     <system:String x:Key="cdcIP">IP Addresse</system:String>
@@ -249,7 +249,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="vceUnParked">Entparkt</system:String>
     <system:String x:Key="vceActive">Stimme aktiv</system:String>
     <system:String x:Key="vceError">Fehler Fehler</system:String>
-    <system:String x:Key="vceLimit">Grenzwertwarnung</system:String>
+    <system:String x:Key="vceLimit">Grenzwert-Warnung</system:String>
     <system:String x:Key="vceTrackingOn">Nachführung an</system:String>
     <system:String x:Key="vceTrackingOff">Nachführung aus</system:String>
     <system:String x:Key="vcePeckOn">Peck an</system:String>
@@ -261,11 +261,11 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="vceParkSet">Parkposition festlegen</system:String>
     <system:String x:Key="vceSyncAz">Synchronisierung mit Azimut</system:String>
     <system:String x:Key="vceSyncCoords">Synchronisierung mit den Koordinaten</system:String>
-    <system:String x:Key="vceSlewing">Bewegen</system:String>
-    <system:String x:Key="vceSlewCoords">Zu Koordinaten bewegen</system:String>
-    <system:String x:Key="vceSlewPark">Auf Parkposition bewegen</system:String>
-    <system:String x:Key="vceSlewHome">Auf Homeposition bewegen</system:String>
-    <system:String x:Key="vceSlewComplete">Bewegen Komplett</system:String>
+    <system:String x:Key="vceSlewing">Schwenken</system:String>
+    <system:String x:Key="vceSlewCoords">Zu Koordinaten schwenken</system:String>
+    <system:String x:Key="vceSlewPark">Auf Parkposition schwenken</system:String>
+    <system:String x:Key="vceSlewHome">Auf Homeposition schwenken</system:String>
+    <system:String x:Key="vceSlewComplete">Schwenkung komplett</system:String>
     <system:String x:Key="vceHome">Home</system:String>
     <!--<system:String x:Key="vceHomeSet">Home festgelegt</system:String>-->
     <system:String x:Key="vceSidereal">Sternzeit</system:String>
@@ -288,7 +288,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="notShortcuts">Kürzel:</system:String>
     <system:String x:Key="notOpen">Öffnen</system:String>
     <system:String x:Key="notSave">Speichern</system:String>
-    <system:String x:Key="notSaveAs">Speichern Als</system:String>
+    <system:String x:Key="notSaveAs">SpeichernAls</system:String>
     <system:String x:Key="notPrint">Drucken</system:String>
     <system:String x:Key="notCut">Ausschneiden</system:String>
     <system:String x:Key="notCopy">Kopieren</system:String>
@@ -318,9 +318,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="notAz">AZ</system:String>
     <system:String x:Key="notPhase">Mond Phase</system:String>
     <system:String x:Key="notEntry">Protokolleintrag</system:String>
-    <system:String x:Key="notAlignmentMode">Ausrichtungs Modus</system:String>
-    <system:String x:Key="notEqType">Äquatoriale Koordinaten Art</system:String>
-    <system:String x:Key="notObLoc">Position der Beobachtungsstelle</system:String>
+    <system:String x:Key="notAlignmentMode">Ausrichtungsmodus</system:String>
+    <system:String x:Key="notEqType">Äquatorialkoordinaten Typ</system:String>
+    <system:String x:Key="notObLoc">Standort der Beobachtungsstelle</system:String>
     <system:String x:Key="notWeather">Wetter</system:String>
     <system:String x:Key="notMoon">Mond</system:String>
     <system:String x:Key="notLog">Protokoll</system:String>
@@ -328,20 +328,20 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="notEq">Äq</system:String>
     <system:String x:Key="notOb">Bs</system:String>
     <system:String x:Key="notSidereal">Sternzeit</system:String>
-    <system:String x:Key="notHa">SW</system:String>
+    <system:String x:Key="notHa">Sw</system:String>
     <system:String x:Key="notAngle">Stundenwinkel</system:String>
-    <system:String x:Key="notNoData">Keine Daten vorhanden</system:String>
+    <system:String x:Key="notNoData">Keine Daten gefunden</system:String>
     <system:String x:Key="notTimeout">Der Vorgang wurde abgebrochen</system:String>
     <system:String x:Key="notFullMoon">Vollmond</system:String>
     <system:String x:Key="notWaningGibbous">Abnehmender Halbmond</system:String>
     <system:String x:Key="notLastQuarter">Letztes Viertel</system:String>
-    <system:String x:Key="notWaningCrescent">Abnehmender Mondsichel</system:String>
+    <system:String x:Key="notWaningCrescent">Abnehmende Mondsichel</system:String>
     <system:String x:Key="notNewMoon">Neumond</system:String>
     <system:String x:Key="notWaxingCrescent">Zunehmender Halbmond</system:String>
     <system:String x:Key="notFirstQuarter">Erstes Viertel</system:String>
     <system:String x:Key="notWaxingGibbous">Zunehmende Mondsichel</system:String>
     <system:String x:Key="notLogEntry">Protokolleintrag</system:String>
-    <system:String x:Key="notCoordinateType">Koordinaten Art</system:String>
+    <system:String x:Key="notCoordinateType">Koordinaten Typ</system:String>
     <system:String x:Key="notObservatory">Beobachtungsstelle</system:String>
     <system:String x:Key="notLat">Bg</system:String>
     <system:String x:Key="notLong">Lg</system:String>
@@ -354,23 +354,23 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skyBaud">Baud Rate</system:String>
     <system:String x:Key="skyEquatorial">Äquatoriales System</system:String>
     <system:String x:Key="skyAlignment">Ausrichtungsmodus</system:String>
-    <system:String x:Key="skyRaGuiding">Nachführung RA %</system:String>
+    <system:String x:Key="skyRaGuiding">Nachführung Ra %</system:String>
     <system:String x:Key="skyDecGuiding">Nachführung Dek %</system:String>
     <system:String x:Key="skyMount">Montierungstyp</system:String>
     <system:String x:Key="skyMaxSlew">Max Bewegungsgeschwindigkeit Grad/sek</system:String>
     <system:String x:Key="skyMeridian">Meridiangrenzen (Grad)</system:String>
-    <system:String x:Key="skyTracking">Nachführung Rate</system:String>
+    <system:String x:Key="skyTracking">Nachführungsrate</system:String>
     <system:String x:Key="skyST4">ST4 Nachführung</system:String>
     <system:String x:Key="skyReset">Zurücksetzen</system:String>
     <system:String x:Key="SkyResetDef">Auf Standardwerte zurücksetzen?</system:String>
-    <system:String x:Key="skyRefraction">Refraktion</system:String>
-    <system:String x:Key="skyEncoders">Enkoder</system:String>
+    <system:String x:Key="skyRefraction">Brechung</system:String>
+    <system:String x:Key="skyEncoders">Drehgeber</system:String>
     <system:String x:Key="skyAltPpEC">Alternativer PPEC</system:String>
     <system:String x:Key="skyFullCurrent">Voller Strom</system:String>
     <system:String x:Key="skyGoToDecPulse">GoTo Dek Impuls</system:String>
     <system:String x:Key="skyDiagnostics">Diagnose</system:String>
     <system:String x:Key="skySetPark">Parken auf aktuelle Position setzen</system:String>
-    <system:String x:Key="skyOBL">Position der Beobachtungsstelle</system:String>
+    <system:String x:Key="skyOBL">Standort der Beobachtungsstelle</system:String>
     <system:String x:Key="skyLatitude">Breitengrad:</system:String>
     <system:String x:Key="skyLongitude">Längengrad:</system:String>
     <system:String x:Key="skyTemperature">Temperatur</system:String>
@@ -390,17 +390,17 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skyKingRate">King Rate</system:String>
     <system:String x:Key="skyConnect">Verbinden</system:String>
     <system:String x:Key="skyDisconnect">Trennen</system:String>
-    <system:String x:Key="skyHome1">Stellen Sie die Montierung beim Start normalerweise in die Homeposition.</system:String>
-    <system:String x:Key="skyHome2">Die Homeposition ist das Gegengewicht nach unten und die Deklination zum Pol.</system:String>
-    <system:String x:Key="skyHome2AltAz">Die Homeposition ist die horizontale Ausrichtung des Teleskops auf den geografischen Norden.</system:String>
+    <system:String x:Key="skyHome1">Stellen Sie die Montierung beim Start normalerweise in die Ausgangsposition</system:String>
+    <system:String x:Key="skyHome2">Die Ausgangsposition ist das Gegengewicht nach unten und die Deklination zeigt zum Pol.</system:String>
+    <system:String x:Key="skyHome2AltAz">Die Ausgangsposition ist die horizontale Ausrichtung des Teleskoptubus auf den geografischen Norden.</system:String>
     <system:String x:Key="skyParkNewName">Neue Parkposition hinzufügen</system:String>
     <system:String x:Key="skyParkDelete">Parkposition löschen?</system:String>
     <system:String x:Key="skyLat0">Nord oder Süd</system:String>
     <system:String x:Key="skyLat01">N/S</system:String>
     <system:String x:Key="skyLong0">Ost oder West</system:String>
     <system:String x:Key="skyLong01">O/W</system:String>
-    <system:String x:Key="skyMinPulseDec">Min. Dek-Impuls</system:String>
-    <system:String x:Key="skyMinPulseRa">Min. RA-Impuls</system:String>
+    <system:String x:Key="skyMinPulseDec">Minimaler Dek-Impuls</system:String>
+    <system:String x:Key="skyMinPulseRa">Minimaler RA-Impuls</system:String>
     <system:String x:Key="skySchCol1">Ein/Aus</system:String>
     <system:String x:Key="skySchCol2">Aktion</system:String>
     <system:String x:Key="skySchCol3">Datum</system:String>
@@ -410,7 +410,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skyLunar">Lunar</system:String>
     <system:String x:Key="skyKing">King</system:String>
     <system:String x:Key="skyNoSelected">Nichts ausgewählt</system:String>
-    <system:String x:Key="skyParkSaved">Position gespeichert zu</system:String>
+    <system:String x:Key="skyParkSaved">Position gespeichert auf</system:String>
     <system:String x:Key="skyParkEvent1">Ungültige Zeit</system:String>
     <system:String x:Key="skyParkEvent2">Ungültiges Datum</system:String>
     <system:String x:Key="skyParkEvent3">Ungültiges Datum und Zeit</system:String>
@@ -433,7 +433,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="optType">Typ:</system:String>
     <system:String x:Key="optInfo">Info</system:String>
     <system:String x:Key="optData">Daten</system:String>
-    <system:String x:Key="optWarning">Warnung</system:String>
+    <system:String x:Key="optWarning">Warnungen</system:String>
     <system:String x:Key="optError">Fehler</system:String>
     <system:String x:Key="optSessionLogOn">Sitzungsprotokoll erstellen ein/aus</system:String>
     <system:String x:Key="optSessionLog">Sitzungsprotokoll</system:String>
@@ -459,7 +459,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="optModel3D">3D Modell</system:String>
     <system:String x:Key="optSleepMode">Kein Ruhemodus</system:String>
     <system:String x:Key="optStartMin">Minimiert starten</system:String>
-    <system:String x:Key="optStartTop">Fenster im Vodergrund</system:String>
+    <system:String x:Key="optStartTop">Startfenster im Vodergrund</system:String>
     <system:String x:Key="optHomeWarning">Homeposition Warnung An</system:String>
     <system:String x:Key="optVoiceSpeech">Stimme</system:String>
     <system:String x:Key="optVoiceName">Name der Stimme</system:String>
@@ -485,14 +485,14 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="optRender">Renderfähigkeiten</system:String>
     <system:String x:Key="optUTCOffset">UTC Abweichung</system:String>
     <system:String x:Key="optLSTAdjusted">UTC angepasstes Datum:</system:String>
-    <system:String x:Key="optLocalAdjusted">UTC angepasstes Datum:</system:String>
+    <system:String x:Key="optLocalAdjusted">Lokales angepasstes Datum:</system:String>
     <system:String x:Key="optDownload">Herunterladen</system:String>
     <system:String x:Key="optUpdateVer">Verfügbare Version:</system:String>
     <system:String x:Key="optCurrentVer">Installierte Version:</system:String>
     <system:String x:Key="optCheckUpdates">Aktualisierungen suchen</system:String>
     <system:String x:Key="optNotAvail">Keine Aktualisierung vorhanden</system:String>
     <system:String x:Key="optNotFound">Aktualisierung nicht gefunden</system:String>
-    <system:String x:Key="optDisconnects">Trennen der Montierung und der verbundenen Anwendungen vor der Durchführung</system:String>
+    <system:String x:Key="optDisconnects">Trennen der Montierung und der verbundenen Anwendungen vor der Ausführung</system:String>
     <system:String x:Key="optPole">Polsucher</system:String>
     <system:String x:Key="optCopiedClip">In Zwischenablage kopiert</system:String>
 
@@ -540,8 +540,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="polLDate">Örtliches Datum:</system:String>
     <system:String x:Key="polLTime">Ortszeit:</system:String>
     <system:String x:Key="polMirrorFlip">Ansicht wechslen</system:String>
-    <system:String x:Key="polPolaris">Polaris</system:String>
-    <system:String x:Key="polOct">Sigma Oktantis</system:String>
+    <system:String x:Key="polPolaris">Polarstern</system:String>
+    <system:String x:Key="polOct">Polaris Australis</system:String>
 
     <!--1.0.1.8 -->
     <system:String x:Key="1018MouseLock">Maus gesperrt</system:String>
@@ -590,7 +590,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="snap2">Snap Anschluss 2:</system:String>
     <system:String x:Key="snapTimer">Zeitmesser</system:String>
     <system:String x:Key="snapCounter">Zähler</system:String>
-    <system:String x:Key="snapLoops">Schleifen</system:String>
+    <system:String x:Key="snapLoops">Kreisläufe</system:String>
     <system:String x:Key="snapDelay">Verzögerung</system:String>
     <system:String x:Key="snapTimerEr">Betrag des Zeitmessers einstellen</system:String>
     <system:String x:Key="snapEnable">Snap aktivieren</system:String>
@@ -611,19 +611,19 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliClearModelOnStartup">Modell beim Starten löschen</system:String>
     <system:String x:Key="aliAlignmentSettings">Einstellungen</system:String>
     <system:String x:Key="aliProximityLimitTooltip">Wie nahe können Synchronisationspunkte beieinander liegen, bevor sie vorherige Punkte ersetzen (Bogensekunden).</system:String>
-    <system:String x:Key="aliAlignmentModeTooltip">Choose whether to use the nearest point or the nearest three points</system:String>
-    <system:String x:Key="aliActivePointsTooltip">Choose whether to consider all points, just points on the same side of the pier or just points in the local quadrant or</system:String>
-    <system:String x:Key="aliThreePointAlgorithmTooltip">How to pick the three points, triangle with closest points or the triangle with the centre nearest.</system:String>
-    <system:String x:Key="aliClearModelOnStartupTooltip">Aktivieren Sie diese Option, wenn Sie bei jeder erneuten Verbindung ein neues Modell erstellen möchten.</system:String>
+    <system:String x:Key="aliSampleSizeTooltip">Wie viele naheliegende Synchronisationspunkte bei der Positionsberechnung verwendet werden sollen.</system:String>
+    <system:String x:Key="aliNearbyLimitTooltip">Wie nahe sollten Synchronisationspunkte beieinander liegen, bevor sie in Berechnungen verwendet werden (Grad).</system:String>
+    <system:String x:Key="aliThreePointAlgorithmTooltip">Wie wählt man die drei Punkte, das Dreieck mit den nächstliegenden Punkten oder das Dreieck mit dem nächstliegenden Mittelpunkt aus?</system:String>
+    <system:String x:Key="aliClearModelOnStartupTooltip">Anklicken, wenn Sie bei jeder erneuten Verbindung ein neues Modell erstellen möchten.</system:String>
     <system:String x:Key="aliClearAll">Alle löschen</system:String>
     <system:String x:Key="aliClearAllTooltip">Klicken Sie auf diese Schaltfläche, um alle Ausrichtungspunkte aus dem Modell zu löschen.</system:String>
     <system:String x:Key="aliDelete">Löschen</system:String>
     <system:String x:Key="aliDeleteTooltip">Klicken Sie auf diese Schaltfläche, um den ausgewählten Ausrichtungspunkt zu löschen.</system:String>
     <system:String x:Key="optAlignment">Ausrichtung</system:String>
     <system:String x:Key="optProximityLimit">Annäherungsgrenze</system:String>
-    <system:String x:Key="optAlignmentMode">Alignment Behaviour</system:String>
-    <system:String x:Key="optActivePoints">Point Filter</system:String>
-    <system:String x:Key="optThreePointAlgorithm">Three Point Selection</system:String>
+    <system:String x:Key="optAlignmentMode">Ausrichtungsverhalten</system:String>
+    <system:String x:Key="optActivePoints">Punkt-Filter</system:String>
+    <system:String x:Key="optThreePointAlgorithm">Drei-Punkte-Auswahl</system:String>
 
     <!--1.0.3.2 -->
     <system:String x:Key="customGears">Benutzerdefinierte Zahnräder</system:String>
@@ -644,14 +644,14 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!--1.0.3.4 -->
     <system:String x:Key="btnReSyncEnc">ReSync Enkoder</system:String>
-    <system:String x:Key="btnReSyncHome">Homeposition</system:String>
+    <system:String x:Key="btnReSyncHome">Ausgangsposition</system:String>
     <system:String x:Key="btnReSyncAccept">Akzeptieren, um die Montierungsposition zurückzusetzen</system:String>
     <system:String x:Key="btnReSync">ReSync</system:String>
     <system:String x:Key="vceSync">Synchronisiert</system:String>
-    <system:String x:Key="skyGlobalStopOn">Global Stop (esc)</system:String>
-    <system:String x:Key="btnCap">External Capabilities</system:String>
-    <system:String x:Key="capCanSetPark">Can Set Park</system:String>
-    <system:String x:Key="skyStopMount">Mount must be stopped</system:String>
+    <system:String x:Key="skyGlobalStopOn">Globaler Stop (esc)</system:String>
+    <system:String x:Key="btnCap">Externe Fähigkeiten</system:String>
+    <system:String x:Key="capCanSetPark">Kann Parken einstellen</system:String>
+    <system:String x:Key="skyStopMount">Montierung muss gestoppt werden</system:String>
 
     <!-- 1.0.3.8 -->
     <system:String x:Key="aliExport">Export</system:String>
@@ -669,24 +669,24 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliPointModelFileFilter">Daten der Punktmodelle (*.GssPointModel)|*.GssPointModel|All files (*.*)|*.*</system:String>
 
     <system:String x:Key="tabFocuserTooltip">Anzeige des Fokussierfeldes</system:String>
-    <system:String x:Key="focuserSettings">Fokussierer Einstellungen</system:String>
-    <system:String x:Key="focuserCloseTooltip">Fokussierer-Einstellungsfeld schließen</system:String>
+    <system:String x:Key="focuserSettings">Auszugs Einstellungen</system:String>
+    <system:String x:Key="focuserCloseTooltip">Auszugs-Einstellungsfeld schließen</system:String>
     <system:String x:Key="focuserIn">Rein</system:String>
     <system:String x:Key="focuserOut">Raus</system:String>
     <system:String x:Key="focuserConnected">Verbunden</system:String>
     <system:String x:Key="focuserPosition">Aktuelle Position</system:String>
     <system:String x:Key="focuserRefresh">Aktualisieren</system:String>
-    <system:String x:Key="focuserRefreshTooltip">Aktualisieren Sie die Liste der verfügbaren Fokussierer</system:String>
+    <system:String x:Key="focuserRefreshTooltip">Aktualisieren Sie die Liste der verfügbaren Auszüge</system:String>
     <system:String x:Key="focuserSetup">Einrichtung</system:String>
-    <system:String x:Key="focuserSetupTooltip">Öffnen Sie das ASCOM Einstellungsdialog für den ausgewählten Fokussierer</system:String>
+    <system:String x:Key="focuserSetupTooltip">Öffnen Sie das ASCOM Einstellungsdialog für den ausgewählten Auszug</system:String>
     <system:String x:Key="focuserConnect">Verbinden</system:String>
-    <system:String x:Key="focuserConnectTooltip">Mit dem ausgewählten Fokussierer verbinden</system:String>
+    <system:String x:Key="focuserConnectTooltip">Mit dem ausgewählten Auszug verbinden</system:String>
     <system:String x:Key="focuserDisconnect">Trennen</system:String>
-    <system:String x:Key="focuserDisconnectTooltip">Verbindung zum Fokussierer trennen</system:String>
+    <system:String x:Key="focuserDisconnectTooltip">Verbindung zum Auszug trennen</system:String>
     <system:String x:Key="focuserStepSizeHint">Schrittweite</system:String>
-    <system:String x:Key="focuserStepSizeTooltip">Die Fokussierposition wird bei jedem Tastendruck erhöht</system:String>
-    <system:String x:Key="focuserSelectTooltip">Wählen Sie den Fokussierer zur Verbindung aus</system:String>
-    <system:String x:Key="focuserSelectHint">Fokussierer</system:String>
+    <system:String x:Key="focuserStepSizeTooltip">Die Auszugsposition wird bei jedem Tastendruck erhöht</system:String>
+    <system:String x:Key="focuserSelectTooltip">Wählen Sie den Auszug zur Verbindung aus</system:String>
+    <system:String x:Key="focuserSelectHint">Auszug</system:String>
 
     <system:String x:Key="focuserReverseDirectionTooltip">Aktivieren Sie dieses Kästchen, um die Richtung des Fokussierers umzukehren, wenn die Tasten gedrückt werden.</system:String>
     <system:String x:Key="focuserReverseDirection">Richtung umkehren</system:String>
@@ -713,24 +713,24 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="lbAlt">Alt</system:String>
 
     <!--1.0.4.7 -->
-    <system:String x:Key="gpsDecimals">Dezimalzahlen eingeben</system:String>
+    <system:String x:Key="gpsDecimals">Dezimalen eingeben</system:String>
     <system:String x:Key="InvCord">Ungültige Koordinaten</system:String>
 
     <!--1.0.4.8 -->
-    <system:String x:Key="skyFlipAng">Umkehrwinkel (Grad)</system:String>
+    <system:String x:Key="skyFlipAng">Drehwinkel (Grad)</system:String>
     <system:String x:Key="lbAxisTrackingLimit">Nachführgrenze (Grad)</system:String>
     <system:String x:Key="mntCap">Fähigkeiten:</system:String>
     <system:String x:Key="mntAdv">Erweiterte Funkt.</system:String>
 
     <!-- 1.0.?.? -->
-    <system:String x:Key="aliAlertTooltip">Ausrichtungsmodell wurde aufgrund eines unerwartet großen Versatz abgeschaltet.</system:String>
+    <system:String x:Key="aliAlertTooltip">Ausrichtungsmodell wurde aufgrund eines unerwartet großen Versatzes abgeschaltet.</system:String>
     <system:String x:Key="aliCancelAlert">Ausrichtungswarnung abbrechen</system:String>
     <system:String x:Key="aliCancelAlertTooltip">Klicken Sie auf diese Schaltfläche, um die Ausrichtungswarnung abzubrechen.</system:String>
     <system:String x:Key="vceAlignmentAlert">Ausrichtungswarnung</system:String>
     
     <!--1.0.6.3 -->
-    <system:String x:Key="btnContinueHome">Akzeptieren, um zur Homeposition zu bewegen</system:String>
-    <system:String x:Key="btnContinuePark">Akzeptieren für Parkposition</system:String>
+    <system:String x:Key="btnContinueHome">Akzeptieren, um zur Ausgangsposition zu schwenken</system:String>
+    <system:String x:Key="btnContinuePark">Akzeptieren für Parken</system:String>
     <system:String x:Key="FlipOnNextGoto">Erzwungene Umkehrung beim nächsten GoTo</system:String>
     
     <!--1.0.6.4 -->
