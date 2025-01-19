@@ -46,7 +46,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>greenswamp1.ico</ApplicationIcon>
-    <Copyright>Copyright © Green Swamp Software 2019-2024</Copyright>
+    <Copyright>Copyright © Green Swamp Software 2019-2025</Copyright>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
