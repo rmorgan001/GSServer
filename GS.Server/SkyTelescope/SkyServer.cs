@@ -62,6 +62,7 @@ namespace GS.Server.SkyTelescope
         private static readonly object _timerLock = new object();
         private static MediaTimer _mediaTimer;
         private static MediaTimer _altAzTrackingTimer;
+        private static Int32 _altAzTrackingLock;
 
         // Slew and HC speeds
         private static double SlewSpeedOne;
@@ -3377,15 +3378,23 @@ namespace GS.Server.SkyTelescope
                 Datetime = HiResDateTime.UtcNow,
                 Device = MonitorDevice.Server,
                 Category = MonitorCategory.Server,
-                Type = MonitorType.Debug,
+                Type = MonitorType.Information,
                 Method = MonitorLog.GetCurrentMethod(),
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = $"TimerID|{_altAzTrackingTimer?.TimerID}"
             };
             MonitorLog.LogToMonitor(monitorItem);
-            // handle timer race condition triggering handler after AltAzTimer has been stopped
-            if(AltAzTimerIsRunning) 
-                SetTracking();
+            // timer must be running to update tracking
+            if (_altAzTrackingTimer?.IsRunning == true)
+            {
+                // handle timer race condition triggering handler
+                if (Interlocked.CompareExchange(ref _altAzTrackingLock, -1, 0) == 0)
+                {
+                    SetTracking();
+                    // Release the lock
+                    _altAzTrackingLock = 0;
+                }
+            }
         }
 
         /// <summary>
@@ -4670,6 +4679,8 @@ public static double CurrentTrackingRate()
             // For Alt / Az mode swap to alt / az rate tracking whilst slewing
             if ((altAzModeSet) && (change[0] != 0.0 || change[1] != 0.0) && Tracking)
             {
+                // Acquire the AltAz tracking lock
+                while (Interlocked.CompareExchange(ref _altAzTrackingLock, -1, 0) != 0) Thread.Sleep(10);
                 if (AltAzTimerIsRunning) _altAzTrackingTimer.Stop();
                 SetAltAzTrackingRates(AltAzTrackingType.Rate);
             }
@@ -4784,18 +4795,17 @@ public static double CurrentTrackingRate()
                         AxesRateOfChange.Reset();
                         do
                         {
+                            MountPositionUpdated = false;
                             // Update mount velocity
                             UpdateSteps();
                             while (!MountPositionUpdated) Thread.Sleep(50);
                             AxesRateOfChange.Update(_actualAxisX, _actualAxisY, HiResDateTime.UtcNow);
                         } while ((AxesRateOfChange.AxisVelocity - trackingRate).Length > 1.1 * CurrentTrackingRate());
                         // resume tracking
-                        // Update mount position
-                        MountPositionUpdated = false;
-                        UpdateSteps();
-                        while (!MountPositionUpdated) Thread.Sleep(50);
                         SkyPredictor.Set(RightAscensionXForm, DeclinationXForm, 0, 0);
                         SetTracking();
+                        // release the AltAz tracking timer lock
+                        _altAzTrackingLock = 0;
                         monitorItem = new MonitorEntry
                         {
                             Datetime = HiResDateTime.UtcNow,
