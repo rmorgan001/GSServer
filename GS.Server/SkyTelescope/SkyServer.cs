@@ -2059,6 +2059,7 @@ namespace GS.Server.SkyTelescope
 
             if (Math.Abs(RateMoveAxisRa) > 0) // MoveAxis RA absolute at the given rate
             {
+              //change.X -= SkyTrackingRate.X; // remove any tracking
                 change.X += RateMoveAxisRa;
             }
             else // Alt Az handles RateRa through AltAzPredictor
@@ -2066,8 +2067,11 @@ namespace GS.Server.SkyTelescope
                 change.X += SkySettings.AlignmentMode != AlignmentModes.algAltAz ? GetRaRateDirection(RateRa) : 0;
             }
 
-            if (Math.Abs(RateMoveAxisDec) > 0)// MoveAxis Dec absolute at the given rate
-            { change.Y += RateMoveAxisDec; }
+            if (Math.Abs(RateMoveAxisDec) > 0) // MoveAxis Dec absolute at the given rate
+            {
+              //change.Y -= SkyTrackingRate.Y; // remove any tracking
+                change.Y += RateMoveAxisDec;
+            }
             else // Alt Az handles RateDec through AltAzPredictor
             {
                 change.Y += SkySettings.AlignmentMode != AlignmentModes.algAltAz ? GetDecRateDirection(RateDec) : 0;
