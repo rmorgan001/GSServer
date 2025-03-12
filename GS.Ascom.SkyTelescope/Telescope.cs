@@ -783,6 +783,7 @@ namespace ASCOM.GS.Sky.Telescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 CheckVersionOne("GuideRateDeclination", true);
+                CheckRange(value, 0.0, 0.5, "GuideRateDeclination");
                 SkyServer.GuideRateDec = value;
             }
         }
@@ -807,6 +808,7 @@ namespace ASCOM.GS.Sky.Telescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 CheckVersionOne("GuideRateRightAscension", true);
+                CheckRange(value, 0.0, 0.5, "GuideRateRightAscension");
                 SkyServer.GuideRateRa = value;
             }
         }

@@ -268,6 +268,8 @@ namespace GS.SkyWatcher
                         SkyQueue.IsPulseGuidingRa = true;
                         var trackingRateRa = _trackingRates[0];    // current speed set from AxisSlew
                         var trackingSpeedRa = _trackingSpeeds[0];   // current speed set from AxisSlew
+                        bool changeDirection = false; // change direction of motion
+                        bool slewingForward = true; // current axis direction of motion
                         try
                         {
 
@@ -307,8 +309,21 @@ namespace GS.SkyWatcher
                             }
                             else
                             {
-                                var speedInt = CalculateSpeed(AxisId.Axis1, applyRate);  // Calculate mount speed  
-                                _commands.SetStepSpeed(AxisId.Axis1, speedInt); // :I Send pulse to axis
+                                var speedInt = CalculateSpeed(AxisId.Axis1, applyRate);  // Calculate required mount speed
+                                AxisStatus axesStatus = _commands.GetAxisStatus(AxisId.Axis1); // Get axis status
+                                slewingForward = axesStatus.SlewingForward; // Get current direction of motion
+                                changeDirection = slewingForward != (applyRate >= 0.0);
+                                if (changeDirection) // Need to change direction of motion
+                                {
+                                    _commands.AxisStop(AxisId.Axis1); // Stop axis motion
+                                    _commands.SetMotionMode(AxisId.Axis1, 1, axesStatus.SlewingForward ? 1 : 0, false);
+                                    _commands.SetStepSpeed(AxisId.Axis1, speedInt); // :I Send pulse to axis
+                                    _commands.StartMotion(AxisId.Axis1);
+                                }
+                                else
+                                {
+                                    _commands.SetStepSpeed(AxisId.Axis1, speedInt); // :I Send pulse to axis
+                                }
                             }
 
                             pulseEntry.StartTime = _commands.LastI1RunTime; // get the last :I start time
@@ -350,7 +365,17 @@ namespace GS.SkyWatcher
                             }
                             else
                             {
-                                _commands.SetStepSpeed(AxisId.Axis1, trackingSpeedRa); // :I set speed back to previous tracking speed
+                                if (changeDirection)
+                                {
+                                    _commands.AxisStop(AxisId.Axis1); // Stop axis motion
+                                    _commands.SetMotionMode(AxisId.Axis1, 1, slewingForward ? 0 : 1, false);
+                                    _commands.SetStepSpeed(AxisId.Axis1, trackingSpeedRa); // :I Send pulse to axis
+                                    _commands.StartMotion(AxisId.Axis1);
+                                }
+                                else
+                                {
+                                    _commands.SetStepSpeed(AxisId.Axis1, trackingSpeedRa); // :I set speed back to previous tracking speed
+                                }
                             }
 
                             if (_pPecOn && AlternatingPPec) { SetPPec(AxisId.Axis1, true); } // implements the alternating pPEC
