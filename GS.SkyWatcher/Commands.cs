@@ -1419,8 +1419,8 @@ namespace GS.SkyWatcher
             }
             var b = bool.Parse(ignoreWarnings.Trim());
             var c = char.Parse(cmd.Trim());
-
-            var response = CmdToMount(a, c, cmdData.Trim(), b);
+            var d = cmdData == null ? string.Empty : cmdData.Trim();
+            var response = CmdToMount(a, c, d, b);
             return response;
         }
 
