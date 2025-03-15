@@ -932,6 +932,18 @@ namespace ASCOM.GS.Sky.Telescope
             {
                 if (IsPulseGuiding && SkySettings.AlignmentMode == AlignmentModes.algAltAz)
                     throw new InvalidOperationException("Alt Az mode does not support dual axis pulse guiding");
+                if (!SkyServer.AsComOn) { throw new InvalidOperationException("Not accepting commands"); }
+                if (SkyServer.AtPark) { throw new ParkedException(); }
+                //if (SkyServer.IsSlewing) { throw new InvalidValueException("Pulse rejected when slewing"); }
+                //if (!SkyServer.Tracking) { throw new InvalidValueException("Pulse rejected when tracking is off"); }
+
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{Direction},{Duration}") };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                CheckCapability(SkySettings.CanPulseGuide, "PulseGuide");
+                CheckRange(Duration, 0, 30000, "PulseGuide", "Duration");
+
                 switch (Direction)
                 {
                     case GuideDirections.guideNorth:
@@ -945,20 +957,6 @@ namespace ASCOM.GS.Sky.Telescope
                     default:
                         throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null);
                 }
-
-                var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{Direction},{Duration}") };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                if (!SkyServer.AsComOn) { throw new InvalidOperationException("Not accepting commands"); }
-                if (SkyServer.AtPark) { throw new ParkedException(); }
-
-                if (SkyServer.IsSlewing) { throw new InvalidValueException("Pulse rejected when slewing"); }
-
-                if (!SkyServer.Tracking) { throw new InvalidValueException("Pulse rejected when tracking is off"); }
-
-                CheckCapability(SkySettings.CanPulseGuide, "PulseGuide");
-                CheckRange(Duration, 0, 30000, "PulseGuide", "Duration");
 
                 var startTime = HiResDateTime.UtcNow;
                 SkyServer.PulseGuide(Direction, Duration);

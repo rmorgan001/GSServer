@@ -15,6 +15,7 @@
  */
 using ASCOM.DeviceInterface;
 using ASCOM.Utilities;
+using GS.Server.Pulses;
 using GS.Shared;
 using Newtonsoft.Json;
 using System;
@@ -855,7 +856,6 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-
         private static string _port;
         public static string Port
         {
@@ -1105,6 +1105,21 @@ namespace GS.Server.SkyTelescope
                 _hcFlipNS = value;
                 Properties.SkyTelescope.Default.HcFlipNS = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static List<HcPulseGuide> _hcPulseGuides;
+        public static List<HcPulseGuide> HcPulseGuides
+        {
+            get => _hcPulseGuides;
+            set
+            {
+                // if (_hcPulseGuides == value) return;
+                _hcPulseGuides = value.OrderBy(hcPulseGuide => hcPulseGuide.Speed).ToList();
+                var output = JsonConvert.SerializeObject(_hcPulseGuides);
+                Properties.SkyTelescope.Default.HCPulseSpeeds = output;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{output}");
                 OnStaticPropertyChanged();
             }
         }
@@ -1434,7 +1449,6 @@ namespace GS.Server.SkyTelescope
                 OnStaticPropertyChanged();
             }
         }
-
 
         private static bool _pecOn;
         public static bool PecOn
@@ -2179,7 +2193,7 @@ namespace GS.Server.SkyTelescope
             }
 
              //first time load from old park positions EQ
-           ParkPositionsAltAz = JsonConvert.DeserializeObject<List<ParkPosition>>(pp);
+            ParkPositionsAltAz = JsonConvert.DeserializeObject<List<ParkPosition>>(pp);
             pp = Properties.SkyTelescope.Default.ParkPositionsEQ;
             if (string.IsNullOrEmpty(pp))
             {
@@ -2190,6 +2204,24 @@ namespace GS.Server.SkyTelescope
                 Properties.SkyTelescope.Default.ParkPositionsEQ = pp;
             }
             ParkPositionsEQ =JsonConvert.DeserializeObject<List<ParkPosition>>(pp);
+
+            var hcp = Properties.SkyTelescope.Default.HCPulseSpeeds;
+            if (string.IsNullOrEmpty(hcp))
+            {
+                var hcPulseGuides = new List<HcPulseGuide>
+                {
+                    new HcPulseGuide { Speed = 1, Duration = 30, Rate = 0.01 },
+                    new HcPulseGuide { Speed = 2, Duration = 30, Rate = 0.02 },
+                    new HcPulseGuide { Speed = 3, Duration = 30, Rate = 0.141 },
+                    new HcPulseGuide { Speed = 4, Duration = 30, Rate = 0.204 },
+                    new HcPulseGuide { Speed = 5, Duration = 30, Rate = 0.6 },
+                    new HcPulseGuide { Speed = 6, Duration = 30, Rate = 1.2 },
+                    new HcPulseGuide { Speed = 7, Duration = 30, Rate = 2.4 },
+                    new HcPulseGuide { Speed = 8, Duration = 30, Rate = 3.0 }
+                };
+                hcp = JsonConvert.SerializeObject(hcPulseGuides);
+            }
+            HcPulseGuides =JsonConvert.DeserializeObject<List<HcPulseGuide>>(hcp);
         }
 
         /// <summary>
