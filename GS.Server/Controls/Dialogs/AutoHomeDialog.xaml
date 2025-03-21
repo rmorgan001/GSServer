@@ -6,7 +6,7 @@
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
         xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
-        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}">
     <GroupBox Header="{StaticResource btnAutoHome}" Margin="5" >
             <StackPanel Orientation="Vertical">
                 <ProgressBar Value="{Binding AutoHomeProgressBar}" md:TransitionAssist.DisableTransitions="True" Height="10" Width="200" Foreground="{StaticResource SecondaryHueMidBrush}" />

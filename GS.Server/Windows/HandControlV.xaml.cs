@@ -9,7 +9,7 @@ namespace GS.Server.Windows
     {
         public HandControlV()
         {
-            DataContext = new HandControlVM(); 
+            DataContext = new HandControlVm(); 
             InitializeComponent();
         }
 

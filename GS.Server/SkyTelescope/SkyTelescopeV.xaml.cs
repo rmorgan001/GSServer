@@ -22,12 +22,12 @@ namespace GS.Server.SkyTelescope
             switch (name)
             {
                 case "RaDecGoTo":
-                    SkyTelescopeVM._skyTelescopeVM.RaDecDialogActive = false;
-                    SkyTelescopeVM._skyTelescopeVM.AltAzDialogActive = true;
+                    SkyTelescopeVm.ASkyTelescopeVm.RaDecDialogActive = false;
+                    SkyTelescopeVm.ASkyTelescopeVm.AltAzDialogActive = true;
                     break;
                 case "AltAzGoTo":
-                    SkyTelescopeVM._skyTelescopeVM.RaDecDialogActive = true;
-                    SkyTelescopeVM._skyTelescopeVM.AltAzDialogActive = false;
+                    SkyTelescopeVm.ASkyTelescopeVm.RaDecDialogActive = true;
+                    SkyTelescopeVm.ASkyTelescopeVm.AltAzDialogActive = false;
                     break;
             }
         }

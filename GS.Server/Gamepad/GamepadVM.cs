@@ -43,7 +43,7 @@ namespace GS.Server.GamePad
         public string BottomName => "GamePad";
         public int Uid => 3;
 
-        private SkyTelescopeVM _skyTelescopeVM;
+        private SkyTelescopeVm _skyTelescopeVM;
         private FocuserVM _focuserVM;
         private SettingsVM _settingsVM;
         private CancellationTokenSource ctsGamePad;
@@ -463,7 +463,7 @@ namespace GS.Server.GamePad
         /// <returns></returns>
         private bool SkyTelescope()
         {
-            if (_skyTelescopeVM == null) _skyTelescopeVM = SkyTelescopeVM._skyTelescopeVM;
+            if (_skyTelescopeVM == null) _skyTelescopeVM = SkyTelescopeVm.ASkyTelescopeVm;
             return _skyTelescopeVM != null;
         }
 

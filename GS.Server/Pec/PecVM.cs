@@ -52,7 +52,7 @@ namespace GS.Server.Pec
         private const double _secondsOfArc = 1296000.0;
         private const string _tab = "|"; //"\t";
 
-        private readonly SkyTelescopeVM _skyTelescopeVM;
+        private readonly SkyTelescopeVm _skyTelescopeVM;
         private Timer _timer;
         private readonly object _timerLock = new object();
         private static readonly string _logPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments, Environment.SpecialFolderOption.Create);
@@ -83,7 +83,7 @@ namespace GS.Server.Pec
                     };
                     MonitorLog.LogToMonitor(monitorItem);
 
-                    if (_skyTelescopeVM == null) _skyTelescopeVM = SkyTelescopeVM._skyTelescopeVM;
+                    if (_skyTelescopeVM == null) _skyTelescopeVM = SkyTelescopeVm.ASkyTelescopeVm;
                     // setup property events to monitor
                     SkyServer.StaticPropertyChanged += PropertyChangedSkyServer;
                     SkySettings.StaticPropertyChanged += PropertyChangedSkySettings;

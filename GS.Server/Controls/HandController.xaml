@@ -6,7 +6,7 @@
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
              xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
-             xmlns:b="http://schemas.microsoft.com/xaml/behaviors" mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors" mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}">
     <!--<b:Interaction.Triggers>
         --><!--Stop Mouse Lock--><!--
         <b:EventTrigger EventName="PreviewKeyDown">
@@ -34,9 +34,12 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <!--<md:DialogHost HorizontalAlignment="Center" CloseOnClickAway="True" IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" Background="Transparent" />-->
-            <Button Grid.Row="0" Grid.Column="0" Width="20" Height="20" ToolTip="{StaticResource hcOpenWin}" Command="{Binding OpenHCWindowCmd}" Style="{StaticResource MaterialDesignRaisedAccentButton}" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" 
+            <Button Grid.Row="0" Grid.Column="0" Width="20" Height="20" ToolTip="{StaticResource hcOpenWin}" Command="{Binding OpenHcWindowCmd}" Style="{StaticResource MaterialDesignRaisedAccentButton}" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" 
                     Visibility="{Binding HcWinVisibility, Converter={StaticResource BoolToVis}}">
                 <md:PackIcon Kind="OpenInNew" Margin="-14,-2,0,0" />
+            </Button>
+            <Button Grid.Row="0" Grid.Column="2"  Margin="-5,0,0,0" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding OpenPulseGuidesDialogCmd}" Width="24" Height="24" >
+                <md:PackIcon Kind="Pulse" />
             </Button>
             <Button Grid.Row="1" Grid.Column="0" Width="50" Height="50" ToolTipService.Placement="Center">
                 <Button.ToolTip>
@@ -161,7 +164,7 @@
             <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="3" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Top" >
                 <!--Mode-->
                 <ComboBox Margin="0,5,0,0"  md:HintAssist.Hint="{StaticResource hcMode}" ToolTip="{StaticResource hcTipMode}" 
-                          ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type skyTelescope:HCMode}}}" 
+                          ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type skyTelescope:HcMode}}}" 
                           Style="{StaticResource MaterialDesignFloatingHintComboBox}" FontSize="12">
                     <ComboBox.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -175,11 +178,11 @@
                 <!--Flip-->
                 <Label VerticalAlignment="Bottom" Margin="-3,5,0,0"  Content="{StaticResource hcFlip}" FontSize="12" />
                 <StackPanel Orientation="Horizontal" Margin="0,-5,0,0" >
-                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource hcTipFlipEW}" IsChecked="{Binding FlipEW, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding EWEnabled}" />
+                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource hcTipFlipEW}" IsChecked="{Binding FlipEw, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding EwEnabled}" />
                     <Label VerticalAlignment="Bottom" Content="{StaticResource hcFlipEW}" FontSize="12" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,-5,0,0">
-                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource hcTipFlipNS}" IsChecked="{Binding FlipNS, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding NSEnabled}" />
+                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource hcTipFlipNS}" IsChecked="{Binding FlipNs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding NsEnabled}" />
                     <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource hcFlipNS}" FontSize="12" />
                 </StackPanel>
                 <!--backlash-->

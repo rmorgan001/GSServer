@@ -40,7 +40,7 @@ namespace GS.Server.Windows
     {
         #region Fields
 
-        private readonly SkyTelescopeVM _skyTelescopeVM;
+        private readonly SkyTelescopeVm _skyTelescopeVM;
         private readonly Util _util = new Util();
 
         #endregion
@@ -55,7 +55,7 @@ namespace GS.Server.Windows
                         { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Opening Hand Control Window" };
                     MonitorLog.LogToMonitor(monitorItem);
 
-                    _skyTelescopeVM = SkyTelescopeVM._skyTelescopeVM;
+                    _skyTelescopeVM = SkyTelescopeVm.ASkyTelescopeVm;
                     SkyServer.StaticPropertyChanged += PropertyChangedSkyServer;
                     SkySettings.StaticPropertyChanged += PropertyChangedSkySettings;
 
@@ -843,13 +843,13 @@ namespace GS.Server.Windows
             }
         }
         
-        public double EyepieceFS
+        public double EyepieceFs
         {
-            get => SkySettings.EyepieceFS;
+            get => SkySettings.EyepieceFs;
             set
             {
-                if (Math.Abs(SkySettings.EyepieceFS - value) < 0.0) return;
-                SkySettings.EyepieceFS = value;
+                if (Math.Abs(SkySettings.EyepieceFs - value) < 0.0) return;
+                SkySettings.EyepieceFs = value;
                 OnPropertyChanged();
             }
         }
@@ -1103,8 +1103,8 @@ namespace GS.Server.Windows
             {
                 using (new WaitCursor())
                 {
-                    var h = (EyepieceFS / FocalLength) * 57.3 * 3600;
-                    var w = (EyepieceFS / FocalLength) * 57.3 * 3600;
+                    var h = (EyepieceFs / FocalLength) * 57.3 * 3600;
+                    var w = (EyepieceFs / FocalLength) * 57.3 * 3600;
 
                     CalcHeight = (int)h;
                     CalcWidth = (int)w;

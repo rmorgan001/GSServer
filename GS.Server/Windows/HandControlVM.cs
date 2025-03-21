@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
@@ -10,6 +11,7 @@ using ASCOM.DeviceInterface;
 using GS.Principles;
 using GS.Server.Controls.Dialogs;
 using GS.Server.Helpers;
+using GS.Server.Pulses;
 using GS.Server.SkyTelescope;
 using GS.Shared;
 using GS.Shared.Command;
@@ -18,15 +20,15 @@ using NativeMethods = GS.Server.Helpers.NativeMethods;
 
 namespace GS.Server.Windows
 {
-    public class HandControlVM : ObservableObject, IDisposable
+    public class HandControlVm : ObservableObject, IDisposable
     {
         #region Fields
 
-        private readonly SkyTelescopeVM _skyTelescopeVM;
+        private readonly SkyTelescopeVm _skyTelescopeVm;
 
         #endregion
 
-        public HandControlVM()
+        public HandControlVm()
         {
             try
             {
@@ -36,11 +38,11 @@ namespace GS.Server.Windows
                         { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Opening Hand Control Window" };
                     MonitorLog.LogToMonitor(monitorItem);
 
-                    _skyTelescopeVM = SkyTelescopeVM._skyTelescopeVM;
+                    _skyTelescopeVm = SkyTelescopeVm.ASkyTelescopeVm;
                     SkyServer.StaticPropertyChanged += PropertyChangedSkyServer;
                     SkySettings.StaticPropertyChanged += PropertyChangedSkySettings;
 
-                    SetHCFlipsVisibility();
+                    SetHcFlipsVisibility();
 
                     Title = Application.Current.Resources["hcHc"].ToString();
                     ScreenEnabled = SkyServer.IsMountRunning;
@@ -150,11 +152,11 @@ namespace GS.Server.Windows
                      case "HcSpeed":
                          HcSpeed = (double)SkySettings.HcSpeed;
                          break;
-                     case "HcFlipEW":
-                         FlipEW = SkySettings.HcFlipEW;
+                     case "HcFlipEw":
+                         FlipEw = SkySettings.HcFlipEw;
                          break;
-                     case "HcFlipNS":
-                         FlipNS = SkySettings.HcFlipNS;
+                     case "HcFlipNs":
+                         FlipNs = SkySettings.HcFlipNs;
                          break;
                      case "HcAntiRa":
                          HcAntiRa = SkySettings.HcAntiRa;
@@ -162,8 +164,204 @@ namespace GS.Server.Windows
                      case "HcAntiDec":
                          HcAntiDec = SkySettings.HcAntiDec;
                          break;
+                     case "HcMode":
+                         HcMode = SkySettings.HcMode;
+                         break;
                  }
              });
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
+
+         #region HC PulseGuides
+
+        private List<HcPulseGuide> _hcPulseGuides;
+        public List<HcPulseGuide> HcPulseGuides
+        {
+            get => _hcPulseGuides;
+            set
+            {
+                _hcPulseGuides = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openPulseGuidesDialogCmd;
+        public ICommand OpenPulseGuidesDialogCmd
+        {
+            get
+            {
+                var command = _openPulseGuidesDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openPulseGuidesDialogCmd = new RelayCommand(
+                    param => OpenPulseGuidesDialog()
+                );
+            }
+        }
+        private void OpenPulseGuidesDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    _hcPulseGuides = SkySettings.HcPulseGuides;
+                    DialogContent = new HcPulseGuidesDialog();
+                    IsDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelPulseGuidesDialogCmd;
+        public ICommand CancelPulseGuidesDialogCmd
+        {
+            get
+            {
+                var command = _cancelPulseGuidesDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelPulseGuidesDialogCmd = new RelayCommand(
+                    param => CancelPulseGuidesDialog()
+                );
+            }
+        }
+        private void CancelPulseGuidesDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _acceptPulseGuidesDialogCmd;
+        public ICommand AcceptPulseGuidesDialogCmd
+        {
+            get
+            {
+                var command = _acceptPulseGuidesDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptPulseGuidesDialogCmd = new RelayCommand(
+                    param => AcceptPulseGuidesDialog()
+                );
+            }
+        }
+        private void AcceptPulseGuidesDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    SkySettings.HcPulseGuides = _hcPulseGuides;
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _resetPulseGuidesDialogCmd;
+        public ICommand ResetPulseGuidesDialogCmd
+        {
+            get
+            {
+                var command = _resetPulseGuidesDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _resetPulseGuidesDialogCmd = new RelayCommand(
+                    param => ResetPulseGuidesDialog()
+                );
+            }
+        }
+        private void ResetPulseGuidesDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    var hcp = new HcDefaultPulseGuides();
+                    HcPulseGuides = hcp.DefaultPulseGuides;
+                    IsDialogOpen = true;
+                }
             }
             catch (Exception ex)
             {
@@ -207,28 +405,28 @@ namespace GS.Server.Windows
             }
         }
 
-        public bool FlipNS
+        public bool FlipNs
         {
-            get => SkySettings.HcFlipNS;
+            get => SkySettings.HcFlipNs;
             set
             {
-                SkySettings.HcFlipNS = value;
+                SkySettings.HcFlipNs = value;
                 OnPropertyChanged();
             }
         }
 
-        public bool FlipEW
+        public bool FlipEw
         {
-            get => SkySettings.HcFlipEW;
+            get => SkySettings.HcFlipEw;
             set
             {
-                SkySettings.HcFlipEW = value;
+                SkySettings.HcFlipEw = value;
                 OnPropertyChanged();
             }
         }
 
         private bool _nsEnabled;
-        public bool NSEnabled
+        public bool NsEnabled
         {
             get => _nsEnabled;
             set
@@ -240,7 +438,7 @@ namespace GS.Server.Windows
         }
 
         private bool _ewEnabled;
-        public bool EWEnabled
+        public bool EwEnabled
         {
             get => _ewEnabled;
             set
@@ -307,30 +505,34 @@ namespace GS.Server.Windows
             }
         }
 
-        private void SetHCFlipsVisibility()
+        private void SetHcFlipsVisibility()
         {
             switch (HcMode)
             {
-                case HCMode.Axes:
-                    EWEnabled = true;
-                    NSEnabled = true;
+                case HcMode.Axes:
+                    EwEnabled = true;
+                    NsEnabled = true;
                     break;
-                case HCMode.Guiding:
-                    EWEnabled = false;
-                    NSEnabled = false;
+                case HcMode.Guiding:
+                    EwEnabled = false;
+                    NsEnabled = false;
+                    break;
+                case HcMode.Pulse:
+                    EwEnabled = false;
+                    NsEnabled = false;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        public HCMode HcMode
+        public HcMode HcMode
         {
             get => SkySettings.HcMode;
             set
             {
                 SkySettings.HcMode = value;
-                SetHCFlipsVisibility();
+                SetHcFlipsVisibility();
                 OnPropertyChanged();
             }
         }
@@ -442,11 +644,11 @@ namespace GS.Server.Windows
             {
                 if (SkyServer.AtPark)
                 {
-                    _skyTelescopeVM.BlinkParked();
+                    _skyTelescopeVm.BlinkParked();
                     Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
-                StartSlew(FlipEW && EWEnabled ? SlewDirection.SlewRight : SlewDirection.SlewLeft);
+                StartSlew(FlipEw && EwEnabled ? SlewDirection.SlewRight : SlewDirection.SlewLeft);
             }
             catch (Exception ex)
             {
@@ -528,11 +730,11 @@ namespace GS.Server.Windows
             {
                 if (SkyServer.AtPark)
                 {
-                    _skyTelescopeVM.BlinkParked();
+                    _skyTelescopeVm.BlinkParked();
                     Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
-                StartSlew(FlipEW && EWEnabled ? SlewDirection.SlewLeft : SlewDirection.SlewRight);
+                StartSlew(FlipEw && EwEnabled ? SlewDirection.SlewLeft : SlewDirection.SlewRight);
             }
             catch (Exception ex)
             {
@@ -614,11 +816,11 @@ namespace GS.Server.Windows
             {
                 if (SkyServer.AtPark)
                 {
-                    _skyTelescopeVM.BlinkParked();
+                    _skyTelescopeVm.BlinkParked();
                     Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
-                StartSlew(FlipNS && NSEnabled ? SlewDirection.SlewDown : SlewDirection.SlewUp);
+                StartSlew(FlipNs && NsEnabled ? SlewDirection.SlewDown : SlewDirection.SlewUp);
             }
             catch (Exception ex)
             {
@@ -700,11 +902,11 @@ namespace GS.Server.Windows
             {
                 if (SkyServer.AtPark)
                 {
-                    _skyTelescopeVM.BlinkParked();
+                    _skyTelescopeVm.BlinkParked();
                     Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
-                StartSlew(FlipNS && NSEnabled ? SlewDirection.SlewUp : SlewDirection.SlewDown);
+                StartSlew(FlipNs && NsEnabled ? SlewDirection.SlewUp : SlewDirection.SlewDown);
             }
             catch (Exception ex)
             {
@@ -804,18 +1006,18 @@ namespace GS.Server.Windows
             }
         }
 
-        private ICommand _openHCWindowCmd;
-        public ICommand OpenHCWindowCmd
+        private ICommand _openHcWindowCmd;
+        public ICommand OpenHcWindowCmd
         {
             get
             {
-                var cmd = _openHCWindowCmd;
+                var cmd = _openHcWindowCmd;
                 if (cmd != null)
                 {
                     return cmd;
                 }
 
-                return _openHCWindowCmd = new RelayCommand(param => OpenHcWindow());
+                return _openHcWindowCmd = new RelayCommand(param => OpenHcWindow());
             }
         }
         private void OpenHcWindow()
@@ -848,36 +1050,36 @@ namespace GS.Server.Windows
                 return;
             }
 
-            var HcMode = SkySettings.HcMode;
-            var HcAntiDec = SkySettings.HcAntiDec;
-            var HcAntiRa = SkySettings.HcAntiRa;
-            var DecBacklash = SkySettings.DecBacklash;
-            var RaBacklash = SkySettings.RaBacklash;
+            var hcMode = SkySettings.HcMode;
+            var hcAntiDec = SkySettings.HcAntiDec;
+            var hcAntiRa = SkySettings.HcAntiRa;
+            var decBacklash = SkySettings.DecBacklash;
+            var raBacklash = SkySettings.RaBacklash;
 
             var speed = SkySettings.HcSpeed;
             switch (direction)
             {
                 case SlewDirection.SlewEast:
                 case SlewDirection.SlewRight:
-                    SkyServer.HcMoves(speed, SlewDirection.SlewEast, HcMode, HcAntiRa, HcAntiDec, RaBacklash, DecBacklash);
+                    SkyServer.HcMoves(speed, SlewDirection.SlewEast, hcMode, hcAntiRa, hcAntiDec, raBacklash, decBacklash);
                     break;
                 case SlewDirection.SlewWest:
                 case SlewDirection.SlewLeft:
-                    SkyServer.HcMoves(speed, SlewDirection.SlewWest, HcMode, HcAntiRa, HcAntiDec, RaBacklash, DecBacklash);
+                    SkyServer.HcMoves(speed, SlewDirection.SlewWest, hcMode, hcAntiRa, hcAntiDec, raBacklash, decBacklash);
                     break;
                 case SlewDirection.SlewNorth:
                 case SlewDirection.SlewUp:
-                    SkyServer.HcMoves(speed, SlewDirection.SlewNorth, HcMode, HcAntiRa, HcAntiDec, RaBacklash, DecBacklash);
+                    SkyServer.HcMoves(speed, SlewDirection.SlewNorth, hcMode, hcAntiRa, hcAntiDec, raBacklash, decBacklash);
                     break;
                 case SlewDirection.SlewSouth:
                 case SlewDirection.SlewDown:
-                    SkyServer.HcMoves(speed, SlewDirection.SlewSouth, HcMode, HcAntiRa, HcAntiDec, RaBacklash, DecBacklash);
+                    SkyServer.HcMoves(speed, SlewDirection.SlewSouth, hcMode, hcAntiRa, hcAntiDec, raBacklash, decBacklash);
                     break;
                 case SlewDirection.SlewNoneRa:
-                    SkyServer.HcMoves(speed, SlewDirection.SlewNoneRa, HcMode, HcAntiRa, HcAntiDec, RaBacklash, DecBacklash);
+                    SkyServer.HcMoves(speed, SlewDirection.SlewNoneRa, hcMode, hcAntiRa, hcAntiDec, raBacklash, decBacklash);
                     break;
                 case SlewDirection.SlewNoneDec:
-                    SkyServer.HcMoves(speed, SlewDirection.SlewNoneDec, HcMode, HcAntiRa, HcAntiDec, RaBacklash, DecBacklash);
+                    SkyServer.HcMoves(speed, SlewDirection.SlewNoneDec, hcMode, hcAntiRa, hcAntiDec, raBacklash, decBacklash);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -1131,14 +1333,14 @@ namespace GS.Server.Windows
 
                 if (e.XButton1 == MouseButtonState.Pressed)
                 {
-                    if (_skyTelescopeVM.SpiralOutCmd.CanExecute(null))
-                        _skyTelescopeVM.SpiralOutCmd.Execute(null);
+                    if (_skyTelescopeVm.SpiralOutCmd.CanExecute(null))
+                        _skyTelescopeVm.SpiralOutCmd.Execute(null);
                 }
 
                 if (e.XButton2 == MouseButtonState.Pressed)
                 {
-                    if (_skyTelescopeVM.SpiralInCmd.CanExecute(null))
-                        _skyTelescopeVM.SpiralInCmd.Execute(null);
+                    if (_skyTelescopeVm.SpiralInCmd.CanExecute(null))
+                        _skyTelescopeVm.SpiralInCmd.Execute(null);
                 }
 
                 if (e.MiddleButton != MouseButtonState.Pressed) return;
@@ -1522,7 +1724,7 @@ namespace GS.Server.Windows
         // NOTE: Leave out the finalizer altogether if this class doesn't
         // own unmanaged resources itself, but leave the other methods
         // exactly as they are.
-        ~HandControlVM()
+        ~HandControlVm()
         {
             // Finalizer calls Dispose(false)
             Dispose(false);

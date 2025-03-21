@@ -29,7 +29,7 @@
         Left="{Binding WindowLeft, Mode=TwoWay}" 
         Top="{Binding WindowTop, Mode=TwoWay}" MinHeight="100" MinWidth="200" AllowsTransparency="True">
     <Window.Resources>
-        <DataTemplate DataType="{x:Type skyTelescope:SkyTelescopeVM}">
+        <DataTemplate DataType="{x:Type skyTelescope:SkyTelescopeVm}">
             <skyTelescope:SkyTelescopeV />
         </DataTemplate>
         <DataTemplate DataType="{x:Type focuser:FocuserVM}">

@@ -687,8 +687,8 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static HCMode _hcMode;
-        public static HCMode HcMode
+        private static HcMode _hcMode;
+        public static HcMode HcMode
         {
             get => _hcMode;
             set
@@ -697,6 +697,7 @@ namespace GS.Server.SkyTelescope
                 _hcMode = value;
                 Properties.SkyTelescope.Default.HCMode = value.ToString();
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
+                OnStaticPropertyChanged();
             }
         }
 
@@ -955,14 +956,14 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static double _eyepieceFS;
-        public static double EyepieceFS
+        private static double _eyepieceFs;
+        public static double EyepieceFs
         {
-            get => _eyepieceFS;
+            get => _eyepieceFs;
             set
             {
-                if (Math.Abs(_eyepieceFS - value) < 0.0) return;
-                _eyepieceFS = value;
+                if (Math.Abs(_eyepieceFs - value) < 0.0) return;
+                _eyepieceFs = value;
                 Properties.SkyTelescope.Default.EyepieceFS = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
@@ -1081,28 +1082,28 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static bool _hcFlipEW;
-        public static bool HcFlipEW
+        private static bool _hcFlipEw;
+        public static bool HcFlipEw
         {
-            get => _hcFlipEW;
+            get => _hcFlipEw;
             set
             {
-                if (_hcFlipEW == value) return;
-                _hcFlipEW = value;
+                if (_hcFlipEw == value) return;
+                _hcFlipEw = value;
                 Properties.SkyTelescope.Default.HcFlipEW = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
 
-        private static bool _hcFlipNS;
-        public static bool HcFlipNS
+        private static bool _hcFlipNs;
+        public static bool HcFlipNs
         {
-            get => _hcFlipNS;
+            get => _hcFlipNs;
             set
             {
-                if (_hcFlipNS == value) return;
-                _hcFlipNS = value;
+                if (_hcFlipNs == value) return;
+                _hcFlipNs = value;
                 Properties.SkyTelescope.Default.HcFlipNS = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
@@ -1194,28 +1195,28 @@ namespace GS.Server.SkyTelescope
             }
         }
         
-        private static bool _HzlimitTracking;
+        private static bool _hzlimitTracking;
         public static bool HzLimitTracking
         {
-            get => _HzlimitTracking;
+            get => _hzlimitTracking;
             set
             {
-                if (_HzlimitTracking == value) return;
-                _HzlimitTracking = value;
+                if (_hzlimitTracking == value) return;
+                _hzlimitTracking = value;
                 Properties.SkyTelescope.Default.HzLimitTracking = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
 
-        private static bool _HzlimitPark;
+        private static bool _hzlimitPark;
         public static bool HzLimitPark
         {
-            get => _HzlimitPark;
+            get => _hzlimitPark;
             set
             {
-                if (_HzlimitPark == value) return;
-                _HzlimitPark = value;
+                if (_hzlimitPark == value) return;
+                _hzlimitPark = value;
                 Properties.SkyTelescope.Default.HzLimitPark = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
@@ -1863,16 +1864,16 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static List<ParkPosition> _parkPositionsEQ;
+        private static List<ParkPosition> _parkPositionsEq;
         public static List<ParkPosition> ParkPositionsEQ
         {
-            get => _parkPositionsEQ;
+            get => _parkPositionsEq;
             set
             {
                 {
                     // if (_parkPositions == value) return;
-                    _parkPositionsEQ = value.OrderBy(parkPosition => parkPosition.Name).ToList();
-                    var output = JsonConvert.SerializeObject(_parkPositionsEQ);
+                    _parkPositionsEq = value.OrderBy(parkPosition => parkPosition.Name).ToList();
+                    var output = JsonConvert.SerializeObject(_parkPositionsEq);
                     Properties.SkyTelescope.Default.ParkPositionsEQ = output;
                     LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{output}");
                     OnStaticPropertyChanged();
@@ -1937,14 +1938,14 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static int _AltAzTrackingUpdateInterval;
+        private static int _altAzTrackingUpdateInterval;
         public static int AltAzTrackingUpdateInterval
         {
-            get => _AltAzTrackingUpdateInterval;
+            get => _altAzTrackingUpdateInterval;
             set
             {
-                if (_AltAzTrackingUpdateInterval == value) return;
-                _AltAzTrackingUpdateInterval = value;
+                if (_altAzTrackingUpdateInterval == value) return;
+                _altAzTrackingUpdateInterval = value;
                 Properties.SkyTelescope.Default.AltAzTrackingUpdateInterval = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
@@ -1965,28 +1966,28 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static double _AltAxisUpperLimit;
+        private static double _altAxisUpperLimit;
         public static double AltAxisUpperLimit
         {
-            get => _AltAxisUpperLimit;
+            get => _altAxisUpperLimit;
             set
             {
-                if (Math.Abs(_AltAxisUpperLimit - value) < 0.000001) return;
-                _AltAxisUpperLimit = value;
+                if (Math.Abs(_altAxisUpperLimit - value) < 0.000001) return;
+                _altAxisUpperLimit = value;
                 Properties.SkyTelescope.Default.AltAxisUpperLimit = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
 
-        private static double _AltAxisLowerLimit;
+        private static double _altAxisLowerLimit;
         public static double AltAxisLowerLimit
         {
-            get => _AltAxisLowerLimit;
+            get => _altAxisLowerLimit;
             set
             {
-                if (Math.Abs(_AltAxisLowerLimit - value) < 0.000001) return;
-                _AltAxisLowerLimit = value;
+                if (Math.Abs(_altAxisLowerLimit - value) < 0.000001) return;
+                _altAxisLowerLimit = value;
                 Properties.SkyTelescope.Default.AltAxisLowerLimit = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
@@ -2061,8 +2062,8 @@ namespace GS.Server.SkyTelescope
             TrackingRate = dparse;
             Enum.TryParse<SlewSpeed>(Properties.SkyTelescope.Default.HcSpeed, true, out var hparse);
             HcSpeed = hparse;
-            var hcmodebol = Enum.TryParse<HCMode>(Properties.SkyTelescope.Default.HCMode, true, out var hcparse);
-            if (!hcmodebol) hcparse = HCMode.Guiding;// getting rid of compass mode
+            var hcmodebol = Enum.TryParse<HcMode>(Properties.SkyTelescope.Default.HCMode, true, out var hcparse);
+            if (!hcmodebol) hcparse = HcMode.Guiding;// getting rid of compass mode
             HcMode = hcparse;
             Enum.TryParse<MountType>(Properties.SkyTelescope.Default.Mount, true, out var mountparse);
             Mount = mountparse;
@@ -2099,13 +2100,13 @@ namespace GS.Server.SkyTelescope
             DtrEnable = Properties.SkyTelescope.Default.DTREnable;
             Elevation = Properties.SkyTelescope.Default.Elevation;
             Encoders = Properties.SkyTelescope.Default.EncodersOn;
-            EyepieceFS = Properties.SkyTelescope.Default.EyepieceFS;
+            EyepieceFs = Properties.SkyTelescope.Default.EyepieceFS;
             FocalLength = Properties.SkyTelescope.Default.FocalLength;
             FullCurrent = Properties.SkyTelescope.Default.FullCurrent;
             HcAntiDec = Properties.SkyTelescope.Default.HcAntiDec;
             HcAntiRa = Properties.SkyTelescope.Default.HcAntiRa;
-            HcFlipEW = Properties.SkyTelescope.Default.HcFlipEW;
-            HcFlipNS = Properties.SkyTelescope.Default.HcFlipNS;
+            HcFlipEw = Properties.SkyTelescope.Default.HcFlipEW;
+            HcFlipNs = Properties.SkyTelescope.Default.HcFlipNS;
             GlobalStopOn = Properties.SkyTelescope.Default.GlobalStopOn;
             GotoPrecision = Properties.SkyTelescope.Default.GotoPrecision;
             GpsComPort = "COM" + Properties.SkyTelescope.Default.GpsPort;
@@ -2205,21 +2206,12 @@ namespace GS.Server.SkyTelescope
             }
             ParkPositionsEQ =JsonConvert.DeserializeObject<List<ParkPosition>>(pp);
 
+            //default list is stored in HCPulses.cs not in the app.config
             var hcp = Properties.SkyTelescope.Default.HCPulseSpeeds;
             if (string.IsNullOrEmpty(hcp))
             {
-                var hcPulseGuides = new List<HcPulseGuide>
-                {
-                    new HcPulseGuide { Speed = 1, Duration = 30, Rate = 0.01 },
-                    new HcPulseGuide { Speed = 2, Duration = 30, Rate = 0.02 },
-                    new HcPulseGuide { Speed = 3, Duration = 30, Rate = 0.141 },
-                    new HcPulseGuide { Speed = 4, Duration = 30, Rate = 0.204 },
-                    new HcPulseGuide { Speed = 5, Duration = 30, Rate = 0.6 },
-                    new HcPulseGuide { Speed = 6, Duration = 30, Rate = 1.2 },
-                    new HcPulseGuide { Speed = 7, Duration = 30, Rate = 2.4 },
-                    new HcPulseGuide { Speed = 8, Duration = 30, Rate = 3.0 }
-                };
-                hcp = JsonConvert.SerializeObject(hcPulseGuides);
+                var hg = new HcDefaultPulseGuides();
+                hcp = JsonConvert.SerializeObject(hg.DefaultPulseGuides);
             }
             HcPulseGuides =JsonConvert.DeserializeObject<List<HcPulseGuide>>(hcp);
         }

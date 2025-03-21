@@ -6,7 +6,7 @@
         xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
-        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}">
     <GroupBox Header="{StaticResource botLimitOptions}" Margin="5">
         <StackPanel Orientation="Vertical">
             <Label Content="{StaticResource Meridian}" VerticalAlignment="Center" />

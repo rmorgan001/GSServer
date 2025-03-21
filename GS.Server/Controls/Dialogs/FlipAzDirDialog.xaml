@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
-        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}">
     <GroupBox Header="{StaticResource btnFlipAzDir}" Margin="5">
         <StackPanel Orientation="Vertical">
             <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,5,0,0" Text="{StaticResource btnContinueFlipAzDir}" TextWrapping="Wrap" Width="200"/>

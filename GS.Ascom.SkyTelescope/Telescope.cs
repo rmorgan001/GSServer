@@ -959,7 +959,7 @@ namespace ASCOM.GS.Sky.Telescope
                 }
 
                 var startTime = HiResDateTime.UtcNow;
-                SkyServer.PulseGuide(Direction, Duration);
+                SkyServer.PulseGuide(Direction, Duration,0);
                 // If synchronous (must be for Alt Az ASCOM V3) wait out the remaining pulse guide duration here
                 if (SkySettings.AlignmentMode != AlignmentModes.algAltAz) return;
                 // Wait for pulse guiding completion

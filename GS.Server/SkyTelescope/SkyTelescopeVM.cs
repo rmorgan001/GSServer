@@ -59,23 +59,24 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using GS.Server.Pulses;
 
 namespace GS.Server.SkyTelescope
 {
-    public sealed class SkyTelescopeVM : ObservableObject, IPageVM, IDisposable
+    public sealed class SkyTelescopeVm : ObservableObject, IPageVM, IDisposable
     {
         #region Fields
-        private static readonly Util _util = new Util();
+        private static readonly Util Util = new Util();
         public string TopName => "SkyWatcher";
         public string BottomName => "Telescope";
         public int Uid => 0;
-        public static SkyTelescopeVM _skyTelescopeVM;
+        public static SkyTelescopeVm ASkyTelescopeVm;
         private CancellationTokenSource _ctsPark;
         private CancellationToken _ctPark;
-        private IKeyboardMouseEvents _GlobalHook;
+        private IKeyboardMouseEvents _globalHook;
         #endregion
 
-        public SkyTelescopeVM()
+        public SkyTelescopeVm()
         {
             try
             {
@@ -94,7 +95,7 @@ namespace GS.Server.SkyTelescope
                     };
                     MonitorLog.LogToMonitor(monitorItem);
 
-                    _skyTelescopeVM = this;
+                    ASkyTelescopeVm = this;
                     LoadImages();  // load front image
 
                     if (!Properties.Server.Default.SkyWatcher) return; // Show in Tab?
@@ -118,8 +119,8 @@ namespace GS.Server.SkyTelescope
                     HourAngleLimits = new List<double>(Numbers.InclusiveRange(0, 90, 1));
                     Range90 = new List<int>(Enumerable.Range(0, 90));
                     Range179 = new List<int>(Enumerable.Range(0, 180));
-                    LatitudeRangeNS = new List<string>() { "N", "S" };
-                    LongitudeRangeEW = new List<string>() { "E", "W" };
+                    LatitudeRangeNs = new List<string>() { "N", "S" };
+                    LongitudeRangeEw = new List<string>() { "E", "W" };
                     DecRange = new List<int>(Enumerable.Range(-90, 181));
                     CustomMountOffset = new List<int>(Enumerable.Range(-5, 11));
                     Hours = new List<int>(Enumerable.Range(0, 24));
@@ -146,7 +147,7 @@ namespace GS.Server.SkyTelescope
                     VoiceState = Settings.Settings.VoiceActive;
                     ParkSelection = AtPark ? SkyServer.GetStoredParkPosition() : ParkPositions.FirstOrDefault();
                     ParkSelectionSetting = ParkPositions.FirstOrDefault();
-                    SetHCFlipsVisibility();
+                    SetHcFlipsVisibility();
                     RightAscension = "00h 00m 00s";
                     Declination = "00\xb0 00m 00s";
                     Azimuth = "00\xb0 00m 00s";
@@ -180,7 +181,7 @@ namespace GS.Server.SkyTelescope
                             AltRange = Range90;
                             break;
                     }
-                    EnableFlipSOP = SkySettings.CanSetPierSide;
+                    EnableFlipSop = SkySettings.CanSetPierSide;
 
                     HcWinVisibility = true;
                     ModelWinVisibility = true;
@@ -239,7 +240,7 @@ namespace GS.Server.SkyTelescope
                         break;
                     case FrontGraphic.Model3D:
                         Rotate();
-                        LoadGEM();
+                        LoadGem();
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(value), value, null);
@@ -385,17 +386,20 @@ namespace GS.Server.SkyTelescope
                      case "ParkHzLimitName":
                          SetParkHzLimitSelection(SkySettings.ParkHzLimitName);
                          break;
-                     case "HcFlipEW":
-                         FlipEW = SkySettings.HcFlipEW;
+                     case "HcFlipEw":
+                         FlipEw = SkySettings.HcFlipEw;
                          break;
-                     case "HcFlipNS":
-                         FlipNS = SkySettings.HcFlipNS;
+                     case "HcFlipNs":
+                         FlipNs = SkySettings.HcFlipNs;
                          break;
                      case "HcAntiRa":
                          HcAntiRa = SkySettings.HcAntiRa;
                          break;
                      case "HcAntiDec":
                          HcAntiDec = SkySettings.HcAntiDec;
+                         break;
+                     case "HcMode":
+                         HcMode = SkySettings.HcMode;
                          break;
                      case "RaGaugeFlip":
                          RaGaugeFlip = SkySettings.RaGaugeFlip;
@@ -404,7 +408,7 @@ namespace GS.Server.SkyTelescope
                          SelectedDevice = SkySettings.Port;
                          break;
                      case "CanSetPierSide":
-                         EnableFlipSOP = SkySettings.CanSetPierSide;
+                         EnableFlipSop = SkySettings.CanSetPierSide;
                          break;
                      case "AlignmentMode":
                          ParkPositions = SkySettings.ParkPositions;
@@ -474,18 +478,18 @@ namespace GS.Server.SkyTelescope
                             switch (e.PropertyName)
                             {
                                 case "Altitude":
-                                    Altitude = _util.DegreesToDMS(SkyServer.Altitude, "° ", ":", "", 2);
+                                    Altitude = Util.DegreesToDMS(SkyServer.Altitude, "° ", ":", "", 2);
                                     if (Graphic != FrontGraphic.None){Alt = SkyServer.Altitude;}
                                     break;
                                 case "Azimuth":
-                                    Azimuth = _util.DegreesToDMS(SkyServer.Azimuth, "° ", ":", "", 2);
+                                    Azimuth = Util.DegreesToDMS(SkyServer.Azimuth, "° ", ":", "", 2);
                                     if (Graphic != FrontGraphic.None) {AzGauge = SkyServer.Azimuth;}
                                     break;
                                 case "CanPPec":
                                     PPecEnabled = SkyServer.CanPPec;
                                     break;
                                 case "DeclinationXForm":
-                                    Declination = _util.DegreesToDMS(SkyServer.DeclinationXForm, "° ", ":", "", 2);
+                                    Declination = Util.DegreesToDMS(SkyServer.DeclinationXForm, "° ", ":", "", 2);
                                     break;
                                 case "CanHomeSensor":
                                     AutoHomeEnabled = SkyServer.CanHomeSensor;
@@ -494,16 +498,13 @@ namespace GS.Server.SkyTelescope
                                     OpenSetupDialog = SkyServer.OpenSetupDialog;
                                     break;
                                 case "Lha":
-                                    Lha = _util.HoursToHMS(SkyServer.Lha, "h ", ":", "", 2);
+                                    Lha = Util.HoursToHMS(SkyServer.Lha, "h ", ":", "", 2);
                                     break;
                                 case "RightAscensionXForm":
-                                    var ra = _util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
-                                    if (RaInDegrees) 
-                                        RightAscension = _util.DegreesToDMS(_util.HMSToDegrees(ra), "° ", ":", "", 2);
-                                    else
-                                    {
-                                        RightAscension = ra;
-                                    }
+                                    var ra = Util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
+                                    if (_raInDegrees) 
+                                        RightAscension = Util.DegreesToDMS(Util.HMSToDegrees(ra), "° ", ":", "", 2);
+                                    else { RightAscension = ra; }
                                     SetGraphics();
                                     break;
                                 case "Rotate3DModel":
@@ -741,7 +742,7 @@ namespace GS.Server.SkyTelescope
                         {
                             case "AccentColor":
                             case "ModelType":
-                                LoadGEM();
+                                LoadGem();
                                 break;
                             case "VoiceActive":
                                 VoiceState = Settings.Settings.VoiceActive;
@@ -1170,7 +1171,7 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-        public IList<string> LatitudeRangeNS { get; }
+        public IList<string> LatitudeRangeNs { get; }
         public string Lat0
         {
             get => SkySettings.Latitude < 0 ? "S" : "N";
@@ -1237,7 +1238,7 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-        public IList<string> LongitudeRangeEW { get; }
+        public IList<string> LongitudeRangeEw { get; }
         public string Long0
         {
             get => SkySettings.Longitude < 0 ? "W" : "E";
@@ -1309,14 +1310,14 @@ namespace GS.Server.SkyTelescope
                 if (value)
                 {
                     SkySettings.GlobalStopOn = true;
-                    _GlobalHook = null;
-                    _GlobalHook = Hook.GlobalEvents();
-                    _GlobalHook.KeyPress += GlobalHookKeyPress;
+                    _globalHook = null;
+                    _globalHook = Hook.GlobalEvents();
+                    _globalHook.KeyPress += GlobalHookKeyPress;
                 }
                 else
                 {
                     SkySettings.GlobalStopOn = false;
-                    _GlobalHook?.Dispose();
+                    _globalHook?.Dispose();
                 }
                 OnPropertyChanged();
             }
@@ -1623,7 +1624,7 @@ namespace GS.Server.SkyTelescope
         private int _remotePort;
         private TimeSpan _broadcastTimeout;
         private ConcurrentDictionary<IPAddress, Lazy<UdpClient>> _udpClients;
-        private readonly byte[] DiscoverMsg = Encode(":e1\r");
+        private readonly byte[] _discoverMsg = Encode(":e1\r");
         private CancellationTokenSource _cts;
         
         private static byte[] Encode(string msg) => Encoding.ASCII.GetBytes(msg);
@@ -1770,7 +1771,7 @@ namespace GS.Server.SkyTelescope
             var oldCts = Interlocked.Exchange(ref _cts, new CancellationTokenSource(_broadcastTimeout));
             oldCts?.Cancel();
 
-            var broadCastIP = new IPEndPoint(IPAddress.Broadcast, _remotePort);
+            var broadCastIp = new IPEndPoint(IPAddress.Broadcast, _remotePort);
 
             Parallel.ForEach(
                 _udpClients,
@@ -1778,7 +1779,7 @@ namespace GS.Server.SkyTelescope
                 {
                     try
                     {
-                        kv.Value.Value.BeginSend(DiscoverMsg, DiscoverMsg.Length, broadCastIP, EndSendCb,
+                        kv.Value.Value.BeginSend(_discoverMsg, _discoverMsg.Length, broadCastIp, EndSendCb,
                             new DiscoveryState(kv.Key, _cts));
                     }
                     catch (SocketException ex)
@@ -1805,20 +1806,20 @@ namespace GS.Server.SkyTelescope
             if (sendRes.IsCompleted && sender != null && !state.Cts.IsCancellationRequested && _udpClients.TryGetValue(sender, out var updClient))
             {
                 _ = updClient.Value.EndSend(sendRes);
-                updClient.Value.BeginReceive(BeginReceiveEP1Cb, state);
+                updClient.Value.BeginReceive(BeginReceiveEp1Cb, state);
             }
         }
-        private void BeginReceiveEP1Cb(IAsyncResult receiveRes)
+        private void BeginReceiveEp1Cb(IAsyncResult receiveRes)
         {
             var state = receiveRes.AsyncState as DiscoveryState;
             var sender = state?.InterfaceAddress;
             if (receiveRes.IsCompleted && sender != null && !state.Cts.IsCancellationRequested && _udpClients.TryGetValue(sender, out var updClient))
             {
-                IPEndPoint remoteEP = null;
-                var response = Decode(updClient.Value.EndReceive(receiveRes, ref remoteEP));
-                if (remoteEP != null && IsSuccessfulResponse(response))
+                IPEndPoint remoteEp = null;
+                var response = Decode(updClient.Value.EndReceive(receiveRes, ref remoteEp));
+                if (remoteEp != null && IsSuccessfulResponse(response))
                 {
-                    SkySystem.AddRemoteIp(remoteEP.ToString());
+                    SkySystem.AddRemoteIp(remoteEp.ToString());
                     var monitorItem = new MonitorEntry
                     {
                         Type = MonitorType.Information,
@@ -1827,7 +1828,7 @@ namespace GS.Server.SkyTelescope
                         Datetime = DateTime.UtcNow,
                         Method = MethodBase.GetCurrentMethod()?.Name,
                         Thread = Thread.CurrentThread.ManagedThreadId,
-                        Message = $"|{remoteEP}"
+                        Message = $"|{remoteEp}"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
                 }
@@ -2185,9 +2186,9 @@ namespace GS.Server.SkyTelescope
 
         #region Viewport3D
 
-        private double xAxisOffset;
-        private double yAxisOffset;
-        private double zAxisOffset;
+        private double _axAxisOffset;
+        private double _ayAxisOffset;
+        private double _azAxisOffset;
 
         private bool _modelWinVisibility;
         public bool ModelWinVisibility
@@ -2268,7 +2269,7 @@ namespace GS.Server.SkyTelescope
             set
             {
                 _xAxis = value;
-                XAxisOffset = value + xAxisOffset;
+                XAxisOffset = value + _axAxisOffset;
                 OnPropertyChanged();
             }
         }
@@ -2280,7 +2281,7 @@ namespace GS.Server.SkyTelescope
             set
             {
                 _yAxis = value;
-                YAxisOffset = value + yAxisOffset;
+                YAxisOffset = value + _ayAxisOffset;
                 OnPropertyChanged();
             }
         }
@@ -2292,7 +2293,7 @@ namespace GS.Server.SkyTelescope
             set
             {
                 _zAxis = value;
-                ZAxisOffset = zAxisOffset - value;
+                ZAxisOffset = _azAxisOffset - value;
                 OnPropertyChanged();
             }
         }
@@ -2363,7 +2364,7 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-        private void LoadGEM()
+        private void LoadGem()
         {
             try
             {
@@ -2378,9 +2379,9 @@ namespace GS.Server.SkyTelescope
                 {
                     case AlignmentModes.algAltAz:
                         //offset for model to match start position
-                        xAxisOffset = 0;
-                        yAxisOffset = 90;
-                        zAxisOffset = 0;
+                        _axAxisOffset = 0;
+                        _ayAxisOffset = 90;
+                        _azAxisOffset = 0;
                         //start position
                         XAxis = -90;
                         YAxis = 90;
@@ -2392,9 +2393,9 @@ namespace GS.Server.SkyTelescope
                     case AlignmentModes.algGermanPolar:
                     default:
                         //offset for model to match start position
-                        xAxisOffset = 90;
-                        yAxisOffset = -90;
-                        zAxisOffset = 0;
+                        _axAxisOffset = 90;
+                        _ayAxisOffset = -90;
+                        _azAxisOffset = 0;
 
                         //start position
                         XAxis = -90;
@@ -2486,14 +2487,14 @@ namespace GS.Server.SkyTelescope
                 var win = Application.Current.Windows.OfType<ModelV>().FirstOrDefault();
                 if (win != null) return;
                 var bWin = new ModelV();
-                var _modelVM = ModelVM._modelVM;
-                _modelVM.WinHeight = 320;
-                _modelVM.WinWidth = 250;
-                _modelVM.Position = Position;
-                _modelVM.LookDirection = LookDirection;
-                _modelVM.UpDirection = UpDirection;
-                _modelVM.ImageFile = ImageFile;
-                _modelVM.CameraIndex = 2;
+                var modelVm = ModelVM._modelVM;
+                modelVm.WinHeight = 320;
+                modelVm.WinWidth = 250;
+                modelVm.Position = Position;
+                modelVm.LookDirection = LookDirection;
+                modelVm.UpDirection = UpDirection;
+                modelVm.ImageFile = ImageFile;
+                modelVm.CameraIndex = 2;
                 bWin.Show();
             }
             catch (Exception ex)
@@ -2546,7 +2547,7 @@ namespace GS.Server.SkyTelescope
                     Settings.Settings.ModelPosition2 = new Point3D(900, 1100, 800);
                 }
 
-                LoadGEM();
+                LoadGem();
             }
             catch (Exception ex)
             {
@@ -2707,7 +2708,7 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private bool RaInDegrees;
+        private bool _raInDegrees;
 
         private ICommand _raDoubleClickCommand;
 
@@ -2731,7 +2732,7 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
-                RaInDegrees = !RaInDegrees;
+                _raInDegrees = !_raInDegrees;
             }
             catch (Exception ex)
             {
@@ -3234,14 +3235,14 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private bool _enableFlipSOP;
-        public bool EnableFlipSOP
+        private bool _enableFlipSop;
+        public bool EnableFlipSop
         {
-            get => _enableFlipSOP;
+            get => _enableFlipSop;
             set
             {
-                if (_enableFlipSOP == value) return;
-                _enableFlipSOP = value;
+                if (_enableFlipSop == value) return;
+                _enableFlipSop = value;
                 OnPropertyChanged();
             }
         }
@@ -3480,13 +3481,13 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    var ra = _util.HoursToHMS(SkyServer.RightAscensionXForm, ":", ":", ":", 3);
+                    var ra = Util.HoursToHMS(SkyServer.RightAscensionXForm, ":", ":", ":", 3);
                     var ras = ra.Split(':');
                     RaHours = Convert.ToDouble(ras[0]);
                     RaMinutes = Convert.ToDouble(ras[1]);
                     RaSeconds = Convert.ToDouble(ras[2]);
 
-                    var dec = _util.HoursToHMS(SkyServer.DeclinationXForm, ":", ":", ":", 3);
+                    var dec = Util.HoursToHMS(SkyServer.DeclinationXForm, ":", ":", ":", 3);
                     var decs = dec.Split(':');
                     DecDegrees = Convert.ToDouble(decs[0]);
                     DecMinutes = Convert.ToDouble(decs[1]);
@@ -3589,13 +3590,13 @@ namespace GS.Server.SkyTelescope
                         return;
                     }
 
-                    var ra = _util.DegreesToHMS(vra, ":",":",":", 3);
+                    var ra = Util.DegreesToHMS(vra, ":",":",":", 3);
                     var ras = ra.Split(':');
                     RaHours = Convert.ToDouble(ras[0]);
                     RaMinutes = Convert.ToDouble(ras[1]);
                     RaSeconds = Convert.ToDouble(ras[2]);
 
-                    var dec = _util.DegreesToDMS(vdec,":",":",":",3);
+                    var dec = Util.DegreesToDMS(vdec,":",":",":",3);
                     var decs = dec.Split(':');
                     DecDegrees = Convert.ToDouble(decs[0]);
                     DecMinutes = Convert.ToDouble(decs[1]);
@@ -3752,13 +3753,13 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    var az = _util.HoursToHMS(SkyServer.Azimuth, ":", ":", ":", 3);
+                    var az = Util.HoursToHMS(SkyServer.Azimuth, ":", ":", ":", 3);
                     var azs = az.Split(':');
                     AzDegrees = Convert.ToDouble(azs[0]);
                     AzMinutes = Convert.ToDouble(azs[1]);
                     AzSeconds = Convert.ToDouble(azs[2]);
 
-                    var alt = _util.HoursToHMS(SkyServer.Altitude, ":", ":", ":", 3);
+                    var alt = Util.HoursToHMS(SkyServer.Altitude, ":", ":", ":", 3);
                     var alts = alt.Split(':');
                     AltDegrees = Convert.ToDouble(alts[0]);
                     AltMinutes = Convert.ToDouble(alts[1]);
@@ -3859,28 +3860,28 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-        public bool FlipNS
+        public bool FlipNs
         {
-            get => SkySettings.HcFlipNS;
+            get => SkySettings.HcFlipNs;
             set
             {
-                SkySettings.HcFlipNS = value;
+                SkySettings.HcFlipNs = value;
                 OnPropertyChanged();
             }
         }
 
-        public bool FlipEW
+        public bool FlipEw
         {
-            get => SkySettings.HcFlipEW;
+            get => SkySettings.HcFlipEw;
             set
             {
-                SkySettings.HcFlipEW = value;
+                SkySettings.HcFlipEw = value;
                 OnPropertyChanged();
             }
         }
 
         private bool _nsEnabled;
-        public bool NSEnabled
+        public bool NsEnabled
         {
             get => _nsEnabled;
             set
@@ -3892,7 +3893,7 @@ namespace GS.Server.SkyTelescope
         }
 
         private bool _ewEnabled;
-        public bool EWEnabled
+        public bool EwEnabled
         {
             get => _ewEnabled;
             set
@@ -3971,34 +3972,34 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private void SetHCFlipsVisibility()
+        private void SetHcFlipsVisibility()
         {
             switch (HcMode)
             {
-                case HCMode.Axes:
-                    EWEnabled = true;
-                    NSEnabled = true;
+                case HcMode.Axes:
+                    EwEnabled = true;
+                    NsEnabled = true;
                     break;
-                //case HCMode.Compass:
-                //    EWVisibility = false;
-                //    NSVisibility = false;
-                //    break;
-                case HCMode.Guiding:
-                    EWEnabled = false;
-                    NSEnabled = false;
+                case HcMode.Guiding:
+                    EwEnabled = false;
+                    NsEnabled = false;
+                    break;
+                case HcMode.Pulse:
+                    EwEnabled = false;
+                    NsEnabled = false;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        public HCMode HcMode
+        public HcMode HcMode
         {
             get => SkySettings.HcMode;
             set
             {
                 SkySettings.HcMode = value;
-                SetHCFlipsVisibility();
+                SetHcFlipsVisibility();
                 OnPropertyChanged();
             }
         }
@@ -4114,7 +4115,7 @@ namespace GS.Server.SkyTelescope
                     Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
-                StartSlew(FlipEW && EWEnabled ? SlewDirection.SlewRight : SlewDirection.SlewLeft);
+                StartSlew(FlipEw && EwEnabled ? SlewDirection.SlewRight : SlewDirection.SlewLeft);
             }
             catch (Exception ex)
             {
@@ -4200,7 +4201,7 @@ namespace GS.Server.SkyTelescope
                     Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
-                StartSlew(FlipEW && EWEnabled ? SlewDirection.SlewLeft : SlewDirection.SlewRight);
+                StartSlew(FlipEw && EwEnabled ? SlewDirection.SlewLeft : SlewDirection.SlewRight);
             }
             catch (Exception ex)
             {
@@ -4286,7 +4287,7 @@ namespace GS.Server.SkyTelescope
                     Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
-                StartSlew(FlipNS && NSEnabled ? SlewDirection.SlewDown : SlewDirection.SlewUp);
+                StartSlew(FlipNs && NsEnabled ? SlewDirection.SlewDown : SlewDirection.SlewUp);
             }
             catch (Exception ex)
             {
@@ -4372,7 +4373,7 @@ namespace GS.Server.SkyTelescope
                     Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
                     return;
                 }
-                StartSlew(FlipNS && NSEnabled ? SlewDirection.SlewUp : SlewDirection.SlewDown);
+                StartSlew(FlipNs && NsEnabled ? SlewDirection.SlewUp : SlewDirection.SlewDown);
             }
             catch (Exception ex)
             {
@@ -4472,18 +4473,18 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private ICommand _openHCWindowCmd;
-        public ICommand OpenHCWindowCmd
+        private ICommand _openHcWindowCmd;
+        public ICommand OpenHcWindowCmd
         {
             get
             {
-                var cmd = _openHCWindowCmd;
+                var cmd = _openHcWindowCmd;
                 if (cmd != null)
                 {
                     return cmd;
                 }
 
-                return _openHCWindowCmd = new RelayCommand(param => OpenHcWindow());
+                return _openHcWindowCmd = new RelayCommand(param => OpenHcWindow());
             }
         }
         private void OpenHcWindow()
@@ -4550,7 +4551,7 @@ namespace GS.Server.SkyTelescope
 
         #endregion
 
-        #region Locked Mouse
+        #region HC Locked Mouse
 
         private bool _lockOn;
         public bool LockOn
@@ -4609,7 +4610,7 @@ namespace GS.Server.SkyTelescope
                 if (IsDialogOpen) { return; }
                 LockOn = false;
 
-                if (("ADWS".IndexOf(param.Key.ToString()) > -1) && !param.IsRepeat)
+                if (("ADWS".IndexOf(param.Key.ToString(), StringComparison.Ordinal) > -1) && !param.IsRepeat)
                 {
                     switch (param.Key)
                     {
@@ -4916,7 +4917,7 @@ namespace GS.Server.SkyTelescope
 
         #endregion
 
-        #region Spiral Window
+        #region HC Spiral Window
 
         private ICommand _openSpiralWindowCmd;
         public ICommand OpenSpiralWindowCmd
@@ -5311,7 +5312,7 @@ namespace GS.Server.SkyTelescope
                 return;
             }
 
-            LogSpiral($"Spiral Move: {_util.HoursToHMS(newpoint.RaDec.X, "h ", "m ", "s", 2)}|{_util.DegreesToDMS(newpoint.RaDec.Y, "° ", "m ", "s", 2)}|{amt}", MonitorType.Information);
+            LogSpiral($"Spiral Move: {Util.HoursToHMS(newpoint.RaDec.X, "h ", "m ", "s", 2)}|{Util.DegreesToDMS(newpoint.RaDec.Y, "° ", "m ", "s", 2)}|{amt}", MonitorType.Information);
 
             var radec = Transforms.CoordTypeToInternal(newpoint.RaDec.X, newpoint.RaDec.Y);
 
@@ -5346,6 +5347,199 @@ namespace GS.Server.SkyTelescope
                 Message = $"{msg}"
             };
             MonitorLog.LogToMonitor(monitorItem);
+        }
+
+        #endregion
+
+        #region HC PulseGuides
+
+        private List<HcPulseGuide> _hcPulseGuides;
+        public List<HcPulseGuide> HcPulseGuides
+        {
+            get => _hcPulseGuides;
+            set
+            {
+                _hcPulseGuides = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openPulseGuidesDialogCmd;
+        public ICommand OpenPulseGuidesDialogCmd
+        {
+            get
+            {
+                var command = _openPulseGuidesDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openPulseGuidesDialogCmd = new RelayCommand(
+                    param => OpenPulseGuidesDialog()
+                );
+            }
+        }
+        private void OpenPulseGuidesDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    _hcPulseGuides = SkySettings.HcPulseGuides;
+                    DialogContent = new HcPulseGuidesDialog();
+                    IsDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelPulseGuidesDialogCmd;
+        public ICommand CancelPulseGuidesDialogCmd
+        {
+            get
+            {
+                var command = _cancelPulseGuidesDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelPulseGuidesDialogCmd = new RelayCommand(
+                    param => CancelPulseGuidesDialog()
+                );
+            }
+        }
+        private void CancelPulseGuidesDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _acceptPulseGuidesDialogCmd;
+        public ICommand AcceptPulseGuidesDialogCmd
+        {
+            get
+            {
+                var command = _acceptPulseGuidesDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptPulseGuidesDialogCmd = new RelayCommand(
+                    param => AcceptPulseGuidesDialog()
+                );
+            }
+        }
+        private void AcceptPulseGuidesDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    SkySettings.HcPulseGuides = _hcPulseGuides;
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _resetPulseGuidesDialogCmd;
+        public ICommand ResetPulseGuidesDialogCmd
+        {
+            get
+            {
+                var command = _resetPulseGuidesDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _resetPulseGuidesDialogCmd = new RelayCommand(
+                    param => ResetPulseGuidesDialog()
+                );
+            }
+        }
+        private void ResetPulseGuidesDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    var hcp = new HcDefaultPulseGuides();
+                    HcPulseGuides = hcp.DefaultPulseGuides;
+                    IsDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
         }
 
         #endregion
@@ -6720,12 +6914,12 @@ namespace GS.Server.SkyTelescope
 
         #region Schedule Dialog
 
-        public async void ScheduleAction(Action action, DateTime ExecutionTime, CancellationToken token)
+        public async void ScheduleAction(Action action, DateTime executionTime, CancellationToken token)
         {
             try
             {
                 SchedulerBadgeContent = "On";
-                await Task.Delay((int)ExecutionTime.Subtract(DateTime.Now).TotalMilliseconds, token);
+                await Task.Delay((int)executionTime.Subtract(DateTime.Now).TotalMilliseconds, token);
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
@@ -7503,11 +7697,11 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    var AltAz = Coordinate.RaDec2AltAz(GoToRa, GoToDec, SkyServer.SiderealTime,
+                    var altAz = Coordinate.RaDec2AltAz(GoToRa, GoToDec, SkyServer.SiderealTime,
                         SkySettings.Latitude);
-                    if (AltAz[0] < 0)
+                    if (altAz[0] < 0)
                     {
-                        OpenDialog($"{Application.Current.Resources["goTargetBelow"]}: {AltAz[1]} Alt: {AltAz[0]}");
+                        OpenDialog($"{Application.Current.Resources["goTargetBelow"]}: {altAz[1]} Alt: {altAz[0]}");
                         return;
                     }
 
@@ -7646,8 +7840,8 @@ namespace GS.Server.SkyTelescope
         #region GoTo RA Dec Dialog
         public double GoToDec => Principles.Units.Deg2Dou(DecDegrees, DecMinutes, DecSeconds);
         public double GoToRa => Principles.Units.Ra2Dou(RaHours, RaMinutes, RaSeconds);
-        public string GoToDecString => _util.DegreesToDMS(GoToDec, "° ", "m ", "s", 3);
-        public string GoToRaString => _util.HoursToHMS(GoToRa, "h ", "m ", "s", 3);
+        public string GoToDecString => Util.DegreesToDMS(GoToDec, "° ", "m ", "s", 3);
+        public string GoToRaString => Util.HoursToHMS(GoToRa, "h ", "m ", "s", 3);
 
         private ICommand _openRaGoToDialogCommand;
         public ICommand OpenRaGoToDialogCommand
@@ -7671,11 +7865,11 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    var AltAz = Coordinate.RaDec2AltAz(GoToRa, GoToDec, SkyServer.SiderealTime,
+                    var altAz = Coordinate.RaDec2AltAz(GoToRa, GoToDec, SkyServer.SiderealTime,
                         SkySettings.Latitude);
-                    if (AltAz[0] < 0)
+                    if (altAz[0] < 0)
                     {
-                        OpenDialog($"{Application.Current.Resources["goTargetBelow"]}: {AltAz[1]} Alt: {AltAz[0]}");
+                        OpenDialog($"{Application.Current.Resources["goTargetBelow"]}: {altAz[1]} Alt: {altAz[0]}");
                         return;
                     }
 
@@ -7836,7 +8030,7 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    RaDecimal = _util.HMSToHours($"{RaHours}:{RaMinutes}:{RaSeconds}");
+                    RaDecimal = Util.HMSToHours($"{RaHours}:{RaMinutes}:{RaSeconds}");
                     DialogContent = new RaGoToDecimalDialog();
                     IsDialogOpen = true;
                 }
@@ -7927,7 +8121,7 @@ namespace GS.Server.SkyTelescope
                     {
                         throw new Exception($"{Application.Current.Resources["exError"]}");
                     }
-                    var ra = _util.HoursToHMS(RaDecimal, ":", ":", ":", 3);
+                    var ra = Util.HoursToHMS(RaDecimal, ":", ":", ":", 3);
                     var ras = ra.Split(':');
                     RaHours = Convert.ToDouble(ras[0]);
                     RaMinutes = Convert.ToDouble(ras[1]);
@@ -7976,7 +8170,7 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    DecDecimal = _util.DMSToDegrees($"{DecDegrees}:{DecMinutes}:{DecSeconds}");
+                    DecDecimal = Util.DMSToDegrees($"{DecDegrees}:{DecMinutes}:{DecSeconds}");
                     DialogContent = new DecGoToDecimalDialog();
                     IsDialogOpen = true;
                 }
@@ -8067,7 +8261,7 @@ namespace GS.Server.SkyTelescope
                     {
                         throw new Exception($"{Application.Current.Resources["exError"]}");
                     }
-                    var ra = _util.DegreesToDMS(DecDecimal, ":", ":", ":", 3);
+                    var ra = Util.DegreesToDMS(DecDecimal, ":", ":", ":", 3);
                     var ras = ra.Split(':');
                     DecDegrees = Convert.ToDouble(ras[0]);
                     DecMinutes = Convert.ToDouble(ras[1]);
@@ -8098,8 +8292,8 @@ namespace GS.Server.SkyTelescope
         #region GoTo Az Alt Dialog
         public double GoToAlt => Principles.Units.Deg2Dou(AltDegrees, AltMinutes, AltSeconds);
         public double GoToAz => Principles.Units.Deg2Dou(AzDegrees, AzMinutes, AzSeconds);
-        public string GoToAltString => _util.DegreesToDMS(GoToAlt, "° ", "m ", "s", 3);
-        public string GoToAzString => _util.DegreesToDMS(GoToAz, "° ", "m ", "s", 3);
+        public string GoToAltString => Util.DegreesToDMS(GoToAlt, "° ", "m ", "s", 3);
+        public string GoToAzString => Util.DegreesToDMS(GoToAz, "° ", "m ", "s", 3);
 
         private ICommand _openAzGoToDialogCommand;
         public ICommand OpenAzGoToDialogCommand
@@ -8280,7 +8474,7 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    AzDecimal = _util.HMSToHours($"{AzDegrees}:{AzMinutes}:{AzSeconds}");
+                    AzDecimal = Util.HMSToHours($"{AzDegrees}:{AzMinutes}:{AzSeconds}");
                     DialogContent = new AzGoToDecimalDialog();
                     IsDialogOpen = true;
                 }
@@ -8371,7 +8565,7 @@ namespace GS.Server.SkyTelescope
                     {
                         throw new Exception($"{Application.Current.Resources["exError"]}");
                     }
-                    var az = _util.DegreesToDMS(AzDecimal, ":", ":", ":", 3);
+                    var az = Util.DegreesToDMS(AzDecimal, ":", ":", ":", 3);
                     var azs = az.Split(':');
                     AzDegrees = Convert.ToDouble(azs[0]);
                     AzMinutes = Convert.ToDouble(azs[1]);
@@ -8420,7 +8614,7 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    AltDecimal = _util.DMSToDegrees($"{AltDegrees}:{AltMinutes}:{AltSeconds}");
+                    AltDecimal = Util.DMSToDegrees($"{AltDegrees}:{AltMinutes}:{AltSeconds}");
                     DialogContent = new AltGoToDecimalDialog();
                     IsDialogOpen = true;
                 }
@@ -8511,7 +8705,7 @@ namespace GS.Server.SkyTelescope
                     {
                         throw new Exception($"{Application.Current.Resources["exError"]}");
                     }
-                    var alt = _util.DegreesToDMS(AltDecimal, ":", ":", ":", 3);
+                    var alt = Util.DegreesToDMS(AltDecimal, ":", ":", ":", 3);
                     var alts = alt.Split(':');
                     AltDegrees = Convert.ToDouble(alts[0]);
                     AltMinutes = Convert.ToDouble(alts[1]);
@@ -8603,25 +8797,25 @@ namespace GS.Server.SkyTelescope
             ParkHzLimitSelection = found ?? ParkPositions.FirstOrDefault();
         }
 
-        private bool _HzlimitTracking;
+        private bool _hzlimitTracking;
         public bool HzLimitTracking
         {
-            get => _HzlimitTracking;
+            get => _hzlimitTracking;
             set
             {
-                _HzlimitTracking = value;
+                _hzlimitTracking = value;
                 SkySettings.HzLimitTracking = value;
                 OnPropertyChanged();
             }
         }
 
-        private bool _HzlimitPark;
+        private bool _hzlimitPark;
         public bool HzLimitPark
         {
-            get => _HzlimitPark;
+            get => _hzlimitPark;
             set
             {
-                _HzlimitPark = value;
+                _hzlimitPark = value;
                 SkySettings.HzLimitPark = value;
                 OnPropertyChanged();
             }
@@ -8640,13 +8834,13 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private bool _HzlimitNothing;
+        private bool _hzlimitNothing;
         public bool HzLimitNothing
         {
-            get => _HzlimitNothing;
+            get => _hzlimitNothing;
             set
             {
-                _HzlimitNothing = value;
+                _hzlimitNothing = value;
                 OnPropertyChanged();
             }
         }
@@ -8868,7 +9062,7 @@ namespace GS.Server.SkyTelescope
         }
         private string NmeaSentence { get; set; }
         private bool _hasGpsData;
-        public bool HasGSPData
+        public bool HasGspData
         {
             get => _hasGpsData;
             set
@@ -9034,7 +9228,7 @@ namespace GS.Server.SkyTelescope
                 using (new WaitCursor())
                 {
                     SkySystem.DiscoverSerialDevices();
-                    HasGSPData = false;
+                    HasGspData = false;
                     NmeaTag = "N/A";
                     GpsLong = 0.0;
                     GpsLongString = $"{GpsLong}";
@@ -9174,23 +9368,23 @@ namespace GS.Server.SkyTelescope
                     if (!GpsGga && !GpsRmc) return;
                     if (IsGpsRunning) return;
                     IsGpsRunning = true;
-                    HasGSPData = false;
+                    HasGspData = false;
                     var gpsHardware = new GpsHardware(GpsComPort, GpsBaudRate, GpsTimeout) { Gga = GpsGga, Rmc = GpsRmc };
                     gpsHardware.GpsOn();
 
                     if (gpsHardware.GpsRunning && gpsHardware.HasData)
                     {
                         GpsLong = gpsHardware.Longitude;
-                        GpsLongString = _util.DegreesToDMS(GpsLong, "° ", ":", "", 2);
+                        GpsLongString = Util.DegreesToDMS(GpsLong, "° ", ":", "", 2);
                         GpsLat = gpsHardware.Latitude;
-                        GpsLatString = _util.DegreesToDMS(GpsLat, "° ", ":", "", 2);
+                        GpsLatString = Util.DegreesToDMS(GpsLat, "° ", ":", "", 2);
                         GpsElevation = gpsHardware.Altitude;
                         NmeaTag = gpsHardware.NmEaTag;
                         GpsPcTime = gpsHardware.PcUtcNow.ToLocalTime();
                         GpsTime = gpsHardware.TimeStamp.ToLocalTime();
                         GpsSpan = gpsHardware.TimeSpan;
                         NmeaSentence = gpsHardware.NmEaSentence;
-                        HasGSPData = true;
+                        HasGspData = true;
                         gpsHardware.GpsOff();
                     }
                     else
@@ -9528,9 +9722,9 @@ namespace GS.Server.SkyTelescope
                 {
                     CdcElevation = SkySettings.Elevation;
                     CdcLong = SkySettings.Longitude;
-                    CdcLongString = _util.DegreesToDMS(CdcLong, "° ", ":", "", 2);
+                    CdcLongString = Util.DegreesToDMS(CdcLong, "° ", ":", "", 2);
                     CdcLat = SkySettings.Latitude;
-                    CdcLatString = _util.DegreesToDMS(CdcLat, "° ", ":", "", 2);
+                    CdcLatString = Util.DegreesToDMS(CdcLat, "° ", ":", "", 2);
                 }
             }
             catch (Exception ex)
@@ -9668,9 +9862,9 @@ namespace GS.Server.SkyTelescope
                     var cdcServer = new CdcServer(CdcIpAddress, CdcPortNumber);
                     var darray = cdcServer.GetObs();
                     CdcLat = darray[0];
-                    CdcLatString = _util.DegreesToDMS(CdcLat, "° ", ":", "", 2);
+                    CdcLatString = Util.DegreesToDMS(CdcLat, "° ", ":", "", 2);
                     CdcLong = darray[1];
-                    CdcLongString = _util.DegreesToDMS(CdcLong, "° ", ":", "", 2);
+                    CdcLongString = Util.DegreesToDMS(CdcLong, "° ", ":", "", 2);
                     CdcElevation = darray[2];
                 }
             }
@@ -10442,12 +10636,12 @@ namespace GS.Server.SkyTelescope
             Dispose(true);
             _ctsPark?.Cancel();
             _ctsPark?.Dispose();
-            _GlobalHook?.Dispose();
+            _globalHook?.Dispose();
         }
         // NOTE: Leave out the finalizer altogether if this class doesn't
         // own unmanaged resources itself, but leave the other methods
         // exactly as they are.
-        ~SkyTelescopeVM()
+        ~SkyTelescopeVm()
         {
             // Finalizer calls Dispose(false)
             Dispose(false);
@@ -10457,7 +10651,7 @@ namespace GS.Server.SkyTelescope
         {
             if (disposing)
             {
-                _util?.Dispose();
+                Util?.Dispose();
             }
 
             // free native resources if there are any.

@@ -7,7 +7,7 @@
         xmlns:enums="clr-namespace:ASCOM.Utilities;assembly=ASCOM.Utilities"
         xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
         xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
-        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>
@@ -102,7 +102,7 @@
             </StackPanel>
             <TextBlock Margin="0,15,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{StaticResource gpsAccept}"/>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  Margin="0,5">
-                <Button IsDefault="False" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaAccept}" Command="{Binding AcceptGpsDialogCommand}" IsEnabled="{Binding HasGSPData}"/>
+                <Button IsDefault="False" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaAccept}" Command="{Binding AcceptGpsDialogCommand}" IsEnabled="{Binding HasGspData}"/>
                 <Button IsCancel="True" IsDefault="True" Margin="8,0,0,0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaCancel}" Command="{Binding CancelGpsDialogCommand}"/>
             </StackPanel>
         </StackPanel>

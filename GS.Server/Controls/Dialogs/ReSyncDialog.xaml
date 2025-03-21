@@ -7,7 +7,7 @@
         xmlns:domain="clr-namespace:GS.Server.Domain"
         xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}">
     <UserControl.Resources>
         <domain:EnumBooleanConverter x:Key="EnumBoolean" />
     </UserControl.Resources>

@@ -17,10 +17,11 @@ using System;
 
 namespace GS.Server.SkyTelescope
 {
-    public enum HCMode
+    public enum HcMode
     {
         Axes,
-        Guiding
+        Guiding,
+        Pulse
     }
 
     public enum SlewType

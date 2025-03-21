@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
         xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
-        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}">
     <GroupBox Header="{StaticResource skyParkNewName}" Margin="5">
         <StackPanel Orientation="Vertical">
             <StackPanel Orientation="Horizontal" Margin="10">

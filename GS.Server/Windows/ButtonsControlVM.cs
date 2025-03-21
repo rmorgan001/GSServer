@@ -22,7 +22,7 @@ namespace GS.Server.Windows
     {
         #region Fields
 
-        private readonly SkyTelescopeVM _skyTelescopeVM;
+        private readonly SkyTelescopeVm _skyTelescopeVM;
 
         #endregion
 
@@ -36,7 +36,7 @@ namespace GS.Server.Windows
                         { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Opening Hand Control Window" };
                     MonitorLog.LogToMonitor(monitorItem);
 
-                    _skyTelescopeVM = SkyTelescopeVM._skyTelescopeVM;
+                    _skyTelescopeVM = SkyTelescopeVm.ASkyTelescopeVm;
                     SkyServer.StaticPropertyChanged += PropertyChangedSkyServer;
                     SkySettings.StaticPropertyChanged += PropertyChangedSkySettings;
 

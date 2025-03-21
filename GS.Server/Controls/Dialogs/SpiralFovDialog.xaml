@@ -46,7 +46,7 @@
                     <TextBlock Text="{StaticResource 1021EyepieceFS}" VerticalAlignment="Center" />
                     <TextBox materialDesign:HintAssist.Hint="{StaticResource 1021MM}" ToolTip="{StaticResource 1021MM}" Margin="5,0,0,0" MinWidth="50">
                         <TextBox.Text>
-                            <Binding Path="EyepieceFS" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                            <Binding Path="EyepieceFs" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
                                 <Binding.ValidationRules>
                                     <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
                                     <domain:DoubleValidationRule ValidatesOnTargetUpdated="True" />

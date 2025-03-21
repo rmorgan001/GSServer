@@ -12,7 +12,7 @@
              xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+             d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}">
     <b:Interaction.Triggers>
         <b:EventTrigger EventName="PreviewKeyDown">
             <b:InvokeCommandAction Command="{Binding PressKeyDownCmd}" PassEventArgsToCommand="True" />
@@ -486,7 +486,7 @@
                                     <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" HorizontalAlignment="Center" Content="{StaticResource skyOBL}"/>
                                     <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="{StaticResource skyLatitude}"/>
                                     <ComboBox Grid.Row="1" Grid.Column="1" IsEnabled="True" md:HintAssist.Hint="{StaticResource skyLat01}" Margin="10,5,0,0" ToolTip="{StaticResource skyLat0}"
-                                              ItemsSource="{Binding LatitudeRangeNS}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                                              ItemsSource="{Binding LatitudeRangeNs}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                         <ComboBox.SelectedItem>
                                             <Binding Path="Lat0" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                                 <Binding.ValidationRules>
@@ -548,7 +548,7 @@
                                     </ComboBox>
                                     <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="{StaticResource skyLongitude}"/>
                                     <ComboBox Grid.Row="2" Grid.Column="1" md:HintAssist.Hint="{StaticResource skyLong01}" Margin="10,5,0,0" ToolTip="{StaticResource skyLong0}"
-                                              ItemsSource="{Binding LongitudeRangeEW}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                                              ItemsSource="{Binding LongitudeRangeEw}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                                         <ComboBox.SelectedItem>
                                             <Binding Path="Long0" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                                 <Binding.ValidationRules>

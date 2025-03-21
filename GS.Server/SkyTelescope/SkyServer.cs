@@ -25,7 +25,6 @@ using GS.SkyWatcher;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.Linq.SqlClient;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -41,8 +40,8 @@ using GS.Server.Alignment;
 using AxisStatus = GS.Simulator.AxisStatus;
 using Range = GS.Principles.Range;
 using static System.Math;
-using MaterialDesignThemes.Wpf;
-using ASCOM.DriverAccess;
+using GS.Server.Pulses;
+
 
 namespace GS.Server.SkyTelescope
 {
@@ -93,7 +92,7 @@ namespace GS.Server.SkyTelescope
         private static CancellationTokenSource _ctsGoTo;
         private static CancellationTokenSource _ctsPulseGuideRa;
         private static CancellationTokenSource _ctsPulseGuideDec;
-
+        private static CancellationTokenSource _ctsHcPulseGuide;
         #endregion Fields 
 
         static SkyServer()
@@ -526,9 +525,9 @@ namespace GS.Server.SkyTelescope
         public static Main.IPageVM SelectedTab { get; set; }
         
         /// <summary>
-    /// Checks if the auto home async process is running
-    /// </summary>
-    public static bool IsAutoHomeRunning
+        /// Checks if the auto home async process is running
+        /// </summary>
+        public static bool IsAutoHomeRunning
         {
             get => _isAutoHomeRunning;
             private set
@@ -2772,7 +2771,7 @@ namespace GS.Server.SkyTelescope
             {
                 AxesStopValidate();
                 // wait for the movment to stop - physical overrun
-                var trackingRate = SkyGetRate();
+                //var trackingRate = SkyGetRate();
                 AxesRateOfChange.Reset();
                 do
                 {
@@ -3513,22 +3512,23 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         public static void CancelAllAsync()
         {
-            if (_ctsGoTo != null || _ctsPulseGuideDec != null || _ctsPulseGuideRa != null)
+            if (_ctsGoTo != null || _ctsPulseGuideDec != null || _ctsPulseGuideRa != null || _ctsHcPulseGuide != null)
             {
                 _ctsGoTo?.Cancel();
                 _ctsPulseGuideDec?.Cancel();
                 _ctsPulseGuideRa?.Cancel();
+                _ctsHcPulseGuide?.Cancel();
                 var sw = Stopwatch.StartNew();
-                while (_ctsGoTo != null &&_ctsPulseGuideDec != null && _ctsPulseGuideRa != null && sw.ElapsedMilliseconds< 2000)
+                while (_ctsGoTo != null &&_ctsPulseGuideDec != null && _ctsPulseGuideRa != null && _ctsHcPulseGuide != null && sw.ElapsedMilliseconds< 2000)
                     Thread.Sleep(200); // wait for any pending pulse guide operations to wake up and cancel
             }
         }
 
-/// <summary>
+        /// <summary>
 /// Calculates the current RA tracking rate used in arc seconds per second
 /// </summary>
 /// <returns></returns>
-public static double CurrentTrackingRate()
+        public static double CurrentTrackingRate()
         {
             double rate;
             switch (SkySettings.TrackingRate)
@@ -4346,7 +4346,7 @@ public static double CurrentTrackingRate()
         /// return the change in axis values as a result of any HC button presses
         /// </summary>
         /// <returns></returns>
-        public static void HcMoves(SlewSpeed speed, SlewDirection direction, HCMode HcMode, bool HcAntiRa, bool HcAntiDec, int RaBacklash, int DecBacklash)
+        public static void HcMoves(SlewSpeed speed, SlewDirection direction, HcMode hcMode, bool HcAntiRa, bool HcAntiDec, int RaBacklash, int DecBacklash)
         {
             if (!IsMountRunning) { return; }
 
@@ -4358,7 +4358,7 @@ public static double CurrentTrackingRate()
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{SkySettings.HcSpeed}|{HcMode}|{direction}|{ActualAxisX}|{ActualAxisY}"
+                Message = $"{SkySettings.HcSpeed}|{hcMode}|{direction}|{ActualAxisX}|{ActualAxisY}"
             };
             MonitorLog.LogToMonitor(monitorItem);
             var altAzModeSet = (SkySettings.AlignmentMode == AlignmentModes.algAltAz);
@@ -4397,9 +4397,9 @@ public static double CurrentTrackingRate()
             }
 
             // Check hand control mode and direction
-            switch (HcMode)
+            switch (hcMode)
             {
-                case HCMode.Axes:
+                case HcMode.Axes:
                     switch (direction)
                     {
                         case SlewDirection.SlewNorth:
@@ -4445,7 +4445,7 @@ public static double CurrentTrackingRate()
                             break;
                     }
                     break;
-                case HCMode.Guiding:
+                case HcMode.Guiding:
                     switch (direction)
                     {
                         case SlewDirection.SlewNorth:
@@ -4539,6 +4539,9 @@ public static double CurrentTrackingRate()
                             break;
                     }
                     break;
+                case HcMode.Pulse:
+                    HcPulseMoveAsync(speed,direction);
+                    return;
                 default:
                     change[0] = 0;
                     change[1] = 0;
@@ -4823,6 +4826,175 @@ public static double CurrentTrackingRate()
                         MonitorLog.LogToMonitor(monitorItem);
                     }
                 );
+        }
+
+        /// <summary>
+        /// Starts async process from the hand controller which will continue to send pulses to mount until they are canceled
+        /// </summary>
+        /// <param name="speed">HC speed 1 to 8</param>
+        /// <param name="direction">direction of pulse</param>
+        public static async void HcPulseMoveAsync(SlewSpeed speed, SlewDirection direction)
+        {
+            try
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MonitorLog.GetCurrentMethod(),
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message =
+                        $"{speed}|{direction}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                switch (direction)
+                {
+                    case SlewDirection.SlewNoneRa:
+                        _ctsHcPulseGuide?.Cancel();
+                        return;
+                    case SlewDirection.SlewNoneDec:
+                        _ctsHcPulseGuide?.Cancel();
+                        return;
+                    default:
+                        break;
+                }
+
+                var hpgs = SkySettings.HcPulseGuides;
+                if (hpgs == null) { return; }
+
+                var hcSpeed = (int)speed;  // selected HC speed
+                var exist = hpgs.Any(x => x.Speed == hcSpeed); 
+                if (!exist) { return; }  // could do a default here
+            
+                var hcPulseGuide = hpgs.Find(x => x.Speed == hcSpeed);
+                GuideDirections pulseDirection;
+                switch (direction)
+                {
+                    case SlewDirection.SlewNorth:
+                    case SlewDirection.SlewUp:
+                        pulseDirection = GuideDirections.guideNorth;
+                        break;
+                    case SlewDirection.SlewSouth:
+                    case SlewDirection.SlewDown:
+                        pulseDirection = GuideDirections.guideSouth;
+                        break;
+                    case SlewDirection.SlewEast:
+                    case SlewDirection.SlewLeft:
+                        pulseDirection = GuideDirections.guideEast;
+                        break;
+                    case SlewDirection.SlewWest:
+                    case SlewDirection.SlewRight:
+                        pulseDirection = GuideDirections.guideWest;
+                        break;
+                    case SlewDirection.SlewNoneRa:
+                        _ctsHcPulseGuide?.Cancel();
+                        return;
+                    case SlewDirection.SlewNoneDec:
+                        _ctsHcPulseGuide?.Cancel();
+                        return;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
+                }
+
+                int returncode;
+                string msg;
+                switch (pulseDirection)
+                {
+                    case GuideDirections.guideSouth:
+                    case GuideDirections.guideNorth:
+                        _ctsHcPulseGuide = new CancellationTokenSource();
+                        returncode = await Task.Run(() => HcPulseMove(hcPulseGuide, pulseDirection, _ctsHcPulseGuide.Token));
+                        break;
+                    case GuideDirections.guideWest:
+                    case GuideDirections.guideEast:
+                        _ctsHcPulseGuide = new CancellationTokenSource();
+                        returncode = await Task.Run(() => HcPulseMove(hcPulseGuide, pulseDirection, _ctsHcPulseGuide.Token));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
+                }
+                if (returncode > 0)
+                {
+                    monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Server,
+                        Category = MonitorCategory.Server,
+                        Type = MonitorType.Warning,
+                        Method = MonitorLog.GetCurrentMethod(),
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message =
+                            $"Returncode:{returncode}|{hcPulseGuide.Speed}|{hcPulseGuide.Duration}|{hcPulseGuide.Interval}|{hcPulseGuide.Rate}"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
+                }
+            }
+            catch (Exception ex)
+            {
+                // OperationCanceledException thrown by HcPulseMove
+                var cancelled = ex is OperationCanceledException || ex.GetBaseException() is OperationCanceledException;
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Warning,
+                    Method = MonitorLog.GetCurrentMethod(),
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = cancelled ? "HcPulseGuide cancelled by command" : "HcPulseGuides failed"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+
+        }
+
+        /// <summary>
+        /// Inf loop to send pulse until token is canceled
+        /// </summary>
+        /// <param name="hcPulseGuide">PulseGuide object</param>
+        /// <param name="pulseDirection">direction button from the HC</param>
+        /// <param name="token">CancellationToken</param>
+        /// <returns></returns>
+        public static int HcPulseMove(HcPulseGuide hcPulseGuide,GuideDirections pulseDirection,CancellationToken token)
+        {
+            try
+            {
+                var direction = pulseDirection;
+                var duration = hcPulseGuide.Duration;
+                var interval = hcPulseGuide.Interval;
+                if (duration <= 0){return 2;}
+                if (interval < 0){return 2;}
+
+                while (true)
+                {
+                    if (token.IsCancellationRequested){break;}
+                    PulseGuide(direction, duration, hcPulseGuide.Rate);
+                    if (token.IsCancellationRequested){break;}
+                    Thread.Sleep(interval);
+                } 
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                _ctsPulseGuideDec?.Cancel();
+                _ctsPulseGuideRa?.Cancel();
+                return 3;
+            }
         }
 
         /// <summary>
@@ -5259,7 +5431,8 @@ public static double CurrentTrackingRate()
         /// </summary>
         /// <param name="direction">GuideDirections</param>
         /// <param name="duration">in milliseconds</param>
-        public static void PulseGuide(GuideDirections direction, int duration)
+        /// /// <param name="altRate">alternate rate to replace the guiderate</param>
+        public static void PulseGuide(GuideDirections direction, int duration, double altRate)
         {
             if (!IsMountRunning) { throw new Exception("Mount not running"); }
 
@@ -5268,6 +5441,8 @@ public static double CurrentTrackingRate()
             MonitorLog.LogToMonitor(monitorItem);
 
             dynamic _;
+            var useAltRate = Math.Abs(altRate) > 0 ? true : false;
+            
             switch (direction)
             {
                 case GuideDirections.guideNorth:
@@ -5279,7 +5454,7 @@ public static double CurrentTrackingRate()
                     }
                     IsPulseGuidingDec = true;
                     HcResetPrevMove(MountAxis.Dec);
-                    var decGuideRate = Math.Abs(GuideRateDec);
+                    var decGuideRate = useAltRate ? altRate : Math.Abs(GuideRateDec);
                     if (SkySettings.AlignmentMode != AlignmentModes.algAltAz)
                     {
                         if (SideOfPier == PierSide.pierEast)
@@ -5327,7 +5502,6 @@ public static double CurrentTrackingRate()
                             {
                                 _ = new SkyAxisPulse(0, AxisId.Axis2, decGuideRate, duration, decbacklashamount, _ctsPulseGuideDec.Token);
                             }
-
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -5342,7 +5516,7 @@ public static double CurrentTrackingRate()
                     }
                     IsPulseGuidingRa = true;
                     HcResetPrevMove(MountAxis.Ra);
-                    var raGuideRate = Math.Abs(GuideRateRa);
+                    var raGuideRate = useAltRate ? altRate : Math.Abs(GuideRateRa);
                     if (SkySettings.AlignmentMode != AlignmentModes.algAltAz)
                     {
                         if (SouthernHemisphere)
@@ -5678,14 +5852,8 @@ public static double CurrentTrackingRate()
 
             for (var intCounter = Application.Current.Windows.Count - 1; intCounter >= 0; intCounter--)
             {
-                if (Application.Current.Windows[intCounter] != null)
-                {
-                    Application.Current.Windows[intCounter].Close();
-                }
+                Application.Current.Windows[intCounter]?.Close();
             }
-
-            // if (Application.Current.MainWindow != null) Application.Current.MainWindow.Close();
-
         }
 
         /// <summary>
@@ -5895,7 +6063,7 @@ public static double CurrentTrackingRate()
         /// <summary>
         /// Stop Axes in a normal motion
         /// </summary>
-        public static void StopAxes(bool setSlewState = true)
+        public static void StopAxes()
         {
             if (!IsMountRunning) { return; }
 

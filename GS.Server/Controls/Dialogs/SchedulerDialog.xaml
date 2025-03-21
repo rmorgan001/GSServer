@@ -6,7 +6,7 @@
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:domain="clr-namespace:GS.Server.Domain"
         xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
-        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVM}">
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}">
     <GroupBox Header="{StaticResource btnScheduler}" Margin="5">
         <StackPanel Orientation="Vertical">
             <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Width="300" Margin="5">

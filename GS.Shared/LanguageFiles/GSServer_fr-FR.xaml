@@ -758,4 +758,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--1.0.8.6 -->
     <system:String x:Key="HomeDialog">Alerte Home dialogue</system:String>
     <system:String x:Key="ParkDialog">Alerte Park dialogue</system:String>
+    
+    <!--1.0.9.1 -->
+    <system:String x:Key="HcInt">Intervalle</system:String>
+    <system:String x:Key="HcRate">La vitesse</system:String>
 </ResourceDictionary>
