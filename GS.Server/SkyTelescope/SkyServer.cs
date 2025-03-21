@@ -4973,7 +4973,7 @@ namespace GS.Server.SkyTelescope
                     if (token.IsCancellationRequested){break;}
                     PulseGuide(direction, duration, hcPulseGuide.Rate);
                     if (token.IsCancellationRequested){break;}
-                    Thread.Sleep(interval);
+                    Thread.Sleep(duration + interval);
                 } 
                 return 0;
             }
