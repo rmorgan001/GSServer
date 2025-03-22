@@ -523,6 +523,17 @@ namespace GS.Server.SkyTelescope
         /// Current Tab being viewed by the user
         /// </summary>
         public static Main.IPageVM SelectedTab { get; set; }
+
+        private static bool _hcPulseDone;
+        public static bool HcPulseDone
+        {
+            get => _hcPulseDone;
+            set
+            {
+                _hcPulseDone = value;
+                OnStaticPropertyChanged();
+            }
+        }
         
         /// <summary>
         /// Checks if the auto home async process is running
@@ -4973,7 +4984,10 @@ namespace GS.Server.SkyTelescope
                     if (token.IsCancellationRequested){break;}
                     PulseGuide(direction, duration, hcPulseGuide.Rate);
                     if (token.IsCancellationRequested){break;}
-                    Thread.Sleep(duration + interval);
+                    Thread.Sleep(duration);
+                    HcPulseDone = true;
+                    Thread.Sleep(interval);
+                    HcPulseDone = false;
                 } 
                 return 0;
             }
@@ -4991,6 +5005,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
+                HcPulseDone = false;
                 _ctsPulseGuideDec?.Cancel();
                 _ctsPulseGuideRa?.Cancel();
                 return 3;
@@ -5441,7 +5456,7 @@ namespace GS.Server.SkyTelescope
             MonitorLog.LogToMonitor(monitorItem);
 
             dynamic _;
-            var useAltRate = Math.Abs(altRate) > 0 ? true : false;
+            var useAltRate = Math.Abs(altRate) > 0;
             
             switch (direction)
             {

@@ -585,6 +585,9 @@ namespace GS.Server.SkyTelescope
                                 case "CanFlipAzimuthSide":
                                     EnableFlipAzDir = SkyServer.CanFlipAzimuthSide;
                                     break;
+                                case "HcPulseDone":
+                                    HcPulseDone = SkyServer.HcPulseDone;
+                                    break;
                             }
                         });
             }
@@ -5353,6 +5356,17 @@ namespace GS.Server.SkyTelescope
 
         #region HC PulseGuides
 
+        private bool _hcPulseDone;
+        public bool HcPulseDone
+        {
+            get => _hcPulseDone;
+            set
+            {
+                _hcPulseDone = value;
+                OnPropertyChanged();
+            }
+        }
+
         private List<HcPulseGuide> _hcPulseGuides;
         public List<HcPulseGuide> HcPulseGuides
         {
@@ -5542,6 +5556,89 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private ICommand _openWinPulseGuidesDialogCmd;
+        public ICommand OpenWinPulseGuidesDialogCmd
+        {
+            get
+            {
+                var command = _openWinPulseGuidesDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openWinPulseGuidesDialogCmd = new RelayCommand(
+                    param => OpenWinPulseGuidesDialog()
+                );
+            }
+        }
+        private void OpenWinPulseGuidesDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _openHcPulseGuideWindowCmd;
+        public ICommand OpenHcPulseGuideWindowCmd
+        {
+            get
+            {
+                var cmd = _openHcPulseGuideWindowCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openHcPulseGuideWindowCmd = new RelayCommand(param => OpenHcPulseGuideWindow());
+            }
+        }
+        private void OpenHcPulseGuideWindow()
+        {
+            try
+            {
+                var win = Application.Current.Windows.OfType<HcPulseGuidesV>().FirstOrDefault();
+                if (win != null) return;
+                var bWin = new HcPulseGuidesV();
+                bWin.Show();
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
         #endregion
 
         #region Backlash

@@ -38,8 +38,20 @@
                     Visibility="{Binding HcWinVisibility, Converter={StaticResource BoolToVis}}">
                 <md:PackIcon Kind="OpenInNew" Margin="-14,-2,0,0" />
             </Button>
-            <Button Grid.Row="0" Grid.Column="2"  Margin="-5,0,0,0" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding OpenPulseGuidesDialogCmd}" Width="24" Height="24" >
-                <md:PackIcon Kind="Pulse" />
+            <Button Grid.Row="0" Grid.Column="2"  Margin="-5,0,0,0"  Command="{Binding OpenPulseGuidesDialogCmd}" Width="24" Height="24" >
+               <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFloatingActionMiniAccentButton}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HcPulseDone}" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource PrimaryHueDarkBrush}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding HcPulseDone}" Value="False">
+                                    <Setter Property="Background" Value="{StaticResource SecondaryHueMidBrush}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                <md:PackIcon Kind="Pulse" /> 
             </Button>
             <Button Grid.Row="1" Grid.Column="0" Width="50" Height="50" ToolTipService.Placement="Center">
                 <Button.ToolTip>
