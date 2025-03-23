@@ -90,7 +90,7 @@
                 </Style>
             </TextBlock.Style>
             </TextBlock>
-        <TextBlock Grid.Column="3" Margin="3 0" VerticalAlignment="Center" ToolTip="{StaticResource botTipTracking}" Text="{StaticResource botTracking}" FontSize="15">
+        <TextBlock Grid.Column="3" Margin="3 0" VerticalAlignment="Center" ToolTip="{StaticResource botTipTracking}" Text="{StaticResource botTracking}" FontSize="15" Name="Tracking">
             <TextBlock.Style>
                 <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
                     <Style.Triggers>
@@ -103,6 +103,23 @@
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" Value="0.5"/>
                         </Trigger>
+                        <DataTrigger Binding="{Binding TrackingBlinker}" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource SecondaryHueMidBrush}"/>
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard Name="TrackingBlinker">
+                                    <Storyboard RepeatBehavior="Forever" >
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0.25" Duration="0:0:1" BeginTime="0:0:0" />
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.25" To="1" Duration="0:0:1" BeginTime="0:0:1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding TrackingBlinker}" Value="False">
+                            <DataTrigger.EnterActions>
+                                <StopStoryboard BeginStoryboardName="TrackingBlinker"/>
+                            </DataTrigger.EnterActions>
+                            <Setter Property="Opacity" Value="1.0"/>
+                        </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </TextBlock.Style>

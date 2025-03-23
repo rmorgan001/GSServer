@@ -202,7 +202,7 @@ namespace GS.Server.SkyTelescope
         private static bool _canAdvancedCmdSupport;
         private static Vector _raDec;
         private static Vector _rateMoveAxes;
-        private static bool _MoveAxisPrevTracking;
+        private static bool _moveAxisPrevTracking;
         private static Vector _rateRaDec;
         private static double _rightAscensionXForm;
         private static bool _rotate3DModel;
@@ -788,6 +788,32 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
+        /// Status of primary axis move
+        /// </summary>
+        public static bool MovePrimaryAxisActive
+        {
+            get => _rateMoveAxes.X != 0.0;
+        }
+
+        /// <summary>
+        /// Status of secondary axis move
+        /// </summary>
+        public static bool MoveSecondaryAxisActive
+        {
+            get => _rateMoveAxes.Y != 0.0;
+        }
+
+        public static bool MoveAxisPrevTracking
+        {
+            get => _moveAxisPrevTracking;
+            set
+            {
+                _moveAxisPrevTracking = value;
+                OnStaticPropertyChanged();
+            }
+        }
+
+        /// <summary>
         /// Persistence of the rtf document while switching tabs
         /// </summary>
         public static string Notes { get; set; }
@@ -897,90 +923,134 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Move dec at the given rate in degrees, MoveAxis
+        /// Move secondary axis at the given rate in degrees, MoveAxis
+        /// Tracking, if required is implemented by RateMove and restored when
+        /// no MoveAxis commands are active
         /// </summary>
-        public static double RateMoveAxisDec
+        public static double RateMoveSecondaryAxis
         {
             private get => _rateMoveAxes.Y;
             set
             {
                 _rateMoveAxes.Y = value;
                 CancelAllAsync();
-                if (Math.Abs(value) > 0)
+                if (!MovePrimaryAxisActive)
                 {
-                    IsSlewing = true;
-                    SlewState = SlewType.SlewMoveAxis;
-                }
-                else
-                {
-                    IsSlewing = false;
-                    SlewState = SlewType.SlewNone;
+                    if (Math.Abs(value) > 0)
+                    {
+                        // Save current tracking state if tracking is on  
+                        if (Tracking)
+                        {
+                            MoveAxisPrevTracking = true;
+                        }
+
+                        Tracking = false;
+                        IsSlewing = true;
+                        SlewState = SlewType.SlewMoveAxis;
+                        // MoveAxis at zero rate continues tracking on primary axis
+                        RateMovePrimaryAxis = 0.0;
+                    }
+                    else
+                    {
+                        IsSlewing = false;
+                        SlewState = SlewType.SlewNone;
+                        if (MoveAxisPrevTracking)
+                        {
+                            Tracking = true;
+                            MoveAxisPrevTracking = false;
+                        }
+                    }
                 }
 
                 object _;
+                Vector rate = new Vector(0.0, 0.0);
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
                         _ = new CmdMoveAxisRate(0, Axis.Axis2, _rateMoveAxes.Y);
+                        if (!MoveSecondaryAxisActive && MoveAxisPrevTracking)
+                        {
+                            SkyTrackingRate.Y = Conversions.Deg2ArcSec(RateDec);
+                            rate = SkyGetRate();
+                            _ = new CmdAxisTracking(0, Axis.Axis2, -rate.Y);
+                        }
                         break;
                     case MountType.SkyWatcher:
-                        var rate = SkyGetRate();
+                        // Temporary tracking rate for primary axis whilst secondary axis is moving
+                        if (!MoveSecondaryAxisActive && MoveAxisPrevTracking)
+                        {
+                            SkyTrackingRate.Y = Conversions.Deg2ArcSec(RateDec);
+                        }
+
+                        rate = SkyGetRate();
                         _ = new SkyAxisSlew(0, AxisId.Axis2, rate.Y);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
-                    Category = MonitorCategory.Server,
-                    Type = MonitorType.Data,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{_rateMoveAxes.Y}|{SkyTrackingOffset[1]}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
         /// <summary>
-        /// Move ra at the given rate in degrees, MoveAxis
+        /// Move primary axis at the given rate in degrees, MoveAxis
+        /// Tracking, if required is implemented by RateMove and restored when
+        /// no MoveAxis commands are active
         /// </summary>
-        public static double RateMoveAxisRa
+        public static double RateMovePrimaryAxis
         {
             private get => _rateMoveAxes.X;
             set
             {
                 _rateMoveAxes.X = value;
                 CancelAllAsync();
-                if (Math.Abs(value) > 0)
+                if (!MoveSecondaryAxisActive)
                 {
-                    if (Tracking) { _MoveAxisPrevTracking = true; }
-                    Tracking = false;
-                    IsSlewing = true;
-                    SlewState = SlewType.SlewMoveAxis;
-                }
-                else
-                {
-                    IsSlewing = false;
-                    SlewState = SlewType.SlewNone;
-                    if (_MoveAxisPrevTracking)
+                    if (Math.Abs(value) > 0)
                     {
-                        Tracking = true;
-                        _MoveAxisPrevTracking = false;
+                        // Save current tracking state if tracking is on  
+                        if (Tracking)
+                        {
+                            MoveAxisPrevTracking = true;
+                        }
+
+                        Tracking = false;
+                        IsSlewing = true;
+                        SlewState = SlewType.SlewMoveAxis;
+                        // MoveAxis at zero rate continues tracking on secondary axis
+                        RateMoveSecondaryAxis = 0.0;
+                    }
+                    else
+                    {
+                        IsSlewing = false;
+                        SlewState = SlewType.SlewNone;
+                        if (MoveAxisPrevTracking)
+                        {
+                            Tracking = true;
+                            MoveAxisPrevTracking = false;
+                        }
                     }
                 }
 
                 object _;
+                Vector rate = new Vector(0.0, 0.0);
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
+                        if (!MovePrimaryAxisActive && MoveAxisPrevTracking)
+                        {
+                            SkyTrackingRate.X = CurrentTrackingRate() + Conversions.Deg2ArcSec(RateRa);
+                            rate = SkyGetRate();
+                            _ = new CmdAxisTracking(0, Axis.Axis1, rate.X);
+                        }
                         _ = new CmdMoveAxisRate(0, Axis.Axis1, _rateMoveAxes.X);
                         break;
                     case MountType.SkyWatcher:
-                        var rate = SkyGetRate();
+                        // Temporary tracking rate for primary axis whilst secondary axis is moving
+                        if (!MovePrimaryAxisActive && MoveAxisPrevTracking)
+                        {
+                            SkyTrackingRate.X = CurrentTrackingRate() + Conversions.Deg2ArcSec(RateRa);
+                        }
+                        rate = SkyGetRate();
                         _ = new SkyAxisSlew(0, AxisId.Axis1, rate.X);
                         break;
                     default:
@@ -1011,59 +1081,63 @@ namespace GS.Server.SkyTelescope
             set
             {
                 _rateRaDec.Y = value;
-                object _;
-                switch (SkySettings.Mount)
+                // If tracking is on then update the mount tracking rate
+                if (Tracking)
                 {
-                    case MountType.Simulator:
-                        var a = GetDecRateDirection(_rateRaDec.Y);
-                        if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
-                        {
-                            if (Tracking)
+                    object _;
+                    switch (SkySettings.Mount)
+                    {
+                        case MountType.Simulator:
+                            var a = GetDecRateDirection(_rateRaDec.Y);
+                            if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
                             {
-                                // get tracking target at time now
-                                var raDec = SkyPredictor.GetRaDecAtTime(HiResDateTime.UtcNow);
-                                // set predictor parameters ready for tracking
-                                SkyPredictor.Set(raDec[0], raDec[1], _rateRaDec.X, _rateRaDec.Y);
-                                SetTracking();
+                                if (Tracking)
+                                {
+                                    // get tracking target at time now
+                                    var raDec = SkyPredictor.GetRaDecAtTime(HiResDateTime.UtcNow);
+                                    // set predictor parameters ready for tracking
+                                    SkyPredictor.Set(raDec[0], raDec[1], _rateRaDec.X, _rateRaDec.Y);
+                                    SetTracking();
+                                }
+                                else
+                                {
+                                    // no tracking target so set to current position 
+                                    SkyPredictor.Set(RightAscensionXForm, DeclinationXForm, _rateRaDec.X, _rateRaDec.Y);
+                                }
                             }
                             else
                             {
-                                // no tracking target so set to current position 
-                                SkyPredictor.Set(RightAscensionXForm, DeclinationXForm, _rateRaDec.X, _rateRaDec.Y);
+                                _ = new CmdRaDecRate(0, Axis.Axis2, a);
                             }
-                        }
-                        else
-                        {
-                            _ = new CmdRaDecRate(0, Axis.Axis2, a);
-                        }
-                        break;
-                    case MountType.SkyWatcher:
-                        var rate = SkyGetRate();
-                        if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
-                        {
-                            if (Tracking)
+                            break;
+                        case MountType.SkyWatcher:
+                            var rate = SkyGetRate();
+                            if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
                             {
-                                // get tracking target at time now
-                                var raDec = SkyPredictor.GetRaDecAtTime(HiResDateTime.UtcNow);
-                                // set predictor parameters ready for tracking
-                                SkyPredictor.Set(raDec[0], raDec[1], _rateRaDec.X, _rateRaDec.Y);
-                                SetTracking();
+                                if (Tracking)
+                                {
+                                    // get tracking target at time now
+                                    var raDec = SkyPredictor.GetRaDecAtTime(HiResDateTime.UtcNow);
+                                    // set predictor parameters ready for tracking
+                                    SkyPredictor.Set(raDec[0], raDec[1], _rateRaDec.X, _rateRaDec.Y);
+                                    SetTracking();
+                                }
+                                else
+                                {
+                                    // no tracking target so set to current position 
+                                    SkyPredictor.Set(RightAscensionXForm, DeclinationXForm, _rateRaDec.X, _rateRaDec.Y);
+                                }
                             }
                             else
                             {
-                                // no tracking target so set to current position 
-                                SkyPredictor.Set(RightAscensionXForm, DeclinationXForm, _rateRaDec.X, _rateRaDec.Y);
+                                _ = new SkyAxisSlew(0, AxisId.Axis2, rate.Y);
                             }
-                        }
-                        else
-                        {
-                            _ = new SkyAxisSlew(0, AxisId.Axis2, rate.Y);
-                        }
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
 
+                }
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
@@ -1093,59 +1167,63 @@ namespace GS.Server.SkyTelescope
             set
             {
                 _rateRaDec.X = value;
-                object _;
-                switch (SkySettings.Mount)
+                // If tracking is on then update the mount tracking rate
+                if (Tracking)
                 {
-                    case MountType.Simulator:
-                        var a = GetRaRateDirection(_rateRaDec.X);
-                        if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
-                        {
-                            if (Tracking)
+                    object _;
+                    switch (SkySettings.Mount)
+                    {
+                        case MountType.Simulator:
+                            var a = GetRaRateDirection(_rateRaDec.X);
+                            if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
                             {
-                                // get tracking target at time now
-                                var raDec = SkyPredictor.GetRaDecAtTime(HiResDateTime.UtcNow);
-                                // set predictor parameters ready for tracking
-                                SkyPredictor.Set(raDec[0], raDec[1], _rateRaDec.X, _rateRaDec.Y);
-                                SetTracking();
+                                if (Tracking)
+                                {
+                                    // get tracking target at time now
+                                    var raDec = SkyPredictor.GetRaDecAtTime(HiResDateTime.UtcNow);
+                                    // set predictor parameters ready for tracking
+                                    SkyPredictor.Set(raDec[0], raDec[1], _rateRaDec.X, _rateRaDec.Y);
+                                    SetTracking();
+                                }
+                                else
+                                {
+                                    // no tracking target so set to current position 
+                                    SkyPredictor.Set(RightAscensionXForm, DeclinationXForm, _rateRaDec.X, _rateRaDec.Y);
+                                }
                             }
                             else
                             {
-                                // no tracking target so set to current position 
-                                SkyPredictor.Set(RightAscensionXForm, DeclinationXForm, _rateRaDec.X, _rateRaDec.Y);
+                                _ = new CmdRaDecRate(0, Axis.Axis1, a);
                             }
-                        }
-                        else
-                        {
-                            _ = new CmdRaDecRate(0, Axis.Axis1, a);
-                        }
-                        break;
-                    case MountType.SkyWatcher:
-                        var rate = SkyGetRate();
-                        if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
-                        {
-                            if (Tracking)
+                            break;
+                        case MountType.SkyWatcher:
+                            var rate = SkyGetRate();
+                            if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
                             {
-                                // get tracking target at time now
-                                var raDec = SkyPredictor.GetRaDecAtTime(HiResDateTime.UtcNow);
-                                // set predictor parameters ready for tracking
-                                SkyPredictor.Set(raDec[0], raDec[1], _rateRaDec.X, _rateRaDec.Y);
-                                SetTracking();
+                                if (Tracking)
+                                {
+                                    // get tracking target at time now
+                                    var raDec = SkyPredictor.GetRaDecAtTime(HiResDateTime.UtcNow);
+                                    // set predictor parameters ready for tracking
+                                    SkyPredictor.Set(raDec[0], raDec[1], _rateRaDec.X, _rateRaDec.Y);
+                                    SetTracking();
+                                }
+                                else
+                                {
+                                    // no tracking target so set to current position 
+                                    SkyPredictor.Set(RightAscensionXForm, DeclinationXForm, _rateRaDec.X, _rateRaDec.Y);
+                                }
                             }
                             else
                             {
-                                // no tracking target so set to current position 
-                                SkyPredictor.Set(RightAscensionXForm, DeclinationXForm, _rateRaDec.X, _rateRaDec.Y);
+                                _ = new SkyAxisSlew(0, AxisId.Axis1, rate.X);
                             }
-                        }
-                        else
-                        {
-                            _ = new SkyAxisSlew(0, AxisId.Axis1, rate.X);
-                        }
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
 
+                }
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
@@ -2068,20 +2146,20 @@ namespace GS.Server.SkyTelescope
             change += SkyTrackingRate; // Tracking
             change += SkyHCRate; // Hand controller
 
-            if (Math.Abs(RateMoveAxisRa) > 0) // MoveAxis RA absolute at the given rate
+            if (MovePrimaryAxisActive) // MoveAxis Primary absolute at the given rate
             {
-              //change.X -= SkyTrackingRate.X; // remove any tracking
-                change.X += RateMoveAxisRa;
+                change.X -= SkyTrackingRate.X; // remove any tracking
+                change.X += RateMovePrimaryAxis;
             }
             else // Alt Az handles RateRa through AltAzPredictor
             {
                 change.X += SkySettings.AlignmentMode != AlignmentModes.algAltAz ? GetRaRateDirection(RateRa) : 0;
             }
 
-            if (Math.Abs(RateMoveAxisDec) > 0) // MoveAxis Dec absolute at the given rate
+            if (MoveSecondaryAxisActive) // MoveAxis secondary absolute at the given rate
             {
-              //change.Y -= SkyTrackingRate.Y; // remove any tracking
-                change.Y += RateMoveAxisDec;
+                change.Y -= SkyTrackingRate.Y; // remove any tracking
+                change.Y += RateMoveSecondaryAxis;
             }
             else // Alt Az handles RateDec through AltAzPredictor
             {
@@ -2764,6 +2842,7 @@ namespace GS.Server.SkyTelescope
             Tracking = false; //added back in for spec "Tracking is returned to its pre-slew state"
             CancelAllAsync();
             _rateMoveAxes = new Vector(0, 0);
+            MoveAxisPrevTracking = false;
             _rateRaDec = new Vector(0, 0);
             SlewState = SlewType.SlewNone;
 
@@ -3251,7 +3330,7 @@ namespace GS.Server.SkyTelescope
                     break;
             }
 
-            if ((Math.Abs(RateMoveAxisRa) + Math.Abs(RateMoveAxisDec)) > 0) { slewing = true; }
+            if ((Math.Abs(RateMovePrimaryAxis) + Math.Abs(RateMoveSecondaryAxis)) > 0) { slewing = true; }
             IsSlewing = slewing;
         }
 
@@ -4268,6 +4347,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
                 // Reset rates and axis movement
                 _rateMoveAxes = new Vector(0, 0);
+                MoveAxisPrevTracking = false;
                 _rateRaDec = new Vector(0, 0);
                 // Stop axes
                 switch (SkySettings.Mount)
@@ -6098,6 +6178,7 @@ namespace GS.Server.SkyTelescope
 
             CancelAllAsync();
             _rateMoveAxes = new Vector(0, 0);
+            MoveAxisPrevTracking = false;
             _rateRaDec = new Vector(0, 0);
 
             if (!AxesStopValidate())
@@ -6679,6 +6760,7 @@ namespace GS.Server.SkyTelescope
             // reset any rates so slewing doesn't start
             _rateRaDec = new Vector(0, 0);
             _rateMoveAxes = new Vector(0, 0);
+            MoveAxisPrevTracking = false;
             SlewState = SlewType.SlewNone;
 
             // invalidate target positions

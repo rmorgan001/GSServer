@@ -870,10 +870,10 @@ namespace ASCOM.GS.Sky.Telescope
             switch (Axis)
             {
                 case TelescopeAxes.axisPrimary:
-                    SkyServer.RateMoveAxisRa = Rate;
+                    SkyServer.RateMovePrimaryAxis = Rate;
                     break;
                 case TelescopeAxes.axisSecondary:
-                    SkyServer.RateMoveAxisDec = Rate;
+                    SkyServer.RateMoveSecondaryAxis = Rate;
                     break;
                 case TelescopeAxes.axisTertiary:
                 default:
