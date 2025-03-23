@@ -585,6 +585,9 @@ namespace GS.Server.SkyTelescope
                                 case "CanFlipAzimuthSide":
                                     EnableFlipAzDir = SkyServer.CanFlipAzimuthSide;
                                     break;
+                                case "MoveAxisPrevTracking":
+                                    TrackingBlinker = SkyServer.MoveAxisPrevTracking;
+                                    break;
                                 case "HcPulseDone":
                                     HcPulseDone = SkyServer.HcPulseDone;
                                     break;
@@ -5978,6 +5981,16 @@ namespace GS.Server.SkyTelescope
             for (var i = 0; i < 4; i++)
             {
                 SopBlinker = !SopBlinker;
+            }
+        }
+        private bool _trackingBlinker;
+        public bool TrackingBlinker
+        {
+            get => _trackingBlinker;
+            set
+            {
+                _trackingBlinker = value;
+                OnPropertyChanged();
             }
         }
 
