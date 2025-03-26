@@ -41,7 +41,7 @@ using Color = System.Drawing.Color;
 
 namespace GS.Server.Plot
 {
-    public class PlotVM : ObservableObject, IPageVM, IDisposable
+    public class PlotVm : ObservableObject, IPageVM, IDisposable
     {
         #region Fields
         public string TopName => "Plot";
@@ -51,13 +51,14 @@ namespace GS.Server.Plot
         private DispatcherTimer _xAxisTimer;
         private CancellationTokenSource _cts;
         private CancellationToken _ct;
-        private double raStepsPerSecond;
-        private double decStepsPerSecond;
+        private double _raStepsPerSecond;
+        private double _decStepsPerSecond;
         private const string BaseLogName = "Plot";
+        private double _trackingRate;
         
         #endregion
         
-        public PlotVM()
+        public PlotVm()
         {
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Loading PlotVM" };
@@ -127,15 +128,15 @@ namespace GS.Server.Plot
 
             if (IsZeroBased)
             {
-                var zero = Conversions.Deg2ArcSec(90.0) * raStepsPerSecond;
+                var zero = Conversions.Deg2ArcSec(90.0) * _raStepsPerSecond;
                 steps -= zero;
             }
 
-            TitleItem item;
+            TitleItem item; //display Ra/Dec on top of graph
             switch (Scale)
             {
                 case ChartScale.Degrees:
-                    point.Value = Conversions.ArcSec2Deg(steps / raStepsPerSecond);
+                    point.Value = Conversions.ArcSec2Deg(steps / _raStepsPerSecond);
                     Values1.Add(point);
                     item = TitleItems.FirstOrDefault(x => x.TitleName == Values1Title);
                     if (item != null)
@@ -144,19 +145,34 @@ namespace GS.Server.Plot
                     }
                     break;
                 case ChartScale.Arcsecs:
-                    point.Value = steps;
+                    // attempt to normalize the plot, automatically takes out the tracking rate. only works with tracking on
+                    var firstPoint = Values1.FirstOrDefault();
+                    var f = 0;
+                    if (firstPoint != null && SkyServer.Tracking && Normalize)
+                    {
+                        var timeSpan = firstPoint.DateTime - point.DateTime;
+                        var rate = Math.Abs(_trackingRate);
+                        var a = Math.Abs(timeSpan.TotalSeconds);
+                        var b = a * rate;
+                        var c = b * 3600;
+                        var d = c * _raStepsPerSecond;
+                        var e = (int) Math.Round(d,4);
+                        f = SkyServer.SouthernHemisphere ? -Math.Abs(e) : Math.Abs(e);
+                    }
+                     
+                    point.Value = steps - f; 
                     Values1.Add(point);
                     item = TitleItems.FirstOrDefault(x => x.TitleName == Values1Title);
                     if (item != null)
                     {
                         item.Value = point.Value;
-                        var fpoint = Values1.FirstOrDefault();
-                        var lpoint = Values1.LastOrDefault();
-                        if (fpoint != null && lpoint != null)
+                        var fPoint = Values1.FirstOrDefault();
+                        var lPoint = Values1.LastOrDefault();
+                        if (fPoint != null && lPoint != null)
                         {
-                            var tspan = lpoint.DateTime - fpoint.DateTime;
-                            var vspan = Math.Abs(lpoint.Value - fpoint.Value);
-                            var rate = vspan / raStepsPerSecond / Math.Abs(tspan.TotalSeconds);
+                            var tSpan = lPoint.DateTime - fPoint.DateTime;
+                            var vSpan = Math.Abs(lPoint.Value - fPoint.Value);
+                            var rate = vSpan / _raStepsPerSecond / Math.Abs(tSpan.TotalSeconds);
                             item.Value = Numbers.TruncateD(rate, 4);  
                         }
                     }
@@ -173,6 +189,7 @@ namespace GS.Server.Plot
                 default:
                     return;
             }
+            
             if (IsLogging){ChartLogging.LogPoint(BaseLogName,ChartType.Plot, point);}
             if (Values1.Count > MaxPoints){Values1.RemoveAt(0);}
         }
@@ -190,14 +207,14 @@ namespace GS.Server.Plot
 
             if (IsZeroBased)
             {
-                var zero = Conversions.Deg2ArcSec(90) * decStepsPerSecond;
+                var zero = Conversions.Deg2ArcSec(90) * _decStepsPerSecond;
                 steps -= zero;
             }
             TitleItem item;
             switch (Scale)
             {
                 case ChartScale.Degrees:
-                    point.Value = Conversions.ArcSec2Deg(steps / decStepsPerSecond);
+                    point.Value = Conversions.ArcSec2Deg(steps / _decStepsPerSecond);
                     Values2.Add(point);
                     item = TitleItems.FirstOrDefault(x => x.TitleName == Values2Title);
                     if (item != null)
@@ -212,13 +229,13 @@ namespace GS.Server.Plot
                     if (item != null)
                     {
                         item.Value = point.Value;
-                        var fpoint = Values2.FirstOrDefault();
-                        var lpoint = Values2.LastOrDefault();
-                        if (fpoint != null && lpoint != null)
+                        var fPoint = Values2.FirstOrDefault();
+                        var lPoint = Values2.LastOrDefault();
+                        if (fPoint != null && lPoint != null)
                         {
-                            var tspan = lpoint.DateTime - fpoint.DateTime;
-                            var vspan = Math.Abs(lpoint.Value - fpoint.Value);
-                            var rate = vspan / decStepsPerSecond / Math.Abs(tspan.TotalSeconds);
+                            var tSpan = lPoint.DateTime - fPoint.DateTime;
+                            var vSpan = Math.Abs(lPoint.Value - fPoint.Value);
+                            var rate = vSpan / _decStepsPerSecond / Math.Abs(tSpan.TotalSeconds);
                             item.Value = Numbers.TruncateD(rate, 4);
                         }
                     }
@@ -309,6 +326,18 @@ namespace GS.Server.Plot
             {
                 if (_isLogging == value) return;
                 _isLogging = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _normalize;
+        public bool Normalize
+        {
+            get => _normalize;
+            set
+            {
+                if (_normalize == value) return;
+                _normalize = value;
                 OnPropertyChanged();
             }
         }
@@ -536,7 +565,7 @@ namespace GS.Server.Plot
             }
         }
 
-        public SeriesCollection _valuesCollection;
+        private SeriesCollection _valuesCollection;
         public SeriesCollection ValuesCollection
         {
             get => _valuesCollection;
@@ -560,7 +589,7 @@ namespace GS.Server.Plot
             }
         }
 
-        public List<ChartScale> ScaleList { get; set; }
+        //public List<ChartScale> ScaleList { get; set; }
 
         private ChartScale _scale;
         public ChartScale Scale
@@ -582,19 +611,16 @@ namespace GS.Server.Plot
             TitleItems.Clear();
             SetScale(Scale);
 
-            raStepsPerSecond = Conversions.StepPerArcSec(SkyServer.StepsPerRevolution[0]);
-            decStepsPerSecond = Conversions.StepPerArcSec(SkyServer.StepsPerRevolution[1]);
-
+            _raStepsPerSecond = Conversions.StepPerArcSec(SkyServer.StepsPerRevolution[0]);
+            _decStepsPerSecond = Conversions.StepPerArcSec(SkyServer.StepsPerRevolution[1]);
             MonitorLog.GetJEntries = true;
 
             ValuesCollection = new SeriesCollection();
-
             if (Values1Toggle)
             {
                 var titleItem = CreateSeries(Values1Color, Values1Title, Values1Series, Values1, ChartValueSet.Values1, Values1PtSz, 0);
                 if (titleItem != null) TitleItems.Add(titleItem);
             }
-
             if (!Values2Toggle) return;
             {
                 var titleItem = CreateSeries(Values2Color, Values2Title, Values2Series, Values2, ChartValueSet.Values2, Values2PtSz, 0);
@@ -736,6 +762,8 @@ namespace GS.Server.Plot
         }
         private void ClearValues()
         {
+            _trackingRate = SkyServer.Tracking ? SkyServer.CurrentTrackingRate() : 0;
+
             Values1?.Clear();
             Values2?.Clear();
 
@@ -809,16 +837,16 @@ namespace GS.Server.Plot
             }
         }
 
-        private double _value1value;
-        public double Value1Value
-        {
-            get => _value1value;
-            set
-            {
-                _value1value = value;
-                OnPropertyChanged();
-            }
-        }
+        //private double _value1Value;
+        //public double Value1Value
+        //{
+        //    get => _value1Value;
+        //    set
+        //    {
+        //        _value1Value = value;
+        //        OnPropertyChanged();
+        //    }
+        //}
 
         private ChartSeriesType _values1Series;
         public ChartSeriesType Values1Series
@@ -1379,7 +1407,7 @@ namespace GS.Server.Plot
         // NOTE: Leave out the finalizer altogether if this class doesn't
         // own unmanaged resources itself, but leave the other methods
         // exactly as they are.
-        ~PlotVM()
+        ~PlotVm()
         {
             // Finalizer calls Dispose(false)
             Dispose(false);

@@ -57,7 +57,7 @@ namespace GS.Server.Main
         private SettingsVM _settingsVM;
         private GamePadVM _gamePadVM;
         private Model3DVM _model3dVM;
-        private PlotVM _plotVM;
+        private PlotVm _plotVM;
         private PoleLocatorVM _poleLocatorVM;
         private PulsesVM _pulsesVM;
         private PecVM _pecVM;
@@ -295,7 +295,7 @@ namespace GS.Server.Main
                     {
                         if (!PageViewModels.Contains(_plotVM))
                         {
-                            _plotVM = new PlotVM();
+                            _plotVM = new PlotVm();
                             PageViewModels.Add(_plotVM);
                         }
                         PlotRadioVisible = true;

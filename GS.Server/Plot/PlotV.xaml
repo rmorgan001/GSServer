@@ -9,7 +9,7 @@
              xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              xmlns:plot="clr-namespace:GS.Server.Plot"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:geared="clr-namespace:LiveCharts.Geared;assembly=LiveCharts.Geared" mc:Ignorable="d" d:DataContext="{d:DesignInstance plot:PlotVM}">
+             xmlns:geared="clr-namespace:LiveCharts.Geared;assembly=LiveCharts.Geared" mc:Ignorable="d" d:DataContext="{d:DesignInstance plot:PlotVm}">
     <UserControl.Resources>
         <domain:InverseBooleanConverter x:Key="InvBol" />
     </UserControl.Resources>
@@ -44,7 +44,7 @@
                         <ToggleButton Width="25" Height="25" Style="{StaticResource MaterialDesignActionLightToggleButton}" IsChecked="{Binding IsZeroBased}" />
                             <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="{StaticResource pltZero}" />
                     </StackPanel>
-                            <ComboBox Margin="0,10,0,0" md:HintAssist.Hint="{StaticResource pltYScale}" HorizontalAlignment="Left" Width="100" VerticalAlignment="Bottom" Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource pltYScale}" ItemsSource="{Binding Source={domain1:EnumValueBindingSourceExtension {x:Type plot:ChartScale}}}">
+                        <ComboBox Margin="0,10,0,0" md:HintAssist.Hint="{StaticResource pltYScale}" HorizontalAlignment="Left" Width="100" VerticalAlignment="Bottom" Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource pltYScale}" ItemsSource="{Binding Source={domain1:EnumValueBindingSourceExtension {x:Type plot:ChartScale}}}">
                         <ComboBox.SelectedItem>
                                     <Binding Path="Scale" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                 <Binding.ValidationRules>
@@ -58,7 +58,7 @@
                             </ItemsPanelTemplate>
                         </ComboBox.ItemsPanel>
                     </ComboBox>
-                            <ComboBox Margin="0,10,0,0" md:HintAssist.Hint="{StaticResource pltQuality}" HorizontalAlignment="Left" Width="100" VerticalAlignment="Bottom" Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource pltQuality}" ItemsSource="{Binding Source={domain1:EnumValueBindingSourceExtension {x:Type geared:Quality}}}">
+                        <ComboBox Margin="0,10,0,0" md:HintAssist.Hint="{StaticResource pltQuality}" HorizontalAlignment="Left" Width="100" VerticalAlignment="Bottom" Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource pltQuality}" ItemsSource="{Binding Source={domain1:EnumValueBindingSourceExtension {x:Type geared:Quality}}}">
                         <ComboBox.SelectedItem>
                             <Binding Path="ChartQuality" UpdateSourceTrigger="PropertyChanged">
                                 <Binding.ValidationRules>
@@ -89,6 +89,10 @@
                         <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
                             <ToggleButton Width="25" Height="25" Style="{StaticResource MaterialDesignActionLightToggleButton}" IsChecked="{Binding IsLogging}" />
                                 <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="{StaticResource pltLogging}" />
+                        </StackPanel>
+                    <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+                        <ToggleButton Width="25" Height="25" Style="{StaticResource MaterialDesignActionLightToggleButton}" IsChecked="{Binding Normalize}" />
+                        <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="Remove RA Tracking" />
                     </StackPanel>
                     </StackPanel>
             </Grid>
@@ -152,7 +156,7 @@
                         <DataTemplate DataType="plot:TitleItem">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{Binding Path=TitleName}" Foreground="{Binding Path=Fill}" FontSize="25" Opacity=".5" />
-                                    <TextBlock Text="{Binding Path=Value}" Foreground="{Binding Path=Fill}" FontSize="25" Opacity=".5" Margin="10,0,0,0" />
+                                <TextBlock Text="{Binding Path=Value}" Foreground="{Binding Path=Fill}" FontSize="25" Opacity=".5" Margin="10,0,0,0" />
                             </StackPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>

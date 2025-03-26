@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019-2022 Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2025 Rob  Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -162,7 +162,7 @@ namespace GS.SkyWatcher
             {
                 if (!IsRunning || _cts.IsCancellationRequested || _skyWatcher?.IsConnected != true)
                 {
-                    var a = "Queue | IsRunning:" + IsRunning + "| IsCancel:" + _cts.IsCancellationRequested + "| IsConnected:" + (_skyWatcher?.IsConnected == true);
+                    var a = "Queue | IsRunning:" + IsRunning + "| IsCancel:" + _cts?.IsCancellationRequested + "| IsConnected:" + (_skyWatcher?.IsConnected == true);
                     if (command.Exception != null) { a += "| Ex:" + command.Exception.Message; }
                     var e = new MountControlException(ErrorCode.ErrQueueFailed, a);
                     command.Exception = e;
@@ -236,29 +236,43 @@ namespace GS.SkyWatcher
         /// <param name="customRaWormSteps"></param>
         public static void Start(ISerialPort serial, int[] customMount360Steps, double[] customRaWormSteps)
         {
-            Serial = serial;
-            CustomMount360Steps = customMount360Steps;
-            CustomRaWormSteps = customRaWormSteps;
-            Stop();
-            if (_cts == null) _cts = new CancellationTokenSource();
-            var ct = _cts.Token;
+            try
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{serial?.IsOpen}|{customMount360Steps}|{customRaWormSteps}" };
+                MonitorLog.LogToMonitor(monitorItem);
 
-            _skyWatcher = new SkyWatcher();
-            _resultsDictionary = new ConcurrentDictionary<long, ISkyCommand>();
-            _commandBlockingCollection = new BlockingCollection<ISkyCommand>();
+                Serial = serial;
+                CustomMount360Steps = customMount360Steps;
+                CustomRaWormSteps = customRaWormSteps;
+                Stop();
+                if (_cts == null) _cts = new CancellationTokenSource();
+                var ct = _cts.Token;
 
-            _ = Task.Factory.StartNew(() =>
-              {
-                  while (!ct.IsCancellationRequested)
-                  {
-                      foreach (var command in _commandBlockingCollection.GetConsumingEnumerable())
-                      {
-                          ProcessCommandQueue(command);
-                      }
-                  }
-              }, ct);
+                _skyWatcher = new SkyWatcher();
+                _resultsDictionary = new ConcurrentDictionary<long, ISkyCommand>();
+                _commandBlockingCollection = new BlockingCollection<ISkyCommand>();
 
-            IsRunning = true;
+                _ = Task.Factory.StartNew(() =>
+                {
+                    while (!ct.IsCancellationRequested)
+                    {
+                        foreach (var command in _commandBlockingCollection.GetConsumingEnumerable())
+                        {
+                            ProcessCommandQueue(command);
+                        }
+                    }
+                }, ct);
+
+                IsRunning = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{IsRunning}|{ex}" };
+                MonitorLog.LogToMonitor(monitorItem);
+                throw;
+            }
         }
 
         /// <summary>
