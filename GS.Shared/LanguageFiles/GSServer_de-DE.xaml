@@ -762,5 +762,6 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--1.0.9.1 -->
     <system:String x:Key="HcInt">Intervall</system:String>
     <system:String x:Key="HcRate">Rate</system:String>
+    <system:String x:Key="PlotNormalize">Entfernen Sie RA-Tracking</system:String>
 </ResourceDictionary>
  

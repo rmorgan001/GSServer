@@ -962,8 +962,7 @@ namespace GS.Server.SkyTelescope
                     }
                 }
 
-                object _;
-                Vector rate = new Vector(0.0, 0.0);
+                Vector rate;
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
@@ -1031,8 +1030,8 @@ namespace GS.Server.SkyTelescope
                     }
                 }
 
-                object _;
-                Vector rate = new Vector(0.0, 0.0);
+
+                Vector rate;
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
@@ -3524,8 +3523,10 @@ namespace GS.Server.SkyTelescope
         private static void StartAltAzTrackingTimer()
         {
             var timerID = _altAzTrackingTimer?.TimerID;
-            _altAzTrackingTimer = new MediaTimer();
-            _altAzTrackingTimer.Period = SkySettings.AltAzTrackingUpdateInterval;
+            _altAzTrackingTimer = new MediaTimer
+            {
+                Period = SkySettings.AltAzTrackingUpdateInterval
+            };
             _altAzTrackingTimer.Tick += AltAzTrackingTimerEvent;
             _altAzTrackingTimer.Start();
             var monitorItem = new MonitorEntry
