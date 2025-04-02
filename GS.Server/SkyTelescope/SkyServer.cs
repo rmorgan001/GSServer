@@ -31,6 +31,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -5334,6 +5335,28 @@ namespace GS.Server.SkyTelescope
             monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Pec: {pecmsg}" };
             MonitorLog.LogToMonitor(monitorItem);
+
+            try
+            {
+                // Get the app's configuration
+                var userConfig = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
+                // User config file copy from path
+                var userConfigFilepath = userConfig.FilePath;
+                // User config file copy to directory path
+                var logDirectoryPath = GSFile.GetLogPath();
+                // Copy the user config file to the log directory
+                File.Copy(userConfigFilepath, Path.Combine(logDirectoryPath, "user.config"), true);
+
+                monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Copied user.config to {logDirectoryPath}" };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+            catch (Exception e) when (e is ConfigurationErrorsException || e is ArgumentException) // All other exceptions mean app cannot function
+            {
+                monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Cannot copy user.config. {e.Message} " };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
 
             return true;
         }
