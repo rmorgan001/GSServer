@@ -4574,6 +4574,7 @@ namespace GS.Server.SkyTelescope
                     MonitorLog.LogToMonitor(monitorItem);
                     return;
                 }
+
             }
 
             var speed = SkySettings.HcSpeed;
