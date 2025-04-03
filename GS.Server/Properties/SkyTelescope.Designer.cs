@@ -1750,5 +1750,17 @@ namespace GS.Server.Properties {
                 this["HCPulseSpeeds"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DisableKeysOnGoTo {
+            get {
+                return ((bool)(this["DisableKeysOnGoTo"]));
+            }
+            set {
+                this["DisableKeysOnGoTo"] = value;
+            }
+        }
     }
 }

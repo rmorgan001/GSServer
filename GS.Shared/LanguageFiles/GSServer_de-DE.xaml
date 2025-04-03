@@ -763,5 +763,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="HcInt">Intervall</system:String>
     <system:String x:Key="HcRate">Rate</system:String>
     <system:String x:Key="PlotNormalize">Entfernen Sie RA-Tracking</system:String>
+    <system:String x:Key="DisableKeysOnGoTo">Direction Keys Off</system:String>
+    <system:String x:Key="DisableKeysOnGoToToolTip">Disable direction keys during go to</system:String>
 </ResourceDictionary>
  

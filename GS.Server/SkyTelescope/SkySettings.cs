@@ -914,6 +914,20 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static bool _disableKeysOnGoTo;
+        public static bool DisableKeysOnGoTo
+        {
+            get => _disableKeysOnGoTo;
+            set
+            {
+                if (_disableKeysOnGoTo == value) return;
+                _disableKeysOnGoTo = value;
+                Properties.SkyTelescope.Default.DisableKeysOnGoTo = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static bool _dtrEnable;
         public static bool DtrEnable
         {
@@ -2097,6 +2111,7 @@ namespace GS.Server.SkyTelescope
             DataBits = Properties.SkyTelescope.Default.DataBits;
             DecBacklash = Properties.SkyTelescope.Default.DecBacklash;
             DecPulseToGoTo = Properties.SkyTelescope.Default.DecPulseToGoTo;
+            DisableKeysOnGoTo = Properties.SkyTelescope.Default.DisableKeysOnGoTo;
             DtrEnable = Properties.SkyTelescope.Default.DTREnable;
             Elevation = Properties.SkyTelescope.Default.Elevation;
             Encoders = Properties.SkyTelescope.Default.EncodersOn;

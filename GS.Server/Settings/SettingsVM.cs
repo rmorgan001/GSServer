@@ -678,11 +678,22 @@ namespace GS.Server.Settings
             }
         }
 
+        public bool DisableKeysOnGoTo
+        {
+            get => SkySettings.DisableKeysOnGoTo;
+            set
+            {
+                if (DisableKeysOnGoTo == value) return;
+                SkySettings.DisableKeysOnGoTo = value;
+                OnPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Time
 
-       //public TimeSpan UTCDateOffset => SkySettings.UTCDateOffset;
+        //public TimeSpan UTCDateOffset => SkySettings.UTCDateOffset;
 
         //public DateTime UTCTime => HiResDateTime.UtcNow.Add(SkySettings.UTCDateOffset);
 
@@ -713,7 +724,7 @@ namespace GS.Server.Settings
 
         #region Utilities
 
-        
+
         private ICommand _clickUtilCmd;
 
         public ICommand ClickUtilCmd
