@@ -4521,10 +4521,40 @@ namespace GS.Server.SkyTelescope
 
         private void StartSlew(SlewDirection direction)
         {
+            // No action when at park
             if (SkyServer.AtPark)
             {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Warning,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"Hand controller movement not possible when parked"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
                 return;
             }
+
+            // No action unless not currently slewing or hand control movement is already active
+            if (SkyServer.SlewState != SlewType.SlewNone && SkyServer.SlewState != SlewType.SlewHandpad)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Warning,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"Hand controller movement not possible when slewing"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                return;
+            }
+
             var speed = SkySettings.HcSpeed;
             switch (direction)
             {
