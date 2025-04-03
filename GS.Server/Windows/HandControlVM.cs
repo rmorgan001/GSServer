@@ -1142,9 +1142,59 @@ namespace GS.Server.Windows
 
         private static void StartSlew(SlewDirection direction)
         {
+            // No action when at park
             if (SkyServer.AtPark)
             {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Warning,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"Hand controller movement not possible when parked"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
                 return;
+            }
+
+            var slewInProgress = (SkyServer.SlewState != SlewType.SlewNone) && (SkyServer.SlewState != SlewType.SlewHandpad);
+            if (slewInProgress)
+            {
+                if (SkySettings.DisableKeysOnGoTo)
+                // No action if direction keys are disabled and slewing is in progress 
+                {
+                    var monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.UI,
+                        Category = MonitorCategory.Interface,
+                        Type = MonitorType.Warning,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"Hand controller keys disabled when slewing"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
+                    return;
+                }
+                // Abort slew if direction keys are enabled and slewing is in progress 
+                else
+                {
+                    SkyServer.AbortSlew(true);
+                    var monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.UI,
+                        Category = MonitorCategory.Interface,
+                        Type = MonitorType.Information,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"Slew aborted by direction key"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
+                    return;
+                }
             }
 
             var hcMode = SkySettings.HcMode;
