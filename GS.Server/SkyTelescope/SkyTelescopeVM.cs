@@ -4541,8 +4541,8 @@ namespace GS.Server.SkyTelescope
             var slewInProgress = (SkyServer.SlewState != SlewType.SlewNone) && (SkyServer.SlewState != SlewType.SlewHandpad);
             if (slewInProgress)
             {
-                if (SkySettings.DisableKeysOnGoTo)
-                // No action if direction keys are disabled and slewing is in progress 
+
+                if (SkySettings.DisableKeysOnGoTo) // No action if direction keys are disabled and slewing is in progress 
                 {
                     var monitorItem = new MonitorEntry
                     {
