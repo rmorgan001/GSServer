@@ -640,6 +640,13 @@ namespace GS.Server.SkyTelescope
             {
                 if (_trackingRate == value) return;
                 _trackingRate = value;
+                if (value != DriveRates.driveSidereal)
+                {
+                    SkyServer.RateDecOrg = 0;
+                    SkyServer.RateDec = 0;
+                    SkyServer.RateRaOrg = 0;
+                    SkyServer.RateRa = 0;
+                }
                 Properties.SkyTelescope.Default.TrackingRate = value.ToString();
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
                 OnStaticPropertyChanged();

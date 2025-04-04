@@ -579,7 +579,7 @@ namespace ASCOM.GS.Sky.Telescope
             set
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {value}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {value}|{_objectId}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkySystem.SetConnected(_objectId, value);
@@ -1573,13 +1573,6 @@ namespace ASCOM.GS.Sky.Telescope
 
                 CheckVersionOne("TrackingRate", true);
                 CheckTrackingRate("TrackingRate", value);
-                if (value != DriveRates.driveSidereal)
-                {
-                    SkyServer.RateDecOrg = 0;
-                    SkyServer.RateDec = 0;
-                    SkyServer.RateRaOrg = 0;
-                    SkyServer.RateRa = 0;
-                }
                 SkySettings.TrackingRate = value;
             }
         }
