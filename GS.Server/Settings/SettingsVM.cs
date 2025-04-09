@@ -41,27 +41,27 @@ using ASCOM.DeviceInterface;
 
 namespace GS.Server.Settings
 {
-    public sealed class SettingsVM : ObservableObject, IPageVM, IDisposable
+    public sealed class SettingsVm : ObservableObject, IPageVM, IDisposable
     {
         #region fields
         public string TopName => "GS Server";
         public string BottomName => "Options";
-        private static string GsUrl => $"https://github.com/rmorgan001/GSServer/wiki/autodownloads";
+        private static string GsUrl => "https://github.com/rmorgan001/GSServer/wiki/autodownloads";
         public int Uid => 2;
-        private readonly MainWindowVM _mainWindowVm;
-        public static SettingsVM _settingsVM;
+        private readonly MainWindowVm _mainWindowVm;
+        public static SettingsVm SettingVm;
         private readonly CancellationToken _cts;
         private readonly CancellationToken _ctsMonitor;
 
         #endregion
 
-        public SettingsVM()
+        public SettingsVm()
         {
             try
             {
                 using (new WaitCursor())
                 {
-                    _settingsVM = this;
+                    SettingVm = this;
 
                     var monitorItem = new MonitorEntry
                     {
@@ -86,9 +86,9 @@ namespace GS.Server.Settings
                     MonitorQueue.StaticPropertyChanged += PropertyChangedMonitorQueue;
 
                     MonitorEntries = new ObservableCollection<MonitorEntry>();
-                    StartStopButtonText = Shared.Settings.StartMonitor ? @"Stop" : @"Start";
+                    StartStopButtonText = Shared.Settings.StartMonitor ?"Stop" : "Start";
 
-                    _mainWindowVm = MainWindowVM._mainWindowVm;
+                    _mainWindowVm = MainWindowVm.MainWindow1Vm;
                     SleepMode = Settings.SleepMode;
                     Synthesizer.VoicePause = true;
                     VoiceActive = Settings.VoiceActive;
@@ -96,7 +96,7 @@ namespace GS.Server.Settings
 
                     // Theme Colors
                     var swatches = new SwatchesProvider().Swatches;
-                    var primaryColors = PrimaryColors = swatches is IList<Swatch> list ? list : swatches.ToList();
+                    var primaryColors = PrimaryColors = swatches as IList<Swatch> ?? swatches.ToList();
                     AccentColors = primaryColors.Where(item => item.IsAccented).ToList();
                     PrimaryColor = primaryColors.First(item => item.Name.Equals(Settings.PrimaryColor, StringComparison.InvariantCultureIgnoreCase));
                     AccentColor = primaryColors.First(item => item.Name.Equals(Settings.AccentColor, StringComparison.InvariantCultureIgnoreCase));
@@ -468,6 +468,7 @@ namespace GS.Server.Settings
             get => (SkySettings.AlignmentMode != AlignmentModes.algAltAz);
             set
             {
+                _sleepMode1 = value;
                 Settings.AlignmentTabVisible = (SkySettings.AlignmentMode != AlignmentModes.algAltAz);
                 _mainWindowVm.UpdateTabViewModel("Alignment");
                 OnPropertyChanged();
@@ -475,13 +476,13 @@ namespace GS.Server.Settings
         }
 
         private SleepMode _sleepMode;
-        private bool sleepMode;
+        private bool _sleepMode1;
         public bool SleepMode
         {
             get => Settings.SleepMode;
             set
             {
-                if(sleepMode == value) {return;}
+                if(_sleepMode1 == value) {return;}
                 if (value)
                 {
                     if (_sleepMode == null)
@@ -499,7 +500,7 @@ namespace GS.Server.Settings
                     }
                 }
 
-                sleepMode = value;
+                _sleepMode1 = value;
                 Settings.SleepMode = value;
                 OnPropertyChanged();
             }
@@ -678,16 +679,16 @@ namespace GS.Server.Settings
             }
         }
 
-        public bool DisableKeysOnGoTo
-        {
-            get => SkySettings.DisableKeysOnGoTo;
-            set
-            {
-                if (DisableKeysOnGoTo == value) return;
-                SkySettings.DisableKeysOnGoTo = value;
-                OnPropertyChanged();
-            }
-        }
+        //public bool DisableKeysOnGoTo
+        //{
+        //    get => SkySettings.DisableKeysOnGoTo;
+        //    set
+        //    {
+        //        if (DisableKeysOnGoTo == value) return;
+        //        SkySettings.DisableKeysOnGoTo = value;
+        //        OnPropertyChanged();
+        //    }
+        //}
 
         #endregion
 
@@ -831,7 +832,7 @@ namespace GS.Server.Settings
             set => MonitorLog.DevicesToMonitor(MonitorDevice.Telescope, value);
         }
 
-        public static bool UI
+        public static bool Ui
         {
             get => MonitorLog.InDevices(MonitorDevice.UI);
             set => MonitorLog.DevicesToMonitor(MonitorDevice.UI, value);
@@ -941,8 +942,8 @@ namespace GS.Server.Settings
         {
             try
             {
-                var currentvVolume = VoiceVolume;
-                if (currentvVolume <= 90)
+                var currentVolume = VoiceVolume;
+                if (currentVolume <= 90)
                 {
                     VoiceVolume += 10;
                 }
@@ -986,8 +987,8 @@ namespace GS.Server.Settings
         {
             try
             {
-                var currentvVolume = VoiceVolume;
-                if (currentvVolume >= 10)
+                var currentVolume = VoiceVolume;
+                if (currentVolume >= 10)
                 {
                     VoiceVolume -= 10;
                 }
@@ -1135,11 +1136,11 @@ namespace GS.Server.Settings
                 var saveFileDialog = new SaveFileDialog
                 {
                     InitialDirectory = @"C:\",
-                    Title = @"Save Monitor Information",
+                    Title = "Save Monitor Information",
                     CheckFileExists = false,
                     CheckPathExists = false,
                     DefaultExt = "txt",
-                    Filter = @"Txt files (*.txt)|*.txt|All files (*.*)|*.*",
+                    Filter = "Txt files (*.txt)|*.txt|All files (*.*)|*.*",
                     FilterIndex = 2,
                     RestoreDirectory = true,
                     FileName = $"GSServerMonitor_{DateTime.Now:yyyy-dd-M--HH-mm-ss}.txt"
@@ -1333,14 +1334,14 @@ namespace GS.Server.Settings
 
         #region Dialog
 
-        private string _DialogMsg;
+        private string _dialogMsg;
         public string DialogMsg
         {
-            get => _DialogMsg;
+            get => _dialogMsg;
             set
             {
-                if (_DialogMsg == value) return;
-                _DialogMsg = value;
+                if (_dialogMsg == value) return;
+                _dialogMsg = value;
                 OnPropertyChanged();
             }
         }
@@ -1503,7 +1504,7 @@ namespace GS.Server.Settings
         }
         private void ClosingMessageEventHandler(object sender, DialogClosingEventArgs eventArgs)
         {
-            Console.WriteLine(@"You can intercept the closing event, and cancel here.");
+            Console.WriteLine("You can intercept the closing event, and cancel here.");
         }
 
         #endregion
@@ -1965,7 +1966,7 @@ namespace GS.Server.Settings
         // NOTE: Leave out the finalizer altogether if this class doesn't
         // own unmanaged resources itself, but leave the other methods
         // exactly as they are.
-        ~SettingsVM()
+        ~SettingsVm()
         {
             // Finalizer calls Dispose(false)
             Dispose(false);

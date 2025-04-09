@@ -9,7 +9,7 @@
              xmlns:domain="clr-namespace:GS.Server.Domain"
              xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              xmlns:settings="clr-namespace:GS.Server.Settings"
-             d:DataContext="{d:DesignInstance Type=settings:SettingsVM}"
+             d:DataContext="{d:DesignInstance Type=settings:SettingsVm}"
              mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -42,7 +42,7 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="{Binding Index}" Grid.Column="0" FontSize="13" FontWeight="Bold" Margin="5,0,0,0"/>
                     <TextBlock Text="{Binding Path=Datetime, StringFormat=HH:mm:ss.fff}" Grid.Column="1" FontSize="13" Margin="5,0,0,0"/>
-                    <!-- Other fields to display in the monitor textblock
+                    <!-- Other fields to display in the monitor textBlock
                                 <TextBlock Text="{Binding Datetime}" Grid.Column="1" FontSize="13" Margin="5,0,0,0"/>
                                 <TextBlock Text="{Binding Category}" Grid.Column="2" FontSize="13" Margin="5,0,0,0"/>
                                 <TextBlock Text="{Binding Type}" Grid.Column="3" FontSize="13" Margin="5,0,0,0"/>-->
@@ -87,7 +87,7 @@
                                 <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optTelescope}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding UI}" Style="{StaticResource MaterialDesignCheckBox}" />
+                                <CheckBox IsChecked="{Binding Ui}" Style="{StaticResource MaterialDesignCheckBox}" />
                                 <TextBlock Width="65" Margin="10 0" VerticalAlignment="Center" Text="{StaticResource optUI}" />
                             </StackPanel>
                         </StackPanel>
@@ -259,10 +259,10 @@
                                     <CheckBox Height="25" Width="25" IsChecked="{Binding ParkDialog}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource ParkDialog}"/>
                                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource ParkDialog}"/>
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal">
+                                <!--<StackPanel Orientation="Horizontal">
                                     <CheckBox Height="25" Width="25" IsChecked="{Binding DisableKeysOnGoTo}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource DisableKeysOnGoToToolTip}"/>
                                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource DisableKeysOnGoTo}"/>
-                                </StackPanel>
+                                </StackPanel>-->
                             </StackPanel>
                             <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Left">
                                 <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optVoice}"/>

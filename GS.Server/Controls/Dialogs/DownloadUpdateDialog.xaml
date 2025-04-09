@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:settings="clr-namespace:GS.Server.Settings"
-        mc:Ignorable="d" d:DataContext="{d:DesignInstance settings:SettingsVM}">
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance settings:SettingsVm}">
     <GroupBox Header="{StaticResource optCheckUpdates}" Margin="5">
         <StackPanel Orientation="Vertical">
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center">

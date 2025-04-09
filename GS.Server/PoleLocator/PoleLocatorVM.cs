@@ -41,7 +41,7 @@ namespace GS.Server.PoleLocator
         public string BottomName => "Locator";
         public int Uid => 5;
 
-        private MainWindowVM _mainWindowVM;
+        private MainWindowVm _mainWindowVM;
         private readonly Util _util = new Util();
         private readonly DispatcherTimer _timer;
         private readonly double _polarisRa = 2.53019444;
@@ -216,7 +216,7 @@ namespace GS.Server.PoleLocator
         /// </summary>
         private void MainVM()
         {
-            if (_mainWindowVM == null) _mainWindowVM = MainWindowVM._mainWindowVm;
+            if (_mainWindowVM == null) _mainWindowVM = MainWindowVm.MainWindow1Vm;
         }
 
         private Vector TransformCoords(double ra, double dec, string from, string to)

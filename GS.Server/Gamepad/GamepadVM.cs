@@ -45,7 +45,7 @@ namespace GS.Server.GamePad
 
         private SkyTelescopeVm _skyTelescopeVM;
         private FocuserVM _focuserVM;
-        private SettingsVM _settingsVM;
+        private SettingsVm _settingsVM;
         private CancellationTokenSource ctsGamePad;
         private string _focusTextBox;
         private IGamePad _gamePad;
@@ -483,7 +483,7 @@ namespace GS.Server.GamePad
         /// <returns></returns>
         private bool Settings()
         {
-            if (_settingsVM == null) _settingsVM = SettingsVM._settingsVM;
+            if (_settingsVM == null) _settingsVM = SettingsVm.SettingVm;
             return _settingsVM != null;
         }
 

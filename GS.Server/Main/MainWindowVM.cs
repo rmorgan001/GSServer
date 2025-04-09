@@ -45,34 +45,34 @@ using ASCOM.DeviceInterface;
 
 namespace GS.Server.Main
 {
-    public sealed class MainWindowVM : ObservableObject, IDisposable
+    public sealed class MainWindowVm : ObservableObject, IDisposable
     {
         #region Fields
 
         private IPageVM _currentPageViewModel;
         private List<IPageVM> _pageViewModels;
-        private SkyTelescopeVm _skyTelescopeVM;
-        private FocuserVM _focuserVM;
-        private NotesVM _notesVM;
-        private SettingsVM _settingsVM;
-        private GamePadVM _gamePadVM;
-        private Model3DVM _model3dVM;
-        private PlotVm _plotVM;
-        private PoleLocatorVM _poleLocatorVM;
-        private PulsesVM _pulsesVM;
-        private PecVM _pecVM;
-        private SnapVM _snapVM;
-        private AlignmentVM _alignmentVM;
-        public static MainWindowVM _mainWindowVm;
+        private SkyTelescopeVm _skyTelescopeVm;
+        private FocuserVM _focuserVm;
+        private NotesVM _notesVm;
+        private SettingsVm _settingsVm;
+        private GamePadVM _gamePadVm;
+        private Model3DVM _model3dVm;
+        private PlotVm _plotVm;
+        private PoleLocatorVM _poleLocatorVm;
+        private PulsesVM _pulsesVm;
+        private PecVM _pecVm;
+        private SnapVM _snapVm;
+        private AlignmentVM _alignmentVm;
+        public static MainWindowVm MainWindow1Vm;
         private double _tempHeight = 510;
         private double _tempWidth = 850;
         private WindowState _tempWindowState = WindowState.Normal;
-        private readonly double MinHeight = 100;
-        private readonly double MinWidth = 200;
+        private const double MinHeight = 100;
+        private const double MinWidth = 200;
 
         #endregion
 
-        public MainWindowVM()
+        public MainWindowVm()
         {
             try
             {
@@ -99,7 +99,7 @@ namespace GS.Server.Main
 
                     MountType = SkySettings.Mount;
 
-                    _mainWindowVm = this;
+                    MainWindow1Vm = this;
 
                     // Sets up the Tab menu items
                     UpdateTabViewModel("SkyWatcher");
@@ -118,7 +118,7 @@ namespace GS.Server.Main
 
                     // Set starting page
                     CurrentPageViewModel = PageViewModels[0];
-                    SkyWatcherVMRadio = true;
+                    SkyWatcherVmRadio = true;
 
                     TopMost = Properties.Server.Default.StartOnTop || SkyServer.OpenSetupDialog;
                 }
@@ -193,18 +193,18 @@ namespace GS.Server.Main
                 case "Focuser":
                     if (Settings.Settings.Focuser)
                     {
-                        if (!PageViewModels.Contains(_focuserVM))
+                        if (!PageViewModels.Contains(_focuserVm))
                         {
-                            _focuserVM = new FocuserVM();
-                            PageViewModels.Add(_focuserVM);
+                            _focuserVm = new FocuserVM();
+                            PageViewModels.Add(_focuserVm);
                         }
                         FocuserRadioVisible = true;
                     }
                     else
                     {
-                        if (PageViewModels.Contains(_focuserVM))
+                        if (PageViewModels.Contains(_focuserVm))
                         {
-                            PageViewModels.Remove(_focuserVM);
+                            PageViewModels.Remove(_focuserVm);
                         }
                         FocuserRadioVisible = false;
                     }
@@ -212,18 +212,18 @@ namespace GS.Server.Main
                 case "Notes":
                     if (Settings.Settings.Notes)
                     {
-                        if (!PageViewModels.Contains(_notesVM))
+                        if (!PageViewModels.Contains(_notesVm))
                         {
-                            _notesVM = new NotesVM();
-                            PageViewModels.Add(_notesVM);
+                            _notesVm = new NotesVM();
+                            PageViewModels.Add(_notesVm);
                         }
                         NotesRadioVisible = true;
                     }
                     else
                     {
-                        if (PageViewModels.Contains(_notesVM))
+                        if (PageViewModels.Contains(_notesVm))
                         {
-                            PageViewModels.Remove(_notesVM);
+                            PageViewModels.Remove(_notesVm);
                         }
                         NotesRadioVisible = false;
                     }
@@ -231,18 +231,18 @@ namespace GS.Server.Main
                 case "SkyWatcher":
                     if (Settings.Settings.SkyWatcher)
                     {
-                        if (!PageViewModels.Contains(_skyTelescopeVM))
+                        if (!PageViewModels.Contains(_skyTelescopeVm))
                         {
-                            _skyTelescopeVM = new SkyTelescopeVm();
-                            PageViewModels.Add(_skyTelescopeVM);
+                            _skyTelescopeVm = new SkyTelescopeVm();
+                            PageViewModels.Add(_skyTelescopeVm);
                         }
                         SkyWatcherRadioVisible = true;
                     }
                     else
                     {
-                        if (PageViewModels.Contains(_skyTelescopeVM))
+                        if (PageViewModels.Contains(_skyTelescopeVm))
                         {
-                            PageViewModels.Remove(_skyTelescopeVM);
+                            PageViewModels.Remove(_skyTelescopeVm);
                         }
                         SkyWatcherRadioVisible = false;
                     }
@@ -250,42 +250,42 @@ namespace GS.Server.Main
                 case "GamePad":
                     if (Settings.Settings.GamePad)
                     {
-                        if (!PageViewModels.Contains(_gamePadVM))
+                        if (!PageViewModels.Contains(_gamePadVm))
                         {
-                            _gamePadVM = new GamePadVM();
-                            PageViewModels.Add(_gamePadVM);
+                            _gamePadVm = new GamePadVM();
+                            PageViewModels.Add(_gamePadVm);
                         }
                         GamePadRadioVisible = true;
                     }
                     else
                     {
-                        if (PageViewModels.Contains(_gamePadVM))
+                        if (PageViewModels.Contains(_gamePadVm))
                         {
-                            PageViewModels.Remove(_gamePadVM);
+                            PageViewModels.Remove(_gamePadVm);
                         }
                         GamePadRadioVisible = false;
                     }
                     break;
                 case "Settings":
-                    _settingsVM = new SettingsVM();
-                    PageViewModels.Add(_settingsVM);
+                    _settingsVm = new SettingsVm();
+                    PageViewModels.Add(_settingsVm);
                     SettingsRadioVisible = true;
                     break;
                 case "Model3D":
                     if (Settings.Settings.Model3D)
                     {
-                        if (!PageViewModels.Contains(_model3dVM))
+                        if (!PageViewModels.Contains(_model3dVm))
                         {
-                            _model3dVM = new Model3DVM();
-                            PageViewModels.Add(_model3dVM);
+                            _model3dVm = new Model3DVM();
+                            PageViewModels.Add(_model3dVm);
                         }
                         Model3DRadioVisible = true;
                     }
                     else
                     {
-                        if (PageViewModels.Contains(_model3dVM))
+                        if (PageViewModels.Contains(_model3dVm))
                         {
-                            PageViewModels.Remove(_model3dVM);
+                            PageViewModels.Remove(_model3dVm);
                         }
                         Model3DRadioVisible = false;
                     }
@@ -293,18 +293,18 @@ namespace GS.Server.Main
                 case "Plot":
                     if (Settings.Settings.Plot)
                     {
-                        if (!PageViewModels.Contains(_plotVM))
+                        if (!PageViewModels.Contains(_plotVm))
                         {
-                            _plotVM = new PlotVm();
-                            PageViewModels.Add(_plotVM);
+                            _plotVm = new PlotVm();
+                            PageViewModels.Add(_plotVm);
                         }
                         PlotRadioVisible = true;
                     }
                     else
                     {
-                        if (PageViewModels.Contains(_plotVM))
+                        if (PageViewModels.Contains(_plotVm))
                         {
-                            PageViewModels.Remove(_plotVM);
+                            PageViewModels.Remove(_plotVm);
                         }
                         PlotRadioVisible = false;
                     }
@@ -312,18 +312,18 @@ namespace GS.Server.Main
                 case "PoleLocator":
                     if (Settings.Settings.PoleLocator)
                     {
-                        if (!PageViewModels.Contains(_poleLocatorVM))
+                        if (!PageViewModels.Contains(_poleLocatorVm))
                         {
-                            _poleLocatorVM = new PoleLocatorVM();
-                            PageViewModels.Add(_poleLocatorVM);
+                            _poleLocatorVm = new PoleLocatorVM();
+                            PageViewModels.Add(_poleLocatorVm);
                         }
                         PoleLocatorRadioVisible = true;
                     }
                     else
                     {
-                        if (PageViewModels.Contains(_poleLocatorVM))
+                        if (PageViewModels.Contains(_poleLocatorVm))
                         {
-                            PageViewModels.Remove(_poleLocatorVM);
+                            PageViewModels.Remove(_poleLocatorVm);
                         }
                         PoleLocatorRadioVisible = false;
                     }
@@ -331,18 +331,18 @@ namespace GS.Server.Main
                 case "Pulses":
                     if (Settings.Settings.Pulses)
                     {
-                        if (!PageViewModels.Contains(_pulsesVM))
+                        if (!PageViewModels.Contains(_pulsesVm))
                         {
-                            _pulsesVM = new PulsesVM();
-                            PageViewModels.Add(_pulsesVM);
+                            _pulsesVm = new PulsesVM();
+                            PageViewModels.Add(_pulsesVm);
                         }
                         PulsesRadioVisible = true;
                     }
                     else
                     {
-                        if (PageViewModels.Contains(_pulsesVM))
+                        if (PageViewModels.Contains(_pulsesVm))
                         {
-                            PageViewModels.Remove(_pulsesVM);
+                            PageViewModels.Remove(_pulsesVm);
                         }
                         PulsesRadioVisible = false;
                     }
@@ -351,18 +351,18 @@ namespace GS.Server.Main
                     //if (Settings.Settings.Pec)
                     if (SkyServer.PecShow && Settings.Settings.Pec)
                     {
-                        if (!PageViewModels.Contains(_pecVM))
+                        if (!PageViewModels.Contains(_pecVm))
                         {
-                            _pecVM = new PecVM();
-                            PageViewModels.Add(_pecVM);
+                            _pecVm = new PecVM();
+                            PageViewModels.Add(_pecVm);
                         }
                         PecRadioVisible = true;
                     }
                     else
                     {
-                        if (PageViewModels.Contains(_pecVM))
+                        if (PageViewModels.Contains(_pecVm))
                         {
-                            PageViewModels.Remove(_pecVM);
+                            PageViewModels.Remove(_pecVm);
                         }
                         PecRadioVisible = false;
                     }
@@ -370,18 +370,18 @@ namespace GS.Server.Main
                 case "Snap":
                     if (Settings.Settings.Snap)
                     {
-                        if (!PageViewModels.Contains(_snapVM))
+                        if (!PageViewModels.Contains(_snapVm))
                         {
-                            _snapVM = new SnapVM();
-                            PageViewModels.Add(_snapVM);
+                            _snapVm = new SnapVM();
+                            PageViewModels.Add(_snapVm);
                         }
                         SnapRadioVisible = true;
                     }
                     else
                     {
-                        if (PageViewModels.Contains(_snapVM))
+                        if (PageViewModels.Contains(_snapVm))
                         {
-                            PageViewModels.Remove(_snapVM);
+                            PageViewModels.Remove(_snapVm);
                         }
                         SnapRadioVisible = false;
                     }
@@ -389,19 +389,19 @@ namespace GS.Server.Main
                 case "Alignment":
                     if (SkySettings.AlignmentMode != AlignmentModes.algAltAz && Settings.Settings.AlignmentTabVisible)
                     {
-                        if (!PageViewModels.Contains(_alignmentVM))
+                        if (!PageViewModels.Contains(_alignmentVm))
                         {
-                            _alignmentVM = new AlignmentVM();
-                            _alignmentVM.PropertyChanged += AlignmentVM_PropertyChanged;
-                            PageViewModels.Add(_alignmentVM);
+                            _alignmentVm = new AlignmentVM();
+                            _alignmentVm.PropertyChanged += AlignmentVM_PropertyChanged;
+                            PageViewModels.Add(_alignmentVm);
                         }
                         AlignmentRadioVisible = true;
                     }
                     else
                     {
-                        if (PageViewModels.Contains(_alignmentVM))
+                        if (PageViewModels.Contains(_alignmentVm))
                         {
-                            PageViewModels.Remove(_alignmentVM);
+                            PageViewModels.Remove(_alignmentVm);
                         }
 
                         AlignmentRadioVisible = false;
@@ -450,17 +450,17 @@ namespace GS.Server.Main
 
         #region Radio buttons
 
-        private bool _settingsVMRadio;
-        public bool SettingsVMRadio
+        private bool _settingsVmRadio;
+        public bool SettingsVmRadio
         {
-            get => _settingsVMRadio;
+            get => _settingsVmRadio;
             set
             {
                 using (new WaitCursor())
                 {
-                    if (_settingsVMRadio == value) return;
-                    _settingsVMRadio = value;
-                    if (value) ChangeViewModel(_settingsVM);
+                    if (_settingsVmRadio == value) return;
+                    _settingsVmRadio = value;
+                    if (value) ChangeViewModel(_settingsVm);
                     OnPropertyChanged();
                 }
             }
@@ -478,17 +478,17 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _skyWatcherVMRadio;
-        public bool SkyWatcherVMRadio
+        private bool _skyWatcherVmRadio;
+        public bool SkyWatcherVmRadio
         {
-            get => _skyWatcherVMRadio;
+            get => _skyWatcherVmRadio;
             set
             {
                 using (new WaitCursor())
                 {
-                    if (_skyWatcherVMRadio == value) return;
-                    _skyWatcherVMRadio = value;
-                    if (value) ChangeViewModel(_skyTelescopeVM);
+                    if (_skyWatcherVmRadio == value) return;
+                    _skyWatcherVmRadio = value;
+                    if (value) ChangeViewModel(_skyTelescopeVm);
                     OnPropertyChanged();
                 }
             }
@@ -506,17 +506,17 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _notesVMRadio;
-        public bool NotesVMRadioRadio
+        private bool _notesVmRadio;
+        public bool NotesVmRadioRadio
         {
-            get => _notesVMRadio;
+            get => _notesVmRadio;
             set
             {
                 using (new WaitCursor())
                 {
-                    if (_notesVMRadio == value) return;
-                    _notesVMRadio = value;
-                    if (value) ChangeViewModel(_notesVM);
+                    if (_notesVmRadio == value) return;
+                    _notesVmRadio = value;
+                    if (value) ChangeViewModel(_notesVm);
                     OnPropertyChanged();
                 }
             }
@@ -534,17 +534,17 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _focuserVMRadio;
-        public bool FocuserVMRadioRadio
+        private bool _focuserVmRadio;
+        public bool FocuserVmRadioRadio
         {
-            get => _focuserVMRadio;
+            get => _focuserVmRadio;
             set
             {
                 using (new WaitCursor())
                 {
-                    if (_focuserVMRadio == value) return;
-                    _focuserVMRadio = value;
-                    if (value) ChangeViewModel(_focuserVM);
+                    if (_focuserVmRadio == value) return;
+                    _focuserVmRadio = value;
+                    if (value) ChangeViewModel(_focuserVm);
                     OnPropertyChanged();
                 }
             }
@@ -562,17 +562,17 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _gamePadVMRadio;
-        public bool GamePadVMRadioRadio
+        private bool _gamePadVmRadio;
+        public bool GamePadVmRadioRadio
         {
-            get => _gamePadVMRadio;
+            get => _gamePadVmRadio;
             set
             {
                 using (new WaitCursor())
                 {
-                    if (_gamePadVMRadio == value) return;
-                    _gamePadVMRadio = value;
-                    if (value) ChangeViewModel(_gamePadVM);
+                    if (_gamePadVmRadio == value) return;
+                    _gamePadVmRadio = value;
+                    if (value) ChangeViewModel(_gamePadVm);
                     OnPropertyChanged();
                 }
             }
@@ -590,17 +590,17 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _model3dVMRadio;
-        public bool Model3DVMRadioRadio
+        private bool _model3dVmRadio;
+        public bool Model3DvmRadioRadio
         {
-            get => _model3dVMRadio;
+            get => _model3dVmRadio;
             set
             {
                 using (new WaitCursor())
                 {
-                    if (_model3dVMRadio == value) return;
-                    _model3dVMRadio = value;
-                    if (value) ChangeViewModel(_model3dVM);
+                    if (_model3dVmRadio == value) return;
+                    _model3dVmRadio = value;
+                    if (value) ChangeViewModel(_model3dVm);
                     OnPropertyChanged();
                 }
             }
@@ -618,17 +618,17 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _plotVMRadio;
-        public bool PlotVMRadioRadio
+        private bool _plotVmRadio;
+        public bool PlotVmRadioRadio
         {
-            get => _plotVMRadio;
+            get => _plotVmRadio;
             set
             {
                 using (new WaitCursor())
                 {
-                    if (_plotVMRadio == value) return;
-                    _plotVMRadio = value;
-                    if (value) ChangeViewModel(_plotVM);
+                    if (_plotVmRadio == value) return;
+                    _plotVmRadio = value;
+                    if (value) ChangeViewModel(_plotVm);
                     OnPropertyChanged();
                 }
             }
@@ -646,17 +646,17 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _poleLocatorVMRadio;
-        public bool PoleLocatorVMRadioRadio
+        private bool _poleLocatorVmRadio;
+        public bool PoleLocatorVmRadioRadio
         {
-            get => _poleLocatorVMRadio;
+            get => _poleLocatorVmRadio;
             set
             {
                 using (new WaitCursor())
                 {
-                    if (_poleLocatorVMRadio == value) return;
-                    _poleLocatorVMRadio = value;
-                    if (value) ChangeViewModel(_poleLocatorVM);
+                    if (_poleLocatorVmRadio == value) return;
+                    _poleLocatorVmRadio = value;
+                    if (value) ChangeViewModel(_poleLocatorVm);
                     OnPropertyChanged();
                 }
             }
@@ -674,17 +674,17 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _pulsesVMRadio;
-        public bool PulsesVMRadioRadio
+        private bool _pulsesVmRadio;
+        public bool PulsesVmRadioRadio
         {
-            get => _pulsesVMRadio;
+            get => _pulsesVmRadio;
             set
             {
                 using (new WaitCursor())
                 {
-                    if (_pulsesVMRadio == value) return;
-                    _pulsesVMRadio = value;
-                    if (value) ChangeViewModel(_pulsesVM);
+                    if (_pulsesVmRadio == value) return;
+                    _pulsesVmRadio = value;
+                    if (value) ChangeViewModel(_pulsesVm);
                     OnPropertyChanged();
                 }
             }
@@ -702,17 +702,17 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _pecVMRadio;
-        public bool PecVMRadioRadio
+        private bool _pecVmRadio;
+        public bool PecVmRadioRadio
         {
-            get => _pecVMRadio;
+            get => _pecVmRadio;
             set
             {
                 using (new WaitCursor())
                 {
-                    if (_pecVMRadio == value) return;
-                    _pecVMRadio = value;
-                    if (value) ChangeViewModel(_pecVM);
+                    if (_pecVmRadio == value) return;
+                    _pecVmRadio = value;
+                    if (value) ChangeViewModel(_pecVm);
                     OnPropertyChanged();
                 }
             }
@@ -730,17 +730,17 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _snapVMRadio;
-        public bool SnapVMRadioRadio
+        private bool _snapVmRadio;
+        public bool SnapVmRadioRadio
         {
-            get => _snapVMRadio;
+            get => _snapVmRadio;
             set
             {
                 using (new WaitCursor())
                 {
-                    if (_snapVMRadio == value) return;
-                    _snapVMRadio = value;
-                    if (value) ChangeViewModel(_snapVM);
+                    if (_snapVmRadio == value) return;
+                    _snapVmRadio = value;
+                    if (value) ChangeViewModel(_snapVm);
                     OnPropertyChanged();
                 }
             }
@@ -758,26 +758,23 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _alignmentVMRadio;
-        public bool AlignmentVMRadioRadio
+        private bool _alignmentVmRadio;
+        public bool AlignmentVmRadioRadio
         {
-            get => _alignmentVMRadio;
+            get => _alignmentVmRadio;
             set
             {
                 using (new WaitCursor())
                 {
-                    if (_alignmentVMRadio == value) return;
-                    _alignmentVMRadio = value;
-                    if (value) ChangeViewModel(_alignmentVM);
+                    if (_alignmentVmRadio == value) return;
+                    _alignmentVmRadio = value;
+                    if (value) ChangeViewModel(_alignmentVm);
                     OnPropertyChanged();
                 }
             }
         }
 
-        public string AlignmentAlertBadge
-        {
-            get => _alignmentVM?.AlertBadge;
-        }
+        public string AlignmentAlertBadge => _alignmentVm?.AlertBadge;
 
         private bool _alignmentRadioVisible;
         public bool AlignmentRadioVisible
@@ -829,6 +826,7 @@ namespace GS.Server.Main
 
                 _mountType = value;
                 OnPropertyChanged();
+                // ReSharper disable once ExplicitCallerInfoArgument
                 OnPropertyChanged("MountTypeColor");
             }
         }
@@ -837,7 +835,7 @@ namespace GS.Server.Main
         {
             get
             {
-                var accentbrush = new SolidColorBrush(Colors.Transparent);
+                var accentBrush = new SolidColorBrush(Colors.Transparent);
                 if (MountType == MountType.Simulator)
                 {
                     if (!string.IsNullOrEmpty(Settings.Settings.AccentColor))
@@ -847,13 +845,13 @@ namespace GS.Server.Main
                         {
                             if (swatch.Name != Settings.Settings.AccentColor) continue;
                             var converter = new BrushConverter();
-                            accentbrush = (SolidColorBrush)converter.ConvertFromString(swatch.ExemplarHue.Color.ToString());
+                            accentBrush = (SolidColorBrush)converter.ConvertFromString(swatch.ExemplarHue.Color.ToString());
                         }
                     }
 
                 }
 
-                return accentbrush;
+                return accentBrush;
             }
         }
 
@@ -1029,7 +1027,7 @@ namespace GS.Server.Main
         #region Close Dialog
         private void CloseServer()
         {
-            Task.Run(()=> _focuserVM?.Disconnect());
+            Task.Run(()=> _focuserVm?.Disconnect());
             SkyServer.ShutdownServer();
         }
 
@@ -1144,7 +1142,7 @@ namespace GS.Server.Main
         // NOTE: Leave out the finalizer altogether if this class doesn't
         // own unmanaged resources itself, but leave the other methods
         // exactly as they are.
-        ~MainWindowVM()
+        ~MainWindowVm()
         {
             // Finalizer calls Dispose(false)
             Dispose(false);
@@ -1154,18 +1152,18 @@ namespace GS.Server.Main
         {
             if (disposing)
             {
-                _skyTelescopeVM?.Dispose();
-                _focuserVM?.Dispose();
-                _notesVM?.Dispose();
-                _settingsVM?.Dispose();
-                _gamePadVM?.Dispose();
-                _model3dVM?.Dispose();
-                _pulsesVM?.Dispose();
-                _mainWindowVm?.Dispose();
-                _pecVM?.Dispose();
-                _plotVM?.Dispose();
-                _poleLocatorVM?.Dispose();
-                _alignmentVM?.Dispose();
+                _skyTelescopeVm?.Dispose();
+                _focuserVm?.Dispose();
+                _notesVm?.Dispose();
+                _settingsVm?.Dispose();
+                _gamePadVm?.Dispose();
+                _model3dVm?.Dispose();
+                _pulsesVm?.Dispose();
+                MainWindow1Vm?.Dispose();
+                _pecVm?.Dispose();
+                _plotVm?.Dispose();
+                _poleLocatorVm?.Dispose();
+                _alignmentVm?.Dispose();
             }
             // free native resources if there are any.
             //if (nativeResource != IntPtr.Zero)

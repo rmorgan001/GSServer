@@ -17,10 +17,9 @@
         xmlns:pec="clr-namespace:GS.Server.Pec" 
         xmlns:snap="clr-namespace:GS.Server.Snap" 
         xmlns:alignment="clr-namespace:GS.Server.Alignment"
-        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanResizeWithGrip" WindowStyle="None" TextOptions.TextFormattingMode="Display" FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" 
         ContentRendered="MainWindow_OnContentRendered" Closed="MainWindow_OnClosed" Topmost="{Binding TopMost}" 
-        d:DataContext="{d:DesignInstance main:MainWindowVM, IsDesignTimeCreatable=True}" 
+        d:DataContext="{d:DesignInstance main:MainWindowVm, IsDesignTimeCreatable=True}" 
         TextElement.Foreground="{DynamicResource MaterialDesignBody}" 
         Title="GS Server" FontStretch="Normal" 
         WindowState="{Binding WindowStates}" 
@@ -38,7 +37,7 @@
         <DataTemplate DataType="{x:Type notes:NotesVM}">
             <notes:NotesV />
         </DataTemplate>
-        <DataTemplate DataType="{x:Type settings:SettingsVM}">
+        <DataTemplate DataType="{x:Type settings:SettingsVm}">
             <settings:SettingsV />
         </DataTemplate>
         <DataTemplate DataType="{x:Type gamepad:GamePadVM}">
@@ -67,7 +66,7 @@
         </DataTemplate>
     </Window.Resources>
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo x:Name="taskBarItemInfo" Description="{StaticResource titleDescription}" />
+        <TaskbarItemInfo x:Name="TaskBarItemInfo" Description="{StaticResource titleDescription}" />
     </Window.TaskbarItemInfo>
         <Grid Background="{DynamicResource MaterialDesignBody}">
             <Grid.RowDefinitions>

@@ -64,7 +64,7 @@ namespace GS.Server
             base.OnStartup(e);
             Languages.SetLanguageDictionary(false, LanguageApp.GSServer, Shared.Settings.Language);
             var app = new MainWindow();
-            var context = new MainWindowVM();
+            var context = new MainWindowVm();
             app.DataContext = context;
             app.Show();
         }

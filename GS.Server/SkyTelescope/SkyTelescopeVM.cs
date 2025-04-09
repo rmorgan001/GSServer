@@ -3975,7 +3975,16 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-
+        public bool DisableKeysOnGoTo
+        {
+            get => SkySettings.DisableKeysOnGoTo;
+            set
+            {
+                if (DisableKeysOnGoTo == value) return;
+                SkySettings.DisableKeysOnGoTo = value;
+                OnPropertyChanged();
+            }
+        }
         private void SetHcFlipsVisibility()
         {
             switch (HcMode)
