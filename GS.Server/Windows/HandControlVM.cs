@@ -205,7 +205,7 @@ namespace GS.Server.Windows
 
         #endregion
 
-         #region HC PulseGuides
+        #region HC PulseGuides
 
         private List<HcPulseGuide> _hcPulseGuides;
         public List<HcPulseGuide> HcPulseGuides
@@ -1230,6 +1230,89 @@ namespace GS.Server.Windows
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        
+        private ICommand _openHcOptionsDialogCmd;
+        public ICommand OpenHcOptionsDialogCmd
+        {
+            get
+            {
+                var cmd = _openHcOptionsDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openHcOptionsDialogCmd = new RelayCommand(param => OpenHcOptionsDialog());
+            }
+        }
+        private void OpenHcOptionsDialog()
+        {
+            try
+            {
+                DialogContent = new HcOptionsDialog();
+                IsDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _acceptHcOptionsDialogCmd;
+        public ICommand AcceptHcOptionsDialogCmd
+        {
+            get
+            {
+                var cmd = _acceptHcOptionsDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _acceptHcOptionsDialogCmd = new RelayCommand(
+                    param => AcceptHcOptionsDialog()
+                );
+            }
+        }
+        private void AcceptHcOptionsDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 

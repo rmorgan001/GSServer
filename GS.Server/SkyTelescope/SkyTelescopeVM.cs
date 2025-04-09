@@ -134,9 +134,9 @@ namespace GS.Server.SkyTelescope
                     MinPulseList = new List<int>(Enumerable.Range(5, 46));
                     RaBacklashList = new List<int>(Enumerable.Range(0, 1001));
                     DecBacklashList = new List<int>(Enumerable.Range(0, 1001));
-                    var extendedlist = new List<int>(Numbers.InclusiveIntRange(1000, 3000, 100));
-                    RaBacklashList = RaBacklashList.Concat(extendedlist);
-                    DecBacklashList = DecBacklashList.Concat(extendedlist);
+                    var extendedList = new List<int>(Numbers.InclusiveIntRange(1000, 3000, 100));
+                    RaBacklashList = RaBacklashList.Concat(extendedList);
+                    DecBacklashList = DecBacklashList.Concat(extendedList);
                     AxisTrackingLimits = new List<double>(Numbers.InclusiveRange(0, 15, 1));
                     AxisHzTrackingLimits = new List<double>(Numbers.InclusiveRange(-20, 20, 1));
 
@@ -358,7 +358,7 @@ namespace GS.Server.SkyTelescope
                      case "ParkPositionsEQ":
                      case "ParkPositionsAltAz":
                          // ReSharper disable ExplicitCallerInfoArgument
-                         OnPropertyChanged($"ParkPositions");
+                         OnPropertyChanged("ParkPositions");
                          break;
                      case "DecBacklash":
                          DecBacklash = SkySettings.DecBacklash;
@@ -436,7 +436,7 @@ namespace GS.Server.SkyTelescope
                                  break;
                          }
                          // ReSharper disable ExplicitCallerInfoArgument
-                         OnPropertyChanged($"ParkPositions");
+                         OnPropertyChanged("ParkPositions");
                          break;
                      case "Refraction":
                          Refraction = SkySettings.Refraction;
@@ -502,9 +502,7 @@ namespace GS.Server.SkyTelescope
                                     break;
                                 case "RightAscensionXForm":
                                     var ra = Util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
-                                    if (_raInDegrees) 
-                                        RightAscension = Util.DegreesToDMS(Util.HMSToDegrees(ra), "° ", ":", "", 2);
-                                    else { RightAscension = ra; }
+                                    RightAscension = _raInDegrees ? Util.DegreesToDMS(Util.HMSToDegrees(ra), "° ", ":", "", 2) : ra;
                                     SetGraphics();
                                     break;
                                 case "Rotate3DModel":
@@ -1330,17 +1328,17 @@ namespace GS.Server.SkyTelescope
         }
         private void UpdateLongitude()
         {
-            OnPropertyChanged($"Long0");
-            OnPropertyChanged($"Long1");
-            OnPropertyChanged($"Long2");
-            OnPropertyChanged($"Long3");
+            OnPropertyChanged("Long0");
+            OnPropertyChanged("Long1");
+            OnPropertyChanged("Long2");
+            OnPropertyChanged("Long3");
         }
         private void UpdateLatitude()
         {
-            OnPropertyChanged($"Lat0");
-            OnPropertyChanged($"Lat1");
-            OnPropertyChanged($"Lat2");
-            OnPropertyChanged($"Lat3");
+            OnPropertyChanged("Lat0");
+            OnPropertyChanged("Lat1");
+            OnPropertyChanged("Lat2");
+            OnPropertyChanged("Lat3");
         }
         public double Elevation
         {
@@ -1414,15 +1412,15 @@ namespace GS.Server.SkyTelescope
                         OpenDialog($"{Application.Current.Resources["skyNoSelected"]}");
                         return;
                     }
-                    var parkcoords = Axes.MountAxis2Mount();
-                    ParkSelectionSetting.X = parkcoords[0];
-                    ParkSelectionSetting.Y = parkcoords[1];
+                    var parkCoords = Axes.MountAxis2Mount();
+                    ParkSelectionSetting.X = parkCoords[0];
+                    ParkSelectionSetting.Y = parkCoords[1];
 
                     var parkToUpdate = ParkPositions.FirstOrDefault(p => p.Name == ParkSelectionSetting.Name);
                     if (parkToUpdate == null) return;
 
-                    parkToUpdate.X = parkcoords[0];
-                    parkToUpdate.Y = parkcoords[1];
+                    parkToUpdate.X = parkCoords[0];
+                    parkToUpdate.Y = parkCoords[1];
                     SkySettings.ParkPositions = ParkPositions;
                     OpenDialog($"{Application.Current.Resources["skyParkSaved"]} {parkToUpdate.Name}");
                     Synthesizer.Speak(Application.Current.Resources["vceParkSet"].ToString());
@@ -1852,18 +1850,18 @@ namespace GS.Server.SkyTelescope
             try
             {
                 //Proposed
-                var networkIfaceIps = NetworkInterface.GetAllNetworkInterfaces()
+                var networkIFaceIps = NetworkInterface.GetAllNetworkInterfaces()
                     .Where(ni => ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||
                                  ni.NetworkInterfaceType == NetworkInterfaceType.GigabitEthernet ||
                                  ni.NetworkInterfaceType == NetworkInterfaceType.Loopback ||
                                  ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 ||
                                  ni.OperationalStatus == OperationalStatus.Up && !ni.IsReceiveOnly)
                     .SelectMany(ni => ni.GetIPProperties().UnicastAddresses, (ni, ip) => new { ni, ip })
-                    .Where(@t => @t.ip.Address.AddressFamily == AddressFamily.InterNetwork)
-                    .Select(@t => @t.ip.Address);
+                    .Where(t => t.ip.Address.AddressFamily == AddressFamily.InterNetwork)
+                    .Select(t => t.ip.Address);
 
 
-                var ipAddresses = networkIfaceIps.ToList();
+                var ipAddresses = networkIFaceIps.ToList();
                 var monitorItem = new MonitorEntry
                 {
                     Type = MonitorType.Data,
@@ -2427,20 +2425,20 @@ namespace GS.Server.SkyTelescope
                     {
                         if (swatch.Name != Settings.Settings.AccentColor) continue;
                         var converter = new BrushConverter();
-                        var accentbrush = (Brush)converter.ConvertFromString(swatch.ExemplarHue.Color.ToString());
+                        var accentBrush = (Brush)converter.ConvertFromString(swatch.ExemplarHue.Color.ToString());
 
-                        var materialota = MaterialHelper.CreateMaterial(accentbrush);
-                        if (model.Children[0] is GeometryModel3D ota) ota.Material = materialota;
+                        var materialOta = MaterialHelper.CreateMaterial(accentBrush);
+                        if (model.Children[0] is GeometryModel3D ota) ota.Material = materialOta;
                     }
                 }
                 //color weights
                 if (SkySettings.AlignmentMode != AlignmentModes.algAltAz)
                 {
-                    var materialweights = MaterialHelper.CreateMaterial(new SolidColorBrush(Color.FromRgb(64, 64, 64)));
-                if (model.Children[1] is GeometryModel3D weights){ weights.Material = materialweights;}
+                    var materialWeights = MaterialHelper.CreateMaterial(new SolidColorBrush(Color.FromRgb(64, 64, 64)));
+                if (model.Children[1] is GeometryModel3D weights){ weights.Material = materialWeights;}
                 //color bar
-                var materialbar = MaterialHelper.CreateMaterial(Brushes.Gainsboro);
-                if (model.Children[2] is GeometryModel3D bar){ bar.Material = materialbar;}
+                var materialBar = MaterialHelper.CreateMaterial(Brushes.Gainsboro);
+                if (model.Children[2] is GeometryModel3D bar){ bar.Material = materialBar;}
 
                 }
                 Model = model;
@@ -3068,8 +3066,8 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    var istracking = SkyServer.Tracking;
-                    if (!istracking && SkyServer.AtPark)
+                    var isTracking = SkyServer.Tracking;
+                    if (!isTracking && SkyServer.AtPark)
                     {
                         SkyServer.AtPark = false;
                     }
@@ -4030,8 +4028,8 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
-                var currentspeed = HcSpeed;
-                if (currentspeed < 8)
+                var currentSpeed = HcSpeed;
+                if (currentSpeed < 8)
                 {
                     HcSpeed++;
                 }
@@ -4073,8 +4071,8 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
-                var currentspeed = HcSpeed;
-                if (currentspeed > 1)
+                var currentSpeed = HcSpeed;
+                if (currentSpeed > 1)
                 {
                     HcSpeed--;
                 }
@@ -4519,6 +4517,88 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private ICommand _openHcOptionsDialogCmd;
+        public ICommand OpenHcOptionsDialogCmd
+        {
+            get
+            {
+                var cmd = _openHcOptionsDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _openHcOptionsDialogCmd = new RelayCommand(param => OpenHcOptionsDialog());
+            }
+        }
+        private void OpenHcOptionsDialog()
+        {
+            try
+            {
+                DialogContent = new HcOptionsDialog();
+                IsDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _acceptHcOptionsDialogCmd;
+        public ICommand AcceptHcOptionsDialogCmd
+        {
+            get
+            {
+                var cmd = _acceptHcOptionsDialogCmd;
+                if (cmd != null)
+                {
+                    return cmd;
+                }
+
+                return _acceptHcOptionsDialogCmd = new RelayCommand(
+                    param => AcceptHcOptionsDialog()
+                );
+            }
+        }
+        private void AcceptHcOptionsDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.UI,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
         private void StartSlew(SlewDirection direction)
         {
             // No action when at park
@@ -4532,7 +4612,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Warning,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Hand controller movement not possible when parked"
+                    Message = "Hand controller movement not possible when parked"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
                 return;
@@ -4605,7 +4685,7 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
         }
-
+        
         #endregion
 
         #region HC Locked Mouse

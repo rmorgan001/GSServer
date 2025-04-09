@@ -5,17 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
-             xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors" mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}">
-    <!--<b:Interaction.Triggers>
-        --><!--Stop Mouse Lock--><!--
-        <b:EventTrigger EventName="PreviewKeyDown">
-            <b:InvokeCommandAction Command="{Binding PressKeyDownCmd}" PassEventArgsToCommand="True" />
-        </b:EventTrigger>
-        <b:EventTrigger EventName="PreviewKeyUp">
-            <b:InvokeCommandAction Command="{Binding PressKeyReleaseCmd}" PassEventArgsToCommand="True" />
-        </b:EventTrigger>
-    </b:Interaction.Triggers>-->
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>
@@ -33,26 +23,6 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <!--<md:DialogHost HorizontalAlignment="Center" CloseOnClickAway="True" IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" Background="Transparent" />-->
-            <Button Grid.Row="0" Grid.Column="0" Width="20" Height="20" ToolTip="{StaticResource hcOpenWin}" Command="{Binding OpenHcWindowCmd}" Style="{StaticResource MaterialDesignRaisedAccentButton}" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" 
-                    Visibility="{Binding HcWinVisibility, Converter={StaticResource BoolToVis}}">
-                <md:PackIcon Kind="OpenInNew" Margin="-14,-2,0,0" />
-            </Button>
-            <Button Grid.Row="0" Grid.Column="2"  Margin="-5,0,0,0"  Command="{Binding OpenPulseGuidesDialogCmd}" Width="24" Height="24" >
-               <Button.Style>
-                        <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFloatingActionMiniAccentButton}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding HcPulseDone}" Value="True">
-                                    <Setter Property="Background" Value="{StaticResource PrimaryHueDarkBrush}"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding HcPulseDone}" Value="False">
-                                    <Setter Property="Background" Value="{StaticResource SecondaryHueMidBrush}" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                <md:PackIcon Kind="Pulse" /> 
-            </Button>
             <Button Grid.Row="1" Grid.Column="0" Width="50" Height="50" ToolTipService.Placement="Center">
                 <Button.ToolTip>
                     <TextBlock Text="{Binding HcToolTipW}" />
@@ -117,98 +87,62 @@
                 </b:Interaction.Triggers>
                 <md:PackIcon Kind="ArrowAll" />
             </Button>
-            <!--Spiral-->
-            <Button Grid.Row="2" Grid.Column="2" Width="20" Height="20" Padding="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" ToolTip="{StaticResource 1021SpiralSearch}" Command="{Binding OpenSpiralWindowCmd}" Style="{StaticResource MaterialDesignFlatButton}">
-                <Canvas Width="18" Height="20">
-                    <Canvas.RenderTransform>
-                        <TranslateTransform X="-365" Y="-7879" />
-                    </Canvas.RenderTransform>
-                    <Polygon Points="383 7879 383 7893.105 383 7895 369 7895 369 7883 379 7883 379 7891 373 7891 373 7887 375 7887 375 7889 377 7889 377 7885 371 7885 371 7893 381 7893 381 7881 367 7881 367 7897 383 7897 383 7899 365 7899 365 7879" Fill="{StaticResource SecondaryHueMidBrush}" />
-                </Canvas>
-            </Button>
-            <!--<md:DialogHost Grid.Row="2" Grid.Column="2" CloseOnClickAway="True" IsOpen="{Binding IsHcSettingsDialogOpen}" DialogContent="{Binding HcSettingsContent}">
-                <Button Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource btnSpiralSearch}" Width="40" Padding="0">
-                    <b:Interaction.Triggers>
-                        <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                            <b:InvokeCommandAction Command="{Binding HcMouseDownSpiralCmd}" PassEventArgsToCommand="True" />
-                        </b:EventTrigger>
-                        <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                            <b:InvokeCommandAction Command="{Binding HcMouseUpSpiralCmd}" PassEventArgsToCommand="True" />
-                        </b:EventTrigger>
-                        <b:EventTrigger EventName="PreviewMouseRightButtonDown">
-                            <b:InvokeCommandAction Command="{Binding OpenHcSettingsDialogCmd}" PassEventArgsToCommand="True" />
-                        </b:EventTrigger>
-                    </b:Interaction.Triggers>
-                    <Canvas Width="18" Height="20">
-                            <Canvas.RenderTransform>
-                                <TranslateTransform X="-365" Y="-7879" />
-                            </Canvas.RenderTransform>
-                            <Polygon Points="383 7879 383 7893.105 383 7895 369 7895 369 7883 379 7883 379 7891 373 7891 373 7887 375 7887 375 7889 377 7889 377 7885 371 7885 371 7893 381 7893 381 7881 367 7881 367 7897 383 7897 383 7899 365 7899 365 7879" Fill="{StaticResource SecondaryHueMidBrush}" />
-                    </Canvas>
+            <StackPanel Margin="10,0,10,0" Orientation="Vertical" Grid.Row="0" Grid.Column="3" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Top" Width="50">
+                <Button Margin="0,0,0,0" ToolTip="{StaticResource hcOpenWin}" Command="{Binding OpenHcWindowCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                        Visibility="{Binding HcWinVisibility, Converter={StaticResource BoolToVis}}">
+                    <md:PackIcon Kind="OpenInNew" />
                 </Button>
-            </md:DialogHost>-->
-            <!--Mouse Lock-->
-            <Button Grid.Row="2" Grid.Column="0" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource 1018LockMouse}" Width="40" Padding="0">
-                <md:PackIcon Kind="MouseVariant" Foreground="{StaticResource SecondaryHueMidBrush}" Height="25" Width="25" >
-                    <md:PackIcon.Style>
-                        <Style TargetType="md:PackIcon">
+                <Button Margin="0,3,0,0" ToolTip="{StaticResource optServerSettings}" Command="{Binding OpenHcOptionsDialogCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}">
+                    <md:PackIcon Kind="settings" />
+                </Button>
+                <Button Margin="0,3,0,0" ToolTip="{StaticResource tabPulses}"   Command="{Binding OpenPulseGuidesDialogCmd}" >
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedDarkButton}">
                             <Style.Triggers>
-                                <Trigger Property="IsEnabled" Value="False">
-                                    <Setter Property="Opacity" Value="0.3" />
-                                </Trigger>
+                                <DataTrigger Binding="{Binding HcPulseDone}" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource SecondaryHueMidBrush }"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding HcPulseDone}" Value="False">
+                                    <Setter Property="Background" Value="{StaticResource PrimaryHueDarkBrush}" />
+                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </md:PackIcon.Style>
-                </md:PackIcon>
-                <b:Interaction.Triggers>
-                    <b:EventTrigger EventName="PreviewMouseWheel">
-                        <b:InvokeCommandAction Command="{Binding ScrollMouseWheelCmd}" PassEventArgsToCommand="True"/>
-                    </b:EventTrigger>
-                    <b:EventTrigger EventName="PreviewMouseDown">
-                        <b:InvokeCommandAction Command="{Binding ClickLockedMouseDownCmd}" PassEventArgsToCommand="True" />
-                    </b:EventTrigger>
-                    <b:EventTrigger EventName="PreviewMouseUp">
-                        <b:InvokeCommandAction Command="{Binding ClickLockedMouseUpCmd}" PassEventArgsToCommand="True" />
-                    </b:EventTrigger>
-                </b:Interaction.Triggers>
-            </Button>
-            <!--options-->
-            <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="3" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Top" >
-                <!--Mode-->
-                <ComboBox Margin="0,5,0,0"  md:HintAssist.Hint="{StaticResource hcMode}" ToolTip="{StaticResource hcTipMode}" 
-                          ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type skyTelescope:HcMode}}}" 
-                          Style="{StaticResource MaterialDesignFloatingHintComboBox}" FontSize="12">
-                    <ComboBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel />
-                        </ItemsPanelTemplate>
-                    </ComboBox.ItemsPanel>
-                    <ComboBox.Text>
-                        <Binding Path="HcMode" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged"/>
-                    </ComboBox.Text>
-                </ComboBox>
-                <!--Flip-->
-                <Label VerticalAlignment="Bottom" Margin="-3,5,0,0"  Content="{StaticResource hcFlip}" FontSize="12" />
-                <StackPanel Orientation="Horizontal" Margin="0,-5,0,0" >
-                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource hcTipFlipEW}" IsChecked="{Binding FlipEw, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding EwEnabled}" />
-                    <Label VerticalAlignment="Bottom" Content="{StaticResource hcFlipEW}" FontSize="12" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,-5,0,0">
-                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource hcTipFlipNS}" IsChecked="{Binding FlipNs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding NsEnabled}" />
-                    <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource hcFlipNS}" FontSize="12" />
-                </StackPanel>
-                <!--backlash-->
-                <Label VerticalAlignment="Bottom" Margin="-3,0,0,0" Content="{StaticResource hcBacklash}" FontSize="12" />
-                <StackPanel Orientation="Horizontal" Margin="0,-5,0,0">
-                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource hcTipHcAntiBacklash}" IsChecked="{Binding HcAntiRa, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource hcRa}" FontSize="12" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,-5,0,0">
-                    <CheckBox HorizontalAlignment="Center" ToolTip="{StaticResource hcTipHcAntiBacklash}" IsChecked="{Binding HcAntiDec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <Label VerticalAlignment="Bottom" Content="{StaticResource hcDec}" FontSize="12" />
-                </StackPanel>
+                    </Button.Style>
+                    <md:PackIcon Kind="Pulse" /> 
+                </Button>
+                <Button Margin="0,3,0,0" ToolTip="{StaticResource 1021SpiralSearch}" Command="{Binding OpenSpiralWindowCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}">
+                    <Canvas Width="18" Height="20">
+                        <Canvas.RenderTransform>
+                            <TranslateTransform X="-365" Y="-7879" />
+                        </Canvas.RenderTransform>
+                        <Polygon Points="383 7879 383 7893.105 383 7895 369 7895 369 7883 379 7883 379 7891 373 7891 373 7887 375 7887 375 7889 377 7889 377 7885 371 7885 371 7893 381 7893 381 7881 367 7881 367 7897 383 7897 383 7899 365 7899 365 7879" Fill="{StaticResource PrimaryHueLightBrush}" />
+                    </Canvas>
+                </Button>
+                <Button Margin="0,3,0,0"  ToolTip="{StaticResource 1018LockMouse}"  Style="{StaticResource MaterialDesignRaisedDarkButton}" Visibility="{Binding HcWinVisibility, Converter={StaticResource BoolToVis}}">
+                    <md:PackIcon Kind="MouseVariant">
+                        <md:PackIcon.Style>
+                            <Style TargetType="md:PackIcon">
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Opacity" Value="0.3" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </md:PackIcon.Style>
+                    </md:PackIcon>
+                    <b:Interaction.Triggers>
+                        <b:EventTrigger EventName="PreviewMouseWheel">
+                            <b:InvokeCommandAction Command="{Binding ScrollMouseWheelCmd}" PassEventArgsToCommand="True"/>
+                        </b:EventTrigger>
+                        <b:EventTrigger EventName="PreviewMouseDown">
+                            <b:InvokeCommandAction Command="{Binding ClickLockedMouseDownCmd}" PassEventArgsToCommand="True" />
+                        </b:EventTrigger>
+                        <b:EventTrigger EventName="PreviewMouseUp">
+                            <b:InvokeCommandAction Command="{Binding ClickLockedMouseUpCmd}" PassEventArgsToCommand="True" />
+                        </b:EventTrigger>
+                    </b:Interaction.Triggers>
+                </Button>
             </StackPanel>
-            <!--Speed-->
             <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="4" Grid.RowSpan="3" >
                 <StackPanel Orientation="Vertical">
                     <Label Content="{StaticResource hcSpeed}" HorizontalAlignment="Center" FontSize="12" />
