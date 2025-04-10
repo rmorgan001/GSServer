@@ -1216,28 +1216,28 @@ namespace GS.Server.SkyTelescope
             }
         }
         
-        private static bool _hzlimitTracking;
+        private static bool _hzLimitTracking;
         public static bool HzLimitTracking
         {
-            get => _hzlimitTracking;
+            get => _hzLimitTracking;
             set
             {
-                if (_hzlimitTracking == value) return;
-                _hzlimitTracking = value;
+                if (_hzLimitTracking == value) return;
+                _hzLimitTracking = value;
                 Properties.SkyTelescope.Default.HzLimitTracking = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
         }
 
-        private static bool _hzlimitPark;
+        private static bool _hzLimitPark;
         public static bool HzLimitPark
         {
-            get => _hzlimitPark;
+            get => _hzLimitPark;
             set
             {
-                if (_hzlimitPark == value) return;
-                _hzlimitPark = value;
+                if (_hzLimitPark == value) return;
+                _hzLimitPark = value;
                 Properties.SkyTelescope.Default.HzLimitPark = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
@@ -1836,17 +1836,17 @@ namespace GS.Server.SkyTelescope
 
         //private static TimeSpan _uTCDateOffset;
         //public static TimeSpan UTCDateOffset
-        //{
+        // {}
         //    get => _uTCDateOffset;
         //    set
-        //    {
+        //    {}
         //        if (_uTCDateOffset == value) return;
         //        _uTCDateOffset = value;
         //        Properties.SkyTelescope.Default.UTCOffset = value;
         //        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
         //        OnStaticPropertyChanged();
         //    }
-        //}
+        // }
 
         public static List<ParkPosition> ParkPositions
         {
@@ -1859,7 +1859,7 @@ namespace GS.Server.SkyTelescope
                             return ParkPositionsAltAz;
                         case AlignmentModes.algPolar:
                         case AlignmentModes.algGermanPolar:
-                            return ParkPositionsEQ;
+                            return ParkPositionsEq;
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
@@ -1875,7 +1875,7 @@ namespace GS.Server.SkyTelescope
                             break;
                         case AlignmentModes.algPolar:
                         case AlignmentModes.algGermanPolar:
-                            ParkPositionsEQ = value;
+                            ParkPositionsEq = value;
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -1886,7 +1886,7 @@ namespace GS.Server.SkyTelescope
         }
 
         private static List<ParkPosition> _parkPositionsEq;
-        public static List<ParkPosition> ParkPositionsEQ
+        public static List<ParkPosition> ParkPositionsEq
         {
             get => _parkPositionsEq;
             set
@@ -2073,29 +2073,29 @@ namespace GS.Server.SkyTelescope
 
             //Server
 
-            Enum.TryParse<EquatorialCoordinateType>(Properties.SkyTelescope.Default.EquatorialCoordinateType, true, out var eparse);
-            EquatorialCoordinateType = eparse;
-            Enum.TryParse<AlignmentModes>(Properties.SkyTelescope.Default.AlignmentMode, true, out var aparse);
-            AlignmentMode = aparse;
-            Enum.TryParse<FrontGraphic>(Properties.SkyTelescope.Default.FrontGraphic, true, out var fparse);
-            FrontGraphic = fparse;
-            Enum.TryParse<DriveRates>(Properties.SkyTelescope.Default.TrackingRate, true, out var dparse);
-            TrackingRate = dparse;
-            Enum.TryParse<SlewSpeed>(Properties.SkyTelescope.Default.HcSpeed, true, out var hparse);
-            HcSpeed = hparse;
-            var hcmodebol = Enum.TryParse<HcMode>(Properties.SkyTelescope.Default.HCMode, true, out var hcparse);
-            if (!hcmodebol) hcparse = HcMode.Guiding;// getting rid of compass mode
-            HcMode = hcparse;
-            Enum.TryParse<MountType>(Properties.SkyTelescope.Default.Mount, true, out var mountparse);
-            Mount = mountparse;
-            Enum.TryParse<Handshake>(Properties.SkyTelescope.Default.HandShake, true, out var hsparse);
-            HandShake = hsparse;
-            Enum.TryParse<SerialSpeed>(Properties.SkyTelescope.Default.BaudRate, true, out var brateparse);
-            BaudRate = brateparse;
-            Enum.TryParse<SerialSpeed>(Properties.SkyTelescope.Default.GpsBaudRate, true, out var grateparse);
-            GpsBaudRate = grateparse;
-            Enum.TryParse<PecMode>(Properties.SkyTelescope.Default.PecMode, true, out var pecparse);
-            PecMode = pecparse;
+            Enum.TryParse<EquatorialCoordinateType>(Properties.SkyTelescope.Default.EquatorialCoordinateType, true, out var eParse);
+            EquatorialCoordinateType = eParse;
+            Enum.TryParse<AlignmentModes>(Properties.SkyTelescope.Default.AlignmentMode, true, out var aParse);
+            AlignmentMode = aParse;
+            Enum.TryParse<FrontGraphic>(Properties.SkyTelescope.Default.FrontGraphic, true, out var fParse);
+            FrontGraphic = fParse;
+            Enum.TryParse<DriveRates>(Properties.SkyTelescope.Default.TrackingRate, true, out var dParse);
+            TrackingRate = dParse;
+            Enum.TryParse<SlewSpeed>(Properties.SkyTelescope.Default.HcSpeed, true, out var hParse);
+            HcSpeed = hParse;
+            var hcModeBol = Enum.TryParse<HcMode>(Properties.SkyTelescope.Default.HCMode, true, out var hcParse);
+            if (!hcModeBol) hcParse = HcMode.Guiding;// getting rid of compass mode
+            HcMode = hcParse;
+            Enum.TryParse<MountType>(Properties.SkyTelescope.Default.Mount, true, out var mountParse);
+            Mount = mountParse;
+            Enum.TryParse<Handshake>(Properties.SkyTelescope.Default.HandShake, true, out var hsParse);
+            HandShake = hsParse;
+            Enum.TryParse<SerialSpeed>(Properties.SkyTelescope.Default.BaudRate, true, out var bRateParse);
+            BaudRate = bRateParse;
+            Enum.TryParse<SerialSpeed>(Properties.SkyTelescope.Default.GpsBaudRate, true, out var grateParse);
+            GpsBaudRate = grateParse;
+            Enum.TryParse<PecMode>(Properties.SkyTelescope.Default.PecMode, true, out var pecParse);
+            PecMode = pecParse;
 
             AllowAdvancedCommandSet = Properties.SkyTelescope.Default.AllowAdvancedCommandSet;
             AlternatingPPec = Properties.SkyTelescope.Default.AlternatingPPEC;
@@ -2226,7 +2226,7 @@ namespace GS.Server.SkyTelescope
                 pp = JsonConvert.SerializeObject(pps);
                 Properties.SkyTelescope.Default.ParkPositionsEQ = pp;
             }
-            ParkPositionsEQ =JsonConvert.DeserializeObject<List<ParkPosition>>(pp);
+            ParkPositionsEq =JsonConvert.DeserializeObject<List<ParkPosition>>(pp);
 
             //default list is stored in HCPulses.cs not in the app.config
             var hcp = Properties.SkyTelescope.Default.HCPulseSpeeds;

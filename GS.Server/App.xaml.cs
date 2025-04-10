@@ -23,15 +23,15 @@ namespace GS.Server
         // declare the mutex
         private readonly Mutex _mutex;
         // overload the constructor
-        private readonly bool createdNew;
+        private readonly bool _createdNew;
         public App()
         {
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
 
             // overloaded mutex constructor which outs a boolean telling if the mutex is new or not.
             // see http://msdn.microsoft.com/en-us/library/System.Threading.Mutex.aspx
-            _mutex = new Mutex(true, MutexName, out createdNew);
-            if (createdNew) return;
+            _mutex = new Mutex(true, MutexName, out _createdNew);
+            if (_createdNew) return;
             // if the mutex already exists, notify and quit
             MessageBox.Show("GS Server is already running", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
             Current.Shutdown(0);
@@ -53,7 +53,7 @@ namespace GS.Server
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            if (!createdNew) return;
+            if (!_createdNew) return;
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 

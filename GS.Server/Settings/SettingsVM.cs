@@ -645,7 +645,6 @@ namespace GS.Server.Settings
                 OnPropertyChanged();
             }
         }
-
         public bool HomeWarning
         {
             get => SkySettings.HomeWarning;
@@ -678,17 +677,6 @@ namespace GS.Server.Settings
                 OnPropertyChanged();
             }
         }
-
-        //public bool DisableKeysOnGoTo
-        //{
-        //    get => SkySettings.DisableKeysOnGoTo;
-        //    set
-        //    {
-        //        if (DisableKeysOnGoTo == value) return;
-        //        SkySettings.DisableKeysOnGoTo = value;
-        //        OnPropertyChanged();
-        //    }
-        //}
 
         #endregion
 
@@ -1818,8 +1806,8 @@ namespace GS.Server.Settings
                     var s = w.DownloadString(GsUrl);
 
                     var html = new HTML();
-                    var linklist = html.FindLinks(s);
-                    foreach (var i in linklist)
+                    var linkList = html.FindLinks(s);
+                    foreach (var i in linkList)
                     {
                         if (i.Text.IndexOf("GS Server Version:", StringComparison.OrdinalIgnoreCase) < 0) continue;
                         var ver = i.Text.Split();
