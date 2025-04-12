@@ -63,6 +63,15 @@
                     </GroupBox>
             </md:PopupBox>
             <md:Badged Badge="{Binding TrackingBadgeContent}" BadgePlacementMode="Right">
+                <md:Badged.Style>
+                    <Style TargetType="md:Badged">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsMoveAxisActive}" Value="False">
+                                <Setter Property="BadgeBackground" Value="{StaticResource SecondaryHueMidBrush}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </md:Badged.Style>
                 <Button Margin="0,6,0,0" Width="90" Height="25" HorizontalAlignment="Left" Padding="-5"
                         Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipTracking}"
                     Command="{Binding ClickTrackingCommand}" Content="{StaticResource btnTracking}">

@@ -203,7 +203,7 @@ namespace GS.Server.SkyTelescope
         private static bool _canAdvancedCmdSupport;
         private static Vector _raDec;
         private static Vector _rateMoveAxes;
-        private static bool _moveAxisPrevTracking;
+        private static bool _moveAxisActive;
         private static Vector _rateRaDec;
         private static double _rightAscensionXForm;
         private static bool _rotate3DModel;
@@ -805,12 +805,12 @@ namespace GS.Server.SkyTelescope
             get => _rateMoveAxes.Y != 0.0;
         }
 
-        public static bool MoveAxisPrevTracking
+        public static bool MoveAxisActive
         {
-            get => _moveAxisPrevTracking;
+            get => _moveAxisActive;
             set
             {
-                _moveAxisPrevTracking = value;
+                _moveAxisActive = value;
                 OnStaticPropertyChanged();
             }
         }
@@ -935,10 +935,11 @@ namespace GS.Server.SkyTelescope
             private get => _rateMoveAxes.Y;
             set
             {
+                if (_rateMoveAxes.Y == value) return;
                 _rateMoveAxes.Y = value;
                 CancelAllAsync();
-                // Setup tracking and slewing state if not alrady done by primary MoveAxis call
-                if (!MovePrimaryAxisActive) RateMoveTrackingSetup(value);
+                // Set slewing state
+                SetRateMoveSlewState();
                 // Move axis at requested rate
                 switch (SkySettings.Mount)
                 {
@@ -951,11 +952,8 @@ namespace GS.Server.SkyTelescope
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-                // Restore tracking for secondary axis
-                if (!MoveSecondaryAxisActive && MoveAxisPrevTracking)
-                {
-                    SetTracking();
-                }
+                // Update tracking if required
+                if (Tracking) SetTracking();
 
                 var monitorItem = new MonitorEntry
                 {
@@ -982,10 +980,11 @@ namespace GS.Server.SkyTelescope
             private get => _rateMoveAxes.X;
             set
             {
+                if (_rateMoveAxes.X == value) return;
                 _rateMoveAxes.X = value;
                 CancelAllAsync();
-                // Setup tracking and slewing state if not alrady done by secondary MoveAxis call
-                if (!MoveSecondaryAxisActive) RateMoveTrackingSetup(value);
+                // Set slewing state
+                SetRateMoveSlewState();
                 // Move axis at requested rate
                 switch (SkySettings.Mount)
                 {
@@ -998,12 +997,8 @@ namespace GS.Server.SkyTelescope
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-                // Restore tracking for primary axis
-                if (!MovePrimaryAxisActive && MoveAxisPrevTracking)
-                {
-                    SetTracking();
-                }
-
+                // Update tracking if required
+                if (Tracking) SetTracking();
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
@@ -1021,32 +1016,19 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Set/ reset tracking and slewing state whilst MoveAxisis active
         /// </summary>
-        /// <param name="rate"></param>
-        private static void RateMoveTrackingSetup(double rate)
+        private static void SetRateMoveSlewState()
         {
-            if (Math.Abs(rate) > 0)
+            if (MovePrimaryAxisActive || MoveSecondaryAxisActive)
             {
-                // Save current tracking state if tracking is on  
-                if (Tracking)
-                {
-                    MoveAxisPrevTracking = true;
-                    _prevTrackingMode = _trackingMode;
-                }
-
-                Tracking = false;
+                MoveAxisActive = true;
                 IsSlewing = true;
                 SlewState = SlewType.SlewMoveAxis;
             }
-            else
+            if (!MovePrimaryAxisActive && !MoveSecondaryAxisActive)
             {
+                MoveAxisActive = false;
                 IsSlewing = false;
                 SlewState = SlewType.SlewNone;
-                if (MoveAxisPrevTracking)
-                {
-                    MoveAxisPrevTracking = false;
-                    _prevTrackingMode = TrackingMode.Off;
-                    Tracking = true;
-                }
             }
         }
 
@@ -2719,11 +2701,11 @@ namespace GS.Server.SkyTelescope
             MonitorLog.LogToMonitor(monitorItem);
 
             //IsSlewing = false;
-            var tracking = Tracking || SlewState == SlewType.SlewRaDec;
+            var tracking = Tracking || SlewState == SlewType.SlewRaDec || MoveAxisActive;
             Tracking = false; //added back in for spec "Tracking is returned to its pre-slew state"
             CancelAllAsync();
-            // Stop all MoveAxis and do not restore tracking
-            MoveAxisPrevTracking = false;
+            // Stop all MoveAxis commands
+            MoveAxisActive = false;
             RateMovePrimaryAxis = 0.0;
             RateMoveSecondaryAxis = 0.0;
             _rateRaDec = new Vector(0, 0);
@@ -4232,7 +4214,7 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
                 // Reset rates and axis movement
                 _rateMoveAxes = new Vector(0, 0);
-                MoveAxisPrevTracking = false;
+                MoveAxisActive = false;
                 _rateRaDec = new Vector(0, 0);
                 // Stop axes
                 switch (SkySettings.Mount)
@@ -5744,8 +5726,8 @@ namespace GS.Server.SkyTelescope
 
             double rateChange = 0;
             Vector rate;
-            // Use saved tracking mode from MoveAxis if tracking was active
-            switch (MoveAxisPrevTracking ? _prevTrackingMode : _trackingMode)
+            // Set rate change for tracking mode
+            switch (_trackingMode)
             {
                 case TrackingMode.Off:
                     break;
@@ -6118,7 +6100,7 @@ namespace GS.Server.SkyTelescope
 
             CancelAllAsync();
             // Stop all MoveAxis and do not restore tracking
-            MoveAxisPrevTracking = false;
+            MoveAxisActive = false;
             RateMovePrimaryAxis = 0.0;
             RateMoveSecondaryAxis = 0.0;
             _rateRaDec = new Vector(0, 0);
@@ -6702,7 +6684,7 @@ namespace GS.Server.SkyTelescope
             // reset any rates so slewing doesn't start
             _rateRaDec = new Vector(0, 0);
             _rateMoveAxes = new Vector(0, 0);
-            MoveAxisPrevTracking = false;
+            MoveAxisActive = false;
             SlewState = SlewType.SlewNone;
 
             // invalidate target positions

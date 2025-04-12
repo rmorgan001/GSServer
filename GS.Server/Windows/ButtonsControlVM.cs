@@ -50,6 +50,7 @@ namespace GS.Server.Windows
                     AtPark = SkyServer.AtPark;
                     IsHome = SkyServer.IsHome;
                     IsTracking = SkyServer.Tracking || SkyServer.SlewState == SlewType.SlewRaDec;
+                    IsMoveAxisActive = SkyServer.Tracking && SkyServer.MoveAxisActive;
                     TrackingRate = SkySettings.TrackingRate;
                     _skyTelescopeVM.TrackingRate = SkySettings.TrackingRate;
 
@@ -149,6 +150,9 @@ namespace GS.Server.Windows
                          break;
                      case "Tracking":
                          IsTracking = SkyServer.Tracking || SkyServer.SlewState == SlewType.SlewRaDec;
+                         break;
+                     case "MoveAxisActive":
+                         IsMoveAxisActive = SkyServer.Tracking && SkyServer.MoveAxisActive;
                          break;
                      case "ParkSelected":
                          ParkSelection = SkyServer.ParkSelected;
@@ -432,6 +436,18 @@ namespace GS.Server.Windows
                 if (IsTracking == value) return;
                 _isTracking = value;
                 TrackingBadgeContent = value ? Application.Current.Resources["btnHintTracking"].ToString() : "";
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isMoveAxisActive;
+        public bool IsMoveAxisActive
+        {
+            get => _isMoveAxisActive;
+            set
+            {
+                if (_isMoveAxisActive == value) return;
+                _isMoveAxisActive = value;
                 OnPropertyChanged();
             }
         }
