@@ -583,8 +583,8 @@ namespace GS.Server.SkyTelescope
                                 case "CanFlipAzimuthSide":
                                     EnableFlipAzDir = SkyServer.CanFlipAzimuthSide;
                                     break;
-                                case "MoveAxisPrevTracking":
-                                    TrackingBlinker = SkyServer.MoveAxisPrevTracking;
+                                case "MoveAxisActive":
+                                    IsMoveAxisActive = SkyServer.Tracking && SkyServer.MoveAxisActive;
                                     break;
                                 case "HcPulseDone":
                                     HcPulseDone = SkyServer.HcPulseDone;
@@ -5878,6 +5878,18 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private bool _isMoveAxisActive;
+        public bool IsMoveAxisActive
+        {
+            get => _isMoveAxisActive;
+            set
+            {
+                if (_isMoveAxisActive == value) return;
+                _isMoveAxisActive = value;
+                OnPropertyChanged();
+            }
+        }
+
         private string _trackingRateIcon;
         public string TrackingRateIcon
         {
@@ -6121,16 +6133,6 @@ namespace GS.Server.SkyTelescope
             for (var i = 0; i < 4; i++)
             {
                 SopBlinker = !SopBlinker;
-            }
-        }
-        private bool _trackingBlinker;
-        public bool TrackingBlinker
-        {
-            get => _trackingBlinker;
-            set
-            {
-                _trackingBlinker = value;
-                OnPropertyChanged();
             }
         }
 
