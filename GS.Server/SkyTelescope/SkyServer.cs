@@ -1029,6 +1029,7 @@ namespace GS.Server.SkyTelescope
                 MoveAxisActive = false;
                 IsSlewing = false;
                 SlewState = SlewType.SlewNone;
+                if (Tracking) SkyPredictor.Set(RightAscensionXForm, DeclinationXForm);
             }
         }
 
