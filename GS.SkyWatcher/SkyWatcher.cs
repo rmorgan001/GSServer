@@ -39,8 +39,8 @@ namespace GS.SkyWatcher
         private readonly Commands _commands;
         // 128.9 steps per sidereal second * rads per second = steps per rad second
         private const double LowSpeedMargin = (128 * Constant.SiderealRate);
-        private readonly double[] _slewingSpeed = { 0, 0 }; // store for last used speed in radians
-        private readonly double[] _targetPositions = { 0, 0 }; //  Store for last used target coordinate 
+        //private readonly double[] _slewingSpeed = { 0, 0 }; // store for last used speed in radians
+        //private readonly double[] _targetPositions = { 0, 0 }; //  Store for last used target coordinate 
         private readonly double[] _trackingRates = { 0, 0 };
         private readonly long[] _trackingSpeeds = { 0, 0 };
         private double[] _factorRadRateToInt = { 0, 0 };
@@ -235,7 +235,7 @@ namespace GS.SkyWatcher
                 }
             }
 
-            _slewingSpeed[(int)axis] = rate; //store axis rate
+            //_slewingSpeed[(int)axis] = rate; //store axis rate
             _commands.GetAxisPositionCounter(axis); // read for plotting
         }
 
@@ -533,7 +533,7 @@ namespace GS.SkyWatcher
         /// <param name="axis">>AxisId.Axis1 or AxisId.Axis2</param>
         internal void AxisStop(AxisId axis)
         {
-            _slewingSpeed[(int)axis] = 0;
+            //_slewingSpeed[(int)axis] = 0;
             _commands.AxisStop(axis);
             _commands.GetAxisPositionCounter(axis); // read for plotting
         }
@@ -544,7 +544,7 @@ namespace GS.SkyWatcher
         /// <param name="axis">>AxisId.Axis1 or AxisId.Axis2</param>
         internal void AxisStopInstant(AxisId axis)
         {
-            _slewingSpeed[(int)axis] = 0;
+            //_slewingSpeed[(int)axis] = 0;
             _commands.AxisStopInstant(axis);
             _commands.GetAxisPositionCounter(axis); // read for plotting
         }
@@ -751,7 +751,7 @@ namespace GS.SkyWatcher
             }
             _commands.GetAxisPositionCounter(axis); // read for plotting
 
-            _targetPositions[(int)axis] = targetPosition;
+            //_targetPositions[(int)axis] = targetPosition;
         }
 
         /// <summary>
