@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019-2022 Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2025 Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -26,26 +26,26 @@ namespace GS.Shared
 {
     public static class ChartLogging
     {
-        private static readonly BlockingCollection<ChartLogItem> _chartBlockingCollection;
-        private static readonly string _instanceFileName;
-        private static readonly string _logPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        private static readonly string _fileLocation = Path.Combine(_logPath, "GSServer\\");
-        private static readonly string _fileNameAddOn = "ChartLog";
-        private static readonly SemaphoreSlim _lockFile = new SemaphoreSlim(1);
+        private static readonly BlockingCollection<ChartLogItem> ChartBlockingCollection;
+        private static readonly string InstanceFileName;
+        private static readonly string LogPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        private static readonly string FileLocation = Path.Combine(LogPath, "GSServer\\");
+        private const string FileNameAddOn = "ChartLog";
+        private static readonly SemaphoreSlim LockFile = new SemaphoreSlim(1);
 
         static ChartLogging()
         {
             try
             {
-                _instanceFileName = $"{DateTime.Now:yyyy-dd-MM}.txt";
-                DeleteFiles(_fileNameAddOn, 7, _logPath);
+                InstanceFileName = $"{DateTime.Now:yyyy-dd-MM}.txt";
+                DeleteFiles(FileNameAddOn, 7, LogPath);
 
-                _chartBlockingCollection = new BlockingCollection<ChartLogItem>();
+                ChartBlockingCollection = new BlockingCollection<ChartLogItem>();
                 Task.Factory.StartNew(() =>
                 {
-                    foreach (var logitem in _chartBlockingCollection.GetConsumingEnumerable())
+                    foreach (var logItem in ChartBlockingCollection.GetConsumingEnumerable())
                     {
-                        ProcessChartQueueItem(logitem);
+                        ProcessChartQueueItem(logItem);
                     }
                 });
 
@@ -76,7 +76,7 @@ namespace GS.Shared
         /// <param name="logItem"></param>
         private static void AddEntry(ChartLogItem logItem)
         {
-            _chartBlockingCollection.TryAdd(logItem);
+            ChartBlockingCollection.TryAdd(logItem);
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace GS.Shared
         {
             try
             {
-                if (logItem.Message != string.Empty) FileWriteAsync(_fileLocation + "GS" + logItem.LogBaseName + _fileNameAddOn + _instanceFileName, logItem);
+                if (logItem.Message != string.Empty) FileWriteAsync(FileLocation + "GS" + logItem.LogBaseName + FileNameAddOn + InstanceFileName, logItem);
             }
             catch (Exception ex)
             {
@@ -130,7 +130,7 @@ namespace GS.Shared
         /// <param name="append"></param>
         private static async void FileWriteAsync(string filePath, ChartLogItem logItem, bool append = true)
         {
-            await _lockFile.WaitAsync();
+            await LockFile.WaitAsync();
             try
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? throw new InvalidOperationException());
@@ -157,7 +157,7 @@ namespace GS.Shared
             }
             finally
             {
-                _lockFile.Release();
+                LockFile.Release();
             }
         }
 
