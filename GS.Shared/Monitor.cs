@@ -26,17 +26,17 @@ namespace GS.Shared
     {
         #region Fields
 
-        private static readonly List<MonitorCategory> _categoryCheckList;
-        private static readonly List<MonitorType> _typesCheckList;
-        private static readonly List<MonitorDevice> _deviceCheckList;
+        private static readonly List<MonitorCategory> CategoryCheckList;
+        private static readonly List<MonitorType> TypesCheckList;
+        private static readonly List<MonitorDevice> DeviceCheckList;
 
         #endregion
 
         static MonitorLog()
         {
-            _categoryCheckList = new List<MonitorCategory>();
-            _typesCheckList = new List<MonitorType>();
-            _deviceCheckList = new List<MonitorDevice>();
+            CategoryCheckList = new List<MonitorCategory>();
+            TypesCheckList = new List<MonitorType>();
+            DeviceCheckList = new List<MonitorDevice>();
             //Load_Settings();
         }
 
@@ -166,7 +166,7 @@ namespace GS.Shared
         /// <returns></returns>
         public static bool InDevices(MonitorDevice device)
         {
-            return _deviceCheckList.Exists(entry => entry == device);
+            return DeviceCheckList.Exists(entry => entry == device);
         }
 
         /// <summary>
@@ -178,11 +178,11 @@ namespace GS.Shared
         {
             if (add)
             {
-                _deviceCheckList.Add(device);
+                DeviceCheckList.Add(device);
             }
             else
             {
-                _deviceCheckList.Remove(device);
+                DeviceCheckList.Remove(device);
             }
 
             Save_MonitorDevice(device, add);
@@ -195,7 +195,7 @@ namespace GS.Shared
         /// <returns></returns>
         public static bool InCategory(MonitorCategory category)
         {
-            return _categoryCheckList.Exists(entry => entry == category);
+            return CategoryCheckList.Exists(entry => entry == category);
         }
 
         /// <summary>
@@ -207,11 +207,11 @@ namespace GS.Shared
         {
             if (add)
             {
-                _categoryCheckList.Add(category);
+                CategoryCheckList.Add(category);
             }
             else
             {
-                _categoryCheckList.Remove(category);
+                CategoryCheckList.Remove(category);
             }
 
             Save_MonitorCategory(category, add);
@@ -224,7 +224,7 @@ namespace GS.Shared
         /// <returns></returns>
         public static bool InTypes(MonitorType type)
         {
-            return _typesCheckList.Exists(entry => entry == type);
+            return TypesCheckList.Exists(entry => entry == type);
         }
 
         /// <summary>
@@ -236,11 +236,11 @@ namespace GS.Shared
         {
             if (add)
             {
-                _typesCheckList.Add(entryType);
+                TypesCheckList.Add(entryType);
             }
             else
             {
-                _typesCheckList.Remove(entryType);
+                TypesCheckList.Remove(entryType);
             }
 
             Save_MonitorType(entryType, add);
@@ -251,7 +251,7 @@ namespace GS.Shared
         /// </summary>
         public static void ClearDevicesToMonitor()
         {
-            _deviceCheckList.Clear();
+            DeviceCheckList.Clear();
         }
 
         /// <summary>
@@ -259,7 +259,7 @@ namespace GS.Shared
         /// </summary>
         public static void ClearTypesToMonitor()
         {
-            _typesCheckList.Clear();
+            TypesCheckList.Clear();
         }
 
         /// <summary>
@@ -267,7 +267,7 @@ namespace GS.Shared
         /// </summary>
         public static void ClearCategoriesToMonitor()
         {
-            _categoryCheckList.Clear();
+            CategoryCheckList.Clear();
         }
 
         /// <summary>

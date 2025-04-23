@@ -30,14 +30,14 @@ namespace GS.Shared
     {
         #region Fields
         public static event PropertyChangedEventHandler StaticPropertyChanged;
-        private static readonly BlockingCollection<MonitorEntry> _monitorBlockingCollection;
-        private static readonly BlockingCollection<PulseEntry> _pulseBlockingCollection;
+        private static readonly BlockingCollection<MonitorEntry> MonitorBlockingCollection;
+        private static readonly BlockingCollection<PulseEntry> PulseBlockingCollection;
         private static int _errIndex;
         private static int _sessionIndex;
         private static int _monitorIndex;
-        private static readonly string _instanceFileName;
-        private static readonly SemaphoreSlim _lockFile = new SemaphoreSlim(1);
-        private const string fmt = "0000#";
+        private static readonly string InstanceFileName;
+        private static readonly SemaphoreSlim LockFile = new SemaphoreSlim(1);
+        private const string Fmt = "0000#";
         #endregion
 
         #region Properties
@@ -132,26 +132,26 @@ namespace GS.Shared
 
         static MonitorQueue()
         {
-            _instanceFileName = $"{DateTime.Now:yyyy-MM-dd-HH}.txt";
+            InstanceFileName = $"{DateTime.Now:yyyy-MM-dd-HH}.txt";
             DeleteFiles("GSSessionLog", 7, GSFile.GetLogPath());
             DeleteFiles("GSErrorLog", 7, GSFile.GetLogPath());
             DeleteFiles("GSChartingLog", 7, GSFile.GetLogPath());
             DeleteFiles("GSMonitorLog", 7, GSFile.GetLogPath());
 
 
-            _monitorBlockingCollection = new BlockingCollection<MonitorEntry>();
+            MonitorBlockingCollection = new BlockingCollection<MonitorEntry>();
             Task.Factory.StartNew(() =>
             {
-                foreach (var monitorentry in _monitorBlockingCollection.GetConsumingEnumerable())
+                foreach (var monitorentry in MonitorBlockingCollection.GetConsumingEnumerable())
                 {
                     ProcessEntryQueueItem(monitorentry);
                 }
             });
 
-            _pulseBlockingCollection = new BlockingCollection<PulseEntry>();
+            PulseBlockingCollection = new BlockingCollection<PulseEntry>();
             Task.Factory.StartNew(() =>
             {
-                foreach (var pulseEntry in _pulseBlockingCollection.GetConsumingEnumerable())
+                foreach (var pulseEntry in PulseBlockingCollection.GetConsumingEnumerable())
                 {
                     ProcessPulseQueueItem(pulseEntry);
                 }
@@ -174,7 +174,7 @@ namespace GS.Shared
         /// <param name="entry"></param>
         public static void AddEntry(MonitorEntry entry)
         {
-            _monitorBlockingCollection.TryAdd(entry);
+            MonitorBlockingCollection.TryAdd(entry);
         }
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace GS.Shared
         /// <param name="entry"></param>
         public static void AddPulse(PulseEntry entry)
         {
-            _pulseBlockingCollection.TryAdd(entry);
+            PulseBlockingCollection.TryAdd(entry);
         }
 
         /// <summary>
@@ -345,7 +345,7 @@ namespace GS.Shared
             {
                 if (!Settings.LogSession) return;
                 ++_sessionIndex;
-                FileWriteAsync(Path.Combine(GSFile.GetLogPath(), "GSSessionLog") + _instanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{_sessionIndex.ToString(fmt)}|{entry.Device}|{entry.Category}|{entry.Type}|{entry.Thread}|{entry.Method}|{entry.Message}");
+                FileWriteAsync(Path.Combine(GSFile.GetLogPath(), "GSSessionLog") + InstanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{_sessionIndex.ToString(Fmt)}|{entry.Device}|{entry.Category}|{entry.Type}|{entry.Thread}|{entry.Method}|{entry.Message}");
             }
             catch (Exception e)
             {
@@ -363,7 +363,7 @@ namespace GS.Shared
             try
             {
                 ++_errIndex;
-                FileWriteAsync(Path.Combine(GSFile.GetLogPath(), "GSErrorLog") + _instanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{_errIndex.ToString(fmt)}|{entry.Device}|{entry.Category}|{entry.Type}|{entry.Thread}|{entry.Method}|{entry.Message}");
+                FileWriteAsync(Path.Combine(GSFile.GetLogPath(), "GSErrorLog") + InstanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{_errIndex.ToString(Fmt)}|{entry.Device}|{entry.Category}|{entry.Type}|{entry.Thread}|{entry.Method}|{entry.Message}");
             }
             catch (Exception e)
             {
@@ -381,7 +381,7 @@ namespace GS.Shared
             try
             {
                 if (!Settings.LogMonitor) return;
-                FileWriteAsync(Path.Combine(GSFile.GetLogPath(), "GSMonitorLog") + _instanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{entry.Index.ToString(fmt)}|{entry.Device}|{entry.Category}|{entry.Type}|{entry.Thread}|{entry.Method}|{entry.Message}"); //YYYY-MM-DD HH:MM:SS.fff
+                FileWriteAsync(Path.Combine(GSFile.GetLogPath(), "GSMonitorLog") + InstanceFileName, $"{entry.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{entry.Index.ToString(Fmt)}|{entry.Device}|{entry.Category}|{entry.Type}|{entry.Thread}|{entry.Method}|{entry.Message}"); //YYYY-MM-DD HH:MM:SS.fff
             }
             catch (Exception e)
             {
@@ -400,7 +400,7 @@ namespace GS.Shared
         {
             try
             {
-                await _lockFile.WaitAsync();
+                await LockFile.WaitAsync();
 
                 Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? throw new InvalidOperationException());
                 using (var stream = new FileStream(filePath, append ? FileMode.Append : FileMode.Create,
@@ -417,7 +417,7 @@ namespace GS.Shared
             }
             finally
             {
-                _lockFile.Release();
+                LockFile.Release();
             }
         }
 

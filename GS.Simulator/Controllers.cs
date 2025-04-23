@@ -71,14 +71,14 @@ namespace GS.Simulator
         private bool _homeSensorX;
         private bool _homeSensorY;
 
-        private const int _factorSteps = 36000;
-        private const int _maxRate = 4;
-        private const double SlewSpeedOne = .01 * _maxRate;
+        private const int FactorSteps = 36000;
+        private const int MaxRate = 4;
+        private const double SlewSpeedOne = .01 * MaxRate;
         //private const double SlewSpeedTwo = .02 * _maxRate;
         //private const double SlewSpeedThree = 1.0 * _maxRate;
-        private const double SlewSpeedFour = 1.5 * _maxRate;
+        private const double SlewSpeedFour = 1.5 * MaxRate;
         //private const double SlewSpeedFive = 2.0 * _maxRate;
-        private const double SlewSpeedSix = 2.5 * _maxRate;
+        private const double SlewSpeedSix = 2.5 * MaxRate;
         //private const double SlewSpeedSeven = 3.0 * _maxRate;
         //private const double SlewSpeedEight = 3.4 * _maxRate;
 
@@ -88,8 +88,8 @@ namespace GS.Simulator
 
         private double DegreesX { get; set; }
         private double DegreesY { get; set; }
-        private int StepsX => (int)(DegreesX * _factorSteps);
-        private int StepsY => (int)(DegreesY * _factorSteps);
+        private int StepsX => (int)(DegreesX * FactorSteps);
+        private int StepsY => (int)(DegreesY * FactorSteps);
         private double HcX { get; set; }
         private double HcY { get; set; }
         private int HomeSensorX { get; set; }
@@ -348,7 +348,7 @@ namespace GS.Simulator
                 case "spw":
                     return $"{WormRevolutionSteps}";
                 case "factorsteps":
-                    return $"{_factorSteps}";
+                    return $"{FactorSteps}";
                 case "gotorate":
                     var x = Convert.ToInt32(cmd[1]);
                     if (x >= 1 && x <= 20)

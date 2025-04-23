@@ -31,21 +31,21 @@ namespace GS.Simulator
     {
         #region Fields
 
-        private readonly IOSerial _ioSerial;
-        private readonly double[] _stepsPerSec = { 0.0, 0.0 };
-        private readonly int[] _revSteps = { 0, 0 };
+        private readonly IoSerial _ioSerial;
+        //private readonly double[] _stepsPerSec = { 0.0, 0.0 };
+        //private readonly int[] _revSteps = { 0, 0 };
 
         #endregion
 
         #region Properties
-        internal static bool IsConnected => IOSerial.IsConnected;
+        internal static bool IsConnected => IoSerial.IsConnected;
         internal MountInfo MountInfo { get; private set; }
         internal bool MonitorPulse { private get; set; }
         #endregion
 
         internal Actions()
         {
-            _ioSerial = new IOSerial();
+            _ioSerial = new IoSerial();
         }
 
         #region Action Commands
@@ -341,13 +341,13 @@ namespace GS.Simulator
         private void LoadDefaults()
         {
             //steps per revolution
-            var a = Convert.ToInt32(_ioSerial.Send("getrevsteps"));
-            _revSteps[0] = a;
-            _revSteps[1] = a;
+            //var a = Convert.ToInt32(_ioSerial.Send("getrevsteps"));
+            //_revSteps[0] = a;
+            //_revSteps[1] = a;
             //steps per second
-            var b = Conversions.StepPerArcSec(a);
-            _stepsPerSec[0] = b;
-            _stepsPerSec[1] = b;
+            //var b = Conversions.StepPerArcSec(a);
+            //_stepsPerSec[0] = b;
+            //_stepsPerSec[1] = b;
 
             var c = _ioSerial.Send("capabilities");
             var d = c.Split('|');

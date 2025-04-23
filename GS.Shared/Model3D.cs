@@ -20,7 +20,7 @@ namespace GS.Shared
 {
     public static class Model3D
     {
-        private static readonly string _directoryPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase) + "\\Models\\";
+        private static readonly string DirectoryPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase) + @"\Models\";
         public static string GetModelFile(Model3DType modelType, String altAz = "")
         {
             string gpModel;
@@ -47,7 +47,7 @@ namespace GS.Shared
                 default:
                     throw new ArgumentOutOfRangeException(nameof(modelType), modelType, null);
             }
-            var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(),
+            var filePath = System.IO.Path.Combine(DirectoryPath ?? throw new InvalidOperationException(),
                 gpModel.Replace(".obj", altAz + ".obj"));
             var file = new Uri(filePath).LocalPath;
             return file;
@@ -57,7 +57,7 @@ namespace GS.Shared
             const string compassN = @"CompassN.png";
             const string compassS = @"CompassS.png";
             var compassFile = southernHemisphere && !altAz ? compassS : compassN;
-            var filePath = System.IO.Path.Combine(_directoryPath ?? throw new InvalidOperationException(), compassFile);
+            var filePath = System.IO.Path.Combine(DirectoryPath ?? throw new InvalidOperationException(), compassFile);
             var file = new Uri(filePath).LocalPath;
             return file;
         }

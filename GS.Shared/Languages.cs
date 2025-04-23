@@ -28,10 +28,10 @@ namespace GS.Shared
 {
     public static class Languages
     {
-        private static readonly string _directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase) + "\\LanguageFiles\\";
-        private const string gsServer = "GSServer_";
-        private const string gsChart = "GSChart_";
-        private const string gsUtil = "GSUtil_";
+        private static readonly string DirectoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase) + @"\LanguageFiles\";
+        private const string GsServer = "GSServer_";
+        private const string GsChart = "GSChart_";
+        private const string GsUtil = "GSUtil_";
 
         static Languages()
         {
@@ -86,7 +86,7 @@ namespace GS.Shared
                             uri = new Uri("GS.Shared;component/Languages/StringResServer_en-us.xaml", UriKind.Relative);
                             break;
                         default:
-                            localpath = new Uri(Path.Combine(_directoryPath, $"{gsServer}{cultureInfo}.xaml")).LocalPath;
+                            localpath = new Uri(Path.Combine(DirectoryPath, $"{GsServer}{cultureInfo}.xaml")).LocalPath;
                             if (!File.Exists(localpath))
                             {
                                 filenotfound = true;
@@ -102,7 +102,7 @@ namespace GS.Shared
                             uri = new Uri("GS.Shared;component/Languages/StringResChart_en-us.xaml", UriKind.Relative);
                             break;
                         default:
-                            localpath = new Uri(Path.Combine(_directoryPath, $"{gsChart}{cultureInfo}.xaml")).LocalPath;
+                            localpath = new Uri(Path.Combine(DirectoryPath, $"{GsChart}{cultureInfo}.xaml")).LocalPath;
                             if (!File.Exists(localpath))
                             {
                                 filenotfound = true;
@@ -118,7 +118,7 @@ namespace GS.Shared
                             uri = new Uri("GS.Shared;component/Languages/StringResUtil_en-us.xaml", UriKind.Relative);
                             break;
                         default:
-                            localpath = new Uri(Path.Combine(_directoryPath, $"{gsUtil}{cultureInfo}.xaml")).LocalPath;
+                            localpath = new Uri(Path.Combine(DirectoryPath, $"{GsUtil}{cultureInfo}.xaml")).LocalPath;
                             if (!File.Exists(localpath))
                             {
                                 filenotfound = true;

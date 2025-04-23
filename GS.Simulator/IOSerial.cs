@@ -21,13 +21,13 @@ using System.Threading;
 
 namespace GS.Simulator
 {
-    internal class IOSerial
+    internal class IoSerial
     {
         private readonly Controllers _controllers;
 
         internal static bool IsConnected => true;
 
-        internal IOSerial()
+        internal IoSerial()
         {
             _controllers = new Controllers();
         }
