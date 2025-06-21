@@ -22,6 +22,7 @@ using GS.Shared;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -32,13 +33,13 @@ using System.Windows.Threading;
 
 namespace ASCOM.GS.Sky.Telescope
 {
-
     [Guid("DFAC33EA-34DB-460D-810F-5EBFA40FB478")]
     [ServedClassName("ASCOM GS Sky Telescope")]
     [ProgId("ASCOM.GS.Sky.Telescope")]
     [ClassInterface(ClassInterfaceType.None)]
-    public sealed class Telescope : ObjectBase, ITelescopeV3, IDisposable
+    public sealed class Telescope : ObjectBase, ITelescopeV4, IDisposable
     {
+        #region Fields
         // Driver private data (rate collections)
         private AxisRates[] _mAxisRates;
         private TrackingRates _mTrackingRates;
@@ -46,6 +47,8 @@ namespace ASCOM.GS.Sky.Telescope
         private Util _util;
         private CommandStrings _mCommandStrings;
         private readonly long _objectId;
+
+        #endregion
 
         /// <summary>
         /// Constructor - Must be public for COM registration!
@@ -84,73 +87,7 @@ namespace ASCOM.GS.Sky.Telescope
             }
         }
 
-        #region Public com Interface ITelescope Implementaion
-
-        public string Action(string ActionName, string ActionParameters)
-        {
-            ActionName = ActionName?.Trim();
-            ActionParameters = ActionParameters?.Trim();
-
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Telescope,
-                Category = MonitorCategory.Driver,
-                Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod()?.Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $" ActionName:{ActionName}, ActionParameters:'{ActionParameters}'"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            switch (ActionName)
-            {
-                // ReSharper disable once StringLiteralTypo
-                case string str when str.Equals("telescope:setparkposition", StringComparison.InvariantCultureIgnoreCase):
-                    if (SkyServer.IsMountRunning == false) { throw new NotConnectedException("Mount Not Connected"); }
-                    var found = SkySettings.ParkPositions.Find(x => string.Equals(x.Name, ActionParameters, StringComparison.InvariantCultureIgnoreCase));
-                    if (found == null)
-                    {
-                        var _parkPositions = SkySettings.ParkPositions.OrderBy(ParkPosition => ParkPosition.Name).ToList();
-                        var output = JsonConvert.SerializeObject(_parkPositions);
-                        throw new Exception($"Param Not Found:'{ActionParameters}', {output}");
-                    }
-                    SkyServer.ParkSelected = found;
-                    return found.Name;
-                default:
-                    throw new ActionNotImplementedException($"Not Found:'{ActionName}'");
-            }
-        }
-
-        /// <summary>
-        /// Gets the supported actions.
-        /// </summary>
-        public ArrayList SupportedActions
-        {
-            // no supported actions, return empty array
-            get
-            {
-                var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Started" };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                // ReSharper disable once StringLiteralTypo
-                var sa = new ArrayList { @"Telescope:SetParkPosition" };
-
-                return sa;
-            }
-        }
-
-        public void AbortSlew()
-        {
-            var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Started" };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            CheckParked("AbortSlew");
-            SkyServer.AbortSlew(true);
-        }
-
+        #region Public Properties
         public AlignmentModes AlignmentMode
         {
             get
@@ -250,26 +187,7 @@ namespace ASCOM.GS.Sky.Telescope
                 return r;
             }
         }
-
-        public IAxisRates AxisRates(TelescopeAxes Axis)
-        {
-            var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"   {Axis}" };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            switch (Axis)
-            {
-                case TelescopeAxes.axisPrimary:
-                    return new AxisRates(TelescopeAxes.axisPrimary);
-                case TelescopeAxes.axisSecondary:
-                    return new AxisRates(TelescopeAxes.axisSecondary);
-                case TelescopeAxes.axisTertiary:
-                    return new AxisRates(TelescopeAxes.axisTertiary);
-                default:
-                    return null;
-            }
-        }
-
+        
         public double Azimuth
         {
             get
@@ -278,39 +196,27 @@ namespace ASCOM.GS.Sky.Telescope
                 var r = SkyServer.Azimuth;
 
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {r}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {r}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 return r;
             }
         }
-
+        
         public bool CanFindHome
-        {
-            get
+            {
+                get
             {
                 var r = SkySettings.CanFindHome;
 
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {r}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {r}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 return r;
             }
-        }
-
-        public bool CanMoveAxis(TelescopeAxes Axis)
-        {
-            CheckVersionOne("CanMoveAxis");
-            var r = SkyServer.CanMoveAxis(Axis);
-
-            var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {r}" };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            return r;
-        }
-
+            }
+        
         public bool CanPark
         {
             get
@@ -525,54 +431,17 @@ namespace ASCOM.GS.Sky.Telescope
                 return r;
             }
         }
-
-        public void CommandBlind(string Command, bool Raw)
-        {
-            throw new MethodNotImplementedException("CommandBlind");
-        }
-
-        public bool CommandBool(string Command, bool Raw)
-        {
-            throw new MethodNotImplementedException("CommandBool");
-        }
-
-        public string CommandString(string Command, bool Raw)
-        {
-            try
-            {
-                var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{Command},{Raw}") };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                if (string.IsNullOrWhiteSpace(Command)) { throw new MethodNotImplementedException("CommandString"); }
-
-                if (_mCommandStrings == null) { _mCommandStrings = new CommandStrings(); }
-                return CommandStrings.ProcessCommand(Command, Raw);
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Telescope,
-                    Category = MonitorCategory.Driver,
-                    Type = MonitorType.Warning,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = FormattableString.Invariant($"{ex.Message},{ex.StackTrace}")
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-                throw;
-            }
-        }
-
+        
+        /// <remarks>
+        /// https://ascom-standards.org/newdocs/telescope.html#Telescope.Connected
+        /// </remarks>
         public bool Connected
         {
             get
             {
                 var r = SkySystem.Connected;
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {r}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {r}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 return r;
             }
@@ -581,11 +450,25 @@ namespace ASCOM.GS.Sky.Telescope
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {value}|{_objectId}" };
                 MonitorLog.LogToMonitor(monitorItem);
-
                 SkySystem.SetConnected(_objectId, value);
             }
         }
 
+        /// <remarks>
+        /// https://ascom-standards.org/newdocs/telescope.html#Telescope.Connecting
+        /// </remarks>
+        public bool Connecting 
+        {
+            get
+            {
+                var r = SkySystem.Connecting;
+                var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {r}" };
+                MonitorLog.LogToMonitor(monitorItem);
+                return r;
+            }
+        }
+        
         public double Declination
         {
             get
@@ -601,9 +484,9 @@ namespace ASCOM.GS.Sky.Telescope
             }
         }
 
-        /// <summary>
+        /// <remarks>
         /// The declination tracking rate (arc seconds per second, default = 0.0)
-        /// </summary>
+        /// </remarks>
         public double DeclinationRate
         {
             get
@@ -647,17 +530,56 @@ namespace ASCOM.GS.Sky.Telescope
             }
         }
 
-        public PierSide DestinationSideOfPier(double RightAscension, double Declination)
+        /// <summary>
+        /// Return the device's operational state in one call
+        /// </summary>
+        public IStateValueCollection DeviceState
         {
-            CheckVersionOne("DestinationSideOfPier");
+            get
+            {
+                string msg = null;
+                try
+                {
+                    // Create an array list to hold the IStateValue entries
+                    var deviceState = new List<IStateValue>();
 
-            var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"RA|{RightAscension}|Dec|{Declination}" };
-            MonitorLog.LogToMonitor(monitorItem);
+                    // Add one entry for each operational state, if possible
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Altitude), Altitude)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.AtHome), AtHome)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.AtPark), AtPark)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Azimuth), Azimuth)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Declination), Declination)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.IsPulseGuiding), IsPulseGuiding)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.RightAscension), RightAscension)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.SideOfPier), SideOfPier)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.SiderealTime), SiderealTime)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Slewing), Slewing)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Tracking), Tracking)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.UTCDate), UTCDate)); } catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
+                    try { deviceState.Add(new StateValue(DateTime.Now)); }catch (Exception ex) { LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
 
-            var radec = Transforms.CoordTypeToInternal(RightAscension, Declination);
-            var r = SkyServer.DetermineSideOfPier(radec.X, radec.Y);
-            return r;
+                    var r = new StateValueCollection(deviceState);
+
+                    for (var index = 0; index < r.Count; index++)
+                    {
+                        var a = r[index];
+                        msg += $"{a.Name}-{a.Value}|";
+                    }
+
+                    var monitorItem = new MonitorEntry
+                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
+                    MonitorLog.LogToMonitor(monitorItem);
+
+                    return r;
+                }
+                catch (Exception ex)
+                {
+                    var monitorItem = new MonitorEntry
+                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}, {ex.Message}" };
+                    MonitorLog.LogToMonitor(monitorItem);
+                    throw;
+                }
+            }
         }
 
         public bool DoesRefraction
@@ -726,24 +648,6 @@ namespace ASCOM.GS.Sky.Telescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 return SkySettings.EquatorialCoordinateType;
-            }
-        }
-
-        public void FindHome()
-        {
-            if (!SkyServer.AsComOn) return;
-            CheckCapability(SkySettings.CanFindHome, "FindHome");
-            CheckParked("FindHome");
-
-            var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Started" };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            SkyServer.GoToHome();
-            while (SkyServer.SlewState == SlewType.SlewHome || SkyServer.SlewState == SlewType.SlewSettle)
-            {
-                Thread.Sleep(1);
-                DoEvents();
             }
         }
 
@@ -823,7 +727,7 @@ namespace ASCOM.GS.Sky.Telescope
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "3" };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                return 3;
+                return 4;
             }
         }
 
@@ -842,46 +746,6 @@ namespace ASCOM.GS.Sky.Telescope
             }
         }
 
-        /// <summary>
-        /// Move one axis at the given AxisRates(TelescopeAxes axis).
-        /// </summary>
-        /// <param name="Axis"></param>
-        /// <param name="Rate"></param>
-        public void MoveAxis(TelescopeAxes Axis, double Rate)
-        {
-            if (!SkyServer.AsComOn) return;
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Telescope,
-                Category = MonitorCategory.Driver,
-                Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod()?.Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{Axis}, {Rate}"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            CheckVersionOne("MoveAxis");
-            CheckRate(Axis, Rate);
-            if (!CanMoveAxis(Axis)){throw new MethodNotImplementedException("CanMoveAxis " + Enum.GetName(typeof(TelescopeAxes), Axis));}
-            CheckParked("MoveAxis");
-
-            switch (Axis)
-            {
-                case TelescopeAxes.axisPrimary:
-                    SkyServer.RateMovePrimaryAxis = Rate;
-                    break;
-                case TelescopeAxes.axisSecondary:
-                    SkyServer.RateMoveSecondaryAxis = Rate;
-                    break;
-                case TelescopeAxes.axisTertiary:
-                default:
-                    // not implemented
-                    break;
-            }
-        }
-
         public string Name
         {
             get
@@ -889,91 +753,10 @@ namespace ASCOM.GS.Sky.Telescope
                 string r = SkySettings.InstrumentName;
 
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{r}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{r}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 return r;
-            }
-        }
-
-        public void Park()
-        {
-            if (!SkyServer.AsComOn) return;
-            CheckCapability(SkySettings.CanPark, "Park");
-
-            var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Started" };
-            if (SkyServer.AtPark)
-            {
-                monitorItem.Message = "Already Parked";
-                MonitorLog.LogToMonitor(monitorItem);
-                return;
-            }
-
-            //if (SkyServer.SlewState == SlewType.SlewPark) // uncomment to avoid multiple calls
-            //{
-            //    monitorItem.Message = "Park In Progress, Use AbortSlew first";
-            //    MonitorLog.LogToMonitor(monitorItem);
-            //    return;
-            //} 
-
-            MonitorLog.LogToMonitor(monitorItem);
-            SkyServer.GoToPark();
-            //while (SkyServer.SlewState == SlewType.SlewPark)
-            //{
-            //    Thread.Sleep(1);
-            //    DoEvents();
-            //}
-        }
-
-        public void PulseGuide(GuideDirections Direction, int Duration)
-        {
-            try
-            {
-                if (IsPulseGuiding && SkySettings.AlignmentMode == AlignmentModes.algAltAz)
-                    throw new InvalidOperationException("Alt Az mode does not support dual axis pulse guiding");
-                if (!SkyServer.AsComOn) { throw new InvalidOperationException("Not accepting commands"); }
-                if (SkyServer.AtPark) { throw new ParkedException(); }
-                //if (SkyServer.IsSlewing) { throw new InvalidValueException("Pulse rejected when slewing"); }
-                //if (!SkyServer.Tracking) { throw new InvalidValueException("Pulse rejected when tracking is off"); }
-
-                var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{Direction},{Duration}") };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                CheckCapability(SkySettings.CanPulseGuide, "PulseGuide");
-                CheckRange(Duration, 0, 30000, "PulseGuide", "Duration");
-
-                switch (Direction)
-                {
-                    case GuideDirections.guideNorth:
-                    case GuideDirections.guideSouth:
-                        SkyServer.IsPulseGuidingDec = true;
-                        break;
-                    case GuideDirections.guideEast:
-                    case GuideDirections.guideWest:
-                        SkyServer.IsPulseGuidingRa = true;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null);
-                }
-
-                var startTime = HiResDateTime.UtcNow;
-                SkyServer.PulseGuide(Direction, Duration,0);
-                // If synchronous (must be for Alt Az ASCOM V3) wait out the remaining pulse guide duration here
-                if (SkySettings.AlignmentMode != AlignmentModes.algAltAz) return;
-                // Wait for pulse guiding completion
-                // Async operation may be active, sleep timers are not precise across threads
-                while (IsPulseGuiding) Thread.Sleep(10);
-            }
-            catch (Exception e)
-            {
-                SkyServer.IsPulseGuidingRa = false;
-                SkyServer.IsPulseGuidingDec = false;
-                var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{e.Message}") };
-                MonitorLog.LogToMonitor(monitorItem);
-                throw;
             }
         }
 
@@ -1038,38 +821,6 @@ namespace ASCOM.GS.Sky.Telescope
                 SkyServer.RateRaOrg = value;
                 SkyServer.RateRa = Conversions.ArcSec2Deg(Conversions.SideSec2ArcSec(value));
             }
-        }
-
-        public void SetPark()
-        {
-            var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Started" };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            CheckCapability(SkySettings.CanSetPark, "SetPark");
-            SkyServer.SetParkAxis("External");
-        }
-
-        public void SetupDialog()
-        {
-            var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Started" };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            SkyServer.OpenSetupDialog = true;
-            //check if window is minimized or not top most
-            NativeMethods.SetForegroundWindow("GS.Server"); //may cause flashing in task bar due to windows restrictions
-            //Calling app will destroy instance after the dialog is finished
-            while (true)
-            {
-                Thread.Sleep(100);
-                if (SkyServer.OpenSetupDialogFinished) { break; }
-            }
-
-            monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Open:{SkyServer.OpenSetupDialog}, Finished:{SkyServer.OpenSetupDialogFinished}" };
-            MonitorLog.LogToMonitor(monitorItem);
-
         }
 
         public PierSide SideOfPier
@@ -1195,6 +946,20 @@ namespace ASCOM.GS.Sky.Telescope
             }
         }
 
+        public bool Slewing
+        {
+            get
+            {
+                var r = SkyServer.IsSlewing;
+
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{r}" };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                return r;
+            }
+        }
+
         public short SlewSettleTime
         {
             get
@@ -1216,255 +981,6 @@ namespace ASCOM.GS.Sky.Telescope
                 CheckRange(value, 0, 100, "SlewSettleTime");
                 var r = value;
                 SkyServer.SlewSettleTime = r;
-            }
-        }
-
-        public void SlewToAltAz(double Azimuth, double Altitude)
-        {
-            if (!SkyServer.AsComOn) return;
-
-            var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(Azimuth, "\u00B0 ", ":", "", 2)}|{_util.DegreesToDMS(Altitude, "\u00B0 ", ":", "", 2)}" };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            CheckCapability(SkySettings.CanSlewAltAz, "SlewToAltAz");
-            CheckParked("SlewToAltAz");
-            CheckTracking(false, "SlewToAltAz");
-            CheckRange(Azimuth, 0, 360, "SlewToAltAz", "azimuth");
-            CheckRange(Altitude, -90, 90, "SlewToAltAz", "Altitude");
-            SkyServer.SlewAltAz(Altitude, Azimuth);
-            while (SkyServer.SlewState == SlewType.SlewAltAz || SkyServer.SlewState == SlewType.SlewSettle)
-            {
-                Thread.Sleep(1);
-                DoEvents();
-            }
-            DelayInterval();
-            // Wait for updated mount position before returning
-        }
-
-        public void SlewToAltAzAsync(double Azimuth, double Altitude)
-        {
-            if (!SkyServer.AsComOn) return;
-
-            var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(Azimuth, "\u00B0 ", ":", "", 2)}|{_util.DegreesToDMS(Altitude, "\u00B0 ", ":", "", 2)}" };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            CheckCapability(SkySettings.CanSlewAltAzAsync, "SlewToAltAzAsync");
-            CheckParked("SlewToAltAz");
-            CheckTracking(false, "SlewToAltAzAsync");
-            CheckRange(Azimuth, 0, 360, "SlewToAltAzAsync", "Azimuth");
-            CheckRange(Altitude, -90, 90, "SlewToAltAzAsync", "Altitude");
-            SkyServer.SlewAltAz(Altitude, Azimuth);
-        }
-
-        public void SlewToCoordinates(double RightAscension, double Declination)
-        {
-            if (!SkyServer.AsComOn) return;
-
-            var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.HoursToHMS(RightAscension, "h ", ":", "", 2)}|{_util.DegreesToDMS(Declination, "\u00B0 ", ":", "", 2)}" };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            CheckCapability(SkySettings.CanSlew, "SlewToCoordinates");
-            CheckRange(RightAscension, 0, 24, "SlewToCoordinates", "RightAscension");
-            CheckRange(Declination, -90, 90, "SlewToCoordinates", "Declination");
-            CheckParked("SlewToCoordinates");
-            CheckTracking(true, "SlewToCoordinates");
-
-            TargetRightAscension = RightAscension;
-            TargetDeclination = Declination;
-            var radec = Transforms.CoordTypeToInternal(RightAscension, Declination);
-            SkyServer.SlewRaDec(radec.X, radec.Y);
-            while (SkyServer.SlewState == SlewType.SlewRaDec || SkyServer.SlewState == SlewType.SlewSettle)
-            {
-                Thread.Sleep(1);
-                DoEvents();
-            }
-            DelayInterval();
-            // Wait for updated mount position before returning
-        }
-
-        public void SlewToCoordinatesAsync(double RightAscension, double Declination)
-        {
-            if (!SkyServer.AsComOn) return;
-
-            var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.HoursToHMS(RightAscension, "h ", ":", "", 2)}|{_util.DegreesToDMS(Declination, "\u00B0 ", ":", "", 2)}" };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            CheckCapability(SkySettings.CanSlewAsync, "SlewToCoordinatesAsync");
-            CheckRange(RightAscension, 0, 24, "SlewToCoordinatesAsync", "RightAscension");
-            CheckRange(Declination, -90, 90, "SlewToCoordinatesAsync", "Declination");
-            CheckParked("SlewToCoordinatesAsync");
-
-            TargetRightAscension = RightAscension;
-            TargetDeclination = Declination;
-            var radec = Transforms.CoordTypeToInternal(RightAscension, Declination);
-            SkyServer.SlewRaDec(radec.X, radec.Y, true);
-        }
-
-        public void SlewToTarget()
-        {
-            if (!SkyServer.AsComOn) return;
-
-            var ra = TargetRightAscension;
-            var dec = TargetDeclination;
-
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Telescope,
-                Category = MonitorCategory.Driver,
-                Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod()?.Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message =
-                    FormattableString.Invariant($"{ra}|{dec}")
-            };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            CheckCapability(SkySettings.CanSlew, "SlewToTarget");
-            CheckRange(ra, 0, 24, "SlewToTarget", "TargetRightAscension");
-            CheckRange(dec, -90, 90, "SlewToTarget", "TargetDeclination");
-            CheckParked("SlewToTarget");
-            CheckTracking(true, "SlewToTarget");
-            var xy = Transforms.CoordTypeToInternal(ra, dec);
-            SkyServer.SlewRaDec(xy.X, xy.Y);
-            while (SkyServer.SlewState == SlewType.SlewRaDec || SkyServer.SlewState == SlewType.SlewSettle)
-            {
-                Thread.Sleep(1);
-                DoEvents();
-            }
-            DelayInterval();
-            // Wait for updated mount position before returning
-        }
-
-        public void SlewToTargetAsync()
-        {
-            if (!SkyServer.AsComOn) return;
-
-            var ra = TargetRightAscension;
-            var dec = TargetDeclination;
-
-            var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{ra}|{dec}") };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            CheckCapability(SkySettings.CanSlewAsync, "SlewToTargetAsync");
-            CheckRange(ra, 0, 24, "SlewToTargetAsync", "TargetRightAscension");
-            CheckRange(dec, -90, 90, "SlewToTargetAsync", "TargetDeclination");
-            CheckParked("SlewToTargetAsync");
-            CheckTracking(true, "SlewToTargetAsync");
-
-            var xy = Transforms.CoordTypeToInternal(ra, dec);
-            SkyServer.SlewRaDec(xy.X, xy.Y);
-        }
-
-        public bool Slewing
-        {
-            get
-            {
-                var r = SkyServer.IsSlewing;
-
-                var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{r}" };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                return r;
-            }
-        }
-
-        public void SyncToAltAz(double Azimuth, double Altitude)
-        {
-            var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(Azimuth, "\u00B0 ", ":", "", 2)}|{_util.DegreesToDMS(Altitude, "\u00B0 ", ":", "", 2)}" };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            CheckCapability(SkySettings.CanSyncAltAz, "SyncToAltAz");
-            CheckRange(Azimuth, 0, 360, "SyncToAltAz", "Azimuth");
-            CheckRange(Altitude, -90, 90, "SyncToAltAz", "Altitude");
-            CheckParked("SyncToAltAz");
-            CheckTracking(false, "SyncToAltAz");
-            CheckAltAzSync(Altitude, Azimuth, "SyncToAltAz");
-            SkyServer.AtPark = false;
-            SkyServer.SyncToAltAzm(Azimuth, Altitude);
-            // DelayInterval(); RightAscension and Declination wait for latest update
-            // Wait for updated mount position before returning
-            SkyServer.MountPositionUpdated = false;
-            while (!SkyServer.MountPositionUpdated)
-            {
-                Thread.Sleep(10);
-            }
-        }
-
-        public void SyncToCoordinates(double RightAscension, double Declination)
-        {
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Telescope,
-                Category = MonitorCategory.Driver,
-                Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod()?.Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{_util.HoursToHMS(RightAscension, "h ", ":", "", 2)}|{_util.DegreesToDMS(Declination, "\u00B0 ", ":", "", 2)}"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            CheckCapability(SkySettings.CanSync, "SyncToCoordinates");
-            CheckRange(RightAscension, 0, 24, "SyncToCoordinates", "RightAscension");
-            CheckRange(Declination, -90, 90, "SyncToCoordinates", "Declination");
-            CheckParked("SyncToCoordinates");
-            CheckTracking(true, "SyncToCoordinates");
-
-            SkyServer.TargetDec = Declination;
-            SkyServer.TargetRa = RightAscension;
-            var a = Transforms.CoordTypeToInternal(RightAscension, Declination);
-            CheckRaDecSync(a.X, a.Y, "SyncToCoordinates");
-
-            SkyServer.AtPark = false;
-            SkyServer.SyncToTargetRaDec();
-            // DelayInterval(); RightAscension and Declination wait for latest update
-            // Wait for updated mount position before returning
-            SkyServer.MountPositionUpdated = false;
-            while (!SkyServer.MountPositionUpdated)
-            {
-                Thread.Sleep(10);
-            }
-        }
-
-        public void SyncToTarget()
-        {
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Telescope,
-                Category = MonitorCategory.Driver,
-                Type = MonitorType.Information,
-                Method = MethodBase.GetCurrentMethod()?.Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{_util.HoursToHMS(SkyServer.TargetRa, "h ", ":", "", 2)}|{_util.DegreesToDMS(SkyServer.TargetDec, "\u00B0 ", ":", "", 2)}"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
-
-            CheckCapability(SkySettings.CanSync, "SyncToTarget");
-            CheckRange(SkyServer.TargetRa, 0, 24, "SyncToTarget", "TargetRightAscension");
-            CheckRange(SkyServer.TargetDec, -90, 90, "SyncToTarget", "TargetDeclination");
-            CheckParked("SyncToTarget");
-            CheckTracking(true, "SyncToTarget");
-
-            var a = Transforms.CoordTypeToInternal(RightAscension, Declination);
-            CheckRaDecSync(a.X, a.Y, "SyncToTarget");
-
-            SkyServer.AtPark = false;
-            SkyServer.SyncToTargetRaDec();
-            // DelayInterval(); RightAscension and Declination wait for latest update
-            // Wait for updated mount position before returning
-            SkyServer.MountPositionUpdated = false;
-            while (!SkyServer.MountPositionUpdated)
-            {
-                Thread.Sleep(10);
             }
         }
 
@@ -1542,7 +1058,7 @@ namespace ASCOM.GS.Sky.Telescope
             {
                 if (!SkyServer.AsComOn) return;
 
-                CheckParked("Cannot enable tracking at park");
+                if (value & SkyServer.AtPark){CheckParked("Cannot enable tracking at park");}
 
                 var monitorItem = new MonitorEntry
                     { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
@@ -1626,6 +1142,592 @@ namespace ASCOM.GS.Sky.Telescope
             }
         }
 
+        #endregion
+
+        #region Public Methods
+
+        public string Action(string actionName, string actionParameters)
+        {
+            actionName = actionName?.Trim();
+            actionParameters = actionParameters?.Trim();
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Driver,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $" ActionName:{actionName}, ActionParameters:'{actionParameters}'"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            switch (actionName)
+            {
+                // ReSharper disable once StringLiteralTypo
+                case string str when str.Equals("telescope:setparkposition", StringComparison.InvariantCultureIgnoreCase):
+                    if (SkyServer.IsMountRunning == false) { throw new NotConnectedException("Mount Not Connected"); }
+                    var found = SkySettings.ParkPositions.Find(x => string.Equals(x.Name, actionParameters, StringComparison.InvariantCultureIgnoreCase));
+                    if (found == null)
+                    {
+                        var parkPositions = SkySettings.ParkPositions.OrderBy(parkPosition => parkPosition.Name).ToList();
+                        var output = JsonConvert.SerializeObject(parkPositions);
+                        throw new Exception($"Param Not Found:'{actionParameters}', {output}");
+                    }
+                    SkyServer.ParkSelected = found;
+                    return found.Name;
+                default:
+                    throw new ActionNotImplementedException($"Not Found:'{actionName}'");
+            }
+        }
+
+        /// <summary>
+        /// Gets the supported actions.
+        /// </summary>
+        public ArrayList SupportedActions
+        {
+            // no supported actions, return empty array
+            get
+            {
+                var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Started" };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                // ReSharper disable once StringLiteralTypo
+                var sa = new ArrayList { @"Telescope:SetParkPosition" };
+
+                return sa;
+            }
+        }
+
+        public void AbortSlew()
+        {
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Started" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            CheckParked("AbortSlew");
+            SkyServer.AbortSlew(true);
+        }
+
+        public IAxisRates AxisRates(TelescopeAxes axis)
+        {
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"   {axis}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            switch (axis)
+            {
+                case TelescopeAxes.axisPrimary:
+                    return new AxisRates(TelescopeAxes.axisPrimary);
+                case TelescopeAxes.axisSecondary:
+                    return new AxisRates(TelescopeAxes.axisSecondary);
+                case TelescopeAxes.axisTertiary:
+                    return new AxisRates(TelescopeAxes.axisTertiary);
+                default:
+                    return null;
+            }
+        }
+
+        public bool CanMoveAxis(TelescopeAxes axis)
+        {
+            CheckVersionOne("CanMoveAxis");
+            var r = SkyServer.CanMoveAxis(axis);
+
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {r}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            return r;
+        }
+
+        public void CommandBlind(string command, bool raw)
+        {
+            throw new MethodNotImplementedException("CommandBlind");
+        }
+
+        public bool CommandBool(string command, bool raw)
+        {
+            throw new MethodNotImplementedException("CommandBool");
+        }
+
+        public string CommandString(string command, bool raw)
+        {
+            try
+            {
+                var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{command},{raw}") };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                if (string.IsNullOrWhiteSpace(command)) { throw new MethodNotImplementedException("CommandString"); }
+
+                if (_mCommandStrings == null) { _mCommandStrings = new CommandStrings(); }
+                return CommandStrings.ProcessCommand(command, raw);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Driver,
+                    Type = MonitorType.Warning,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = FormattableString.Invariant($"{ex.Message},{ex.StackTrace}")
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                throw;
+            }
+        }
+
+        /// <remarks>
+        /// https://ascom-standards.org/newdocs/telescope.html#Telescope.Connect
+        /// </remarks>
+        public void Connect()
+        {
+            Connected = true;
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "true" };
+            MonitorLog.LogToMonitor(monitorItem);
+        }
+        
+        public PierSide DestinationSideOfPier(double ra, double dec)
+        {
+            CheckVersionOne("DestinationSideOfPier");
+
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"RA|{ra}|Dec|{dec}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            var raDec = Transforms.CoordTypeToInternal(ra, dec);
+            var r = SkyServer.DetermineSideOfPier(raDec.X, raDec.Y);
+            return r;
+        }
+
+        /// <remarks>
+        /// https://ascom-standards.org/newdocs/telescope.html#Telescope.Disconnect
+        /// </remarks>
+        public void Disconnect()
+        {
+            Connected = false;
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "false" };
+            MonitorLog.LogToMonitor(monitorItem);
+        }
+
+        public void FindHome()
+        {
+            if (!SkyServer.AsComOn) return;
+            CheckCapability(SkySettings.CanFindHome, "FindHome");
+            CheckParked("FindHome");
+
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Started" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            SkyServer.GoToHome();
+
+            if (InterfaceVersion >= 4) return;
+            while (SkyServer.SlewState == SlewType.SlewHome || SkyServer.SlewState == SlewType.SlewSettle)
+            {
+                Thread.Sleep(1);
+                DoEvents();
+            }
+        }
+        
+        /// <summary>
+        /// Move one axis at the given AxisRates(TelescopeAxes axis).
+        /// </summary>
+        /// <param name="axis"></param>
+        /// <param name="rate"></param>
+        public void MoveAxis(TelescopeAxes axis, double rate)
+        {
+            if (!SkyServer.AsComOn) return;
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Driver,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{axis}, {rate}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            CheckVersionOne("MoveAxis");
+            CheckRate(axis, rate);
+            if (!CanMoveAxis(axis)){throw new MethodNotImplementedException("CanMoveAxis " + Enum.GetName(typeof(TelescopeAxes), axis));}
+            CheckParked("MoveAxis");
+
+            switch (axis)
+            {
+                case TelescopeAxes.axisPrimary:
+                    SkyServer.RateMovePrimaryAxis = rate;
+                    break;
+                case TelescopeAxes.axisSecondary:
+                    SkyServer.RateMoveSecondaryAxis = rate;
+                    break;
+                case TelescopeAxes.axisTertiary:
+                default:
+                    // not implemented
+                    break;
+            }
+        }
+
+        public void Park()
+        {
+            if (!SkyServer.AsComOn) return;
+            CheckCapability(SkySettings.CanPark, "Park");
+
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Started" };
+            if (SkyServer.AtPark)
+            {
+                monitorItem.Message = "Already Parked";
+                MonitorLog.LogToMonitor(monitorItem);
+                return;
+            }
+
+            //if (SkyServer.SlewState == SlewType.SlewPark) // uncomment to avoid multiple calls
+            //{
+            //    monitorItem.Message = "Park In Progress, Use AbortSlew first";
+            //    MonitorLog.LogToMonitor(monitorItem);
+            //    return;
+            //} 
+
+            MonitorLog.LogToMonitor(monitorItem);
+            SkyServer.GoToPark();
+            //while (SkyServer.SlewState == SlewType.SlewPark)
+            //{
+            //    Thread.Sleep(1);
+            //    DoEvents();
+            //}
+        }
+
+        public void PulseGuide(GuideDirections direction, int duration)
+        {
+            try
+            {
+                if (IsPulseGuiding && SkySettings.AlignmentMode == AlignmentModes.algAltAz)
+                    throw new InvalidOperationException("Alt Az mode does not support dual axis pulse guiding");
+                if (!SkyServer.AsComOn) { throw new InvalidOperationException("Not accepting commands"); }
+                if (SkyServer.AtPark) { throw new ParkedException(); }
+                //if (SkyServer.IsSlewing) { throw new InvalidValueException("Pulse rejected when slewing"); }
+                //if (!SkyServer.Tracking) { throw new InvalidValueException("Pulse rejected when tracking is off"); }
+
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{direction},{duration}") };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                CheckCapability(SkySettings.CanPulseGuide, "PulseGuide");
+                CheckRange(duration, 0, 30000, "PulseGuide", "Duration");
+
+                switch (direction)
+                {
+                    case GuideDirections.guideNorth:
+                    case GuideDirections.guideSouth:
+                        SkyServer.IsPulseGuidingDec = true;
+                        break;
+                    case GuideDirections.guideEast:
+                    case GuideDirections.guideWest:
+                        SkyServer.IsPulseGuidingRa = true;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
+                }
+
+                //var startTime = HiResDateTime.UtcNow;
+                SkyServer.PulseGuide(direction, duration,0);
+                // If synchronous (must be for Alt Az - V3) wait out the remaining pulse guide duration here
+                if (SkySettings.AlignmentMode != AlignmentModes.algAltAz) return;
+                // Wait for pulse guiding completion
+                // Async operation may be active, sleep timers are not precise across threads
+                while (IsPulseGuiding) Thread.Sleep(10);
+            }
+            catch (Exception e)
+            {
+                SkyServer.IsPulseGuidingRa = false;
+                SkyServer.IsPulseGuidingDec = false;
+                var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{e.Message}") };
+                MonitorLog.LogToMonitor(monitorItem);
+                throw;
+            }
+        }
+
+        public void SetPark()
+        {
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Started" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            CheckCapability(SkySettings.CanSetPark, "SetPark");
+            SkyServer.SetParkAxis("External");
+        }
+
+        public void SetupDialog()
+        {
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Started" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            SkyServer.OpenSetupDialog = true;
+            //check if window is minimized or not top most
+            NativeMethods.SetForegroundWindow("GS.Server"); //may cause flashing in task bar due to windows restrictions
+            //Calling app will destroy instance after the dialog is finished
+            while (true)
+            {
+                Thread.Sleep(100);
+                if (SkyServer.OpenSetupDialogFinished) { break; }
+            }
+
+            monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Open:{SkyServer.OpenSetupDialog}, Finished:{SkyServer.OpenSetupDialogFinished}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+        }
+
+        public void SlewToAltAz(double az, double alt)
+        {
+            if (!SkyServer.AsComOn) return;
+
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(az, "\u00B0 ", ":", "", 2)}|{_util.DegreesToDMS(alt, "\u00B0 ", ":", "", 2)}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            CheckCapability(SkySettings.CanSlewAltAz, "SlewToAltAz");
+            CheckParked("SlewToAltAz");
+            CheckTracking(false, "SlewToAltAz");
+            CheckRange(az, 0, 360, "SlewToAltAz", "azimuth");
+            CheckRange(alt, -90, 90, "SlewToAltAz", "Altitude");
+            SkyServer.SlewAltAz(alt, az);
+            Thread.Sleep(250); // Wait for asynchronous slewing to start
+            while (SkyServer.SlewState == SlewType.SlewAltAz || SkyServer.SlewState == SlewType.SlewSettle)
+            {
+                Thread.Sleep(1);
+                DoEvents();
+            }
+            DelayInterval();
+            // Wait for updated mount position before returning
+        }
+
+        public void SlewToAltAzAsync(double az, double alt)
+        {
+            if (!SkyServer.AsComOn) return;
+
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(az, "\u00B0 ", ":", "", 2)}|{_util.DegreesToDMS(alt, "\u00B0 ", ":", "", 2)}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            CheckCapability(SkySettings.CanSlewAltAzAsync, "SlewToAltAzAsync");
+            CheckParked("SlewToAltAz");
+            CheckTracking(false, "SlewToAltAzAsync");
+            CheckRange(az, 0, 360, "SlewToAltAzAsync", "Azimuth");
+            CheckRange(alt, -90, 90, "SlewToAltAzAsync", "Altitude");
+            SkyServer.SlewAltAz(alt, az);
+        }
+
+        public void SlewToCoordinates(double ra, double dec)
+        {
+            if (!SkyServer.AsComOn) return;
+
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.HoursToHMS(ra, "h ", ":", "", 2)}|{_util.DegreesToDMS(dec, "\u00B0 ", ":", "", 2)}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            CheckCapability(SkySettings.CanSlew, "SlewToCoordinates");
+            CheckRange(ra, 0, 24, "SlewToCoordinates", "RightAscension");
+            CheckRange(dec, -90, 90, "SlewToCoordinates", "Declination");
+            CheckParked("SlewToCoordinates");
+            CheckTracking(true, "SlewToCoordinates");
+
+            TargetRightAscension = ra;
+            TargetDeclination = dec;
+            var raDec = Transforms.CoordTypeToInternal(ra, dec);
+            SkyServer.SlewRaDec(raDec.X, raDec.Y);
+            Thread.Sleep(250); // Wait for asynchronous slewing to start
+            while (SkyServer.SlewState == SlewType.SlewRaDec || SkyServer.SlewState == SlewType.SlewSettle)
+            {
+                Thread.Sleep(1);
+                DoEvents();
+            }
+            DelayInterval();
+            // Wait for updated mount position before returning
+        }
+
+        public void SlewToCoordinatesAsync(double ra, double dec)
+        {
+            if (!SkyServer.AsComOn) return;
+
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.HoursToHMS(ra, "h ", ":", "", 2)}|{_util.DegreesToDMS(dec, "\u00B0 ", ":", "", 2)}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            CheckCapability(SkySettings.CanSlewAsync, "SlewToCoordinatesAsync");
+            CheckRange(ra, 0, 24, "SlewToCoordinatesAsync", "RightAscension");
+            CheckRange(dec, -90, 90, "SlewToCoordinatesAsync", "Declination");
+            CheckParked("SlewToCoordinatesAsync");
+
+            TargetRightAscension = ra;
+            TargetDeclination = dec;
+            var raDec = Transforms.CoordTypeToInternal(ra, dec);
+            SkyServer.SlewRaDec(raDec.X, raDec.Y, true);
+        }
+
+        public void SlewToTarget()
+        {
+            if (!SkyServer.AsComOn) return;
+
+            var ra = TargetRightAscension;
+            var dec = TargetDeclination;
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Driver,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message =
+                    FormattableString.Invariant($"{ra}|{dec}")
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            CheckCapability(SkySettings.CanSlew, "SlewToTarget");
+            CheckRange(ra, 0, 24, "SlewToTarget", "TargetRightAscension");
+            CheckRange(dec, -90, 90, "SlewToTarget", "TargetDeclination");
+            CheckParked("SlewToTarget");
+            CheckTracking(true, "SlewToTarget");
+            var xy = Transforms.CoordTypeToInternal(ra, dec);
+            SkyServer.SlewRaDec(xy.X, xy.Y);
+            Thread.Sleep(250); // Wait for asynchronous slewing to start
+            while (SkyServer.SlewState == SlewType.SlewRaDec || SkyServer.SlewState == SlewType.SlewSettle)
+            {
+                Thread.Sleep(1);
+                DoEvents();
+            }
+            DelayInterval();
+            // Wait for updated mount position before returning
+        }
+
+        public void SlewToTargetAsync()
+        {
+            if (!SkyServer.AsComOn) return;
+
+            var ra = TargetRightAscension;
+            var dec = TargetDeclination;
+
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{ra}|{dec}") };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            CheckCapability(SkySettings.CanSlewAsync, "SlewToTargetAsync");
+            CheckRange(ra, 0, 24, "SlewToTargetAsync", "TargetRightAscension");
+            CheckRange(dec, -90, 90, "SlewToTargetAsync", "TargetDeclination");
+            CheckParked("SlewToTargetAsync");
+            CheckTracking(true, "SlewToTargetAsync");
+
+            var xy = Transforms.CoordTypeToInternal(ra, dec);
+            SkyServer.SlewRaDec(xy.X, xy.Y);
+        }
+
+        public void SyncToAltAz(double az, double alt)
+        {
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(az, "\u00B0 ", ":", "", 2)}|{_util.DegreesToDMS(alt, "\u00B0 ", ":", "", 2)}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            CheckCapability(SkySettings.CanSyncAltAz, "SyncToAltAz");
+            CheckRange(az, 0, 360, "SyncToAltAz", "Azimuth");
+            CheckRange(alt, -90, 90, "SyncToAltAz", "Altitude");
+            CheckParked("SyncToAltAz");
+            CheckTracking(false, "SyncToAltAz");
+            CheckAltAzSync(alt, az, "SyncToAltAz");
+            SkyServer.AtPark = false;
+            SkyServer.SyncToAltAzm(az, alt);
+            // DelayInterval(); RightAscension and Declination wait for latest update
+            // Wait for updated mount position before returning
+            SkyServer.MountPositionUpdated = false;
+            while (!SkyServer.MountPositionUpdated)
+            {
+                Thread.Sleep(10);
+            }
+        }
+
+        public void SyncToCoordinates(double ra, double dec)
+        {
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Driver,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{_util.HoursToHMS(ra, "h ", ":", "", 2)}|{_util.DegreesToDMS(dec, "\u00B0 ", ":", "", 2)}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            CheckCapability(SkySettings.CanSync, "SyncToCoordinates");
+            CheckRange(ra, 0, 24, "SyncToCoordinates", "RightAscension");
+            CheckRange(dec, -90, 90, "SyncToCoordinates", "Declination");
+            CheckParked("SyncToCoordinates");
+            CheckTracking(true, "SyncToCoordinates");
+
+            SkyServer.TargetDec = dec;
+            SkyServer.TargetRa = ra;
+            var a = Transforms.CoordTypeToInternal(ra, dec);
+            CheckRaDecSync(a.X, a.Y, "SyncToCoordinates");
+
+            SkyServer.AtPark = false;
+            SkyServer.SyncToTargetRaDec();
+            // DelayInterval(); RightAscension and Declination wait for latest update
+            // Wait for updated mount position before returning
+            SkyServer.MountPositionUpdated = false;
+            while (!SkyServer.MountPositionUpdated)
+            {
+                Thread.Sleep(10);
+            }
+        }
+
+        public void SyncToTarget()
+        {
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Driver,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{_util.HoursToHMS(SkyServer.TargetRa, "h ", ":", "", 2)}|{_util.DegreesToDMS(SkyServer.TargetDec, "\u00B0 ", ":", "", 2)}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            CheckCapability(SkySettings.CanSync, "SyncToTarget");
+            CheckRange(SkyServer.TargetRa, 0, 24, "SyncToTarget", "TargetRightAscension");
+            CheckRange(SkyServer.TargetDec, -90, 90, "SyncToTarget", "TargetDeclination");
+            CheckParked("SyncToTarget");
+            CheckTracking(true, "SyncToTarget");
+
+            var a = Transforms.CoordTypeToInternal(RightAscension, Declination);
+            CheckRaDecSync(a.X, a.Y, "SyncToTarget");
+
+            SkyServer.AtPark = false;
+            SkyServer.SyncToTargetRaDec();
+            // DelayInterval(); RightAscension and Declination wait for latest update
+            // Wait for updated mount position before returning
+            SkyServer.MountPositionUpdated = false;
+            while (!SkyServer.MountPositionUpdated)
+            {
+                Thread.Sleep(10);
+            }
+        }
+
         public void Unpark()
         {
             CheckCapability(SkySettings.CanUnPark, "UnPark");
@@ -1636,34 +1738,6 @@ namespace ASCOM.GS.Sky.Telescope
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Finished" };
             MonitorLog.LogToMonitor(monitorItem);
         }
-
-        #endregion
-
-        #region Pier Side Properties
-
-        //public double AvailableTimeInThisPointingState
-        //{
-        //    get
-        //    {
-        //        if (AlignmentMode != AlignmentModes.algGermanPolar)
-        //        {
-        //            return 86400;
-        //        }
-        //        return TelescopeHardware.AvailableTimeInThisPointingState;
-        //    }
-        //}
-
-        //public double TimeUntilPointingStateCanChange
-        //{
-        //    get
-        //    {
-        //        if (AlignmentMode != AlignmentModes.algGermanPolar)
-        //        {
-        //            return 0;
-        //        }
-        //        return TelescopeHardware.TimeUntilPointingStateCanChange;
-        //    }
-        //}
 
         #endregion
 
@@ -1819,7 +1893,7 @@ namespace ASCOM.GS.Sky.Telescope
                 }
                 ratesStr = $"{ratesStr}, {item.Minimum} to {item.Maximum}";
             }
-            throw new InvalidValueException($"MoveAxis", rate.ToString(CultureInfo.InvariantCulture), ratesStr);
+            throw new InvalidValueException("MoveAxis", rate.ToString(CultureInfo.InvariantCulture), ratesStr);
         }
 
         /// <summary>
@@ -1913,6 +1987,13 @@ namespace ASCOM.GS.Sky.Telescope
             var sw = Stopwatch.StartNew();
             while (sw.Elapsed.TotalMilliseconds < delay) { }
             sw.Stop();
+        }
+
+        private static void LogMessage(MonitorType type, string method, string msg)
+        {
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = type, Method = $"{method}", Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{msg}" };
+            MonitorLog.LogToMonitor(monitorItem);
         }
 
         #endregion

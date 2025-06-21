@@ -150,7 +150,6 @@ namespace GS.Server.SkyTelescope
             }
             catch (Exception ex)
             {
-                // oops now what happened?
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
@@ -212,7 +211,7 @@ namespace GS.Server.SkyTelescope
         private static bool _spiralChanged;
         private static Vector _targetRaDec;
         private static TrackingMode _trackingMode;
-        private static TrackingMode _prevTrackingMode;
+        //private static TrackingMode _prevTrackingMode;
         private static bool _tracking; //off
         private static bool _snapPort1Result;
         private static bool _snapPort2Result;
@@ -792,18 +791,12 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Status of primary axis move
         /// </summary>
-        public static bool MovePrimaryAxisActive
-        {
-            get => _rateMoveAxes.X != 0.0;
-        }
+        public static bool MovePrimaryAxisActive => _rateMoveAxes.X != 0.0;
 
         /// <summary>
         /// Status of secondary axis move
         /// </summary>
-        public static bool MoveSecondaryAxisActive
-        {
-            get => _rateMoveAxes.Y != 0.0;
-        }
+        public static bool MoveSecondaryAxisActive => _rateMoveAxes.Y != 0.0;
 
         public static bool MoveAxisActive
         {
@@ -4021,7 +4014,7 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         /// <param name="target"></param>
         /// <param name="slewState"></param>
-        private static async void GoToAsync(double[] target, SlewType slewState, bool tracking = false)
+        private static void GoToAsync(double[] target, SlewType slewState, bool tracking = false)
         {
             bool cancelled = false;
             Stopwatch sw;
@@ -4032,7 +4025,9 @@ namespace GS.Server.SkyTelescope
             }
 
             CancelAllAsync();
+
             while (_ctsGoTo != null) Thread.Sleep(10);
+
             if (IsSlewing)
             {
                 SlewState = SlewType.SlewNone;
@@ -4068,25 +4063,26 @@ namespace GS.Server.SkyTelescope
             IsSlewing = true;
 
             // Assume fail
-            var returncode = 1;
             try
             {
                 _ctsGoTo = new CancellationTokenSource();
+                var returnCode = 1;
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
-                        returncode = await Task.Run(() => SimGoTo(target, trackingState, slewState, _ctsGoTo.Token));
+                        returnCode = SimGoTo(target, trackingState, slewState, _ctsGoTo.Token);
                         break;
                     case MountType.SkyWatcher:
-                        returncode = await Task.Run(() => SkyGoTo(target, trackingState, slewState, _ctsGoTo.Token));
+                        returnCode = SkyGoTo(target, trackingState, slewState, _ctsGoTo.Token);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
+
                 }
 
                 TrackingSpeak = false;
 
-                if (returncode == 0)
+                if (returnCode == 0)
                 {
                     if (SlewState == SlewType.SlewNone)
                     {
@@ -4098,9 +4094,7 @@ namespace GS.Server.SkyTelescope
                     switch (startingState)
                     {
                         case SlewType.SlewNone:
-                            break;
                         case SlewType.SlewSettle:
-                            break;
                         case SlewType.SlewMoveAxis:
                             break;
                         case SlewType.SlewRaDec:
@@ -4169,7 +4163,7 @@ namespace GS.Server.SkyTelescope
                         Method = MonitorLog.GetCurrentMethod(),
                         Thread = Thread.CurrentThread.ManagedThreadId,
                         Message =
-                            $"{SlewState} finished|code|{returncode}|{_util.HoursToHMS(RightAscensionXForm, "h ", ":", "", 2)}|{_util.DegreesToDMS(DeclinationXForm, "° ", ":", "", 2)}|Actual|{ActualAxisX}|{ActualAxisY}"
+                            $"{SlewState} finished|code|{returnCode}|{_util.HoursToHMS(RightAscensionXForm, "h ", ":", "", 2)}|{_util.DegreesToDMS(DeclinationXForm, "° ", ":", "", 2)}|Actual|{ActualAxisX}|{ActualAxisY}"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
                     SlewState = SlewType.SlewNone;
@@ -4248,8 +4242,9 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         public static void GoToHome()
         {
+            if (AtHome){ return;}
+
             Tracking = false;
-            StopAxes();
 
             var monitorItem = new MonitorEntry
             {
@@ -4271,17 +4266,14 @@ namespace GS.Server.SkyTelescope
         public static void GoToPark()
         {
             Tracking = false;
-            StopAxes();
 
-            // get position selected could be set from UI or AsCom
-            var ps = ParkSelected;
+            var ps = ParkSelected; // get position selected could be set from UI or AsCom
             if (ps == null) { return; }
             if (double.IsNaN(ps.X)) { return; }
             if (double.IsNaN(ps.Y)) { return; }
             SetParkAxis(ps.Name, ps.X, ps.Y);
 
-            // Store for startup default position
-            SkySettings.ParkAxisX = ps.X;
+            SkySettings.ParkAxisX = ps.X; // Store for startup default position
             SkySettings.ParkAxisY = ps.Y;
             SkySettings.ParkName = ps.Name;
 
@@ -4859,7 +4851,7 @@ namespace GS.Server.SkyTelescope
                 }
 
                 int returncode;
-                string msg;
+                //string msg;
                 switch (pulseDirection)
                 {
                     case GuideDirections.guideSouth:
@@ -6053,7 +6045,7 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         /// <param name="targetPosition">The position.</param>
         /// <param name="slewState"></param>
-        private static void SlewMount(Vector targetPosition, SlewType slewState, bool tracking = false)
+        private static async void SlewMount(Vector targetPosition, SlewType slewState, bool tracking = false)
         {
             if (!IsMountRunning) { return; }
 
@@ -6075,7 +6067,8 @@ namespace GS.Server.SkyTelescope
             _targetAxes = targetPosition;
             AtPark = false;
             SpeakSlewStart(slewState);
-            GoToAsync(new[] { _targetAxes.X, _targetAxes.Y }, slewState, tracking);
+            //GoToAsync(new[] { _targetAxes.X, _targetAxes.Y }, slewState, tracking);
+            await Task.Run(() => GoToAsync(new[] { targetPosition.X, targetPosition.Y }, slewState, tracking));
         }
 
         /// <summary>

@@ -12,11 +12,14 @@
 
 #endregion "copyright"
 
+using ASCOM.DeviceInterface;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace NINA.Model.MyFocuser
 {
-    public interface IAscomFocuserProvider
+    public interface IFocuserV4Ex : IFocuserV4
     {
-
-        IFocuserV4Ex GetFocuser(string focuserId, bool connect);
+        Task MoveAsync(int position, CancellationToken ct);
     }
 }

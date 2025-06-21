@@ -88,9 +88,9 @@
     <None Include="Resources\ASCOM.snk" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ASCOM.Platform" Version="6.5.2">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
+	  <PackageReference Include="ASCOM7.BuildEnvironment.Support" Version="7.0.0">
+		  <ExcludeAssets>runtime</ExcludeAssets>
+	  </PackageReference>
     <PackageReference Include="StrongNamer" Version="0.2.5" />
   </ItemGroup>
   <ItemGroup>

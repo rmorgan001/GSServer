@@ -15,93 +15,128 @@
 using ASCOM.DeviceInterface;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace NINA.Model.MyFocuser
 {
-    class RelativeAscomFocuser : IFocuserV3Ex
+    internal class RelativeAscomFocuser : IFocuserV4Ex
     {
-        private int position;
-        private readonly IFocuserV3 focuser;
-        public RelativeAscomFocuser(IFocuserV3 relativeFocuser)
+        private readonly IFocuserV4 _focuser;
+        public RelativeAscomFocuser(IFocuserV4 relativeFocuser)
         {
             if (relativeFocuser.Absolute)
             {
                 throw new InvalidOperationException($"Focuser {relativeFocuser.Name} is an absolute focuser");
             }
-            this.focuser = relativeFocuser;
-            this.position = 5000;
+            this._focuser = relativeFocuser;
+            this.Position = 5000;
         }
 
-        public bool Connected { get => focuser.Connected; set => focuser.Connected = value; }
+        /// <summary>
+        /// Connect to the device asynchronously using Connecting as the completion variable
+        /// </summary>
+        public void Connect()
+        {
+        }
 
-        public string Description => focuser.Description;
+        /// <summary>
+        /// Disconnect from the device asynchronously using Connecting as the completion variable
+        /// </summary>
+        public void Disconnect()
+        {
+        }
 
-        public string DriverInfo => focuser.DriverInfo;
+        /// <summary>
+        /// Completion variable for the asynchronous Connect() and Disconnect()  methods
+        /// </summary>
+        public bool Connecting => false;
 
-        public string DriverVersion => focuser.DriverVersion;
-
-        public short InterfaceVersion => focuser.InterfaceVersion;
-
-        public string Name => focuser.Name;
-
-        public ArrayList SupportedActions => focuser.SupportedActions;
-
-        public bool Absolute => true;
-
-        public bool IsMoving => focuser.IsMoving;
-
-        public bool Link { get => focuser.Link; set => focuser.Link = value; }
-
-        public int MaxIncrement => focuser.MaxIncrement;
-
-        public int MaxStep => focuser.MaxStep;
-
-        public int Position
+        /// <summary>
+        /// Return the device's state in one call
+        /// </summary>
+        public IStateValueCollection DeviceState
         {
             get
             {
-                return this.position;
+                // Create an array list to hold the IStateValue entries
+                var deviceState = new List<IStateValue>
+                {
+                    // Add one entry for each operational state, if possible
+                    new StateValue(nameof(IFocuserV4.IsMoving), IsMoving),
+                    new StateValue(nameof(IFocuserV4.Position), Position),
+                    new StateValue(nameof(IFocuserV4.Temperature), Temperature),
+                    new StateValue(DateTime.Now)
+                };
+
+                // Return the overall device state
+                return new StateValueCollection(deviceState);
             }
         }
 
-        public double StepSize => focuser.StepSize;
+        public bool Connected { get => _focuser.Connected; set => _focuser.Connected = value; }
 
-        public bool TempComp { get => focuser.TempComp && focuser.TempCompAvailable; set => focuser.TempComp = value; }
+        public string Description => _focuser.Description;
 
-        public bool TempCompAvailable => focuser.TempCompAvailable;
+        public string DriverInfo => _focuser.DriverInfo;
 
-        public double Temperature => focuser.Temperature;
+        public string DriverVersion => _focuser.DriverVersion;
+
+        public short InterfaceVersion => _focuser.InterfaceVersion;
+
+        public string Name => _focuser.Name;
+
+        public ArrayList SupportedActions => _focuser.SupportedActions;
+
+        public bool Absolute => true;
+
+        public bool IsMoving => _focuser.IsMoving;
+
+        public bool Link { get => _focuser.Link; set => _focuser.Link = value; }
+
+        public int MaxIncrement => _focuser.MaxIncrement;
+
+        public int MaxStep => _focuser.MaxStep;
+
+        public int Position { get; private set; }
+
+        public double StepSize => _focuser.StepSize;
+
+        public bool TempComp { get => _focuser.TempComp && _focuser.TempCompAvailable; set => _focuser.TempComp = value; }
+
+        public bool TempCompAvailable => _focuser.TempCompAvailable;
+
+        public double Temperature => _focuser.Temperature;
 
         public string Action(string actionName, string actionParameters)
         {
-            return focuser.Action(actionName, actionParameters);
+            return _focuser.Action(actionName, actionParameters);
         }
 
         public void CommandBlind(string command, bool raw = false)
         {
-            focuser.CommandBlind(command, raw);
+            _focuser.CommandBlind(command, raw);
         }
 
         public bool CommandBool(string command, bool raw = false)
         {
-            return focuser.CommandBool(command, raw);
+            return _focuser.CommandBool(command, raw);
         }
 
         public string CommandString(string command, bool raw = false)
         {
-            return focuser.CommandString(command, raw);
+            return _focuser.CommandString(command, raw);
         }
 
         public void Dispose()
         {
-            focuser.Dispose();
+            _focuser.Dispose();
         }
 
         public void Halt()
         {
-            focuser.Halt();
+            _focuser.Halt();
         }
 
         public void Move(int position)
@@ -111,7 +146,7 @@ namespace NINA.Model.MyFocuser
 
         public void SetupDialog()
         {
-            focuser.SetupDialog();
+            _focuser.SetupDialog();
         }
 
         public async Task MoveAsync(int pos, CancellationToken ct)
@@ -132,13 +167,13 @@ namespace NINA.Model.MyFocuser
                     {
                         moveAmount *= -1;
                     }
-                    focuser.Move(moveAmount);
+                    _focuser.Move(moveAmount);
                     while (IsMoving)
                     {
-                        await NINA.Utility.Utility.Wait(TimeSpan.FromSeconds(1), ct);
+                        await Utility.Utility.Wait(TimeSpan.FromSeconds(1), ct);
                     }
                     relativeOffsetRemaining -= moveAmount;
-                    this.position += moveAmount;
+                    this.Position += moveAmount;
                 }
 
                 if (reEnableTempComp)

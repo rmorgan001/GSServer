@@ -33,13 +33,14 @@ namespace GS.Server.SkyTelescope
     {
         public static event PropertyChangedEventHandler StaticPropertyChanged;
         private static long _idCount;
-        private static readonly ConcurrentDictionary<long, bool> ConnectStates;
+        public static readonly ConcurrentDictionary<long, bool> ConnectStates;
 
         static SkySystem()
         {
             ConnectStates = new ConcurrentDictionary<long, bool>();
             _idCount = 0;
             DiscoverSerialDevices();
+            Connecting = false;
         }
 
         public static ISerialPort Serial { get; private set; }
@@ -61,6 +62,8 @@ namespace GS.Server.SkyTelescope
 
         public static bool Connected => ConnectStates.Count > 0;
 
+        public static bool Connecting { get; set; }
+
         public static Exception Error { get; private set; }
 
         public static ConnectType ConnType { get; private set; }
@@ -70,6 +73,8 @@ namespace GS.Server.SkyTelescope
             // add or remove the instance, this is done once regardless of the number of calls
             if (value)
             {
+                if (!Connected) {Connecting = true;}
+
                 var notAlreadyPresent = ConnectStates.TryAdd(id, true);
 
                 if (Connected)
@@ -77,13 +82,13 @@ namespace GS.Server.SkyTelescope
                     if (!SkyServer.IsMountRunning)
                     {
                         SkyServer.IsMountRunning = true;
-                        Stopwatch connectionTimer = Stopwatch.StartNew();
+                        var connectionTimer = Stopwatch.StartNew();
                         // Wait for two server event loop updates or 5 second timeout
                         while (SkyServer.LoopCounter < 2 && connectionTimer.ElapsedMilliseconds < 5000)
                             Thread.Sleep(100);
                     }
                 }
-     
+
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = Principles.HiResDateTime.UtcNow,
@@ -98,6 +103,8 @@ namespace GS.Server.SkyTelescope
             }
             else
             {
+                if (ConnectStates.Count == 1) {Connecting = true;}
+
                 var successfullyRemoved = ConnectStates.TryRemove(id, out _);
 
                 var monitorItem = new MonitorEntry
@@ -112,6 +119,7 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
+            Connecting = false;
         }
 
         public static void DiscoverSerialDevices()
@@ -178,7 +186,7 @@ namespace GS.Server.SkyTelescope
                         }
                         else
                         {
-                            var endpoint = CreateIPEndPoint(SkySettings.Port);
+                            var endpoint = CreateIpEndPoint(SkySettings.Port);
                             Serial = new SerialOverUdpPort(endpoint, readTimeout);
                             ConnType = ConnectType.Wifi;
                         }
@@ -211,7 +219,7 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         /// <param name="endPoint"></param>
         /// <returns></returns>
-        private static IPEndPoint CreateIPEndPoint(string endPoint)
+        private static IPEndPoint CreateIpEndPoint(string endPoint)
         {
             var ep = endPoint.Split(':');
             if (ep.Length < 2) {throw new FormatException("Invalid endpoint format");}

@@ -107,7 +107,7 @@ namespace GS.Server.Gps
 
         private void ConnectSerialPort()
         {
-            var _serial = new SerialPort()
+            var serial = new SerialPort()
             {
                 PortName = _gpsPort,
                 //PortName = "COM" + _gpsPort,
@@ -121,17 +121,17 @@ namespace GS.Server.Gps
 
             try
             {
-                _serial.Open();
-                IsConnected = _serial.IsOpen;
-                ReadGpsData(_serial);
-                _serial.Close();
-                _serial.Dispose();
+                serial.Open();
+                IsConnected = serial.IsOpen;
+                ReadGpsData(serial);
+                serial.Close();
+                serial.Dispose();
             }
             catch (Exception)
             {
                 GpsRunning = false;
-                _serial.Close();
-                _serial.Dispose();
+                serial.Close();
+                serial.Dispose();
                 throw;
             }
 
@@ -142,17 +142,17 @@ namespace GS.Server.Gps
         /// </summary>
         /// <remarks>https://gpsd.gitlab.io/gpsd/NMEA.html#_rmc_recommended_minimum_navigation_information</remarks>
         /// <returns></returns>
-        private void ReadGpsData(SerialPort _serial)
+        private void ReadGpsData(SerialPort serial)
         {
             if (!Gga && !Rmc) return;
             if (!IsConnected) return;
-            var _stopwatch = Stopwatch.StartNew();
-            while (_stopwatch.Elapsed.TotalMilliseconds < _readTimeout * 1000)
+            var stopwatch = Stopwatch.StartNew();
+            while (stopwatch.Elapsed.TotalMilliseconds < _readTimeout * 1000)
             {
                 ClearProperties();
                 HasData = false;
                 PcUtcNow = Principles.HiResDateTime.UtcNow;
-                var receivedData = _serial.ReadLine();
+                var receivedData = serial.ReadLine();
                 //var receivedData = "$GPGGA,010537,2934.2442,N,09816.2099,W,1,05,2.1,227.0,M,-22.2,M,,*76\r\n";
                 if (receivedData.Length <= 0) continue;
                 var gpsDataArr = receivedData.Split(',');

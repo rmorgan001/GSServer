@@ -31,7 +31,7 @@ namespace NINA.Model.MyFocuser
             Name = name;
         }
 
-        private IFocuserV3Ex _focuser;
+        private IFocuserV4Ex _focuser;
         public IAscomFocuserProvider FocuserProvider { get; set; } = new AscomFocuserProvider();
 
         public string Category { get; } = "ASCOM";
@@ -40,10 +40,7 @@ namespace NINA.Model.MyFocuser
 
         public string Id
         {
-            get
-            {
-                return _id;
-            }
+            get => _id;
             set
             {
                 _id = value;
@@ -55,10 +52,7 @@ namespace NINA.Model.MyFocuser
 
         public string Name
         {
-            get
-            {
-                return _name;
-            }
+            get => _name;
             set
             {
                 _name = value;
@@ -277,7 +271,7 @@ namespace NINA.Model.MyFocuser
                         if (_connected != val)
                         {
                             var monitorItem = new MonitorEntry
-                            { Datetime = GS.Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Focuser, Category = MonitorCategory.Other, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Focuser connection lost" };
+                            { Datetime = GS.Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Focuser, Category = MonitorCategory.Other, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Focuser connection lost" };
                             MonitorLog.LogToMonitor(monitorItem);
                             Disconnect();
                         }
@@ -289,7 +283,7 @@ namespace NINA.Model.MyFocuser
                         MonitorLog.LogToMonitor(monitorItem);
                         
                         monitorItem = new MonitorEntry
-                        { Datetime = GS.Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Focuser, Category = MonitorCategory.Other, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Focuser connection lost" };
+                        { Datetime = GS.Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Focuser, Category = MonitorCategory.Other, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Focuser connection lost" };
                         MonitorLog.LogToMonitor(monitorItem);
                         try
                         {
@@ -323,7 +317,7 @@ namespace NINA.Model.MyFocuser
                     MonitorLog.LogToMonitor(monitorItem);
 
                     monitorItem = new MonitorEntry
-                    { Datetime = GS.Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Focuser, Category = MonitorCategory.Other, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Reconnect focuser" };
+                    { Datetime = GS.Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Focuser, Category = MonitorCategory.Other, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Reconnect focuser" };
                     MonitorLog.LogToMonitor(monitorItem);
                     _connected = false;
                 }
@@ -359,13 +353,7 @@ namespace NINA.Model.MyFocuser
             }
         }
 
-        public bool HasSetupDialog
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public bool HasSetupDialog => true;
 
         public string Description
         {
@@ -382,28 +370,16 @@ namespace NINA.Model.MyFocuser
             }
         }
 
-        public string DriverInfo
-        {
-            get
-            {
-                return Connected ? _focuser?.DriverInfo ?? string.Empty : string.Empty;
-            }
-        }
+        public string DriverInfo => Connected ? _focuser?.DriverInfo ?? string.Empty : string.Empty;
 
-        public string DriverVersion
-        {
-            get
-            {
-                return Connected ? _focuser?.DriverVersion ?? string.Empty : string.Empty;
-            }
-        }
+        public string DriverVersion => Connected ? _focuser?.DriverVersion ?? string.Empty : string.Empty;
 
         public void Dispose()
         {
             _focuser?.Dispose();
         }
 
-        private IFocuserV3Ex GetFocuser(bool connect)
+        private IFocuserV4Ex GetFocuser(bool connect)
         {
             return FocuserProvider.GetFocuser(Id, connect);
         }
@@ -474,7 +450,7 @@ namespace NINA.Model.MyFocuser
                     // TODO: Notification.ShowError("Unable to connect to focuser " + ex.Message);
                 }
                 return Connected;
-            });
+            }, token);
         }
 
         private void Initialize()

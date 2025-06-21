@@ -38,9 +38,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ASCOM.Platform" Version="6.5.2">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
+	  <PackageReference Include="ASCOM7.BuildEnvironment.Support" Version="7.0.0">
+		  <ExcludeAssets>runtime</ExcludeAssets>
+	  </PackageReference>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
