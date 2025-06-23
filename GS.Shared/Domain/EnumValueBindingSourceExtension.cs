@@ -24,7 +24,7 @@ using System.Windows.Markup;
 namespace GS.Shared.Domain
 {
     /// <summary>
-    /// Same as <see cref="EnumBindingSourceExtention"/> but returns the enum value not the name.
+    /// returns the enum value not the name.
     /// </summary>
     public class EnumValueBindingSourceExtension : MarkupExtension
     {

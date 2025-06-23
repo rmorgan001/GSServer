@@ -110,7 +110,7 @@ namespace GS.FitsImageManager
 		{ }
 
 		/// <summary>
-		/// Create a header item with a Int32 value and units
+		/// Create a header item with Int32 value and units
 		/// </summary>
 		/// <param name="keyName"></param>
 		/// <param name="nativeValue"></param>
@@ -256,7 +256,7 @@ namespace GS.FitsImageManager
 			Comment = comment;
 		}
 
-		public string KeyName { get; private set; }
+		public string KeyName { get; }
 		public HeaderValueType ValueType { get; private set; }
 		public string Value { get; private set; }
 		public string Units { get; private set; }
@@ -368,7 +368,7 @@ namespace GS.FitsImageManager
 
 			if ( !String.IsNullOrEmpty( Units ) )
 			{
-				comment = String.Format( "[{0}]{1}{2}", Units, !String.IsNullOrEmpty( comment) ? " " : "", comment );
+				comment = $"[{Units}]{(!String.IsNullOrEmpty(comment) ? " " : "")}{comment}";
 			}
 
 			var sb = new StringBuilder();
@@ -397,16 +397,9 @@ namespace GS.FitsImageManager
 				}
 			}
 			else
-			{ 
-				if ( KeyName.Length <= 8 )
-				{
-					sb.AppendFormat( "{0,-8}= {1,19}", KeyName, Value );
-				}
-				else
-				{
-					sb.AppendFormat( "HIERARCH {0} = {1}", KeyName, Value );
-				}
-			}
+            {
+                sb.AppendFormat(KeyName.Length <= 8 ? "{0,-8}= {1,19}" : "HIERARCH {0} = {1}", KeyName, Value);
+            }
 
 			if ( sb.Length > 80 )
 			{

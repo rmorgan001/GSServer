@@ -53,7 +53,7 @@ namespace GS.Server.Snap
             try
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading SnapVM" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Ui, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading SnapVM" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 SkyServer.StaticPropertyChanged += PropertyChangedSkyServer;
@@ -66,7 +66,7 @@ namespace GS.Server.Snap
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -126,7 +126,7 @@ namespace GS.Server.Snap
                 OnPropertyChanged();
 
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Snap|{value}|{SkyServer.SnapPort1Result}|{SkyServer.SnapPort2Result}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Ui, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Snap|{value}|{SkyServer.SnapPort1Result}|{SkyServer.SnapPort2Result}" };
                 MonitorLog.LogToMonitor(monitorItem);
             }
         }
@@ -192,7 +192,7 @@ namespace GS.Server.Snap
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -333,7 +333,7 @@ namespace GS.Server.Snap
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -376,7 +376,7 @@ namespace GS.Server.Snap
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -455,7 +455,7 @@ namespace GS.Server.Snap
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -498,7 +498,7 @@ namespace GS.Server.Snap
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -649,7 +649,7 @@ namespace GS.Server.Snap
                         var monitorItem = new MonitorEntry
                         {
                             Datetime = HiResDateTime.UtcNow,
-                            Device = MonitorDevice.UI,
+                            Device = MonitorDevice.Ui,
                             Category = MonitorCategory.Interface,
                             Type = MonitorType.Information,
                             Method = MethodBase.GetCurrentMethod()?.Name,
@@ -666,7 +666,7 @@ namespace GS.Server.Snap
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -717,7 +717,7 @@ namespace GS.Server.Snap
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -881,7 +881,7 @@ namespace GS.Server.Snap
                                         monitorItem = new MonitorEntry
                                         {
                                             Datetime = HiResDateTime.UtcNow,
-                                            Device = MonitorDevice.UI,
+                                            Device = MonitorDevice.Ui,
                                             Category = MonitorCategory.Server,
                                             Type = MonitorType.Information,
                                             Method = MethodBase.GetCurrentMethod()?.Name,
@@ -895,7 +895,7 @@ namespace GS.Server.Snap
                                     monitorItem = new MonitorEntry
                                     {
                                         Datetime = HiResDateTime.UtcNow,
-                                        Device = MonitorDevice.UI,
+                                        Device = MonitorDevice.Ui,
                                         Category = MonitorCategory.Server,
                                         Type = MonitorType.Information,
                                         Method = MethodBase.GetCurrentMethod()?.Name,
@@ -919,7 +919,7 @@ namespace GS.Server.Snap
                                 var monitorItem = new MonitorEntry
                                 {
                                     Datetime = HiResDateTime.UtcNow,
-                                    Device = MonitorDevice.UI,
+                                    Device = MonitorDevice.Ui,
                                     Category = MonitorCategory.Server,
                                     Type = MonitorType.Warning,
                                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -958,7 +958,7 @@ namespace GS.Server.Snap
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -976,7 +976,7 @@ namespace GS.Server.Snap
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1128,7 +1128,7 @@ namespace GS.Server.Snap
                         var monitorItem = new MonitorEntry
                         {
                             Datetime = HiResDateTime.UtcNow,
-                            Device = MonitorDevice.UI,
+                            Device = MonitorDevice.Ui,
                             Category = MonitorCategory.Interface,
                             Type = MonitorType.Information,
                             Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1145,7 +1145,7 @@ namespace GS.Server.Snap
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1196,7 +1196,7 @@ namespace GS.Server.Snap
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1356,7 +1356,7 @@ namespace GS.Server.Snap
                                         monitorItem = new MonitorEntry
                                         {
                                             Datetime = HiResDateTime.UtcNow,
-                                            Device = MonitorDevice.UI,
+                                            Device = MonitorDevice.Ui,
                                             Category = MonitorCategory.Server,
                                             Type = MonitorType.Information,
                                             Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1370,7 +1370,7 @@ namespace GS.Server.Snap
                                     monitorItem = new MonitorEntry
                                     {
                                         Datetime = HiResDateTime.UtcNow,
-                                        Device = MonitorDevice.UI,
+                                        Device = MonitorDevice.Ui,
                                         Category = MonitorCategory.Server,
                                         Type = MonitorType.Information,
                                         Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1393,7 +1393,7 @@ namespace GS.Server.Snap
                                 var monitorItem = new MonitorEntry
                                 {
                                     Datetime = HiResDateTime.UtcNow,
-                                    Device = MonitorDevice.UI,
+                                    Device = MonitorDevice.Ui,
                                     Category = MonitorCategory.Server,
                                     Type = MonitorType.Warning,
                                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1429,7 +1429,7 @@ namespace GS.Server.Snap
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1447,7 +1447,7 @@ namespace GS.Server.Snap
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1543,7 +1543,7 @@ namespace GS.Server.Snap
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.UI,
+                Device = MonitorDevice.Ui,
                 Category = MonitorCategory.Interface,
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,

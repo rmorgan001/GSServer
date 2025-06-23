@@ -14,7 +14,7 @@
         Left="{Binding WindowLeft, Source={x:Static properties:Utilities.Default}, Mode=TwoWay}"
         Top="{Binding WindowTop, Source={x:Static properties:Utilities.Default}, Mode=TwoWay}"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        Background="{DynamicResource MaterialDesignPaper}" Title="GS Utilities" FontSize="13" d:DataContext="{d:DesignInstance main:MainWindowVM}">
+        Background="{DynamicResource MaterialDesignPaper}" Title="GS Utilities" FontSize="13" d:DataContext="{d:DesignInstance main:MainWindowVm}">
     <Window.Resources>
     </Window.Resources>
     <Grid>

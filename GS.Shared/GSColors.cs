@@ -19,7 +19,7 @@ using Color = System.Drawing.Color;
 
 namespace GS.Shared
 {
-    public class GSColors
+    public class GsColors
     {
         public Brush DrawingColorToBrush(Color color)
         {

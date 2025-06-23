@@ -27,7 +27,7 @@ namespace GS.Server.Windows
                 using (new WaitCursor())
                 {
                     var monitorItem = new MonitorEntry
-                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Opening Hand Control Window" };
+                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Ui, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Opening Hand Control Window" };
                     MonitorLog.LogToMonitor(monitorItem);
 
                     SkyServer.StaticPropertyChanged += PropertyChangedSkyServer;
@@ -43,7 +43,7 @@ namespace GS.Server.Windows
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Ui, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 throw;
@@ -116,7 +116,7 @@ namespace GS.Server.Windows
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -150,7 +150,7 @@ namespace GS.Server.Windows
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -249,7 +249,7 @@ namespace GS.Server.Windows
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.UI,
+                Device = MonitorDevice.Ui,
                 Category = MonitorCategory.Interface,
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,

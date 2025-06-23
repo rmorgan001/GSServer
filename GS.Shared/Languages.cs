@@ -50,13 +50,13 @@ namespace GS.Shared
                  string lang;
                  switch (app)
                  {
-                     case LanguageApp.GSServer:
+                     case LanguageApp.GsServer:
                          lang = Settings.Language;
                          break;
-                     case LanguageApp.GSChartViewer:
+                     case LanguageApp.GsChartViewer:
                          lang = language;
                          break;
-                     case LanguageApp.GSUtilities:
+                     case LanguageApp.GsUtilities:
                          lang = language;
                          break;
                      default:
@@ -75,53 +75,53 @@ namespace GS.Shared
         {
             var dict = new ResourceDictionary();
             Uri uri = null;
-            var localpath = string.Empty;
-            var filenotfound = false;
+            var localPath = string.Empty;
+            var fileNotFound = false;
             switch (app)
             {
-                case LanguageApp.GSServer:
+                case LanguageApp.GsServer:
                     switch (cultureInfo)
                     {
                         case "en-US":
                             uri = new Uri("GS.Shared;component/Languages/StringResServer_en-us.xaml", UriKind.Relative);
                             break;
                         default:
-                            localpath = new Uri(Path.Combine(DirectoryPath, $"{GsServer}{cultureInfo}.xaml")).LocalPath;
-                            if (!File.Exists(localpath))
+                            localPath = new Uri(Path.Combine(DirectoryPath, $"{GsServer}{cultureInfo}.xaml")).LocalPath;
+                            if (!File.Exists(localPath))
                             {
-                                filenotfound = true;
+                                fileNotFound = true;
                                 uri = new Uri("GS.Shared;component/Languages/StringResServer_en-us.xaml", UriKind.Relative);
                             }
                             break;
                     }
                     break;
-                case LanguageApp.GSChartViewer:
+                case LanguageApp.GsChartViewer:
                     switch (cultureInfo)
                     {
                         case "en-US":
                             uri = new Uri("GS.Shared;component/Languages/StringResChart_en-us.xaml", UriKind.Relative);
                             break;
                         default:
-                            localpath = new Uri(Path.Combine(DirectoryPath, $"{GsChart}{cultureInfo}.xaml")).LocalPath;
-                            if (!File.Exists(localpath))
+                            localPath = new Uri(Path.Combine(DirectoryPath, $"{GsChart}{cultureInfo}.xaml")).LocalPath;
+                            if (!File.Exists(localPath))
                             {
-                                filenotfound = true;
+                                fileNotFound = true;
                                 uri = new Uri("GS.Shared;component/Languages/StringResChart_en-us.xaml", UriKind.Relative);
                             }
                             break;
                     }
                     break;
-                case LanguageApp.GSUtilities:
+                case LanguageApp.GsUtilities:
                     switch (cultureInfo)
                     {
                         case "en-US":
                             uri = new Uri("GS.Shared;component/Languages/StringResUtil_en-us.xaml", UriKind.Relative);
                             break;
                         default:
-                            localpath = new Uri(Path.Combine(DirectoryPath, $"{GsUtil}{cultureInfo}.xaml")).LocalPath;
-                            if (!File.Exists(localpath))
+                            localPath = new Uri(Path.Combine(DirectoryPath, $"{GsUtil}{cultureInfo}.xaml")).LocalPath;
+                            if (!File.Exists(localPath))
                             {
-                                filenotfound = true;
+                                fileNotFound = true;
                                 uri = new Uri("GS.Shared;component/Languages/StringResUtil_en-us.xaml", UriKind.Relative);
                             }
                             break;
@@ -137,7 +137,7 @@ namespace GS.Shared
                     Application.Current.Resources.MergedDictionaries.Add(dict);
                     break;
                  default:
-                     if (filenotfound)
+                     if (fileNotFound)
                      {
                          dict.Source = uri;
                          if (dict.Source == null)
@@ -148,7 +148,7 @@ namespace GS.Shared
                      }
                      else
                      {
-                         using (var fs = new FileStream(localpath, FileMode.Open, FileAccess.Read))
+                         using (var fs = new FileStream(localPath, FileMode.Open, FileAccess.Read))
                          {
                              var dic = (ResourceDictionary) XamlReader.Load(fs);
                              //Resources.MergedDictionaries.Clear();
@@ -168,8 +168,8 @@ namespace GS.Shared
 
     public enum LanguageApp
     {
-        GSServer = 1,
-        GSChartViewer = 2,
-        GSUtilities = 3
+        GsServer = 1,
+        GsChartViewer = 2,
+        GsUtilities = 3
     }
 }

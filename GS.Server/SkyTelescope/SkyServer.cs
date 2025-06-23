@@ -4016,7 +4016,6 @@ namespace GS.Server.SkyTelescope
         /// <param name="slewState"></param>
         private static void GoToAsync(double[] target, SlewType slewState, bool tracking = false)
         {
-            bool cancelled = false;
             Stopwatch sw;
             MonitorEntry monitorItem;
             if (!IsMountRunning)
@@ -4195,7 +4194,7 @@ namespace GS.Server.SkyTelescope
             {
                 // OperationCanceledException thrown by SimGoTo or SkyGoTo
                 // AggregateException with base OperationCanceledException thrown by PrecisionGoTo
-                cancelled = ex is OperationCanceledException || ex.GetBaseException() is OperationCanceledException;
+                var cancelled = ex is OperationCanceledException || ex.GetBaseException() is OperationCanceledException;
                 monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
@@ -5201,7 +5200,7 @@ namespace GS.Server.SkyTelescope
                 // User config file copy from path
                 var userConfigFilepath = userConfig.FilePath;
                 // User config file copy to directory path
-                var logDirectoryPath = GSFile.GetLogPath();
+                var logDirectoryPath = GsFile.GetLogPath();
                 // Copy the user config file to the log directory
                 File.Copy(userConfigFilepath, Path.Combine(logDirectoryPath, "user.config"), true);
 

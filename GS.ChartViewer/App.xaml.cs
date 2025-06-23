@@ -53,7 +53,7 @@ namespace GS.ChartViewer
             if (!createdNew) return;
             base.OnStartup(e);
             //Shared.Settings.Load();
-            Languages.SetLanguageDictionary(false, LanguageApp.GSChartViewer, ChartViewer.Properties.ChartViewer.Default.Language);
+            Languages.SetLanguageDictionary(false, LanguageApp.GsChartViewer, ChartViewer.Properties.ChartViewer.Default.Language);
 
         }
 

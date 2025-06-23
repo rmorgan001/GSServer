@@ -21,9 +21,9 @@ using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
 namespace GS.Shared
 {
-    public static class GSFile
+    public static class GsFile
     {
-        private static readonly SemaphoreSlim _lockFile = new SemaphoreSlim(1);
+        private static readonly SemaphoreSlim LockFile = new SemaphoreSlim(1);
 
         /// <summary>
         /// Uses the file dialog to retrieve a file path
@@ -86,7 +86,7 @@ namespace GS.Shared
         {
             try
             {
-                await _lockFile.WaitAsync();
+                await LockFile.WaitAsync();
 
                 Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? throw new InvalidOperationException());
                 using (var stream = new FileStream(filePath, append ? FileMode.Append : FileMode.Create,
@@ -102,7 +102,7 @@ namespace GS.Shared
             }
             finally
             {
-                _lockFile.Release();
+                LockFile.Release();
             }
         }
     }

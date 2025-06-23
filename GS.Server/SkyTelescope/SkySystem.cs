@@ -173,7 +173,7 @@ namespace GS.Server.SkyTelescope
                                 | (SkySettings.DtrEnable ? SerialOptions.DtrEnable : SerialOptions.None)
                                 | (SkySettings.RtsEnable ? SerialOptions.RtsEnable : SerialOptions.None);
 
-                            Serial = new GSSerialPort(
+                            Serial = new GsSerialPort(
                                 SkySettings.Port,
                                 (int)SkySettings.BaudRate,
                                 readTimeout,

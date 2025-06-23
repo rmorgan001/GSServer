@@ -7,8 +7,8 @@ namespace GS.Shared.Domain
 {
     #region Documentation Tags
     /// <summary>
-    ///     WPF Maskable TextBox class. Just specify the TextBoxMaskBehavior.Mask attached property to a TextBox. 
-    ///     It protect your TextBox from unwanted non numeric symbols and make it easy to modify your numbers.
+    ///     WPF mask able TextBox class. Just specify the TextBoxMaskBehavior.Mask attached property to a TextBox. 
+    ///     It protect your TextBox from unwanted non-numeric symbols and make it easy to modify your numbers.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -45,8 +45,8 @@ namespace GS.Shared.Domain
 
         private static void MinimumValueChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var _this = (d as TextBox);
-            ValidateTextBox(_this);
+            var aThis = (d as TextBox);
+            ValidateTextBox(aThis);
         }
         #endregion
 
@@ -72,8 +72,8 @@ namespace GS.Shared.Domain
 
         private static void MaximumValueChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var _this = (d as TextBox);
-            ValidateTextBox(_this);
+            var aThis = (d as TextBox);
+            ValidateTextBox(aThis);
         }
         #endregion
 
@@ -105,39 +105,39 @@ namespace GS.Shared.Domain
                 DataObject.RemovePastingHandler(box, TextBoxPastingEventHandler);
             }
 
-            var _this = (d as TextBox);
-            if (_this == null)
+            var aThis = (d as TextBox);
+            if (aThis == null)
                 return;
 
             if ((MaskType)e.NewValue != MaskType.Any)
             {
-                _this.PreviewTextInput += TextBox_PreviewTextInput;
-                DataObject.AddPastingHandler(_this, TextBoxPastingEventHandler);
+                aThis.PreviewTextInput += TextBox_PreviewTextInput;
+                DataObject.AddPastingHandler(aThis, TextBoxPastingEventHandler);
             }
 
-            ValidateTextBox(_this);
+            ValidateTextBox(aThis);
         }
 
         #endregion
 
         #region Private Static Methods
 
-        private static void ValidateTextBox(TextBox _this)
+        private static void ValidateTextBox(TextBox aThis)
         {
-            if (GetMask(_this) != MaskType.Any)
+            if (GetMask(aThis) != MaskType.Any)
             {
-                _this.Text = ValidateValue(GetMask(_this), _this.Text);
+                aThis.Text = ValidateValue(GetMask(aThis), aThis.Text);
             }
         }
 
         private static void TextBoxPastingEventHandler(object sender, DataObjectPastingEventArgs e)
         {
-            var _this = (sender as TextBox);
+            var aThis = (sender as TextBox);
             var clipboard = e.DataObject.GetData(typeof(string)) as string;
-            clipboard = ValidateValue(GetMask(_this), clipboard);
+            clipboard = ValidateValue(GetMask(aThis), clipboard);
             if (!string.IsNullOrEmpty(clipboard))
             {
-                if (_this != null) _this.Text = clipboard;
+                if (aThis != null) aThis.Text = clipboard;
             }
             e.CancelCommand();
             e.Handled = true;
@@ -145,23 +145,23 @@ namespace GS.Shared.Domain
 
         private static void TextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
-            var _this = (sender as TextBox);
-            var isValid = IsSymbolValid(GetMask(_this), e.Text);
+            var aThis = (sender as TextBox);
+            var isValid = IsSymbolValid(GetMask(aThis), e.Text);
             e.Handled = !isValid;
             if (isValid)
             {
-                if (_this != null)
+                if (aThis != null)
                 {
-                    var caret = _this.CaretIndex;
-                    var text = _this.Text;
+                    var caret = aThis.CaretIndex;
+                    var text = aThis.Text;
                     var textInserted = false;
                     var selectionLength = 0;
 
-                    if (_this.SelectionLength > 0)
+                    if (aThis.SelectionLength > 0)
                     {
-                        text = text.Substring(0, _this.SelectionStart) +
-                               text.Substring(_this.SelectionStart + _this.SelectionLength);
-                        caret = _this.SelectionStart;
+                        text = text.Substring(0, aThis.SelectionStart) +
+                               text.Substring(aThis.SelectionStart + aThis.SelectionLength);
+                        caret = aThis.SelectionStart;
                     }
 
                     if (e.Text == NumberFormatInfo.CurrentInfo.NumberDecimalSeparator)
@@ -202,7 +202,7 @@ namespace GS.Shared.Domain
                     else if (e.Text == NumberFormatInfo.CurrentInfo.NegativeSign)
                     {
                         textInserted = true;
-                        if (_this.Text.Contains(NumberFormatInfo.CurrentInfo.NegativeSign))
+                        if (aThis.Text.Contains(NumberFormatInfo.CurrentInfo.NegativeSign))
                         {
                             text = text.Replace(NumberFormatInfo.CurrentInfo.NegativeSign, string.Empty);
                             if (caret != 0)
@@ -210,7 +210,7 @@ namespace GS.Shared.Domain
                         }
                         else
                         {
-                            text = NumberFormatInfo.CurrentInfo.NegativeSign + _this.Text;
+                            text = NumberFormatInfo.CurrentInfo.NegativeSign + aThis.Text;
                             caret++;
                         }
                     }
@@ -218,7 +218,7 @@ namespace GS.Shared.Domain
                     if (!textInserted)
                     {
                         text = text.Substring(0, caret) + e.Text +
-                               ((caret < _this.Text.Length) ? text.Substring(caret) : string.Empty);
+                               ((caret < aThis.Text.Length) ? text.Substring(caret) : string.Empty);
 
                         caret++;
                     }
@@ -226,7 +226,7 @@ namespace GS.Shared.Domain
                     try
                     {
                         var val = Convert.ToDouble(text);
-                        var newVal = ValidateLimits(GetMinimumValue(_this), GetMaximumValue(_this), val);
+                        var newVal = ValidateLimits(GetMinimumValue(aThis), GetMaximumValue(aThis), val);
                         if (Math.Abs(val - newVal) > 0.0000000000001)
                         {
                             text = newVal.ToString(CultureInfo.InvariantCulture);
@@ -259,10 +259,10 @@ namespace GS.Shared.Domain
                     if (caret > text.Length)
                         caret = text.Length;
 
-                    _this.Text = text;
-                    _this.CaretIndex = caret;
-                    _this.SelectionStart = caret;
-                    _this.SelectionLength = selectionLength;
+                    aThis.Text = text;
+                    aThis.CaretIndex = caret;
+                    aThis.SelectionStart = caret;
+                    aThis.SelectionLength = selectionLength;
                 }
 
                 e.Handled = true;
@@ -278,11 +278,11 @@ namespace GS.Shared.Domain
             switch (mask)
             {
                 case MaskType.Integer:
-                    var resulti = long.TryParse(value, out _);
-                    return resulti ? value : string.Empty;
+                    var resultI = long.TryParse(value, out _);
+                    return resultI ? value : string.Empty;
                 case MaskType.Decimal:
-                    var resultd = double.TryParse(value, out _);
-                        return resultd ? value : string.Empty;
+                    var resultD = double.TryParse(value, out _);
+                        return resultD ? value : string.Empty;
             }
             return value;
         }

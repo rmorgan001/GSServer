@@ -86,7 +86,7 @@ namespace GS.Server.SkyTelescope
                     var monitorItem = new MonitorEntry
                     {
                         Datetime = HiResDateTime.UtcNow,
-                        Device = MonitorDevice.UI,
+                        Device = MonitorDevice.Ui,
                         Category = MonitorCategory.Interface,
                         Type = MonitorType.Information,
                         Method = MethodBase.GetCurrentMethod()?.Name,
@@ -205,7 +205,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -449,7 +449,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -597,7 +597,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -632,7 +632,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -674,7 +674,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -716,7 +716,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -759,7 +759,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1431,7 +1431,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1475,7 +1475,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1521,7 +1521,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1693,7 +1693,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1738,7 +1738,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -2448,7 +2448,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -2506,7 +2506,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -2558,7 +2558,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -2598,7 +2598,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -2743,7 +2743,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -2869,7 +2869,7 @@ namespace GS.Server.SkyTelescope
                     var monitorItem = new MonitorEntry
                     {
                         Datetime = HiResDateTime.UtcNow,
-                        Device = MonitorDevice.UI,
+                        Device = MonitorDevice.Ui,
                         Category = MonitorCategory.Interface,
                         Type = MonitorType.Information,
                         Method = MethodBase.GetCurrentMethod()?.Name,
@@ -2885,7 +2885,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -2984,7 +2984,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -3030,7 +3030,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -3079,7 +3079,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -3165,7 +3165,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -3503,7 +3503,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -3537,7 +3537,7 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
-                var filename = GSFile.GetFileName("*.fit", @"C:\");
+                var filename = GsFile.GetFileName("*.fit", @"C:\");
                 if (!File.Exists(filename)){return;}
                 
                 using (new WaitCursor())
@@ -3612,7 +3612,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -3775,7 +3775,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4048,7 +4048,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4091,7 +4091,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4135,7 +4135,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4175,7 +4175,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4221,7 +4221,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4261,7 +4261,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4307,7 +4307,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4347,7 +4347,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4393,7 +4393,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4433,7 +4433,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4473,7 +4473,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4514,7 +4514,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4552,7 +4552,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4594,7 +4594,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4616,7 +4616,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Warning,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4636,7 +4636,7 @@ namespace GS.Server.SkyTelescope
                     var monitorItem = new MonitorEntry
                     {
                         Datetime = HiResDateTime.UtcNow,
-                        Device = MonitorDevice.UI,
+                        Device = MonitorDevice.Ui,
                         Category = MonitorCategory.Interface,
                         Type = MonitorType.Warning,
                         Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4653,7 +4653,7 @@ namespace GS.Server.SkyTelescope
                     var monitorItem = new MonitorEntry
                     {
                         Datetime = HiResDateTime.UtcNow,
-                        Device = MonitorDevice.UI,
+                        Device = MonitorDevice.Ui,
                         Category = MonitorCategory.Interface,
                         Type = MonitorType.Information,
                         Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4785,7 +4785,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4839,7 +4839,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4924,7 +4924,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -4995,7 +4995,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -5049,7 +5049,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -5093,7 +5093,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -5139,7 +5139,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -5186,7 +5186,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -5230,7 +5230,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -5274,7 +5274,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -5318,7 +5318,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -5485,7 +5485,7 @@ namespace GS.Server.SkyTelescope
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.UI,
+                Device = MonitorDevice.Ui,
                 Category = MonitorCategory.Interface,
                 Type = typ,
                 Method = MethodBase.GetCurrentMethod()?.Name,
@@ -5553,7 +5553,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -5594,7 +5594,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -5639,7 +5639,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -5685,7 +5685,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -5729,7 +5729,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -5771,7 +5771,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -6347,7 +6347,7 @@ namespace GS.Server.SkyTelescope
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.UI,
+                Device = MonitorDevice.Ui,
                 Category = MonitorCategory.Interface,
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,
@@ -6485,7 +6485,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -6530,7 +6530,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -6584,7 +6584,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -6630,7 +6630,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -6672,7 +6672,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -6760,7 +6760,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -6822,7 +6822,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -6863,7 +6863,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -6909,7 +6909,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -6960,7 +6960,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -6999,7 +6999,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -7058,7 +7058,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -7109,7 +7109,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -7148,7 +7148,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -7175,7 +7175,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Information,
                     Method = MonitorLog.GetCurrentMethod(),
@@ -7196,7 +7196,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Information,
                     Method = MonitorLog.GetCurrentMethod(),
@@ -7210,7 +7210,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Information,
                     Method = MonitorLog.GetCurrentMethod(),
@@ -7271,7 +7271,7 @@ namespace GS.Server.SkyTelescope
                         var monitorItem = new MonitorEntry
                         {
                             Datetime = HiResDateTime.UtcNow,
-                            Device = MonitorDevice.UI,
+                            Device = MonitorDevice.Ui,
                             Category = MonitorCategory.Interface,
                             Type = MonitorType.Information,
                             Method = MethodBase.GetCurrentMethod()?.Name,
@@ -7355,7 +7355,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -7432,7 +7432,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -7519,7 +7519,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -7606,7 +7606,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -7679,7 +7679,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -7730,7 +7730,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -7794,7 +7794,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -7845,7 +7845,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -7909,7 +7909,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -7966,7 +7966,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8032,7 +8032,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8073,7 +8073,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8134,7 +8134,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8182,7 +8182,7 @@ namespace GS.Server.SkyTelescope
                     var monitorItem = new MonitorEntry
                     {
                         Datetime = HiResDateTime.UtcNow,
-                        Device = MonitorDevice.UI,
+                        Device = MonitorDevice.Ui,
                         Category = MonitorCategory.Interface,
                         Type = MonitorType.Information,
                         Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8205,7 +8205,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8246,7 +8246,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8292,7 +8292,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8333,7 +8333,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8386,7 +8386,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8432,7 +8432,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8473,7 +8473,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8526,7 +8526,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8586,7 +8586,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8632,7 +8632,7 @@ namespace GS.Server.SkyTelescope
                     var monitorItem = new MonitorEntry
                     {
                         Datetime = HiResDateTime.UtcNow,
-                        Device = MonitorDevice.UI,
+                        Device = MonitorDevice.Ui,
                         Category = MonitorCategory.Interface,
                         Type = MonitorType.Information,
                         Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8649,7 +8649,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8690,7 +8690,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8736,7 +8736,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8777,7 +8777,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8830,7 +8830,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8876,7 +8876,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8917,7 +8917,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -8970,7 +8970,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -9142,7 +9142,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -9186,7 +9186,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -9432,7 +9432,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -9506,7 +9506,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -9565,7 +9565,7 @@ namespace GS.Server.SkyTelescope
                     var monitorItem = new MonitorEntry
                     {
                         Datetime = HiResDateTime.UtcNow,
-                        Device = MonitorDevice.UI,
+                        Device = MonitorDevice.Ui,
                         Category = MonitorCategory.Interface,
                         Type = MonitorType.Information,
                         Method = MethodBase.GetCurrentMethod()?.Name,
@@ -9582,7 +9582,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -9651,7 +9651,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -9695,7 +9695,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -9768,7 +9768,7 @@ namespace GS.Server.SkyTelescope
                     var monitorItem = new MonitorEntry
                     {
                         Datetime = HiResDateTime.UtcNow,
-                        Device = MonitorDevice.UI,
+                        Device = MonitorDevice.Ui,
                         Category = MonitorCategory.Interface,
                         Type = MonitorType.Information,
                         Method = MethodBase.GetCurrentMethod()?.Name,
@@ -9785,7 +9785,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -9825,7 +9825,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -9871,7 +9871,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -9984,7 +9984,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -10029,7 +10029,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -10076,7 +10076,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -10125,7 +10125,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -10171,7 +10171,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -10211,7 +10211,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -10359,7 +10359,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -10410,7 +10410,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -10450,7 +10450,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -10574,7 +10574,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -10622,7 +10622,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -10669,7 +10669,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -10716,7 +10716,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -10823,7 +10823,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -10867,7 +10867,7 @@ namespace GS.Server.SkyTelescope
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,

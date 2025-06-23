@@ -21,29 +21,30 @@ using Timer = System.Timers.Timer;
 
 namespace GS.Utilities.Main
 {
-    internal class MainWindowVM : ObservableObject, IDisposable
+    internal class MainWindowVm : ObservableObject, IDisposable
     {
-        private static readonly string _docDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        private static readonly string _logDir = Path.Combine(_docDir, "GSServer");
+        private static readonly string DocDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        private static readonly string LogDir = Path.Combine(DocDir, "GSServer");
 
-        private static readonly string _commonDir =
+        private static readonly string CommonDir =
             Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles);
-        private static readonly string _gsDir = "\\ASCOM\\Telescope\\GSServer\\";
-        private static string _gsFilePath = _commonDir + _gsDir + "GS.Server.exe";
+
+        private const string GsDir = @"\ASCOM\Telescope\GSServer\";
+        private static string _gsFilePath = CommonDir + GsDir + "GS.Server.exe";
 
         //serial test
-        private static Timer aTimer;
-        private static readonly object _timerLock = new object();
-        private SerialPort serial;
-        private const char _endChar = (char)13;
-        private const string j1 = ":j1";
-        private const string j2 = ":j2";
-        private int counter;
-        private bool axis;
-        private const string zoom = "Zoom Zoom...";
+        private static Timer _aTimer;
+        private static readonly object TimerLock = new object();
+        private SerialPort _serial;
+        private const char EndChar = (char)13;
+        private const string J1 = ":j1";
+        private const string J2 = ":j2";
+        private int _counter;
+        private bool _axis;
+        private const string Zoom = "Zoom Zoom...";
         private Stopwatch _startTime;
 
-        public MainWindowVM()
+        public MainWindowVm()
         {
             try
             {
@@ -122,7 +123,7 @@ namespace GS.Utilities.Main
             BaudRate = 9600;
         }
 
-        private static bool IsGSAppOpen(string name)
+        private static bool IsGsAppOpen(string name)
         {
             return Process.GetProcesses().Any(clsProcess => clsProcess.ProcessName.Contains(name));
         }
@@ -214,10 +215,10 @@ namespace GS.Utilities.Main
                 Connect = null;
                 var msg = $"{Application.Current.Resources["utilNotFound"]}";
                 var util = new ASCOM.Utilities.Chooser();
-                var progID = util.Choose("ASCOM.GS.Sky.Telescope");
-                if (progID != null)
+                var progId = util.Choose("ASCOM.GS.Sky.Telescope");
+                if (progId != null)
                 {
-                    var t = new Telescope(progID) { Connected = true };
+                    var t = new Telescope(progId) { Connected = true };
                     msg = $"v{t.DriverVersion}, {t.DriverInfo}";
                     t.Connected = false;
                     t.Dispose();
@@ -305,14 +306,14 @@ namespace GS.Utilities.Main
         private void Stop()
         {
             _startTime?.Stop();
-            aTimer?.Stop();
-            if (aTimer != null) aTimer.Elapsed -= OnTimedEvent;
+            _aTimer?.Stop();
+            if (_aTimer != null) _aTimer.Elapsed -= OnTimedEvent;
             var sw = Stopwatch.StartNew();
             while (sw.Elapsed.TotalMilliseconds < 100)
             {
 
             }
-            serial?.Close();
+            _serial?.Close();
         }
 
         private void OnTimedEvent(Object source, ElapsedEventArgs e)
@@ -320,15 +321,15 @@ namespace GS.Utilities.Main
             var hasLock = false;
             try
             {
-                Monitor.TryEnter(_timerLock, ref hasLock);
+                Monitor.TryEnter(TimerLock, ref hasLock);
                 if (!hasLock) return;
-                if (!serial.IsOpen) return;
+                if (!_serial.IsOpen) return;
                 var commandStr = new StringBuilder(20);
-                commandStr.Append(axis ? j1 : j2);
-                axis = !axis;
-                commandStr.Append(_endChar);
-                serial.Write(commandStr.ToString());
-                counter++;
+                commandStr.Append(_axis ? J1 : J2);
+                _axis = !_axis;
+                commandStr.Append(EndChar);
+                _serial.Write(commandStr.ToString());
+                _counter++;
 
                 // var receivedData = IncomingData;
                 var receivedData = ReceiveResponse();
@@ -337,23 +338,23 @@ namespace GS.Utilities.Main
                 if (string.IsNullOrEmpty(receivedData))
                 {
                     Stop();
-                    throw new Exception($"{Application.Current.Resources["utilTimeout"]} {counter}");
+                    throw new Exception($"{Application.Current.Resources["utilTimeout"]} {_counter}");
                 }
 
                 var zoomtxt = string.Empty;
                 if (Interval < 11.0 && ZoomCounter < 30)
                 {
                     ZoomCounter++;
-                    if (ZoomCounter < 12) zoomtxt = zoom.Substring(0, ZoomCounter);
+                    if (ZoomCounter < 12) zoomtxt = Zoom.Substring(0, ZoomCounter);
                 }
 
                 InvokeOnUiThread(
                     delegate
                     {
                         SerMsg =
-                            $"{Application.Current.Resources["utilCounter"]} {counter} {Application.Current.Resources["utilTimer"]} {_startTime.Elapsed:hh\\:mm\\:ss\\.fff}, {commandStr} {receivedData} {zoomtxt}";
+                            $"{Application.Current.Resources["utilCounter"]} {_counter} {Application.Current.Resources["utilTimer"]} {_startTime.Elapsed:hh\\:mm\\:ss\\.fff}, {commandStr} {receivedData} {zoomtxt}";
                     });
-                aTimer.Interval = Interval;
+                _aTimer.Interval = Interval;
 
             }
             catch (Exception ex)
@@ -367,7 +368,7 @@ namespace GS.Utilities.Main
             }
             finally
             {
-                if (hasLock) Monitor.Exit(_timerLock);
+                if (hasLock) Monitor.Exit(TimerLock);
             }
         }
 
@@ -389,20 +390,20 @@ namespace GS.Utilities.Main
         {
             // format "::e1\r=020883\r"
             var mBuffer = new StringBuilder(15);
-            var StartReading = false;
+            var startReading = false;
 
             var sw = Stopwatch.StartNew();
-            while (sw.Elapsed.TotalMilliseconds < serial.ReadTimeout)
+            while (sw.Elapsed.TotalMilliseconds < _serial.ReadTimeout)
             {
-                var data = serial.ReadExisting();
+                var data = _serial.ReadExisting();
                 foreach (var byt in data)
                 {
                     // this code order is important
-                    if (byt == '=' || byt == '!' || byt == _endChar) StartReading = true;
-                    if ((byt == _endChar) && (mBuffer.Length == 0)) continue;
-                    if (StartReading) mBuffer.Append(byt);
-                    if (byt != _endChar) continue;
-                    if (!StartReading) continue;
+                    if (byt == '=' || byt == '!' || byt == EndChar) startReading = true;
+                    if ((byt == EndChar) && (mBuffer.Length == 0)) continue;
+                    if (startReading) mBuffer.Append(byt);
+                    if (byt != EndChar) continue;
+                    if (!startReading) continue;
                     return mBuffer.ToString();
                 }
                 Thread.Sleep(1);
@@ -440,7 +441,7 @@ namespace GS.Utilities.Main
         {
             try
             {
-                if (IsGSAppOpen("GS.Server"))
+                if (IsGsAppOpen("GS.Server"))
                 {
                     var str = $"{Application.Current.Resources["utilCloseApps"]}" + Environment.NewLine;
                     OpenDialog(str);
@@ -450,12 +451,12 @@ namespace GS.Utilities.Main
                 using (new WaitCursor())
                 {
                     SerMsg = string.Empty;
-                    counter = 0;
+                    _counter = 0;
                     ZoomCounter = 0;
                     _startTime = new Stopwatch();
                     _startTime.Start();
 
-                    serial = new SerialPort
+                    _serial = new SerialPort
                     {
                         PortName = $"COM{ComPort}",
                         BaudRate = BaudRate,
@@ -468,16 +469,16 @@ namespace GS.Utilities.Main
                         Parity = Parity.None,
                         DiscardNull = true,
                     };
-                    serial.Open();
+                    _serial.Open();
                     //serial.DataReceived += DataReceived;
 
-                    aTimer = new Timer { Interval = Interval };
+                    _aTimer = new Timer { Interval = Interval };
                     // Hook up the Elapsed event for the timer. 
-                    aTimer.Elapsed += OnTimedEvent;
+                    _aTimer.Elapsed += OnTimedEvent;
                     // Have the timer fire repeated events (true is the default)
-                    aTimer.AutoReset = true;
+                    _aTimer.AutoReset = true;
                     // Start the timer
-                    aTimer.Enabled = true;
+                    _aTimer.Enabled = true;
                 }
             }
             catch (Exception ex)
@@ -683,7 +684,7 @@ namespace GS.Utilities.Main
 
                 if (DelSettings || DelLogFiles)
                 {
-                    if (IsGSAppOpen("GS.Server") || IsGSAppOpen("GS.ChartViewer"))
+                    if (IsGsAppOpen("GS.Server") || IsGsAppOpen("GS.ChartViewer"))
                     {
                         var str = $"{Application.Current.Resources["utilCloseApps"]}" + Environment.NewLine;
                         OpenDialog(str);
@@ -723,28 +724,28 @@ namespace GS.Utilities.Main
                     var cntLogs = 0;
                     if (DelLogFiles)
                     {
-                        if (Directory.Exists(_logDir))
+                        if (Directory.Exists(LogDir))
                         {
-                            foreach (var file in Directory.EnumerateFiles(_logDir, "GSMonitorLog*.txt"))
+                            foreach (var file in Directory.EnumerateFiles(LogDir, "GSMonitorLog*.txt"))
                             {
                                 File.Delete(file);
                                 cntLogs++;
                             }
 
-                            foreach (var file in Directory.EnumerateFiles(_logDir, "GSErrorLog*.txt"))
+                            foreach (var file in Directory.EnumerateFiles(LogDir, "GSErrorLog*.txt"))
                             {
                                 File.Delete(file);
                                 cntLogs++;
                             }
 
-                            foreach (var file in Directory.EnumerateFiles(_logDir, "GSSessionLog*.txt"))
+                            foreach (var file in Directory.EnumerateFiles(LogDir, "GSSessionLog*.txt"))
                             {
                                 File.Delete(file);
                                 cntLogs++;
 
                             }
 
-                            foreach (var file in Directory.EnumerateFiles(_logDir, "GSPulsesLog*.txt"))
+                            foreach (var file in Directory.EnumerateFiles(LogDir, "GSPulsesLog*.txt"))
                             {
                                 File.Delete(file);
                                 cntLogs++;
@@ -847,14 +848,14 @@ namespace GS.Utilities.Main
 
         #region Dialog  
 
-        private string _DialogMsg;
+        private string _dialogMsg;
         public string DialogMsg
         {
-            get => _DialogMsg;
+            get => _dialogMsg;
             set
             {
-                if (_DialogMsg == value) return;
-                _DialogMsg = value;
+                if (_dialogMsg == value) return;
+                _dialogMsg = value;
                 OnPropertyChanged();
             }
         }
@@ -984,8 +985,8 @@ namespace GS.Utilities.Main
 
         public void Dispose()
         {
-            serial?.Dispose();
-            aTimer?.Stop();
+            _serial?.Dispose();
+            _aTimer?.Stop();
         }
     }
 }

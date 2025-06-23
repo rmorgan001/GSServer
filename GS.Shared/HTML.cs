@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace GS.Shared
 {
-    public class HTML
+    public class Html
     {
         public bool IsValidUri(string uri)
         {
@@ -27,7 +27,7 @@ namespace GS.Shared
 
             // 1.
             // Find all matches in file.
-            var m1 = Regex.Matches(file, @"(<a.*?>.*?</a>)",
+            var m1 = Regex.Matches(file, "(<a.*?>.*?</a>)",
                 RegexOptions.Singleline);
 
             // 2.

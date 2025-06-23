@@ -92,7 +92,7 @@
                        MouseDown="CanvasImage_MouseDown"
                        MouseUp="CanvasImage_MouseUp"
                        MouseMove="CanvasImage_MouseMove">
-                    <Ellipse x:Name="ellipsePixel" Width="10" 
+                    <Ellipse x:Name="EllipsePixel" Width="10" 
                        Height="10" Stroke="Black" Fill="White" 
                        Canvas.Left="0" Canvas.Top="0"/>
 
@@ -109,7 +109,7 @@
                 <Border Margin="4,5,10,0" Width="154" Height="154" 
                         HorizontalAlignment="Left" BorderBrush="Black" BorderThickness="2"
                         Background="{StaticResource CheckerboardBrush}">
-                    <InkPresenter Name="previewPresenter" Margin="0" Width="150" Height="150" Strokes="AOcBAxdIEESAgYAERYQBGwIAJAFGhAEbAgAkAQUBOBkgMgkA9P8CAekiOkUzCQD4nwIBWiA6RTgIAP4DAAAAgH8RAACAPx8JEQAAAAAAAPA/CpYBNIfm3uajgcQgUUiUkjUelEal0KkUBh0HichlM1mtJotZp9JodDl8jk8ZgcBiUOjUYl08m0+l0+lFCjksjESAh+kg6auNwaEwSBQiEQyLRKTRiVSiUSSORyLQ6JQSBIPFYnKZTL5fOZfMZXL4/H47DYLBYHFoJLIpEo9GgIP3OB5PlxLCJiZmU1MISSi4SJiS74+D4+4o" />
+                    <InkPresenter Name="PreviewPresenter" Margin="0" Width="150" Height="150" Strokes="AOcBAxdIEESAgYAERYQBGwIAJAFGhAEbAgAkAQUBOBkgMgkA9P8CAekiOkUzCQD4nwIBWiA6RTgIAP4DAAAAgH8RAACAPx8JEQAAAAAAAPA/CpYBNIfm3uajgcQgUUiUkjUelEal0KkUBh0HichlM1mtJotZp9JodDl8jk8ZgcBiUOjUYl08m0+l0+lFCjksjESAh+kg6auNwaEwSBQiEQyLRKTRiVSiUSSORyLQ6JQSBIPFYnKZTL5fOZfMZXL4/H47DYLBYHFoJLIpEo9GgIP3OB5PlxLCJiZmU1MISSi4SJiS74+D4+4o" />
                 </Border>
 
             </StackPanel>
@@ -122,12 +122,12 @@
                             Foreground="Black" FontWeight="Bold" VerticalAlignment="Center"/>
                     <Border CornerRadius="5" BorderBrush="Black" Background="LightGray" 
                             BorderThickness="2" Width="50" Height="30">
-                        <TextBox x:Name="txtAlpha" BorderThickness="0" Background="LightGray" 
+                        <TextBox x:Name="TxtAlpha" BorderThickness="0" Background="LightGray" 
                             BorderBrush="Transparent" Margin="5,1,5,1" IsReadOnly="True"/>
                     </Border>
                     <Border CornerRadius="5" BorderBrush="Black" Background="LightGray" 
                             BorderThickness="2" Margin="10,0,0,0" Width="50" Height="30">
-                        <TextBox x:Name="txtAlphaHex" BorderThickness="0" 
+                        <TextBox x:Name="TxtAlphaHex" BorderThickness="0" 
                             Background="LightGray" BorderBrush="Transparent"
                             Margin="5,1,5,1" IsReadOnly="True"/>
                     </Border>
@@ -138,12 +138,12 @@
                             Foreground="Black" FontWeight="Bold" VerticalAlignment="Center"/>
                     <Border CornerRadius="5" BorderBrush="Black" Background="LightGray" 
                             BorderThickness="2" Width="50" Height="30">
-                        <TextBox x:Name="txtRed" BorderThickness="0" Background="LightGray" 
+                        <TextBox x:Name="TxtRed" BorderThickness="0" Background="LightGray" 
                             BorderBrush="Transparent" Margin="5,1,5,1" IsReadOnly="True"/>
                     </Border>
                     <Border CornerRadius="5" BorderBrush="Black" Background="LightGray" 
                             BorderThickness="2" Margin="10,0,0,0" Width="50" Height="30">
-                        <TextBox x:Name="txtRedHex" BorderThickness="0" Background="LightGray" 
+                        <TextBox x:Name="TxtRedHex" BorderThickness="0" Background="LightGray" 
                             BorderBrush="Transparent" Margin="5,1,5,1" IsReadOnly="True"/>
                     </Border>
                 </StackPanel>
@@ -154,13 +154,13 @@
                             VerticalAlignment="Center"/>
                     <Border CornerRadius="5" BorderBrush="Black" Background="LightGray" 
                             BorderThickness="2" Width="50" Height="30">
-                        <TextBox x:Name="txtGreen" BorderThickness="0" 
+                        <TextBox x:Name="TxtGreen" BorderThickness="0" 
                             Background="LightGray" BorderBrush="Transparent" 
                             Margin="5,1,5,1" IsReadOnly="True"/>
                     </Border>
                     <Border CornerRadius="5" BorderBrush="Black" Background="LightGray"
                             BorderThickness="2" Margin="10,0,0,0" Width="50" Height="30">
-                        <TextBox x:Name="txtGreenHex" BorderThickness="0"
+                        <TextBox x:Name="TxtGreenHex" BorderThickness="0"
                             Background="LightGray" BorderBrush="Transparent" 
                             Margin="5,1,5,1" IsReadOnly="True"/>
                     </Border>
@@ -172,12 +172,12 @@
                            VerticalAlignment="Center"/>
                     <Border CornerRadius="5" BorderBrush="Black" Background="LightGray" 
                            BorderThickness="2" Width="50" Height="30">
-                        <TextBox x:Name="txtBlue" BorderThickness="0" Background="LightGray" 
+                        <TextBox x:Name="TxtBlue" BorderThickness="0" Background="LightGray" 
                            BorderBrush="Transparent" Margin="5,1,5,1" IsReadOnly="True"/>
                     </Border>
                     <Border CornerRadius="5" BorderBrush="Black" Background="LightGray" 
                             BorderThickness="2" Margin="10,0,0,0" Width="50" Height="30">
-                        <TextBox x:Name="txtBlueHex" BorderThickness="0" 
+                        <TextBox x:Name="TxtBlueHex" BorderThickness="0" 
                             Background="LightGray" BorderBrush="Transparent" 
                             Margin="5,1,5,1" IsReadOnly="True"/>
                     </Border>
@@ -186,7 +186,7 @@
                 <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                     <Border CornerRadius="5" Margin="22,0,0,0" Background="LightGray" 
                             BorderBrush="Black" BorderThickness="2" Width="112" Height="30">
-                        <TextBox x:Name="txtAll" BorderThickness="0" Background="LightGray" 
+                        <TextBox x:Name="TxtAll" BorderThickness="0" Background="LightGray" 
                             BorderBrush="Transparent" Margin="5,1,5,1" IsReadOnly="True"/>
                     </Border>
                 </StackPanel>

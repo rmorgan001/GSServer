@@ -327,7 +327,7 @@ namespace GS.ChartViewer.Main
             var chartType = ChartType.Plot;
             var endTime = string.Empty;
             var loadedLogs = new List<List<string>>();
-            List<string> chartlog = null;
+            List<string> chartLog = null;
             using (var fileStream = File.OpenRead(filename))
 
             {
@@ -361,27 +361,27 @@ namespace GS.ChartViewer.Main
                                 switch (code)
                                 {
                                     case ChartLogCode.Start:
-                                        if (chartlog == null)
+                                        if (chartLog == null)
                                         {
-                                            chartlog = new List<string> { readline };
+                                            chartLog = new List<string> { readline };
                                         }
                                         else
                                         {
-                                            if (chartlog.Count > 1) loadedLogs.Add(chartlog);
-                                            chartlog = new List<string> { readline };
+                                            if (chartLog.Count > 1) loadedLogs.Add(chartLog);
+                                            chartLog = new List<string> { readline };
                                         }
                                         break;
                                     case ChartLogCode.Info:
-                                        chartlog?.Add(readline);
+                                        chartLog?.Add(readline);
                                         break;
                                     case ChartLogCode.Data:
-                                        chartlog?.Add(readline);
+                                        chartLog?.Add(readline);
                                         break;
                                     case ChartLogCode.Point:
-                                        chartlog?.Add(readline);
+                                        chartLog?.Add(readline);
                                         break;
                                     case ChartLogCode.Series:
-                                        chartlog?.Add(readline);
+                                        chartLog?.Add(readline);
                                         break;
                                     default:
                                         BadLineCount++;
@@ -405,7 +405,7 @@ namespace GS.ChartViewer.Main
                         if (recBad) BadLineCount++;
                     }
                     // check for log with no stop or end of file
-                    if (chartlog?.Count > 0) loadedLogs.Add(chartlog);
+                    if (chartLog?.Count > 0) loadedLogs.Add(chartLog);
                 }
             }
 
@@ -416,8 +416,8 @@ namespace GS.ChartViewer.Main
             }
             else
             {
-                chartlog?.Add($"{chartType}|{ChartLogCode.Data}|{endTime}|LineCount|{LineCount}");
-                chartlog?.Add($"{chartType}|{ChartLogCode.Data}|{endTime}|BadLineCount|{BadLineCount}");
+                chartLog?.Add($"{chartType}|{ChartLogCode.Data}|{endTime}|LineCount|{LineCount}");
+                chartLog?.Add($"{chartType}|{ChartLogCode.Data}|{endTime}|BadLineCount|{BadLineCount}");
                 loaded = true;
                 _logs = loadedLogs;
                 IndexItems = null;
@@ -428,28 +428,28 @@ namespace GS.ChartViewer.Main
         private bool BuildIndex()
         {
             var index = new List<IndexItem>();
-            var recno = 0;
+            var recNo = 0;
 
             foreach (var list in _logs)
             {
                 try
                 {
-                    var firstline = list.First().Split('|');
-                    if (firstline.Length < 4) continue;
-                    var type = firstline[4];
-                    var result =  Enum.TryParse(firstline[0].Trim(), out ChartType ctype);
+                    var firstLine = list.First().Split('|');
+                    if (firstLine.Length < 4) continue;
+                    var type = firstLine[4];
+                    var result =  Enum.TryParse(firstLine[0].Trim(), out ChartType ctype);
                     if (!result) continue;
                     var lastline = list.Last().Split('|');
-                    if (firstline.Length < 2) continue;
-                    var pass = DateTime.TryParseExact(firstline[2].Trim(), "yyyy-MM-dd HH:mm:ss.fff", null, System.Globalization.DateTimeStyles.None, out var startTime);
+                    if (firstLine.Length < 2) continue;
+                    var pass = DateTime.TryParseExact(firstLine[2].Trim(), "yyyy-MM-dd HH:mm:ss.fff", null, System.Globalization.DateTimeStyles.None, out var startTime);
                     if (!pass) continue;
                     pass = DateTime.TryParseExact(lastline[2].Trim(), "yyyy-MM-dd HH:mm:ss.fff", null, System.Globalization.DateTimeStyles.None, out var endTime);
                     if (!pass) continue;
 
-                    recno++;
+                    recNo++;
                     var indexItem = new IndexItem
                     {
-                        RecNo = recno,
+                        RecNo = recNo,
                         StartTime = startTime,
                         EndTime = endTime,
                         TimeLength = endTime - startTime,
@@ -525,15 +525,15 @@ namespace GS.ChartViewer.Main
                 ClearChart();
                 ChartsQuality(ChartQuality);
 
-                foreach (var linearray in log.Select(line => line.Split('|')))
+                foreach (var lineArray in log.Select(line => line.Split('|')))
                 {
-                    var result = Enum.TryParse<ChartLogCode>(linearray[1], true, out var code);
+                    var result = Enum.TryParse<ChartLogCode>(lineArray[1], true, out var code);
                     if (!result) continue;
-                    var result1 = Enum.TryParse<ChartType>(linearray[0], true, out var type);
+                    var result1 = Enum.TryParse<ChartType>(lineArray[0], true, out var type);
                     if (!result1) continue;
                     if (indexItem.ChartType != type) continue;
-                    LoadLogLine(code, linearray);
-                    LogText.Add(string.Join("|", linearray));
+                    LoadLogLine(code, lineArray);
+                    LogText.Add(string.Join("|", lineArray));
                 }
 
                 StartDateTicks = indexItem.StartTime.Ticks;
@@ -1461,7 +1461,7 @@ namespace GS.ChartViewer.Main
         {
             var view = new ErrorMessageDialog
             {
-                DataContext = new ErrorMessageDialogVM()
+                DataContext = new ErrorMessageDialogVm()
             };
 
             //show the dialog
@@ -1469,7 +1469,7 @@ namespace GS.ChartViewer.Main
         }
         private void ClosingMessageEventHandler(object sender, DialogClosingEventArgs eventArgs)
         {
-            Console.WriteLine(@"You can intercept the closing event, and cancel here.");
+            Console.WriteLine("You can intercept the closing event, and cancel here.");
         }
 
         #endregion

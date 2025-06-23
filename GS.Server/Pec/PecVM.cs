@@ -644,12 +644,12 @@ namespace GS.Server.Pec
                     throw new ArgumentOutOfRangeException();
             }
 
-           GSFile.FileWriteAsync(filePath, message);
+           GsFile.FileWriteAsync(filePath, message);
         }
         
         private static string GetFileName(string name, string dir)
         {
-            return GSFile.GetFileName(name, dir);
+            return GsFile.GetFileName(name, dir);
         }
 
         /// <summary>
@@ -807,7 +807,7 @@ namespace GS.Server.Pec
             {
                 message += $"{capData.Index}{_tab}{capData.TimeStamp:yyyy:MM:dd:HH:mm:ss.fff}{_tab}{capData.Position}{_tab}{capData.DeltaSteps}{_tab}{capData.DeltaTime.TotalSeconds}{_tab}{capData.RateEstimate}{_tab}{capData.Normalized}{_tab}{capData.BinNumber}{_tab}{capData.BinFactor}{_tab}{capData.BinEstimate}{_tab}{capData.Status}" + Environment.NewLine;
             }
-            GSFile.FileWriteAsync(filePath, message);
+            GsFile.FileWriteAsync(filePath, message);
         }
 
         /// <summary>
@@ -1162,7 +1162,7 @@ namespace GS.Server.Pec
 
         private void AddSeries()
         {
-            var col = new GSColors();
+            var col = new GsColors();
             var series = new GLineSeries
             {
                 Fill = col.ToBrush(Color.Transparent),

@@ -47,7 +47,7 @@ namespace GS.Shared
             //MonitorDevice
             if (Settings.ServerDevice){DevicesToMonitor(MonitorDevice.Server, Settings.ServerDevice);}
             if (Settings.Telescope){DevicesToMonitor(MonitorDevice.Telescope, Settings.Telescope);}
-            if (Settings.Telescope){DevicesToMonitor(MonitorDevice.UI, Settings.Ui);}
+            if (Settings.Telescope){DevicesToMonitor(MonitorDevice.Ui, Settings.Ui);}
             //MonitorCategory
             if (Settings.Other){CategoriesToMonitor(MonitorCategory.Other, Settings.Other);}
             if (Settings.Driver){CategoriesToMonitor(MonitorCategory.Driver, Settings.Driver);}
@@ -77,7 +77,7 @@ namespace GS.Shared
                 case MonitorDevice.Telescope:           // Ascom and api interfaces
                     Settings.Telescope = value;
                     break;
-                case MonitorDevice.UI:                  // view and view models 
+                case MonitorDevice.Ui:                  // view and view models 
                     Settings.Ui = value;
                     break;
                 default:
@@ -338,7 +338,7 @@ namespace GS.Shared
         Server,
         Telescope,
         Focuser,
-        UI
+        Ui
     }
 
     /// <summary>

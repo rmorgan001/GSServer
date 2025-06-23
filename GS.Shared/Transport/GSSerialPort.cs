@@ -12,9 +12,9 @@ namespace GS.Shared.Transport
         DiscardNull = 1 << 2
     }
 
-    public sealed class GSSerialPort : SerialPort, ISerialPort
+    public sealed class GsSerialPort : SerialPort, ISerialPort
     {
-        public GSSerialPort(
+        public GsSerialPort(
             string portName,
             int baudRate,
             TimeSpan readTimeout,

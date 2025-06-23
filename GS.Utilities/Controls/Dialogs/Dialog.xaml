@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:main="clr-namespace:GS.Utilities.Main"
-        mc:Ignorable="d" d:DataContext="{d:DesignInstance main:MainWindowVM}">
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance main:MainWindowVm}">
     <Grid Margin="15">
         <Grid.RowDefinitions>
             <RowDefinition />

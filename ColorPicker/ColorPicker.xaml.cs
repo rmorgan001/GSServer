@@ -135,8 +135,8 @@ namespace ColorPicker
 
 
                 //Ok now, so update the mouse cursor position and the SelectedColor
-                ellipsePixel.SetValue(Canvas.LeftProperty, Mouse.GetPosition(CanvasImage).X - 5);
-                ellipsePixel.SetValue(Canvas.TopProperty, Mouse.GetPosition(CanvasImage).Y - 5);
+                EllipsePixel.SetValue(Canvas.LeftProperty, Mouse.GetPosition(CanvasImage).X - 5);
+                EllipsePixel.SetValue(Canvas.TopProperty, Mouse.GetPosition(CanvasImage).Y - 5);
                 CanvasImage.InvalidateVisual();
                 SelectedColor = Color.FromArgb((byte)AlphaSlider.Value, pixels[2], pixels[1], pixels[0]);
             }
@@ -151,15 +151,15 @@ namespace ColorPicker
         /// </summary>
         private void UpdateTextBoxes()
         {
-            txtAlpha.Text = SelectedColor.A.ToString();
-            txtAlphaHex.Text = SelectedColor.A.ToString("X");
-            txtRed.Text = SelectedColor.R.ToString();
-            txtRedHex.Text = SelectedColor.R.ToString("X");
-            txtGreen.Text = SelectedColor.G.ToString();
-            txtGreenHex.Text = SelectedColor.G.ToString("X");
-            txtBlue.Text = SelectedColor.B.ToString();
-            txtBlueHex.Text = SelectedColor.B.ToString("X");
-            txtAll.Text = $"#{txtAlphaHex.Text}{txtRedHex.Text}{txtGreenHex.Text}{txtBlueHex.Text}";
+            TxtAlpha.Text = SelectedColor.A.ToString();
+            TxtAlphaHex.Text = SelectedColor.A.ToString("X");
+            TxtRed.Text = SelectedColor.R.ToString();
+            TxtRedHex.Text = SelectedColor.R.ToString("X");
+            TxtGreen.Text = SelectedColor.G.ToString();
+            TxtGreenHex.Text = SelectedColor.G.ToString("X");
+            TxtBlue.Text = SelectedColor.B.ToString();
+            TxtBlueHex.Text = SelectedColor.B.ToString("X");
+            TxtAll.Text = $"#{TxtAlphaHex.Text}{TxtRedHex.Text}{TxtGreenHex.Text}{TxtBlueHex.Text}";
         }
 
         /// <summary>
@@ -172,7 +172,7 @@ namespace ColorPicker
             drawingAttributes.Width = 5;
 
             // Update DA on previewPresenter
-            foreach (var s in previewPresenter.Strokes)
+            foreach (var s in PreviewPresenter.Strokes)
             {
                 s.DrawingAttributes = drawingAttributes;
             }

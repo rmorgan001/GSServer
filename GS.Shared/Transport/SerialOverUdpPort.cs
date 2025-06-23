@@ -142,9 +142,9 @@ namespace GS.Shared.Transport
 
     internal class SendReceiveState
     {
-        public SendReceiveState(int timeoutMS)
+        public SendReceiveState(int timeoutMs)
         {
-            Cts = new CancellationTokenSource(timeoutMS);
+            Cts = new CancellationTokenSource(timeoutMs);
         }
         public string Received { get; set; }
         public CancellationTokenSource Cts { get; }

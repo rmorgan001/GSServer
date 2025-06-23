@@ -65,7 +65,7 @@ namespace GS.Server.Settings
 
                     var monitorItem = new MonitorEntry
                     {
-                        Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI,
+                        Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Ui,
                         Category = MonitorCategory.Interface, Type = MonitorType.Information,
                         Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                         Message = "Loading SettingsVM"
@@ -122,7 +122,7 @@ namespace GS.Server.Settings
                     monitorItem = new MonitorEntry
                     {
                         Datetime = HiResDateTime.UtcNow,
-                        Device = MonitorDevice.UI,
+                        Device = MonitorDevice.Ui,
                         Category = MonitorCategory.Interface,
                         Type = MonitorType.Information,
                         Method = MethodBase.GetCurrentMethod()?.Name,
@@ -141,7 +141,7 @@ namespace GS.Server.Settings
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI,
+                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
@@ -214,7 +214,7 @@ namespace GS.Server.Settings
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI,
+                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
@@ -247,7 +247,7 @@ namespace GS.Server.Settings
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI,
+                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
@@ -769,7 +769,7 @@ namespace GS.Server.Settings
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI,
+                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
@@ -797,7 +797,7 @@ namespace GS.Server.Settings
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI,
+                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
@@ -822,8 +822,8 @@ namespace GS.Server.Settings
 
         public static bool Ui
         {
-            get => MonitorLog.InDevices(MonitorDevice.UI);
-            set => MonitorLog.DevicesToMonitor(MonitorDevice.UI, value);
+            get => MonitorLog.InDevices(MonitorDevice.Ui);
+            set => MonitorLog.DevicesToMonitor(MonitorDevice.Ui, value);
         }
 
         public bool Driver
@@ -941,7 +941,7 @@ namespace GS.Server.Settings
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -986,7 +986,7 @@ namespace GS.Server.Settings
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1043,7 +1043,7 @@ namespace GS.Server.Settings
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI,
+                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
@@ -1086,7 +1086,7 @@ namespace GS.Server.Settings
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI,
+                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
@@ -1151,7 +1151,7 @@ namespace GS.Server.Settings
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI,
+                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
@@ -1216,7 +1216,7 @@ namespace GS.Server.Settings
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI,
+                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
@@ -1261,7 +1261,7 @@ namespace GS.Server.Settings
             {
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI,
+                    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface, Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}"
@@ -1296,9 +1296,9 @@ namespace GS.Server.Settings
             {
                 using (new WaitCursor())
                 {
-                    var folder = GSFile.GetFolderName(GSFile.GetLogPath());
+                    var folder = GsFile.GetFolderName(GsFile.GetLogPath());
                     if(string.IsNullOrEmpty(folder)){ return; }
-                    if (Directory.Exists(folder)) { GSFile.SaveLogPath(folder); }
+                    if (Directory.Exists(folder)) { GsFile.SaveLogPath(folder); }
                 }
             }
             catch (Exception ex)
@@ -1306,7 +1306,7 @@ namespace GS.Server.Settings
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1405,7 +1405,7 @@ namespace GS.Server.Settings
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.UI,
+                Device = MonitorDevice.Ui,
                 Category = MonitorCategory.Interface,
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1593,7 +1593,7 @@ namespace GS.Server.Settings
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1670,7 +1670,7 @@ namespace GS.Server.Settings
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1714,7 +1714,7 @@ namespace GS.Server.Settings
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.UI,
+                    Device = MonitorDevice.Ui,
                     Category = MonitorCategory.Interface,
                     Type = MonitorType.Error,
                     Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1805,7 +1805,7 @@ namespace GS.Server.Settings
                     var w = new WebClient();
                     var s = w.DownloadString(GsUrl);
 
-                    var html = new HTML();
+                    var html = new Html();
                     var linkList = html.FindLinks(s);
                     foreach (var i in linkList)
                     {
@@ -1864,7 +1864,7 @@ namespace GS.Server.Settings
         {
             try
             {
-                var html = new HTML();
+                var html = new Html();
                 if (!html.IsValidUri(UpdateLink))
                 {
                     OpenDialog(Application.Current.Resources["optNotFound"].ToString());
@@ -1876,10 +1876,14 @@ namespace GS.Server.Settings
                 SkyServer.IsMountRunning = false;
 
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.UI, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Downloading Update, Closing Window" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Ui, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Downloading Update, Closing Window" };
                 MonitorLog.LogToMonitor(monitorItem);
 
-                if (Application.Current.MainWindow != null) Application.Current.MainWindow.Close();
+                if (Application.Current.MainWindow == null)
+                {
+                    return;
+                }
+                Application.Current.MainWindow.Close();
             }
             catch (Exception ex)
             {

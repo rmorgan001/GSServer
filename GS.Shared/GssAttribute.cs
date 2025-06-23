@@ -18,7 +18,7 @@ using System;
 namespace GS.Shared
 {
     /// <summary>
-    /// Specific GS Server attribute that is check when a driver assembly loads
+    /// Specific GS Server attribute that is checked when a driver assembly loads
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class GssAttribute : Attribute

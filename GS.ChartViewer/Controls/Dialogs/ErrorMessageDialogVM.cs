@@ -20,7 +20,7 @@ using GS.Shared.Domain;
 
 namespace GS.ChartViewer.Controls.Dialogs
 {
-    class ErrorMessageDialogVM : INotifyPropertyChanged
+    class ErrorMessageDialogVm : INotifyPropertyChanged
     {
         private string _name;
         public string Name

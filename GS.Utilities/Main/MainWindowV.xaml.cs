@@ -11,7 +11,7 @@ namespace GS.Utilities.Main
         public MainWindowV()
         {
             InitializeComponent();
-            DataContext = new MainWindowVM();
+            DataContext = new MainWindowVm();
         }
 
         private void MainWindow_OnClosed(object sender, EventArgs e)

@@ -7,11 +7,11 @@ namespace GS.Shared.Domain
 {
     public class EnumTypeConverter : EnumConverter
     {
-        private Type m_EnumType;
+        private readonly Type _numType;
         public EnumTypeConverter(Type type)
             : base(type)
         {
-            m_EnumType = type;
+            _numType = type;
         }
 
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destType)
@@ -24,7 +24,7 @@ namespace GS.Shared.Domain
             DescriptionAttribute dna = null;
             if (value != null)
             {
-                FieldInfo fi = m_EnumType.GetField(Enum.GetName(m_EnumType, value));
+                FieldInfo fi = _numType.GetField(Enum.GetName(_numType, value));
                 dna =
                     (DescriptionAttribute)Attribute.GetCustomAttribute(
                         fi, typeof(DescriptionAttribute));
@@ -42,16 +42,16 @@ namespace GS.Shared.Domain
 
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            foreach (FieldInfo fi in m_EnumType.GetFields())
+            foreach (FieldInfo fi in _numType.GetFields())
             {
                 DescriptionAttribute dna =
                     (DescriptionAttribute)Attribute.GetCustomAttribute(
                         fi, typeof(DescriptionAttribute));
 
                 if ((dna != null) && ((string)value == dna.Description))
-                    return Enum.Parse(m_EnumType, fi.Name);
+                    return Enum.Parse(_numType, fi.Name);
             }
-            return Enum.Parse(m_EnumType, (string)value ?? string.Empty);
+            return Enum.Parse(_numType, (string)value ?? string.Empty);
         }
     }
 }

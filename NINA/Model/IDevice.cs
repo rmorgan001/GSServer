@@ -13,7 +13,6 @@
 #endregion "copyright"
 
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -87,7 +86,6 @@ namespace NINA.Model
 
         public void Disconnect()
         {
-            return;
         }
 
         public void SetupDialog()

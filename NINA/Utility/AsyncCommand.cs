@@ -84,17 +84,13 @@ namespace NINA.Utility
 
         public AsyncCommand(Func<Task<TResult>> command)
         {
-            _command = (object o) => {
-                return command();
-            };
+            _command = o => command();
             _canExecute = DefaultCanExecute;
         }
 
         public AsyncCommand(Func<Task<TResult>> command, Predicate<object> canExecute)
         {
-            _command = (object o) => {
-                return command();
-            };
+            _command = o => command();
             _canExecute = canExecute;
         }
 
