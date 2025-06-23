@@ -41,7 +41,7 @@ using Color = System.Drawing.Color;
 
 namespace GS.ChartViewer.Main
 {
-    internal class MainWindowVM : ObservableObject, IDisposable
+    internal class MainWindowVm : ObservableObject, IDisposable
     {
         #region Fields
 
@@ -50,7 +50,7 @@ namespace GS.ChartViewer.Main
 
         #endregion
 
-        public MainWindowVM()
+        public MainWindowVm()
         {
             Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             LoadDefaults();
@@ -321,7 +321,7 @@ namespace GS.ChartViewer.Main
         private bool LoadFile(string filename)
         {
             bool loaded;
-            const int BufferSize = 128;
+            const int bufferSize = 128;
             LineCount = 0;
             BadLineCount = 0;
             var chartType = ChartType.Plot;
@@ -331,7 +331,7 @@ namespace GS.ChartViewer.Main
             using (var fileStream = File.OpenRead(filename))
 
             {
-                using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, BufferSize))
+                using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, bufferSize))
                 {
                     string readline;
                     while ((readline = streamReader.ReadLine()) != null)
@@ -419,7 +419,7 @@ namespace GS.ChartViewer.Main
                 chartlog?.Add($"{chartType}|{ChartLogCode.Data}|{endTime}|LineCount|{LineCount}");
                 chartlog?.Add($"{chartType}|{ChartLogCode.Data}|{endTime}|BadLineCount|{BadLineCount}");
                 loaded = true;
-                Logs = loadedLogs;
+                _logs = loadedLogs;
                 IndexItems = null;
             }
 
@@ -430,7 +430,7 @@ namespace GS.ChartViewer.Main
             var index = new List<IndexItem>();
             var recno = 0;
 
-            foreach (var list in Logs)
+            foreach (var list in _logs)
             {
                 try
                 {
@@ -519,8 +519,8 @@ namespace GS.ChartViewer.Main
             {
                 if (indexItem == null) return;
                 var index = indexItem.RecNo - 1;
-                if (index > Logs.Count) return;
-                var log = Logs[index];
+                if (index > _logs.Count) return;
+                var log = _logs[index];
 
                 ClearChart();
                 ChartsQuality(ChartQuality);
@@ -1006,7 +1006,7 @@ namespace GS.ChartViewer.Main
             }
         }
 
-        private List<List<string>> Logs = new List<List<string>>();
+        private List<List<string>> _logs = new List<List<string>>();
 
         private List<string> _selectedLog;
 
@@ -1364,14 +1364,14 @@ namespace GS.ChartViewer.Main
 
         #region Dialog  
 
-        private string _DialogMsg;
+        private string _dialogMsg;
         public string DialogMsg
         {
-            get => _DialogMsg;
+            get => _dialogMsg;
             set
             {
-                if (_DialogMsg == value) return;
-                _DialogMsg = value;
+                if (_dialogMsg == value) return;
+                _dialogMsg = value;
                 OnPropertyChanged();
             }
         }

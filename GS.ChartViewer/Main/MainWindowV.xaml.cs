@@ -28,7 +28,7 @@ namespace GS.ChartViewer.Main
         public MainWindowV()
         {
             InitializeComponent();
-            DataContext = new MainWindowVM();
+            DataContext = new MainWindowVm();
         }
 
         private void MainWindow_OnClosed(object sender, EventArgs e)
@@ -38,7 +38,7 @@ namespace GS.ChartViewer.Main
 
         private void Axis_OnRangeChanged(RangeChangedEventArgs eventArgs)
         {
-            var vm = (MainWindowVM)DataContext;
+            var vm = (MainWindowVm)DataContext;
             var currentRange = eventArgs.Range;
             var tmpRange = currentRange;
             var time = TimeSpan.FromTicks((long)tmpRange);

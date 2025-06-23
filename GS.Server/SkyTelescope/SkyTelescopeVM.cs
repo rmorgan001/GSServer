@@ -149,9 +149,9 @@ namespace GS.Server.SkyTelescope
                     ParkSelectionSetting = ParkPositions.FirstOrDefault();
                     SetHcFlipsVisibility();
                     RightAscension = "00h 00m 00s";
-                    Declination = "00\xb0 00m 00s";
-                    Azimuth = "00\xb0 00m 00s";
-                    Altitude = "00\xb0 00m 00s";
+                    Declination = "00\xb0" + " 00m 00s";
+                    Azimuth = "00\xb0" + " 00m 00s";
+                    Altitude = "00\xb0" + " 00m 00s";
                     Lha = "00h 00m 00s";
                     Graphic = SkySettings.FrontGraphic;
                     SetTrackingIcon(SkySettings.TrackingRate);

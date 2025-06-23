@@ -16,7 +16,7 @@
         Left="{Binding WindowLeft, Source={x:Static properties:ChartViewer.Default}, Mode=TwoWay}"
         Top="{Binding WindowTop, Source={x:Static properties:ChartViewer.Default}, Mode=TwoWay}"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        Background="{DynamicResource MaterialDesignPaper}" Title="GS LogView" FontSize="13" d:DataContext="{d:DesignInstance main:MainWindowVM}">
+        Background="{DynamicResource MaterialDesignPaper}" Title="GS LogView" FontSize="13" d:DataContext="{d:DesignInstance main:MainWindowVm}">
     <Window.Resources>
         <BooleanToVisibilityConverter  x:Key="BoolToVis" />
         <Style TargetType="{x:Type ScrollBar}">
