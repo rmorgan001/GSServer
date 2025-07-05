@@ -145,9 +145,9 @@ namespace GS.Server.SkyTelescope
 
     public enum PecFileType
     {
-        GSPecWorm = 0,
-        GSPec360 = 1,
-        GSPecDebug = 2
+        GsPecWorm = 0,
+        GsPec360 = 1,
+        GsPecDebug = 2
     }
 
     public enum ReSyncMode

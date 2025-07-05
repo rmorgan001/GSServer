@@ -918,19 +918,17 @@ namespace GS.SkyWatcher
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $":s|{axis}|{response}|{pecPeriod}|Custom:{SkyQueue.CustomRaWormSteps[ax]}" };
             MonitorLog.LogToMonitor(monitorItem);
 
-            if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
-            {
-                response = CmdToMount(axis, 'X', "000E");    // Read 32-bit Resolution of the worm(Counts per revolution)
-                pecPeriod = String32ToInt(response, true, _resolutionFactor[(int)axis]);
-                ax = (int)axis;
-                if (SkyQueue.CustomRaWormSteps[ax] > 0) { pecPeriod = SkyQueue.CustomRaWormSteps[ax]; } // Setup custom mount worm steps
-                _peSteps[ax] = pecPeriod;
-                ret = pecPeriod;
+            if (!SupportAdvancedCommandSet || !AllowAdvancedCommandSet) return ret;
+            response = CmdToMount(axis, 'X', "000E");    // Read 32-bit Resolution of the worm(Counts per revolution)
+            pecPeriod = String32ToInt(response, true, _resolutionFactor[(int)axis]);
+            ax = (int)axis;
+            if (SkyQueue.CustomRaWormSteps[ax] > 0) { pecPeriod = SkyQueue.CustomRaWormSteps[ax]; } // Setup custom mount worm steps
+            _peSteps[ax] = pecPeriod;
+            ret = pecPeriod;
 
-                monitorItem = new MonitorEntry
+            monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $":X000E|{axis}|{response}|{pecPeriod}|Custom:{SkyQueue.CustomRaWormSteps[ax]}" };
-                MonitorLog.LogToMonitor(monitorItem);
-            }
+            MonitorLog.LogToMonitor(monitorItem);
 
             return ret;
         }
@@ -1054,7 +1052,7 @@ namespace GS.SkyWatcher
                     msg = ":F|Axis1";
                 }
                 monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Initialized|" + msg };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Initialized|" + msg };
                 MonitorLog.LogToMonitor(monitorItem);
             }
 
@@ -1751,70 +1749,70 @@ namespace GS.SkyWatcher
                 case "=":  // Normal response
                     break;
                 case "!":  // Abnormal response.
-                    string errormsg;
-                    var subdata = string.Empty;
+                    string errorMsg;
+                    var subData = string.Empty;
                     switch (receivedData)
                     {
                         case "!":
-                            errormsg = "Invalid Reason Code";
-                            if (command == 'q') subdata = "=000000";
+                            errorMsg = "Invalid Reason Code";
+                            if (command == 'q') subData = "=000000";
                             break;
                         case "!0":
-                            errormsg = "Unknown Command: Command doesn't apply to the model";
+                            errorMsg = "Unknown Command: Command doesn't apply to the model";
                             switch (command)
                             {
                                 case 'q':
                                 case 'W':
-                                    subdata = "=000000"; // EQ6R W1060100,!0 workaround
+                                    subData = "=000000"; // EQ6R W1060100,!0 workaround
                                     break;
                                 case 'O':
-                                    subdata = "!0"; // for not supported
+                                    subData = "!0"; // for not supported
                                     break;
                             }
                             break;
                         case "!1":
-                            errormsg = "Invalid Param count: Valid command was passed with invalid param count";
+                            errorMsg = "Invalid Param count: Valid command was passed with invalid param count";
                             break;
                         case "!2":
-                            errormsg = "Motor not Stopped: Valid command failed to run ( ie sending :G whilst motor is running )";
+                            errorMsg = "Motor not Stopped: Valid command failed to run ( ie sending :G whilst motor is running )";
                             // send stop
                             SendRequest(axis, 'K', null);
                             Thread.Sleep(500);
                             break;
                         case "!3":
-                            errormsg = "NonHex Param: Parameter contains a non uppercase Hex Char ";
+                            errorMsg = "NonHex Param: Parameter contains a non uppercase Hex Char ";
                             break;
                         case "!4":
-                            errormsg = "Not energized: Motor is not energized";
+                            errorMsg = "Not energized: Motor is not energized";
                             break;
                         case "!5":
-                            errormsg = "Driver Asleep: card is in sleep mode";
+                            errorMsg = "Driver Asleep: card is in sleep mode";
                             break;
                         case "!6":
-                            errormsg = "Mount is not tracking";
+                            errorMsg = "Mount is not tracking";
                             break;
                         case "!7":
-                            errormsg = "Unknown";
+                            errorMsg = "Unknown";
                             break;
                         case "!8":
-                            errormsg = "Invalid pPEC model";
-                            subdata = "!8";
+                            errorMsg = "Invalid pPEC model";
+                            subData = "!8";
                             break;
                         case "!9":
-                            errormsg = "Invalid Command";
+                            errorMsg = "Invalid Command";
                             break;
                         case "!A":
-                            errormsg = "Extra following data overtime";
+                            errorMsg = "Extra following data overtime";
                             break;
                         default:
-                            errormsg = "Code Not Found";
+                            errorMsg = "Code Not Found";
                             break;
                     }
 
                     monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Abnormal Response|Axis|{axis}|Command|{command}|Received|{receivedData}|CommandStr|{cmdDataStr}|Message|{errormsg}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Abnormal Response|Axis|{axis}|Command|{command}|Received|{receivedData}|CommandStr|{cmdDataStr}|Message|{errorMsg}" };
                     MonitorLog.LogToMonitor(monitorItem);
-                    if (!string.IsNullOrEmpty(subdata)) { return subdata; }
+                    if (!string.IsNullOrEmpty(subData)) { return subData; }
                     receivedData = null;
                     break;
                 default:
@@ -1888,6 +1886,12 @@ namespace GS.SkyWatcher
                 {
                     value += (long)(int.Parse(str.Substring(i, 2), NumberStyles.AllowHexSpecifier) * Math.Pow(16, i - 1));
                 }
+
+                var msg = $"|{str}|{value}";
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = msg };
+                MonitorLog.LogToMonitor(monitorItem);
+
                 return value;
             }
             catch (FormatException e)
@@ -1957,6 +1961,11 @@ namespace GS.SkyWatcher
                 { response = response.Substring(1, response.Length - 1); }
                 var parsed = int.Parse(response, NumberStyles.HexNumber);
                 var a = parsed / divFactor;
+
+                var msg = $"|{response}|{parseFirst}|{divFactor}|{a}";
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = msg };
+                MonitorLog.LogToMonitor(monitorItem);
                 return a;
             }
             catch (Exception ex)

@@ -407,10 +407,10 @@ namespace GS.Server.Pec
                     switch (key)
                     {
                         case "Worm":
-                            filename = GetFileName(PecFileType.GSPecWorm + "_*", _logPath);
+                            filename = GetFileName(PecFileType.GsPecWorm + "_*", _logPath);
                             break;
                         case "360":
-                            filename = GetFileName(PecFileType.GSPec360 + "_*", _logPath);
+                            filename = GetFileName(PecFileType.GsPec360 + "_*", _logPath);
                             break;
                     }
                     if (filename == null) return;
@@ -585,13 +585,13 @@ namespace GS.Server.Pec
             {
                 case PecMode.PecWorm:
                     if (SkyServer.PecWormMaster == null) { return; }
-                    fileType = PecFileType.GSPecWorm;
+                    fileType = PecFileType.GsPecWorm;
                     filePath = GetNextFileName(fileType + "_");
                     PecWormFileName = filePath;
                     break;
                 case PecMode.Pec360:
                     if (SkyServer.Pec360Master == null) { return; }
-                    fileType = PecFileType.GSPec360;
+                    fileType = PecFileType.GsPec360;
                     filePath = GetNextFileName(fileType + "_");
                     Pec360FileName = filePath;
                     break;
@@ -778,9 +778,9 @@ namespace GS.Server.Pec
         {
             if (!Debug) return;
             if (PecTrainDef == null) return;
-            var filePath = GetNextFileName(PecFileType.GSPecDebug + "_");
+            var filePath = GetNextFileName(PecFileType.GsPecDebug + "_");
 
-            var message = $"#FileType={PecFileType.GSPecDebug}" + Environment.NewLine;
+            var message = $"#FileType={PecFileType.GsPecDebug}" + Environment.NewLine;
             message += $"#StartTime={PecTrainDef.StartTime:yyyy:MM:dd:HH:mm:ss.fff}" + Environment.NewLine;
             message += $"#StartPosition={PecTrainDef.StartPosition}" + Environment.NewLine;
             message += $"#EndTime={PecTrainDef.EndTime:yyyy:MM:dd:HH:mm:ss.fff}" + Environment.NewLine;
