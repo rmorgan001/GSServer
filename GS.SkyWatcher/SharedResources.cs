@@ -118,6 +118,7 @@ namespace GS.SkyWatcher
         public bool TrajectoryMode; 
         public string StepSpeed;
         public string Response;
+        public bool LowVoltageEventState;
 
         public void SetFullStop()
         {

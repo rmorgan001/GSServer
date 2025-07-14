@@ -448,6 +448,7 @@ namespace GS.SkyWatcher
         }
 
         private static readonly Version AzgTiAdvancedSetSupportedVersion = new Version(3, 40);
+
         /// <summary>
         /// e or X0005 Gets version of the axis
         /// </summary>
@@ -564,6 +565,8 @@ namespace GS.SkyWatcher
 
             response = CmdToMount(axis, 'f', null);
             _axesStatus[(int)axis].Response = response;
+            // Set low voltage event status
+            _axesStatus[(int)axis].LowVoltageEventState = (response[3] & 0x04) == 4;
 
             //check if at full stop = 1
             if ((response[2] & 0x01) == 0)
@@ -589,6 +592,20 @@ namespace GS.SkyWatcher
             return _axesStatus[(int)axis];
         }
 
+        /// <summary>
+        /// Retrieves the current voltage level of the controller using :qx030000.
+        /// </summary>
+        /// <remarks>This method is intended to obtain the voltage level of the controller for diagnostic
+        /// or monitoring purposes. The voltage value may vary depending on the controller's operational
+        /// state.</remarks>
+        internal double GetControllerVoltage(AxisId axis)
+        {
+            var szCmd = "030000";
+            var response = CmdToMount(axis, 'q', szCmd);
+            if (string.IsNullOrEmpty(response)) return double.NaN;
+            var voltage = StringToLong(response) / 100.0; // Convert to volts
+            return voltage;
+        }
         /// <summary>
         /// g Inquire High Speed Ratio, EQ6Pro, AZeQ5, EQ8 = 16   AZeQ6 = 32
         /// </summary>

@@ -589,6 +589,11 @@ namespace GS.Server.SkyTelescope
                                 case "HcPulseDone":
                                     HcPulseDone = SkyServer.HcPulseDone;
                                     break;
+                                case "LowVoltageEventState":
+                                    LowVoltageEventState = SkyServer.LowVoltageEventState;
+                                    if (SkyServer.LowVoltageEventState)
+                                        OpenDialog($"{ Application.Current.Resources["LowVoltage"]}", $"{Application.Current.Resources["Stopped"]}");
+                                    break;
                             }
                         });
             }
@@ -6099,6 +6104,8 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
+
+        private bool LowVoltageEventState { get; set; }
 
         private bool _parkedBlinker;
         public bool ParkedBlinker

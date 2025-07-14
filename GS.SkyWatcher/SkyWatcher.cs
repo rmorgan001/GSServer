@@ -34,6 +34,15 @@ namespace GS.SkyWatcher
     /// </summary>
     public class SkyWatcher
     {
+        #region Events
+        public event EventHandler LowVoltageEvent; // Low voltage event
+
+        protected virtual void OnLowVoltageEvent()
+        {
+            LowVoltageEvent?.Invoke(this, EventArgs.Empty);
+        }
+        #endregion
+
         #region Fields
 
         private readonly Commands _commands;
@@ -49,6 +58,7 @@ namespace GS.SkyWatcher
         private long[] _lowSpeedGotoMargin = new long[2];
         private long[] _breakSteps = new long[2];
         private readonly double[] _stepsPerSecond = new double[2];
+        private bool _lowVoltageEventState = false; // Low voltage event state
 
         #endregion
 
@@ -88,6 +98,15 @@ namespace GS.SkyWatcher
         internal bool CanAxisSlewsIndependent { get; private set; }
         internal bool CanPolarLed { get; private set; }
         private string Capabilities { get; set; }
+        private bool LowVoltageEventState { 
+            get => _lowVoltageEventState;
+            set
+            {
+                if (value == _lowVoltageEventState) return; // No change
+                _lowVoltageEventState = value;
+                OnLowVoltageEvent();
+            }
+        }
         internal bool MonitorPulse { private get; set; }
         internal string MountType { get; private set; }
         private int MountNum { get; set; }
@@ -879,7 +898,9 @@ namespace GS.SkyWatcher
         /// <returns></returns>
         internal AxisStatus GetAxisStatus(AxisId axis)
         {
-            return _commands.GetAxisStatus(axis);
+            var axisStatus = _commands.GetAxisStatus(axis);
+            LowVoltageEventState = axisStatus.LowVoltageEventState;
+            return axisStatus;
         }
 
         /// <summary>
@@ -981,7 +1002,7 @@ namespace GS.SkyWatcher
 
         #endregion
 
-        #region SciptCommands
+        #region ScriptCommands
 
         /// <summary>
         /// Axis Position
@@ -1022,6 +1043,11 @@ namespace GS.SkyWatcher
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
             }
+        }
+
+        internal double GetControllerVoltage(AxisId axis)
+        {
+            return _commands.GetControllerVoltage(axis);
         }
 
         internal double GetRampDownRange(AxisId axis)

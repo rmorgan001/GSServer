@@ -798,6 +798,39 @@ namespace GS.SkyWatcher
         }
     }
 
+    public class SkyGetControllerVoltage : ISkyCommand
+    {
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public dynamic Result { get; private set; }
+        private readonly AxisId _axis;
+
+        public SkyGetControllerVoltage(long id, AxisId axis)
+        {
+            Id = id;
+            _axis = axis;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            Successful = false;
+            SkyQueue.AddCommand(this);
+        }
+
+        public void Execute(SkyWatcher skyWatcher)
+        {
+            try
+            {
+                Result = skyWatcher.GetControllerVoltage(_axis);
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
     public class SkyGetRampDownRange : ISkyCommand
     {
         public long Id { get; }
