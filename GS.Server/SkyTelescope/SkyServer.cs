@@ -190,6 +190,7 @@ namespace GS.Server.SkyTelescope
         private static Exception _lastAutoHomeError;
         private static double _lha;
         private static bool _limitAlarm;
+        private static bool _lowVoltageEventState;
         private static bool _mountRunning;
         private static bool _monitorPulse;
         private static double _mountAxisX;
@@ -734,6 +735,19 @@ namespace GS.Server.SkyTelescope
 
                 SimTasks(MountTaskName.MonitorPulse);
                 SkyTasks(MountTaskName.MonitorPulse);
+            }
+        }
+
+        /// <summary>
+        /// Low voltage event from mount status
+        /// </summary>
+        public static bool LowVoltageEventState
+        {
+            get => _lowVoltageEventState;
+            private set
+            {
+                _lowVoltageEventState = value;
+                OnStaticPropertyChanged();
             }
         }
 
@@ -5245,7 +5259,7 @@ namespace GS.Server.SkyTelescope
                         customWormSteps = new[] { (double)SkySettings.CustomRa360Steps / SkySettings.CustomRaWormTeeth, (double)SkySettings.CustomDec360Steps / SkySettings.CustomDecWormTeeth };
                     }
 
-                    SkyQueue.Start(SkySystem.Serial, custom360Steps, customWormSteps);
+                    SkyQueue.Start(SkySystem.Serial, custom360Steps, customWormSteps, LowVoltageEventSet);
                     if (!SkyQueue.IsRunning)
                     {
                         throw new SkyServerException(ErrorCode.ErrMount, "Failed to start sky queue");
@@ -6836,6 +6850,29 @@ namespace GS.Server.SkyTelescope
             {
                 if (hasLock) { Monitor.Exit(TimerLock); }
             }
+        }
+
+        /// <summary>
+        /// Handles the event triggered when a low voltage condition is detected.
+        /// </summary>
+        /// <remarks>This method sets the <see cref="LowVoltageEventState"/> to <see langword="true"/> to
+        /// indicate that a low voltage condition has occurred.</remarks>
+        /// <param name="sender">The source of the event. Typically, this is the object that raised the event.</param>
+        /// <param name="e">An <see cref="EventArgs"/> instance containing the event data.</param>
+        private static void LowVoltageEventSet(object sender, EventArgs e)
+        {
+            LowVoltageEventState = true;
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Mount,
+                Type = MonitorType.Error,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"Mount detected low voltage: check power supply and wiring"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
         }
 
         private static double GetLocalSiderealTime()

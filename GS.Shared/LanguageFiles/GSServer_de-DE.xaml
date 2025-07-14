@@ -765,5 +765,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="PlotNormalize">Entfernen Sie RA-Tracking</system:String>
     <system:String x:Key="DisableKeysOnGoTo">Direction Keys Off</system:String>
     <system:String x:Key="DisableKeysOnGoToToolTip">Disable direction keys during go to</system:String>
+
+    <!--1.1.0.1 -->
+    <system:String x:Key="Stopped">Mount stopped</system:String>
+    <system:String x:Key="LowVoltage">Voltage is low: check power supply and wiring</system:String>
 </ResourceDictionary>
  

@@ -234,7 +234,8 @@ namespace GS.SkyWatcher
         /// <param name="serial"></param>
         /// <param name="customMount360Steps"></param>
         /// <param name="customRaWormSteps"></param>
-        public static void Start(ISerialPort serial, int[] customMount360Steps, double[] customRaWormSteps)
+        /// <param name="lowVoltageEventHandler"></param>
+        public static void Start(ISerialPort serial, int[] customMount360Steps, double[] customRaWormSteps, EventHandler lowVoltageEventHandler = null)
         {
             try
             {
@@ -250,6 +251,7 @@ namespace GS.SkyWatcher
                 var ct = _cts.Token;
 
                 _skyWatcher = new SkyWatcher();
+                _skyWatcher.LowVoltageEvent += lowVoltageEventHandler;
                 _resultsDictionary = new ConcurrentDictionary<long, ISkyCommand>();
                 _commandBlockingCollection = new BlockingCollection<ISkyCommand>();
 
