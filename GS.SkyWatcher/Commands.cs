@@ -528,42 +528,43 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// f or X0001 Get the target axis's status as a struct
+        /// f Get the target axis's status as a struct including low voltage event state.
+        /// X 0001 does not return low voltage event state.
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <returns></returns>
         internal AxisStatus GetAxisStatus(AxisId axis)
         {
-            string response;
-            if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
-            {
-                response = CmdToMount(axis, 'X', "0001");
-                var val = String32ToInt(response, true, 1);
+            //string response;
+            //if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
+            //{
+            //    response = CmdToMount(axis, 'X', "0001");
+            //    var val = String32ToInt(response, true, 1);
 
-                if (IsBitSet(val, 0))
-                {
-                    _axesStatus[(int)axis].FullStop = false;
-                    _axesStatus[(int)axis].Slewing = true;
-                    _axesStatus[(int)axis].SlewingTo = true;
-                    _axesStatus[(int)axis].SlewingForward = true;
-                }
-                else
-                {
-                    _axesStatus[(int)axis].FullStop = true;
-                    _axesStatus[(int)axis].Slewing = false;
-                    _axesStatus[(int)axis].SlewingTo = false;
-                    _axesStatus[(int)axis].StepSpeed = "*";
-                }
+            //    if (IsBitSet(val, 0))
+            //    {
+            //        _axesStatus[(int)axis].FullStop = false;
+            //        _axesStatus[(int)axis].Slewing = true;
+            //        _axesStatus[(int)axis].SlewingTo = true;
+            //        _axesStatus[(int)axis].SlewingForward = true;
+            //    }
+            //    else
+            //    {
+            //        _axesStatus[(int)axis].FullStop = true;
+            //        _axesStatus[(int)axis].Slewing = false;
+            //        _axesStatus[(int)axis].SlewingTo = false;
+            //        _axesStatus[(int)axis].StepSpeed = "*";
+            //    }
 
-                _axesStatus[(int)axis].Response = response;
-                _axesStatus[(int)axis].TrajectoryMode = IsBitSet(val, 2);
-                _axesStatus[(int)axis].HighSpeed = false;
-                _axesStatus[(int)axis].Initialized = IsBitSet(val, 6);
+            //    _axesStatus[(int)axis].Response = response;
+            //    _axesStatus[(int)axis].TrajectoryMode = IsBitSet(val, 2);
+            //    _axesStatus[(int)axis].HighSpeed = false;
+            //    _axesStatus[(int)axis].Initialized = IsBitSet(val, 6);
 
-                return _axesStatus[(int)axis];
-            }
+            //    return _axesStatus[(int)axis];
+            //}
 
-            response = CmdToMount(axis, 'f', null);
+            var response = CmdToMount(axis, 'f', null);
             _axesStatus[(int)axis].Response = response;
             // Set low voltage event status
             _axesStatus[(int)axis].LowVoltageEventState = (response[3] & 0x04) == 4;

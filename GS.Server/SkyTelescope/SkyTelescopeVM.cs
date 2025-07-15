@@ -6105,7 +6105,7 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private bool LowVoltageEventState { get; set; }
+        public bool LowVoltageEventState { get; set; }
 
         private bool _parkedBlinker;
         public bool ParkedBlinker
@@ -10758,6 +10758,8 @@ namespace GS.Server.SkyTelescope
         public string DecArcSec { get; private set; }
         public string Capabilities { get; private set; }
         public string CanAdvancedCmdSupport { get; private set; }
+        public string ControllerVoltage { get; private set; }
+        public string LowVoltageError { get; private set; }
 
         private static string SupportedBol(bool supported)
         {
@@ -10786,25 +10788,27 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
+                    var cultureInfo = CultureInfo.GetCultureInfo(Shared.Settings.Language);
                     DialogContent = new MountInfoDialog();
                     MountName = SkyServer.MountName;
                     MountVersion = SkyServer.MountVersion;
                     RaSteps = SkyServer.StepsPerRevolution[0].ToString();
                     DecSteps = SkyServer.StepsPerRevolution[1].ToString();
-                    RaWormSteps = SkyServer.StepsWormPerRevolution[0].ToString(CultureInfo.InvariantCulture);
-                    DecWormSteps = SkyServer.StepsWormPerRevolution[1].ToString(CultureInfo.InvariantCulture);
-                    RaFreq = SkyServer.StepsTimeFreq[0].ToString(CultureInfo.InvariantCulture);
-                    DecFreq = SkyServer.StepsTimeFreq[1].ToString(CultureInfo.InvariantCulture);
-                    RaCustomOffset = SkyServer.TrackingOffsetRaRate.ToString(CultureInfo.InvariantCulture);
-                    DecCustomOffset = SkyServer.TrackingOffsetDecRate.ToString(CultureInfo.InvariantCulture);
+                    RaWormSteps = SkyServer.StepsWormPerRevolution[0].ToString(cultureInfo);
+                    DecWormSteps = SkyServer.StepsWormPerRevolution[1].ToString(cultureInfo);
+                    RaFreq = SkyServer.StepsTimeFreq[0].ToString(cultureInfo);
+                    DecFreq = SkyServer.StepsTimeFreq[1].ToString(cultureInfo);
+                    RaCustomOffset = SkyServer.TrackingOffsetRaRate.ToString(cultureInfo);
+                    DecCustomOffset = SkyServer.TrackingOffsetDecRate.ToString(cultureInfo);
                     CanPec = SupportedBol(SkyServer.CanPPec);
                     CanPolarLed = SupportedBol(SkyServer.CanPolarLed);
                     CanHome = SupportedBol(SkyServer.CanHomeSensor);
-                    RaArcSec = Math.Round(SkyServer.StepsPerRevolution[0] / 360.0 / 3600, 2).ToString(CultureInfo.InvariantCulture);
-                    DecArcSec = Math.Round(SkyServer.StepsPerRevolution[1] / 360.0 / 3600, 2).ToString(CultureInfo.InvariantCulture);
+                    RaArcSec = Math.Round(SkyServer.StepsPerRevolution[0] / 360.0 / 3600, 2).ToString(cultureInfo);
+                    DecArcSec = Math.Round(SkyServer.StepsPerRevolution[1] / 360.0 / 3600, 2).ToString(cultureInfo);
                     Capabilities = SkyServer.Capabilities;
                     CanAdvancedCmdSupport = SupportedBol(SkyServer.CanAdvancedCmdSupport);
-
+                    LowVoltageError = LowVoltageEventState.ToString();
+                    ControllerVoltage =SkyServer.ControllerVoltage.ToString(cultureInfo);
                     OnPropertyChanged($"MountName");
                     OnPropertyChanged($"MountVersion");
                     OnPropertyChanged($"RaSteps");
@@ -10822,6 +10826,8 @@ namespace GS.Server.SkyTelescope
                     OnPropertyChanged($"DecArcSec");
                     OnPropertyChanged($"Capabilities");
                     OnPropertyChanged($"CanAdvancedCmdSupport");
+                    OnPropertyChanged($"LowVoltageError");
+                    OnPropertyChanged($"ControllerVoltage");
                     IsDialogOpen = true;
                 }
             }
