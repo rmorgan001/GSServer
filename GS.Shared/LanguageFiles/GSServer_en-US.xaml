@@ -146,6 +146,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="mntRaSteps">Ra Steps/Arcsec:</system:String>
     <system:String x:Key="mntDecSteps">Dec Steps/Arcsec:</system:String>
     <system:String x:Key="mntInfo">Mount Info</system:String>
+    <system:String x:Key="mntVoltage">Controller Voltage:</system:String>
+    <system:String x:Key="mntVoltageError">Low Voltage Error:</system:String>
 
     <!--GoTo bar-->
     <system:String x:Key="goAcpCoords">Accept Coordinates?</system:String>

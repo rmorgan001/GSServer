@@ -146,6 +146,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="mntRaSteps">AD Pas/Arcsec:</system:String>
     <system:String x:Key="mntDecSteps">Dec Pas/Arcsec:</system:String>
     <system:String x:Key="mntInfo">Info Monture</system:String>
+    <system:String x:Key="mntVoltage">Tension du contrôleur:</system:String>
+    <system:String x:Key="mntVoltageError">Erreur basse tension:</system:String>
 
     <!--GoTo bar-->
     <system:String x:Key="goAcpCoords">Accepter les coordonnées?</system:String>
@@ -767,6 +769,6 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="DisableKeysOnGoToToolTip">Disable direction keys during go to</system:String>
 
     <!--1.1.0.1 -->
-    <system:String x:Key="Stopped">Mount stopped</system:String>
-    <system:String x:Key="LowVoltage">Voltage is low: check power supply and wiring</system:String>
+    <system:String x:Key="Stopped">monture</system:String>
+    <system:String x:Key="LowVoltage">La tension est basse: vérifiez l'alimentation et le câblage</system:String>
 </ResourceDictionary>

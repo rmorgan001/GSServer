@@ -17,31 +17,32 @@
 using ASCOM.DeviceInterface;
 using ASCOM.Utilities;
 using GS.Principles;
+using GS.Server.Alignment;
 using GS.Server.AutoHome;
 using GS.Server.Helpers;
+using GS.Server.Pec;
+using GS.Server.Pulses;
+using GS.Server.Windows;
 using GS.Shared;
 using GS.Simulator;
 using GS.SkyWatcher;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using GS.Server.Pec;
-using GS.Server.Windows;
-using GS.Server.Alignment;
+using static System.Math;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using AxisStatus = GS.Simulator.AxisStatus;
 using Range = GS.Principles.Range;
-using static System.Math;
-using GS.Server.Pulses;
 
 
 namespace GS.Server.SkyTelescope
@@ -444,6 +445,22 @@ namespace GS.Server.SkyTelescope
                 if (_capabilities == value) { return; }
                 _capabilities = value;
                 OnStaticPropertyChanged();
+            }
+        }
+
+        public static double ControllerVoltage
+        {
+            get
+            {
+                try
+                {
+                    var status = new SkyGetControllerVoltage(SkyQueue.NewId, AxisId.Axis1);
+                    return SkyQueue.GetCommandResult(status).Result;
+                }
+                catch (Exception)
+                {
+                    return Double.NaN;
+                }
             }
         }
 

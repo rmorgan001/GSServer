@@ -342,6 +342,16 @@ namespace GS.SkyApi
         }
 
         /// <inheritdoc />
+        public double GetControllerVoltage(int axis)
+        {
+            ValidateMount();
+            var validAxis = ValidateAxis(axis);
+            var command = new SkyGetControllerVoltage(SkyQueue.NewId, validAxis);
+            var results = GetResult(command);
+            return results.Result;
+        }
+
+        /// <inheritdoc />
         public double GetEncoderCount(int axis)
         {
             ValidateMount();
@@ -443,6 +453,12 @@ namespace GS.SkyApi
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        /// <inheritdoc />
+        public bool GetLowVoltageErrorState()
+        {
+            return SkyServer.LowVoltageEventState;
         }
 
         /// <inheritdoc />
@@ -1257,6 +1273,12 @@ namespace GS.SkyApi
         /// <returns>Cardinal encoder count as long</returns>
         long GetAxisPositionCounter(int axis, bool raw = false);
         /// <summary>
+        /// Retrieves the current voltage of the controller for the specified axis.
+        /// </summary>
+        /// <param name="axis">The axis identifier for which the voltage is requested. Must be a valid axis index.</param>
+        /// <returns>The voltage of the controller for the specified axis, in volts.</returns>
+        double GetControllerVoltage(int axis);
+        /// <summary>
         /// d Gets Axis Current Encoder count
         /// </summary>
         /// <param name="axis">axis number 1 or 2</param>
@@ -1302,6 +1324,11 @@ namespace GS.SkyApi
         /// <param name="axis">axis number 1 or 2</param>
         /// <returns></returns>
         long GetLowSpeedGotoMargin(int axis);
+        /// <summary>
+        /// Determines whether a low voltage error has been logged by the controller.
+        /// </summary>
+        /// <returns><see langword="true"/> if a low voltage error has occured; otherwise, <see langword="false"/>.</returns>
+        bool GetLowVoltageErrorState();
         /// <summary>
         /// e Gets the complete version string
         /// </summary>

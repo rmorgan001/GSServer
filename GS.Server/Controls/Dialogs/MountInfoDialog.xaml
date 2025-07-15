@@ -67,13 +67,17 @@
             <Label Margin="-3" Grid.Row="2" Grid.Column="6" Content="{Binding CanPolarLed}" HorizontalAlignment="Left" />
             <Label Margin="-3" Grid.Row="3" Grid.Column="4" Content="{StaticResource mntHomeSensor}" HorizontalAlignment="Right" />
             <Label Margin="-3" Grid.Row="3" Grid.Column="6" Content="{Binding CanHome}" HorizontalAlignment="Left" />
-            <Label Margin="-3" Grid.Row="4" Grid.Column="4" HorizontalAlignment="Right" >
+            <Label Margin="-3" Grid.Row="4" Grid.Column="4" Content="{StaticResource mntVoltageError}" HorizontalAlignment="Right" />
+            <Label Margin="-3" Grid.Row="4" Grid.Column="6" Content="{Binding LowVoltageError}" HorizontalAlignment="Left" />
+            <Label Margin="-3" Grid.Row="5" Grid.Column="4" Content="{StaticResource mntVoltage}" HorizontalAlignment="Right" />
+            <Label Margin="-3" Grid.Row="5" Grid.Column="6" Content="{Binding ControllerVoltage}" HorizontalAlignment="Left" />
+            <Label Margin="-3" Grid.Row="6" Grid.Column="4" HorizontalAlignment="Right" >
                 <TextBlock>
                     <Run Text="{StaticResource mntAdv}" />
                     <Run Text=":" />
                 </TextBlock>
             </Label>
-            <Label Margin="-3" Grid.Row="4" Grid.Column="6" Content="{Binding CanAdvancedCmdSupport}" HorizontalAlignment="Left" />
+            <Label Margin="-3" Grid.Row="6" Grid.Column="6" Content="{Binding CanAdvancedCmdSupport}" HorizontalAlignment="Left" />
 
             <Button IsDefault="True" IsCancel="True" Grid.Row="15" Grid.Column="0" Grid.ColumnSpan="7" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding OkMountInfoDialogCmd}" Content="{StaticResource diaOk}" />
         </Grid>

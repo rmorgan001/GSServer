@@ -146,6 +146,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="mntRaSteps">RA Schritte/Arksek:</system:String>
     <system:String x:Key="mntDecSteps">Dek Schritte/Arksek:</system:String>
     <system:String x:Key="mntInfo">Montierungs Infos</system:String>
+    <system:String x:Key="mntVoltage">Controller-Spannung:</system:String>
+    <system:String x:Key="mntVoltageError">Unterspannungsfehler:</system:String>
 
     <!--GoTo bar-->
     <system:String x:Key="goAcpCoords">Koordinaten akzeptieren?</system:String>
@@ -767,7 +769,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="DisableKeysOnGoToToolTip">Disable direction keys during go to</system:String>
 
     <!--1.1.0.1 -->
-    <system:String x:Key="Stopped">Mount stopped</system:String>
-    <system:String x:Key="LowVoltage">Voltage is low: check power supply and wiring</system:String>
+    <system:String x:Key="Stopped">Montierung stoppen</system:String>
+    <system:String x:Key="LowVoltage">Die Spannung ist niedrig: Überprüfen Sie die Stromversorgung und die Verkabelung</system:String>
 </ResourceDictionary>
  
