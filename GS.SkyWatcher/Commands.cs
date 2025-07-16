@@ -41,7 +41,7 @@ namespace GS.SkyWatcher
         private readonly double[] _factorRadToStep = { 0, 0 };          // steps per radian based on gear ratio
         private readonly long[] _breakSteps = new long[2];
         private readonly long[] _stepTimerFreq = new long[2];
-        private readonly double[] _peSteps = new double[2];
+        //private readonly double[] _peSteps = new double[2];
         private readonly long[] _axisGearRatios = new long[2];
         private readonly double[] _factorRadRateToInt = { 0, 0 };
         private readonly long[] _lowSpeedGotoMargin = new long[2];
@@ -535,40 +535,37 @@ namespace GS.SkyWatcher
         /// <returns></returns>
         internal AxisStatus GetAxisStatus(AxisId axis)
         {
-            //string response;
-            //if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
-            //{
-            //    response = CmdToMount(axis, 'X', "0001");
-            //    var val = String32ToInt(response, true, 1);
+            string response;
+            if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
+            {
+                response = CmdToMount(axis, 'X', "0001");
+                var val = String32ToInt(response, true, 1);
 
-            //    if (IsBitSet(val, 0))
-            //    {
-            //        _axesStatus[(int)axis].FullStop = false;
-            //        _axesStatus[(int)axis].Slewing = true;
-            //        _axesStatus[(int)axis].SlewingTo = true;
-            //        _axesStatus[(int)axis].SlewingForward = true;
-            //    }
-            //    else
-            //    {
-            //        _axesStatus[(int)axis].FullStop = true;
-            //        _axesStatus[(int)axis].Slewing = false;
-            //        _axesStatus[(int)axis].SlewingTo = false;
-            //        _axesStatus[(int)axis].StepSpeed = "*";
-            //    }
+                if (IsBitSet(val, 0))
+                {
+                    _axesStatus[(int)axis].FullStop = false;
+                    _axesStatus[(int)axis].Slewing = true;
+                    _axesStatus[(int)axis].SlewingTo = true;
+                    _axesStatus[(int)axis].SlewingForward = true;
+                }
+                else
+                {
+                    _axesStatus[(int)axis].FullStop = true;
+                    _axesStatus[(int)axis].Slewing = false;
+                    _axesStatus[(int)axis].SlewingTo = false;
+                    _axesStatus[(int)axis].StepSpeed = "*";
+                }
 
-            //    _axesStatus[(int)axis].Response = response;
-            //    _axesStatus[(int)axis].TrajectoryMode = IsBitSet(val, 2);
-            //    _axesStatus[(int)axis].HighSpeed = false;
-            //    _axesStatus[(int)axis].Initialized = IsBitSet(val, 6);
+                _axesStatus[(int)axis].Response = response;
+                _axesStatus[(int)axis].TrajectoryMode = IsBitSet(val, 2);
+                _axesStatus[(int)axis].HighSpeed = false;
+                _axesStatus[(int)axis].Initialized = IsBitSet(val, 6);
+                _axesStatus[(int)axis].LowVoltageEventState = IsBitSet(val, 9);
+                return _axesStatus[(int)axis];
+            }
 
-            //    return _axesStatus[(int)axis];
-            //}
-
-            var response = CmdToMount(axis, 'f', null);
-            _axesStatus[(int)axis].Response = response;
-            // Set low voltage event status
-            _axesStatus[(int)axis].LowVoltageEventState = (response[3] & 0x04) == 4;
-
+            response = CmdToMount(axis, 'f', null);
+            
             //check if at full stop = 1
             if ((response[2] & 0x01) == 0)
             {
@@ -585,11 +582,12 @@ namespace GS.SkyWatcher
                 _axesStatus[(int)axis].SlewingTo = (response[1] & 0x01) == 0;
             }
 
+            _axesStatus[(int)axis].Response = response;
             _axesStatus[(int)axis].SlewingForward = (response[1] & 0x02) == 0;
             _axesStatus[(int)axis].HighSpeed = (response[1] & 0x04) != 0;
             _axesStatus[(int)axis].Initialized = (response[3] & 1) == 1;
             _axesStatus[(int)axis].TrajectoryMode = false;
-
+            _axesStatus[(int)axis].LowVoltageEventState = (response[3] & 0x04) == 4; // Set low voltage event status
             return _axesStatus[(int)axis];
         }
 
@@ -601,7 +599,7 @@ namespace GS.SkyWatcher
         /// state.</remarks>
         internal double GetControllerVoltage(AxisId axis)
         {
-            var szCmd = "030000";
+            const string szCmd = "030000";
             var response = CmdToMount(axis, 'q', szCmd);
             if (string.IsNullOrEmpty(response)) return double.NaN;
             var voltage = StringToLong(response) / 100.0; // Convert to volts
@@ -929,7 +927,7 @@ namespace GS.SkyWatcher
             var pecPeriod = (double)StringToLong(response);
             var ax = (int)axis;
             if (SkyQueue.CustomRaWormSteps[ax] > 0) { pecPeriod = SkyQueue.CustomRaWormSteps[ax]; } // Setup custom mount worm steps
-            _peSteps[ax] = pecPeriod;
+            //_peSteps[ax] = pecPeriod;
             var ret = pecPeriod;
 
             var monitorItem = new MonitorEntry
@@ -941,7 +939,7 @@ namespace GS.SkyWatcher
             pecPeriod = String32ToInt(response, true, _resolutionFactor[(int)axis]);
             ax = (int)axis;
             if (SkyQueue.CustomRaWormSteps[ax] > 0) { pecPeriod = SkyQueue.CustomRaWormSteps[ax]; } // Setup custom mount worm steps
-            _peSteps[ax] = pecPeriod;
+            //_peSteps[ax] = pecPeriod;
             ret = pecPeriod;
 
             monitorItem = new MonitorEntry

@@ -40,7 +40,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using static System.Math;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using AxisStatus = GS.Simulator.AxisStatus;
 using Range = GS.Principles.Range;
 
@@ -459,7 +458,7 @@ namespace GS.Server.SkyTelescope
                 }
                 catch (Exception)
                 {
-                    return Double.NaN;
+                    return double.NaN;
                 }
             }
         }

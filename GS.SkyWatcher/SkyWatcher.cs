@@ -58,7 +58,7 @@ namespace GS.SkyWatcher
         private long[] _lowSpeedGotoMargin = new long[2];
         private long[] _breakSteps = new long[2];
         private readonly double[] _stepsPerSecond = new double[2];
-        private bool _lowVoltageEventState = false; // Low voltage event state
+        private bool _lowVoltageEventState; // Low voltage event state
 
         #endregion
 
@@ -99,7 +99,7 @@ namespace GS.SkyWatcher
         internal bool CanPolarLed { get; private set; }
         private string Capabilities { get; set; }
         private bool LowVoltageEventState { 
-            get => _lowVoltageEventState;
+            //get => _lowVoltageEventState;  not used
             set
             {
                 if (value == _lowVoltageEventState) return; // No change
