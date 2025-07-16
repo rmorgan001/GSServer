@@ -528,8 +528,7 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// f Get the target axis's status as a struct including low voltage event state.
-        /// X 0001 does not return low voltage event state.
+        /// f / X 0001 Get the target axis's status as a struct including low voltage event state.
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <returns></returns>
@@ -560,7 +559,7 @@ namespace GS.SkyWatcher
                 _axesStatus[(int)axis].TrajectoryMode = IsBitSet(val, 2);
                 _axesStatus[(int)axis].HighSpeed = false;
                 _axesStatus[(int)axis].Initialized = IsBitSet(val, 6);
-                _axesStatus[(int)axis].LowVoltageEventState = IsBitSet(val, 9);
+                _axesStatus[(int)axis].LowVoltageEventState = IsBitSet(val, 10); // x4xx is low voltage event state
                 return _axesStatus[(int)axis];
             }
 
