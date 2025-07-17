@@ -37,14 +37,14 @@ using MaterialDesignThemes.Wpf;
 
 namespace GS.Server.Windows
 {
-    public class ModelVM : ObservableObject, IDisposable
+    public class ModelVm : ObservableObject, IDisposable
     {
         #region Fields
         private readonly Util _util = new Util();
-        public static ModelVM _modelVM;
+        public static ModelVm Model1Vm;
         #endregion
 
-        public ModelVM()
+        public ModelVm()
         {
             try
             {
@@ -61,11 +61,11 @@ namespace GS.Server.Windows
                     ScreenEnabled = SkyServer.IsMountRunning;
                     ModelWinVisibility = false;
                     TopMost = true;
-                    _modelVM = this;
+                    Model1Vm = this;
 
                     LoadImages();
                     Rotate();
-                    LoadGEM();
+                    LoadGem();
 
                     RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
                     Declination = _util.DegreesToDMS(SkyServer.DeclinationXForm, "° ", ":", "", 2);
@@ -158,7 +158,7 @@ namespace GS.Server.Windows
                         {
                             case "AccentColor":
                             case "ModelType":
-                                LoadGEM();
+                                LoadGem();
                                 break;
                         }
                     });
@@ -238,9 +238,9 @@ namespace GS.Server.Windows
         #endregion
 
         #region Viewport3D
-        private double xAxisOffset;
-        private double yAxisOffset;
-        private double zAxisOffset;
+        private double _x1AxisOffset;
+        private double _y1AxisOffset;
+        private double _z1AxisOffset;
 
         private bool _modelWinVisibility;
         public bool ModelWinVisibility
@@ -323,7 +323,7 @@ namespace GS.Server.Windows
             set
             {
                 _xAxis = value;
-                XAxisOffset = value + xAxisOffset;
+                XAxisOffset = value + _x1AxisOffset;
                 OnPropertyChanged();
             }
         }
@@ -335,7 +335,7 @@ namespace GS.Server.Windows
             set
             {
                 _yAxis = value;
-                YAxisOffset = value + yAxisOffset;
+                YAxisOffset = value + _y1AxisOffset;
                 OnPropertyChanged();
             }
         }
@@ -347,7 +347,7 @@ namespace GS.Server.Windows
             set
             {
                 _zAxis = value;
-                ZAxisOffset = zAxisOffset - value;
+                ZAxisOffset = _z1AxisOffset - value;
                 OnPropertyChanged();
             }
         }
@@ -418,7 +418,7 @@ namespace GS.Server.Windows
                 OnPropertyChanged();
             }
         }
-        private void LoadGEM()
+        private void LoadGem()
         {
             try
             {
@@ -445,9 +445,9 @@ namespace GS.Server.Windows
                         YAxis = 90;
                         ZAxis = 90;
                         //offset for model to match start position
-                        xAxisOffset = 0;
-                        yAxisOffset = 90;
-                        zAxisOffset = 0;
+                        _x1AxisOffset = 0;
+                        _y1AxisOffset = 90;
+                        _z1AxisOffset = 0;
                         YAxisCentre = 0;
                         GemBlockVisible = false;
                         break;
@@ -457,14 +457,12 @@ namespace GS.Server.Windows
                         XAxis = -90;
                         YAxis = 90;
                         //offset for model to match start position
-                        xAxisOffset = 90;
-                        yAxisOffset = -90;
-                        zAxisOffset = 0;
+                        _x1AxisOffset = 90;
+                        _y1AxisOffset = -90;
+                        _z1AxisOffset = 0;
                         ZAxis = Math.Round(Math.Abs(SkySettings.Latitude), 2);
                         YAxisCentre = Settings.Settings.YAxisCentre;
                         GemBlockVisible = true;
-                        break;
-                    default:
                         break;
                 }
 
@@ -581,7 +579,7 @@ namespace GS.Server.Windows
         {
             try
             {
-                LoadGEM();
+                LoadGem();
             }
             catch (Exception ex)
             {
@@ -962,7 +960,7 @@ namespace GS.Server.Windows
         // NOTE: Leave out the finalizer altogether if this class doesn't
         // own unmanaged resources itself, but leave the other methods
         // exactly as they are.
-        ~ModelVM()
+        ~ModelVm()
         {
             // Finalizer calls Dispose(false)
             Dispose(false);

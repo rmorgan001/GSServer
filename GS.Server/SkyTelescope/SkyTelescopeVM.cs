@@ -2496,7 +2496,7 @@ namespace GS.Server.SkyTelescope
                 var win = Application.Current.Windows.OfType<ModelV>().FirstOrDefault();
                 if (win != null) return;
                 var bWin = new ModelV();
-                var modelVm = ModelVM._modelVM;
+                var modelVm = ModelVm.Model1Vm;
                 modelVm.WinHeight = 320;
                 modelVm.WinWidth = 250;
                 modelVm.Position = Position;

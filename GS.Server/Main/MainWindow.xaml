@@ -43,7 +43,7 @@
         <DataTemplate DataType="{x:Type gamepad:GamePadVM}">
             <gamepad:GamePadV />
         </DataTemplate>
-        <DataTemplate DataType="{x:Type model3D:Model3DVM}">
+        <DataTemplate DataType="{x:Type model3D:Model3Dvm}">
             <model3D:Model3DV />
         </DataTemplate>
         <DataTemplate DataType="{x:Type plot:PlotVm}">

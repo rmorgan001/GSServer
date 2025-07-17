@@ -56,7 +56,7 @@ namespace GS.Server.Main
         private NotesVM _notesVm;
         private SettingsVm _settingsVm;
         private GamePadVM _gamePadVm;
-        private Model3DVM _model3dVm;
+        private Model3Dvm _model3dVm;
         private PlotVm _plotVm;
         private PoleLocatorVM _poleLocatorVm;
         private PulsesVM _pulsesVm;
@@ -276,7 +276,7 @@ namespace GS.Server.Main
                     {
                         if (!PageViewModels.Contains(_model3dVm))
                         {
-                            _model3dVm = new Model3DVM();
+                            _model3dVm = new Model3Dvm();
                             PageViewModels.Add(_model3dVm);
                         }
                         Model3DRadioVisible = true;

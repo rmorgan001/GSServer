@@ -9,7 +9,7 @@
         mc:Ignorable="d" TextElement.FontSize="14" ResizeMode="CanResizeWithGrip" WindowStyle="None" 
         TextOptions.TextFormattingMode="Display" Height="{Binding WinHeight}" Width="{Binding WinWidth}"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Title="{StaticResource 3dModel}" FontStretch="Normal" Topmost="{Binding TopMost}"
-        d:DataContext="{d:DesignInstance windows:ModelVM, IsDesignTimeCreatable=True}" 
+        d:DataContext="{d:DesignInstance windows:ModelVm, IsDesignTimeCreatable=True}" 
         TextElement.Foreground="{DynamicResource MaterialDesignBody}" 
         WindowState="{Binding WindowStates}" WindowStartupLocation="CenterOwner" AllowsTransparency="True" ContentRendered="MainWindow_OnContentRendered">
     <Window.TaskbarItemInfo>

@@ -39,7 +39,7 @@ using ASCOM.DeviceInterface;
 
 namespace GS.Server.Model3D
 {
-    public class Model3DVM : ObservableObject, IPageVM, IDisposable
+    public class Model3Dvm : ObservableObject, IPageVM, IDisposable
     {
         #region fields
         public string TopName => "";
@@ -49,7 +49,7 @@ namespace GS.Server.Model3D
         private readonly Util _util = new Util();
         #endregion
 
-        public Model3DVM()
+        public Model3Dvm()
         {
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Ui, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading Model3D" };
@@ -64,7 +64,7 @@ namespace GS.Server.Model3D
             Position = Settings.Settings.ModelPosition1;
 
             LoadTopBar();
-            LoadGEM();
+            LoadGem();
             Rotate();
 
             FactorList = new List<int>(Enumerable.Range(1, 21));
@@ -119,7 +119,9 @@ namespace GS.Server.Model3D
                          Lha = _util.HoursToHMS(SkyServer.Lha, "h ", ":", "", 2);
                          break;
                      case "RightAscensionXForm":
-                         RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
+                         var ra = _util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
+                         RightAscension = _raInDegrees ? _util.DegreesToDMS(_util.HMSToDegrees(ra), "° ", ":", "", 2) : ra;
+                         //RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
                          break;
                      case "Rotate3DModel":
                          Rotate();
@@ -179,7 +181,7 @@ namespace GS.Server.Model3D
                             case "AccentColor":
                             case "ModelType":
                                 ModelType = Settings.Settings.ModelType;
-                                LoadGEM();
+                                LoadGem();
                                 break;
                             case "ModelIntFactor":
                                 ModelFactor = Settings.Settings.ModelIntFactor;
@@ -297,14 +299,14 @@ namespace GS.Server.Model3D
                 var win = Application.Current.Windows.OfType<ModelV>().FirstOrDefault();
                 if (win != null) return;
                 var bWin = new ModelV();
-                var _modelVM = ModelVM._modelVM;
-                _modelVM.WinHeight = 220;
-                _modelVM.WinWidth = 250;
-                _modelVM.Position = Position;
-                _modelVM.LookDirection = LookDirection;
-                _modelVM.UpDirection = UpDirection;
-                _modelVM.ImageFile = ImageFile;
-                _modelVM.CameraIndex = 1;
+                var modelVm = ModelVm.Model1Vm;
+                modelVm.WinHeight = 220;
+                modelVm.WinWidth = 250;
+                modelVm.Position = Position;
+                modelVm.LookDirection = LookDirection;
+                modelVm.UpDirection = UpDirection;
+                modelVm.ImageFile = ImageFile;
+                modelVm.CameraIndex = 1;
                 bWin.Show();
             }
             catch (Exception ex)
@@ -357,7 +359,7 @@ namespace GS.Server.Model3D
                     Settings.Settings.ModelPosition2 = new Point3D(900, 1100, 800);
                 }
 
-                LoadGEM();
+                LoadGem();
             }
             catch (Exception ex)
             {
@@ -430,9 +432,9 @@ namespace GS.Server.Model3D
         #endregion
 
         #region Viewport3D
-        private double xAxisOffset;
-        private double yAxisOffset;
-        private double zAxisOffset;
+        private double _x1AxisOffset;
+        private double _y1AxisOffset;
+        private double _z1AxisOffset;
         private string _imageFile;
         public string ImageFile
         {
@@ -644,7 +646,7 @@ namespace GS.Server.Model3D
             set
             {
                 _xAxis = value;
-                XAxisOffset = value + xAxisOffset;
+                XAxisOffset = value + _x1AxisOffset;
                 OnPropertyChanged();
             }
         }
@@ -656,7 +658,7 @@ namespace GS.Server.Model3D
             set
             {
                 _yAxis = value;
-                YAxisOffset = value + yAxisOffset;
+                YAxisOffset = value + _y1AxisOffset;
                 OnPropertyChanged();
             }
         }
@@ -668,7 +670,7 @@ namespace GS.Server.Model3D
             set
             {
                 _zAxis = value;
-                ZAxisOffset = zAxisOffset - value;
+                ZAxisOffset = _z1AxisOffset - value;
                 OnPropertyChanged();
             }
         }
@@ -758,27 +760,27 @@ namespace GS.Server.Model3D
             }
         }
 
-        private int _Interval;
+        private int _interval;
         public int Interval
         {
             get => SkySettings.DisplayInterval;
             set
             {
-                if (value == _Interval) {return;}
-                _Interval = value;
+                if (value == _interval) {return;}
+                _interval = value;
                 OnPropertyChanged();
-                _Interval = value;
+                _interval = value;
                 IntervalTotal = value * ModelFactor;
             }
         }
 
-        private double _IntervalTotal;
+        private double _intervalTotal;
         public double IntervalTotal
         {
-            get => _IntervalTotal;
+            get => _intervalTotal;
             set
             {
-                _IntervalTotal = value;
+                _intervalTotal = value;
                 OnPropertyChanged();
             }
         }
@@ -794,7 +796,7 @@ namespace GS.Server.Model3D
             }
         }
 
-        private void LoadGEM()
+        private void LoadGem()
         {
             try
             {
@@ -809,9 +811,9 @@ namespace GS.Server.Model3D
                 {
                     case AlignmentModes.algAltAz:
                         //offset for model to match start position
-                        xAxisOffset = 0;
-                        yAxisOffset = 90;
-                        zAxisOffset = 0;
+                        _x1AxisOffset = 0;
+                        _y1AxisOffset = 90;
+                        _z1AxisOffset = 0;
                         //start position
                         XAxis = -90;
                         YAxis = 90;
@@ -823,9 +825,9 @@ namespace GS.Server.Model3D
                     case AlignmentModes.algGermanPolar:
                     default:
                         //offset for model to match start position
-                        xAxisOffset = 90;
-                        yAxisOffset = -90;
-                        zAxisOffset = 0;
+                        _x1AxisOffset = 90;
+                        _y1AxisOffset = -90;
+                        _z1AxisOffset = 0;
 
                         //start position
                         XAxis = -90;
@@ -964,6 +966,49 @@ namespace GS.Server.Model3D
                 if (value == _rightAscension) return;
                 _rightAscension = value;
                 OnPropertyChanged();
+            }
+        }
+
+        private bool _raInDegrees;
+
+        private ICommand _raDoubleClickCommand;
+
+        public ICommand RaDoubleClickCommand
+        {
+            get
+            {
+                var command = _raDoubleClickCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _raDoubleClickCommand = new RelayCommand(
+                    ClickRaDoubleClickCommand
+                );
+            }
+        }
+
+        private void ClickRaDoubleClickCommand(object parameter)
+        {
+            try
+            {
+                _raInDegrees = !_raInDegrees;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message);
             }
         }
 
@@ -1169,7 +1214,7 @@ namespace GS.Server.Model3D
             _disposed = true;
         }
 
-        ~Model3DVM()
+        ~Model3Dvm()
         {
             Settings.Settings.ModelLookDirection1 = LookDirection;
             Settings.Settings.ModelUpDirection1 = UpDirection;

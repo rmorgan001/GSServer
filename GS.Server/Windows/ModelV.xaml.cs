@@ -9,7 +9,7 @@ namespace GS.Server.Windows
     {
         public ModelV()
         {
-            DataContext = new ModelVM(); 
+            DataContext = new ModelVm(); 
             InitializeComponent();
         }
 
