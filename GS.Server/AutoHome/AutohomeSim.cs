@@ -53,8 +53,8 @@ namespace GS.Server.AutoHome
         private void HomeSensorCapabilityCheck()
         {
             HasHomeSensor = false;
-            var canHomeCmda = new GetHomeSensorCapability(MountQueue.NewId);
-            bool.TryParse(Convert.ToString(MountQueue.GetCommandResult(canHomeCmda).Result), out bool hasHome);
+            var canHomeCmdA = new GetHomeSensorCapability(MountQueue.NewId);
+            bool.TryParse(Convert.ToString(MountQueue.GetCommandResult(canHomeCmdA).Result), out bool hasHome);
             HasHomeSensor = hasHome;
         }
 
@@ -158,35 +158,35 @@ namespace GS.Server.AutoHome
         {
             HomeSensorCapabilityCheck();
             if (!HasHomeSensor) { return -5; }
-            var _ = new CmdAxisStop(0, axis);
+            _ = new CmdAxisStop(0, axis);
             if (SkyServer.Tracking) SkyServer.Tracking = false;
             //StartCount = GetEncoderCount(axis);
-            var totalmove = 0.0;
+            var totalMove = 0.0;
             // ReSharper disable once RedundantAssignment
             var clockwise = false;
-            var startovers = 0;
+            var startOvers = 0;
             bool? status;
-            bool? loopstatus = null;
+            bool? loopStatus = null;
             SkyServer.AutoHomeProgressBar += 5;
 
             // slew away from those that start at home position
             var slew = SlewAxis(3.3, axis);
-            totalmove += 3.3;
+            totalMove += 3.3;
             if (slew != 0) return slew;
 
             #region 5 degree loops to look for sensor
             for (var i = 0; i <= (maxMove / 5); i++)
             {
                 if (SkyServer.AutoHomeStop) return -3; //stop requested
-                if (totalmove >= maxMove) return -2; // home not found
-                if (startovers >= 2) return -4; // too many restarts
+                if (totalMove >= maxMove) return -2; // home not found
+                if (startOvers >= 2) return -4; // too many restarts
 
                 status = GetValidStatus(axis);
-                var laststatus = status;
+                var lastStatus = status;
                 // check status last loop vs this loop and see if status changed
-                if (status != null && loopstatus != null) // home not found and not first loop
+                if (status != null && loopStatus != null) // home not found and not first loop
                 {
-                    if (status != loopstatus) // status changed but no detection of home
+                    if (status != loopStatus) // status changed but no detection of home
                     {
                         slew = SlewAxis(2.7, axis, clockwise); //slew 5 degrees
                         if (slew != 0) return slew;
@@ -196,7 +196,7 @@ namespace GS.Server.AutoHome
                             //should be far enough from the dead zone to start over.
                             i = 0;
                             //total move = 0.0;
-                            startovers++;
+                            startOvers++;
                             continue; //start over
                         }
                         break; //found home
@@ -218,29 +218,29 @@ namespace GS.Server.AutoHome
 
                 slew = SlewAxis(5.0, axis, clockwise); //slew 5 degrees
                 if (slew != 0) return slew;
-                totalmove += 5.0; // keep track of how far moved
+                totalMove += 5.0; // keep track of how far moved
                 status = GetHomeSensorStatus(axis); // check sensor
-                loopstatus = status;
+                loopStatus = status;
                 if (status != null) // home not found
                 {
-                    if (status == laststatus) continue;
+                    if (status == lastStatus) continue;
                     slew = SlewAxis(5.0 + 2.5, axis, clockwise); //slew 5 degrees
                     if (slew != 0) return slew;
                     status = GetHomeSensorStatus(axis); // check sensor
-                    loopstatus = status;
+                    loopStatus = status;
                     if (status != null)
                     {
                         i = 0;
                         //total move = 0.0;
-                        startovers++;
+                        startOvers++;
                         continue; //start over
                     }
                 }
                 break;//found home
             }
             if (SkyServer.AutoHomeStop) return -3; //stop requested
-            if (totalmove >= maxMove) return -2; // home not found
-            if (startovers >= 2) return -4; // too many restarts
+            if (totalMove >= maxMove) return -2; // home not found
+            if (startOvers >= 2) return -4; // too many restarts
             #endregion
 
             #region slew to detected home
@@ -320,10 +320,10 @@ namespace GS.Server.AutoHome
             switch (axis)
             {
                 case Axis.Axis1:
-                    SkyServer.SlewAxes(a, positions[1], SlewType.SlewMoveAxis);
+                    SkyServer.SlewAxes(a, positions[1], SlewType.SlewMoveAxis, false);
                     break;
                 case Axis.Axis2:
-                    SkyServer.SlewAxes(positions[0], a, SlewType.SlewMoveAxis);
+                    SkyServer.SlewAxes(positions[0], a, SlewType.SlewMoveAxis, false);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
@@ -335,7 +335,7 @@ namespace GS.Server.AutoHome
                 Thread.Sleep(300);
             }
 
-            var _ = new CmdAxisStop(0, axis);
+            _ = new CmdAxisStop(0, axis);
             //Thread.Sleep(1000);
             return 0;
         }
@@ -363,11 +363,11 @@ namespace GS.Server.AutoHome
                 case Axis.Axis1:
                     degrees = direction ? -Math.Abs(degrees) : Math.Abs(degrees);
                     if (SkyServer.SouthernHemisphere) degrees = direction ? Math.Abs(degrees) : -Math.Abs(degrees);
-                    SkyServer.SlewAxes(positions[0] + degrees, positions[1], SlewType.SlewMoveAxis);
+                    SkyServer.SlewAxes(positions[0] + degrees, positions[1], SlewType.SlewMoveAxis, false);
                     break;
                 case Axis.Axis2:
                     degrees = direction ? -Math.Abs(degrees) : Math.Abs(degrees);
-                    SkyServer.SlewAxes(positions[0], positions[1] + degrees, SlewType.SlewMoveAxis);
+                    SkyServer.SlewAxes(positions[0], positions[1] + degrees, SlewType.SlewMoveAxis, false);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
@@ -375,11 +375,11 @@ namespace GS.Server.AutoHome
 
             while (SkyServer.IsSlewing)
             {
-                Console.WriteLine(@"slewing");
+                //Console.WriteLine(@"slewing");
                 Thread.Sleep(300);
             }
 
-            var _ = new CmdAxisStop(0, axis);
+            _ = new CmdAxisStop(0, axis);
 
             //Thread.Sleep(1000);
             return 0;

@@ -6051,9 +6051,9 @@ namespace GS.Server.SkyTelescope
         /// <param name="primaryAxis"></param>
         /// <param name="secondaryAxis"></param>
         /// <param name="slewState"></param>
-        public static void SlewAxes(double primaryAxis, double secondaryAxis, SlewType slewState)
+        public static void SlewAxes(double primaryAxis, double secondaryAxis, SlewType slewState, bool async = true)
         {
-            SlewMount(new Vector(primaryAxis, secondaryAxis), slewState);
+            SlewMount(new Vector(primaryAxis, secondaryAxis), slewState, false, async);
         }
 
         /// <summary>
@@ -6063,7 +6063,7 @@ namespace GS.Server.SkyTelescope
         /// <param name="slewState"></param>
         /// <param name="tracking"></param>
         // ReSharper disable once AsyncVoidMethod
-        private static async void SlewMount(Vector targetPosition, SlewType slewState, bool tracking = false)
+        private static async void SlewMount(Vector targetPosition, SlewType slewState, bool tracking = false, bool async = true)
         {
             if (!IsMountRunning) { return; }
 
@@ -6085,8 +6085,14 @@ namespace GS.Server.SkyTelescope
             //_targetAxes = targetPosition;
             AtPark = false;
             SpeakSlewStart(slewState);
-            //GoToAsync(new[] { _targetAxes.X, _targetAxes.Y }, slewState, tracking);
-            await Task.Run(() => GoToAsync(new[] { targetPosition.X, targetPosition.Y }, slewState, tracking));
+            if (async)
+            {
+                await Task.Run(() => GoToAsync(new[] { targetPosition.X, targetPosition.Y }, slewState, tracking));
+            }
+            else
+            {
+                GoToAsync(new[] { targetPosition.X, targetPosition.Y }, slewState, tracking);
+            }
         }
 
         /// <summary>
