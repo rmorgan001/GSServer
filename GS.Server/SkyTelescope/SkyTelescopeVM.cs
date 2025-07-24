@@ -592,7 +592,7 @@ namespace GS.Server.SkyTelescope
                                 case "LowVoltageEventState":
                                     LowVoltageEventState = SkyServer.LowVoltageEventState;
                                     if (SkyServer.LowVoltageEventState)
-                                        OpenDialog($"{ Application.Current.Resources["LowVoltage"]}", $"{Application.Current.Resources["Stopped"]}");
+                                        OpenDialog($"{Application.Current.Resources["LowVoltage"]}", $"{Application.Current.Resources["Stopped"]}");
                                     break;
                             }
                         });
@@ -10808,7 +10808,18 @@ namespace GS.Server.SkyTelescope
                     Capabilities = SkyServer.Capabilities;
                     CanAdvancedCmdSupport = SupportedBol(SkyServer.CanAdvancedCmdSupport);
                     LowVoltageError = LowVoltageEventState.ToString();
-                    ControllerVoltage =SkyServer.ControllerVoltage.ToString(cultureInfo);
+                    ControllerVoltage = SkyServer.ControllerVoltage.ToString("F2", cultureInfo) + " V";
+                    var monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Ui,
+                        Category = MonitorCategory.Interface,
+                        Type = MonitorType.Information,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"Voltage|{ControllerVoltage}|Voltage error|{LowVoltageError}"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
                     OnPropertyChanged($"MountName");
                     OnPropertyChanged($"MountVersion");
                     OnPropertyChanged($"RaSteps");

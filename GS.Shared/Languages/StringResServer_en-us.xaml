@@ -771,5 +771,6 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--1.1.0.1 -->
     <system:String x:Key="Stopped">Mount stopped</system:String>
     <system:String x:Key="LowVoltage">Voltage is low: check power supply and wiring</system:String>
+    <system:String x:Key="CheckMount">Check mount connections, power and baud rate</system:String>
 </ResourceDictionary>
  

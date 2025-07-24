@@ -771,5 +771,6 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--1.1.0.1 -->
     <system:String x:Key="Stopped">Montierung stoppen</system:String>
     <system:String x:Key="LowVoltage">Die Spannung ist niedrig: Überprüfen Sie die Stromversorgung und die Verkabelung</system:String>
+    <system:String x:Key="CheckMount">Überprüfen Sie die Montierung, die Stromversorgung und die Baudrate</system:String>
 </ResourceDictionary>
  

@@ -771,5 +771,6 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--1.1.0.1 -->
     <system:String x:Key="Stopped">Montatura fermato</system:String>
     <system:String x:Key="LowVoltage">La tensione è bassa: controllare l'alimentazione e il cablaggio</system:String>
+    <system:String x:Key="CheckMount">Controllare i collegamenti della montatura, l'alimentazione e la velocità in baud</system:String>
 </ResourceDictionary>
  

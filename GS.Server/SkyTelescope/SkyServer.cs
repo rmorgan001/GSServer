@@ -39,6 +39,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Xml;
 using static System.Math;
 using AxisStatus = GS.Simulator.AxisStatus;
 using Range = GS.Principles.Range;
@@ -5076,10 +5077,22 @@ namespace GS.Server.SkyTelescope
                     _ = (string)SkyQueue.GetCommandResult(init).Result;
                     if (!init.Successful && init.Exception != null)
                     {
+                        init.Exception = new Exception($"{Application.Current.Resources["CheckMount"]}{Environment.NewLine}{init.Exception.Message}", init.Exception);
                         SkyErrorHandler(init.Exception);
                         return false;
                     }
 
+                    monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Server,
+                        Category = MonitorCategory.Server,
+                        Type = MonitorType.Information,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"Voltage|{SkyServer.ControllerVoltage.ToString("F2")+ " V"}"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
                     // defaults
                     if (SkySettings.Mount == MountType.SkyWatcher)
                     {
