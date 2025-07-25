@@ -765,10 +765,11 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="HcInt">Intervalle</system:String>
     <system:String x:Key="HcRate">La vitesse</system:String>
     <system:String x:Key="PlotNormalize">Supprimer le suivi RA</system:String>
-    <system:String x:Key="DisableKeysOnGoTo">Direction Keys Off</system:String>
-    <system:String x:Key="DisableKeysOnGoToToolTip">Disable direction keys during go to</system:String>
+    <system:String x:Key="DisableKeysOnGoTo">Touches de direction désactivées</system:String>
+    <system:String x:Key="DisableKeysOnGoToToolTip">Désactiver les touches de direction pendant le mouvement</system:String>
 
     <!--1.1.0.1 -->
-    <system:String x:Key="Stopped">monture</system:String>
-    <system:String x:Key="LowVoltage">La tension est basse: vérifiez l'alimentation et le câblage</system:String>
+    <system:String x:Key="Stopped">Monture arrêtée</system:String>
+    <system:String x:Key="LowVoltage">La tension est basse : vérifiez l'alimentation et le câblage</system:String>
+    <system:String x:Key="CheckMount">Vérifiez les connexions de la monture, l'alimentation et le débit en bauds</system:String>
 </ResourceDictionary>
