@@ -4028,16 +4028,27 @@ namespace GS.Server.SkyTelescope
         //}
 
         /// <summary>
-        /// Runs the Goto in async so not to block the driver or UI threads.
+        /// Initiates an asynchronous GoTo operation to move the mount to the specified target coordinates.
         /// </summary>
-        /// <param name="target"></param>
-        /// <param name="slewState"></param>
-        /// <param name="tracking"></param>
-        private static void GoToAsync(double[] target, SlewType slewState, bool tracking = false)
+        /// <remarks>This method handles various mount states, including stopping any ongoing slewing
+        /// operations, canceling pending asynchronous operations, and ensuring the mount is ready for the new GoTo
+        /// command. <para> The method supports different mount types and slewing modes, such as equatorial (RA/Dec) and
+        /// alt-azimuth slewing. It also manages tracking states and updates the mount's internal state based on the
+        /// operation's outcome. </para> <para> If the mount is not running, the method exits early and signals the
+        /// <paramref name="goToStarted"/> handle. If the operation is canceled or fails, the mount's axes are stopped,
+        /// and the internal state is reset. </para></remarks>
+        /// <param name="target">An array of two doubles representing the target coordinates.</param>
+        /// <param name="slewState">The type of slew operation to perform, specified as a <see cref="SlewType"/>.</param>
+        /// <param name="goToStarted">An <see cref="EventWaitHandle"/> that is signaled when the GoTo operation starts.</param>
+        /// <param name="tracking">Optional. A boolean value indicating whether tracking should be enabled after the GoTo operation completes.
+        /// Defaults to <see langword="false"/>.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if an unsupported mount type or slew type is specified.</exception>
+        private static void GoToAsync(double[] target, SlewType slewState, EventWaitHandle goToStarted, bool tracking = false)
         {
             MonitorEntry monitorItem;
             if (!IsMountRunning)
             {
+                goToStarted.Set();
                 return;
             }
 
@@ -4078,6 +4089,7 @@ namespace GS.Server.SkyTelescope
                 SkyPredictor.Set(TargetRa, TargetDec, RateRa, RateDec); // 
             }
             IsSlewing = true;
+            goToStarted.Set(); // Signal that GoTo has started so async ASCOM operations can return with Slewing = true
 
             // Assume fail
             try
@@ -6095,17 +6107,18 @@ namespace GS.Server.SkyTelescope
             HcResetPrevMove(MountAxis.Ra);
             HcResetPrevMove(MountAxis.Dec);
 
-            //_targetAxes = targetPosition;
             AtPark = false;
             SpeakSlewStart(slewState);
-            if (async)
-            {
-                await Task.Run(() => GoToAsync(new[] { targetPosition.X, targetPosition.Y }, slewState, tracking));
-            }
-            else
-            {
-                GoToAsync(new[] { targetPosition.X, targetPosition.Y }, slewState, tracking);
-            }
+            // Set up event handle and task for checking slew started
+            EventWaitHandle goToStartedEvent = new ManualResetEvent(false);
+            Action goTo = () =>
+                GoToAsync(new[] { targetPosition.X, targetPosition.Y }, slewState, goToStartedEvent, tracking);
+            Task goToTask = new Task(goTo);
+            // Start the go to and wait for the started event
+            goToTask.Start();
+            goToStartedEvent.WaitOne(5000); // Timeout for the event to be set
+            if (!async) goToTask.Wait();
+            goToStartedEvent = null;
         }
 
         /// <summary>
