@@ -6076,19 +6076,26 @@ namespace GS.Server.SkyTelescope
         /// <param name="primaryAxis"></param>
         /// <param name="secondaryAxis"></param>
         /// <param name="slewState"></param>
-        public static void SlewAxes(double primaryAxis, double secondaryAxis, SlewType slewState, bool async = true)
+        public static void SlewAxes(double primaryAxis, double secondaryAxis, SlewType slewState, bool slewAsync = true)
         {
-            SlewMount(new Vector(primaryAxis, secondaryAxis), slewState, false, async);
+            SlewMount(new Vector(primaryAxis, secondaryAxis), slewState, false, slewAsync);
         }
 
         /// <summary>
-        /// Start physical mount moves positions in internal degrees.
+        /// Initiates a slew operation to move the mount to the specified target position.
         /// </summary>
-        /// <param name="targetPosition">The position.</param>
-        /// <param name="slewState"></param>
-        /// <param name="tracking"></param>
-        // ReSharper disable once AsyncVoidMethod
-        private static async void SlewMount(Vector targetPosition, SlewType slewState, bool tracking = false, bool async = true)
+        /// <remarks>This method will only execute if the mount is running. If <paramref
+        /// name="slewAsync"/> is <see langword="false"/>,  the method will block until the slew operation is complete.
+        /// Otherwise, the operation will proceed asynchronously.</remarks>
+        /// <param name="targetPosition">The target position to which the mount should slew, specified as a <see cref="Vector"/> with X and Y
+        /// coordinates.</param>
+        /// <param name="slewState">The type of slew operation to perform, specified as a <see cref="SlewType"/>.</param>
+        /// <param name="tracking">A value indicating whether tracking should be enabled during the slew operation. <see langword="true"/> to
+        /// enable tracking; otherwise, <see langword="false"/>. The default is <see langword="false"/>.</param>
+        /// <param name="slewAsync">A value indicating whether the slew operation should be performed asynchronously. <see langword="true"/> to
+        /// perform the operation asynchronously; otherwise, <see langword="false"/>. The default is <see
+        /// langword="true"/>.</param>
+        private static void SlewMount(Vector targetPosition, SlewType slewState, bool tracking = false, bool slewAsync = true)
         {
             if (!IsMountRunning) { return; }
 
@@ -6114,10 +6121,10 @@ namespace GS.Server.SkyTelescope
             Action goTo = () =>
                 GoToAsync(new[] { targetPosition.X, targetPosition.Y }, slewState, goToStartedEvent, tracking);
             Task goToTask = new Task(goTo);
-            // Start the go to and wait for the started event
+            // Start the go to and wait for the started event - IsSlewing will be set
             goToTask.Start();
             goToStartedEvent.WaitOne(5000); // Timeout for the event to be set
-            if (!async) goToTask.Wait();
+            if (!slewAsync) goToTask.Wait();
             goToStartedEvent = null;
         }
 
