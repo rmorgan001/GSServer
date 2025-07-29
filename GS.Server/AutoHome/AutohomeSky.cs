@@ -353,13 +353,13 @@ namespace GS.Server.AutoHome
                     var d = Axes.AxesMountToApp(new[] { c, 0 }); // Convert to local
                     if ((SkySettings.AlignmentMode != AlignmentModes.algAltAz) && (SkyServer.SouthernHemisphere)) d[0] = d[0] + 180;
 
-                    SkyServer.SlewAxes(d[0], positions[1], SlewType.SlewMoveAxis, false);
+                    SkyServer.SlewAxes(d[0], positions[1], SlewType.SlewMoveAxis, slewAsync: false);
                     break;
                 case AxisId.Axis2:
                     var e = Axes.AxesMountToApp(new[] { 0, c }); // Convert to local
                     if ((SkySettings.AlignmentMode != AlignmentModes.algAltAz) && (SkyServer.SouthernHemisphere)) e[1] = 180 - e[1];
 
-                    SkyServer.SlewAxes(positions[0], e[1], SlewType.SlewMoveAxis, false);
+                    SkyServer.SlewAxes(positions[0], e[1], SlewType.SlewMoveAxis, slewAsync: false);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
@@ -401,13 +401,13 @@ namespace GS.Server.AutoHome
                     degrees = direction ? Math.Abs(degrees) : -Math.Abs(degrees);
                     if ((SkySettings.AlignmentMode != AlignmentModes.algAltAz) && (SkyServer.SouthernHemisphere))
                         degrees = direction ? -Math.Abs(degrees) : Math.Abs(degrees);
-                    SkyServer.SlewAxes(positions[0] + degrees, positions[1], SlewType.SlewMoveAxis, false);
+                    SkyServer.SlewAxes(positions[0] + degrees, positions[1], SlewType.SlewMoveAxis, slewAsync: false);
                     break;
                 case AxisId.Axis2:
                     degrees = direction ? -Math.Abs(degrees) : Math.Abs(degrees);
                     if ((SkySettings.AlignmentMode != AlignmentModes.algAltAz) && (SkyServer.SouthernHemisphere))
                         degrees = direction ? Math.Abs(degrees) : -Math.Abs(degrees);
-                    SkyServer.SlewAxes(positions[0], positions[1] + degrees, SlewType.SlewMoveAxis, false);
+                    SkyServer.SlewAxes(positions[0], positions[1] + degrees, SlewType.SlewMoveAxis, slewAsync: false);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);

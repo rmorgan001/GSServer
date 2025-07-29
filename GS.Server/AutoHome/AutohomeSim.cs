@@ -320,10 +320,10 @@ namespace GS.Server.AutoHome
             switch (axis)
             {
                 case Axis.Axis1:
-                    SkyServer.SlewAxes(a, positions[1], SlewType.SlewMoveAxis, false);
+                    SkyServer.SlewAxes(a, positions[1], SlewType.SlewMoveAxis, slewAsync: false);
                     break;
                 case Axis.Axis2:
-                    SkyServer.SlewAxes(positions[0], a, SlewType.SlewMoveAxis, false);
+                    SkyServer.SlewAxes(positions[0], a, SlewType.SlewMoveAxis, slewAsync: false);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
@@ -363,11 +363,11 @@ namespace GS.Server.AutoHome
                 case Axis.Axis1:
                     degrees = direction ? -Math.Abs(degrees) : Math.Abs(degrees);
                     if (SkyServer.SouthernHemisphere) degrees = direction ? Math.Abs(degrees) : -Math.Abs(degrees);
-                    SkyServer.SlewAxes(positions[0] + degrees, positions[1], SlewType.SlewMoveAxis, false);
+                    SkyServer.SlewAxes(positions[0] + degrees, positions[1], SlewType.SlewMoveAxis, slewAsync: false);
                     break;
                 case Axis.Axis2:
                     degrees = direction ? -Math.Abs(degrees) : Math.Abs(degrees);
-                    SkyServer.SlewAxes(positions[0], positions[1] + degrees, SlewType.SlewMoveAxis, false);
+                    SkyServer.SlewAxes(positions[0], positions[1] + degrees, SlewType.SlewMoveAxis, slewAsync: false);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
