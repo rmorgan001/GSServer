@@ -1,0 +1,69 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="GS.Server.Properties.Profiles" GeneratedClassName="GermanPolar">
+  <Profiles />
+  <Settings>
+    <Setting Name="ParkPositions" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">[{"Name":"Default","X":90.0,"Y":90.0},{"Name":"Home","X":90.0,"Y":90.0}]</Value>
+    </Setting>
+    <Setting Name="HomeAxisX" Type="System.Double" Scope="Application">
+      <Value Profile="(Default)">90</Value>
+    </Setting>
+    <Setting Name="HomeAxisY" Type="System.Double" Scope="Application">
+      <Value Profile="(Default)">90</Value>
+    </Setting>
+    <Setting Name="HourAngleLimit" Type="System.Double" Scope="Application">
+      <Value Profile="(Default)">15</Value>
+    </Setting>
+    <Setting Name="CanSetPierSide" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="AlignmentMode" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">algGermanPolar</Value>
+    </Setting>
+    <Setting Name="AxisUpperLimitY" Type="System.Double" Scope="Application">
+      <Value Profile="(Default)">180</Value>
+    </Setting>
+    <Setting Name="AxisLowerLimitY" Type="System.Double" Scope="Application">
+      <Value Profile="(Default)">-180</Value>
+    </Setting>
+    <Setting Name="AtPark" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="AxisLimitX" Type="System.Double" Scope="Application">
+      <Value Profile="(Default)">180</Value>
+    </Setting>
+    <Setting Name="ModelType" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Default</Value>
+    </Setting>
+    <Setting Name="AxisModelOffsets" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">{"X":90.0,"Y":-90.0,"Z":0.0}</Value>
+    </Setting>
+    <Setting Name="AxisHzTrackingLimit" Type="System.Double" Scope="Application">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="ParkAxes" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">[90,90]</Value>
+    </Setting>
+    <Setting Name="LimitTracking" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="LimitPark" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ParkLimitName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Default</Value>
+    </Setting>
+    <Setting Name="HzLimitTracking" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="HzLimitPark" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ParkHzLimitName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Default</Value>
+    </Setting>
+    <Setting Name="AxisOriginX" Type="System.Double" Scope="Application">
+      <Value Profile="(Default)">90</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

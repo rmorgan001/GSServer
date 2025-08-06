@@ -564,7 +564,7 @@ namespace GS.SkyWatcher
             }
 
             response = CmdToMount(axis, 'f', null);
-            
+
             //check if at full stop = 1
             if ((response[2] & 0x01) == 0)
             {
@@ -840,7 +840,7 @@ namespace GS.SkyWatcher
                     }
                 }
                 var iPosition = StringToLong(response);
-                if(!raw){iPosition -= 0x00800000;}
+                if (!raw) { iPosition -= 0x00800000; }
                 return iPosition;
             }
         }
@@ -942,7 +942,7 @@ namespace GS.SkyWatcher
             ret = pecPeriod;
 
             monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $":X000E|{axis}|{response}|{pecPeriod}|Custom:{SkyQueue.CustomRaWormSteps[ax]}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $":X000E|{axis}|{response}|{pecPeriod}|Custom:{SkyQueue.CustomRaWormSteps[ax]}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             return ret;

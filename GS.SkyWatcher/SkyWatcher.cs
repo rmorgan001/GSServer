@@ -99,7 +99,7 @@ namespace GS.SkyWatcher
         internal bool CanPolarLed { get; private set; }
         private string Capabilities { get; set; }
         private bool LowVoltageEventState { 
-            //get => _lowVoltageEventState;  not used
+            //get => _lowVoltageEventState; not used
             set
             {
                 if (value == _lowVoltageEventState) return; // No change
@@ -192,7 +192,7 @@ namespace GS.SkyWatcher
                         // issue new stop
                         if (counter % 5 == 0) { AxisStop(axis); }
                         counter++;
-                        Thread.Sleep(100);
+                        Thread.Sleep(25);
                     }
                     return;
                 }
@@ -205,6 +205,7 @@ namespace GS.SkyWatcher
                 }
 
                 var speedInt = CalculateSpeed(axis, internalSpeed); // Calculate mount speed
+                speedInt = Math.Min(speedInt, (long)0x00ffffff); // I command parameter must fit in 24 bits
 
                 SetRates(axis, rate);
 
@@ -238,7 +239,7 @@ namespace GS.SkyWatcher
                             // issue new stop
                             if (counter % 5 == 0) { AxisStop(axis); }
                             counter++;
-                            Thread.Sleep(100);
+                            Thread.Sleep(25);
                         }
                     }
 

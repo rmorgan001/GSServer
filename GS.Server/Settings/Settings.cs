@@ -173,7 +173,7 @@ namespace GS.Server.Settings
             {
                 if (_modelType == value) return;
                 _modelType = value;
-                Properties.Server.Default.ModelType = value.ToString();
+                Properties.SkyTelescope.Default.ModelType = value.ToString();
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
@@ -587,6 +587,47 @@ namespace GS.Server.Settings
             }
         }
 
+        private static double _modelPierHeight;
+        public static double ModelPierHeight
+        {
+            get => _modelPierHeight;
+            set
+            {
+                if (Math.Abs(_modelPierHeight - value) < 0.1) return;
+                _modelPierHeight = value;
+                Properties.Server.Default.ModelPierHeight = value;
+                // LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static double _modelPierPivot;
+        public static double ModelPierPivot
+        {
+            get => _modelPierPivot;
+            set
+            {
+                if (Math.Abs(_modelPierPivot - value) < 0.1) return;
+                _modelPierPivot = value;
+                Properties.Server.Default.ModelPierPivot = value;
+                // LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        private static double _modelBeamWidth;
+        public static double ModelBeamWidth
+        {
+            get => _modelBeamWidth;
+            set
+            {
+                if (Math.Abs(_modelBeamWidth - value) < 0.1) return;
+                _modelBeamWidth = value;
+                Properties.Server.Default.ModelBeamWidth = value;
+                // LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
         #endregion
 
         #region Methods      
@@ -615,6 +656,9 @@ namespace GS.Server.Settings
             ModelLookDirection2 = Vector3D.Parse(Properties.Server.Default.ModelLookDirection2);
             ModelPosition2 = Point3D.Parse(Properties.Server.Default.ModelPosition2);
             ModelUpDirection2 = Vector3D.Parse(Properties.Server.Default.ModelUpDirection2);
+            ModelPierHeight = Properties.Server.Default.ModelPierHeight;
+            ModelBeamWidth = Properties.Server.Default.ModelBeamWidth;
+            ModelPierPivot = Properties.Server.Default.ModelPierPivot;
             Pec = Properties.Server.Default.Pec;
             Plot = Properties.Server.Default.Plot;
             PoleLocator = Properties.Server.Default.PoleLocator;
@@ -637,9 +681,6 @@ namespace GS.Server.Settings
             WindowTop = Properties.Server.Default.WindowTop;
             AlignmentTabVisible = Properties.Server.Default.AlignmentTabVisible;
             YAxisCentre = Properties.Server.Default.YAxisCentre;
-
-            Enum.TryParse<Model3DType>(Properties.Server.Default.ModelType, true, out var aparse);
-            ModelType = aparse;
 
         }
 

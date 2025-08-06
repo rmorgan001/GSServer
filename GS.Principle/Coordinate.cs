@@ -14,6 +14,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using System;
+using System.Collections.Generic;
 
 namespace GS.Principles
 {
@@ -102,6 +103,33 @@ namespace GS.Principles
             return haDec2AltAz;
         }
 
+        /// <summary>
+        /// Altitude and Azimuth to Hour Angles and Declination
+        /// </summary>
+        /// <param name="altitude">In decimal degrees</param>
+        /// <param name="azimuth">In decimal degrees</param>
+        /// <param name="latitude">In decimal degrees</param>
+        /// <returns>HA in decimal hours, Dec in decimal degrees</returns>
+        public static double[] AltAz2HaDec(double altitude, double azimuth, double latitude)
+        {
+            var a = Units.Deg2Rad(azimuth);
+            var b = Units.Deg2Rad(altitude);
+            var c = Units.Deg2Rad(latitude);
+            var d = Math.Sin(a);
+            var e = Math.Cos(a);
+            var f = Math.Sin(b);
+            var g = Math.Cos(b);
+            var h = Math.Sin(c);
+            var i = Math.Cos(c);
+            var j = e * i * g + h * f;
+            var k = Units.Rad2Deg2(Math.Asin(j));
+            var l = Range.Range90(k);
+            var n = -d * g;
+            var o = -e * h * g + f * i;
+            var p = Units.Rad2Hrs(Math.Atan2(n, o));
+            return new [] {p, l};
+        }
+
         ///// <summary>
         ///// Hour Angles and Declination to Azimuth
         ///// Adopted from AsCom
@@ -154,6 +182,7 @@ namespace GS.Principles
 
         /// <summary>
         /// Azimuth and Altitude to Right Ascension and Declination
+        /// Adopted from AsCom
         /// </summary>
         /// <param name="altitude">In decimal degrees</param>
         /// <param name="azimuth">In decimal degrees</param>

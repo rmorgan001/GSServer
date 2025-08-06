@@ -9,7 +9,7 @@
       <Value Profile="(Default)">ps9600</Value>
     </Setting>
     <Setting Name="AlignmentMode" Type="System.String" Scope="User">
-      <Value Profile="(Default)">algGermanPolar</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="AlternatingPPEC" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -18,7 +18,7 @@
       <Value Profile="(Default)">0.2</Value>
     </Setting>
     <Setting Name="AtPark" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="AutoTrack" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -48,13 +48,13 @@
       <Value Profile="(Default)">None</Value>
     </Setting>
     <Setting Name="HomeAxisX" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="HomeAxisY" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="HourAngleLimit" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">15</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="KingRate" Type="System.Double" Scope="User">
       <Value Profile="(Default)">15.0369</Value>
@@ -73,12 +73,6 @@
     </Setting>
     <Setting Name="HcSpeed" Type="System.String" Scope="User">
       <Value Profile="(Default)">Seven</Value>
-    </Setting>
-    <Setting Name="ParkAxisX" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">90</Value>
-    </Setting>
-    <Setting Name="ParkAxisY" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">90</Value>
     </Setting>
     <Setting Name="ReadTimeout" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1000</Value>
@@ -119,9 +113,6 @@
     <Setting Name="CanDoesRefraction" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="CanDualAxisPulseGuide" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
     <Setting Name="CanEquatorial" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
@@ -138,7 +129,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="CanPierSide" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="CanPulseGuide" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -248,7 +239,7 @@
     <Setting Name="HCMode" Type="System.String" Scope="User">
       <Value Profile="(Default)">Axes</Value>
     </Setting>
-    <Setting Name="ParkPositionsEQ" Type="System.String" Scope="User">
+    <Setting Name="ParkPositions" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="ParkName" Type="System.String" Scope="User">
@@ -258,7 +249,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="LimitTracking" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="MinPulseRa" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">20</Value>
@@ -330,7 +321,7 @@
       <Value Profile="(Default)">PecWorm</Value>
     </Setting>
     <Setting Name="LimitPark" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="ParkLimitName" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -389,41 +380,17 @@
     <Setting Name="AltAzTrackingUpdateInterval" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">2500</Value>
     </Setting>
-    <Setting Name="AltAxisLimitOn" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="ParkAxisAz" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="ParkAxisAlt" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="ParkPositionsAltAz" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="AltAzAxesLimitOn" Type="System.String" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="AltAxisUpperLimit" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">80</Value>
-    </Setting>
-    <Setting Name="AltAxisLowerLimit" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">-10</Value>
-    </Setting>
-    <Setting Name="AzSlewLimit" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">15</Value>
-    </Setting>
     <Setting Name="HzLimitTracking" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="ParkHzLimitName" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="HzLimitPark" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="AxisHzTrackingLimit" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="HomeDialog" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -431,11 +398,32 @@
     <Setting Name="ParkDialog" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="AxisUpperLimitY" Type="System.Double" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="AxisLowerLimitY" Type="System.Double" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="AxisLimitX" Type="System.Double" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ModelType" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="AxisModelOffsets" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ParkAxes" Type="System.String" Scope="User">
+      <Value Profile="(Default)">[0,0]</Value>
+    </Setting>
     <Setting Name="HCPulseSpeeds" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="DisableKeysOnGoTo" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="AxisOriginX" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>
 </SettingsFile>

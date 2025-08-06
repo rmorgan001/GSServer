@@ -5,9 +5,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}">
-    <GroupBox Header="{StaticResource btnFlip}" Margin="5">
-        <StackPanel Orientation="Vertical">
-            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" Text="{StaticResource btnContinueFlip}"/>
+    <GroupBox Header="{Binding FlipDialogHeader}" Margin="5">
+        <StackPanel Orientation="Vertical" MaxWidth="220">
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" TextWrapping="Wrap" Text="{Binding FlipDialogText}"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
                 <Button IsDefault="False" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AcceptFlipDialogCommand}" Content="{StaticResource diaAccept}"/>
                 <Button IsCancel="True" IsDefault="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelFlipDialogCommand}" Content="{StaticResource diaCancel}"/>

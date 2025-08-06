@@ -12,7 +12,7 @@ namespace GS.Server.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.13.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.14.0.0")]
     internal sealed partial class SkyTelescope : global::System.Configuration.ApplicationSettingsBase {
         
         private static SkyTelescope defaultInstance = ((SkyTelescope)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new SkyTelescope())));
@@ -49,7 +49,7 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("algGermanPolar")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string AlignmentMode {
             get {
                 return ((string)(this["AlignmentMode"]));
@@ -85,7 +85,6 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool AtPark {
             get {
                 return ((bool)(this["AtPark"]));
@@ -205,7 +204,6 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public double HomeAxisX {
             get {
                 return ((double)(this["HomeAxisX"]));
@@ -217,7 +215,6 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public double HomeAxisY {
             get {
                 return ((double)(this["HomeAxisY"]));
@@ -229,7 +226,6 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("15")]
         public double HourAngleLimit {
             get {
                 return ((double)(this["HourAngleLimit"]));
@@ -308,30 +304,6 @@ namespace GS.Server.Properties {
             }
             set {
                 this["HcSpeed"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("90")]
-        public double ParkAxisX {
-            get {
-                return ((double)(this["ParkAxisX"]));
-            }
-            set {
-                this["ParkAxisX"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("90")]
-        public double ParkAxisY {
-            get {
-                return ((double)(this["ParkAxisY"]));
-            }
-            set {
-                this["ParkAxisY"] = value;
             }
         }
         
@@ -494,18 +466,6 @@ namespace GS.Server.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool CanDualAxisPulseGuide {
-            get {
-                return ((bool)(this["CanDualAxisPulseGuide"]));
-            }
-            set {
-                this["CanDualAxisPulseGuide"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool CanEquatorial {
             get {
                 return ((bool)(this["CanEquatorial"]));
@@ -565,7 +525,6 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool CanPierSide {
             get {
                 return ((bool)(this["CanPierSide"]));
@@ -1010,12 +969,12 @@ namespace GS.Server.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string ParkPositionsEQ {
+        public string ParkPositions {
             get {
-                return ((string)(this["ParkPositionsEQ"]));
+                return ((string)(this["ParkPositions"]));
             }
             set {
-                this["ParkPositionsEQ"] = value;
+                this["ParkPositions"] = value;
             }
         }
         
@@ -1045,7 +1004,6 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool LimitTracking {
             get {
                 return ((bool)(this["LimitTracking"]));
@@ -1333,7 +1291,6 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool LimitPark {
             get {
                 return ((bool)(this["LimitPark"]));
@@ -1573,103 +1530,6 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool AltAxisLimitOn {
-            get {
-                return ((bool)(this["AltAxisLimitOn"]));
-            }
-            set {
-                this["AltAxisLimitOn"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public double ParkAxisAz {
-            get {
-                return ((double)(this["ParkAxisAz"]));
-            }
-            set {
-                this["ParkAxisAz"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public double ParkAxisAlt {
-            get {
-                return ((double)(this["ParkAxisAlt"]));
-            }
-            set {
-                this["ParkAxisAlt"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string ParkPositionsAltAz {
-            get {
-                return ((string)(this["ParkPositionsAltAz"]));
-            }
-            set {
-                this["ParkPositionsAltAz"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public string AltAzAxesLimitOn {
-            get {
-                return ((string)(this["AltAzAxesLimitOn"]));
-            }
-            set {
-                this["AltAzAxesLimitOn"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("80")]
-        public double AltAxisUpperLimit {
-            get {
-                return ((double)(this["AltAxisUpperLimit"]));
-            }
-            set {
-                this["AltAxisUpperLimit"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-10")]
-        public double AltAxisLowerLimit {
-            get {
-                return ((double)(this["AltAxisLowerLimit"]));
-            }
-            set {
-                this["AltAxisLowerLimit"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("15")]
-        public double AzSlewLimit {
-            get {
-                return ((double)(this["AzSlewLimit"]));
-            }
-            set {
-                this["AzSlewLimit"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool HzLimitTracking {
             get {
                 return ((bool)(this["HzLimitTracking"]));
@@ -1693,7 +1553,6 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool HzLimitPark {
             get {
                 return ((bool)(this["HzLimitPark"]));
@@ -1705,7 +1564,6 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public double AxisHzTrackingLimit {
             get {
                 return ((double)(this["AxisHzTrackingLimit"]));
@@ -1741,6 +1599,75 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public double AxisUpperLimitY {
+            get {
+                return ((double)(this["AxisUpperLimitY"]));
+            }
+            set {
+                this["AxisUpperLimitY"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public double AxisLowerLimitY {
+            get {
+                return ((double)(this["AxisLowerLimitY"]));
+            }
+            set {
+                this["AxisLowerLimitY"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public double AxisLimitX {
+            get {
+                return ((double)(this["AxisLimitX"]));
+            }
+            set {
+                this["AxisLimitX"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ModelType {
+            get {
+                return ((string)(this["ModelType"]));
+            }
+            set {
+                this["ModelType"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AxisModelOffsets {
+            get {
+                return ((string)(this["AxisModelOffsets"]));
+            }
+            set {
+                this["AxisModelOffsets"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("[0,0]")]
+        public string ParkAxes {
+            get {
+                return ((string)(this["ParkAxes"]));
+            }
+            set {
+                this["ParkAxes"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string HCPulseSpeeds {
             get {
@@ -1760,6 +1687,18 @@ namespace GS.Server.Properties {
             }
             set {
                 this["DisableKeysOnGoTo"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double AxisOriginX {
+            get {
+                return ((double)(this["AxisOriginX"]));
+            }
+            set {
+                this["AxisOriginX"] = value;
             }
         }
     }

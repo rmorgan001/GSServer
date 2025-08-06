@@ -124,7 +124,7 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <TextBlock Grid.Column="4" Margin="3 0" VerticalAlignment="Center" ToolTip="{StaticResource botTipSOP}" Visibility="{Binding SopShow, Converter={StaticResource BoolToClap}}" Text="{Binding IsSideOfPier}" Foreground="DimGray" FontSize="15">
+        <TextBlock Grid.Column="4" Margin="3 0" VerticalAlignment="Center" ToolTip="{Binding SideOfPierUIToolTip}" Text="{Binding SideOfPierUI}" Foreground="DimGray" FontSize="15">
             <TextBlock.Style>
                 <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
                     <Style.Triggers>
@@ -146,17 +146,6 @@
                                 </BeginStoryboard>
                             </DataTrigger.EnterActions>
                         </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
-        <TextBlock Grid.Column="4" Margin="3 0" VerticalAlignment="Center" Text="{Binding AzDirection}" ToolTip="{StaticResource botTipAzDir}" Visibility="{Binding AzDirShow, Converter={StaticResource BoolToClap}}" FontSize="15" Foreground="{StaticResource SecondaryHueMidBrush}">
-            <TextBlock.Style>
-                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
-                    <Style.Triggers>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="0.5"/>
-                        </Trigger>
                     </Style.Triggers>
                 </Style>
             </TextBlock.Style>

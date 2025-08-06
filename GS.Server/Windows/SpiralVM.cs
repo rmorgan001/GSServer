@@ -1339,7 +1339,13 @@ namespace GS.Server.Windows
                         }
                     }
 
-                    SkyServer.SlewRaDec(radec.X, radec.Y);
+                    var target = SkyServer.MapSlewTargetToAxes(new[] { radec.X, radec.Y }, SlewType.SlewRaDec); // map target to axes
+                    if (target is null)
+                    {
+                        OpenDialog($"{Application.Current.Resources["goTargetLimits"]} Ra: {radec.X} Dec: {radec.Y}");
+                        return;
+                    }
+                    SkyServer.SlewRaDec(radec.X, radec.Y, SkyServer.Tracking);
 
                     var currentpoint = SkyServer.SpiralCollection.Find(x => x.Status == SpiralPointStatus.Current);
                     var newpoint = SkyServer.SpiralCollection.Find(x => x.Index == SelectedPoint.Index);

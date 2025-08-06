@@ -70,6 +70,8 @@ namespace GS.Simulator
         private bool _isGotoSlewingY;
         private bool _homeSensorX;
         private bool _homeSensorY;
+        private int _homeX;
+        private int _homeY;
 
         private const int FactorSteps = 36000;
         private const int MaxRate = 4;
@@ -107,6 +109,8 @@ namespace GS.Simulator
             SlewSpeedEight = 13;
             SnapPort1 = false;
             SnapPort2 = false;
+            _homeX = 90;
+            _homeY = 90;
         }
 
         /// <summary>
@@ -633,7 +637,7 @@ namespace GS.Simulator
             var marY = MoveAxisRate(Axis.Axis2, seconds);
 
             // Ra & Dec Rates 
-            var rdrX= RaDecRate(Axis.Axis1, seconds);
+            var rdrX = RaDecRate(Axis.Axis1, seconds);
             var rdrY = RaDecRate(Axis.Axis2, seconds);
 
             //MoveAxis is absolute
@@ -688,28 +692,28 @@ namespace GS.Simulator
             {
                 case Axis.Axis1:
                     // if (DegreesX > 110 || DegreesX < 70) return;
-                    if (DegreesX > 90 && _homeSensorX)
+                    if (DegreesX > _homeX && _homeSensorX)
                     {
-                        HomeSensorX = 90 * 36000;
+                        HomeSensorX = _homeX * 36000;
                         _homeSensorX = false;
                     }
-                    if (DegreesX < 90 && !_homeSensorX)
+                    if (DegreesX < _homeX && !_homeSensorX)
                     {
-                        HomeSensorX = 90 * 36000;
+                        HomeSensorX = _homeX * 36000;
                         _homeSensorX = true;
                     }
                     break;
                 case Axis.Axis2:
                     // if (DegreesY > 110 || DegreesY < 70) return;
-                    if (DegreesY > 90.0 && _homeSensorY)
+                    if (DegreesY > _homeY && _homeSensorY)
                     {
-                        HomeSensorY = 90 * 36000;
+                        HomeSensorY = _homeY * 36000;
                         _homeSensorY = false;
                     }
 
-                    if (DegreesY < 90.0 && !_homeSensorY)
+                    if (DegreesY < _homeY && !_homeSensorY)
                     {
-                        HomeSensorY = 90 * 36000;
+                        HomeSensorY = _homeY * 36000;
                         _homeSensorY = true;
                     }
                     break;
@@ -723,12 +727,12 @@ namespace GS.Simulator
             switch (axis)
             {
                 case Axis.Axis1:
-                    if (DegreesX > 90) HomeSensorX = 0;
-                    if (DegreesX < 90) HomeSensorX = 16777215;
+                    if (DegreesX > _homeX) HomeSensorX = 0;
+                    if (DegreesX < _homeX) HomeSensorX = 16777215;
                     break;
                 case Axis.Axis2:
-                    if (DegreesY > 90) HomeSensorY = 0;
-                    if (DegreesY < 90) HomeSensorY = 16777215;
+                    if (DegreesY > _homeY) HomeSensorY = 0;
+                    if (DegreesY < _homeY) HomeSensorY = 16777215;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);

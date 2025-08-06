@@ -178,10 +178,15 @@ namespace GS.Server.SkyTelescope
         Wifi
     }
 
-    public enum AzSlewMotionType
+    public enum PierSideUI
     {
-        East,
-        West
+        pierUnknown = -1,
+        pierEast = 0,
+        pierWest = 1,
+        ThroughPole = 3,
+        Normal = 2,
+        East = 4,
+        West = 5
     }
 
     public enum AltAzTrackingType

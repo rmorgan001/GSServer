@@ -61,11 +61,14 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnTipSetHome">Reset axis positions to home</system:String>
     <system:String x:Key="btnFlip">Flip SOP</system:String>
     <system:String x:Key="btnTipFlip">Flip Side of Pier</system:String>
-    <system:String x:Key="btnFlipAzDir">Flip Az Side</system:String>
-    <system:String x:Key="btnTipFlipAzDir">Flip azimuth slew direction</system:String>
+    <system:String x:Key="btnFlipAz">Flip Az</system:String>
+    <system:String x:Key="btnTipFlipAz">Flip azimuth slew direction</system:String>
+    <system:String x:Key="btnFlipPolar">Flip Polar</system:String>
+    <system:String x:Key="btnTipFlipPolar">Flip mount through pole</system:String>
     <!--<system:String x:Key="btnHomeReset">Accept to reset mount position to the Home position</system:String>-->
     <system:String x:Key="btnContinueFlip">Accept to flip mount</system:String>
-    <system:String x:Key="btnContinueFlipAzDir">Accept to swap azimuth side. Mount will slew 360 degrees</system:String>
+    <system:String x:Key="btnContinueFlipAz">Accept to swap azimuth side. Mount will slew 360 degrees</system:String>
+    <system:String x:Key="btnContinueFlipPolar">Accept to flip axes. Mount will slew over pole</system:String>
     <system:String x:Key="btnTipParkPos">Park Positions</system:String>
     <system:String x:Key="btnAutoHome">AutoHome</system:String>
     <system:String x:Key="btnAutoHomeComplete">Auto Home Complete</system:String>
@@ -88,7 +91,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="botTracking">Tracking</system:String>
     <system:String x:Key="botTipTracking">Tracking</system:String>
     <system:String x:Key="botTipSOP">Side of Pier</system:String>
-    <system:String x:Key="botTipAzDir">Azimuth slew direction</system:String>
+    <system:String x:Key="botTipSOPAz">Azimuth slew direction</system:String>
+    <system:String x:Key="botTipSOPPolar">Declination axis orientation</system:String>
     <system:String x:Key="botTipAxisLimit">Axis limit, click for options</system:String>
     <system:String x:Key="botTipWarnings">Warnings, click to reset</system:String>
     <system:String x:Key="botTipErrors">Errors, click to reset</system:String>
@@ -160,6 +164,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="goGoTo">GoTo</system:String>
     <system:String x:Key="goTipGoTo">Slew to coordinates</system:String>
     <system:String x:Key="goTargetBelow">Target Below Horizon</system:String>
+    <system:String x:Key="goTargetLimits">Target outside hardware limits</system:String>
     <system:String x:Key="goSync">Sync</system:String>
     <system:String x:Key="goSyncWarning">Warning: please verify coordinates!</system:String>
     <system:String x:Key="goSlewing">Mount is slewing</system:String>
@@ -419,6 +424,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!--Exceptions -->
     <system:String x:Key="exParked">Unpark first</system:String>
+    <system:String x:Key="exHardwareLimit">Slew outside hardware limits</system:String>
     <system:String x:Key="exError">Error</system:String>
 
     <!--Options and Monitor -->
@@ -503,8 +509,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="3dHud">Coordinates</system:String>
     <system:String x:Key="3dEdit">Edit</system:String>
     <system:String x:Key="3dCamera">Camera Info</system:String>
-    <system:String x:Key="3dRaAxis">RA Axis</system:String>
-    <system:String x:Key="3dDecAxis">Dec Axis</system:String>
+    <system:String x:Key="3dRaAxis">Mount RA/Az Axis:</system:String>
+    <system:String x:Key="3dDecAxis">Mount Dec/Alt Axis:</system:String>
     <system:String x:Key="3dTopBar">Top coords bar</system:String>
     <system:String x:Key="3dModel">GSS 3D Model</system:String>
     <system:String x:Key="3dResetView">Reset View</system:String>
@@ -772,5 +778,17 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="Stopped">Mount stopped</system:String>
     <system:String x:Key="LowVoltage">Voltage is low: check power supply and wiring</system:String>
     <system:String x:Key="CheckMount">Check mount connections, power and baud rate</system:String>
+
+    <!--1.1.0.3 -->
+    <!--Mount Hardware Limits -->
+    <system:String x:Key="mhlButton">Hardware Limits</system:String>
+    <system:String x:Key="mhlButtonToolTip">Set mount hardware movement limits"</system:String>
+    <system:String x:Key="mhlSettingsLabel">Mount Hardware Limits</system:String>
+    <system:String x:Key="mhlRaAz">Right Ascension / Azimuth</system:String>
+    <system:String x:Key="mhlDecAlt">Declination / Altitude</system:String>
+    <system:String x:Key="lbAxisLowerLimitY">Lower limit (degrees)</system:String>
+    <system:String x:Key="lbAxisUpperLimitY">Upper limit (degrees)</system:String>
+    <system:String x:Key="lbAxisLimitX">Limit (degrees)</system:String>
+
 </ResourceDictionary>
  

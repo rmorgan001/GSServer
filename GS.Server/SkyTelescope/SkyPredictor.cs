@@ -120,7 +120,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Debug,
                 Method = "P." + MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{ReferenceTime:yyyy-mm-dd H:mm:ss}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
+                Message = $"{ReferenceTime.ToLocalTime():yyyy-MM-dd HH:mm:ss}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -149,7 +149,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Debug,
                 Method = "P." + MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{ReferenceTime:yyyy-mm-dd H:mm:ss}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
+                Message = $"{ReferenceTime.ToLocalTime():yyyy-MM-dd HH:mm:ss}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -194,7 +194,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Debug,
                 Method = "P." + MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{ReferenceTime:yyyy-mm-dd H:mm:ss}|{result[0]}|{result[1]}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
+                Message = $"{ReferenceTime.ToLocalTime():yyyy-MM-dd HH:mm:ss}|{result[0]}|{result[1]}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -235,7 +235,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Debug,
                 Method = "P." + MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{ReferenceTime:yyyy-mm-dd H:mm:ss}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
+                Message = $"{ReferenceTime.ToLocalTime():yyyy-MM-dd HH:mm:ss}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
             };
             MonitorLog.LogToMonitor(monitorItem);
         }
@@ -263,7 +263,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Debug,
                 Method = "P." + MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{ReferenceTime:yyyy-mm-dd H:mm:ss}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
+                Message = $"{ReferenceTime.ToLocalTime():yyyy-MM-dd HH:mm:ss}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
             };
             MonitorLog.LogToMonitor(monitorItem);
         }

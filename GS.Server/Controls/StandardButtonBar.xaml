@@ -19,8 +19,8 @@
                 Visibility="{Binding ButtonsWinVisibility, Converter={StaticResource BoolToVis}}">
             <md:PackIcon Kind="OpenInNew" Margin="-14,-2,0,0" />
         </Button>
-        <ComboBox md:HintAssist.Hint="{StaticResource btnTipParkPos}" Margin="5,0,0,5" ToolTip="{StaticResource btnTipParkPos}" MaxWidth="120" Width="120"
-                  ItemsSource="{Binding ParkPositions}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEditable="False">
+        <ComboBox md:HintAssist.Hint="{StaticResource btnTipParkPos}" ToolTip="{StaticResource btnTipParkPos}" MaxWidth="120" Width="120"
+                  ItemsSource="{Binding ParkPositions}" IsSynchronizedWithCurrentItem="True" Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEditable="False">
             <ComboBox.SelectedItem>
                 <Binding Path="ParkSelection" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                     <Binding.ValidationRules>
@@ -86,16 +86,8 @@
         </md:DialogHost>
         <md:DialogHost VerticalAlignment="Bottom" CloseOnClickAway="True" IsOpen="{Binding IsFlipDialogOpen}" DialogContent="{Binding FlipContent}">
             <Button Margin="5,6,0,0" Width="100" Height="25"  HorizontalAlignment="Left" Padding="-5"
-                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipFlip}"
-                    IsEnabled="{Binding EnableFlipSop}" Visibility="{Binding FlipSopShow, Converter={StaticResource BoolToClap}}"
-                    Command="{Binding OpenFlipDialogCommand}" Content="{StaticResource btnFlip}">
-            </Button>
-        </md:DialogHost>
-        <md:DialogHost VerticalAlignment="Bottom" CloseOnClickAway="True" IsOpen="{Binding IsFlipAzDirDialogOpen}" DialogContent="{Binding FlipContent}">
-            <Button Margin="5,6,0,0" Width="100" Height="25"  HorizontalAlignment="Left" Padding="-5"
-                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{StaticResource btnTipFlipAzDir}"
-                    IsEnabled="{Binding EnableFlipAzDir}"  Visibility="{Binding FlipAzDirShow, Converter={StaticResource BoolToClap}}"
-                    Command="{Binding OpenFlipAzDirDialogCmd}" Content="{StaticResource btnFlipAzDir}">
+                    Style="{StaticResource MaterialDesignRaisedDarkButton}" ToolTip="{Binding FlipButtonTip}"
+                    Command="{Binding OpenFlipDialogCommand}" Content="{Binding FlipButtonContent}">
             </Button>
         </md:DialogHost>
         <md:DialogHost VerticalAlignment="Bottom" IsOpen="{Binding IsAutoHomeDialogOpen}" DialogContent="{Binding AutoHomeContent}">

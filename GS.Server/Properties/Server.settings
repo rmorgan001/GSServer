@@ -101,9 +101,6 @@
     <Setting Name="ModelPosition2" Type="System.String" Scope="User">
       <Value Profile="(Default)">900, 1100, 800</Value>
     </Setting>
-    <Setting Name="ModelType" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Default.obj</Value>
-    </Setting>
     <Setting Name="Pec" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
@@ -127,6 +124,15 @@
     </Setting>
     <Setting Name="ModelIntFactor" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="ModelBeamWidth" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">50</Value>
+    </Setting>
+    <Setting Name="ModelPierHeight" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">500</Value>
+    </Setting>
+    <Setting Name="ModelPierPivot" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">130</Value>
     </Setting>
   </Settings>
 </SettingsFile>

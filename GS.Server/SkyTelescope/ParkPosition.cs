@@ -14,13 +14,73 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ASCOM.DeviceInterface;
+using System;
 
 namespace GS.Server.SkyTelescope
 {
     public class ParkPosition
     {
-        public string Name { get; set; } = "Blank";
-        public double X { get; set; } = (SkySettings.AlignmentMode == AlignmentModes.algAltAz) ?  0 : 90;
-        public double Y { get; set; } = (SkySettings.AlignmentMode == AlignmentModes.algAltAz) ? 0 : 90;
+        public ParkPosition()
+        {
+            Name = "Blank";
+            switch (SkySettings.AlignmentMode)
+            {
+                case AlignmentModes.algAltAz:
+                    X = 0; Y = 0;
+                    break;
+                case AlignmentModes.algPolar:
+                    X = 0; Y = 0;
+                    break;
+                case AlignmentModes.algGermanPolar:
+                    X = 90; Y = 90;
+                    break;
+            }
+        }
+
+        public ParkPosition(string name, double x, double y)
+        {
+            Name = name;
+            X = x;
+            Y = y;
+        }
+
+        public string Name { get; set; }
+
+        public double X { get; set; }
+
+        public double Y { get; set; }
+
+        public override bool Equals(object obj) => this.Equals(obj as ParkPosition);
+
+        private bool Equals(ParkPosition p)
+        {
+            if (p is null) return false;
+            // Optimization for a common success case.
+            if (Object.ReferenceEquals(this, p)) return true;
+
+            // If run-time types are not exactly the same, return false.
+            if (this.GetType() != p.GetType()) return false;
+
+            // Return true if the fields match.
+            // Note that the base class is not invoked because it is
+            // System.Object, which defines Equals as reference equality.
+            return (Name == p.Name) && (X == p.X) && (Y == p.Y);
+        }
+
+        public override int GetHashCode() => (Name, X, Y).GetHashCode();
+
+        public static bool operator ==(ParkPosition lhs, ParkPosition rhs)
+        {
+            if (lhs is null)
+            {
+                if (rhs is null) return true;
+                // Only the left side is null.
+                return false;
+            }
+            // Equals handles case of null on right side.
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(ParkPosition lhs, ParkPosition rhs) => !(lhs == rhs);
     }
 }

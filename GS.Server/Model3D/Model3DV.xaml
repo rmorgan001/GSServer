@@ -16,7 +16,9 @@
                     </Grid.RowDefinitions>
                     <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" Content="{StaticResource 3dSettings}" />
                     <ToggleButton Grid.Row="0" HorizontalAlignment="Right" Margin="5" ToolTip="{StaticResource optClose}" Style="{StaticResource MaterialDesignHamburgerToggleButton}" Command="{x:Static md:DrawerHost.CloseDrawerCommand}" CommandParameter="{x:Static Dock.Left}" IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}" />
-                    <ComboBox Grid.Row="1" md:HintAssist.Hint="{StaticResource 3dModelType}" MinWidth="10" Margin="20,0,5,20" Width="200" HorizontalAlignment="Left" ToolTip="{StaticResource 3dModelType}" ItemsSource="{Binding Source={domain:EnumBindingSource {x:Type enums:Model3DType}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                    <ComboBox Grid.Row="1" md:HintAssist.Hint="{StaticResource 3dModelType}" MinWidth="10" Margin="20,0,5,20" Width="200" 
+                        HorizontalAlignment="Left" ToolTip="{StaticResource 3dModelType}" ItemsSource="{Binding 
+                        Source={domain:EnumBindingSource {x:Type enums:Model3DType}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" DropDownOpened="ModelListFilter">
                         <ComboBox.Text>
                             <Binding Path="ModelType" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
                         </ComboBox.Text>
@@ -102,36 +104,51 @@
                                     <RowDefinition />
                                     <RowDefinition />
                                     <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
                                 </Grid.RowDefinitions>
                                 <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding RaVis, Converter={StaticResource BoolToVis}}">
                                     <TextBlock Text="{StaticResource topRa}" />
                                     <TextBlock Margin="10,0,0,0" Text="{Binding RightAscension, UpdateSourceTrigger=PropertyChanged}" />
                                 </StackPanel>
-                                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding DecVis, Converter={StaticResource BoolToVis}}">
+                                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding HaVis, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="Hour Angle:" />
+                                    <TextBlock Margin="10,0,0,0" Text="{Binding Lha, UpdateSourceTrigger=PropertyChanged}" />
+                                </StackPanel>
+                                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding DecVis, Converter={StaticResource BoolToVis}}">
                                     <TextBlock Text="{StaticResource topDec}" />
                                     <TextBlock Margin="10,0,0,0" Text="{Binding Declination, UpdateSourceTrigger=PropertyChanged}" />
                                 </StackPanel>
-                                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding AzVis, Converter={StaticResource BoolToVis}}">
+                                <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding AzVis, Converter={StaticResource BoolToVis}}">
                                     <TextBlock Text="{StaticResource topAz}" />
                                     <TextBlock Margin="10,0,0,0" Text="{Binding Azimuth, UpdateSourceTrigger=PropertyChanged}" />
                                 </StackPanel>
-                                <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding AltVis, Converter={StaticResource BoolToVis}}">
+                                <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding AltVis, Converter={StaticResource BoolToVis}}">
                                     <TextBlock Text="{StaticResource topAlt}" />
                                     <TextBlock Margin="10,0,0,0" Text="{Binding Altitude, UpdateSourceTrigger=PropertyChanged}" />
                                 </StackPanel>
-                                <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding SideVis, Converter={StaticResource BoolToVis}}">
+                                <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding SideVis, Converter={StaticResource BoolToVis}}">
                                     <TextBlock Text="{StaticResource bugSiderealTime}" />
                                     <TextBlock Margin="10,0,0,0" Text="{Binding SiderealTime, UpdateSourceTrigger=PropertyChanged}" />
                                 </StackPanel>
-                                <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding RaAxisVis, Converter={StaticResource BoolToVis}}">
+                                <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding RaAxisVis, Converter={StaticResource BoolToVis}}">
                                     <TextBlock Text="{StaticResource 3dRaAxis}" />
                                     <TextBlock Margin="10,0,0,0" Text="{Binding ActualAxisX, UpdateSourceTrigger=PropertyChanged}" />
                                 </StackPanel>
-                                <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding DecAxisVis, Converter={StaticResource BoolToVis}}">
+                                <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding DecAxisVis, Converter={StaticResource BoolToVis}}">
                                     <TextBlock Text="{StaticResource 3dDecAxis}" />
                                     <TextBlock Margin="10,0,0,0" Text="{Binding ActualAxisY, UpdateSourceTrigger=PropertyChanged}" />
                                 </StackPanel>
-                                <Button Grid.Row="7" Style="{StaticResource MaterialDesignFlatButton}" Command="{x:Static md:Flipper.FlipCommand}" Content="{StaticResource 3dEdit}" />
+                                    <StackPanel Grid.Row="8" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding RaAxisVis, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="Raw AxisX:" />
+                                    <TextBlock Margin="10,0,0,0" Text="{Binding RawAxisX, UpdateSourceTrigger=PropertyChanged}" />
+                                </StackPanel>
+                                    <StackPanel Grid.Row="9" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding DecAxisVis, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="Raw AxisY:" />
+                                    <TextBlock Margin="10,0,0,0" Text="{Binding RawAxisY, UpdateSourceTrigger=PropertyChanged}" />
+                                </StackPanel>
+                                <Button Grid.Row="10" Style="{StaticResource MaterialDesignFlatButton}" Command="{x:Static md:Flipper.FlipCommand}" Content="{StaticResource 3dEdit}" />
                             </Grid>
                         </Border>
                     </md:Flipper.FrontContent>
@@ -149,17 +166,19 @@
                                     <RowDefinition />
                                     <RowDefinition />
                                     <RowDefinition />
+                                    <RowDefinition />
                                 </Grid.RowDefinitions>
                                 <CheckBox Grid.Row="0" Content="{StaticResource topRa}" IsChecked="{Binding Path=RaVis}" />
-                                <CheckBox Grid.Row="1" Content="{StaticResource topDec}" IsChecked="{Binding Path=DecVis}" />
-                                <CheckBox Grid.Row="2" Content="{StaticResource topAz}" IsChecked="{Binding Path=AzVis}" />
-                                <CheckBox Grid.Row="3" Content="{StaticResource topAlt}" IsChecked="{Binding Path=AltVis}" />
-                                <CheckBox Grid.Row="4" Content="{StaticResource bugSiderealTime}" IsChecked="{Binding Path=SideVis}" />
-                                <CheckBox Grid.Row="5" Content="{StaticResource 3dRaAxis}" IsChecked="{Binding Path=RaAxisVis}" />
-                                <CheckBox Grid.Row="6" Content="{StaticResource 3dDecAxis}" IsChecked="{Binding Path=DecAxisVis}" />
-                                <CheckBox Grid.Row="7" Content="{StaticResource 3dCamera}" IsChecked="{Binding Path=CameraVis}" />
-                                <CheckBox Grid.Row="8" Content="{StaticResource 3dTopBar}" IsChecked="{Binding Path=TopVis}" />
-                                <Button Grid.Row="9" Style="{StaticResource MaterialDesignToolForegroundButton}" Command="{x:Static md:Flipper.FlipCommand}" HorizontalAlignment="Left">
+                                <CheckBox Grid.Row="1" Content="Local Hour Angle" IsChecked="{Binding Path=HaVis}" />
+                                <CheckBox Grid.Row="2" Content="{StaticResource topDec}" IsChecked="{Binding Path=DecVis}" />
+                                <CheckBox Grid.Row="3" Content="{StaticResource topAz}" IsChecked="{Binding Path=AzVis}" />
+                                <CheckBox Grid.Row="4" Content="{StaticResource topAlt}" IsChecked="{Binding Path=AltVis}" />
+                                <CheckBox Grid.Row="5" Content="{StaticResource bugSiderealTime}" IsChecked="{Binding Path=SideVis}" />
+                                <CheckBox Grid.Row="6" Content="{StaticResource 3dRaAxis}" IsChecked="{Binding Path=RaAxisVis}" />
+                                <CheckBox Grid.Row="7" Content="{StaticResource 3dDecAxis}" IsChecked="{Binding Path=DecAxisVis}" />
+                                <CheckBox Grid.Row="8" Content="{StaticResource 3dCamera}" IsChecked="{Binding Path=CameraVis}" />
+                                <CheckBox Grid.Row="9" Content="{StaticResource 3dTopBar}" IsChecked="{Binding Path=TopVis}" />
+                                <Button Grid.Row="10" Style="{StaticResource MaterialDesignToolForegroundButton}" Command="{x:Static md:Flipper.FlipCommand}" HorizontalAlignment="Left">
                                     <md:PackIcon Kind="ArrowLeft" HorizontalAlignment="Right" Width="25" Height="25" />
                                 </Button>
                             </Grid>

@@ -152,6 +152,21 @@
     <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.2" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Properties\Profiles\AltAz.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AltAz.settings</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Profiles\GermanPolar.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>GermanPolar.settings</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Profiles\Polar.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Polar.settings</DependentUpon>
+    </Compile>
     <Compile Update="Properties\Alignment.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
@@ -166,6 +181,11 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
       <DependentUpon>Gamepad.settings</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Profile.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Profile.settings</DependentUpon>
     </Compile>
     <Compile Update="Properties\Server.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -183,6 +203,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Models\DefaultAltAz.obj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Models\DualTelescope.obj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Models\DualTelescopeAltAz.obj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Models\Reflector.obj">
@@ -215,6 +241,18 @@
     <None Update="Models\SchmidtCassegrainAltAz.obj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Properties\Profiles\AltAz.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>AltAz.Designer.cs</LastGenOutput>
+    </None>
+    <None Update="Properties\Profiles\GermanPolar.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>GermanPolar.Designer.cs</LastGenOutput>
+    </None>
+    <None Update="Properties\Profiles\Polar.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Polar.Designer.cs</LastGenOutput>
+    </None>
     <None Update="Properties\Alignment.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Alignment.Designer.cs</LastGenOutput>
@@ -226,6 +264,10 @@
     <None Update="Properties\Gamepad.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Gamepad.Designer.cs</LastGenOutput>
+    </None>
+    <None Update="Properties\Profile.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Profile.Designer.cs</LastGenOutput>
     </None>
     <None Update="Properties\Server.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -243,6 +285,9 @@
     <Page Update="Controls\Dialogs\DecGoToDecimal.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Controls\Dialogs\AcceptCancelDialog.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
     <Page Update="Controls\Dialogs\Snap1DitherDialog.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>

@@ -84,6 +84,11 @@ namespace GS.Principles
             return d;
         }
 
+        public static double[] Range180(double[] d)
+        {
+            return new[] { Range180(d[0]), Range180(d[1]) };
+        }
+
         /// <summary>
         /// Returns double in the range -90 to 0 to 90 to 180 to 270.
         /// </summary>
@@ -128,14 +133,14 @@ namespace GS.Principles
         }
 
         /// <summary>
-        /// Force range for Azimuth an Altitude
+        /// Force range for Azimuth and Altitude
         /// </summary>
         /// <remarks>Attention to the order given and received</remarks>
-        /// <param name="azAlt"></param>
+        /// <param name="axes"></param>
         /// <returns></returns>
-        public static double[] RangeAzAlt(double[] azAlt)
+        public static double[] RangeAz360Alt90(double[] axes)
         {
-            double[] a = { Range360(azAlt[0]), Range90(azAlt[1]) };
+            double[] a = { Range360(axes[0]), Range90(axes[1]) };
             return a;
         }
 

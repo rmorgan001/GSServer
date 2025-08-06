@@ -13,6 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using ASCOM.DeviceInterface;
 using System;
 using System.Reflection;
 
@@ -23,33 +24,12 @@ namespace GS.Shared
         private static readonly string DirectoryPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase) + @"\Models\";
         public static string GetModelFile(Model3DType modelType, String altAz = "")
         {
-            string gpModel;
-            switch (modelType)
-            {
-                case Model3DType.Default:
-                    gpModel = @"Default.obj";
-                    break;
-                case Model3DType.Reflector:
-                    gpModel = @"Reflector.obj";
-                    break;
-                case Model3DType.Refractor:
-                    gpModel = @"Refractor.obj";
-                    break;
-                case Model3DType.SchmidtCassegrain:
-                    gpModel = @"SchmidtCassegrain.obj";
-                    break;
-                case Model3DType.RitcheyChretien:
-                    gpModel = @"RitcheyChretien.obj";
-                    break;
-                case Model3DType.RitcheyChretienTruss:
-                    gpModel = @"RitcheyChretienTruss.obj";
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(modelType), modelType, null);
-            }
+            // modelType is strongly typed enum so ToString() will succeed 
+            string gpModel = modelType.ToString();
             var filePath = System.IO.Path.Combine(DirectoryPath ?? throw new InvalidOperationException(),
-                gpModel.Replace(".obj", altAz + ".obj"));
+                gpModel+ altAz + ".obj");
             var file = new Uri(filePath).LocalPath;
+            if (!System.IO.File.Exists(file)) file = String.Empty;                
             return file;
         }
         public static string GetCompassFile(bool southernHemisphere, bool altAz)
@@ -59,33 +39,62 @@ namespace GS.Shared
             var compassFile = southernHemisphere && !altAz ? compassS : compassN;
             var filePath = System.IO.Path.Combine(DirectoryPath ?? throw new InvalidOperationException(), compassFile);
             var file = new Uri(filePath).LocalPath;
+            if (!System.IO.File.Exists(file)) file = String.Empty;
             return file;
         }
-        public static double[] RotateModel(string mountType, double ax, double ay, bool southernHemisphere, bool altAz)
+
+        /// <summary>
+        /// Calculate axes for the 3D model based on the mount type, axis values, hemisphere and alignment mode.
+        /// </summary>
+        /// <param name="mountType"></param>
+        /// <param name="ax"></param>
+        /// <param name="ay"></param>
+        /// <param name="southernHemisphere"></param>
+        /// <param name="alignmentMode"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        public static double[] RotateModel(string mountType, double ax, double ay, bool southernHemisphere, AlignmentModes alignmentMode)
         {
             var axes = new[] { 0.0, 0.0 };
-            if (altAz)
+            switch (alignmentMode)
             {
-                axes[0] = Math.Round(ax, 3);
-                axes[1] = Math.Round(ay * -1.0, 3);
+                case AlignmentModes.algAltAz:
+                    axes[0] = Math.Round(ax, 3);
+                    axes[1] = Math.Round(ay * -1.0, 3);
+                    break;
+                case AlignmentModes.algPolar:
+                    switch (mountType)
+                    {
+                        case "Simulator":
+                            axes[0] = Math.Round(ax, 3);
+                            axes[1] = Math.Round(ay * -1.0, 3);
+                            break;
+                        case "SkyWatcher":
+                            axes[0] = Math.Round(ax, 3);
+                            axes[1] = Math.Round(ay * -1.0, 3);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    break;
+                case AlignmentModes.algGermanPolar:
+                    switch (mountType)
+                    {
+                        case "Simulator":
+                            axes[0] = Math.Round(ax, 3);
+                            axes[1] = southernHemisphere ? Math.Round(ay - 180, 3) : Math.Round(ay * -1.0, 3);
+                            break;
+                        case "SkyWatcher":
+                            axes[0] = Math.Round(ax, 3);
+                            axes[1] = Math.Round(ay - 180, 3);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    break;
+                default:
+                    break;
             }
-            else
-            {
-                switch (mountType)
-                {
-                    case "Simulator":
-                        axes[0] = Math.Round(ax, 3);
-                        axes[1] = southernHemisphere ? Math.Round(ay - 180, 3) : Math.Round(ay * -1.0, 3);
-                        break;
-                    case "SkyWatcher":
-                        axes[0] = Math.Round(ax, 3);
-                        axes[1] = Math.Round(ay - 180, 3);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-
             return axes;
         }
     }
@@ -97,6 +106,7 @@ namespace GS.Shared
         Refractor = 2,
         SchmidtCassegrain = 3,
         RitcheyChretien = 4,
-        RitcheyChretienTruss = 5
+        RitcheyChretienTruss = 5,
+        DualTelescope = 6
     }
 }
