@@ -780,7 +780,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--1.1.0.3 -->
     <!--Mount Hardware Limits -->
     <system:String x:Key="mhlButton">Hardware Limits</system:String>
-    <system:String x:Key="mhlButtonToolTip">Set mount hardware movement limits"</system:String>
+    <system:String x:Key="mhlButtonToolTip">Set mount hardware movement limits</system:String>
     <system:String x:Key="mhlSettingsLabel">Mount Hardware Limits</system:String>
     <system:String x:Key="mhlRaAz">Right Ascension / Azimuth</system:String>
     <system:String x:Key="mhlDecAlt">Declination / Altitude</system:String>

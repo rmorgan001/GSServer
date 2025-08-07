@@ -556,7 +556,22 @@ namespace GS.Server.SkyTelescope
             private set
             {
                 if (value == IsSideOfPier) return;
-                Synthesizer.Speak(value.ToString());
+                PierSideUI sideOfPierVoice = PierSideUI.pierUnknown;
+                switch (SkySettings.AlignmentMode)
+                {
+                    case AlignmentModes.algAltAz:
+                        sideOfPierVoice = (PierSideUI)value + 4;
+                        break;
+                    case AlignmentModes.algPolar:
+                        sideOfPierVoice = (PierSideUI)value + 2;
+                        break;
+                    case AlignmentModes.algGermanPolar:
+                        sideOfPierVoice = (PierSideUI)value;
+                        break;
+                    default:
+                        break;
+                }
+                Synthesizer.Speak(sideOfPierVoice.ToString());
                 _isSideOfPier = value;
                 OnStaticPropertyChanged();
 
@@ -6062,6 +6077,7 @@ namespace GS.Server.SkyTelescope
         /// <see langword="false"/>.</returns>
         public static bool IsTargetReachable(double[] target, SlewType slewState)
         {
+            if (SkySettings.AlignmentMode == AlignmentModes.algGermanPolar) return true;
             switch (slewState)
             {
                 case SlewType.SlewRaDec:

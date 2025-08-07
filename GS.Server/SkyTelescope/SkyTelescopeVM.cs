@@ -142,9 +142,6 @@ namespace GS.Server.SkyTelescope
                     DecBacklashList = DecBacklashList.Concat(extendedList);
                     AxisTrackingLimits = new List<double>(Numbers.InclusiveRange(0, 15, 1));
                     AxisHzTrackingLimits = new List<double>(Numbers.InclusiveRange(-20, 20, 1));
-                    AxisLowerLimitYs = new List<double>(Numbers.InclusiveRange(-90, 20, 1));
-                    AxisUpperLimitYs = new List<double>(Numbers.InclusiveRange(50, 90, 1));
-                    AxisLimitXs = new List<double>(Numbers.InclusiveRange(120, 210, 1));
 
                     // defaults
                     AtPark = SkyServer.AtPark;
@@ -1060,166 +1057,7 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
-        /// <summary>
-        /// Range of integer values for Ra / Az limit combo box
-        /// </summary>
-        public IList<double> AxisLimitXs { get; }
 
-        private double _AxisLimitX = SkySettings.AxisLimitX;
-        /// <summary>
-        /// View model property for setting Ra / Az limit
-        /// Settings updated if "Ok" on dialog close
-        /// </summary>
-        public double AxisLimitX
-        {
-            get => _AxisLimitX;
-            set
-            {
-                _AxisLimitX = value;
-                OnPropertyChanged();
-                // Update graphic indicator
-                OnPropertyChanged(nameof(PrimarySectorX));
-                OnPropertyChanged(nameof(SecondarySectorX));
-                OnPropertyChanged(nameof(AxisLimitSectorInfo));
-            }
-        }
-        public Vector PrimarySectorX
-        {
-            get
-            {
-                var angle = AxisLimitX > 180.0 ? 360.0 - AxisLimitX : AxisLimitX;
-                return new Vector(-angle, angle);
-            }
-        }
-        public Vector SecondarySectorX
-        {
-            get
-            {
-                var start = AxisLimitX > 180.0 ? 360.0 - AxisLimitX : AxisLimitX;
-                var end = AxisLimitX < 180.0 ? 360.0 - AxisLimitX : AxisLimitX;
-                return AxisLimitX > 180.0 ? new Vector(start, end) : new Vector(0.0, 0.0);
-            }
-        }
-        public double SlewLimitSectorRotate
-        {
-            get
-            {
-                switch (SkySettings.AlignmentMode)
-                {
-                    case AlignmentModes.algAltAz:
-                        return 180.0;
-                    case AlignmentModes.algPolar:
-                    case AlignmentModes.algGermanPolar:
-                    default:
-                        return 0.0;
-                }
-            }
-        }
-        public IList<double> AxisUpperLimitYs { get; }
-        private double _axisUpperLimitY;
-        public double AxisUpperLimitY
-        {
-            get => _axisUpperLimitY;
-            set
-            {
-                _axisUpperLimitY = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(AxisLimitYSector));
-            }
-        }
-        public IList<double> AxisLowerLimitYs { get; }
-        private double _axisLowerLimitY;
-        public double AxisLowerLimitY
-        {
-            get => _axisLowerLimitY;
-            set
-            {
-                _axisLowerLimitY = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(AxisLimitHorizonInfo));
-                OnPropertyChanged(nameof(AxisLimitYSector));
-            }
-        }
-        public Vector AxisLimitYSector
-        {
-            get
-            {
-                var sector = new Vector(0.0, 0.0);
-                switch (SkySettings.AlignmentMode)
-                {
-                    case AlignmentModes.algAltAz:
-                        sector.Y = AxisUpperLimitY - 90.0;
-                        sector.X = AxisLowerLimitY - 90.0;
-                        break;
-                    case AlignmentModes.algPolar:
-                        sector.Y = AxisUpperLimitY;
-                        // Offset by latitude for graphic display
-                        sector.X = AxisLowerLimitY - Math.Abs(SkySettings.Latitude);
-                        break;
-                    case AlignmentModes.algGermanPolar:
-                    default:
-                        break;
-                }
-                return sector;
-            }
-        }
-
-        public double AxisLimitSectorReflect
-        {
-            get
-            {
-                switch (SkySettings.AlignmentMode)
-                {
-                    case AlignmentModes.algAltAz:
-                        return -1.0;
-                    case AlignmentModes.algPolar:
-                    case AlignmentModes.algGermanPolar:
-                    default:
-                        return 1.0;
-                }
-            }
-        }
-
-        public string AxisLimitHorizonInfo
-        {
-            get
-            {
-                var horizonInfo = String.Empty;
-                switch (SkySettings.AlignmentMode)
-                {
-                    case AlignmentModes.algPolar:
-                        var angle = -Math.Abs(SkySettings.Latitude) - AxisLowerLimitY;
-                        var sign = (angle < 0.0);
-                        horizonInfo = $"Limit is {Math.Abs(angle):F1} degrees {(sign ? "above" : "below")} horizon" ;
-                        break;
-                    case AlignmentModes.algAltAz:
-                    case AlignmentModes.algGermanPolar:
-                    default:
-                        break;
-                }
-                return horizonInfo;
-            }
-        }
-
-        public string AxisLimitSectorInfo
-        {
-            get
-            {
-                var sectorInfo = String.Empty;
-                switch (SkySettings.AlignmentMode)
-                {
-                    case AlignmentModes.algAltAz:
-                    case AlignmentModes.algPolar:
-                        if (SecondarySectorX.LengthSquared > 0.0)
-                            sectorInfo = $"Ra / Az limit enables two goto positions";
-                        break;
-                    case AlignmentModes.algGermanPolar:
-                    default:
-                        break;
-                }
-                return sectorInfo;
-            }
-        }
         public AlignmentModes AlignmentMode
         {
             get => SkySettings.AlignmentMode;
@@ -1227,19 +1065,6 @@ namespace GS.Server.SkyTelescope
             {
                 Properties.SkyTelescope.Default.Save();
                 SkySettings.AlignmentMode = value;
-                //disable CanSetPierSide if AltAz alignment
-                //handled by profiles
-                //switch (AlignmentMode)
-                //{
-                //    case AlignmentModes.algAltAz:
-                //        SkySettings.CanSetPierSide = false;
-                //        break;
-                //    case AlignmentModes.algPolar:
-                //    case AlignmentModes.algGermanPolar:
-                //    default:
-                //        SkySettings.CanSetPierSide = true;
-                //        break;
-                //}
                 OnPropertyChanged();
             }
         }

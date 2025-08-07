@@ -183,8 +183,8 @@ namespace GS.Server.SkyTelescope
         pierUnknown = -1,
         pierEast = 0,
         pierWest = 1,
-        ThroughPole = 3,
         Normal = 2,
+        ThroughPole = 3,
         East = 4,
         West = 5
     }

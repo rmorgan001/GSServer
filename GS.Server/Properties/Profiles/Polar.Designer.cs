@@ -106,7 +106,7 @@ namespace GS.Server.Properties.Profiles {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("120")]
+        [global::System.Configuration.DefaultSettingValueAttribute("115")]
         public double AxisLimitX {
             get {
                 return ((double)(this["AxisLimitX"]));

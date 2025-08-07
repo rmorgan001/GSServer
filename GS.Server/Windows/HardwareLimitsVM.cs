@@ -49,7 +49,7 @@ namespace GS.Server.Windows
             // Initialize axis limits
             AxisLowerLimitYs = new List<double>(Numbers.InclusiveRange(-90, 20, 1));
             AxisUpperLimitYs = new List<double>(Numbers.InclusiveRange(50, 90, 1));
-            AxisLimitXs = new List<double>(Numbers.InclusiveRange(120, 210, 1));
+            AxisLimitXs = new List<double>(Numbers.InclusiveRange(105, 210, 1));
             // Ra / Az axis limit
             AxisLimitX = SkySettings.AxisLimitX;
             // Polar upper limit is offset by latitude
@@ -643,11 +643,11 @@ namespace GS.Server.Windows
         {
             get
             {
-                var horizonInfo = String.Empty;
+                var horizonInfo = string.Empty;
                 switch (SkySettings.AlignmentMode)
                 {
                     case AlignmentModes.algPolar:
-                        var angle = -Math.Abs(SkySettings.Latitude) - AxisLowerLimitY;
+                        var angle = - 90.0 + Math.Abs(SkySettings.Latitude) - AxisLowerLimitY;
                         var sign = (angle < 0.0);
                         horizonInfo = $"Limit is {Math.Abs(angle):F1} degrees {(sign ? "above" : "below")} horizon";
                         break;

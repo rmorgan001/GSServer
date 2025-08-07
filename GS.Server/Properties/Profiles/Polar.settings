@@ -30,7 +30,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="AxisLimitX" Type="System.Double" Scope="Application">
-      <Value Profile="(Default)">120</Value>
+      <Value Profile="(Default)">115</Value>
     </Setting>
     <Setting Name="ModelType" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Default</Value>

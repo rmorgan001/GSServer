@@ -261,10 +261,10 @@
                                 </ComboBox.ItemsPanel>
                             </ComboBox>
                             <StackPanel Grid.Row="3" Grid.Column="4" Orientation="Horizontal" HorizontalAlignment="Right">
-                                <Button Margin="10,0,10,0" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}" ToolTip="{StaticResource btnCap}" Command="{Binding OpenCapDialogCmd}" Foreground="{StaticResource PrimaryHueMidBrush}">
+                                <Button Margin="5,0,5,0" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}" ToolTip="{StaticResource btnCap}" Command="{Binding OpenCapDialogCmd}" Foreground="{StaticResource PrimaryHueMidBrush}">
                                     <md:PackIcon Kind="CheckboxMultipleMarked" Height="25" Width="25" />
                                 </Button>
-                                <Button Margin="10,0,10,0" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}" ToolTip="{StaticResource customGears}" Command="{Binding OpenGearDialogCommand}" >
+                                <Button Margin="5,0,5,0" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}" ToolTip="{StaticResource customGears}" Command="{Binding OpenGearDialogCommand}" >
                                     <md:PackIcon Kind="Gearbox" Height="30" Width="30">
                                         <md:PackIcon.Style>
                                             <Style TargetType="md:PackIcon" >
@@ -273,6 +273,22 @@
                                                         <Setter Property="Foreground" Value="{StaticResource SecondaryHueMidBrush}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding CustomGearing}" Value="False">
+                                                        <Setter Property="Foreground" Value="{StaticResource PrimaryHueMidBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </md:PackIcon.Style>
+                                    </md:PackIcon>
+                                </Button>
+                                <Button Margin="5,0,5,0" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}" ToolTip="{StaticResource mhlButtonToolTip}" Command="{Binding OpenHardwareLimitsWindowCmd}" IsEnabled="{Binding HardwareLimitSettingsEnable}" Foreground="{StaticResource PrimaryHueMidBrush}">
+                                    <md:PackIcon Kind="WifiStrengthOutline" Height="25" Width="25">
+                                        <md:PackIcon.Style>
+                                            <Style TargetType="md:PackIcon" >
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding HardwareLimitSettingsEnable}" Value="True">
+                                                        <Setter Property="Foreground" Value="{StaticResource SecondaryHueMidBrush}" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding HardwareLimitSettingsEnable}" Value="False">
                                                         <Setter Property="Foreground" Value="{StaticResource PrimaryHueMidBrush}" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
@@ -434,10 +450,6 @@
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,6,0,0">
                                     <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource mntAdv}" IsChecked="{Binding AllowAdvancedCommands, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                     <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource mntAdv}" />
-                                </StackPanel>
-                                <StackPanel>
-                                    <Button Margin="0, 10, 0, 0" ToolTip="{StaticResource mhlButtonToolTip}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding OpenHardwareLimitsWindowCmd}" IsEnabled="{Binding HardwareLimitSettingsEnable}" Content="{StaticResource mhlButton}">
-                                    </Button>
                                 </StackPanel>
                             </StackPanel>
                             <Border Margin="0,0,4,0" Grid.Row="8" Grid.Column="3" Grid.ColumnSpan="2" BorderThickness="3" BorderBrush="DimGray" CornerRadius="5"
