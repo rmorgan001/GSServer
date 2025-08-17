@@ -3,10 +3,13 @@
   <Profiles />
   <Settings>
     <Setting Name="List" Type="System.String" Scope="User">
-      <Value Profile="(Default)">algAltAz, algPolar, algGermanPolar</Value>
+      <Value Profile="(Default)">algAltAz,algPolar,algGermanPolar</Value>
     </Setting>
     <Setting Name="Current" Type="System.String" Scope="User">
       <Value Profile="(Default)">algGermanPolar</Value>
+    </Setting>
+    <Setting Name="Version" Type="System.String" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>
 </SettingsFile>

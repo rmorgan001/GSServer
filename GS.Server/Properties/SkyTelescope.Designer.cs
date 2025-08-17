@@ -1692,13 +1692,13 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public double AxisOriginX {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string PolarMode {
             get {
-                return ((double)(this["AxisOriginX"]));
+                return ((string)(this["PolarMode"]));
             }
             set {
-                this["AxisOriginX"] = value;
+                this["PolarMode"] = value;
             }
         }
     }

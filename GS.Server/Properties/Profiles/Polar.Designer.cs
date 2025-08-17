@@ -115,7 +115,7 @@ namespace GS.Server.Properties.Profiles {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Default")]
+        [global::System.Configuration.DefaultSettingValueAttribute("DualTelescope")]
         public string ModelType {
             get {
                 return ((string)(this["ModelType"]));
@@ -205,10 +205,10 @@ namespace GS.Server.Properties.Profiles {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public double AxisOriginX {
+        [global::System.Configuration.DefaultSettingValueAttribute("Left")]
+        public string PolarMode {
             get {
-                return ((double)(this["AxisOriginX"]));
+                return ((string)(this["PolarMode"]));
             }
         }
     }

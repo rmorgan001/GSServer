@@ -24,13 +24,16 @@ using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using NativeMethods = GS.Server.Helpers.NativeMethods;
-
 
 namespace GS.Server.Windows
 {
@@ -55,6 +58,29 @@ namespace GS.Server.Windows
             // Polar upper limit is offset by latitude
             AxisUpperLimitY = SkySettings.AxisUpperLimitY - (SkySettings.AlignmentMode == AlignmentModes.algPolar ? Math.Abs(SkySettings.Latitude) : 0);
             AxisLowerLimitY = SkySettings.AxisLowerLimitY;
+            if (SkySettings.AlignmentMode == AlignmentModes.algPolar)
+            {
+                using (var memory = new MemoryStream())
+                {
+                    switch (SkySettings.PolarMode)
+                    {
+                        case PolarMode.Right:
+                            GS.Server.Properties.Resources.iconPolarRight.Save(memory, ImageFormat.Png);
+                            break;
+                        case PolarMode.Left:
+                            GS.Server.Properties.Resources.iconPolarLeft.Save(memory, ImageFormat.Png);
+                            break;
+                    }
+                    memory.Position = 0;
+                    var bitmapImage = new BitmapImage();
+                    bitmapImage.BeginInit();
+                    bitmapImage.StreamSource = memory;
+                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmapImage.EndInit();
+                    bitmapImage.Freeze();
+                    PolarModeIcon = bitmapImage;
+                }
+            }
         }
 
         #region Properties
@@ -135,7 +161,31 @@ namespace GS.Server.Windows
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
-#endregion
+
+        public Visibility IsVisible
+        {
+            get
+            {
+                if (SkySettings.Mount == MountType.SkyWatcher && SkySettings.AlignmentMode == AlignmentModes.algPolar)
+                {
+                    return Visibility.Visible;
+                }
+                return Visibility.Collapsed;
+            }
+        }
+
+        private ImageSource _polarModeIcon;
+        public ImageSource PolarModeIcon
+        {
+            get => _polarModeIcon;
+            set
+            {
+                _polarModeIcon = value;
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
 
         #region Window Control
 
@@ -244,6 +294,77 @@ namespace GS.Server.Windows
             {
                 _windowState = value;
                 OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
+        #region Polar Mode UI Control
+        private ICommand _clickPolarModeCommand;
+        public ICommand ClickPolarModeCommand
+        {
+            get
+            {
+                var command = _clickPolarModeCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickPolarModeCommand = new RelayCommand(
+                    param => SetPolarMode()
+                );
+            }
+        }
+
+        private void SetPolarMode()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (SkySettings.AlignmentMode == AlignmentModes.algPolar)
+                    {
+                        using (var memory = new MemoryStream())
+                        {
+                            switch (SkySettings.PolarMode)
+                            {
+                                case PolarMode.Left:
+                                    SkySettings.PolarMode = PolarMode.Right;
+                                    GS.Server.Properties.Resources.iconPolarRight.Save(memory, ImageFormat.Png);
+                                    break;
+                                case PolarMode.Right:
+                                    SkySettings.PolarMode = PolarMode.Left;
+                                    GS.Server.Properties.Resources.iconPolarLeft.Save(memory, ImageFormat.Png);
+                                    break;
+                            }
+                            memory.Position = 0;
+                            var bitmapImage = new BitmapImage();
+                            bitmapImage.BeginInit();
+                            bitmapImage.StreamSource = memory;
+                            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                            bitmapImage.EndInit();
+                            bitmapImage.Freeze();
+                            PolarModeIcon = bitmapImage;
+                        }
+                    }
+                }
+            }
+
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 

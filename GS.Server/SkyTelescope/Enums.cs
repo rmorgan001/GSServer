@@ -180,18 +180,24 @@ namespace GS.Server.SkyTelescope
 
     public enum PierSideUI
     {
-        pierUnknown = -1,
-        pierEast = 0,
-        pierWest = 1,
+        Unknown = -1,
+        East = 0,
+        West = 1,
         Normal = 2,
         ThroughPole = 3,
-        East = 4,
-        West = 5
+        AzEast = 4,
+        AzWest = 5
     }
 
     public enum AltAzTrackingType
     {
         Predictor,
         Rate
+    }
+
+    public enum PolarMode
+    {
+        Left,
+        Right
     }
 }

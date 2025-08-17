@@ -134,5 +134,8 @@
     <Setting Name="ModelPierPivot" Type="System.Double" Scope="User">
       <Value Profile="(Default)">130</Value>
     </Setting>
+    <Setting Name="ModelType" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

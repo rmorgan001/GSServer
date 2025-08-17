@@ -242,6 +242,17 @@ namespace GS.Server.Model3D
                      case "DisplayInterval":
                          Interval = SkySettings.DisplayInterval;
                          break;
+                     case "PolarMode":
+                         switch (SkyServer.PolarMode)
+                         {
+                             case PolarMode.Left:
+                                 ModelReflect = -1;
+                                 break;
+                             case PolarMode.Right:
+                                 ModelReflect = 1;
+                                 break;
+                         }
+                         break;
                  }
              });
             }
@@ -318,6 +329,7 @@ namespace GS.Server.Model3D
                 modelVm.Position = Position;
                 modelVm.LookDirection = LookDirection;
                 modelVm.UpDirection = UpDirection;
+                modelVm.ModelReflect = ModelReflect;
                 modelVm.ImageFile = ImageFile;
                 modelVm.CameraIndex = 1;
                 bWin.Show();
@@ -783,6 +795,18 @@ namespace GS.Server.Model3D
             }
         }
 
+        private double _modelReflect;
+        public double ModelReflect
+        {
+            get => _modelReflect;
+            set
+            {
+                if (_modelReflect == value) return;
+                _modelReflect = value;
+                OnPropertyChanged();
+            }
+        }
+
         public IList<int> FactorList { get; }
 
         private int _modelFactor;
@@ -987,6 +1011,15 @@ namespace GS.Server.Model3D
                 YAxis = 90;
                 ZAxis = 90;
                 YAxisCentre = 0;
+                switch (SkyServer.PolarMode)
+                {
+                    case PolarMode.Left:
+                        ModelReflect = -1;
+                        break;
+                    case PolarMode.Right:
+                        ModelReflect = 1;
+                        break;
+                }
 
                 switch (SkySettings.AlignmentMode)
                 {
@@ -1131,7 +1164,7 @@ namespace GS.Server.Model3D
         private void Rotate()
         {
             var axes = Shared.Model3D.RotateModel(SkySettings.Mount.ToString(), SkyServer.ActualAxisX,
-               SkyServer.ActualAxisY, SkyServer.SouthernHemisphere, SkySettings.AlignmentMode);
+               SkyServer.ActualAxisY, SkyServer.SouthernHemisphere, SkySettings.AlignmentMode, (int) SkyServer.PolarMode);
 
             YAxis = axes[0];
             XAxis = axes[1];

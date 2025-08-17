@@ -61,7 +61,7 @@
                                 <AxisAngleRotation3D Axis="1 0 0" Angle="{Binding ZAxisOffset}" />
                         </RotateTransform3D.Rotation>
                     </RotateTransform3D>
-                    <ScaleTransform3D ScaleX="1" ScaleY="1" ScaleZ="1" />
+                        <ScaleTransform3D ScaleX="{Binding ModelReflect}" ScaleY="1" ScaleZ="1" />
                 </Transform3DGroup>
             </h:HelixVisual3D.Transform>
         </h:HelixVisual3D>

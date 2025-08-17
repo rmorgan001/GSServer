@@ -280,21 +280,8 @@
                                         </md:PackIcon.Style>
                                     </md:PackIcon>
                                 </Button>
-                                <Button Margin="5,0,5,0" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}" ToolTip="{StaticResource mhlButtonToolTip}" Command="{Binding OpenHardwareLimitsWindowCmd}" IsEnabled="{Binding HardwareLimitSettingsEnable}" Foreground="{StaticResource PrimaryHueMidBrush}">
-                                    <md:PackIcon Kind="WifiStrengthOutline" Height="25" Width="25">
-                                        <md:PackIcon.Style>
-                                            <Style TargetType="md:PackIcon" >
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding HardwareLimitSettingsEnable}" Value="True">
-                                                        <Setter Property="Foreground" Value="{StaticResource SecondaryHueMidBrush}" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding HardwareLimitSettingsEnable}" Value="False">
-                                                        <Setter Property="Foreground" Value="{StaticResource PrimaryHueMidBrush}" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </md:PackIcon.Style>
-                                    </md:PackIcon>
+                                <Button Margin="5,0,5,0" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}" ToolTip="{StaticResource mhlButtonToolTip}" Command="{Binding OpenHardwareLimitsWindowCmd}" Foreground="{StaticResource PrimaryHueMidBrush}">
+                                    <md:PackIcon Kind="WifiStrengthOutline" Height="25" Width="25"/>
                                 </Button>
                             </StackPanel>
                             <ComboBox Grid.Row="2" Grid.Column="2" md:HintAssist.Hint="{StaticResource skyST4}" MinWidth="10" Margin="10,0,0,0" VerticalAlignment="Center"  ToolTip="{StaticResource skyST4}" 

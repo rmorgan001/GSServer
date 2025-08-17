@@ -1212,7 +1212,7 @@ namespace ASCOM.GS.Sky.Telescope
             MonitorLog.LogToMonitor(monitorItem);
 
             CheckParked("AbortSlew");
-            SkyServer.AbortSlew(true);
+            SkyServer.AbortSlewAsync(true);
         }
 
         public IAxisRates AxisRates(TelescopeAxes axis)

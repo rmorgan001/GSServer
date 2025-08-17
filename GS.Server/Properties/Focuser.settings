@@ -12,7 +12,7 @@
       <Value Profile="(Default)">2</Value>
     </Setting>
     <Setting Name="Version" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="ReverseDirection" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

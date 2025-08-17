@@ -181,7 +181,7 @@ namespace GS.Server.SkyTelescope
                     PolarLedLevelEnabled = true;
                     RaDecDialogActive = true;
                     AltAzDialogActive = false;
-                    HardwareLimitSettingsEnable = (SkySettings.AlignmentMode != AlignmentModes.algGermanPolar);
+                    TrackingLimitSettingsEnable = (SkySettings.AlignmentMode == AlignmentModes.algGermanPolar);
 
                     DiscoverySetup();
                 }
@@ -241,13 +241,13 @@ namespace GS.Server.SkyTelescope
             switch (SkySettings.AlignmentMode)
             {
                 case AlignmentModes.algAltAz:
-                    SideOfPierUI = PierSideUI.East;
+                    SideOfPierUI = PierSideUI.AzEast;
                     break;
                 case AlignmentModes.algPolar:
                     SideOfPierUI = PierSideUI.Normal;
                     break;
                 case AlignmentModes.algGermanPolar:
-                    SideOfPierUI = PierSideUI.pierEast;
+                    SideOfPierUI = PierSideUI.East;
                     break;
             }
         }
@@ -283,14 +283,14 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private bool _hardwareLimitSettingsEnable;
-        public bool HardwareLimitSettingsEnable
+        private bool _trackingLimitSettingsEnable;
+        public bool TrackingLimitSettingsEnable
         {
-            get => _hardwareLimitSettingsEnable;
+            get => _trackingLimitSettingsEnable;
             set
             {
-                if (_hardwareLimitSettingsEnable == value) { return; }
-                _hardwareLimitSettingsEnable = value;
+                if (_trackingLimitSettingsEnable == value) { return; }
+                _trackingLimitSettingsEnable = value;
                 OnPropertyChanged();
             }
         }
@@ -469,7 +469,7 @@ namespace GS.Server.SkyTelescope
                          // Flip Dialog
                          FlipDialogHeader = GetResourceByMode("btnFlip");
                          FlipDialogText = GetResourceByMode("btnContinueFlip");
-                         HardwareLimitSettingsEnable = (SkySettings.AlignmentMode != AlignmentModes.algGermanPolar);
+                         TrackingLimitSettingsEnable = (SkySettings.AlignmentMode == AlignmentModes.algGermanPolar);
 
                          SetShowUI();
                          // ReSharper disable ExplicitCallerInfoArgument
@@ -2290,6 +2290,18 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private double _modelReflect;
+        public double ModelReflect
+        {
+            get => _modelReflect;
+            set
+            {
+                if (_modelReflect == value) return;
+                _modelReflect = value;
+                OnPropertyChanged();
+            }
+        }
+
         private Vector3D _lookDirection;
         public Vector3D LookDirection
         {
@@ -2571,6 +2583,15 @@ namespace GS.Server.SkyTelescope
                 YAxis = 90;
                 ZAxis = 90;
                 YAxisCentre = 0;
+                switch (SkyServer.PolarMode3D)
+                {
+                    case PolarMode.Left:
+                        ModelReflect = -1;
+                        break;
+                    case PolarMode.Right:
+                        ModelReflect = 1;
+                        break;
+                }
 
                 switch (SkySettings.AlignmentMode)
                 {
@@ -2669,7 +2690,7 @@ namespace GS.Server.SkyTelescope
             if (Graphic != FrontGraphic.Model3D) { return; }
             
             var axes = Shared.Model3D.RotateModel(SkySettings.Mount.ToString(), SkyServer.ActualAxisX,
-               SkyServer.ActualAxisY, SkyServer.SouthernHemisphere, SkySettings.AlignmentMode);
+               SkyServer.ActualAxisY, SkyServer.SouthernHemisphere, SkySettings.AlignmentMode, (int)SkyServer.PolarMode3D);
 
             YAxis = axes[0];
             XAxis = axes[1];
@@ -2842,6 +2863,7 @@ namespace GS.Server.SkyTelescope
                 modelVm.Position = Position;
                 modelVm.LookDirection = LookDirection;
                 modelVm.UpDirection = UpDirection;
+                modelVm.ModelReflect = ModelReflect;
                 modelVm.ImageFile = ImageFile;
                 modelVm.CameraIndex = 2;
                 bWin.Show();
@@ -11144,12 +11166,36 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
-                var win = Application.Current.Windows.OfType<HardwareLimitsV>().FirstOrDefault();
-                if (win != null) return;
-                var window = new HardwareLimitsV();
-                // Set by code before window is shown but after constructor is called
-                window.Owner = App.Current.MainWindow;
-                window.ShowDialog();
+                if (SkySettings.AlignmentMode != AlignmentModes.algGermanPolar)
+                {
+                    var win = Application.Current.Windows.OfType<HardwareLimitsV>().FirstOrDefault();
+                    if (win != null) return;
+                    var window = new HardwareLimitsV();
+                    // Set by code before window is shown but after constructor is called
+                    window.Owner = App.Current.MainWindow;
+                    window.ShowDialog();
+                }
+                else
+                {
+                    using (new WaitCursor())
+                    {
+                        //Meridian
+                        LimitTracking = SkySettings.LimitTracking;
+                        LimitPark = SkySettings.LimitPark;
+                        SetParkLimitSelection(SkySettings.ParkLimitName);
+                        if (!LimitPark && !LimitTracking) { LimitNothing = true; }
+                        if (LimitPark || LimitTracking) { LimitNothing = false; }
+                        //Horizon
+                        HzLimitTracking = SkySettings.HzLimitTracking;
+                        HzLimitPark = SkySettings.HzLimitPark;
+                        SetParkHzLimitSelection(SkySettings.ParkHzLimitName);
+                        if (!HzLimitPark && !HzLimitTracking) { HzLimitNothing = true; }
+                        if (HzLimitPark || HzLimitTracking) { HzLimitNothing = false; }
+
+                        DialogContent = new LimitDialog();
+                        IsDialogOpen = true;
+                    }
+                }
             }
             catch (Exception ex)
             {

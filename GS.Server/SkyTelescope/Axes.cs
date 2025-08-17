@@ -31,18 +31,18 @@ namespace GS.Server.SkyTelescope
         /// <returns></returns>
         public static double[] MountAxis2Mount()
         {
-            var a = new[] { SkyServer.MountAxisX, SkyServer.MountAxisY };
+            var a = new[] { SkyServer.AppAxisX, SkyServer.AppAxisY };
             if (SkySettings.AlignmentMode == AlignmentModes.algGermanPolar)
             {
                 if (SkyServer.SouthernHemisphere)
                 {
-                    a[0] = SkyServer.MountAxisX + 180;
-                    a[1] = 180 - SkyServer.MountAxisY;
+                    a[0] = SkyServer.AppAxisX + 180;
+                    a[1] = 180 - SkyServer.AppAxisY;
                 }
                 else
                 {
-                    a[0] = SkyServer.MountAxisX;
-                    a[1] = SkyServer.MountAxisY;
+                    a[0] = SkyServer.AppAxisX;
+                    a[1] = SkyServer.AppAxisY;
                 }
             }
             return a;
@@ -108,15 +108,31 @@ namespace GS.Server.SkyTelescope
                             }
                             break;
                         case MountType.SkyWatcher:
-                            if (SkyServer.SouthernHemisphere)
+                            if (SkyServer.PolarMode == PolarMode.Left)
                             {
-                                a[0] = -a[0];
-                                a[1] = a[1];
+                                if (SkyServer.SouthernHemisphere)
+                                {
+                                    a[0] = 180 - a[0];
+                                    a[1] = a[1];
+                                }
+                                else
+                                {
+                                    a[0] = a[0];
+                                    a[1] = 180 - a[1];
+                                }
                             }
                             else
                             {
-                                a[0] = a[0];
+                                if (SkyServer.SouthernHemisphere)
+                                {
+                                    a[0] = -a[0];
                                 a[1] = a[1];
+                                }
+                                else
+                                {
+                                    a[0] = a[0];
+                                    a[1] = a[1];
+                                }
                             }
                             break;
                         default:
@@ -200,15 +216,31 @@ namespace GS.Server.SkyTelescope
 
                             break;
                         case MountType.SkyWatcher:
-                            if (SkyServer.SouthernHemisphere)
+                            if (SkyServer.PolarMode == PolarMode.Left)
                             {
-                                a[0] = a[0] * -1.0;
-                                a[1] = a[1];
+                                if (SkyServer.SouthernHemisphere)
+                                {
+                                    a[0] = a[0] * -1.0;
+                                    a[1] = 180 - a[1];
+                                }
+                                else
+                                {
+                                    a[0] = a[0];
+                                    a[1] = 180 - a[1];
+                                }
                             }
                             else
                             {
-                                a[0] = a[0];
-                                a[1] = a[1];
+                                if (SkyServer.SouthernHemisphere)
+                                {
+                                    a[0] = a[0] * -1.0;
+                                    a[1] = a[1];
+                                }
+                                else
+                                {
+                                    a[0] = a[0];
+                                    a[1] = a[1];
+                                }
                             }
                             break;
                         default:
@@ -307,6 +339,7 @@ namespace GS.Server.SkyTelescope
 
         /// <summary>
         /// Conversion of mount axis positions in degrees to Az and Alt
+        /// Raw mount axis values must be converted using AxesMountToApp before calling this method.
         /// </summary>
         /// <param name="axes"></param>
         /// <returns>AzAlt</returns>

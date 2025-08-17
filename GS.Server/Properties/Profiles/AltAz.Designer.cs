@@ -205,10 +205,10 @@ namespace GS.Server.Properties.Profiles {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public double AxisOriginX {
+        [global::System.Configuration.DefaultSettingValueAttribute("Right")]
+        public string PolarMode {
             get {
-                return ((double)(this["AxisOriginX"]));
+                return ((string)(this["PolarMode"]));
             }
         }
     }

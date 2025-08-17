@@ -294,6 +294,18 @@ namespace GS.Server.Windows
             }
         }
 
+        private double _modelReflect;
+        public double ModelReflect
+        {
+            get => _modelReflect;
+            set
+            {
+                if (_modelReflect == value) return;
+                _modelReflect = value;
+                OnPropertyChanged();
+            }
+        }
+
         private Vector3D _upDirection;
         public Vector3D UpDirection
         {
@@ -571,6 +583,15 @@ namespace GS.Server.Windows
                 YAxis = 90;
                 ZAxis = 90;
                 YAxisCentre = 0;
+                switch (SkyServer.PolarMode3D)
+                {
+                    case PolarMode.Left:
+                        ModelReflect = -1;
+                        break;
+                    case PolarMode.Right:
+                        ModelReflect = 1;
+                        break;
+                }
 
                 switch (SkySettings.AlignmentMode)
                 {
@@ -667,7 +688,7 @@ namespace GS.Server.Windows
         private void Rotate()
         {
             var axes = Shared.Model3D.RotateModel(SkySettings.Mount.ToString(), SkyServer.ActualAxisX,
-               SkyServer.ActualAxisY, SkyServer.SouthernHemisphere, SkySettings.AlignmentMode);
+               SkyServer.ActualAxisY, SkyServer.SouthernHemisphere, SkySettings.AlignmentMode, (int)SkyServer.PolarMode3D);
 
             YAxis = axes[0];
             XAxis = axes[1];

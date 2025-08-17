@@ -80,7 +80,8 @@ namespace GS.Server.SkyTelescope
         private static readonly IList<double> HcPrevMovesDec = new List<double>();
 
         private static Vector _homeAxes;
-        private static Vector _mountAxes;
+        // App axes derived from mount axes by AxesMountToApp
+        private static Vector _appAxes;
         //private static Vector _targetAxes;
         private static Vector _altAzSync;
 
@@ -121,7 +122,7 @@ namespace GS.Server.SkyTelescope
                 SpiralCollection = new List<SpiralPoint>();
 
                 // set local to NaN for constructor
-                _mountAxes = new Vector(double.NaN, double.NaN);
+                _appAxes = new Vector(double.NaN, double.NaN);
 
                 // initialise the alignment model
                 AlignmentSettings.Load();
@@ -193,8 +194,8 @@ namespace GS.Server.SkyTelescope
         private static bool _lowVoltageEventState;
         private static bool _mountRunning;
         private static bool _monitorPulse;
-        private static double _mountAxisX;
-        private static double _mountAxisY;
+        private static double _appAxisX;
+        private static double _appAxisY;
         private static Exception _mountError;
         private static bool _openSetupDialog;
         private static ParkPosition _parkSelected;
@@ -293,19 +294,21 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// within degree range to trigger home
+        /// within 0.1 degree circular range to trigger home
         /// </summary>
         public static bool AtHome
         {
             get
             {
-                var h = new Vector(_homeAxes.X, _homeAxes.Y);
-                var m = new Vector(Math.Abs(_mountAxes.X), _mountAxes.Y); // Abs is for S Hemisphere, hack for home position
+                // Home axis values are mount values internally
+                var home = Axes.AxesMountToApp(new[] { _homeAxes.X, _homeAxes.Y });
+                var h = new Vector(home[0], home[1]);
+                var m = new Vector(_appAxes.X, _appAxes.Y);
                 double dX = Abs(m.X - h.X);
                 dX = Min(dX, 360.0 - dX);   // Az Alt can have home (0, 0) so wrap at 360
                 double dY = Abs(m.Y - h.Y);
                 var d = new Vector(dX, dY);
-                var r = d.LengthSquared < 0.01;
+                var r = d.LengthSquared < 0.01414;
                 // only report AtHome when slewing has finished
                 return r;
             }
@@ -556,17 +559,17 @@ namespace GS.Server.SkyTelescope
             private set
             {
                 if (value == IsSideOfPier) return;
-                PierSideUI sideOfPierVoice = PierSideUI.pierUnknown;
+                string sideOfPierVoice = string.Empty;
                 switch (SkySettings.AlignmentMode)
                 {
                     case AlignmentModes.algAltAz:
-                        sideOfPierVoice = (PierSideUI)value + 4;
+                        sideOfPierVoice = Application.Current.Resources["vceSop" + ((PierSideUI)value + 4).ToString()].ToString();
                         break;
                     case AlignmentModes.algPolar:
-                        sideOfPierVoice = (PierSideUI)value + 2;
+                        sideOfPierVoice = Application.Current.Resources["vceSop" + ((PierSideUI)value + 2).ToString()].ToString();
                         break;
                     case AlignmentModes.algGermanPolar:
-                        sideOfPierVoice = (PierSideUI)value;
+                        sideOfPierVoice = Application.Current.Resources["vceSop" + ((PierSideUI)value + 0).ToString()].ToString();
                         break;
                     default:
                         break;
@@ -583,7 +586,7 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{value}|{_mountAxes.Y}|{_mountAxes.Y < 90 || _mountAxes.Y.IsEqualTo(90, 0.0000000001)}|{_mountAxes.Y > -90 || _mountAxes.Y.IsEqualTo(-90, 0.0000000001)} "
+                    Message = $"{value}|{_appAxes.Y}|{_appAxes.Y < 90 || _appAxes.Y.IsEqualTo(90, 0.0000000001)}|{_appAxes.Y > -90 || _appAxes.Y.IsEqualTo(-90, 0.0000000001)} "
                 };
                 MonitorLog.LogToMonitor(monitorItem);
             }
@@ -769,13 +772,13 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// UI diagnostics option
         /// </summary>
-        public static double MountAxisX
+        public static double AppAxisX
         {
-            get => _mountAxisX;
+            get => _appAxisX;
             private set
             {
-                if (Math.Abs(value - _mountAxisX) < 0.000000000000001) return;
-                _mountAxisX = value;
+                if (Math.Abs(value - _appAxisX) < 0.000000000000001) return;
+                _appAxisX = value;
                 OnStaticPropertyChanged();
             }
         }
@@ -783,13 +786,13 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// UI diagnostics option
         /// </summary>
-        public static double MountAxisY
+        public static double AppAxisY
         {
-            get => _mountAxisY;
+            get => _appAxisY;
             private set
             {
-                if (Math.Abs(value - _mountAxisY) < 0.000000000000001) return;
-                _mountAxisY = value;
+                if (Math.Abs(value - _appAxisY) < 0.000000000000001) return;
+                _appAxisY = value;
                 OnStaticPropertyChanged();
             }
         }
@@ -1199,20 +1202,20 @@ namespace GS.Server.SkyTelescope
                         sideOfPier = _actualAxisX >= 0.0 ? PierSide.pierEast : PierSide.pierWest;
                         break;
                     case AlignmentModes.algPolar:
-                        sideOfPier = (_mountAxes.Y < 90.0000000001 && _mountAxes.Y > -90.0000000001) ? PierSide.pierEast : PierSide.pierWest;
+                        sideOfPier = (_appAxes.Y < 90.0000000001 && _appAxes.Y > -90.0000000001) ? PierSide.pierEast : PierSide.pierWest;
                         break;
                     case AlignmentModes.algGermanPolar:
                         if (SouthernHemisphere)
                         {
-                            //return _mountAxes.Y <= 90 && _mountAxes.Y >= -90 ? PierSide.pierWest : PierSide.pierEast;
+                            //return _appAxes.Y <= 90 && _appAxes.Y >= -90 ? PierSide.pierWest : PierSide.pierEast;
                             // replaced with ...
-                            sideOfPier = (_mountAxes.Y < 90.0000000001 && _mountAxes.Y > -90.0000000001) ? PierSide.pierWest :PierSide.pierEast;
+                            sideOfPier = (_appAxes.Y < 90.0000000001 && _appAxes.Y > -90.0000000001) ? PierSide.pierWest :PierSide.pierEast;
                         }
                         else
                         {
-                            // return _mountAxes.Y <= 90 && _mountAxes.Y >= -90 ? PierSide.pierEast : PierSide.pierWest;
+                            // return _appAxes.Y <= 90 && _appAxes.Y >= -90 ? PierSide.pierEast : PierSide.pierWest;
                             // replaced with ...
-                            sideOfPier = (_mountAxes.Y < 90.0000000001 && _mountAxes.Y > -90.0000000001) ? PierSide.pierEast : PierSide.pierWest;
+                            sideOfPier = (_appAxes.Y < 90.0000000001 && _appAxes.Y > -90.0000000001) ? PierSide.pierEast : PierSide.pierWest;
                         }
                         break;
                     default:
@@ -1291,8 +1294,15 @@ namespace GS.Server.SkyTelescope
             const double oneArcSec = 1.0 / 3600;
             LimitStatus.AtLowerLimitAxisX = RawPositions[0] <= -SkySettings.AxisLimitX - oneArcSec;
             LimitStatus.AtUpperLimitAxisX = RawPositions[0] >= SkySettings.AxisLimitX + oneArcSec;
-            LimitStatus.AtLowerLimitAxisY = RawPositions[1] <= SkySettings.AxisLowerLimitY - oneArcSec;
-            LimitStatus.AtUpperLimitAxisY = RawPositions[1] >= SkySettings.AxisUpperLimitY + oneArcSec;
+            var axisUpperLimitY = SkySettings.AxisUpperLimitY;
+            var axisLowerLimitY = SkySettings.AxisLowerLimitY;
+            if (SkySettings.AlignmentMode == AlignmentModes.algPolar && PolarMode == PolarMode.Left)
+            {
+                axisLowerLimitY = 180 - SkySettings.AxisUpperLimitY;
+                axisUpperLimitY = 180 - SkySettings.AxisLowerLimitY;
+            }
+            LimitStatus.AtLowerLimitAxisY = RawPositions[1] <= axisLowerLimitY - oneArcSec;
+            LimitStatus.AtUpperLimitAxisY = RawPositions[1] >= axisUpperLimitY + oneArcSec;
         }
 
         /// <summary>
@@ -1320,16 +1330,16 @@ namespace GS.Server.SkyTelescope
                 ActualAxisX = rawPositions[0];
                 ActualAxisY = rawPositions[1];
 
-                // convert positions to local
+                // convert positions to local app axes
                 var axes = Axes.AxesMountToApp(rawPositions);
 
-                // local to track positions
-                _mountAxes.X = axes[0];
-                _mountAxes.Y = axes[1];
+                // store local app axes to track positions
+                _appAxes.X = axes[0];
+                _appAxes.Y = axes[1];
 
-                // UI diagnostics
-                MountAxisX = axes[0];
-                MountAxisY = axes[1];
+                // UI diagnostics for local app exes
+                AppAxisX = axes[0];
+                AppAxisY = axes[1];
 
                 // Calculate mount Alt/Az
                 var altAz = Axes.AxesXyToAzAlt(axes);
@@ -1360,10 +1370,18 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         public static double[] StepsWormPerRevolution { get; private set; }
 
+        private static SlewType _slewState;
         /// <summary>
         /// Set for all types of go tos
         /// </summary>
-        public static SlewType SlewState { get; private set; }
+        public static SlewType SlewState
+        {
+            get => _slewState;
+            private set
+            {
+                _slewState = value;
+            }
+        }
 
         /// <summary>
         /// Camera Port
@@ -1886,7 +1904,7 @@ namespace GS.Server.SkyTelescope
                         case MountTaskName.SetSouthernHemisphere:
                             break;
                         case MountTaskName.SyncAxes:
-                            var sync = Axes.AxesAppToMount(new[] { _mountAxes.X, _mountAxes.Y });
+                            var sync = Axes.AxesAppToMount(new[] { _appAxes.X, _appAxes.Y });
                             _ = new CmdAxisToDegrees(0, Axis.Axis1, sync[0]);
                             _ = new CmdAxisToDegrees(0, Axis.Axis2, sync[1]);
                             break;
@@ -2490,10 +2508,10 @@ namespace GS.Server.SkyTelescope
                             SnapPort2Result = port2Result;
                             break;
                         case MountTaskName.SyncAxes:
-                            var sync = Axes.AxesAppToMount(new[] { _mountAxes.X, _mountAxes.Y });
+                            var sync = Axes.AxesAppToMount(new[] { _appAxes.X, _appAxes.Y });
                             _ = new SkySyncAxis(0, AxisId.Axis1, sync[0]);
                             _ = new SkySyncAxis(0, AxisId.Axis2, sync[1]);
-                            monitorItem.Message += $",{_mountAxes.X}|{_mountAxes.Y}|{sync[0]}|{sync[1]}";
+                            monitorItem.Message += $",{_appAxes.X}|{_appAxes.Y}|{sync[0]}|{sync[1]}";
                             MonitorLog.LogToMonitor(monitorItem);
                             break;
                         case MountTaskName.SyncTarget:
@@ -2668,11 +2686,33 @@ namespace GS.Server.SkyTelescope
         #region Shared Mount Items
 
         /// <summary>
+        /// Asynchronously aborts the current slew operation of the mount.
+        /// Telescope V4 requires asynchronous operation for aborting a slew.
+        /// </summary>
+        /// <param name="speak">A value indicating whether a verbal notification should be provided upon aborting the slew.  <see
+        /// langword="true"/> to enable verbal notification; otherwise, <see langword="false"/>.</param>
+        public static void AbortSlewAsync(bool speak)
+        {
+            // Set up event handle and task for checking slew started
+            EventWaitHandle abortSlewStartedEvent = new ManualResetEvent(false);
+            Action abortSlew = () => AbortSlew(speak, abortSlewStartedEvent);
+            Task abortSlewTask = new Task(abortSlew);
+            // Start the Abort Slew and wait for the started event
+            abortSlewTask.Start();
+            abortSlewStartedEvent.WaitOne(5000); // Timeout for the event to be set
+            abortSlewStartedEvent = null;
+        }
+
+        /// <summary>
         /// Abort Slew in a normal motion
         /// </summary>
-        public static void AbortSlew(bool speak)
+        public static void AbortSlew(bool speak, EventWaitHandle abortSlewStarted = null)
         {
-            if (!IsMountRunning) { return; }
+            if (!IsMountRunning)
+            {
+                if (abortSlewStarted != null) abortSlewStarted.Set();
+                return;
+            }
 
             var monitorItem = new MonitorEntry
             {
@@ -2686,6 +2726,7 @@ namespace GS.Server.SkyTelescope
             };
             MonitorLog.LogToMonitor(monitorItem);
 
+            if (abortSlewStarted != null) abortSlewStarted.Set();
             //IsSlewing = false;
             var tracking = Tracking || SlewState == SlewType.SlewRaDec || MoveAxisActive;
             Tracking = false; //added back in for spec "Tracking is returned to its pre-slew state"
@@ -2695,7 +2736,6 @@ namespace GS.Server.SkyTelescope
             RateMovePrimaryAxis = 0.0;
             RateMoveSecondaryAxis = 0.0;
             _rateRaDec = new Vector(0, 0);
-            SlewState = SlewType.SlewNone;
 
             switch (SkySettings.Mount)
             {
@@ -3022,28 +3062,28 @@ namespace GS.Server.SkyTelescope
                     // check if we have hit the hour angle limit 
                     if (SouthernHemisphere)
                     {
-                        if (_mountAxes.X >= SkySettings.HourAngleLimit ||
-                            _mountAxes.X <= -SkySettings.HourAngleLimit - 180)
+                        if (_appAxes.X >= SkySettings.HourAngleLimit ||
+                            _appAxes.X <= -SkySettings.HourAngleLimit - 180)
                         {
                             limitHit = true;
                         }
 
                         // Check tracking limit
-                        if (_mountAxes.X >= totLimit || _mountAxes.X <= -totLimit - 180)
+                        if (_appAxes.X >= totLimit || _appAxes.X <= -totLimit - 180)
                         {
                             meridianLimit = true;
                         }
                     }
                     else
                     {
-                        if (_mountAxes.X >= SkySettings.HourAngleLimit + 180 ||
-                            _mountAxes.X <= -SkySettings.HourAngleLimit)
+                        if (_appAxes.X >= SkySettings.HourAngleLimit + 180 ||
+                            _appAxes.X <= -SkySettings.HourAngleLimit)
                         {
                             limitHit = true;
                         }
 
                         //Check Tracking Limit
-                        if (_mountAxes.X >= totLimit + 180 || _mountAxes.X <= -totLimit)
+                        if (_appAxes.X >= totLimit + 180 || _appAxes.X <= -totLimit)
                         {
                             meridianLimit = true;
                         }
@@ -3580,6 +3620,9 @@ namespace GS.Server.SkyTelescope
         private static double GetDecRateDirection(double rate)
         {
             bool moveNorth = rate > 0;
+            bool isEast = SideOfPier == PierSide.pierEast;
+            bool isWest = SideOfPier == PierSide.pierWest;
+            bool invert = false;
             rate = Math.Abs(rate);
 
             switch (SkySettings.Mount)
@@ -3593,13 +3636,8 @@ namespace GS.Server.SkyTelescope
                             break;
 
                         case AlignmentModes.algPolar:
-                        case AlignmentModes.algGermanPolar:
-                            bool isEast = SideOfPier == PierSide.pierEast;
-                            bool isWest = SideOfPier == PierSide.pierWest;
-
                             if (isEast || isWest)
                             {
-                                bool invert = false;
                                 if (SkySettings.Mount == MountType.Simulator)
                                 {
                                     if (SouthernHemisphere)
@@ -3609,23 +3647,31 @@ namespace GS.Server.SkyTelescope
                                 }
                                 else // SkyWatcher
                                 {
-                                    if (SkySettings.AlignmentMode == AlignmentModes.algGermanPolar)
-                                    {
-                                        if (SouthernHemisphere)
-                                            invert = (isEast && moveNorth) || (isWest && !moveNorth);
-                                        else
-                                            invert = (isEast && moveNorth) || (isWest && !moveNorth);
-                                    }
-                                    else // Polar
-                                    {
-                                        if (SouthernHemisphere)
-                                            invert = (isEast && moveNorth) || (isWest && !moveNorth);
-                                        else
-                                            invert = (isEast && !moveNorth) || (isWest && moveNorth);
-                                    }
+                                    if (SouthernHemisphere)
+                                        invert = (isEast && moveNorth) || (isWest && !moveNorth);
+                                    else
+                                        invert = (isEast && !moveNorth) || (isWest && moveNorth);
+                                    if (PolarMode == PolarMode.Left) invert = !invert;
                                 }
-                                if (invert)
-                                    rate = -rate;
+                            }
+                            break;
+                        case AlignmentModes.algGermanPolar:
+                            if (isEast || isWest)
+                            {
+                                if (SkySettings.Mount == MountType.Simulator)
+                                {
+                                    if (SouthernHemisphere)
+                                        invert = (isEast && moveNorth) || (isWest && !moveNorth);
+                                    else
+                                        invert = (isEast && !moveNorth) || (isWest && moveNorth);
+                                }
+                                else // SkyWatcher
+                                {
+                                    if (SouthernHemisphere)
+                                        invert = (isEast && moveNorth) || (isWest && !moveNorth);
+                                    else
+                                        invert = (isEast && moveNorth) || (isWest && !moveNorth);
+                                }
                             }
                             break;
                     }
@@ -3635,6 +3681,7 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
 
+            if (invert) rate = -rate;
             return rate;
         }
         /// <summary>
@@ -3673,6 +3720,7 @@ namespace GS.Server.SkyTelescope
             // set default home position or get home override from the settings 
             double[] positions = {0, 0};
             string name = String.Empty;
+            // home axes are mount values
             _homeAxes.X = SkySettings.HomeAxisX;
             _homeAxes.Y = SkySettings.HomeAxisY;
 
@@ -4441,6 +4489,13 @@ namespace GS.Server.SkyTelescope
                     break;
             }
 
+            // Directions are all reversed because polar mount primary OTA is flipped
+            if (SkySettings.AlignmentMode == AlignmentModes.algPolar && PolarMode == PolarMode.Left)
+            {
+                change[0] = -change[0];
+                change[1] = -change[1];
+            }
+
             // Log data to Monitor
             if (Math.Abs(change[0]) > 0 || Math.Abs(change[1]) > 0)
             {
@@ -5124,7 +5179,7 @@ namespace GS.Server.SkyTelescope
             MonitorLog.LogToMonitor(monitorItem);
 
             monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"MountAxes|{_mountAxes.X}|{_mountAxes.Y}|Actual|{ActualAxisX}|{ActualAxisY}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"MountAxes|{_appAxes.X}|{_appAxes.Y}|Actual|{ActualAxisX}|{ActualAxisY}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             monitorItem = new MonitorEntry
@@ -5282,8 +5337,8 @@ namespace GS.Server.SkyTelescope
             _homeAxes.X = SkySettings.HomeAxisX;
             _homeAxes.Y = SkySettings.HomeAxisY;
             // Set axis positions
-            _mountAxisX = _homeAxes.X;
-            _mountAxisY = _homeAxes.Y;
+            _appAxisX = _homeAxes.X;
+            _appAxisY = _homeAxes.Y;
         }
 
         /// <summary>
@@ -5418,6 +5473,7 @@ namespace GS.Server.SkyTelescope
                             {
                                 if (direction == GuideDirections.guideSouth) { decGuideRate = -decGuideRate; }
                             }
+                            if(PolarMode == PolarMode.Left) decGuideRate = -decGuideRate; // Swap direction because primary OTA is flipped
                             break;
                         case AlignmentModes.algGermanPolar:
                             if (SideOfPier == PierSide.pierEast)
@@ -5646,7 +5702,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{name}|{park[0]}|{park[1]}|{MountAxisX}|{MountAxisY}"
+                Message = $"{name}|{park[0]}|{park[1]}|{AppAxisX}|{AppAxisY}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -6360,7 +6416,7 @@ namespace GS.Server.SkyTelescope
             var target = Axes.AxesMountToApp(GetSyncedAxes(xy));
 
             //get current mount position in app coordinates
-            var current = new[] { _mountAxisX, _mountAxisY };
+            var current = new[] { _appAxisX, _appAxisY };
             //compare ra dec / az alt to current mount position
             var a = Math.Abs(target[0]) - Math.Abs(current[0]);
             var b = Math.Abs(target[1]) - Math.Abs(current[1]);
@@ -6400,14 +6456,14 @@ namespace GS.Server.SkyTelescope
             var target = Axes.AxesMountToApp(GetSyncedAxes(xy));
 
             //get current mount position in app coordinates
-            var current = new[] { _mountAxisX, _mountAxisY };
+            var current = new[] { _appAxisX, _appAxisY };
 
             if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
             {
                 target[0] = az;
                 target[1] = alt;
-                current[0] = Range.Range360(_mountAxisX);
-                current[1] = _mountAxisY;
+                current[0] = Range.Range360(_appAxisX);
+                current[1] = _appAxisY;
             }
 
             //compare ra dec to current position
@@ -6460,8 +6516,11 @@ namespace GS.Server.SkyTelescope
                     // convert target to axis for Az / Alt slew
                     target = Axes.AzAltToAxesXy(target);
                     break;
-                case SlewType.SlewPark:
                 case SlewType.SlewHome:
+                    break;
+                case SlewType.SlewPark:
+                    if (SkySettings.AlignmentMode == AlignmentModes.algGermanPolar) target = Axes.AxesAppToMount(target);
+                    break;
                 case SlewType.SlewMoveAxis:
                     target = Axes.AxesAppToMount(target);
                     break;
@@ -6474,8 +6533,15 @@ namespace GS.Server.SkyTelescope
         private static bool IsTargetWithinLimits(double[] target)
         {
             const double oneArcSec = 1.0 / 3600;
+            var axisUpperLimitY = SkySettings.AxisUpperLimitY;
+            var axisLowerLimitY = SkySettings.AxisLowerLimitY;
+            if (SkySettings.AlignmentMode == AlignmentModes.algPolar && PolarMode == PolarMode.Left)
+            {
+                axisLowerLimitY = 180 - SkySettings.AxisUpperLimitY;
+                axisUpperLimitY = 180 - SkySettings.AxisLowerLimitY;
+            }
             return (-SkySettings.AxisLimitX - oneArcSec <= target[0] && target[0] <= SkySettings.AxisLimitX + oneArcSec) &&
-                   (SkySettings.AxisLowerLimitY <= target[1] && target[1] <= SkySettings.AxisUpperLimitY);
+                       (axisLowerLimitY <= target[1] && target[1] <= axisUpperLimitY);
         }
 
         /// <summary>
@@ -7100,6 +7166,44 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
 
                 OnStaticPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets the current polar mode based on the alignment mode and mount type.
+        /// </summary>
+        public static PolarMode PolarMode
+        {
+            get
+            {
+                if (SkySettings.AlignmentMode == AlignmentModes.algPolar)
+                {
+                    return SkySettings.Mount == MountType.SkyWatcher ? SkySettings.PolarMode : PolarMode.Right;
+                }
+                else
+                {
+                    // default to right
+                    return PolarMode.Right;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the current polar mode based on the alignment mode.
+        /// </summary>
+        public static PolarMode PolarMode3D
+        {
+            get
+            {
+                if (SkySettings.AlignmentMode == AlignmentModes.algPolar && SkySettings.Mount == MountType.SkyWatcher)
+                {
+                    return SkySettings.PolarMode;
+                }
+                else
+                {
+                    // default to right
+                    return PolarMode.Right;
+                }
             }
         }
 

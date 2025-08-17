@@ -29,6 +29,7 @@ using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Xml.Linq;
 
 namespace GS.Server.SkyTelescope
 {
@@ -1151,8 +1152,9 @@ namespace GS.Server.SkyTelescope
 
         private static double _homeAxisX = double.NaN;
         /// <summary>
-        /// Home position in mount axes values
+        /// Home position in user.config are app axes values
         /// Home position for polar is stored as Alt / Az in user.config, adjusted for southern hemisphere
+        /// Getter returns the X axis as mount axis value
         /// </summary>
         public static double HomeAxisX
         {
@@ -1160,7 +1162,7 @@ namespace GS.Server.SkyTelescope
             {
                 if (AlignmentMode != AlignmentModes.algPolar)
                 {
-                    return _homeAxisX;
+                    return Axes.AxesAppToMount(new [] {_homeAxisX, _homeAxisY })[0];
                 }
                 else
                 {
@@ -1186,8 +1188,9 @@ namespace GS.Server.SkyTelescope
 
         private static double _homeAxisY = double.NaN;
         /// <summary>
-        /// Home position in mount axes values
+        /// Home position in user.config are app axes values
         /// Home position for polar is stored as Alt / Az in user.config, adjusted for southern hemisphere
+        /// Getter returns the Y axis as mount axis value
         /// </summary>
         public static double HomeAxisY
         {
@@ -1195,7 +1198,7 @@ namespace GS.Server.SkyTelescope
             {
                 if (AlignmentMode != AlignmentModes.algPolar)
                 {
-                    return _homeAxisY;
+                    return Axes.AxesAppToMount(new[] { _homeAxisX, _homeAxisY })[1];
                 }
                 else
                 {
@@ -1463,11 +1466,11 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(_parkAxes[0] - value[0]) <= 0.0000000000001 && Math.Abs(_parkAxes[1] - value[1]) <= 0.0000000000001)
                     return;
                 // On Polar settings load must convert Az / Alt in user.config to Ra / Dec 
-                //if (AlignmentMode == AlignmentModes.algPolar && Loading) value = SkyServer.MapTargetToAxes(Axes.AzAltToAxesXY(value));
+                //if (AlignmentMode == AlignmentModes.algPolar && _loading) value = SkyServer.MapTargetToAxes(Axes.AzAltToAxesXY(value));
                 // Set backing variable to mount native axis type
                 _parkAxes = value;
                 // On Polar setting save must convert Ra / Dec to Az / Alt in user.config 
-                //if (AlignmentMode == AlignmentModes.algPolar && !Loading) value = Axes.AxesXYToAzAlt(value);
+                //if (AlignmentMode == AlignmentModes.algPolar && !_loading) value = Axes.AxesXYToAzAlt(value);
                 value[0] = Math.Round(value[0], 6);
                 value[1] = Math.Round(value[1], 6);
                 Properties.SkyTelescope.Default.ParkAxes = JsonConvert.SerializeObject(value);
@@ -1573,7 +1576,35 @@ namespace GS.Server.SkyTelescope
                 OnStaticPropertyChanged();
             }
         }
-        
+
+        private static PolarMode _polarMode;
+        public static PolarMode PolarMode
+        {
+            get => _polarMode;
+            set
+            {
+                if (_polarMode == value) return;
+                _polarMode = value;
+                Properties.SkyTelescope.Default.PolarMode = value.ToString();
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+        //private static bool _polarModeEast;
+        //public static bool PolarModeEast
+        //{
+        //    get => _polarModeEast;
+        //    set
+        //    {
+        //        if (_polarModeEast == value) return;
+        //        _polarModeEast = value;
+        //        Properties.SkyTelescope.Default.PolarModeEast = value;
+        //        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+        //        OnStaticPropertyChanged();
+        //    }
+        //}
+
         private static int _raBacklash;
         public static int RaBacklash
         {
@@ -1666,20 +1697,6 @@ namespace GS.Server.SkyTelescope
                 if (Math.Abs(_axisLimitX - value) < 0.0000000000001) return;
                 _axisLimitX = value;
                 Properties.SkyTelescope.Default.AxisLimitX = value;
-                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
-                OnStaticPropertyChanged();
-            }
-        }
-
-        private static double _axisOriginX;
-        public static double AxisOriginX
-        {
-            get => _axisOriginX;
-            set
-            {
-                if (Math.Abs(_axisOriginX - value) < 0.0000000000001) return;
-                _axisOriginX = value;
-                Properties.SkyTelescope.Default.AxisOriginX = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
                 OnStaticPropertyChanged();
             }
@@ -1905,9 +1922,26 @@ namespace GS.Server.SkyTelescope
             set
             {
                 {
-                    _parkPositions = value.OrderBy(parkPosition => parkPosition.Name).ToList();
-                    var output = JsonConvert.SerializeObject(_parkPositions);
-                    Properties.SkyTelescope.Default.ParkPositions = output;
+                    string output;
+                    if (AlignmentMode == AlignmentModes.algPolar)
+                    { // Convert from Az/Alt to Ra/Dec on initial load and from Ra/Dec to Az/Alt on saving
+                        if (_loading)
+                        {
+                            _parkPositions = ConvertParkAltAzToXy(value);
+                            output = JsonConvert.SerializeObject(_parkPositions);
+                        }
+                        else
+                        {
+                            output = JsonConvert.SerializeObject(ConvertParkXyToAltAz(value));
+                            Properties.SkyTelescope.Default.ParkPositions = output;
+                        }
+                    }
+                    else
+                    {
+                        _parkPositions = value.OrderBy(parkPosition => parkPosition.Name).ToList();
+                        output = JsonConvert.SerializeObject(_parkPositions);
+                        Properties.SkyTelescope.Default.ParkPositions = output;
+                    }
                     LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{output}");
                     OnStaticPropertyChanged();
                 }
@@ -1915,24 +1949,48 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Converts a list of park positions from XY coordinates to AltAz coordinates.
+        /// Converts a list of park positions from mount XY coordinates to AltAz coordinates.
         /// </summary>
         /// <remarks>The conversion applies an angle offset based on the latitude of the location.
         /// Positions are sorted by their names before conversion.</remarks>
         /// <param name="parkPositions">A list of <see cref="ParkPosition"/> objects representing positions in XY coordinates.</param>
-        /// <returns>A JSON string representing the converted park positions in AltAz coordinates. Each position includes the
+        /// <returns>The converted park positions in AltAz coordinates. Each position includes the
         /// name, azimuth (adjusted for hemisphere determined by latitude sign), and altitude.</returns>
-        private static string ConvertParkXyToAltAz(List<ParkPosition> parkPositions)
+        private static List<ParkPosition> ConvertParkXyToAltAz(List<ParkPosition> parkPositions)
         {
             var angleOffset = Latitude < 0 ? 180.0 : 0.0;
             var parkPositionsTmp = new List<ParkPosition>();
             foreach (var pp in parkPositions.OrderBy(parkPosition => parkPosition.Name).ToList())
             {
-                var azAlt = Axes.AxesXyToAzAlt(new[] { pp.X, pp.Y });
+                var azAlt = Axes.AxesXyToAzAlt(Axes.AxesMountToApp(new[] { pp.X, pp.Y }));
                 var p = new ParkPosition(pp.Name, Range.Range360(Math.Round(azAlt[0], 6) - angleOffset), Math.Round(azAlt[1], 6));
                 parkPositionsTmp.Add(p);
             }
-            return JsonConvert.SerializeObject(parkPositionsTmp);
+            return parkPositionsTmp;
+        }
+
+        /// <summary>
+        /// Converts a list of park positions from AzAlt coordinates to XY coordinates.
+        /// </summary>
+        /// <remarks>The conversion applies an angle offset based on the latitude of the location.
+        /// Positions are sorted by their names before conversion.</remarks>
+        /// <param name="parkPositions">A list of <see cref="ParkPosition"/> objects representing positions in AzAlt coordinates.</param>
+        /// <returns>The converted park positions in XT coordinates. Each position includes the
+        /// name, X axis value and Y axis value.</returns>
+        private static List<ParkPosition> ConvertParkAltAzToXy(List<ParkPosition> parkPositions)
+        {
+            var angleOffset = Latitude < 0 ? 180.0 : 0.0;
+            var parkPositionsTmp = new List<ParkPosition>();
+            foreach (var pp in parkPositions.OrderBy(parkPosition => parkPosition.Name).ToList())
+            {
+                var position = new [] {pp.X, pp.Y};
+                position[0] = Range.Range360(position[0] - angleOffset);
+                var name = pp.Name;
+                var xY = Axes.AzAltToAxesXy(position);
+                var p = new ParkPosition(name, Range.Range360(Math.Round(xY[0], 6)), Math.Round(xY[1], 6));
+                parkPositionsTmp.Add(p);
+            }
+            return parkPositionsTmp;
         }
 
         private static string _parkName;
@@ -2023,22 +2081,20 @@ namespace GS.Server.SkyTelescope
 
         #region Methods
 
+        private static bool _loading;
+
         /// <summary>
-        /// Load SkyTelescope settings from user.config section defined by Profile.Current
-        /// Upgrade if necessary from previous user.config version or app.config
+        /// Loads the application settings and initializes various configuration properties.
         /// </summary>
+        /// <remarks>This method retrieves settings from the user configuration file and applies them to
+        /// initialize  the application's state. It sets various capabilities, server configurations, and mount
+        /// properties  based on the loaded settings. This method also handles deserialization of complex settings and 
+        /// ensures that all required properties are properly initialized.</remarks>
         public static void Load()
         {
-            // Load SettingsKey to access config section and reload from persistent storage
-            Properties.SkyTelescope.Default.SettingsKey = Properties.Profile.Default.Current;
-            Properties.SkyTelescope.Default.Reload();
-            // Compare config settings section version with app version and upgrade if no match
-            Version.TryParse(Properties.SkyTelescope.Default.Version, out var configVersion);
-            if (configVersion != Assembly.GetExecutingAssembly().GetName().Version)
-            {
-                Upgrade();
-                Properties.SkyTelescope.Default.Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            }
+            // Load settings from user.config handles create new, update or migrate settings as needed 
+            LoadConfigSettings();
+            _loading = true;
 
             //capabilities
             CanAlignMode = Properties.SkyTelescope.Default.CanAlignMode;
@@ -2106,7 +2162,6 @@ namespace GS.Server.SkyTelescope
             AxisModelOffsets = JsonConvert.DeserializeObject<Vector3>(Properties.SkyTelescope.Default.AxisModelOffsets);
             AxisUpperLimitY = Properties.SkyTelescope.Default.AxisUpperLimitY;
             AxisLimitX = Properties.SkyTelescope.Default.AxisLimitX;
-            AxisOriginX = Properties.SkyTelescope.Default.AxisOriginX;
             AxisTrackingLimit = Properties.SkyTelescope.Default.AxisTrackingLimit;
             AxisHzTrackingLimit = Properties.SkyTelescope.Default.AxisHzTrackingLimit;
             CameraHeight = Properties.SkyTelescope.Default.CameraHeight;
@@ -2139,8 +2194,6 @@ namespace GS.Server.SkyTelescope
             GpsComPort = "COM" + Properties.SkyTelescope.Default.GpsPort;
             GuideRateOffsetY = Properties.SkyTelescope.Default.GuideRateOffsetY;
             GuideRateOffsetX = Properties.SkyTelescope.Default.GuideRateOffsetX;
-            HomeAxisX = Properties.SkyTelescope.Default.HomeAxisX;
-            HomeAxisY = Properties.SkyTelescope.Default.HomeAxisY;
             HourAngleLimit = Properties.SkyTelescope.Default.HourAngleLimit;
             HomeWarning = Properties.SkyTelescope.Default.HomeWarning;
             HomeDialog = Properties.SkyTelescope.Default.HomeDialog;
@@ -2162,13 +2215,14 @@ namespace GS.Server.SkyTelescope
             ParkName = Properties.SkyTelescope.Default.ParkName;
             ParkLimitName = Properties.SkyTelescope.Default.ParkLimitName;
             ParkHzLimitName = Properties.SkyTelescope.Default.ParkHzLimitName;
-            ParkPositions = JsonConvert.DeserializeObject<List<ParkPosition>>(Properties.SkyTelescope.Default.ParkPositions);
             PecOn = Properties.SkyTelescope.Default.PecOn;
             PecOffSet = Properties.SkyTelescope.Default.PecOffSet;
             PPecOn = Properties.SkyTelescope.Default.PpecOn;
             PecWormFile = Properties.SkyTelescope.Default.PecWormFile;
             Pec360File = Properties.SkyTelescope.Default.Pec360File;
             PolarLedLevel = Properties.SkyTelescope.Default.PolarLedLevel;
+            Enum.TryParse<PolarMode>(Properties.SkyTelescope.Default.PolarMode, true, out var pParse);
+            PolarMode = pParse;
             RaBacklash = Properties.SkyTelescope.Default.RaBacklash;
             RaGaugeFlip = Properties.SkyTelescope.Default.RaGaugeFlip;
             ReadTimeout = Properties.SkyTelescope.Default.ReadTimeout;
@@ -2185,119 +2239,175 @@ namespace GS.Server.SkyTelescope
             SyncLimit = Properties.SkyTelescope.Default.SyncLimit;
             SyncLimitOn = Properties.SkyTelescope.Default.SyncLimitOn;
             Temperature = Properties.SkyTelescope.Default.Temperature;
-            // AzTrackLimitOffset = Properties.SkyTelescope.Default.AzTrackLimitOffset;
             AltAzTrackingUpdateInterval = Properties.SkyTelescope.Default.AltAzTrackingUpdateInterval;
             Enum.TryParse<Model3DType>(Properties.SkyTelescope.Default.ModelType, true, out var mtParse);
             Settings.Settings.ModelType = mtParse;
 
+            // Set axis information once all mount properties are loaded
+            HomeAxisX = Properties.SkyTelescope.Default.HomeAxisX;
+            HomeAxisY = Properties.SkyTelescope.Default.HomeAxisY;
+            ParkPositions = JsonConvert.DeserializeObject<List<ParkPosition>>(Properties.SkyTelescope.Default.ParkPositions);
             //UTCDateOffset = Properties.SkyTelescope.Default.UTCOffset;
+            _loading = false;
         }
 
         /// <summary>
-        /// Upgrade user.config to current version.
-        /// Preconditions:
-        ///     SettingsKey is set to Profile.Default.Current
-        ///     SkyTelescope.Default.Reload() has been called to load app.config default property values
-        ///
-        /// Use cases:
-        /// 1 - Earlier version user.config with AlignmentMode sections (1.0.9.3 onwards), just upgrade
-        /// 2 - No earlier version user.config so create from app.config, set AlignmentMode specific values from Profile settings
-        ///     Earlier version user.config wih no AlignmentMode sections migrate from common settings and copy
-        ///     park positions to EQ, default for AltAz from app.config
-        /// 
-        ///     Update version to executing assembly version
-        ///     Save user.config
+        /// Loads and initializes configuration settings for the application, handling scenarios such as version
+        /// upgrades, profile-based settings, and default configuration initialization.
         /// </summary>
-        public static void Upgrade()
+        /// <remarks>This method manages the application's configuration settings by checking for the
+        /// existence of current and previous configuration files, handling version mismatches, and ensuring that
+        /// settings are properly loaded or initialized. It supports the following scenarios: <list type="bullet">
+        /// <item> <description>If a current configuration file exists, it reloads the settings.</description> </item>
+        /// <item> <description>If a previous version's profile-based settings exist but no current configuration file,
+        /// it upgrades and migrates the settings to the current version.</description> </item> <item> <description>If
+        /// no previous or current configuration files exist, it initializes new settings using default values from the
+        /// application's configuration.</description> </item> </list> This method ensures that the application's
+        /// settings are consistent and up-to-date across different versions and profiles.</remarks>
+        private static void LoadConfigSettings()
         {
-            // Attempt to find a previous version with a versioned SettingsKey section
-            Version.TryParse(Properties.SkyTelescope.Default.GetPreviousVersion("Version")?.ToString(),
-                out Version previousVersion);
-            // UC1: Earlier version user.config with AlignmentMode profile sections (1.0.9.3 onwards), just do upgrade
-            if (previousVersion != null)
+            // Get load information: assembly version, earlier config file, and current config file
+            var version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            Properties.SkyTelescope.Default.SettingsKey = Properties.Profile.Default.Current;
+            var earlierConfigExists = Properties.Server.Default.GetPreviousVersion("Version") != null;
+            var profilesExist = false;
+            if (earlierConfigExists)
             {
-                Properties.SkyTelescope.Default.Upgrade();
-                Properties.SkyTelescope.Default.Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-                // Log upgrading from version
-                return;
+                profilesExist = new Version(Properties.Server.Default.GetPreviousVersion("Version").ToString()) >= new Version("1.2.0.0");
             }
-            // Copy settings from previous version into dictionary - deleted settings are not copied 
-            Properties.SkyTelescope.Default.SettingsKey = "";
-            Dictionary<string, object> previousSettings = new Dictionary<string, object>(256);
-            foreach (SettingsPropertyValue propertyValue in Properties.SkyTelescope.Default.PropertyValues)
+            var currentConfigExists = Properties.SkyTelescope.Default.Version != "0";
+            if (!currentConfigExists) // Scenario 1: user.config exists, profile settings available, settings loaded at end of function
             {
-                if (Properties.SkyTelescope.Default.GetPreviousVersion(propertyValue.Name)?.GetType() != null)
+                // Scenario 2, 3 or 4
+                if (profilesExist)
                 {
-                    previousSettings.Add(propertyValue.Name, Properties.SkyTelescope.Default.GetPreviousVersion(propertyValue.Name));
+                    // Scenario 2:. user.config does not exist, previous version profile based settings available
+                    // Copy settings from previous version profile settings
+                    // Set version and force write of profile settings to user.config
+                    Properties.Profile.Default.Upgrade();
+                    Properties.Profile.Default.Version = version;
+                    Properties.Profile.Default.PropertyValues["Current"].IsDirty = true;
+                    Properties.Profile.Default.Save();
+                    foreach (var mountType in Properties.Profile.Default.List.Split(','))
+                    {
+                        // Copy settings from previous version into dictionary - deleted settings are not copied 
+                        Properties.SkyTelescope.Default.SettingsKey = mountType;
+                        Dictionary<string, object> previousSettings = new Dictionary<string, object>(256);
+                        foreach (SettingsPropertyValue propertyValue in Properties.SkyTelescope.Default.PropertyValues)
+                        {
+                            if (Properties.SkyTelescope.Default.GetPreviousVersion(propertyValue.Name)?.GetType() !=
+                                null)
+                            {
+                                var name = propertyValue.Name;
+                                Properties.SkyTelescope.Default[name] =
+                                    Properties.SkyTelescope.Default.GetPreviousVersion(name);
+                                Properties.SkyTelescope.Default.PropertyValues[name].IsDirty = true;
+                            }
+                        }
+                        Properties.SkyTelescope.Default.Version = version;
+                        Properties.SkyTelescope.Default.PropertyValues["Version"].IsDirty = true;
+                        Properties.SkyTelescope.Default.Save();
+                    }
+                    Properties.SkyTelescope.Default.SettingsKey = Properties.Profile.Default.Current;
+                }
+                else // Scenarios 3 or 4: user.config does not exist, no previous version profile based settings available
+                {
+                    // Setup new profile settings
+                    Properties.Profile.Default.Version = version;
+                    Properties.Profile.Default.PropertyValues["Current"].IsDirty = true;
+                    Properties.Profile.Default.Save();
+
+                    // Create new settings file from app.config defaults for cases 3 and 4
+                    Properties.SkyTelescope.Default.Reset();
+                    Properties.SkyTelescope.Default.Version = version;
+                    foreach (var mountType in Properties.Profile.Default.List.Split(','))
+                    {
+                        InitSettingsFile(mountType, version);
+                    }
+
+                    Properties.SkyTelescope.Default.SettingsKey = Properties.Profile.Default.Current;
+                    Properties.SkyTelescope.Default.Save();
+                    Properties.SkyTelescope.Default.Reload();
+                    if (earlierConfigExists) // Case 3: previous version config file exists so copy applicable settings
+                    {
+                        Dictionary<string, object> previousSettings = new Dictionary<string, object>(256);
+                        Properties.SkyTelescope.Default.SettingsKey = "";
+                        _ = Properties.SkyTelescope.Default["Version"]; // Force read of properties.SkyTelescope.Default
+                        // Get the settings from the previous version
+                        foreach (SettingsPropertyValue propertyValue in Properties.SkyTelescope.Default.PropertyValues)
+                        {
+                            if (Properties.SkyTelescope.Default.GetPreviousVersion(propertyValue.Name)?.GetType() !=
+                                null)
+                            {
+                                previousSettings[propertyValue.Name] =
+                                    Properties.SkyTelescope.Default.GetPreviousVersion(propertyValue.Name);
+                            }
+                        }
+                        // Get model type from previous version Server properties
+                        previousSettings["ModelType"] = Properties.Server.Default.GetPreviousVersion("ModelType");
+                        // Get the mount type from the previous version
+                        var alignMentMode = previousSettings["AlignmentMode"]?.ToString() ?? "algGermanPolar";
+                        // Remove settings that are always mount type specific
+                        foreach (var name in new [] { "AlignmentMode", "AxisModelOffsets", "HomeAxisX", "HomeAxisY", "AtPark", "ParkName", "ParkPositions", "PolarMode", "Version"}) previousSettings.Remove(name);
+                        // Copy settings from previous version into all AltAz and German Polar mount types
+                        CopyEarlierConfigSettings(previousSettings, "algAltAz");
+                        CopyEarlierConfigSettings(previousSettings, "algGermanPolar");
+                        
+                        // Remove settings that are Polar mount type specific
+                        foreach (var name in new[] { "AxisLimitX", "AxisLowerLimitY", "AxisUpperLimitY", "HourAngleLimit", "ModelType" }) 
+                            previousSettings.Remove(name);
+                        // Copy settings from previous version into all Polar mount types
+                        CopyEarlierConfigSettings(previousSettings, "algPolar");
+
+                        // Get the park and limit settings from previous version
+                        previousSettings.Clear();
+                        foreach (var propertyName in new[] {
+                                     "ParkPositionsAltAz", "ParkPositionsEQ", "ParkPositions",
+                                     "ParkAxisX", "ParkAxisY",
+                                     "ParkAxisAz", "ParkAxisAlt",
+                                     "AtPark", 
+                                     // "AzSlewLimit", "AltAxisLowerLimit", "AltAxisUpperLimit",
+                                     // "AltAzAxesLimitOn", "AltAxisLimitOn",
+                                     "AlignmentMode", "Mount" }
+                                ) AddPropertyValue(previousSettings, propertyName, Properties.SkyTelescope.Default);
+                        // Migrate park and limit settings for German Polar and AltAz mounts. No action for Polar mounts
+                        if (String.IsNullOrEmpty((string)previousSettings["ParkPositions"]))
+                        {
+                            RestoreParkSettings(previousSettings, "algGermanPolar", "ParkPositionsEQ", "ParkAxisX", "ParkAxisY");
+                            RestoreParkSettings(previousSettings, "algAltAz", "ParkPositionsAltAz", "ParkAxisAz", "ParkAxisAlt");
+                        }
+                        else
+                        {
+                            RestoreParkSettings(previousSettings, "algGermanPolar", "ParkPositions", "ParkAxisX", "ParkAxisY");
+                        }
+                        Properties.SkyTelescope.Default.SettingsKey = Properties.Profile.Default.Current;
+                        Properties.SkyTelescope.Default.AtPark = (bool)previousSettings["AtPark"];
+                    }
+                    // Scenario 4: user.config does not exist, no previous user.config
+                    // No migration needed, user.config has been created just set the current settings key
+                    Properties.SkyTelescope.Default.SettingsKey = Properties.Profile.Default.Current;
                 }
             }
-            // Remove earlier Version and AlignmentMode settings values
-            previousSettings.Remove("Version");
-            previousSettings.Remove("AlignmentMode");
-            // Remove HomeAxisX and HomeAxisY settings value, now set by profile
-            previousSettings.Remove("HomeAxisX");
-            previousSettings.Remove("HomeAxisY");
-            // Remove Parking related settings, set by profile and mount type from previous settings, restore later
-            previousSettings.Remove("AtPark");
-            // Initialise settings file section for each AlignmentMode and copy in previous settings
-            InitSettingsFile("algAltAz", previousSettings);
-            InitSettingsFile("algGermanPolar", previousSettings);
-            InitSettingsFile("algPolar", previousSettings);
-            // Copy special case deleted parking, limit settings and alignment mode from previous version into dictionary
-            previousSettings.Clear();
-            Properties.SkyTelescope.Default.SettingsKey = "";
-            foreach (var propertyName in new [] { "ParkPositionsAltAz", "ParkPositionsEQ", "ParkPositions",
-                         "ParkAxisX", "ParkAxisY", "AtPark",
-                         "ParkAxisAz", "ParkAxisAlt",
-                         "AzSlewLimit", "AltAxisLowerLimit", "AltAxisUpperLimit", 
-                         "AltAzAxesLimitOn", "AltAxisLimitOn",
-                         "AlignmentMode"})
-            {
-                AddPropertyValue(previousSettings, propertyName, Properties.SkyTelescope.Default);
-            }
-            // Get 3D Model type from previous version Server properties
-            AddPropertyValue(previousSettings, "ModelType", Properties.Server.Default);
-
-            // Versions up to 1.0.7.6 only have ParkPositions settings
-            RestoreParkSettings(previousSettings, (string)previousSettings["AlignmentMode"], "ParkPositions", "ParkAxis", "ParkAxis");
-            // Versions from 1.0.7.7 have ParkPositionsAltAz and ParkPositionsEQ
-            // AltAz and German have previously stored positions
-            RestoreParkSettings(previousSettings, "algAltAz", "ParkPositionsAltAz", "ParkAxisAz", "ParkAxisAlt");
-            RestoreParkSettings(previousSettings, "algGermanPolar", "ParkPositionsEQ", "ParkAxisX", "ParkAxisY");
-            // Polar loads default app.config values for ParkPositions after converting from AltAz to XY
-            ConvertPolarParkSettings();
-
-            // Restore AltAz limit settings
-
-
-            // Set settingsKey from previous AlignmentMode and reload ready to go!
-            Properties.SkyTelescope.Default.SettingsKey = (string)previousSettings["AlignmentMode"];
             Properties.SkyTelescope.Default.Reload();
-            // Restore telescope model
-            Properties.SkyTelescope.Default.ModelType = (string)previousSettings["ModelType"];
-            Save();
         }
 
         /// <summary>
-        /// Initializes the settings file for the application by loading configuration values, applying mount-specific
-        /// defaults, and preserving previous settings.
+        /// Initializes the settings file with configuration values specific to the provided settings key and version.
         /// </summary>
-        /// <remarks>This method updates the application's settings file by loading the specified mount
-        /// type  configuration, copying previous settings values, and applying default values from the  application's
-        /// configuration file. It also marks all settings as dirty to ensure changes  are saved. <para> If a setting
-        /// from the previous version is no longer valid, an informational log entry is created to document the
-        /// removal. </para></remarks>
-        /// <param name="settingsKey">The key identifying the mount type configuration to load. Valid values include are "algAltAz",
-        /// "algGermanPolar", and "algPolar".</param>
-        /// <param name="previousSettings">A dictionary containing the previous settings values to be preserved. Keys represent setting names, and
-        /// values represent their corresponding values.</param>
-        private static void InitSettingsFile(string settingsKey, Dictionary<string, object> previousSettings)
+        /// <remarks>This method loads the configuration values for the specified settings key from the
+        /// application configuration file and applies them to the user-specific settings file. It also marks all
+        /// settings as dirty to ensure they are saved during the next save operation. If a property from the
+        /// application configuration is no longer present in the current version, it is logged as an informational
+        /// message.</remarks>
+        /// <param name="settingsKey">The key identifying the configuration profile to load (e.g., "algAltAz", "algGermanPolar", or "algPolar").</param>
+        /// <param name="version">The version string to associate with the settings file.</param>
+        private static void InitSettingsFile(string settingsKey, string version)
         {
             // Load SettingsKey to access config section
             Properties.SkyTelescope.Default.SettingsKey = settingsKey;
             Properties.SkyTelescope.Default.Reload();
             // Set version to current assembly
-            Properties.SkyTelescope.Default.Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            Properties.SkyTelescope.Default.Version = version;
             // Initialise user.config section with mount type specific values from app.config
             SettingsPropertyCollection profileProperties = null;
             switch (settingsKey)
@@ -2311,14 +2421,6 @@ namespace GS.Server.SkyTelescope
                 case "algPolar":
                     profileProperties = Properties.Profiles.Polar.Default.Properties;
                     break;
-            }
-            // Copy previous version setting values
-            foreach (SettingsProperty property in Properties.SkyTelescope.Default.Properties)
-            {
-                if (previousSettings.TryGetValue(property.Name, out object propertyObject))
-                {
-                    Properties.SkyTelescope.Default[property.Name] = previousSettings[property.Name];
-                }
             }
             // Copy the mount type specific app.config defaults to user.config
             foreach (SettingsProperty profileProperty in profileProperties)
@@ -2347,6 +2449,20 @@ namespace GS.Server.SkyTelescope
             foreach (SettingsPropertyValue propertyValue in Properties.SkyTelescope.Default.PropertyValues)
             {
                 propertyValue.IsDirty = true;
+            }
+            Properties.SkyTelescope.Default.Save();
+        }
+
+        static void  CopyEarlierConfigSettings(Dictionary<string, object> previousSettings, string mountType)
+        {
+            // Copy settings from previous version into dictionary - deleted settings are not copied 
+            Properties.SkyTelescope.Default.SettingsKey = mountType;
+            _ = Properties.SkyTelescope.Default["Version"]; // Force read of properties.SkyTelescope.Default
+            foreach (var setting in previousSettings)
+            {
+                var name = setting.Key;
+                Properties.SkyTelescope.Default[name] = setting.Value;
+                Properties.SkyTelescope.Default.PropertyValues[name].IsDirty = true;
             }
             Properties.SkyTelescope.Default.Save();
         }
@@ -2385,35 +2501,42 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Converts the default app.config ParkPositions setting for polar alignment.
-        /// </summary>
-        /// <remarks>This method adjusts the park positions based on the latitude and converts them from
-        /// AltAz coordinates to App XY coordinates. The updated park positions are serialized and saved back to the
-        /// application settings user.config file.</remarks>
-        private static void ConvertPolarParkSettings()
-        {
-            Properties.SkyTelescope.Default.SettingsKey = "algPolar";
-            Properties.SkyTelescope.Default.Reload();
-            var parkPositions = JsonConvert.DeserializeObject<List<ParkPosition >>(Properties.SkyTelescope.Default.ParkPositions);
-            var latitude = Properties.SkyTelescope.Default.Latitude;
-            var angleOffset = latitude < 0 ? 180.0 : 0.0;
-            foreach (var pp in parkPositions)
-            {
-                var p = Coordinate.AltAz2HaDec(Range.Range360(pp.Y + angleOffset), pp.X, latitude);
-                pp.X = Math.Round(p[0] * 15.0, 6);
-                pp.Y = Math.Round(p[1], 6);
-            }
-            Properties.SkyTelescope.Default.ParkPositions = JsonConvert.SerializeObject(parkPositions);
-            Save();
-        }
-
-        /// <summary>
         /// save and reload using current SettingsKey
         /// </summary>
         private static void Save()
         {
             Properties.SkyTelescope.Default.Save();
             Properties.SkyTelescope.Default.Reload();
+        }
+
+        /// <summary>
+        /// Add property value from previous version of settings file
+        /// GetPreviousVersion assumes setting does not exist in the current settings class
+        /// so we have to wrap GetPreviousVersion with a setting create and delete
+        /// </summary>
+        /// <param name="settingName">The name of the setting to get previous version</param>
+        /// <param name="properties">Properties instance containing setting as property</param>
+        private static void GetPropertyValue(string settingName, ApplicationSettingsBase properties)
+        {
+            try
+            {
+                // Create setting property ready for get
+                SettingsAttributeDictionary settingsAttributeDictionary = new SettingsAttributeDictionary();
+                settingsAttributeDictionary.Add(typeof(UserScopedSettingAttribute), new UserScopedSettingAttribute());
+                SettingsProperty p = new SettingsProperty(settingName, typeof(string),
+                    properties.Providers["LocalFileSettingsProvider"],
+                    false, String.Empty,
+                    SettingsSerializeAs.String, settingsAttributeDictionary,
+                    false, false);
+                properties.Properties.Add(p);
+                var settingValue = properties.GetPreviousVersion(settingName);
+                // Remove setting
+                properties.Properties.Remove(settingName);
+            }
+            catch (ArgumentException)
+            {
+                // Setting already exists - just get the value
+            }
         }
 
         /// <summary>
@@ -2428,6 +2551,8 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
+                // No profile
+                properties.SettingsKey = "";
                 // Create setting property ready for get
                 SettingsAttributeDictionary settingsAttributeDictionary = new SettingsAttributeDictionary();
                 settingsAttributeDictionary.Add(typeof(UserScopedSettingAttribute), new UserScopedSettingAttribute());

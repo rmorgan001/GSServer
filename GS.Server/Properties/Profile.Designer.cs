@@ -25,7 +25,7 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("algAltAz, algPolar, algGermanPolar")]
+        [global::System.Configuration.DefaultSettingValueAttribute("algAltAz,algPolar,algGermanPolar")]
         public string List {
             get {
                 return ((string)(this["List"]));
@@ -44,6 +44,18 @@ namespace GS.Server.Properties {
             }
             set {
                 this["Current"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public string Version {
+            get {
+                return ((string)(this["Version"]));
+            }
+            set {
+                this["Version"] = value;
             }
         }
     }

@@ -44,16 +44,25 @@ namespace GS.Shared
         }
 
         /// <summary>
-        /// Calculate axes for the 3D model based on the mount type, axis values, hemisphere and alignment mode.
+        /// Calculates the rotated axes for a model based on the specified mount type, alignment mode, and other
+        /// parameters.
         /// </summary>
-        /// <param name="mountType"></param>
-        /// <param name="ax"></param>
-        /// <param name="ay"></param>
-        /// <param name="southernHemisphere"></param>
-        /// <param name="alignmentMode"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public static double[] RotateModel(string mountType, double ax, double ay, bool southernHemisphere, AlignmentModes alignmentMode)
+        /// <remarks>The method applies different rotation logic based on the combination of the alignment
+        /// mode, mount type, and hemisphere. For example, in <see cref="AlignmentModes.algPolar"/> mode with a
+        /// "SkyWatcher" mount, the rotation logic differs  depending on whether the primary OTA is
+        /// east-facing.</remarks>
+        /// <param name="mountType">The type of mount being used. Supported values include "Simulator" and "SkyWatcher".</param>
+        /// <param name="ax">The initial X-axis value to be rotated in degrees.</param>
+        /// <param name="ay">The initial Y-axis value to be rotated in degrees.</param>
+        /// <param name="southernHemisphere">A value indicating whether the model is located in the southern hemisphere</param>
+        /// <param name="alignmentMode">The alignment mode to use for the rotation. Supported values are <see cref="AlignmentModes.algAltAz"/>, 
+        /// <see cref="AlignmentModes.algPolar"/>, and <see cref="AlignmentModes.algGermanPolar"/>.</param>
+        /// <param name="polarMode">A value indicating whether the polar alignment is east-facing. This parameter is relevant for  certain mount
+        /// types and alignment modes.</param>
+        /// <returns>An array of double values representing the rotated X and Y axes</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the <paramref name="mountType"/> is not recognized or unsupported for
+        /// the specified <paramref name="alignmentMode"/>.</exception>
+        public static double[] RotateModel(string mountType, double ax, double ay, bool southernHemisphere, AlignmentModes alignmentMode, int polarMode)
         {
             var axes = new[] { 0.0, 0.0 };
             switch (alignmentMode)
@@ -70,8 +79,16 @@ namespace GS.Shared
                             axes[1] = Math.Round(ay * -1.0, 3);
                             break;
                         case "SkyWatcher":
-                            axes[0] = Math.Round(ax, 3);
-                            axes[1] = Math.Round(ay * -1.0, 3);
+                            if (polarMode == 0)
+                            {
+                                axes[0] = Math.Round(-ax, 3);
+                                axes[1] = Math.Round(ay - 180, 3);
+                            }
+                            else
+                            {
+                                axes[0] = Math.Round(ax, 3);
+                                axes[1] = Math.Round(ay * -1.0, 3);
+                            }
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
