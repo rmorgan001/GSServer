@@ -63,9 +63,9 @@ namespace GS.Server.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap iconPolarLeft {
+        internal static System.Drawing.Bitmap iconPolarModeLeftNorth {
             get {
-                object obj = ResourceManager.GetObject("iconPolarLeft", resourceCulture);
+                object obj = ResourceManager.GetObject("iconPolarModeLeftNorth", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,29 @@ namespace GS.Server.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap iconPolarRight {
+        internal static System.Drawing.Bitmap iconPolarModeLeftSouth {
             get {
-                object obj = ResourceManager.GetObject("iconPolarRight", resourceCulture);
+                object obj = ResourceManager.GetObject("iconPolarModeLeftSouth", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap iconPolarModeRightNorth {
+            get {
+                object obj = ResourceManager.GetObject("iconPolarModeRightNorth", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap iconPolarModeRightSouth {
+            get {
+                object obj = ResourceManager.GetObject("iconPolarModeRightSouth", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

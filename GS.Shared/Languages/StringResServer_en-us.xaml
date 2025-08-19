@@ -788,17 +788,18 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="CheckMount">Check mount connections, power and baud rate</system:String>
 
     <!--1.1.0.3 -->
-    <!--Mount Hardware Limits -->
+    <!--Mount Hardware Setup -->
     <system:String x:Key="mhlButton">Hardware Limits</system:String>
     <system:String x:Key="mhlButtonToolTip">Set mount hardware movement limits</system:String>
-    <system:String x:Key="mhlSettingsLabel">Mount Hardware Limits</system:String>
+    <system:String x:Key="mhlSettingsLabel">Mount Hardware Setup</system:String>
     <system:String x:Key="mhlRaAz">Right Ascension / Azimuth</system:String>
     <system:String x:Key="mhlDecAlt">Declination / Altitude</system:String>
     <system:String x:Key="lbAxisLowerLimitY">Lower limit (degrees)</system:String>
     <system:String x:Key="lbAxisUpperLimitY">Upper limit (degrees)</system:String>
     <system:String x:Key="lbAxisLimitX">Limit (degrees)</system:String>
     <system:String x:Key="mhlButtonChange">Change</system:String>
-    <system:String x:Key="mhlTipChangeSide">Click to change between left and right side</system:String>
-    <system:String x:Key="lbTelescopeSide">Primary Telescope Side</system:String>
+    <system:String x:Key="mhlTipChangeSide">Click to change between East and West sides</system:String>
+    <system:String x:Key="mhlPolarHomeText">Primary Telescope on {0} side pointing {1}</system:String>
+
 </ResourceDictionary>
  

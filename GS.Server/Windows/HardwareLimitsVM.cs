@@ -62,13 +62,32 @@ namespace GS.Server.Windows
             {
                 using (var memory = new MemoryStream())
                 {
+                    var formatString = (string)Application.Current.Resources["mhlPolarHomeText"];
                     switch (SkySettings.PolarMode)
                     {
                         case PolarMode.Right:
-                            GS.Server.Properties.Resources.iconPolarRight.Save(memory, ImageFormat.Png);
+                            if (SkyServer.SouthernHemisphere)
+                            {
+                                Properties.Resources.iconPolarModeRightSouth.Save(memory, ImageFormat.Png);
+                                PolarModeHomeText = string.Format(formatString, "East", "North");
+                            }
+                            else
+                            {
+                                Properties.Resources.iconPolarModeRightNorth.Save(memory, ImageFormat.Png);
+                                PolarModeHomeText = string.Format(formatString, "West", "South");
+                            }
                             break;
                         case PolarMode.Left:
-                            GS.Server.Properties.Resources.iconPolarLeft.Save(memory, ImageFormat.Png);
+                            if (SkyServer.SouthernHemisphere)
+                            {
+                                Properties.Resources.iconPolarModeLeftSouth.Save(memory, ImageFormat.Png);
+                                PolarModeHomeText = string.Format(formatString, "West", "North");
+                            }
+                            else
+                            {
+                                Properties.Resources.iconPolarModeLeftNorth.Save(memory, ImageFormat.Png);
+                                PolarModeHomeText = string.Format(formatString, "East", "South");
+                            }
                             break;
                     }
                     memory.Position = 0;
@@ -181,6 +200,17 @@ namespace GS.Server.Windows
             set
             {
                 _polarModeIcon = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _polarModeHomeText;
+        public string PolarModeHomeText
+        {
+            get => _polarModeHomeText;
+            set
+            {
+                _polarModeHomeText = value;
                 OnPropertyChanged();
             }
         }
@@ -327,15 +357,34 @@ namespace GS.Server.Windows
                     {
                         using (var memory = new MemoryStream())
                         {
+                            // Toggle polar mode
+                            SkySettings.PolarMode = SkySettings.PolarMode == PolarMode.Right ? PolarMode.Left : PolarMode.Right;
+                            var formatString = (string)Application.Current.Resources["mhlPolarHomeText"];
                             switch (SkySettings.PolarMode)
                             {
-                                case PolarMode.Left:
-                                    SkySettings.PolarMode = PolarMode.Right;
-                                    GS.Server.Properties.Resources.iconPolarRight.Save(memory, ImageFormat.Png);
-                                    break;
                                 case PolarMode.Right:
-                                    SkySettings.PolarMode = PolarMode.Left;
-                                    GS.Server.Properties.Resources.iconPolarLeft.Save(memory, ImageFormat.Png);
+                                    if (SkyServer.SouthernHemisphere)
+                                    {
+                                        Properties.Resources.iconPolarModeRightSouth.Save(memory, ImageFormat.Png);
+                                        PolarModeHomeText = string.Format(formatString, "East", "North");
+                                    }
+                                    else
+                                    {
+                                        Properties.Resources.iconPolarModeRightNorth.Save(memory, ImageFormat.Png);
+                                        PolarModeHomeText = string.Format(formatString, "West", "South");
+                                    }
+                                    break;
+                                case PolarMode.Left:
+                                    if (SkyServer.SouthernHemisphere)
+                                    {
+                                        Properties.Resources.iconPolarModeLeftSouth.Save(memory, ImageFormat.Png);
+                                        PolarModeHomeText = string.Format(formatString, "West", "North");
+                                    }
+                                    else
+                                    {
+                                        Properties.Resources.iconPolarModeLeftNorth.Save(memory, ImageFormat.Png);
+                                        PolarModeHomeText = string.Format(formatString, "East", "South");
+                                    }
                                     break;
                             }
                             memory.Position = 0;
