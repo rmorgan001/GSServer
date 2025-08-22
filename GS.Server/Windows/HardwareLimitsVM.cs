@@ -181,17 +181,7 @@ namespace GS.Server.Windows
             }
         }
 
-        public Visibility IsVisible
-        {
-            get
-            {
-                if (SkySettings.Mount == MountType.SkyWatcher && SkySettings.AlignmentMode == AlignmentModes.algPolar)
-                {
-                    return Visibility.Visible;
-                }
-                return Visibility.Collapsed;
-            }
-        }
+        public Visibility IsVisible => SkySettings.AlignmentMode == AlignmentModes.algPolar ? Visibility.Visible : Visibility.Collapsed;
 
         private ImageSource _polarModeIcon;
         public ImageSource PolarModeIcon

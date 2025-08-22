@@ -798,6 +798,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="lbAxisLimitX">Limit (degrees)</system:String>
     <system:String x:Key="mhlButtonChange">Change</system:String>
     <system:String x:Key="mhlTipChangeSide">Click to change between East and West sides</system:String>
+    <system:String x:Key="mhlPolarHome">Home Position 5 degrees above horizon</system:String>
     <system:String x:Key="mhlPolarHomeText">Primary Telescope on {0} side pointing {1}</system:String>
 
 </ResourceDictionary>

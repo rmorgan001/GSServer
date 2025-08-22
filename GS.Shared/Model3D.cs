@@ -22,12 +22,12 @@ namespace GS.Shared
     public static class Model3D
     {
         private static readonly string DirectoryPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase) + @"\Models\";
-        public static string GetModelFile(Model3DType modelType, String altAz = "")
+        public static string GetModelFile(Model3DType modelType, String suffix = "")
         {
             // modelType is strongly typed enum so ToString() will succeed 
             string gpModel = modelType.ToString();
             var filePath = System.IO.Path.Combine(DirectoryPath ?? throw new InvalidOperationException(),
-                gpModel+ altAz + ".obj");
+                gpModel+ suffix + ".obj");
             var file = new Uri(filePath).LocalPath;
             if (!System.IO.File.Exists(file)) file = String.Empty;                
             return file;
@@ -81,7 +81,7 @@ namespace GS.Shared
                         case "SkyWatcher":
                             if (polarMode == 0)
                             {
-                                axes[0] = Math.Round(-ax, 3);
+                                axes[0] = Math.Round(ax, 3);
                                 axes[1] = Math.Round(ay - 180, 3);
                             }
                             else

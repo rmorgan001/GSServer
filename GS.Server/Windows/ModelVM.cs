@@ -294,18 +294,6 @@ namespace GS.Server.Windows
             }
         }
 
-        private double _modelReflect;
-        public double ModelReflect
-        {
-            get => _modelReflect;
-            set
-            {
-                if (_modelReflect == value) return;
-                _modelReflect = value;
-                OnPropertyChanged();
-            }
-        }
-
         private Vector3D _upDirection;
         public Vector3D UpDirection
         {
@@ -583,16 +571,6 @@ namespace GS.Server.Windows
                 YAxis = 90;
                 ZAxis = 90;
                 YAxisCentre = 0;
-                switch (SkyServer.PolarMode3D)
-                {
-                    case PolarMode.Left:
-                        ModelReflect = -1;
-                        break;
-                    case PolarMode.Right:
-                        ModelReflect = 1;
-                        break;
-                }
-
                 switch (SkySettings.AlignmentMode)
                 {
                     case AlignmentModes.algAltAz:
@@ -614,8 +592,19 @@ namespace GS.Server.Windows
                 LoadPierModel();
 
                 var import = new ModelImporter();
-                var altAz = (SkySettings.AlignmentMode == AlignmentModes.algAltAz) ? "AltAz" : String.Empty;
-                var model = import.Load(Shared.Model3D.GetModelFile(Settings.Settings.ModelType, altAz));
+                var suffix = string.Empty;
+                switch (SkySettings.AlignmentMode)
+                {
+                    case AlignmentModes.algAltAz:
+                        suffix = "AltAz";
+                        break;
+                    case AlignmentModes.algPolar:
+                        suffix = SkySettings.PolarMode == PolarMode.Left ? "PolarLeft" : "PolarRight";
+                        break;
+                    case AlignmentModes.algGermanPolar:
+                        break;
+                }
+                var model = import.Load(Shared.Model3D.GetModelFile(Settings.Settings.ModelType, suffix));
 
                 // set up OTA color
                 var accentColor = Settings.Settings.AccentColor;
