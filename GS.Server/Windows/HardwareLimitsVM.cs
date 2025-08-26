@@ -46,9 +46,6 @@ namespace GS.Server.Windows
         //#endregion
         public HardwareLimitsVm()
         {
-            // setup property events to monitor
-            SkyServer.StaticPropertyChanged += PropertyChangedSkyServer;
-            Settings.Settings.StaticPropertyChanged += PropertyChangedSettings;
             // Initialize axis limits
             AxisLowerLimitYs = new List<double>(Numbers.InclusiveRange(-90, 20, 1));
             AxisUpperLimitYs = new List<double>(Numbers.InclusiveRange(50, 90, 1));
@@ -63,7 +60,7 @@ namespace GS.Server.Windows
                 using (var memory = new MemoryStream())
                 {
                     var formatString = (string)Application.Current.Resources["mhlPolarHomeText"];
-                    switch (SkySettings.PolarMode)
+                    switch (PolarMode)
                     {
                         case PolarMode.Right:
                             if (SkyServer.SouthernHemisphere)
@@ -103,84 +100,6 @@ namespace GS.Server.Windows
         }
 
         #region Properties
-        /// <summary>
-        /// Property changes from the server
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void PropertyChangedSkyServer(object sender, PropertyChangedEventArgs e)
-        {
-            try
-            {
-                ThreadContext.BeginInvokeOnUiThread(
-             delegate
-             {
-                 switch (e.PropertyName)
-                 {
-                     default:
-                         // Handle any property changes here
-                         break;
-                 }
-             });
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Ui,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}|{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        /// <summary>
-        /// Property changes from the settings
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void PropertyChangedSettings(object sender, PropertyChangedEventArgs e)
-        {
-            try
-            {
-                ThreadContext.BeginInvokeOnUiThread(
-                    delegate
-                    {
-                        switch (e.PropertyName)
-                        {
-                            default:
-                                // Handle any property changes here
-                                break;
-                        }
-                    });
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Ui,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}|{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
         public Visibility IsVisible => SkySettings.AlignmentMode == AlignmentModes.algPolar ? Visibility.Visible : Visibility.Collapsed;
 
         private ImageSource _polarModeIcon;
@@ -201,6 +120,18 @@ namespace GS.Server.Windows
             set
             {
                 _polarModeHomeText = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private PolarMode _polarMode = SkySettings.PolarMode;
+
+        public PolarMode PolarMode
+        {
+            get => _polarMode;
+            set
+            {
+                _polarMode = value;
                 OnPropertyChanged();
             }
         }
@@ -348,9 +279,9 @@ namespace GS.Server.Windows
                         using (var memory = new MemoryStream())
                         {
                             // Toggle polar mode
-                            SkySettings.PolarMode = SkySettings.PolarMode == PolarMode.Right ? PolarMode.Left : PolarMode.Right;
+                            PolarMode = PolarMode == PolarMode.Right ? PolarMode.Left : PolarMode.Right;
                             var formatString = (string)Application.Current.Resources["mhlPolarHomeText"];
-                            switch (SkySettings.PolarMode)
+                            switch (PolarMode)
                             {
                                 case PolarMode.Right:
                                     if (SkyServer.SouthernHemisphere)
@@ -436,6 +367,7 @@ namespace GS.Server.Windows
                     SkySettings.AxisLowerLimitY = AxisLowerLimitY;
                     SkySettings.AxisUpperLimitY = AxisUpperLimitY;
                     SkySettings.AxisLimitX = AxisLimitX;
+                    SkySettings.PolarMode = PolarMode;
                     IsDialogOpen = false;
                     CloseWindow();
                 }
@@ -602,43 +534,6 @@ namespace GS.Server.Windows
             bWin.Show();
         }
 
-        private ICommand _clickOkDialogCommand;
-        public ICommand ClickOkDialogCommand
-        {
-            get
-            {
-                var command = _clickOkDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _clickOkDialogCommand = new RelayCommand(
-                    param => ClickOkDialog()
-                );
-            }
-        }
-        private void ClickOkDialog()
-        {
-            IsDialogOpen = false;
-        }
-
-        private ICommand _clickCancelDialogCommand;
-        public ICommand ClickCancelDialogCommand
-        {
-            get
-            {
-                var command = _clickCancelDialogCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _clickCancelDialogCommand = new RelayCommand(
-                    param => ClickCancelDialog()
-                );
-            }
-        }
         private void ClickCancelDialog()
         {
             IsDialogOpen = false;
@@ -684,17 +579,17 @@ namespace GS.Server.Windows
         /// </summary>
         public IList<double> AxisLimitXs { get; }
 
-        private double _AxisLimitX = SkySettings.AxisLimitX;
+        private double _axisLimitX = SkySettings.AxisLimitX;
         /// <summary>
         /// View model property for setting Ra / Az limit
         /// Settings updated if "Ok" on dialog close
         /// </summary>
         public double AxisLimitX
         {
-            get => _AxisLimitX;
+            get => _axisLimitX;
             set
             {
-                _AxisLimitX = value;
+                _axisLimitX = value;
                 OnPropertyChanged();
                 // Update graphic indicator
                 OnPropertyChanged(nameof(PrimarySectorX));
@@ -736,6 +631,7 @@ namespace GS.Server.Windows
         }
         public IList<double> AxisUpperLimitYs { get; }
         private double _axisUpperLimitY;
+
         public double AxisUpperLimitY
         {
             get => _axisUpperLimitY;
@@ -748,6 +644,7 @@ namespace GS.Server.Windows
         }
         public IList<double> AxisLowerLimitYs { get; }
         private double _axisLowerLimitY;
+
         public double AxisLowerLimitY
         {
             get => _axisLowerLimitY;
@@ -861,8 +758,6 @@ namespace GS.Server.Windows
     {
         if (disposing)
         {
-            SkyServer.StaticPropertyChanged -= PropertyChangedSkyServer;
-            Settings.Settings.StaticPropertyChanged -= PropertyChangedSettings;
         }
             NativeMethods.ClipCursor(IntPtr.Zero);
     }

@@ -2503,7 +2503,7 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// save and reload using current SettingsKey
         /// </summary>
-        private static void Save()
+        public static void Save()
         {
             Properties.SkyTelescope.Default.Save();
             Properties.SkyTelescope.Default.Reload();

@@ -479,6 +479,11 @@ namespace GS.Server.SkyTelescope
                      case "Refraction":
                          Refraction = SkySettings.Refraction;
                          break;
+                     case "PolarMode":
+                         LoadTelescopeModel();
+                         Rotate();
+                         SetPierSideIndicator();
+                         break;
                  }
              });
             }
@@ -2550,6 +2555,8 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private string ModelFileName { get; set; } = string.Empty;
+
         /// <summary>
         /// 
         /// </summary>
@@ -2557,6 +2564,24 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
+                // Check there is a new model to load
+                var suffix = string.Empty;
+                switch (SkySettings.AlignmentMode)
+                {
+                    case AlignmentModes.algAltAz:
+                        suffix = "AltAz";
+                        break;
+                    case AlignmentModes.algPolar:
+                        suffix = SkySettings.PolarMode == PolarMode.Left ? "PolarLeft" : "PolarRight";
+                        break;
+                    case AlignmentModes.algGermanPolar:
+                        break;
+                }
+                var modelFile = Shared.Model3D.GetModelFile(Settings.Settings.ModelType, suffix);
+                if (string.IsNullOrEmpty(modelFile) || modelFile == ModelFileName) return;
+
+                // All good so load models
+                ModelFileName = modelFile;
                 CameraVis = false;
 
                 //camera direction
@@ -2588,24 +2613,13 @@ namespace GS.Server.SkyTelescope
                         break;
                 }
 
-                //load compass, pier model and telescope model
+                //load telescope model
+                var import = new ModelImporter();
+                var model = import.Load(ModelFileName);
+
+                //load compass and pier model
                 Compass = MaterialHelper.CreateImageMaterial(Shared.Model3D.GetCompassFile(SkyServer.SouthernHemisphere, SkySettings.AlignmentMode == AlignmentModes.algAltAz), 100);
                 LoadPierModel();
-
-                var import = new ModelImporter();
-                var suffix = string.Empty;
-                switch (SkySettings.AlignmentMode)
-                {
-                    case AlignmentModes.algAltAz:
-                        suffix = "AltAz";
-                        break;
-                    case AlignmentModes.algPolar:
-                        suffix = SkySettings.PolarMode == PolarMode.Left ? "PolarLeft" : "PolarRight";
-                        break;
-                    case AlignmentModes.algGermanPolar:
-                        break;
-                }
-                var model = import.Load(Shared.Model3D.GetModelFile(Settings.Settings.ModelType, suffix));
 
                 // set up OTA color
                 var accentColor = Settings.Settings.AccentColor;
@@ -11157,12 +11171,41 @@ namespace GS.Server.SkyTelescope
             {
                 if (SkySettings.AlignmentMode != AlignmentModes.algGermanPolar)
                 {
+                    var polarMode = SkySettings.PolarMode;
                     var win = Application.Current.Windows.OfType<HardwareLimitsV>().FirstOrDefault();
                     if (win != null) return;
                     var window = new HardwareLimitsV();
                     // Set by code before window is shown but after constructor is called
                     window.Owner = App.Current.MainWindow;
                     window.ShowDialog();
+                    // If Polar Mode has changed and update settings and views
+                    if (SkySettings.PolarMode != polarMode)
+                        using (new WaitCursor())
+                        {
+                            // Save the settings
+                            SkySettings.Save();
+                            // Disconnect mount if currently connected. User must reconnect
+                            if (SkyServer.IsMountRunning) ClickConnect();
+                            // Reset mount without connecting
+                            SkyServer.MountReset();
+                            // Update View Model with new settings
+                            UpdateSkyTelescopeVM();
+                            SetShowUI();
+                            // ReSharper disable ExplicitCallerInfoArgument
+                            //Reset 3D view for alignment type
+                            OpenResetView();
+                            var monitorItem = new MonitorEntry
+                            {
+                                Datetime = HiResDateTime.UtcNow,
+                                Device = MonitorDevice.Server,
+                                Category = MonitorCategory.Mount,
+                                Type = MonitorType.Information,
+                                Method = MethodBase.GetCurrentMethod()?.Name,
+                                Thread = Thread.CurrentThread.ManagedThreadId,
+                                Message = $"{SkySettings.AxisLimitX}|{SkySettings.AxisLowerLimitY}|{SkySettings.AxisUpperLimitY}|{SkySettings.PolarMode}"
+                            };
+                            MonitorLog.LogToMonitor(monitorItem);
+                        }
                 }
                 else
                 {

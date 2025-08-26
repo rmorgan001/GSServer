@@ -229,23 +229,27 @@ namespace GS.Server.Model3D
         {
             try
             {
-                if (!IsCurrentViewModel() && e.PropertyName != "AlignmentMode") { return; }
+//                if (e.PropertyName != "AlignmentMode") { return; }
+//                if (!IsCurrentViewModel() && e.PropertyName != "AlignmentMode") { return; }
                 ThreadContext.BeginInvokeOnUiThread(
-             delegate
-             {
-                 switch (e.PropertyName)
+                 delegate
                  {
-                     case "AlignmentMode":
-                         ModelType = Settings.Settings.ModelType;
-                         OpenResetView();
-                         break;
-                     case "DisplayInterval":
-                         Interval = SkySettings.DisplayInterval;
-                         break;
-                     case "PolarMode":
-                         break;
-                 }
-             });
+                     switch (e.PropertyName)
+                     {
+                         case "PolarMode":
+                             LoadTelescopeModel();
+                             Rotate();
+                             SetPierSideIndicator();
+                             break;
+                         case "AlignmentMode": 
+                             ModelType = Settings.Settings.ModelType;
+                             OpenResetView();
+                             break;
+                         case "DisplayInterval":
+                             Interval = SkySettings.DisplayInterval;
+                             break;
+                     }
+                 });
             }
             catch (Exception ex)
             {
@@ -969,6 +973,8 @@ namespace GS.Server.Model3D
             }
         }
 
+        private string ModelFileName { get; set; } = string.Empty;
+
         /// <summary>
         /// 
         /// </summary>
@@ -976,6 +982,24 @@ namespace GS.Server.Model3D
         {
             try
             {
+                // Check there is a new model to load
+                var suffix = string.Empty;
+                switch (SkySettings.AlignmentMode)
+                {
+                    case AlignmentModes.algAltAz:
+                        suffix = "AltAz";
+                        break;
+                    case AlignmentModes.algPolar:
+                        suffix = SkySettings.PolarMode == PolarMode.Left ? "PolarLeft" : "PolarRight";
+                        break;
+                    case AlignmentModes.algGermanPolar:
+                        break;
+                }
+                var modelFile = Shared.Model3D.GetModelFile(Settings.Settings.ModelType, suffix);
+                if (string.IsNullOrEmpty(modelFile) || modelFile == ModelFileName) return;
+
+                // All good so load models
+                ModelFileName = modelFile;
                 CameraVis = false;
 
                 //camera direction
@@ -1011,19 +1035,7 @@ namespace GS.Server.Model3D
                 LoadPierModel();
 
                 var import = new ModelImporter();
-                var suffix = string.Empty;
-                switch (SkySettings.AlignmentMode)
-                {
-                    case AlignmentModes.algAltAz:
-                        suffix = "AltAz";
-                        break;
-                    case AlignmentModes.algPolar:
-                        suffix = SkySettings.PolarMode == PolarMode.Left ? "PolarLeft" : "PolarRight";
-                        break;
-                    case AlignmentModes.algGermanPolar:
-                        break;
-                }
-                var model = import.Load(Shared.Model3D.GetModelFile(Settings.Settings.ModelType, suffix));
+                var model = import.Load(ModelFileName);
 
                 // set up OTA color
                 var accentColor = Settings.Settings.AccentColor;

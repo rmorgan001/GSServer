@@ -58,6 +58,7 @@ namespace GS.Server.Windows
 
                     SkyServer.StaticPropertyChanged += PropertyChangedSkyServer;
                     Settings.Settings.StaticPropertyChanged += PropertyChangedSettings;
+                    SkySettings.StaticPropertyChanged += PropertyChangedSkySettings;
 
                     Title = Application.Current.Resources["3dModel"].ToString();
                     ScreenEnabled = SkyServer.IsMountRunning;
@@ -131,6 +132,42 @@ namespace GS.Server.Windows
                          break;
                  }
              });
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private void PropertyChangedSkySettings(object sender, PropertyChangedEventArgs e)
+        {
+            try
+            {
+                ThreadContext.BeginInvokeOnUiThread(
+                    delegate
+                    {
+                        switch (e.PropertyName)
+                        {
+                            case "PolarMode":
+                                LoadTelescopeModel();
+                                Rotate();
+                                SetPierSideIndicator();
+                                break;
+                        }
+                    });
             }
             catch (Exception ex)
             {
@@ -542,6 +579,8 @@ namespace GS.Server.Windows
             }
         }
 
+        private string ModelFileName { get; set; } = string.Empty;
+
         /// <summary>
         /// 
         /// </summary>
@@ -549,6 +588,24 @@ namespace GS.Server.Windows
         {
             try
             {
+                // Check there is a new model to load
+                var suffix = string.Empty;
+                switch (SkySettings.AlignmentMode)
+                {
+                    case AlignmentModes.algAltAz:
+                        suffix = "AltAz";
+                        break;
+                    case AlignmentModes.algPolar:
+                        suffix = SkySettings.PolarMode == PolarMode.Left ? "PolarLeft" : "PolarRight";
+                        break;
+                    case AlignmentModes.algGermanPolar:
+                        break;
+                }
+                var modelFile = Shared.Model3D.GetModelFile(Settings.Settings.ModelType, suffix);
+                if (string.IsNullOrEmpty(modelFile) || modelFile == ModelFileName) return;
+
+                // All good so load models
+                ModelFileName = modelFile;
                 CameraVis = false;
 
                 if (CameraIndex == 1)
@@ -592,19 +649,7 @@ namespace GS.Server.Windows
                 LoadPierModel();
 
                 var import = new ModelImporter();
-                var suffix = string.Empty;
-                switch (SkySettings.AlignmentMode)
-                {
-                    case AlignmentModes.algAltAz:
-                        suffix = "AltAz";
-                        break;
-                    case AlignmentModes.algPolar:
-                        suffix = SkySettings.PolarMode == PolarMode.Left ? "PolarLeft" : "PolarRight";
-                        break;
-                    case AlignmentModes.algGermanPolar:
-                        break;
-                }
-                var model = import.Load(Shared.Model3D.GetModelFile(Settings.Settings.ModelType, suffix));
+                var model = import.Load(ModelFileName);
 
                 // set up OTA color
                 var accentColor = Settings.Settings.AccentColor;
