@@ -25,7 +25,7 @@ namespace GS.Server.Properties.Profiles {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("[{\"Name\":\"Default\",\"X\":180.0,\"Y\":0.0},{\"Name\":\"Home\",\"X\":180.0,\"Y\":5.0}]")]
+        [global::System.Configuration.DefaultSettingValueAttribute("[{\"Name\":\"Default\",\"X\":0.0,\"Y\":0.0},{\"Name\":\"Home\",\"X\":0.0,\"Y\":5.0}]")]
         public string ParkPositions {
             get {
                 return ((string)(this["ParkPositions"]));

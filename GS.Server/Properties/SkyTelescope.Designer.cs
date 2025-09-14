@@ -1668,13 +1668,13 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string HCPulseSpeeds {
+        [global::System.Configuration.DefaultSettingValueAttribute(@"[{""Speed"":1,""Duration"":1000,""Interval"":1000,""Rate"":0.012},{""Speed"":2,""Duration"":1000,""Interval"":1000,""Rate"":0.024},{""Speed"":3,""Duration"":1000,""Interval"":1000,""Rate"":0.165},{""Speed"":4,""Duration"":1000,""Interval"":1000,""Rate"":0.238},{""Speed"":5,""Duration"":1000,""Interval"":1000,""Rate"":0.7},{""Speed"":6,""Duration"":1000,""Interval"":1000,""Rate"":1.4},{""Speed"":7,""Duration"":1000,""Interval"":1000,""Rate"":2.8},{""Speed"":8,""Duration"":1000,""Interval"":1000,""Rate"":3.5}]")]
+        public string HcPulseGuides {
             get {
-                return ((string)(this["HCPulseSpeeds"]));
+                return ((string)(this["HcPulseGuides"]));
             }
             set {
-                this["HCPulseSpeeds"] = value;
+                this["HcPulseGuides"] = value;
             }
         }
         

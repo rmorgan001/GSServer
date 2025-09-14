@@ -416,8 +416,8 @@
     <Setting Name="ParkAxes" Type="System.String" Scope="User">
       <Value Profile="(Default)">[0,0]</Value>
     </Setting>
-    <Setting Name="HCPulseSpeeds" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="HcPulseGuides" Type="System.String" Scope="User">
+      <Value Profile="(Default)">[{"Speed":1,"Duration":1000,"Interval":1000,"Rate":0.012},{"Speed":2,"Duration":1000,"Interval":1000,"Rate":0.024},{"Speed":3,"Duration":1000,"Interval":1000,"Rate":0.165},{"Speed":4,"Duration":1000,"Interval":1000,"Rate":0.238},{"Speed":5,"Duration":1000,"Interval":1000,"Rate":0.7},{"Speed":6,"Duration":1000,"Interval":1000,"Rate":1.4},{"Speed":7,"Duration":1000,"Interval":1000,"Rate":2.8},{"Speed":8,"Duration":1000,"Interval":1000,"Rate":3.5}]</Value>
     </Setting>
     <Setting Name="DisableKeysOnGoTo" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

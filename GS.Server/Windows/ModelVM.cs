@@ -161,8 +161,11 @@ namespace GS.Server.Windows
                     {
                         switch (e.PropertyName)
                         {
+                            case "AlignmentMode":
+                            case "Latitude":
                             case "PolarMode":
                                 LoadTelescopeModel();
+                                LoadPierModel();
                                 Rotate();
                                 SetPierSideIndicator();
                                 break;

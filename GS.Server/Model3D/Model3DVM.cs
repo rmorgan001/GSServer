@@ -236,8 +236,12 @@ namespace GS.Server.Model3D
                  {
                      switch (e.PropertyName)
                      {
-                         case "PolarMode":
+                         case "Latitude":
                              LoadTelescopeModel();
+                             LoadPierModel();
+                             Rotate();
+                             break;
+                         case "PolarMode":
                              Rotate();
                              SetPierSideIndicator();
                              break;

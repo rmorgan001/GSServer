@@ -6519,7 +6519,8 @@ namespace GS.Server.SkyTelescope
                 case SlewType.SlewHome:
                     break;
                 case SlewType.SlewPark:
-                    if (SkySettings.AlignmentMode == AlignmentModes.algGermanPolar) target = Axes.AxesAppToMount(target);
+                    // convert to mount coordinates for park
+                    target = Axes.AxesAppToMount(target);
                     break;
                 case SlewType.SlewMoveAxis:
                     target = Axes.AxesAppToMount(target);
@@ -6731,6 +6732,8 @@ namespace GS.Server.SkyTelescope
                     break;
                 case "Latitude":
                     AlignmentModel.SiteLatitude = SkySettings.Latitude;
+                    // Reset latitude based park positions for Polar mode
+                    if (SkySettings.AlignmentMode == AlignmentModes.algPolar) SkySettings.ResetParkPositions();
                     break;
                 case "Longitude":
                     AlignmentModel.SiteLongitude = SkySettings.Longitude;

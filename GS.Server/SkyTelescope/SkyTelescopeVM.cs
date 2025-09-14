@@ -396,13 +396,16 @@ namespace GS.Server.SkyTelescope
                          break;
                      case "Latitude":
                          UpdateLatitude();
+                         LoadPierModel();
+                         LoadTelescopeModel();
+                         Rotate();
                          break;
                      case "Elevation":
                          Elevation = SkySettings.Elevation;
                          break;
                      case "ParkPositions":
-                         // ReSharper disable ExplicitCallerInfoArgument
-                         OnPropertyChanged($"ParkPositions");
+                         OnPropertyChanged("ParkPositions");
+                         ParkSelectionSetting = ParkPositions.FirstOrDefault();
                          break;
                      case "DecBacklash":
                          DecBacklash = SkySettings.DecBacklash;
@@ -3162,7 +3165,7 @@ namespace GS.Server.SkyTelescope
             {
                 if (_parkSelection == value) return;
 
-                var found = ParkPositions.Find(x => x.Name == value.Name && Math.Abs(x.X - value.X) <= 0 && Math.Abs(x.Y - value.Y) <= 0);
+                var found = ParkPositions.Find(x => x.Name == value.Name && Math.Abs(x.X - value.X) <= 0.00001 && Math.Abs(x.Y - value.Y) <= 0.00001);
                 if (found == null) // did not find match in list
                 {
                     ParkPositions.Add(value);
@@ -7030,7 +7033,7 @@ namespace GS.Server.SkyTelescope
             {
                 if (_reSyncParkSelection == value) { return; }
 
-                var found = ParkPositions.Find(x => x.Name == value.Name && Math.Abs(x.X - value.X) <= 0 && Math.Abs(x.Y - value.Y) <= 0);
+                var found = ParkPositions.Find(x => x.Name == value.Name && Math.Abs(x.X - value.X) <= 0.00001 && Math.Abs(x.Y - value.Y) <= 0.00001);
                 if (found == null) // did not find match in list
                 {
                     ParkPositions.Add(value);
