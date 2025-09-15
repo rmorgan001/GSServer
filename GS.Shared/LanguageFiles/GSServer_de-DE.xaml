@@ -147,7 +147,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="mntDecSteps">Dek Schritte/Arksek:</system:String>
     <system:String x:Key="mntInfo">Montierungs Infos</system:String>
     <system:String x:Key="mntVoltage">Controller-Spannung:</system:String>
-    <system:String x:Key="mntVoltageError">Unterspannungsfehler:</system:String>
+    <system:String x:Key="mntVoltageError">Niedrige Spannung Fehler:</system:String>
 
     <!--GoTo bar-->
     <system:String x:Key="goAcpCoords">Koordinaten akzeptieren?</system:String>
@@ -737,7 +737,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     
     <!--1.0.6.4 -->
     <system:String x:Key="optAlignmentWarningThreshold">Warnung Schwellenwert</system:String>
-    <system:String x:Key="aliWarningThresholdTooltip">Der Wert, bei dem die Ausrichtungswarnung ausgelöst wird (Multiplikation des maximal registrierten Synchronisationsabstands).</system:String>
+    <system:String x:Key="aliWarningThresholdTooltip">Der Wert, bei dem die Ausrichtungswarnung ausgelöst wird (Multiplikator des registrierten maximalen Synchronisationsversatzes).</system:String>
     
     <!--1.0.7.8 -->
     <system:String x:Key="optLogPath">Protokollpfad</system:String>
@@ -765,11 +765,11 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="HcInt">Intervall</system:String>
     <system:String x:Key="HcRate">Rate</system:String>
     <system:String x:Key="PlotNormalize">Entfernen Sie RA-Tracking</system:String>
-    <system:String x:Key="DisableKeysOnGoTo">Direction Keys Off</system:String>
-    <system:String x:Key="DisableKeysOnGoToToolTip">Disable direction keys during go to</system:String>
+    <system:String x:Key="DisableKeysOnGoTo">Richtungstasten aus</system:String>
+    <system:String x:Key="DisableKeysOnGoToToolTip">Richtungstasten während „Gehe zu“ deaktivieren</system:String>
 
     <!--1.1.0.1 -->
-    <system:String x:Key="Stopped">Montierung stoppen</system:String>
+    <system:String x:Key="Stopped">Montierung gestoppt</system:String>
     <system:String x:Key="LowVoltage">Die Spannung ist niedrig: Überprüfen Sie die Stromversorgung und die Verkabelung</system:String>
     <system:String x:Key="CheckMount">Überprüfen Sie die Montierung, die Stromversorgung und die Baudrate</system:String>
 </ResourceDictionary>
