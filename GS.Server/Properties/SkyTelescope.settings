@@ -425,5 +425,11 @@
     <Setting Name="PolarMode" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="AutoHomeAxisX" Type="System.Double" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="AutoHomeAxisY" Type="System.Double" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

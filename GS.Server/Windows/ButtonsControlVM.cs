@@ -2315,6 +2315,28 @@ namespace GS.Server.Windows
             }
         }
 
+        public double AutoHomeAxisX
+        {
+            get => SkySettings.AutoHomeAxisX;
+            set
+            {
+                if (Math.Abs(value - SkySettings.AutoHomeAxisX) < 0.00001) { return; }
+                SkySettings.AutoHomeAxisX = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double AutoHomeAxisY
+        {
+            get => SkySettings.AutoHomeAxisY;
+            set
+            {
+                if (Math.Abs(value - SkySettings.AutoHomeAxisY) < 0.00001) { return; }
+                SkySettings.AutoHomeAxisY = value;
+                OnPropertyChanged();
+            }
+        }
+
         public IList<int> DecOffsets { get; }
         private int _decOffset;
 

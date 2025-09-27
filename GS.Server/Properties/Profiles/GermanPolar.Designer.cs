@@ -211,5 +211,23 @@ namespace GS.Server.Properties.Profiles {
                 return ((string)(this["PolarMode"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
+        public double AutoHomeAxisX {
+            get {
+                return ((double)(this["AutoHomeAxisX"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
+        public double AutoHomeAxisY {
+            get {
+                return ((double)(this["AutoHomeAxisY"]));
+            }
+        }
     }
 }

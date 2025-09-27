@@ -35,6 +35,8 @@ namespace GS.SkyWatcher
         #region Fields
 
         private const char EndChar = (char)13;                         // Tailing character of command and response.
+        private const int MaxSteps = Int32.MaxValue;
+        private const int MinSteps = Int32.MinValue;
         private readonly AxisStatus[] _axesStatus = new AxisStatus[2];  // Status and state information for each axis
         private readonly double[] _positions = { 0, 0 };
         private readonly double[] _factorStepToRad = { 0, 0 };          // radians per step based on gear ratio
@@ -848,8 +850,8 @@ namespace GS.SkyWatcher
         /// <summary>
         /// qx00 or X000B Home position
         /// Send :qx000000[0D]
-        ///     =000000[0D] or =80000000   if axis is CW  from home ( ie -ve ) just after home sensor trip has been reset
-        ///     =FFFFFF[0D] or =7FFFFFFF   CCW from home(ie +ve ) just after home sensor trip has been reset )
+        ///     =000000[0D] or =80000000   if axis is CW  from home (ie -ve) just after home sensor trip has been reset
+        ///     =FFFFFF[0D] or =7FFFFFFF   CCW from home(ie +ve) just after home sensor trip has been reset
         ///     =llhhLL[0D] or =1234ABCD   if sensor has tripped since reset(use :W to clear data first )
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>  
@@ -861,9 +863,9 @@ namespace GS.SkyWatcher
                 var position = String32ToInt(response, true, 1);
                 switch (position)
                 {
-                    case -2147483648:
+                    case MinSteps:
                         return 100000000000;
-                    case 2147483647:
+                    case MaxSteps:
                         return 200000000000;
                     default:
                         return Convert.ToInt32(position / _resolutionFactor[(int)axis]);

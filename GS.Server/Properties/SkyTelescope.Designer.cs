@@ -1701,5 +1701,27 @@ namespace GS.Server.Properties {
                 this["PolarMode"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public double AutoHomeAxisX {
+            get {
+                return ((double)(this["AutoHomeAxisX"]));
+            }
+            set {
+                this["AutoHomeAxisX"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public double AutoHomeAxisY {
+            get {
+                return ((double)(this["AutoHomeAxisY"]));
+            }
+            set {
+                this["AutoHomeAxisY"] = value;
+            }
+        }
     }
 }

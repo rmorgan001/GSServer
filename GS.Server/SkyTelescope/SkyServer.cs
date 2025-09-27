@@ -2778,10 +2778,11 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
-                if (!IsMountRunning) { return; }
+                if (!IsMountRunning) return;
                 IsAutoHomeRunning = true;
                 LastAutoHomeError = null;
-                var monitorItem = new MonitorEntry
+
+                MonitorLog.LogToMonitor(new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
@@ -2790,93 +2791,39 @@ namespace GS.Server.SkyTelescope
                     Method = MonitorLog.GetCurrentMethod(),
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = "Started"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
+                });
 
-                var returnCode1 = 0;
-                var returnCode2 = 0;
-                if (degreeLimit < 20) { degreeLimit = 100; }
+                if (degreeLimit < 20) degreeLimit = 100;
                 AutoHomeProgressBar = 0;
                 var encoderTemp = SkySettings.Encoders;
-                if (Tracking) { Tracking = false; }
+                if (Tracking) Tracking = false;
                 Synthesizer.Speak(Application.Current.Resources["btnAutoHomeStart"].ToString());
                 Synthesizer.VoicePause = true;
+
+                AutoHomeResult raResult, decResult;
 
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
-                        var autoSim = new AutoHomeSim();
-                        returnCode1 = await Task.Run(() => autoSim.StartAutoHome(Axis.Axis1, degreeLimit));
+                        var autoHomeSim = new AutoHomeSim();
+                        raResult = await Task.Run(() => autoHomeSim.StartAutoHome(Axis.Axis1, degreeLimit));
                         AutoHomeProgressBar = 50;
-                        returnCode2 = await Task.Run(() => autoSim.StartAutoHome(Axis.Axis2, degreeLimit, offSetDec));
+                        decResult = await Task.Run(() => autoHomeSim.StartAutoHome(Axis.Axis2, degreeLimit, offSetDec));
                         break;
                     case MountType.SkyWatcher:
-                        var autosSky = new AutoHomeSky();
-                        returnCode1 = await Task.Run(() => autosSky.StartAutoHome(AxisId.Axis1, degreeLimit));
+                        var autoHomeSky = new AutoHomeSky();
+                        raResult = await Task.Run(() => autoHomeSky.StartAutoHome(AxisId.Axis1, degreeLimit));
                         AutoHomeProgressBar = 50;
-                        returnCode2 = await Task.Run(() => autosSky.StartAutoHome(AxisId.Axis2, degreeLimit, offSetDec));
+                        decResult = await Task.Run(() => autoHomeSky.StartAutoHome(AxisId.Axis2, degreeLimit, offSetDec));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
 
-                // put encoder setting back
                 SkySettings.Encoders = encoderTemp;
-                string msgCode1 = null;
-                switch (returnCode1)
-                {
-                    case 0:
-                        //good
-                        break;
-                    case -1:
-                        msgCode1 = "RA failed home sensor reset";
-                        break;
-                    case -2:
-                        msgCode1 = "RA home sensor not found";
-                        break;
-                    case -3:
-                        //stop requested
-                        break;
-                    case -4:
-                        msgCode1 = "RA too many restarts";
-                        break;
-                    case -5:
-                        msgCode1 = "RA home capability check failed";
-                        break;
-                    default:
-                        msgCode1 = "Ra code not found";
-                        break;
-                }
-
-                string msgcode2 = null;
-                switch (returnCode2)
-                {
-                    case 0:
-                        //good
-                        break;
-                    case -1:
-                        msgcode2 = "Dec failed home sensor reset";
-                        break;
-                    case -2:
-                        msgcode2 = "Dec home sensor not found";
-                        break;
-                    case -3:
-                        //stop requested
-                        break;
-                    case -4:
-                        msgcode2 = "Dec too many restarts";
-                        break;
-                    case -5:
-                        msgcode2 = "Dec home capability check failed";
-                        break;
-                    default:
-                        msgcode2 = "Dec code not found";
-                        break;
-                }
-
                 StopAxes();
 
-                monitorItem = new MonitorEntry
+                MonitorLog.LogToMonitor(new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
@@ -2884,32 +2831,33 @@ namespace GS.Server.SkyTelescope
                     Type = MonitorType.Information,
                     Method = MonitorLog.GetCurrentMethod(),
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Complete: {returnCode1}|{returnCode2}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
+                    Message = $"Complete: {raResult}|{decResult}"
+                });
 
-                if (returnCode1 == 0 && returnCode2 == 0)
+                if (raResult == AutoHomeResult.Success && decResult == AutoHomeResult.Success)
                 {
-                    // all is ok
-                    //ResetHomePositions();
-                    ReSyncAxes();
+                    ReSyncAxes(new ParkPosition("AutoHome", SkySettings.AutoHomeAxisX, SkySettings.AutoHomeAxisY), false);
                     Synthesizer.VoicePause = false;
                     Thread.Sleep(1500);
                     Synthesizer.Speak(Application.Current.Resources["btnAutoHomeComplete"].ToString());
-
+                }
+                else if (raResult == AutoHomeResult.StopRequested || decResult == AutoHomeResult.StopRequested)
+                {
+                    // Cancelled by user, do not throw
+                    return;
                 }
                 else
                 {
-                    //throw only if not a cancel request
-                    if (returnCode1 == -3 || returnCode2 == -3) return;
-                    var ex = new Exception($"Incomplete: {msgCode1} ({returnCode1}), {msgcode2}({returnCode2})");
+                    string raMsg = GetAutoHomeResultMessage(raResult, "RA");
+                    string decMsg = GetAutoHomeResultMessage(decResult, "Dec");
+                    var ex = new Exception($"Incomplete: {raMsg} ({raResult}), {decMsg} ({decResult})");
                     LastAutoHomeError = ex;
                     throw ex;
                 }
             }
             catch (Exception ex)
             {
-                var monitorItem = new MonitorEntry
+                MonitorLog.LogToMonitor(new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
@@ -2918,8 +2866,7 @@ namespace GS.Server.SkyTelescope
                     Method = MonitorLog.GetCurrentMethod(),
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{ex.Message}|{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
+                });
                 LastAutoHomeError = ex;
                 MountError = ex;
             }
@@ -2927,10 +2874,31 @@ namespace GS.Server.SkyTelescope
             {
                 AutoHomeProgressBar = 100;
                 IsAutoHomeRunning = false;
-                Synthesizer.VoicePause = false; //make sure pause is off
+                Synthesizer.VoicePause = false;
             }
         }
 
+        private static string GetAutoHomeResultMessage(AutoHomeResult result, string axisName)
+        {
+            switch (result)
+            {
+                case AutoHomeResult.Success:
+                    return $"{axisName} homed successfully";
+                case AutoHomeResult.FailedHomeSensorReset:
+                    return $"{axisName} failed home sensor reset";
+                case AutoHomeResult.HomeSensorNotFound:
+                    return $"{axisName} home sensor not found";
+                case AutoHomeResult.TooManyRestarts:
+                    return $"{axisName} too many restarts";
+                case AutoHomeResult.HomeCapabilityCheckFailed:
+                    return $"{axisName} home capability check failed";
+                case AutoHomeResult.StopRequested:
+                    return $"{axisName} auto home stopped";
+                default:
+                    return $"{axisName} unknown error";
+            }
+        }
+        
         /// <summary>
         /// Makes sure the axes are at full stop
         /// </summary>
@@ -5244,6 +5212,8 @@ namespace GS.Server.SkyTelescope
             switch (SkySettings.Mount)
             {
                 case MountType.Simulator:
+                    Simulator.Settings.AutoHomeAxisX = (int)SkySettings.AutoHomeAxisX;
+                    Simulator.Settings.AutoHomeAxisY = (int)SkySettings.AutoHomeAxisY;
                     MountQueue.Start();
                     if (MountQueue.IsRunning) { ConnectAlignmentModel(); }
                     else
@@ -5599,7 +5569,7 @@ namespace GS.Server.SkyTelescope
         /// Reset positions for the axes.
         /// </summary>
         /// <param name="parkPosition">ParkPosition or Null for home</param>
-        public static void ReSyncAxes(ParkPosition parkPosition = null)
+        public static void ReSyncAxes(ParkPosition parkPosition = null, bool saveParkPosition = true)
         {
             if (!IsMountRunning) { return; }
             Tracking = false;
@@ -5646,7 +5616,7 @@ namespace GS.Server.SkyTelescope
             }
 
             //all good, go ahead and set dropdown to the park position and park
-            if (parkPosition != null)
+            if (parkPosition != null && saveParkPosition)
             {
                 ParkSelected = parkPosition;
                 GoToPark();

@@ -65,5 +65,11 @@
     <Setting Name="PolarMode" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Left</Value>
     </Setting>
+    <Setting Name="AutoHomeAxisX" Type="System.Double" Scope="Application">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="AutoHomeAxisY" Type="System.Double" Scope="Application">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

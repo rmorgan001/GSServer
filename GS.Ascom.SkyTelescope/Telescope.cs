@@ -1306,6 +1306,9 @@ namespace ASCOM.GS.Sky.Telescope
             MonitorLog.LogToMonitor(monitorItem);
 
             var raDec = Transforms.CoordTypeToInternal(ra, dec);
+            CheckRange(raDec.X, 0, 24, "SlewToCoordinatesAsync", "RightAscension");
+            CheckRange(raDec.Y, -90, 90, "SlewToCoordinatesAsync", "Declination");
+            CheckReachable(raDec.X, raDec.Y, SlewType.SlewRaDec);
             var r = SkyServer.DetermineSideOfPier(raDec.X, raDec.Y);
             return r;
         }

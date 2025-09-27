@@ -200,4 +200,21 @@ namespace GS.Server.SkyTelescope
         Left,
         Right
     }
+
+    /// <summary>
+    /// Represents the result of an automatic homing operation.
+    /// </summary>
+    /// <remarks>This enumeration provides a set of predefined values that indicate the outcome of an
+    /// automatic homing process.  Each value corresponds to a specific success or failure condition, allowing the
+    /// caller to determine the result  of the operation and take appropriate action.</remarks>
+    public enum AutoHomeResult
+    {
+        Success = 0,
+        FailedHomeSensorReset = -1,
+        HomeSensorNotFound = -2,
+        StopRequested = -3,
+        TooManyRestarts = -4,
+        HomeCapabilityCheckFailed = -5,
+        UnknownError = -99
+    }
 }

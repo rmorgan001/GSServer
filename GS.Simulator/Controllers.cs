@@ -29,6 +29,8 @@ namespace GS.Simulator
         private static CancellationTokenSource _ctsMount = new CancellationTokenSource();
         private const long RevolutionSteps = 12960000;
         private const long WormRevolutionSteps = 64800;
+        private const int MaxSteps = Int32.MaxValue;
+        private const int MinSteps = Int32.MinValue;
         private const bool CanAxisSlewsIndependent = false;
         private const bool CanAzEq = false;
         private const bool CanDualEncoders = false;
@@ -70,8 +72,6 @@ namespace GS.Simulator
         private bool _isGotoSlewingY;
         private bool _homeSensorX;
         private bool _homeSensorY;
-        private int _homeX;
-        private int _homeY;
 
         private const int FactorSteps = 36000;
         private const int MaxRate = 4;
@@ -109,8 +109,6 @@ namespace GS.Simulator
             SlewSpeedEight = 13;
             SnapPort1 = false;
             SnapPort2 = false;
-            _homeX = 90;
-            _homeY = 90;
         }
 
         /// <summary>
@@ -685,6 +683,16 @@ namespace GS.Simulator
             CheckSlewing();
         }
 
+        /// <summary>
+        /// Checks and updates the state of the home sensor for the specified axis based on the provided change value.
+        /// </summary>
+        /// <remarks>This method adjusts the home sensor state for the specified axis if the axis position
+        /// crosses a predefined threshold. The thresholds are determined by the <see cref="Settings.AutoHomeAxisX"/>
+        /// and <see cref="Settings.AutoHomeAxisY"/> values. If the change is negligible (less than 1e-10), the method
+        /// exits without making any updates.</remarks>
+        /// <param name="axis">The axis to check, either <see cref="Axis.Axis1"/> or <see cref="Axis.Axis2"/>.</param>
+        /// <param name="change">The change in position to evaluate. Must be a non-negligible value.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the <paramref name="axis"/> parameter is not a valid <see cref="Axis"/> value.</exception>
         private void HomeSensorTripCheck(Axis axis, double change)
         {
             if (Math.Abs(change) < .0000000001) return;
@@ -692,28 +700,28 @@ namespace GS.Simulator
             {
                 case Axis.Axis1:
                     // if (DegreesX > 110 || DegreesX < 70) return;
-                    if (DegreesX > _homeX && _homeSensorX)
+                    if (DegreesX > Settings.AutoHomeAxisX && _homeSensorX)
                     {
-                        HomeSensorX = _homeX * 36000;
+                        HomeSensorX = Settings.AutoHomeAxisX * 36000;
                         _homeSensorX = false;
                     }
-                    if (DegreesX < _homeX && !_homeSensorX)
+                    if (DegreesX < Settings.AutoHomeAxisX && !_homeSensorX)
                     {
-                        HomeSensorX = _homeX * 36000;
+                        HomeSensorX = Settings.AutoHomeAxisX * 36000;
                         _homeSensorX = true;
                     }
                     break;
                 case Axis.Axis2:
                     // if (DegreesY > 110 || DegreesY < 70) return;
-                    if (DegreesY > _homeY && _homeSensorY)
+                    if (DegreesY > Settings.AutoHomeAxisY && _homeSensorY)
                     {
-                        HomeSensorY = _homeY * 36000;
+                        HomeSensorY = Settings.AutoHomeAxisY * 36000;
                         _homeSensorY = false;
                     }
 
-                    if (DegreesY < _homeY && !_homeSensorY)
+                    if (DegreesY < Settings.AutoHomeAxisY && !_homeSensorY)
                     {
-                        HomeSensorY = _homeY * 36000;
+                        HomeSensorY = Settings.AutoHomeAxisY * 36000;
                         _homeSensorY = true;
                     }
                     break;
@@ -722,17 +730,30 @@ namespace GS.Simulator
             }
         }
 
+        /// <summary>
+        /// Resets the home sensor value for the specified axis based on its current position using Advanced Command values.
+        /// </summary>
+        /// <remarks>This method adjusts the home sensor value for the specified axis depending on whether
+        /// the current position exceeds or falls below the predefined auto-home threshold for that axis. The thresholds
+        /// are defined in <see cref="Settings.AutoHomeAxisX"/> for <see cref="Axis.Axis1"/> and <see
+        /// cref="Settings.AutoHomeAxisY"/> for <see cref="Axis.Axis2"/>.
+        /// 0x80000000 (-2147483648 / Int32.MinValue) if axis is CW from home (ie -ve) just after home sensor trip has been reset
+        /// 0x7FFFFFFF (+2147483647 / Int32.MaxValue) if axis CCW from home(ie +ve) just after home sensor trip has been reset
+        /// </remarks>
+        /// <param name="axis">The axis for which the home sensor should be reset. Must be either <see cref="Axis.Axis1"/> or <see
+        /// cref="Axis.Axis2"/>.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the <paramref name="axis"/> parameter is not a valid value of the <see cref="Axis"/> enumeration.</exception>
         private void HomeSensorReset(Axis axis)
         {
             switch (axis)
             {
                 case Axis.Axis1:
-                    if (DegreesX > _homeX) HomeSensorX = 0;
-                    if (DegreesX < _homeX) HomeSensorX = 16777215;
+                    if (DegreesX > Settings.AutoHomeAxisX) HomeSensorX = MinSteps;
+                    if (DegreesX < Settings.AutoHomeAxisX) HomeSensorX = MaxSteps;
                     break;
                 case Axis.Axis2:
-                    if (DegreesY > _homeY) HomeSensorY = 0;
-                    if (DegreesY < _homeY) HomeSensorY = 16777215;
+                    if (DegreesY > Settings.AutoHomeAxisY) HomeSensorY = MinSteps;
+                    if (DegreesY < Settings.AutoHomeAxisY) HomeSensorY = MaxSteps;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(axis), axis, null);

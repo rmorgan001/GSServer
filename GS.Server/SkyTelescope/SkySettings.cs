@@ -798,6 +798,41 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static double _autoHomeAxisX = double.NaN;
+        /// <summary>
+        /// AutoHome X Axis sensor position in degrees
+        /// </summary>
+        public static double AutoHomeAxisX
+        {
+            get => _autoHomeAxisX;
+            set
+            {
+                if (Math.Abs(_autoHomeAxisX - value) <= 0.0000000000001) return;
+                _autoHomeAxisX = value;
+                Properties.SkyTelescope.Default.AutoHomeAxisX = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
+
+        private static double _autoHomeAxisY = double.NaN;
+        /// <summary>
+        /// AutoHome Y Axis sensor position in degrees
+        /// </summary>
+        public static double AutoHomeAxisY
+        {
+            get => _autoHomeAxisY;
+            set
+            {
+                if (Math.Abs(_autoHomeAxisY - value) <= 0.0000000000001) return;
+                _autoHomeAxisY = value;
+                Properties.SkyTelescope.Default.AutoHomeAxisY = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static bool _autoTrack;
         public static bool AutoTrack
         {
@@ -2174,6 +2209,8 @@ namespace GS.Server.SkyTelescope
             // Set home axis amd park position information once all mount properties are loaded
             HomeAxisX = Properties.SkyTelescope.Default.HomeAxisX;
             HomeAxisY = Properties.SkyTelescope.Default.HomeAxisY;
+            AutoHomeAxisX = Properties.SkyTelescope.Default.AutoHomeAxisX;
+            AutoHomeAxisY = Properties.SkyTelescope.Default.AutoHomeAxisY;
             ParkPositions = JsonConvert.DeserializeObject<List<ParkPosition>>(Properties.SkyTelescope.Default.ParkPositions);
             //UTCDateOffset = Properties.SkyTelescope.Default.UTCOffset;
         }
@@ -2198,11 +2235,13 @@ namespace GS.Server.SkyTelescope
             var currentVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             Properties.SkyTelescope.Default.SettingsKey = Properties.Profile.Default.Current;
             var configExists = Properties.SkyTelescope.Default.Version != "0";
+
             // Get version information for earlier user config if it exists
             var prevVersionObj = Properties.Server.Default.GetPreviousVersion("Version");
             var earlierVersion = prevVersionObj != null ? new Version(prevVersionObj.ToString()) : zeroVersion;
             var earlierConfigExists = earlierVersion != zeroVersion;
             var isConfigProfile = earlierConfigExists && earlierVersion >= new Version("1.2.0.7");
+
             // Alpha profile handling will be removed for beta and later releases
             var isAlphaProfile = earlierConfigExists && 
                                  new Version("1.2.0.0") <= earlierVersion && earlierVersion <= new Version("1.2.0.6");
@@ -2221,19 +2260,31 @@ namespace GS.Server.SkyTelescope
                     Properties.Profile.Default.Save();
                     foreach (var mountType in Properties.Profile.Default.List.Split(','))
                     {
+                        SettingsPropertyCollection profileDefaultProperties = GetProfileProperties(mountType);
                         // Copy settings from previous version into dictionary - deleted settings are not copied 
                         Properties.SkyTelescope.Default.SettingsKey = mountType;
                         Dictionary<string, object> previousSettings = new Dictionary<string, object>(256);
                         foreach (SettingsPropertyValue propertyValue in Properties.SkyTelescope.Default.PropertyValues)
                         {
-                            if (Properties.SkyTelescope.Default.GetPreviousVersion(propertyValue.Name)?.GetType() !=
+                            var name = propertyValue.Name;
+                            if (Properties.SkyTelescope.Default.GetPreviousVersion(name)?.GetType() !=
                                 null)
                             {
-                                var name = propertyValue.Name;
-                                Properties.SkyTelescope.Default[name] =
-                                    Properties.SkyTelescope.Default.GetPreviousVersion(name);
-                                Properties.SkyTelescope.Default.PropertyValues[name].IsDirty = true;
+                                Properties.SkyTelescope.Default[name] = Properties.SkyTelescope.Default.GetPreviousVersion(name);
                             }
+                            else
+                            {
+                                // Settings does not exist in previous version so set to default value from profile section of app.config
+                                SettingsProperty settingsProperty;
+                                if ((settingsProperty = profileDefaultProperties[name]) != null)
+                                {
+                                    Properties.SkyTelescope.Default[name] =
+                                        // ReSharper disable twice PossibleNullReferenceException
+                                        Convert.ChangeType(settingsProperty.DefaultValue, settingsProperty.PropertyType);
+                                }
+                            }
+                            // Force write of setting to user.config
+                            Properties.SkyTelescope.Default.PropertyValues[name].IsDirty = true;
                         }
                         Properties.SkyTelescope.Default.Version = currentVersion;
                         Properties.SkyTelescope.Default.PropertyValues["Version"].IsDirty = true;
@@ -2351,6 +2402,46 @@ namespace GS.Server.SkyTelescope
             // Set version to current assembly
             Properties.SkyTelescope.Default.Version = version;
             // Initialise user.config section with mount type specific values from app.config
+            SettingsPropertyCollection profileProperties = GetProfileProperties(settingsKey);
+            // Copy the mount type specific app.config defaults to user.config
+            foreach (SettingsProperty profileProperty in profileProperties)
+            {
+                try
+                {
+                    Properties.SkyTelescope.Default.PropertyValues[profileProperty.Name].PropertyValue =
+                        Convert.ChangeType(profileProperty.DefaultValue, profileProperty.PropertyType);
+                }
+                catch (Exception e) //Log unknown properties removed from current version
+                {
+                    MonitorLog.LogToMonitor(new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Server,
+                        Category = MonitorCategory.Server,
+                        Type = MonitorType.Information,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"{profileProperty.Name} removed from current settings version: {e.Message}"
+                    });
+                }
+            }
+            // Iterate over all settings and mark as dirty to force write on save
+            foreach (SettingsPropertyValue propertyValue in Properties.SkyTelescope.Default.PropertyValues)
+            {
+                propertyValue.IsDirty = true;
+            }
+            Properties.SkyTelescope.Default.Save();
+        }
+
+        /// <summary>
+        /// Retrieves the collection of default profile properties from app.config associated with the specified settings key.
+        /// </summary>
+        /// <param name="settingsKey">A string representing the key that identifies the desired profile.  Valid values are "algAltAz",
+        /// "algGermanPolar", and "algPolar".</param>
+        /// <returns>A <see cref="SettingsPropertyCollection"/> containing the properties of the profile  associated with the
+        /// specified key, or <see langword="null"/> if the key does not match any profile.</returns>
+        private static SettingsPropertyCollection GetProfileProperties(string settingsKey)
+        {
             SettingsPropertyCollection profileProperties = null;
             switch (settingsKey)
             {
@@ -2364,35 +2455,7 @@ namespace GS.Server.SkyTelescope
                     profileProperties = Properties.Profiles.Polar.Default.Properties;
                     break;
             }
-            // Copy the mount type specific app.config defaults to user.config
-            foreach (SettingsProperty profileProperty in profileProperties)
-            {
-                try
-                {
-                    Properties.SkyTelescope.Default.PropertyValues[profileProperty.Name].PropertyValue =
-                        Convert.ChangeType(profileProperty.DefaultValue, profileProperty.PropertyType);
-                }
-                catch (Exception e) //Log unknown properties removed from current version
-                {
-                    var monitorItem = new MonitorEntry
-                    {
-                        Datetime = HiResDateTime.UtcNow,
-                        Device = MonitorDevice.Server,
-                        Category = MonitorCategory.Server,
-                        Type = MonitorType.Information,
-                        Method = MethodBase.GetCurrentMethod()?.Name,
-                        Thread = Thread.CurrentThread.ManagedThreadId,
-                        Message = $"{profileProperty.Name} removed from current settings version: {e.Message}"
-                    };
-                    MonitorLog.LogToMonitor(monitorItem);
-                }
-            }
-            // Iterate over all settings and mark as dirty to force write on save
-            foreach (SettingsPropertyValue propertyValue in Properties.SkyTelescope.Default.PropertyValues)
-            {
-                propertyValue.IsDirty = true;
-            }
-            Properties.SkyTelescope.Default.Save();
+            return profileProperties;
         }
 
         static void  CopyEarlierConfigSettings(Dictionary<string, object> previousSettings, string mountType)
