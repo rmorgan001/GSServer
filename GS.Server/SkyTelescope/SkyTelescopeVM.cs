@@ -393,17 +393,12 @@ namespace GS.Server.SkyTelescope
                          break;
                      case "Longitude":
                          UpdateLongitude();
-                         LoadPierModel();
-                         LoadTelescopeModel();
-                         Rotate();
-                         SetPierSideIndicator();
                          break;
                      case "Latitude":
                          UpdateLatitude();
                          LoadPierModel();
                          LoadTelescopeModel();
                          Rotate();
-                         SetPierSideIndicator();
                          break;
                      case "Elevation":
                          Elevation = SkySettings.Elevation;

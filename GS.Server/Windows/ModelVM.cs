@@ -127,13 +127,6 @@ namespace GS.Server.Windows
                          Rotate();
                          SetPierSideIndicator();
                          break;
-                     case "Latitude":
-                     case "Longitude":
-                         LoadPierModel();
-                         LoadTelescopeModel();
-                         Rotate();
-                         SetPierSideIndicator();
-                         break;
                      case "DeclinationXForm":
                          Declination = _util.DegreesToDMS(SkyServer.DeclinationXForm, "° ", ":", "", 2);
                          break;
@@ -170,7 +163,6 @@ namespace GS.Server.Windows
                         {
                             case "AlignmentMode":
                             case "Latitude":
-                            case "Longitude":
                             case "PolarMode":
                                 LoadTelescopeModel();
                                 LoadPierModel();
