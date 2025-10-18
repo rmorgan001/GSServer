@@ -58,26 +58,16 @@ namespace GS.Server.Windows
                     DecOffsets = new List<int>() { 0, -90, 90 };
                     AutoHomeEnabled = SkyServer.CanHomeSensor;
                     AutoHomeProgressBar = SkyServer.AutoHomeProgressBar;
+                    // Pec button
                     PecShow = SkyServer.PecShow;
                     PecOn = SkyServer.PecOn;
                     SchedulerShow = false;
-                    switch (SkySettings.AlignmentMode)
-                    {
-                        case AlignmentModes.algAltAz:
-                            SkySettings.CanSetPierSide = false;
-                            FlipSopShow = false;
-                            FlipAzDirShow = true;
-                            EnableFlipAzDir = SkyServer.CanFlipAzimuthSide;
-                            break;
-                        case AlignmentModes.algPolar:
-                        case AlignmentModes.algGermanPolar:
-                        default:
-                            SkySettings.CanSetPierSide = SkySettings.HourAngleLimit != 0;
-                            FlipSopShow = true;
-                            FlipAzDirShow = false;
-                            break;
-                    }
-                    EnableFlipSOP = SkySettings.CanSetPierSide;
+                    // Flip Button
+                    FlipButtonTip = GetResourceByMode("botTipSOP");
+                    FlipButtonContent = GetResourceByMode("btnFlip");
+                    // Flip Dialog
+                    FlipDialogHeader = GetResourceByMode("btnFlip");
+                    FlipDialogText = GetResourceByMode("btnContinueFlip");
                 }
 
             }
@@ -89,6 +79,29 @@ namespace GS.Server.Windows
 
                 throw;
             }
+        }
+
+        /// <summary>
+        /// get text from resource indexed by Alignment mode
+        /// </summary>
+        /// <param name="resource">Resource key</param>
+        /// <returns></returns>
+        private string GetResourceByMode(string resource)
+        {
+            switch (SkySettings.AlignmentMode)
+            {
+                case AlignmentModes.algAltAz:
+                    resource += "Az";
+                    break;
+                case AlignmentModes.algPolar:
+                    resource += "Polar";
+                    break;
+                case AlignmentModes.algGermanPolar:
+                    break;
+                default:
+                    break;
+            }
+            return $"{Application.Current.Resources[resource]}";
         }
 
         #region ViewModel
@@ -160,9 +173,6 @@ namespace GS.Server.Windows
                      case "PecOn":
                          PecOn = SkyServer.PecOn;
                          break;
-                     case "CanFlipAzimuthSide":
-                         EnableFlipAzDir = SkyServer.CanFlipAzimuthSide;
-                         break;
                  }
              });
             }
@@ -200,9 +210,6 @@ namespace GS.Server.Windows
                      case "HcSpeed":
                          //HcSpeed = (double)SkySettings.HcSpeed;
                          break;
-                     case "CanSetPierSide":
-                         EnableFlipSOP = SkySettings.CanSetPierSide;
-                         break;
                      case "AlignmentMode":
                          ParkPositions = SkySettings.ParkPositions;
                          ParkSelection = ParkPositions.FirstOrDefault();
@@ -211,15 +218,11 @@ namespace GS.Server.Windows
                          {
                              case AlignmentModes.algAltAz:
                                  SkySettings.CanSetPierSide = false;
-                                 FlipSopShow = false;
-                                 FlipAzDirShow = true;
                                  break;
                              case AlignmentModes.algPolar:
+                                 break;
                              case AlignmentModes.algGermanPolar:
-                             default:
                                  SkySettings.CanSetPierSide = SkySettings.HourAngleLimit != 0;
-                                 FlipSopShow = true;
-                                 FlipAzDirShow = false;
                                  break;
                          }
                          // ReSharper disable ExplicitCallerInfoArgument
@@ -259,16 +262,7 @@ namespace GS.Server.Windows
             IsAutoHomeDialogOpen = false;
             IsFlipDialogOpen = false;
             IsHomeResetDialogOpen = false;
-           // IsRaGoToDialogOpen = false;
-           // IsRaGoToSyncDialogOpen = false;
             IsSchedulerDialogOpen = false;
-           // IsLimitDialogOpen = false;
-           // IsPPecDialogOpen = false;
-            IsParkAddDialogOpen = false;
-            IsParkDeleteDialogOpen = false;
-           // IsGpsDialogOpen = false;
-           // IsCdcDialogOpen = false;
-            //IsHcSettingsDialogOpen = false;
 
             ScreenEnabled = SkyServer.IsMountRunning;
         }
@@ -546,7 +540,7 @@ namespace GS.Server.Windows
             {
                 if (_parkSelection == value) return;
 
-                var found = ParkPositions.Find(x => x.Name == value.Name && Math.Abs(x.X - value.X) <= 0 && Math.Abs(x.Y - value.Y) <= 0);
+                var found = ParkPositions.Find(x => x.Name == value.Name && Math.Abs(x.X - value.X) <= 0.00001 && Math.Abs(x.Y - value.Y) <= 0.00001);
                 if (found == null) // did not find match in list
                 {
                     ParkPositions.Add(value);
@@ -1303,39 +1297,26 @@ namespace GS.Server.Windows
             }
         }
 
-
-        private bool _enableFlipSOP;
-        public bool EnableFlipSOP
+        private string _flipButtonContent;
+        public string FlipButtonContent
         {
-            get => _enableFlipSOP;
+            get => _flipButtonContent;
             set
             {
-                if (_enableFlipSOP == value) return;
-                _enableFlipSOP = value;
+                if (_flipButtonContent == value) return;
+                _flipButtonContent = value;
                 OnPropertyChanged();
             }
         }
 
-        private bool _flipSopShow;
-
-        public bool FlipSopShow
+        private string _flipButtonTip;
+        public string FlipButtonTip
         {
-            get => _flipSopShow;
+            get => _flipButtonTip;
             set
             {
-                _flipSopShow = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _flipAzDirShow;
-
-        public bool FlipAzDirShow
-        {
-            get => _flipAzDirShow;
-            set
-            {
-                _flipAzDirShow = value;
+                if (_flipButtonTip == value) return;
+                _flipButtonTip = value;
                 OnPropertyChanged();
             }
         }
@@ -1650,7 +1631,7 @@ namespace GS.Server.Windows
             {
                 if (_reSyncParkSelection == value) { return; }
 
-                var found = ParkPositions.Find(x => x.Name == value.Name && Math.Abs(x.X - value.X) <= 0 && Math.Abs(x.Y - value.Y) <= 0);
+                var found = ParkPositions.Find(x => x.Name == value.Name && Math.Abs(x.X - value.X) <= 0.00001 && Math.Abs(x.Y - value.Y) <= 0.00001);
                 if (found == null) // did not find match in list
                 {
                     ParkPositions.Add(value);
@@ -1879,7 +1860,7 @@ namespace GS.Server.Windows
         //        var monitorItem = new MonitorEntry
         //        {
         //            Datetime = HiResDateTime.UtcNow,
-        //            Device = MonitorDevice.UI,
+        //            Device = MonitorDevice.Ui,
         //            Category = MonitorCategory.Interface,
         //            Type = MonitorType.Error,
         //            Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1927,7 +1908,7 @@ namespace GS.Server.Windows
         //        var monitorItem = new MonitorEntry
         //        {
         //            Datetime = HiResDateTime.UtcNow,
-        //            Device = MonitorDevice.UI,
+        //            Device = MonitorDevice.Ui,
         //            Category = MonitorCategory.Interface,
         //            Type = MonitorType.Error,
         //            Method = MethodBase.GetCurrentMethod()?.Name,
@@ -1968,7 +1949,7 @@ namespace GS.Server.Windows
         //        var monitorItem = new MonitorEntry
         //        {
         //            Datetime = HiResDateTime.UtcNow,
-        //            Device = MonitorDevice.UI,
+        //            Device = MonitorDevice.Ui,
         //            Category = MonitorCategory.Interface,
         //            Type = MonitorType.Error,
         //            Method = MethodBase.GetCurrentMethod()?.Name,
@@ -2334,6 +2315,28 @@ namespace GS.Server.Windows
             }
         }
 
+        public double AutoHomeAxisX
+        {
+            get => SkySettings.AutoHomeAxisX;
+            set
+            {
+                if (Math.Abs(value - SkySettings.AutoHomeAxisX) < 0.00001) { return; }
+                SkySettings.AutoHomeAxisX = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double AutoHomeAxisY
+        {
+            get => SkySettings.AutoHomeAxisY;
+            set
+            {
+                if (Math.Abs(value - SkySettings.AutoHomeAxisY) < 0.00001) { return; }
+                SkySettings.AutoHomeAxisY = value;
+                OnPropertyChanged();
+            }
+        }
+
         public IList<int> DecOffsets { get; }
         private int _decOffset;
 
@@ -2584,33 +2587,7 @@ namespace GS.Server.Windows
 
         #endregion
 
-        #region Flip SOP Direction Dialog
-
-        private bool _isFlipDialogOpen;
-        public bool IsFlipDialogOpen
-        {
-            get => _isFlipDialogOpen;
-            set
-            {
-                if (_isFlipDialogOpen == value) return;
-                _isFlipDialogOpen = value;
-                _skyTelescopeVM.CloseDialogs(value);
-                CloseDialogs(value);
-                OnPropertyChanged();
-            }
-        }
-
-        private object _flipContent;
-        public object FlipContent
-        {
-            get => _flipContent;
-            set
-            {
-                if (_flipContent == value) return;
-                _flipContent = value;
-                OnPropertyChanged();
-            }
-        }
+        #region Flip Dialog
 
         private ICommand _openFlipDialogCommand;
         public ICommand OpenFlipDialogCommand
@@ -2632,8 +2609,8 @@ namespace GS.Server.Windows
         {
             try
             {
-                FlipContent = new FlipDialog();
-                IsFlipDialogOpen = true;
+                DialogContent = new FlipDialog();
+                IsDialogOpen = true;
             }
             catch (Exception ex)
             {
@@ -2691,11 +2668,11 @@ namespace GS.Server.Windows
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-                IsFlipDialogOpen = false;
+                IsDialogOpen = false;
             }
             catch (Exception ex)
             {
-                IsFlipDialogOpen = false;
+                IsDialogOpen = false;
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
@@ -2720,7 +2697,7 @@ namespace GS.Server.Windows
         {
             try
             {
-                IsFlipDialogOpen = false;
+                IsDialogOpen = false;
             }
             catch (Exception ex)
             {
@@ -2740,99 +2717,64 @@ namespace GS.Server.Windows
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
-        #endregion
 
-        #region Flip Az Direction Dialog
-        private bool _enableFlipAzDir;
-        public bool EnableFlipAzDir
+        private bool _isFlipDialogOpen;
+        public bool IsFlipDialogOpen
         {
-            get => _enableFlipAzDir;
+            get => _isFlipDialogOpen;
             set
             {
-                if (_enableFlipAzDir == value) return;
-                _enableFlipAzDir = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _isFlipAzDirDialogOpen;
-        public bool IsFlipAzDirDialogOpen
-        {
-            get => _isFlipAzDirDialogOpen;
-            set
-            {
-                if (_isFlipAzDirDialogOpen == value) return;
-                _isFlipAzDirDialogOpen = value;
+                if (_isFlipDialogOpen == value) return;
+                _isFlipDialogOpen = value;
                 CloseDialogs(value);
                 OnPropertyChanged();
             }
         }
 
-        private ICommand _openFlipAzDirDialogCmd;
-        public ICommand OpenFlipAzDirDialogCmd
+        private object _flipContent;
+        public object FlipContent
+        {
+            get => _flipContent;
+            set
+            {
+                if (_flipContent == value) return;
+                _flipContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _flipOnGoto;
+        public bool FlipOnGoto
+        {
+            get => _flipOnGoto;
+            set
+            {
+                _flipOnGoto = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _acceptFlipGoToDialogCmd;
+        public ICommand AcceptFlipGoToDialogCmd
         {
             get
             {
-                var command = _openFlipAzDirDialogCmd;
+                var command = _acceptFlipGoToDialogCmd;
                 if (command != null)
                 {
                     return command;
                 }
 
-                return _openFlipAzDirDialogCmd = new RelayCommand(
-                    param => OpenFlipAzDirDialog()
+                return _acceptFlipGoToDialogCmd = new RelayCommand(
+                    param => AcceptFlipGoToDialog()
                 );
             }
         }
-        private void OpenFlipAzDirDialog()
+        private void AcceptFlipGoToDialog()
         {
             try
             {
-                DialogContent = new FlipAzDirDialog();
-                IsDialogOpen = true;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Ui,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}|{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-
-        }
-
-        private ICommand _acceptFlipAzDirDialogCmd;
-        public ICommand AcceptFlipAzDirDialogCmd
-        {
-            get
-            {
-                var command = _acceptFlipAzDirDialogCmd;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _acceptFlipAzDirDialogCmd = new RelayCommand(
-                    param => AcceptFlipAzDirDialog()
-                );
-            }
-        }
-        private void AcceptFlipAzDirDialog()
-        {
-            try
-            {
-                if (!SkyServer.IsMountRunning) return;
-                SkyServer.FlipAzimuthPosition();
+                SkyServer.FlipOnNextGoto = FlipOnGoto;
                 IsDialogOpen = false;
             }
             catch (Exception ex)
@@ -2842,47 +2784,31 @@ namespace GS.Server.Windows
             }
         }
 
-        private ICommand _cancelFlipAzDirDialogCmd;
-        public ICommand CancelFlipAzDirDialogCmd
-        {
-            get
-            {
-                var command = _cancelFlipAzDirDialogCmd;
-                if (command != null)
-                {
-                    return command;
-                }
+        private string _flipDialogHeader;
 
-                return _cancelFlipAzDirDialogCmd = new RelayCommand(
-                    param => CancelFlipAzDirDialog()
-                );
-            }
-        }
-        private void CancelFlipAzDirDialog()
+        public string FlipDialogHeader
         {
-            try
+            get => _flipDialogHeader;
+            set
             {
-                IsDialogOpen = false;
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Ui,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}|{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+                if (_flipDialogHeader == value) return;
+                _flipDialogHeader = value;
+                OnPropertyChanged();
             }
         }
 
+        private string _flipDialogText;
+
+        public string FlipDialogText
+        {
+            get => _flipDialogText;
+            set
+            {
+                if (_flipDialogText == value) return;
+                _flipDialogText = value;
+                OnPropertyChanged();
+            }
+        }
         #endregion
 
         #region Dispose

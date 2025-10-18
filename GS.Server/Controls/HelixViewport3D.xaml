@@ -10,7 +10,7 @@
              mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}" d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
-        <domain:NullImageConverter x:Key="NullImage" />
+        <!--<domain:NullImageConverter x:Key="NullImage" />-->
     </UserControl.Resources>
     <Grid>
         <h:HelixViewport3D ShowCameraInfo="{Binding CameraVis}" ShowViewCube="False" ViewCubeVerticalPosition="Top" ShowCameraTarget="False" >
@@ -19,32 +19,52 @@
             </h:HelixViewport3D.Camera>
             <h:SunLight />
             <h:GridLinesVisual3D Fill="Black" Width="5000" Length="5000" MajorDistance="1000" MinorDistance="1000" Thickness="4" Visible="True" />
-            <h:BoxVisual3D Height="50" Width="100" Length="50" Center="0,-50,500" Fill="Black" Visible="{Binding GemBlockVisible}" />
-            <h:BoxVisual3D Height="520" Width="50" Length="50" Center="0,0,265" Fill="Black" />
-                <h:HelixVisual3D Content="{Binding Model}">
-                <h:HelixVisual3D.Transform>
-                    <Transform3DGroup>
-                        <TranslateTransform3D OffsetX="1" OffsetY="0" OffsetZ="0" />
-                        <RotateTransform3D CenterX="0" CenterY="{Binding YAxisCentre}" CenterZ="525">
-                            <RotateTransform3D.Rotation>
-                                <AxisAngleRotation3D Axis="1 0 2000" Angle="{Binding XAxisOffset}" />
-                            </RotateTransform3D.Rotation>
-                        </RotateTransform3D>
-                        <RotateTransform3D CenterX="0" CenterY="{Binding YAxisCentre}" CenterZ="525">
-                            <RotateTransform3D.Rotation>
-                                    <AxisAngleRotation3D Axis="0 1 0" Angle="{Binding YAxisOffset}" />
-                            </RotateTransform3D.Rotation>
-                        </RotateTransform3D>
-                        <RotateTransform3D CenterX="0" CenterY="{Binding YAxisCentre}" CenterZ="525">
-                            <RotateTransform3D.Rotation>
-                                    <AxisAngleRotation3D Axis="2000 0 1" Angle="{Binding ZAxisOffset}" />
-                            </RotateTransform3D.Rotation>
-                        </RotateTransform3D>
-                        <ScaleTransform3D ScaleX="1" ScaleY="1" ScaleZ="1" />
-                    </Transform3DGroup>
-                </h:HelixVisual3D.Transform>
-            </h:HelixVisual3D>
-            <h:BoxVisual3D Height="0" Width="2000" Length="2000" Center="0,0,0" Fill="Transparent" BottomFace="False" BackMaterial="{Binding Compass, Mode=OneWay}" Material="{Binding Compass, Mode=OneWay}" />
+            <h:PipeVisual3D  Diameter="100" Point1="0, 0, 0" Point2="0, 0, 50" Fill="Black" Visible="True"/>
+            <h:BoxVisual3D x:Name="LowerPierBeam" Height="{Binding BeamWidth}" Width="{Binding LowerBeamLength}" Length="{Binding BeamWidth}" Center="{Binding LowerBeamMidPoint}" Fill="Black" Visible="True">
+                <ModelVisual3D.Transform>
+                    <RotateTransform3D CenterX="0" CenterY="0" CenterZ="{Binding BeamHalfWidth}">
+                        <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D Axis="1 0 0" Angle="{Binding LowerBeamAngle}"/>
+                        </RotateTransform3D.Rotation>
+                    </RotateTransform3D>
+                </ModelVisual3D.Transform>
+            </h:BoxVisual3D >
+            <h:BoxVisual3D x:Name="UpperPierBeam" Height="{Binding UpperBeamLength}" Width="{Binding BeamWidth}" Length="{Binding BeamWidth}" Center="{Binding UpperBeamMidPoint}" Fill="Black" Visible="True">
+                <ModelVisual3D.Transform>
+                    <RotateTransform3D CenterX="0" CenterY="0" CenterZ="{Binding ModelPierHeight}">
+                        <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D Axis="-1 0 0" Angle="{Binding UpperBeamAngle}"/>
+                        </RotateTransform3D.Rotation>
+                    </RotateTransform3D>
+                </ModelVisual3D.Transform>
+            </h:BoxVisual3D>
+            <h:PieSliceVisual3D Center="0, 0, 5" InnerRadius="300" OuterRadius="350" 
+                                StartAngle="{Binding PierSideIndicatorStartAngle}" 
+                                EndAngle="{Binding PierSideIndicatorEndAngle}" 
+                                Fill="{StaticResource SecondaryHueMidBrush}" />
+            <h:HelixVisual3D Content="{Binding Model}">
+            <h:HelixVisual3D.Transform>
+                <Transform3DGroup>
+                    <TranslateTransform3D OffsetX="1" OffsetY="0" OffsetZ="0" />
+                    <RotateTransform3D CenterX="0" CenterY="{Binding YAxisCentre}" CenterZ="525">
+                        <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D Axis="0 0 1" Angle="{Binding XAxisOffset}" />
+                        </RotateTransform3D.Rotation>
+                    </RotateTransform3D>
+                    <RotateTransform3D CenterX="0" CenterY="{Binding YAxisCentre}" CenterZ="525">
+                        <RotateTransform3D.Rotation>
+                                <AxisAngleRotation3D Axis="0 1 0" Angle="{Binding YAxisOffset}" />
+                        </RotateTransform3D.Rotation>
+                    </RotateTransform3D>
+                    <RotateTransform3D CenterX="0" CenterY="{Binding YAxisCentre}" CenterZ="525">
+                        <RotateTransform3D.Rotation>
+                                <AxisAngleRotation3D Axis="1 0 0" Angle="{Binding ZAxisOffset}" />
+                        </RotateTransform3D.Rotation>
+                    </RotateTransform3D>
+                </Transform3DGroup>
+            </h:HelixVisual3D.Transform>
+        </h:HelixVisual3D>
+        <h:BoxVisual3D Height="0" Width="2000" Length="2000" Center="0,0,0" Fill="Transparent" BottomFace="False" BackMaterial="{Binding Compass, Mode=OneWay}" Material="{Binding Compass, Mode=OneWay}" />
         </h:HelixViewport3D>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Width="20" Height="20" Margin="5" ToolTip="{StaticResource gpSave}" Command="{Binding SaveModelViewCmd}" Style="{StaticResource MaterialDesignRaisedAccentButton}" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Visibility="{Binding ModelWinVisibility, Converter={StaticResource BoolToVis}}">

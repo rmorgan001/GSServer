@@ -61,11 +61,14 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnTipSetHome">Reset posizione assi a Home</system:String>
     <system:String x:Key="btnFlip">Inv. Meridiano</system:String>
     <system:String x:Key="btnTipFlip">Inversione del Meridiano</system:String>
-    <system:String x:Key="btnFlipAzDir">Inv. Az Lato</system:String>
-    <system:String x:Key="btnTipFlipAzDir">Invertire la direzione di rotazione dell'azimut</system:String>
+    <system:String x:Key="btnFlipAz">Inv. Az Lato</system:String>
+    <system:String x:Key="btnTipFlipAz">Invertire la direzione di rotazione dell'azimut</system:String>
+    <system:String x:Key="btnFlipPolar">Flip Polar</system:String>
+    <system:String x:Key="btnTipFlipPolar">Flip mount through pole</system:String>
     <!--<system:String x:Key="btnHomeReset">Accept to reset mount position to the Home position</system:String>-->
     <system:String x:Key="btnContinueFlip">Accetta Inversione del Meridiano</system:String>
-    <system:String x:Key="btnContinueFlipAzDir">Accept to swap azimuth side. Mount will slew 360 degrees</system:String>
+    <system:String x:Key="btnContinueFlipAz">Accept to swap azimuth side. Mount will slew 360 degrees</system:String>
+    <system:String x:Key="btnContinueFlipPolar">Accept to flip axes. Mount will slew over pole</system:String>
     <system:String x:Key="btnTipParkPos">Posizione di Parcheggio</system:String>
     <system:String x:Key="btnAutoHome">AutoHome</system:String>
     <system:String x:Key="btnAutoHomeComplete">Auto Home Complete</system:String>
@@ -88,7 +91,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="botTracking">Tracciamento</system:String>
     <system:String x:Key="botTipTracking">Tracciamento</system:String>
     <system:String x:Key="botTipSOP">Lato del Meridiano</system:String>
-    <system:String x:Key="botTipAzDir">Azimuth slew direction</system:String>
+    <system:String x:Key="botTipSOPAz">Azimuth slew direction</system:String>
+    <system:String x:Key="botTipSOPPolar">Declination axis orientation</system:String>
     <system:String x:Key="botTipAxisLimit">Limiti Assi, click per le impostazioni</system:String>
     <system:String x:Key="botTipWarnings">Attenzione, click per resettare</system:String>
     <system:String x:Key="botTipErrors">Errori, click per resttare</system:String>
@@ -274,6 +278,13 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="vceSolar">Solare</system:String>
     <system:String x:Key="vceLunar">Lunare</system:String>
     <system:String x:Key="vceKing">King</system:String>
+    <system:String x:Key="vceSopUnknown">Pier side unknown</system:String>
+    <system:String x:Key="vceSopEast">Pier side East</system:String>
+    <system:String x:Key="vceSopWest">Pier side West</system:String>
+    <system:String x:Key="vceSopNormal">Deck axis normal</system:String>
+    <system:String x:Key="vceSopThroughPole">Deck axis through pole</system:String>
+    <system:String x:Key="vceSopAzEast">Azimuth slewing East</system:String>
+    <system:String x:Key="vceSopAzWest">Azimuth slewing West</system:String>
 
     <!--Converters -->
     <system:String x:Key="cvtInvNumber">Numero non Valido</system:String>
@@ -772,5 +783,21 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="Stopped">Montatura fermato</system:String>
     <system:String x:Key="LowVoltage">La tensione è bassa: controllare l'alimentazione e il cablaggio</system:String>
     <system:String x:Key="CheckMount">Controllare i collegamenti della montatura, l'alimentazione e la velocità in baud</system:String>
+
+    <!--1.1.0.3 -->
+    <!--Mount Hardware Setup -->
+    <system:String x:Key="mhlButton">Hardware Limits</system:String>
+    <system:String x:Key="mhlButtonToolTip">Set mount hardware movement limits</system:String>
+    <system:String x:Key="mhlSettingsLabel">Mount Hardware Setup</system:String>
+    <system:String x:Key="mhlRaAz">Right Ascension / Azimuth</system:String>
+    <system:String x:Key="mhlDecAlt">Declination / Altitude</system:String>
+    <system:String x:Key="lbAxisLowerLimitY">Lower limit (degrees)</system:String>
+    <system:String x:Key="lbAxisUpperLimitY">Upper limit (degrees)</system:String>
+    <system:String x:Key="lbAxisLimitX">Limit (degrees)</system:String>
+    <system:String x:Key="mhlButtonChange">Change</system:String>
+    <system:String x:Key="mhlTipChangeSide">Click to change between East and West sides</system:String>
+    <system:String x:Key="mhlPolarHome">Home Position 5 degrees above horizon</system:String>
+    <system:String x:Key="mhlPolarHomeText">Primary Telescope on {0} side pointing {1}</system:String>
+
 </ResourceDictionary>
  

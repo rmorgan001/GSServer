@@ -12,7 +12,7 @@ namespace GS.Server.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.0.3.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.14.0.0")]
     internal sealed partial class Focuser : global::System.Configuration.ApplicationSettingsBase {
         
         private static Focuser defaultInstance = ((Focuser)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Focuser())));
@@ -61,7 +61,7 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public string Version {
             get {
                 return ((string)(this["Version"]));

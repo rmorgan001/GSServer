@@ -477,7 +477,11 @@ namespace ASCOM.GS.Sky.Telescope
                 var dec = SkyServer.DeclinationXForm;
 
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(dec, "\u00B0 ", ":", "", 2)}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"XForm|{_util.DegreesToDMS(dec, "\u00B0 ", ":", "", 2)}" };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Internal|{_util.DegreesToDMS(SkyServer.Declination, "\u00B0 ", ":", "", 2)}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 return dec;
@@ -543,20 +547,20 @@ namespace ASCOM.GS.Sky.Telescope
                     // Create an array list to hold the IStateValue entries
                     var deviceState = new List<IStateValue>();
 
-                    // Add one entry for each operational state, if possible
-                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Altitude), Altitude)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
-                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.AtHome), AtHome)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
-                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.AtPark), AtPark)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
-                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Azimuth), Azimuth)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
-                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Declination), Declination)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
-                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.IsPulseGuiding), IsPulseGuiding)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
-                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.RightAscension), RightAscension)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
-                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.SideOfPier), SideOfPier)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
-                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.SiderealTime), SiderealTime)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
-                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Slewing), Slewing)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
-                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Tracking), Tracking)); }catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
-                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.UTCDate), UTCDate)); } catch (Exception ex){LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
-                    try { deviceState.Add(new StateValue(DateTime.Now)); }catch (Exception ex) { LogMessage(MonitorType.Warning,"DeviceState", ex.Message);}
+                    // Add one entry for each operational state, direct access to SkyServer variables, optimise response time to the client <0.1 seconds
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Altitude), SkyServer.Altitude)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.AtHome), SkyServer.AtHome)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.AtPark), SkyServer.AtPark)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Azimuth), SkyServer.Azimuth)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Declination), SkyServer.Declination)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.IsPulseGuiding), SkyServer.IsPulseGuiding)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.RightAscension), SkyServer.RightAscension)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.SideOfPier), SkyServer.SideOfPier)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.SiderealTime), SkyServer.SiderealTime)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Slewing), SkyServer.IsSlewing)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Tracking), SkyServer.Tracking || SkyServer.SlewState == SlewType.SlewRaDec)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.UTCDate), HiResDateTime.UtcNow)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
+                    try { deviceState.Add(new StateValue(DateTime.Now)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
 
                     var r = new StateValueCollection(deviceState);
 
@@ -724,7 +728,7 @@ namespace ASCOM.GS.Sky.Telescope
                 CheckVersionOne("InterfaceVersion", false);
 
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "3" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "4" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 return 4;
@@ -1208,7 +1212,7 @@ namespace ASCOM.GS.Sky.Telescope
             MonitorLog.LogToMonitor(monitorItem);
 
             CheckParked("AbortSlew");
-            SkyServer.AbortSlew(true);
+            SkyServer.AbortSlewAsync(true);
         }
 
         public IAxisRates AxisRates(TelescopeAxes axis)
@@ -1302,6 +1306,9 @@ namespace ASCOM.GS.Sky.Telescope
             MonitorLog.LogToMonitor(monitorItem);
 
             var raDec = Transforms.CoordTypeToInternal(ra, dec);
+            CheckRange(raDec.X, 0, 24, "SlewToCoordinatesAsync", "RightAscension");
+            CheckRange(raDec.Y, -90, 90, "SlewToCoordinatesAsync", "Declination");
+            CheckReachable(raDec.X, raDec.Y, SlewType.SlewRaDec);
             var r = SkyServer.DetermineSideOfPier(raDec.X, raDec.Y);
             return r;
         }
@@ -1411,8 +1418,6 @@ namespace ASCOM.GS.Sky.Telescope
         {
             try
             {
-                if (IsPulseGuiding && SkySettings.AlignmentMode == AlignmentModes.algAltAz)
-                    throw new InvalidOperationException("Alt Az mode does not support dual axis pulse guiding");
                 if (!SkyServer.AsComOn) { throw new InvalidOperationException("Not accepting commands"); }
                 if (SkyServer.AtPark) { throw new ParkedException(); }
                 //if (SkyServer.IsSlewing) { throw new InvalidValueException("Pulse rejected when slewing"); }
@@ -1439,13 +1444,7 @@ namespace ASCOM.GS.Sky.Telescope
                         throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
                 }
 
-                //var startTime = HiResDateTime.UtcNow;
-                SkyServer.PulseGuide(direction, duration,0);
-                // If synchronous (must be for Alt Az - V3) wait out the remaining pulse guide duration here
-                if (SkySettings.AlignmentMode != AlignmentModes.algAltAz) return;
-                // Wait for pulse guiding completion
-                // Async operation may be active, sleep timers are not precise across threads
-                while (IsPulseGuiding) Thread.Sleep(10);
+                SkyServer.PulseGuide(direction, duration, 0);
             }
             catch (Exception e)
             {
@@ -1517,7 +1516,6 @@ namespace ASCOM.GS.Sky.Telescope
         public void SlewToAltAzAsync(double az, double alt)
         {
             if (!SkyServer.AsComOn) return;
-
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(az, "\u00B0 ", ":", "", 2)}|{_util.DegreesToDMS(alt, "\u00B0 ", ":", "", 2)}" };
             MonitorLog.LogToMonitor(monitorItem);
@@ -1527,6 +1525,7 @@ namespace ASCOM.GS.Sky.Telescope
             CheckTracking(false, "SlewToAltAzAsync");
             CheckRange(az, 0, 360, "SlewToAltAzAsync", "Azimuth");
             CheckRange(alt, -90, 90, "SlewToAltAzAsync", "Altitude");
+            CheckReachable(az, alt, SlewType.SlewAltAz);
             SkyServer.SlewAltAz(alt, az);
         }
 
@@ -1543,11 +1542,12 @@ namespace ASCOM.GS.Sky.Telescope
             CheckRange(dec, -90, 90, "SlewToCoordinates", "Declination");
             CheckParked("SlewToCoordinates");
             CheckTracking(true, "SlewToCoordinates");
+            CheckReachable(ra, dec, SlewType.SlewRaDec);
 
             TargetRightAscension = ra;
             TargetDeclination = dec;
             var raDec = Transforms.CoordTypeToInternal(ra, dec);
-            SkyServer.SlewRaDec(raDec.X, raDec.Y);
+            SkyServer.SlewRaDec(raDec.X, raDec.Y, true);
             Thread.Sleep(250); // Wait for asynchronous slewing to start
             while (SkyServer.SlewState == SlewType.SlewRaDec || SkyServer.SlewState == SlewType.SlewSettle)
             {
@@ -1570,10 +1570,13 @@ namespace ASCOM.GS.Sky.Telescope
             CheckRange(ra, 0, 24, "SlewToCoordinatesAsync", "RightAscension");
             CheckRange(dec, -90, 90, "SlewToCoordinatesAsync", "Declination");
             CheckParked("SlewToCoordinatesAsync");
+            // CheckTracking(true, "SlewToCoordinatesAsync");
+            CheckReachable(ra, dec, SlewType.SlewRaDec);
 
             TargetRightAscension = ra;
             TargetDeclination = dec;
             var raDec = Transforms.CoordTypeToInternal(ra, dec);
+            SkyServer.CycleOnTracking(true);
             SkyServer.SlewRaDec(raDec.X, raDec.Y, true);
         }
 
@@ -1602,8 +1605,10 @@ namespace ASCOM.GS.Sky.Telescope
             CheckRange(dec, -90, 90, "SlewToTarget", "TargetDeclination");
             CheckParked("SlewToTarget");
             CheckTracking(true, "SlewToTarget");
+            CheckReachable(RightAscension, Declination, SlewType.SlewRaDec);
+
             var xy = Transforms.CoordTypeToInternal(ra, dec);
-            SkyServer.SlewRaDec(xy.X, xy.Y);
+            SkyServer.SlewRaDec(xy.X, xy.Y, true);
             Thread.Sleep(250); // Wait for asynchronous slewing to start
             while (SkyServer.SlewState == SlewType.SlewRaDec || SkyServer.SlewState == SlewType.SlewSettle)
             {
@@ -1630,9 +1635,10 @@ namespace ASCOM.GS.Sky.Telescope
             CheckRange(dec, -90, 90, "SlewToTargetAsync", "TargetDeclination");
             CheckParked("SlewToTargetAsync");
             CheckTracking(true, "SlewToTargetAsync");
+            CheckReachable(RightAscension, Declination, SlewType.SlewRaDec);
 
             var xy = Transforms.CoordTypeToInternal(ra, dec);
-            SkyServer.SlewRaDec(xy.X, xy.Y);
+            SkyServer.SlewRaDec(xy.X, xy.Y, true);
         }
 
         public void SyncToAltAz(double az, double alt)
@@ -1946,6 +1952,44 @@ namespace ASCOM.GS.Sky.Telescope
             MonitorLog.LogToMonitor(monitorItem);
 
             throw new InvalidOperationException($"{method} out of sync limits");
+        }
+
+        /// <summary>
+        /// Validates whether the specified target coordinates are reachable based on the current alignment mode and
+        /// slew type.
+        /// </summary>
+        /// <remarks>This method checks the reachability of the target coordinates based on the current
+        /// alignment mode and slew type. If the alignment mode is not polar or the target is reachable, the method
+        /// completes without error. Otherwise, an <see cref="InvalidOperationException"/> is thrown, indicating that
+        /// the target is outside the hardware limits.</remarks>
+        /// <param name="axisX">The X-axis coordinate of the target position.</param>
+        /// <param name="axisY">The Y-axis coordinate of the target position.</param>
+        /// <param name="slewType">The type of slew operation to perform, indicating the coordinate system used.</param>
+        /// <exception cref="InvalidOperationException">Thrown if the target coordinates are outside the hardware limits for the specified slew type.</exception>
+        private static void CheckReachable(double axisX, double axisY, SlewType slewType)
+        {
+            string method;
+            switch (slewType)
+            {
+                case SlewType.SlewAltAz: 
+                    method = "SlewToCoordinates";
+                    break;
+                case SlewType.SlewRaDec:
+                    method = "SlewToAltAz";
+                    break;
+                default:
+                    method = "Unknown Slew Type";
+                    break;
+            }
+            // Only check for polar alignment mode
+            if (SkySettings.AlignmentMode != AlignmentModes.algPolar || 
+                SkyServer.IsTargetReachable(new[] { axisX, axisY }, slewType)) return;
+
+            var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{axisX}|{axisY}|{slewType}") };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            throw new InvalidOperationException($"{method} outside hardware limits");
         }
 
         /// <summary>

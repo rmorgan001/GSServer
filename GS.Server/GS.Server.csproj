@@ -50,7 +50,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
     <Prefer32Bit>true</Prefer32Bit>
     <WarningLevel>5</WarningLevel>
@@ -132,7 +132,7 @@
 		  <ExcludeAssets>runtime</ExcludeAssets>
 	  </PackageReference>
     <PackageReference Include="DarkSkyApi" Version="3.3.0" />
-    <PackageReference Include="HelixToolkit.Wpf" Version="2.27.0" />
+    <PackageReference Include="HelixToolkit.Wpf" Version="2.27.3" />
     <PackageReference Include="LiveCharts" Version="0.9.7" />
     <PackageReference Include="LiveCharts.Geared" Version="1.2.9" />
     <PackageReference Include="LiveCharts.Wpf" Version="0.9.7" />
@@ -142,16 +142,35 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="MouseKeyHook" Version="5.7.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="SharpDX" Version="4.2.0" />
     <PackageReference Include="SharpDX.DirectInput" Version="4.2.0" />
+    <PackageReference Include="SkiaSharp" Version="3.119.1" />
     <PackageReference Include="StrongNamer" Version="0.2.5" />
-    <PackageReference Include="System.Management" Version="9.0.6" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.9" />
+    <PackageReference Include="System.Management" Version="9.0.9" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
     <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.2" />
   </ItemGroup>
   <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Profiles\AltAz.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AltAz.settings</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Profiles\GermanPolar.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>GermanPolar.settings</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Profiles\Polar.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Polar.settings</DependentUpon>
+    </Compile>
     <Compile Update="Properties\Alignment.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
@@ -167,6 +186,16 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Gamepad.settings</DependentUpon>
     </Compile>
+    <Compile Update="Properties\Profile.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Profile.settings</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Update="Properties\Server.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
@@ -179,10 +208,25 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
     <None Update="Models\Default.obj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Models\DefaultAltAz.obj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Models\DualTelescopePolarLeft.obj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Models\DualTelescopePolarRight.obj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Models\DualTelescopeAltAz.obj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Models\Reflector.obj">
@@ -215,6 +259,18 @@
     <None Update="Models\SchmidtCassegrainAltAz.obj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Properties\Profiles\AltAz.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>AltAz.Designer.cs</LastGenOutput>
+    </None>
+    <None Update="Properties\Profiles\GermanPolar.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>GermanPolar.Designer.cs</LastGenOutput>
+    </None>
+    <None Update="Properties\Profiles\Polar.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Polar.Designer.cs</LastGenOutput>
+    </None>
     <None Update="Properties\Alignment.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Alignment.Designer.cs</LastGenOutput>
@@ -226,6 +282,10 @@
     <None Update="Properties\Gamepad.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Gamepad.Designer.cs</LastGenOutput>
+    </None>
+    <None Update="Properties\Profile.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Profile.Designer.cs</LastGenOutput>
     </None>
     <None Update="Properties\Server.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -243,6 +303,9 @@
     <Page Update="Controls\Dialogs\DecGoToDecimal.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Controls\Dialogs\AcceptCancelDialog.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
     <Page Update="Controls\Dialogs\Snap1DitherDialog.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>

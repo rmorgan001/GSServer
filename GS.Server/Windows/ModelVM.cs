@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
@@ -34,6 +35,7 @@ using GS.Shared.Command;
 using HelixToolkit.Wpf;
 using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
+using Vector = System.Windows.Vector;
 
 namespace GS.Server.Windows
 {
@@ -56,6 +58,7 @@ namespace GS.Server.Windows
 
                     SkyServer.StaticPropertyChanged += PropertyChangedSkyServer;
                     Settings.Settings.StaticPropertyChanged += PropertyChangedSettings;
+                    SkySettings.StaticPropertyChanged += PropertyChangedSkySettings;
 
                     Title = Application.Current.Resources["3dModel"].ToString();
                     ScreenEnabled = SkyServer.IsMountRunning;
@@ -64,8 +67,9 @@ namespace GS.Server.Windows
                     Model1Vm = this;
 
                     LoadImages();
+                    LoadTelescopeModel();
                     Rotate();
-                    LoadGem();
+                    SetPierSideIndicator();
 
                     RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
                     Declination = _util.DegreesToDMS(SkyServer.DeclinationXForm, "° ", ":", "", 2);
@@ -121,12 +125,52 @@ namespace GS.Server.Windows
                          break;
                      case "Rotate3DModel":
                          Rotate();
+                         SetPierSideIndicator();
                          break;
                      case "DeclinationXForm":
                          Declination = _util.DegreesToDMS(SkyServer.DeclinationXForm, "° ", ":", "", 2);
                          break;
                  }
              });
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private void PropertyChangedSkySettings(object sender, PropertyChangedEventArgs e)
+        {
+            try
+            {
+                ThreadContext.BeginInvokeOnUiThread(
+                    delegate
+                    {
+                        switch (e.PropertyName)
+                        {
+                            case "AlignmentMode":
+                            case "Latitude":
+                            case "PolarMode":
+                                LoadTelescopeModel();
+                                LoadPierModel();
+                                Rotate();
+                                SetPierSideIndicator();
+                                break;
+                        }
+                    });
             }
             catch (Exception ex)
             {
@@ -158,7 +202,7 @@ namespace GS.Server.Windows
                         {
                             case "AccentColor":
                             case "ModelType":
-                                LoadGem();
+                                LoadTelescopeModel();
                                 break;
                         }
                     });
@@ -238,9 +282,7 @@ namespace GS.Server.Windows
         #endregion
 
         #region Viewport3D
-        private double _x1AxisOffset;
-        private double _y1AxisOffset;
-        private double _z1AxisOffset;
+        private Vector3 _axisModelOffsets;
 
         private bool _modelWinVisibility;
         public bool ModelWinVisibility
@@ -323,7 +365,7 @@ namespace GS.Server.Windows
             set
             {
                 _xAxis = value;
-                XAxisOffset = value + _x1AxisOffset;
+                XAxisOffset = value + _axisModelOffsets.X;
                 OnPropertyChanged();
             }
         }
@@ -335,7 +377,7 @@ namespace GS.Server.Windows
             set
             {
                 _yAxis = value;
-                YAxisOffset = value + _y1AxisOffset;
+                YAxisOffset = value + _axisModelOffsets.Y;
                 OnPropertyChanged();
             }
         }
@@ -347,7 +389,7 @@ namespace GS.Server.Windows
             set
             {
                 _zAxis = value;
-                ZAxisOffset = _z1AxisOffset - value;
+                ZAxisOffset = _axisModelOffsets.Z - value;
                 OnPropertyChanged();
             }
         }
@@ -397,17 +439,6 @@ namespace GS.Server.Windows
             }
         }
 
-        private bool _gemBlockVisible;
-        public bool GemBlockVisible
-        {
-            get => _gemBlockVisible;
-            set
-            {
-                _gemBlockVisible = value;
-                OnPropertyChanged();
-            }
-        }
-
         private Material _compass;
         public Material Compass
         {
@@ -418,17 +449,173 @@ namespace GS.Server.Windows
                 OnPropertyChanged();
             }
         }
-        private void LoadGem()
+
+        private double _beamWidth;
+        public double BeamWidth
+        {
+            get => _beamWidth;
+            set
+            {
+                _beamWidth = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _beamHalfWidth;
+        public double BeamHalfWidth
+        {
+            get => _beamHalfWidth;
+            set
+            {
+                _beamHalfWidth = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _modelPierHeight;
+        public double ModelPierHeight
+        {
+            get => _modelPierHeight;
+            set
+            {
+                _modelPierHeight = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _modelPierPivot;
+        public double ModelPierPivot
+        {
+            get => _modelPierPivot;
+            set
+            {
+                _modelPierPivot = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _upperBeamLength;
+        public double UpperBeamLength
+        {
+            get => _upperBeamLength;
+            set
+            {
+                _upperBeamLength = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Point3D _upperBeamMidPoint;
+        public Point3D UpperBeamMidPoint
+        {
+            get => _upperBeamMidPoint;
+            set
+            {
+                _upperBeamMidPoint = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _upperBeamAngle;
+        public double UpperBeamAngle
+        {
+            get => _upperBeamAngle;
+            set
+            {
+                _upperBeamAngle = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _lowerBeamLength;
+        public double LowerBeamLength
+        {
+            get => _lowerBeamLength;
+            set
+            {
+                _lowerBeamLength = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Point3D _lowerBeamMidPoint;
+        public Point3D LowerBeamMidPoint
+        {
+            get => _lowerBeamMidPoint;
+            set
+            {
+                _lowerBeamMidPoint = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _lowerBeamAngle;
+        public double LowerBeamAngle
+        {
+            get => _lowerBeamAngle;
+            set
+            {
+                _lowerBeamAngle = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _pierSideIndicatorStartAngle;
+        public double PierSideIndicatorStartAngle
+        {
+            get => _pierSideIndicatorStartAngle;
+            set
+            {
+                _pierSideIndicatorStartAngle = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _pierSideIndicatorEndAngle;
+        public double PierSideIndicatorEndAngle
+        {
+            get => _pierSideIndicatorEndAngle;
+            set
+            {
+                _pierSideIndicatorEndAngle = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string ModelFileName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void LoadTelescopeModel()
         {
             try
             {
+                // Check there is a new model to load
+                var suffix = string.Empty;
+                switch (SkySettings.AlignmentMode)
+                {
+                    case AlignmentModes.algAltAz:
+                        suffix = "AltAz";
+                        break;
+                    case AlignmentModes.algPolar:
+                        suffix = SkySettings.PolarMode == PolarMode.Left ? "PolarLeft" : "PolarRight";
+                        break;
+                    case AlignmentModes.algGermanPolar:
+                        break;
+                }
+                var modelFile = Shared.Model3D.GetModelFile(Settings.Settings.ModelType, suffix);
+                if (string.IsNullOrEmpty(modelFile) || modelFile == ModelFileName) return;
+
+                // All good so load models
+                ModelFileName = modelFile;
                 CameraVis = false;
 
                 if (CameraIndex == 1)
                 {
-                    LookDirection = Settings.Settings.ModelLookDirection1;
-                    UpDirection = Settings.Settings.ModelUpDirection1;
-                    Position = Settings.Settings.ModelPosition1;
+                LookDirection = Settings.Settings.ModelLookDirection1;
+                UpDirection = Settings.Settings.ModelUpDirection1;
+                Position = Settings.Settings.ModelPosition1;
                 }
                 else
                 {
@@ -437,66 +624,82 @@ namespace GS.Server.Windows
                     Position = Settings.Settings.ModelPosition2;
                 }
 
+                //offset for model to match start position
+                _axisModelOffsets = SkySettings.AxisModelOffsets;
+                //start position
+                XAxis = -90;
+                YAxis = 90;
+                ZAxis = 90;
+                YAxisCentre = 0;
                 switch (SkySettings.AlignmentMode)
                 {
                     case AlignmentModes.algAltAz:
-                        //start position
-                        XAxis = -90;
-                        YAxis = 90;
-                        ZAxis = 90;
-                        //offset for model to match start position
-                        _x1AxisOffset = 0;
-                        _y1AxisOffset = 90;
-                        _z1AxisOffset = 0;
-                        YAxisCentre = 0;
-                        GemBlockVisible = false;
                         break;
                     case AlignmentModes.algPolar:
-                    case AlignmentModes.algGermanPolar:
                         //start position
-                        XAxis = -90;
-                        YAxis = 90;
-                        //offset for model to match start position
-                        _x1AxisOffset = 90;
-                        _y1AxisOffset = -90;
-                        _z1AxisOffset = 0;
+                        ZAxis = Math.Round(Math.Abs(SkySettings.Latitude), 2);
+                        break;
+                    case AlignmentModes.algGermanPolar:
+                    default:
+                        //start position
                         ZAxis = Math.Round(Math.Abs(SkySettings.Latitude), 2);
                         YAxisCentre = Settings.Settings.YAxisCentre;
-                        GemBlockVisible = true;
                         break;
                 }
 
-                //load model and compass
-                var import = new ModelImporter();
-                var altAz = (SkySettings.AlignmentMode == AlignmentModes.algAltAz) ? "AltAz" : String.Empty;
-                var model = import.Load(Shared.Model3D.GetModelFile(Settings.Settings.ModelType, altAz));
+                //load compass, pier model and telescope model
                 Compass = MaterialHelper.CreateImageMaterial(Shared.Model3D.GetCompassFile(SkyServer.SouthernHemisphere, SkySettings.AlignmentMode == AlignmentModes.algAltAz), 100);
+                LoadPierModel();
 
-                //color OTA
+                var import = new ModelImporter();
+                var model = import.Load(ModelFileName);
+
+                // set up OTA color
                 var accentColor = Settings.Settings.AccentColor;
+                Material materialota = null;
                 if (!string.IsNullOrEmpty(accentColor))
                 {
                     var swatches = new SwatchesProvider().Swatches;
                     foreach (var swatch in swatches)
                     {
-                        if (swatch.Name != Settings.Settings.AccentColor) continue;
+                        if (swatch.Name != accentColor) continue;
                         var converter = new BrushConverter();
                         var accentbrush = (Brush)converter.ConvertFromString(swatch.ExemplarHue.Color.ToString());
-
-                        var materialota = MaterialHelper.CreateMaterial(accentbrush);
-                        if (model.Children[0] is GeometryModel3D ota) ota.Material = materialota;
+                        materialota = MaterialHelper.CreateMaterial(accentbrush);
                     }
                 }
-                //color weights
-                if (SkySettings.AlignmentMode != AlignmentModes.algAltAz)
-                {
-                    var materialweights = MaterialHelper.CreateMaterial(new SolidColorBrush(Color.FromRgb(64, 64, 64)));
-                    if (model.Children[1] is GeometryModel3D weights) weights.Material = materialweights;
-                    //color bar
-                    var materialbar = MaterialHelper.CreateMaterial(Brushes.Gainsboro);
-                    if (model.Children[2] is GeometryModel3D bar) bar.Material = materialbar;
 
-                }
+                // iterate over objects in model: 0 is primary OTA, 1 is weights or secondary OTA, 2 is bar
+                for (int i = 0; i < model.Children.Count; i++)
+                    switch (i)
+                    {
+                        case 0:
+                            //color primary OTA
+                            if (!(materialota is null) && (model.Children[0] is GeometryModel3D otaP))
+                                otaP.Material = materialota;
+                            break;
+                        case 1:
+                            //color weights or secondary ota (not for German Polar)
+                            if (SkySettings.AlignmentMode == AlignmentModes.algGermanPolar)
+                            {
+                                var materialweights = MaterialHelper.CreateMaterial(new SolidColorBrush(Color.FromRgb(64, 64, 64)));
+                                if (model.Children[1] is GeometryModel3D weights) { weights.Material = materialweights; }
+                            }
+                            else
+                            {
+                                //color secondary OTA
+                                if (!(materialota is null) && (model.Children[1] is GeometryModel3D otaS))
+                                    otaS.Material = materialota;
+                            }
+                            break;
+                        case 2:
+                            //color bar
+                            var materialbar = MaterialHelper.CreateMaterial(Brushes.Gainsboro);
+                            if (model.Children[2] is GeometryModel3D bar) { bar.Material = materialbar; }
+                            break;
+                        default:
+                            break;
+                    }
                 Model = model;
             }
             catch (Exception ex)
@@ -515,13 +718,157 @@ namespace GS.Server.Windows
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
         private void Rotate()
         {
             var axes = Shared.Model3D.RotateModel(SkySettings.Mount.ToString(), SkyServer.ActualAxisX,
-               SkyServer.ActualAxisY, SkyServer.SouthernHemisphere, SkySettings.AlignmentMode == AlignmentModes.algAltAz);
+               SkyServer.ActualAxisY, SkyServer.SouthernHemisphere, SkySettings.AlignmentMode, (int)SkyServer.PolarMode3D);
 
             YAxis = axes[0];
             XAxis = axes[1];
+        }
+
+        /// <summary>
+        /// Set start and end angles for pier side indicator graphic
+        /// The coordinate system is offset from North by 90 degrees
+        /// and the angle increases clockwise
+        /// </summary>
+        private void SetPierSideIndicator()
+        {
+            var pierSide = SkyServer.IsSideOfPier;
+
+            PierSideIndicatorStartAngle = 0.0;
+            PierSideIndicatorEndAngle = 0.0;
+
+            switch (SkySettings.AlignmentMode)
+            {
+                case AlignmentModes.algAltAz:
+                    switch (pierSide)
+                    {
+                        case PierSide.pierEast:
+                            PierSideIndicatorStartAngle = -SkySettings.AxisLimitX - 90.0;
+                            PierSideIndicatorEndAngle = -90.0;
+                            break;
+                        case PierSide.pierWest:
+                            PierSideIndicatorStartAngle = +SkySettings.AxisLimitX - 90.0;
+                            PierSideIndicatorEndAngle = -90.0;
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case AlignmentModes.algPolar:
+                    switch (pierSide)
+                    {
+                        case PierSide.pierEast:
+                            PierSideIndicatorEndAngle = -SkySettings.AxisLimitX + 90.0;
+                            PierSideIndicatorStartAngle = SkySettings.AxisLimitX + 90.0;
+                            break;
+                        case PierSide.pierWest:
+                            PierSideIndicatorEndAngle = SkySettings.AxisLimitX - 90.0;
+                            PierSideIndicatorStartAngle = -SkySettings.AxisLimitX - 90.0;
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case AlignmentModes.algGermanPolar:
+                    switch (AdjustPierSide(pierSide))
+                    {
+                        case PierSide.pierEast:
+                            PierSideIndicatorStartAngle = 90.0;
+                            PierSideIndicatorEndAngle = -90.0;
+                            break;
+                        case PierSide.pierWest:
+                            PierSideIndicatorStartAngle = 90.0;
+                            PierSideIndicatorEndAngle = 270.0;
+                            break;
+                        default:
+                            PierSideIndicatorStartAngle = 0.0;
+                            PierSideIndicatorEndAngle = 0.0;
+                            break;
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Southern hemisphere pier side is reversed
+        /// </summary>
+        /// <param name="pierSide"></param>
+        /// <returns></returns>
+        private PierSide AdjustPierSide(PierSide pierSide)
+        {
+            if (SkyServer.SouthernHemisphere)
+            {
+                switch (pierSide)
+                {
+                    case PierSide.pierEast:
+                        return PierSide.pierWest;
+                    case PierSide.pierWest:
+                        return PierSide.pierEast;
+                    default:
+                        return PierSide.pierUnknown;
+                }
+            }
+            else
+            {
+                return pierSide;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void LoadPierModel()
+        {
+            // Default vertical pier only
+            ModelPierHeight = Settings.Settings.ModelPierHeight;
+            ModelPierPivot = 0;
+
+            BeamWidth = Settings.Settings.ModelBeamWidth;
+            BeamHalfWidth = BeamWidth / 2;
+            LowerBeamLength = ModelPierHeight;
+            LowerBeamMidPoint = new Point3D(0, LowerBeamLength / 2, BeamHalfWidth);
+            LowerBeamAngle = 90.0;
+
+            UpperBeamLength = 0;
+            UpperBeamMidPoint = new Point3D(0, 0, ModelPierHeight);
+            UpperBeamAngle = 90.0;
+
+            switch (SkySettings.AlignmentMode)
+            {
+                case AlignmentModes.algAltAz:
+                    // Simple vertical pier
+                    break;
+                case AlignmentModes.algPolar:
+                    // Latitude canted two beam pier
+                    Vector Pier = new Vector(0.0, ModelPierHeight - BeamWidth);
+                    // Upper beam
+                    UpperBeamLength = 0.80 * ModelPierHeight;
+                    // Absolute value for both hemispheres
+                    var latitudeDeg = Math.Abs(SkySettings.Latitude);
+                    var latitudeRad = SkyServer.DegToRad(latitudeDeg);
+                    Vector UpperBeam = new Vector(Math.Cos(latitudeRad), -Math.Sin(latitudeRad));
+                    UpperBeam = (UpperBeamLength - BeamWidth) * UpperBeam;
+                    UpperBeamAngle = latitudeDeg - 90.0;
+                    UpperBeamMidPoint = new Point3D(0, 0, ModelPierHeight - UpperBeamLength / 2);
+                    // Lower beam
+                    Vector LowerBeam = Pier + UpperBeam;
+                    LowerBeamLength = LowerBeam.Length;
+                    LowerBeamAngle = 90.0 - Vector.AngleBetween(LowerBeam, Pier);
+                    LowerBeamMidPoint = new Point3D(0, LowerBeamLength / 2, BeamHalfWidth);
+                    break;
+                case AlignmentModes.algGermanPolar:
+                    // Vertical pier with 90 degree extension
+                    UpperBeamLength = Settings.Settings.ModelPierPivot;
+                    UpperBeamMidPoint = new Point3D(0, 0, ModelPierHeight - UpperBeamLength / 2);
+                    ModelPierPivot = -UpperBeamLength;
+                    break;
+            }
         }
 
         private ICommand _openModelWindowCmd;
@@ -579,7 +926,7 @@ namespace GS.Server.Windows
         {
             try
             {
-                LoadGem();
+                LoadTelescopeModel();
             }
             catch (Exception ex)
             {

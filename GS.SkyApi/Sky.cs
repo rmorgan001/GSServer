@@ -22,6 +22,7 @@ using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
+using ASCOM.DeviceInterface;
 
 namespace GS.SkyApi
 {
@@ -80,14 +81,20 @@ namespace GS.SkyApi
         public void AxisGoToTarget(int axis, double targetPosition)
         {
             var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{targetPosition}" };
+            {
+                Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Telescope,
+                Category = MonitorCategory.Driver, Type = MonitorType.Data,
+                Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"{axis}|{targetPosition}"
+            };
             MonitorLog.LogToMonitor(monitorItem);
 
             ValidateMount();
             var validAxis = ValidateAxis(axis);
-            if (validAxis == AxisId.Axis1)
+            if (validAxis == AxisId.Axis1 && SkySettings.AlignmentMode == AlignmentModes.algAltAz)
             {
-                targetPosition = SkyServer.ConvertToAzEastWest(targetPosition);
+                var altAzTarget = SkyServer.MapSlewTargetToAxes(new[] { targetPosition, 0.0 }, SlewType.SlewAltAz);
+                targetPosition = altAzTarget[0];
             }
             var command = new SkyAxisGoToTarget(SkyQueue.NewId, validAxis, targetPosition);
             GetResult(command);
@@ -259,6 +266,7 @@ namespace GS.SkyApi
         {
             ValidateMount();
             ValidateAxis(axis);
+            cmdData = cmdData ?? string.Empty;
             var command = new SkyCmdToMount(SkyQueue.NewId, axis, cmd, cmdData, ignoreWarnings);
             var results = GetResult(command);
             return results.Result;

@@ -72,9 +72,9 @@
     <Resource Include="Resources\GSS Cleaner.jpg" />
   </ItemGroup>
   <ItemGroup>
-	  <PackageReference Include="ASCOM7.BuildEnvironment.Support" Version="7.0.0">
-		  <ExcludeAssets>runtime</ExcludeAssets>
-	  </PackageReference>
+    <PackageReference Include="ASCOM7.BuildEnvironment.Support" Version="7.0.0">
+	    <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
     <PackageReference Include="MaterialDesignColors" Version="2.1.4" />
     <PackageReference Include="MaterialDesignThemes" Version="4.8.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

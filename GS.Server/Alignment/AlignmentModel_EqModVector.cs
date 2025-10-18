@@ -1207,7 +1207,7 @@ namespace GS.Server.Alignment
 
             SphericalCoord result = new SphericalCoord();
             double[] azAlt = (SkySettings.AlignmentMode != AlignmentModes.algAltAz) ? 
-                Axes.AxesXYToAzAlt(axes) : new[] { spherical.RA, spherical.Dec };
+                Axes.AxesXyToAzAlt(axes) : new[] { spherical.RA, spherical.Dec };
 
             result.x = (((azAlt[0] - 180d) / 360d) * StepsPerRev[0]) + ScaleCenter[0];
             result.y = (((azAlt[1] + 90d) / 180d) * StepsPerRev[1]) + ScaleCenter[1];
@@ -1227,9 +1227,9 @@ namespace GS.Server.Alignment
             double alt = (((pos.y - ScaleCenter[1]) / StepsPerRev[1]) * 180d) - 90d;
 
 
-            double[] axes = Axes.AltAzToAxesYX(new double[] { alt, az });
+            double[] axes = Axes.AzAltToAxesXy(new [] { az, alt });
 
-            AxisPosition result = Axes.AxesAppToMount(new AxisPosition(axes[1], axes[0]));
+            AxisPosition result = Axes.AxesAppToMount(new AxisPosition(axes[0], axes[1]));
             if (pos.weightsUp)
             {
                 result = Axes.GetAltAxisPosition(result);

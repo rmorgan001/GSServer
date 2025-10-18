@@ -155,23 +155,24 @@ namespace GS.Simulator
         {
             Task.Run(() =>
             {
+                var arcSecs = duration / 1000.0 * Conversions.Deg2ArcSec(Math.Abs(guideRate));
+                bool deltaOk = arcSecs > 0.0002;
                 if (axis == Axis.Axis1)
                 {
-                    MountQueue.IsPulseGuidingRa = true;
-                    MountQueue.IsPulseGuidingDec = false;
+                    MountQueue.IsPulseGuidingRa = true && deltaOk;
+//                    MountQueue.IsPulseGuidingDec = false;
                 }
                 else
                 {
-                    MountQueue.IsPulseGuidingDec = true;
-                    MountQueue.IsPulseGuidingRa = false;
+                    MountQueue.IsPulseGuidingDec = true && deltaOk;
+//                    MountQueue.IsPulseGuidingRa = false;
                 }
 
-                var arcSecs = duration / 1000.0 * Conversions.Deg2ArcSec(Math.Abs(guideRate));
-                if (arcSecs < .0002)
-                {
-                    MountQueue.IsPulseGuidingRa = false;
-                    MountQueue.IsPulseGuidingDec = false;
-                }
+                //if (arcSecs < .0002)
+                //{
+                //    MountQueue.IsPulseGuidingRa = false;
+                //    MountQueue.IsPulseGuidingDec = false;
+                //}
 
                 // check for cancellation
                 token.ThrowIfCancellationRequested();
@@ -218,8 +219,14 @@ namespace GS.Simulator
                     sw.Reset();
                     _ioSerial.Send($"pulse|{axis}|{0}");
 
-                    MountQueue.IsPulseGuidingRa = false;
-                    MountQueue.IsPulseGuidingDec = false;
+                    if (axis == Axis.Axis1)
+                    {
+                        MountQueue.IsPulseGuidingRa = false;
+                    }
+                    else
+                    {
+                        MountQueue.IsPulseGuidingDec = false;
+                    }
 
                     if (MonitorPulse)
                     {

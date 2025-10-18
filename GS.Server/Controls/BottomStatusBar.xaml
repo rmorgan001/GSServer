@@ -124,7 +124,7 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <TextBlock Grid.Column="4" Margin="3 0" VerticalAlignment="Center" ToolTip="{StaticResource botTipSOP}" Visibility="{Binding SopShow, Converter={StaticResource BoolToClap}}" Text="{Binding IsSideOfPier}" Foreground="DimGray" FontSize="15">
+        <TextBlock Grid.Column="4" Margin="3 0" VerticalAlignment="Center" ToolTip="{Binding SideOfPierUIToolTip}" Text="{Binding SideOfPierUI}" Foreground="DimGray" FontSize="15">
             <TextBlock.Style>
                 <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
                     <Style.Triggers>
@@ -150,17 +150,6 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <TextBlock Grid.Column="4" Margin="3 0" VerticalAlignment="Center" Text="{Binding AzDirection}" ToolTip="{StaticResource botTipAzDir}" Visibility="{Binding AzDirShow, Converter={StaticResource BoolToClap}}" FontSize="15" Foreground="{StaticResource SecondaryHueMidBrush}">
-            <TextBlock.Style>
-                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
-                    <Style.Triggers>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="0.5"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
         <Path Grid.Column="5" Data="{StaticResource PecVector}" ToolTip="{StaticResource PecStatus}" Stretch="Fill" Margin="3" Width="25" Height="25" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding PecShow, Converter={StaticResource BoolToClap}}">
             <Path.Style>
                 <Style TargetType="Path">
@@ -178,7 +167,7 @@
                 </Style>
             </Path.Style>
         </Path>
-        <Button Grid.Column="6" Command="{Binding OpenLimitDialogCommand}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource botTipAxisLimit}" Padding="9">
+        <Button Grid.Column="6" Command="{Binding OpenLimitDialogCommand}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource botTipAxisLimit}" Padding="9" IsEnabled="{Binding TrackingLimitSettingsEnable}">
                 <md:PackIcon Kind="WarningCircle" Width="29" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-5">
                     <md:PackIcon.Style>
                         <Style TargetType="md:PackIcon">

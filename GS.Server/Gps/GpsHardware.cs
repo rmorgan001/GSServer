@@ -96,7 +96,7 @@ namespace GS.Server.Gps
         internal DateTime TimeStamp { get; private set; }
 
         /// <summary>
-        /// high res system utc date and time
+        /// High Res system utc date and time
         /// </summary>
         internal DateTime PcUtcNow { get; private set; }
 
@@ -202,7 +202,7 @@ namespace GS.Server.Gps
         /// Write to Monitor the NmEa sentence before being parsed
         /// </summary>
         /// <param name="sentence"></param>
-        /// <param name="valid">Passed pre checks</param>
+        /// <param name="valid">Passed prechecks</param>
         private void LogNmEaSentence(string sentence, bool valid)
         {
             var terminated = sentence.Contains("\r\n");
@@ -248,15 +248,15 @@ namespace GS.Server.Gps
             if (!string.IsNullOrEmpty(checkChar))
             {
                 var strToCheck = Strings.GetTxtBetween(receivedData, "$", "*");
-                foreach (var chracter in strToCheck)
+                foreach (var chrA in strToCheck)
                 {
-                    checkSum ^= Convert.ToByte(chracter);
+                    checkSum ^= Convert.ToByte(chrA);
                 }
             }
 
             var final = checkSum.ToString("X2");
-            var retbol = checkChar == final;
-            if (retbol) return true;
+            var retBol = checkChar == final;
+            if (retBol) return true;
             var monitorItem = new MonitorEntry
                 { Datetime = PcUtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{receivedData}" };
             MonitorLog.LogToMonitor(monitorItem);
@@ -273,52 +273,54 @@ namespace GS.Server.Gps
             try
             {
                 NmEaTag = gpsDataArr[0];
-                var utctime = gpsDataArr[1];
+                var utcTime = gpsDataArr[1];
                 var lat = gpsDataArr[3];
                 var ns = gpsDataArr[4];
                 if (lat != null && ns != null)
                 {
-                    Latitude = ConvertLatLong(lat, ns);
+                    //Latitude = ConvertLatLong(lat, ns);
+                    Latitude = NmeaToDecimal(lat, ns);
                 }
 
                 var lon = gpsDataArr[5];
                 var ew = gpsDataArr[6];
                 if (lon != null && ew != null)
                 {
-                    Longitude = ConvertLatLong(lon, ew);
+                    //Longitude = ConvertLatLong(lon, ew);
+                    Longitude = NmeaToDecimal(lon, ew);
                 }
                 Altitude = 0;
-                var utcdate = gpsDataArr[9];
+                var utcDate = gpsDataArr[9];
 
-                string timeformat;
-                if (string.IsNullOrEmpty(utctime)) return;
-                if (!utctime.Contains("."))
+                string timeFormat;
+                if (string.IsNullOrEmpty(utcTime)) return;
+                if (!utcTime.Contains("."))
                 {
-                    utctime += ".00";
+                    utcTime += ".00";
                 }
-                var utcarr = utctime.Split('.');
-                if (utcarr.Length != 2) return;
-                switch (utcarr[1].Length)
+                var utcArr = utcTime.Split('.');
+                if (utcArr.Length != 2) return;
+                switch (utcArr[1].Length)
                 {
                     case 0:
                         return;
                     case 1:
-                        timeformat = @"hhmmss\.f";
+                        timeFormat = @"hhmmss\.f";
                         break;
                     case 2:
-                        timeformat = @"hhmmss\.ff";
+                        timeFormat = @"hhmmss\.ff";
                         break;
                     case 3:
-                        timeformat = @"hhmmss\.fff";
+                        timeFormat = @"hhmmss\.fff";
                         break;
                     case 4:
-                        timeformat = @"hhmmss\.ffff";
+                        timeFormat = @"hhmmss\.ffff";
                         break;
                     default:
                         return;
                 }
 
-                TimeStamp = ConvertDateTime(utcdate, utctime, timeformat);
+                TimeStamp = ConvertDateTime(utcDate, utcTime, timeFormat);
                 TimeSpan = TimeStamp - PcUtcNow;
             }
             catch (Exception ex)
@@ -340,53 +342,55 @@ namespace GS.Server.Gps
             try
             {
                 NmEaTag = gpsDataArr[0];
-                var utctime = gpsDataArr[1];
+                var utcTime = gpsDataArr[1];
                 var lat = gpsDataArr[2];
                 var ns = gpsDataArr[3];
                 if (lat != null && ns != null)
                 {
-                    Latitude = ConvertLatLong(lat, ns);
+                    //Latitude = ConvertLatLong(lat, ns);
+                    Latitude = NmeaToDecimal(lat, ns);
                 }
 
                 var lon = gpsDataArr[4];
                 var ew = gpsDataArr[5];
                 if (lon != null && ew != null)
                 {
-                    Longitude = ConvertLatLong(lon, ew);
+                    //Longitude = ConvertLatLong(lon, ew);
+                    Longitude = NmeaToDecimal(lon, ew);
                 }
 
                 double.TryParse(gpsDataArr[9], NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var d);
                 Altitude = d;
 
-                string timeformat;
-                if (string.IsNullOrEmpty(utctime)) return;
-                if (!utctime.Contains("."))
+                string timeFormat;
+                if (string.IsNullOrEmpty(utcTime)) return;
+                if (!utcTime.Contains("."))
                 {
-                    utctime += ".00";
+                    utcTime += ".00";
                 }
-                var utcarr = utctime.Split('.');
-                if (utcarr.Length != 2) return;
-                switch (utcarr[1].Length)
+                var utcArr = utcTime.Split('.');
+                if (utcArr.Length != 2) return;
+                switch (utcArr[1].Length)
                 {
                     case 0:
                         return;
                     case 1:
-                        timeformat = @"hhmmss\.f";
+                        timeFormat = @"hhmmss\.f";
                         break;
                     case 2:
-                        timeformat = @"hhmmss\.ff";
+                        timeFormat = @"hhmmss\.ff";
                         break;
                     case 3:
-                        timeformat = @"hhmmss\.fff";
+                        timeFormat = @"hhmmss\.fff";
                         break;
                     case 4:
-                        timeformat = @"hhmmss\.ffff";
+                        timeFormat = @"hhmmss\.ffff";
                         break;
                     default:
                         return;
                 }
 
-                TimeStamp = ConvertDateTime(null, utctime, timeformat);
+                TimeStamp = ConvertDateTime(null, utcTime, timeFormat);
                 TimeSpan = TimeStamp - PcUtcNow;
             }
             catch (Exception ex)
@@ -397,35 +401,84 @@ namespace GS.Server.Gps
             }
         }
 
+        ///// <summary>
+        ///// Convert the Sentence data for lat or long
+        ///// </summary>
+        ///// <param name="num"></param>
+        ///// <param name="dir"></param>
+        ///// <returns></returns>
+        //private static double ConvertLatLong(string num, string dir)
+        //{
+        //    try
+        //    {
+        //        const NumberStyles style = NumberStyles.AllowDecimalPoint;
+        //        double.TryParse(num, style, CultureInfo.InvariantCulture, out var num1);
+        //        num1 /= 100;
+        //        var num2 = Math.Truncate(num1);
+        //        var dec = num1 - Math.Truncate(num1);
+        //        var intDec = dec * 1000000000;
+        //        var num3 = (int)(intDec / 60);
+        //        double.TryParse(num2 + "." + num3, style, CultureInfo.InvariantCulture, out var returnNumber);
+        //        switch (dir.ToUpper())
+        //        {
+        //            case "S":
+        //            case "W":
+        //                return -returnNumber;
+        //            case "N":
+        //            case "E":
+        //                return returnNumber;
+        //            default:
+        //                return 0;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var monitorItem = new MonitorEntry
+        //            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
+        //        MonitorLog.LogToMonitor(monitorItem);
+        //        return 0;
+        //    }
+
+        //}
+
         /// <summary>
-        /// Convert the Sentence data for lat or long
+        /// Convert NMEA lat or long to decimal
         /// </summary>
         /// <param name="num"></param>
         /// <param name="dir"></param>
         /// <returns></returns>
-        private static double ConvertLatLong(string num, string dir)
+        private static double NmeaToDecimal(string num, string dir)
         {
             try
             {
                 const NumberStyles style = NumberStyles.AllowDecimalPoint;
-                double.TryParse(num, style, CultureInfo.InvariantCulture, out var num1);
-                num1 /= 100;
-                var num2 = Math.Truncate(num1);
-                var dec = num1 - Math.Truncate(num1);
-                var intdec = dec * 1000000000;
-                var num3 = (int)(intdec / 60);
-                double.TryParse(num2 + "." + num3, style, CultureInfo.InvariantCulture, out var returnNumber);
+                var success = double.TryParse(num, style, CultureInfo.InvariantCulture, out var num1);
+
+                if (!success)
+                {
+                    var monitorItem = new MonitorEntry
+                    {
+                        Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server,
+                        Category = MonitorCategory.Server, Type = MonitorType.Error,
+                        Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"Failed Conversion|{num}|{dir}"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
+                }
+
+                var hemi = 1;
                 switch (dir.ToUpper())
                 {
                     case "S":
                     case "W":
-                        return -returnNumber;
+                        hemi = -hemi;
+                        break;
                     case "N":
                     case "E":
-                        return returnNumber;
-                    default:
-                        return 0;
+                        break;
                 }
+                var a = Math.Round((Convert.ToInt32(num1 / 100, CultureInfo.InvariantCulture) + (num1 - Convert.ToInt32(num1 / 100, CultureInfo.InvariantCulture) * 100) / 60) * hemi,5);
+                return a;
             }
             catch (Exception ex)
             {
@@ -448,18 +501,18 @@ namespace GS.Server.Gps
         {
             try
             {
-                var tmpdate = PcUtcNow.Date;
-                var tmptime = PcUtcNow.TimeOfDay;
+                var tmpDate = PcUtcNow.Date;
+                var tmpTime = PcUtcNow.TimeOfDay;
                 if (date != null)
                 {
-                    const string format = @"ddMMyy";
-                    if (DateTime.TryParseExact(date, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmpdate)) { }
+                    const string format = "ddMMyy";
+                    if (DateTime.TryParseExact(date, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmpDate)) { }
                 }
 
-                if (time == null) { return tmpdate + tmptime; }
+                if (time == null) { return tmpDate + tmpTime; }
 
-                if (TimeSpan.TryParseExact(time, timeFormat, CultureInfo.InvariantCulture, TimeSpanStyles.None, out tmptime)) { }
-                return tmpdate + tmptime;
+                if (TimeSpan.TryParseExact(time, timeFormat, CultureInfo.InvariantCulture, TimeSpanStyles.None, out tmpTime)) { }
+                return tmpDate + tmpTime;
             }
             catch (Exception ex)
             {
