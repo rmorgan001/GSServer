@@ -193,6 +193,7 @@ namespace GS.SkyWatcher
     
     public enum McModel
     {
+        // List Updated on 10/22/2025
         [Description("EQ6(EQ6 MC)")] Eq6 = 0,
         [Description("HEQ5(HEQ5 MC)")] Heq5 = 1,
         [Description("EQ5 Goto mount(MC002)")] Eq52 = 2,
@@ -202,8 +203,11 @@ namespace GS.SkyWatcher
         [Description("AZ-EQ5 (MC0011)")] AzEq5 = 6,
         [Description("Star Adventurer(MC012)")] StarAdventurer = 7,
         [Description("Star Adventurer Mini(MC013)")] StarAdventurerMini = 8,
+        [Description("EQAL55(MC016)")] EqAl55 = 9,
+        [Description("Star Adventurer WiFi(MC017)")] StarAdventurerWifi = 10,
         [Description("Avant(MC018)")] AvAnt = 11,
         [Description("Star Adventurer GTi(MC021)")] StarAdventurerGTi = 12,
+        [Description("Star Adventurer Mini Gen2(MC013)")] StarAdventurerMiniGen2 = 12,
         [Description("EQM35(MC002)")] Eqm35 = 26,
         [Description("EQ8-R(MC015)")] Eq8R = 32,
         [Description("EQ8(MC015)")] Eq8A = 33,
@@ -211,11 +215,13 @@ namespace GS.SkyWatcher
         [Description("EQ6-R(MC015)")] Eq6R = 35,
         [Description("NEQ6 PRO(MC015)")] Neq6Pro = 36,
         [Description("CQ350(MC015)")] Cq350 = 37,
+        [Description("HEQ5R(MC015)")] Heq5R = 38,
         [Description("EQ3(MC019)")] Eq3 = 48,
         [Description("EQ5(MC019)")] Eq5 = 49,
         [Description("EQM35(MC019)")] EQm35 = 50,
         [Description("Prototyping(MC019)")] Prototyping = 55,
         [Description("HEQ5(MC020)")] Heq5A = 56,
+        [Description("HEQ5R(MC030)")] Heq5Ra = 65,
         [Description("Wave 100i(MC030)")] Wave100I = 68,
         [Description("Wave 150i(MC030)")] Wave150I = 69,
         [Description("SynTrek hand control")] SynTrekHc = 127,
@@ -227,6 +233,8 @@ namespace GS.SkyWatcher
         [Description("114GT(MC001)")] B114Gt = 133,
         [Description("80GTSLT (MC001)")] C80GtSlt = 134,
         [Description("114GT SynScan AZ 360(MC001)")] C114GtSlt = 135,
+        [Description("MiniAz(MC021)")] MiniAz = 136,
+        [Description("EQ5DC(MC021)")] Eq5Dc = 139,
         [Description("Dob Tracking 8 to 12(MC003)")] DobTracking8To12 = 144,
         [Description("Dob Goto 8 to 12(MC003)")] DobGoto8To12 = 145,
         [Description("Dob Goto 8 to 12 Clutchless)(MC004)")] DobGoto8To12Cl = 152,
@@ -247,7 +255,17 @@ namespace GS.SkyWatcher
         [Description("SynScan 80GT(MC014)")] SynScan80Gt = 173,
         [Description("Dob14 StarGate(MC007)")] Dob14StarGate = 182,
         [Description("DOB 18(MC015)")] Dob18 = 183,
+        [Description("Stargate 16(MC015)")] Stargate = 184,
         [Description("Fusion-120i(MC029)")] Fusion120I = 192,
-        [Description("Undefined")] Undefined = 999,
+        [Description("AZGTi(MC029)")] AzGtiA = 197,
+        [Description("Discovery(MC029)")] Discovery = 198,
+        [Description("SynScan AZ 130GT(MC029)")] Az130Gt = 200,
+        [Description("DOB 8/10/12 Clutch(MC029)")] Dob81012 = 202,
+        [Description("DOB 8/10/12 NoClutch(MC029)")] Dob81012No = 203,
+        [Description("DOB 14/16 Clutch(MC029)")] Dob1416A = 204,
+        [Description("Virtuoso GTi(MC029)")] Virtuoso = 207,
+        [Description("SynScan WiFi Adapter")] WiFiAdapter = 253,
+        [Description("SHC001 hand control")] Shc001 = 254,
+        [Description("Undefined")] Undefined = 999
     }
 }
