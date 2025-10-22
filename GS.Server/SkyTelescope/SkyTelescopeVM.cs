@@ -8609,7 +8609,7 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    if (RaDecimal <= 0.0 || RaDecimal >= 24.0 )
+                    if (RaDecimal <= -0.000001 || RaDecimal >= 24.0 )
                     {
                         throw new Exception($"{Application.Current.Resources["exError"]}");
                     }
