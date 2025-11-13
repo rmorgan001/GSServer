@@ -33,19 +33,31 @@ using System.Windows.Threading;
 
 namespace GS.Server.Focuser
 {
-    public sealed class FocuserVM : ObservableObject, IPageVM, IDisposable
+    public sealed class FocuserVm : ObservableObject, IPageVM, IDisposable
     {
         #region Fields ...
         public string TopName => "Focuser";
         public string BottomName => "Focuser";
         public int Uid => 11;
 
-        readonly DispatcherTimer _focuserTimer;
+        private readonly DispatcherTimer _focuserTimer;
 
-        public static FocuserVM _focuserVM;
+        public static FocuserVm Focuser1Vm;
         #endregion
 
         #region Properties ...
+        
+        private bool _autoConnect;
+        public bool AutoConnect
+        {
+            get => _autoConnect;
+            set
+            {
+                _autoConnect = value;
+                Properties.Focuser.Default.AutoConnect = value;
+                OnPropertyChanged();
+            }
+        }
 
         private bool _connected;
         public bool Connected
@@ -80,32 +92,14 @@ namespace GS.Server.Focuser
             }
         }
 
-        public bool ShowConnect
-        {
-            get
-            {
-                return FocuserChooserVM.SelectedDevice != null
-                    && (FocuserChooserVM.SelectedDevice is IFocuser)
-                    && (this.Focuser == null);
-            }
-        }
+        public bool ShowConnect =>
+            FocuserChooserVm.SelectedDevice is IFocuser
+            && (this.Focuser == null);
 
-        public bool ShowDisconnect
-        {
-            get
-            {
-                return (Focuser?.Connected == true);
-            }
-        }
+        public bool ShowDisconnect => (Focuser?.Connected == true);
 
-        public bool ShowSetup
-        {
-            get
-            {
-                return (FocuserChooserVM.SelectedDevice != null
-                    && FocuserChooserVM.SelectedDevice is IFocuser);
-            }
-        }
+        public bool ShowSetup =>
+            (FocuserChooserVm.SelectedDevice is IFocuser);
 
 
         public int StepSize
@@ -130,23 +124,20 @@ namespace GS.Server.Focuser
         #endregion
 
 
-        private FocuserChooserVM _focuserChooserVM;
+        private FocuserChooserVM _focuserChooserVm;
 
-        public FocuserChooserVM FocuserChooserVM
+        public FocuserChooserVM FocuserChooserVm
         {
             get
             {
-                if (_focuserChooserVM == null)
+                if (_focuserChooserVm == null)
                 {
-                    _focuserChooserVM = new FocuserChooserVM();
-                    _focuserChooserVM.PropertyChanged += FocuserChooserVM_PropertyChanged;
+                    _focuserChooserVm = new FocuserChooserVM();
+                    _focuserChooserVm.PropertyChanged += FocuserChooserVM_PropertyChanged;
                 }
-                return _focuserChooserVM;
+                return _focuserChooserVm;
             }
-            set
-            {
-                _focuserChooserVM = value;
-            }
+            set => _focuserChooserVm = value;
         }
 
         private void FocuserChooserVM_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -154,18 +145,18 @@ namespace GS.Server.Focuser
             if (e.PropertyName == "SelectedDevice")
             {
                 RefreshButtonVisibilities();
-                Properties.Focuser.Default.DeviceId = FocuserChooserVM.SelectedDevice?.Id ?? "";
+                Properties.Focuser.Default.DeviceId = FocuserChooserVm.SelectedDevice?.Id ?? "";
             }
         }
 
         private void RefreshButtonVisibilities()
         {
-            OnPropertyChanged("ShowSetup");
-            OnPropertyChanged("ShowConnect");
-            OnPropertyChanged("ShowDisconnect");
+            OnPropertyChanged(nameof(ShowSetup));
+            OnPropertyChanged(nameof(ShowConnect));
+            OnPropertyChanged(nameof(ShowDisconnect));
         }
 
-        public FocuserVM()
+        public FocuserVm()
         {
             var monitorItem = new MonitorEntry
             {
@@ -174,27 +165,52 @@ namespace GS.Server.Focuser
                 Category = MonitorCategory.Interface,
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()
-                    .Name,
+                    ?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = " Loading FocuserVM"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
-            _focuserVM = this;
+            Focuser1Vm = this;
 
             FocuserSettings.Load();
 
-            FocuserChooserVM.GetEquipment(Properties.Focuser.Default.DeviceId);
+            FocuserChooserVm.GetEquipment(Properties.Focuser.Default.DeviceId);
 
-            ChooseFocuserCommand = new AsyncCommand<bool>(() => ChooseFocuser());
+            ChooseFocuserCommand = new AsyncCommand<bool>(ChooseFocuser);
             CancelChooseFocuserCommand = new RelayCommand(CancelChooseFocuser);
             DisconnectCommand = new RelayCommand(DisconnectDiag);
             RefreshFocuserListCommand = new RelayCommand(RefreshFocuserList, o => !(Focuser?.Connected == true));
             MoveFocuserInCommand = new AsyncCommand<int>(() => MoveFocuserRelativeInternal((ReverseDirection ? 1: -1) * StepSize), (p) => Connected && !IsMoving);
             MoveFocuserOutCommand = new AsyncCommand<int>(() => MoveFocuserRelativeInternal((ReverseDirection ? -1 : 1)* StepSize), (p) => Connected && !IsMoving);
+            
 
             _focuserTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Properties.Focuser.Default.DevicePollingInterval) };
             _focuserTimer.Tick += FocuserTimer_Tick;
+
+            try
+            {
+                AutoConnect = FocuserSettings.AutoConnect;
+                if (AutoConnect)
+                {
+                    _ = ChooseFocuser();
+                }
+            }
+            catch (Exception e)
+            {
+                monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{e.Message}|{e.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+
         }
 
         private void FocuserTimer_Tick(object sender, EventArgs e)
@@ -208,7 +224,7 @@ namespace GS.Server.Focuser
         private void HaltFocuser()
         {
             var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Focuser, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Halting focuser" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Focuser, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Halting focuser" };
             MonitorLog.LogToMonitor(monitorItem);
 
             if (Focuser?.Connected == true)
@@ -220,7 +236,7 @@ namespace GS.Server.Focuser
                 catch (Exception ex)
                 {
                     monitorItem = new MonitorEntry
-                    { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Focuser, Category = MonitorCategory.Driver, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Focuser, Category = MonitorCategory.Driver, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                     MonitorLog.LogToMonitor(monitorItem);
                 }
             }
@@ -237,7 +253,7 @@ namespace GS.Server.Focuser
 
         public async Task<int> MoveFocuser(int position, CancellationToken ct)
         {
-            int pos = -1;
+            var pos = -1;
 
             await Task.Run(async () =>
             {
@@ -247,7 +263,7 @@ namespace GS.Server.Focuser
                     {
                         var monitorItem = new MonitorEntry
                         {
-                            Datetime = Principles.HiResDateTime.UtcNow,
+                            Datetime = HiResDateTime.UtcNow,
                             Device = MonitorDevice.Focuser,
                             Category = MonitorCategory.Driver,
                             Type = MonitorType.Information,
@@ -275,7 +291,7 @@ namespace GS.Server.Focuser
                     IsMoving = false;
                     // progress.Report(new FocuserStatus() { Status = string.Empty });
                 }
-            });
+            }, ct);
             return pos;
         }
 
@@ -292,29 +308,29 @@ namespace GS.Server.Focuser
 
         private CancellationTokenSource _cancelChooseFocuserSource;
 
-        private readonly SemaphoreSlim ss = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim _ss = new SemaphoreSlim(1, 1);
 
         private async Task<bool> ChooseFocuser()
         {
-            await ss.WaitAsync();
+            await _ss.WaitAsync();
             try
             {
                 _focuserTimer.Stop();
                 Disconnect();
-                if (FocuserChooserVM.SelectedDevice.Id == "No_Device")
+                if (FocuserChooserVm.SelectedDevice.Id == "No_Device")
                 {
-                    Properties.Focuser.Default.DeviceId = FocuserChooserVM.SelectedDevice.Id;
+                    Properties.Focuser.Default.DeviceId = FocuserChooserVm.SelectedDevice.Id;
                     return false;
                 }
 
-                var focuser = (IFocuser)FocuserChooserVM.SelectedDevice;
+                var focuser = (IFocuser)FocuserChooserVm.SelectedDevice;
                 _cancelChooseFocuserSource?.Dispose();
                 _cancelChooseFocuserSource = new CancellationTokenSource();
                 if (focuser != null)
                 {
                     try
                     {
-                        var connected = await focuser?.Connect(_cancelChooseFocuserSource.Token);
+                        var connected = await focuser.Connect(_cancelChooseFocuserSource.Token);
                         _cancelChooseFocuserSource.Token.ThrowIfCancellationRequested();
                         if (connected)
                         {
@@ -325,7 +341,6 @@ namespace GS.Server.Focuser
                             TargetPosition = this.Position;
                             Properties.Focuser.Default.DeviceId = Focuser.Id;
 
-                            // Logger.Info($"Successfully connected Focuser. Id: {Focuser.Id} Name: {Focuser.Name} Driver Version: {Focuser.DriverVersion}");
                             RefreshButtonVisibilities();
                             return true;
                         }
@@ -348,7 +363,7 @@ namespace GS.Server.Focuser
             }
             finally
             {
-                ss.Release();
+                _ss.Release();
             }
         }
 
@@ -375,10 +390,7 @@ namespace GS.Server.Focuser
 
         public int TargetPosition
         {
-            get
-            {
-                return _targetPosition;
-            }
+            get => _targetPosition;
             set
             {
                 _targetPosition = value;
@@ -394,9 +406,10 @@ namespace GS.Server.Focuser
                 Message = "Click <Accept> to disconnect the focuser",
                 ButtonOneCaption = "Accept",
                 ButtonTwoCaption = "Cancel",
+                // ReSharper disable once AsyncVoidLambda
                 OnButtonOneClicked = async () =>
                 {
-                    await Task.Run(() => Disconnect());
+                    await Task.Run(Disconnect);
                     IsDialogOpen = false;
                 },
                 OnButtonTwoClicked = () =>
@@ -421,17 +434,14 @@ namespace GS.Server.Focuser
 
         public void RefreshFocuserList(object obj)
         {
-            FocuserChooserVM.GetEquipment(Properties.Focuser.Default.DeviceId);
+            FocuserChooserVm.GetEquipment(Properties.Focuser.Default.DeviceId);
         }
 
         private IFocuser _focuser;
 
         public IFocuser Focuser
         {
-            get
-            {
-                return _focuser;
-            }
+            get => _focuser;
             private set
             {
                 _focuser = value;
@@ -506,7 +516,7 @@ namespace GS.Server.Focuser
         // NOTE: Leave out the finalizer altogether if this class doesn't
         // own unmanaged resources itself, but leave the other methods
         // exactly as they are.
-        ~FocuserVM()
+        ~FocuserVm()
         {
             // Finalizer calls Dispose(false)
             Dispose(false);

@@ -6537,6 +6537,7 @@ namespace GS.Server.SkyTelescope
                 AlertState = false;
                 HomePositionCheck();
                 PolarLedLevelEnabled = SkyServer.CanPolarLed;
+                
             }
             catch (Exception ex)
             {

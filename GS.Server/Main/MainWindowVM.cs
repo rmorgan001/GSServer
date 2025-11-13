@@ -52,7 +52,7 @@ namespace GS.Server.Main
         private IPageVM _currentPageViewModel;
         private List<IPageVM> _pageViewModels;
         private SkyTelescopeVm _skyTelescopeVm;
-        private FocuserVM _focuserVm;
+        private FocuserVm _focuserVm;
         private NotesVM _notesVm;
         private SettingsVm _settingsVm;
         private GamePadVM _gamePadVm;
@@ -195,7 +195,7 @@ namespace GS.Server.Main
                     {
                         if (!PageViewModels.Contains(_focuserVm))
                         {
-                            _focuserVm = new FocuserVM();
+                            _focuserVm = new FocuserVm();
                             PageViewModels.Add(_focuserVm);
                         }
                         FocuserRadioVisible = true;

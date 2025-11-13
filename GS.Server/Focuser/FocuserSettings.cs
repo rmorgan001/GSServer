@@ -14,8 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-using System;
 using GS.Shared;
 using System.ComponentModel;
 using System.Reflection;
@@ -34,7 +32,23 @@ namespace GS.Server.Focuser
         #endregion
 
 
-        #region Properties 
+        #region Properties
+        
+        private static bool _autoConnect;
+        public static bool AutoConnect
+        {
+            get => _autoConnect;
+            set
+            {
+                if (_autoConnect == value) return;
+                _autoConnect = value;
+                Properties.Focuser.Default.AutoConnect = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
+                OnStaticPropertyChanged();
+            }
+
+        }
+
         private static string _deviceId;
         public static string DeviceId
         {
@@ -44,7 +58,7 @@ namespace GS.Server.Focuser
                 if (_deviceId == value) return;
                 _deviceId = value;
                 Properties.Focuser.Default.DeviceId = value;
-                LogSetting(MethodBase.GetCurrentMethod()?.Name, value.ToString());
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, value);
                 OnStaticPropertyChanged();
             }
 
@@ -95,6 +109,7 @@ namespace GS.Server.Focuser
             // properties
             DeviceId = Properties.Focuser.Default.DeviceId;
             StepSize = Properties.Focuser.Default.StepSize;
+            AutoConnect =  Properties.Focuser.Default.AutoConnect;
         }
 
         /// <summary>

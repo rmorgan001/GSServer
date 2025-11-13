@@ -31,7 +31,7 @@
         <DataTemplate DataType="{x:Type skyTelescope:SkyTelescopeVm}">
             <skyTelescope:SkyTelescopeV />
         </DataTemplate>
-        <DataTemplate DataType="{x:Type focuser:FocuserVM}">
+        <DataTemplate DataType="{x:Type focuser:FocuserVm}">
               <focuser:FocuserView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type notes:NotesVM}">

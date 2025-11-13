@@ -799,4 +799,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="mhlPolarHome">Home Position 5 degrees above horizon</system:String>
     <system:String x:Key="mhlPolarHomeText">Primary Telescope on {0} side pointing {1}</system:String>
 
+    
+    <system:String x:Key="focuserAutoConnect">Automatische Verbindung</system:String>
+    <system:String x:Key="focuserAutoConnectTooltip">Automatische Verbindung mit der Halterung</system:String>
+
 </ResourceDictionary>

@@ -6,7 +6,7 @@
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              xmlns:focuser="clr-namespace:GS.Server.Focuser"
-             mc:Ignorable="d" d:DataContext="{d:DesignInstance focuser:FocuserVM}">
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance focuser:FocuserVm}">
     <Grid MinWidth="750">
         <md:DialogHost HorizontalAlignment="Center" CloseOnClickAway="True" 
                        IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" />
@@ -18,6 +18,7 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="40" />
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
@@ -54,6 +55,11 @@
                                       IsChecked="{Binding ReverseDirection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource focuserReverseDirection}"/>
                     </StackPanel>
+                    <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Grid.Column="0" Orientation="Horizontal" Margin="20,0,5,20">
+                        <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center"  Margin="12,0,0,0"  Width="25" Height="25" ToolTip="{StaticResource focuserAutoConnectTooltip}"
+                                      IsChecked="{Binding AutoConnect, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource focuserAutoConnect}"/>
+                    </StackPanel>
 
                 </Grid>
             </md:DrawerHost.LeftDrawerContent>
@@ -75,8 +81,8 @@
                                   Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
                 <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal">
                     <ComboBox md:HintAssist.Hint="{StaticResource focuserSelectHint}" Width="300" HorizontalAlignment="Left" 
-                              ItemsSource="{Binding FocuserChooserVM.Devices}"
-                              SelectedItem="{Binding FocuserChooserVM.SelectedDevice, Mode=TwoWay}"
+                              ItemsSource="{Binding FocuserChooserVm.Devices}"
+                              SelectedItem="{Binding FocuserChooserVm.SelectedDevice, Mode=TwoWay}"
                               Style="{StaticResource MaterialDesignFloatingHintComboBox}" ToolTip="{StaticResource focuserSelectTooltip}">
                         <ComboBox.ItemsPanel >
                             <ItemsPanelTemplate >
@@ -96,7 +102,7 @@
 
                     <Button Margin="10,0,0,0" Height="30" 
                             ToolTip="{StaticResource focuserSetupTooltip}"  VerticalAlignment="Center" Style="{StaticResource MaterialDesignRaisedDarkButton}" 
-                            Command="{Binding FocuserChooserVM.SetupDialogCommand}"
+                            Command="{Binding FocuserChooserVm.SetupDialogCommand}"
                             Content="{StaticResource focuserSetup}"
                             Visibility="{Binding ShowSetup, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 

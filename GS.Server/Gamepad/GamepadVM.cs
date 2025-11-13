@@ -44,7 +44,7 @@ namespace GS.Server.GamePad
         public int Uid => 3;
 
         private SkyTelescopeVm _skyTelescopeVM;
-        private FocuserVM _focuserVM;
+        private FocuserVm _focuserVM;
         private SettingsVm _settingsVM;
         private CancellationTokenSource ctsGamePad;
         private string _focusTextBox;
@@ -473,7 +473,7 @@ namespace GS.Server.GamePad
         /// <returns></returns>
         private bool Focuser()
         {
-            if (_focuserVM == null) _focuserVM = FocuserVM._focuserVM;
+            if (_focuserVM == null) _focuserVM = FocuserVm.Focuser1Vm;
             return _focuserVM != null;
         }
 
