@@ -152,6 +152,9 @@ namespace GS.Server.Windows
                      case "AutoHomeProgressBar":
                          AutoHomeProgressBar = SkyServer.AutoHomeProgressBar;
                          break;
+                     case "IsAutoHomeRunning":
+                         IsAutoHomeDialogOpen = SkyServer.IsAutoHomeRunning;
+                         break;
                      case "CanHomeSensor":
                          AutoHomeEnabled = SkyServer.CanHomeSensor;
                          break;
@@ -2298,6 +2301,18 @@ namespace GS.Server.Windows
             }
         }
 
+        private bool _decOffsetIsVisible;
+        public bool DecOffsetIsVisible
+        {
+            get => _decOffsetIsVisible;
+            set
+            {
+                if (_decOffsetIsVisible == value) return;
+                _decOffsetIsVisible = value;
+                OnPropertyChanged();
+            }
+        }
+
         private int _autoHomeProgressBar;
         public int AutoHomeProgressBar
         {
@@ -2311,28 +2326,6 @@ namespace GS.Server.Windows
                     IsAutoHomeDialogOpen = false;
                     SkyServer.AutoHomeProgressBar = 0;
                 }
-                OnPropertyChanged();
-            }
-        }
-
-        public double AutoHomeAxisX
-        {
-            get => SkySettings.AutoHomeAxisX;
-            set
-            {
-                if (Math.Abs(value - SkySettings.AutoHomeAxisX) < 0.00001) { return; }
-                SkySettings.AutoHomeAxisX = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public double AutoHomeAxisY
-        {
-            get => SkySettings.AutoHomeAxisY;
-            set
-            {
-                if (Math.Abs(value - SkySettings.AutoHomeAxisY) < 0.00001) { return; }
-                SkySettings.AutoHomeAxisY = value;
                 OnPropertyChanged();
             }
         }
@@ -2419,6 +2412,7 @@ namespace GS.Server.Windows
                     }
                     AutoHomeContent = new AutoHomeDialog();
                     StartEnabled = true;
+                    DecOffsetIsVisible = SkySettings.AlignmentMode == AlignmentModes.algGermanPolar;
                     SkyServer.AutoHomeProgressBar = 0;
                     AutoHomeLimit = 100;
                     IsAutoHomeDialogOpen = true;

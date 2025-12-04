@@ -8,6 +8,9 @@
         xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
         xmlns:domain1="clr-namespace:GS.Server.Domain"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}">
+    <UserControl.Resources>
+        <domain1:BoolToVisConverter x:Key="BoolToVis" />
+    </UserControl.Resources>
     <GroupBox Header="{StaticResource btnAutoHome}" Margin="5" >
             <StackPanel Orientation="Vertical">
                 <ProgressBar Value="{Binding AutoHomeProgressBar}" md:TransitionAssist.DisableTransitions="True" Height="10" Width="200" Foreground="{StaticResource SecondaryHueMidBrush}" />
@@ -29,47 +32,25 @@
                     </ComboBox.ItemsPanel>
                 </ComboBox>
             </StackPanel>
-                <StackPanel Orientation="Vertical" Margin="0,10,0,0" IsEnabled="{Binding StartEnabled}">
-                    <Label Content="{StaticResource btnDecOffset}" VerticalAlignment="Bottom"/>
-                    <ComboBox md:HintAssist.Hint="{StaticResource btnHintDecOffset}" MinWidth="10" ToolTip="{StaticResource btnHintDecOffset}"  
+            <StackPanel Orientation="Vertical" Margin="0,10,0,0" IsEnabled="{Binding StartEnabled}" Visibility="{Binding DecOffsetIsVisible, Mode=OneWay, Converter={StaticResource BoolToVis}}">
+                <Label Content="{StaticResource btnDecOffset}" VerticalAlignment="Bottom"/>
+                <ComboBox md:HintAssist.Hint="{StaticResource btnHintDecOffset}" MinWidth="10" ToolTip="{StaticResource btnHintDecOffset}"  
                               ItemsSource="{Binding DecOffsets}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
-                        <ComboBox.SelectedItem>
-                            <Binding Path="DecOffset" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
-                                <Binding.ValidationRules>
-                                    <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
-                                </Binding.ValidationRules>
-                            </Binding>
-                        </ComboBox.SelectedItem>
-                        <ComboBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel />
-                            </ItemsPanelTemplate>
-                        </ComboBox.ItemsPanel>
-                    </ComboBox>
-                    <Label Content="Home Sensor X Axis" VerticalAlignment="Bottom" Margin="0,15, 0, 0" />
-                <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,-15, 0, 0" >
-                        <TextBox.Text>
-                            <Binding Path="AutoHomeAxisX" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
-                                <Binding.ValidationRules>
-                                    <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
-                                    <domain1:DoubleValidationRule ValidatesOnTargetUpdated="True" />
-                                </Binding.ValidationRules>
-                            </Binding>
-                        </TextBox.Text>
-                    </TextBox>
-                    <Label Content="Home Sensor Y Axis" VerticalAlignment="Bottom" Margin="0,15, 0, 0"/>
-                <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"  Margin="0,-15, 0, 0" >
-                        <TextBox.Text>
-                            <Binding Path="AutoHomeAxisY" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
-                                <Binding.ValidationRules>
-                                    <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
-                                    <domain1:DoubleValidationRule ValidatesOnTargetUpdated="True" />
-                                </Binding.ValidationRules>
-                            </Binding>
-                        </TextBox.Text>
-                    </TextBox>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0 10 0 0" HorizontalAlignment="Center">
+                    <ComboBox.SelectedItem>
+                        <Binding Path="DecOffset" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </ComboBox.SelectedItem>
+                    <ComboBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </ComboBox.ItemsPanel>
+                </ComboBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0 10 0 0" HorizontalAlignment="Center">
                     <Button IsEnabled="{Binding StartEnabled}" IsDefault="False" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding StartAutoHomeDialogCommand}" Content="{StaticResource diaStart}"/>
                     <Button IsCancel="True" IsDefault="True"  Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelAutoHomeDialogCommand}" Content="{StaticResource diaCancel}"/>
                 </StackPanel>

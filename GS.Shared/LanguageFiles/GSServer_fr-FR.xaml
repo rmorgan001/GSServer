@@ -802,4 +802,19 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="focuserAutoConnect">Connexion automatique</system:String>
     <system:String x:Key="focuserAutoConnectTooltip">Connexion automatique avec le support</system:String>
 
+    <!--1.2.1.1 -->
+    <!--Home Settings -->
+    <system:String x:Key="homeSettings">Home Settings</system:String>
+    <system:String x:Key="lbHomePosition">Home Position</system:String>
+    <system:String x:Key="lbAutoHomePosition">AutoHome Sensor Location</system:String>
+    <system:String x:Key="lbAutoHomeDefault">Paramètres par défaut</system:String>
+    <system:String x:Key="lbAutoHomePositionGEM">RA=90&#x00B0;, Dec=90&#x00B0;</system:String>
+    <system:String x:Key="lbAutoHomePositionPolarRADec">Paramètres personnalisés RA/Dec</system:String>
+    <system:String x:Key="lbAutoHomePositionPolarAzAlt">Paramètres personnalisés Az/Alt</system:String>
+    <system:String x:Key="lbAxisX">Azimut:</system:String>
+    <system:String x:Key="lbAxisY">Altitude:</system:String>
+    <system:String x:Key="lbHomePositionPolar">Az = 180, Alt [-10 .. 10] (Polar)</system:String>
+    <system:String x:Key="lbHomePositionToolTipHome">Home position altitude (degrees)</system:String>
+    <system:String x:Key="lbAutoHomeLocationTooltip">AutoHome sensor location altitude (degrees)</system:String>
+
 </ResourceDictionary>

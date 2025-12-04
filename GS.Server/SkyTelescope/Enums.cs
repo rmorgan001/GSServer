@@ -217,4 +217,15 @@ namespace GS.Server.SkyTelescope
         HomeCapabilityCheckFailed = -5,
         UnknownError = -99
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public enum AutoHomePositionType
+    {
+        DefaultGEM,
+        PolarRADec,
+        PolarAzAlt
+    }
+
 }
