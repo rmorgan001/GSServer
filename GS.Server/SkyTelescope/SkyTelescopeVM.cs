@@ -142,6 +142,7 @@ namespace GS.Server.SkyTelescope
                     DecBacklashList = DecBacklashList.Concat(extendedList);
                     AxisTrackingLimits = new List<double>(Numbers.InclusiveRange(0, 15, 1));
                     AxisHzTrackingLimits = new List<double>(Numbers.InclusiveRange(-20, 20, 1));
+                    HomeAxisAltList = new List<int>(Numbers.InclusiveIntRange(-10, 10, 1));
 
                     // defaults
                     AtPark = SkyServer.AtPark;
@@ -169,6 +170,25 @@ namespace GS.Server.SkyTelescope
                     // Flip Dialog
                     FlipDialogHeader = GetResourceByMode("btnFlip");
                     FlipDialogText = GetResourceByMode("btnContinueFlip");
+                    // Home and AutoHome Settings Dialog
+                    HomeAxisX = (int) SkySettings.HomeAxisX;
+                    var angleOffset = SkyServer.SouthernHemisphere ? 180 : 0;
+                    HomeAxisX -= angleOffset;
+                    HomeAxisY = (int) SkySettings.HomeAxisY;
+                    if (SkySettings.AutoHomeAxisX == 90.0 && SkySettings.AutoHomeAxisY == 90.0) // Factory default
+                    {
+                        AutoHomeAxisAz = SkyServer.SouthernHemisphere ? 0 : 180;
+                        AutoHomeAxisAlt = 0;
+                        SelectedAutoHomePosition = AutoHomePositionType.DefaultGEM;
+                    }
+                    else // Custom settings stored as Northern Hemisphere values
+                    {
+                        var autoHome = Coordinate.HaDec2AltAz(SkySettings.AutoHomeAxisX / 15.0, SkySettings.AutoHomeAxisY, 
+                            Math.Abs(SkySettings.Latitude));
+                        AutoHomeAxisAz = Convert.ToInt32(autoHome[1]) - (SkyServer.SouthernHemisphere ? 180 : 0);
+                        AutoHomeAxisAlt = Convert.ToInt32(autoHome[0]);
+                        SelectedAutoHomePosition = AutoHomePositionType.PolarAzAlt;
+                    }
 
                     SetShowUI();
 
@@ -473,6 +493,8 @@ namespace GS.Server.SkyTelescope
                          FlipDialogHeader = GetResourceByMode("btnFlip");
                          FlipDialogText = GetResourceByMode("btnContinueFlip");
                          TrackingLimitSettingsEnable = (SkySettings.AlignmentMode == AlignmentModes.algGermanPolar);
+                         // Home Settings Dialog
+                         OnPropertyChanged("HomeSettingsDialogIsVisible");
 
                          SetShowUI();
                          // ReSharper disable ExplicitCallerInfoArgument
@@ -10738,6 +10760,18 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private bool _decOffsetIsVisible;
+        public bool DecOffsetIsVisible
+        {
+            get => _decOffsetIsVisible;
+            set
+            {
+                if (_decOffsetIsVisible == value) return;
+                _decOffsetIsVisible = value;
+                OnPropertyChanged();
+            }
+        }
+
         private int _autoHomeProgressBar;
         public int AutoHomeProgressBar
         {
@@ -10755,26 +10789,9 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        public double AutoHomeAxisX
+        public bool AutoHomePositionSelectIsVisible
         {
-            get => SkySettings.AutoHomeAxisX;
-            set
-            {
-                if (Math.Abs(value - SkySettings.AutoHomeAxisX) < 0.00001) { return; }
-                SkySettings.AutoHomeAxisX = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public double AutoHomeAxisY
-        {
-            get => SkySettings.AutoHomeAxisY;
-            set
-            {
-                if (Math.Abs(value - SkySettings.AutoHomeAxisY) < 0.00001) { return; }
-                SkySettings.AutoHomeAxisY = value;
-                OnPropertyChanged();
-            }
+            get => SkySettings.AlignmentMode == AlignmentModes.algPolar;
         }
 
         public IList<int> DecOffsets { get; }
@@ -10833,6 +10850,7 @@ namespace GS.Server.SkyTelescope
                     }
                     DialogContent = new AutoHomeDialog();
                     StartEnabled = true;
+                    DecOffsetIsVisible = SkySettings.AlignmentMode == AlignmentModes.algGermanPolar;
                     SkyServer.AutoHomeProgressBar = 0;
                     AutoHomeLimit = 100;
                     IsDialogOpen = true;
@@ -11268,6 +11286,260 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
+
+        #region Home Settings Dialog
+        public bool HomeSettingsDialogIsVisible
+        {
+            get => SkySettings.AlignmentMode == AlignmentModes.algPolar;
+        }
+
+        public bool CustomAutoHomeSettingsIsVisible
+        {
+            get => SelectedAutoHomePosition != AutoHomePositionType.DefaultGEM;
+        }
+
+        private AutoHomePositionType _selectedAutoHomePosition;
+        public AutoHomePositionType SelectedAutoHomePosition
+        {
+            get => _selectedAutoHomePosition;
+            set
+            {
+                if (_selectedAutoHomePosition != value)
+                {
+                    _selectedAutoHomePosition = value;
+                    OnPropertyChanged(nameof(SelectedAutoHomePosition));
+                    OnPropertyChanged(nameof(CustomAutoHomeSettingsIsVisible));
+                }
+            }
+        }
+
+        public double AutoHomeAxisX
+        {
+            get => SkySettings.AutoHomeAxisX;
+            set
+            {
+                SkySettings.AutoHomeAxisX = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double AutoHomeAxisY
+        {
+            get => SkySettings.AutoHomeAxisY;
+            set
+            {
+                SkySettings.AutoHomeAxisY = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _autoHomeAxisAz;
+        public int AutoHomeAxisAz
+        {
+            get => _autoHomeAxisAz;
+            set
+            {
+                if (value == _autoHomeAxisAz) { return; }
+                _autoHomeAxisAz = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _autoHomeAxisAlt;
+        public int AutoHomeAxisAlt
+        {
+            get => _autoHomeAxisAlt;
+            set
+            {
+                if (value == _autoHomeAxisAlt) { return; }
+                _autoHomeAxisAlt = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _homeAxisX;
+        public int HomeAxisX
+        {
+            get => _homeAxisX;
+            set
+            {
+                if (_homeAxisX == value) return;
+                _homeAxisX = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _homeAxisY;
+        public int HomeAxisY
+        {
+            get => _homeAxisY;
+            set
+            {
+                if (_homeAxisY == value) return;
+                _homeAxisY = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public IList<int> HomeAxisAltList { get; }
+
+        // Commands
+        private ICommand _openHomeSettingsDialogCmd;
+        public ICommand OpenHomeSettingsDialogCmd
+        {
+            get
+            {
+                var command = _openHomeSettingsDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openHomeSettingsDialogCmd = new RelayCommand(
+                    param => OpenHomeSettingsDialog()
+                );
+            }
+        }
+        private void OpenHomeSettingsDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    DialogContent = new HomeSettingsDialog();
+                    IsDialogOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _acceptHomeSettingsDialogCmd;
+        public ICommand AcceptHomeSettingsDialogCmd
+        {
+            get
+            {
+                var command = _acceptHomeSettingsDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptHomeSettingsDialogCmd = new RelayCommand(
+                    param => AcceptHomeSettingsDialog()
+                );
+            }
+        }
+        private void AcceptHomeSettingsDialog()
+        {
+            try
+            {
+                switch (SelectedAutoHomePosition)
+                {
+                    case AutoHomePositionType.DefaultGEM:
+                        AutoHomeAxisX = 90.0;
+                        AutoHomeAxisY = 90.0;
+                        break;
+                    case AutoHomePositionType.PolarAzAlt:
+                        var autoHome = Coordinate.AltAz2HaDec(AutoHomeAxisAlt, AutoHomeAxisAz, SkySettings.Latitude);
+                        if (SkyServer.SouthernHemisphere)
+                        {
+                            AutoHomeAxisX = Math.Round(180.0 - autoHome[0] * 15.0, 6); // Convert from Hour Angle
+                            AutoHomeAxisY = Math.Round(-1.0 * autoHome[1], 6);
+                        }
+                        else
+                        {
+                            AutoHomeAxisX = Math.Round(autoHome[0] * 15.0, 6); // Convert from Hour Angle
+                            AutoHomeAxisY = Math.Round(autoHome[1], 6); // Round value of AutoHomeAxisY
+                        }
+                        break;
+                    case AutoHomePositionType.PolarRADec:
+                        break;
+                    default:
+                        break;
+                }
+                using (new WaitCursor())
+                {
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelHomeSettingsDialogCmd;
+        public ICommand CancelHomeSettingsDialogCmd
+        {
+            get
+            {
+                var command = _cancelAltDecimalDialogCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelHomeSettingsDialogCmd = new RelayCommand(
+                    param => CancelHomeSettingsDialog()
+                );
+            }
+        }
+        private void CancelHomeSettingsDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }

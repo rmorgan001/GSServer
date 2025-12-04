@@ -3689,8 +3689,7 @@ namespace GS.Server.SkyTelescope
             double[] positions = {0, 0};
             string name = String.Empty;
             // home axes are mount values
-            _homeAxes.X = SkySettings.HomeAxisX;
-            _homeAxes.Y = SkySettings.HomeAxisY;
+            _homeAxes = GetHomeAxes(SkySettings.HomeAxisX, SkySettings.HomeAxisY);
 
             var monitorItem = new MonitorEntry
             {
@@ -5299,13 +5298,35 @@ namespace GS.Server.SkyTelescope
             SkySystem.ConnectSerial = false;
         }
 
+        /// <summary>
+        /// Get home axes adjusted for angle offset
+        /// </summary>
+        /// <param name="xAxis"></param>
+        /// <param name="yAxis"></param>
+        /// <returns></returns>
+        public static Vector GetHomeAxes(double xAxis, double yAxis)
+        {
+            var home = new[] { xAxis, yAxis };
+            if (SkySettings.AlignmentMode != AlignmentModes.algPolar)
+            {
+                home = Axes.AxesAppToMount(new[] { xAxis, yAxis });
+            }
+            else
+            {
+                var angleOffset = SouthernHemisphere ? 180.0 : 0.0;
+                home[0] -= angleOffset;
+                home = Axes.AzAltToAxesXy(home);
+            }
+            return new Vector(home[0], home[1]);
+        }
+
+
         public static void MountReset()
         {
             // Load all settings
             SkySettings.Load();
             // Set home positions
-            _homeAxes.X = SkySettings.HomeAxisX;
-            _homeAxes.Y = SkySettings.HomeAxisY;
+            _homeAxes = GetHomeAxes(SkySettings.HomeAxisX, SkySettings.HomeAxisY);
             // Set axis positions
             _appAxisX = _homeAxes.X;
             _appAxisY = _homeAxes.Y;
