@@ -807,7 +807,6 @@ namespace GS.Server.SkyTelescope
             get => _autoHomeAxisX;
             set
             {
-                if (Math.Abs(_autoHomeAxisX - value) <= 0.0000000000001) return;
                 _autoHomeAxisX = value;
                 Properties.SkyTelescope.Default.AutoHomeAxisX = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
@@ -825,7 +824,6 @@ namespace GS.Server.SkyTelescope
             get => _autoHomeAxisY;
             set
             {
-                if (Math.Abs(_autoHomeAxisY - value) <= 0.0000000000001) return;
                 _autoHomeAxisY = value;
                 Properties.SkyTelescope.Default.AutoHomeAxisY = value;
                 LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
@@ -1193,25 +1191,9 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         public static double HomeAxisX
         {
-            get
-            {
-                if (AlignmentMode != AlignmentModes.algPolar)
-                {
-                    return Axes.AxesAppToMount(new [] {_homeAxisX, _homeAxisY })[0];
-                }
-                else
-                {
-                    var angleOffset = Latitude < 0 ? 180.0 : 0.0;
-                    var home = new[]
-                    {
-                        Properties.SkyTelescope.Default.HomeAxisX - angleOffset,
-                        Properties.SkyTelescope.Default.HomeAxisY
-                    };
-                    home = Axes.AzAltToAxesXy(home);
-                    return home[0]; // This is the X axis in the mount axes, which is the Ra axis
-                }
-            }
-            private set
+            get => _homeAxisX;
+
+            set
             {
                 if (Math.Abs(_homeAxisX - value) <= 0.0000000000001) return;
                 _homeAxisX = value;
@@ -1229,26 +1211,9 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         public static double HomeAxisY
         {
-            get
-            {
-                if (AlignmentMode != AlignmentModes.algPolar)
-                {
-                    return Axes.AxesAppToMount(new[] { _homeAxisX, _homeAxisY })[1];
-                }
-                else
-                {
-                    var angleOffset = Latitude < 0 ? 180.0 : 0.0;
-                    var home = new[]
-                    {
-                        Properties.SkyTelescope.Default.HomeAxisX - angleOffset,
-                        Properties.SkyTelescope.Default.HomeAxisY
-                    };
-                    home = Axes.AzAltToAxesXy(home);
-                    return home[1]; // This is the Y axis in the mount axes, which is the Dec axis
-                }
-            }
+            get => _homeAxisY;
 
-            private set
+            set
             {
                 if (Math.Abs(_homeAxisY - value) <= 0.0000000000001) return;
                 _homeAxisY = value;

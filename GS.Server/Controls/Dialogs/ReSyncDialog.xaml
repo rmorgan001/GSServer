@@ -9,16 +9,16 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}">
     <UserControl.Resources>
-        <domain:EnumBooleanConverter x:Key="EnumBoolean" />
+        <domain:EnumToBoolConverter x:Key="EnumToBool" />
     </UserControl.Resources>
     <GroupBox Header="{StaticResource btnReSyncEnc}" Margin="5">
         <StackPanel Orientation="Vertical">
             <StackPanel Orientation="Horizontal" Margin="5,0,0,0">
-                <RadioButton Style="{StaticResource MaterialDesignActionLightToggleButton}" Width="25" Height="25" IsChecked="{Binding SyncMode, Converter={StaticResource EnumBoolean}, ConverterParameter={x:Static skyTelescope:ReSyncMode.Home}}" />
+                <RadioButton Style="{StaticResource MaterialDesignActionLightToggleButton}" Width="25" Height="25" IsChecked="{Binding SyncMode, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static skyTelescope:ReSyncMode.Home}}" />
                 <Label Margin="5,0,0,0" Content="{StaticResource btnReSyncHome}" />
                 </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="5">
-                <RadioButton Style="{StaticResource MaterialDesignActionLightToggleButton}" Width="25" Height="25" IsChecked="{Binding SyncMode, Converter={StaticResource EnumBoolean}, ConverterParameter={x:Static skyTelescope:ReSyncMode.Park}}" />
+                <RadioButton Style="{StaticResource MaterialDesignActionLightToggleButton}" Width="25" Height="25" IsChecked="{Binding SyncMode, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static skyTelescope:ReSyncMode.Park}}" />
                 <ComboBox Margin="10,0,0,0" materialDesign:HintAssist.Hint="{StaticResource btnTipParkPos}" ToolTip="{StaticResource btnTipParkPos}" MaxWidth="120" Width="120" ItemsSource="{Binding ParkPositions}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEditable="False">
                     <ComboBox.SelectedItem>
                         <Binding Path="ReSyncParkSelection" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">

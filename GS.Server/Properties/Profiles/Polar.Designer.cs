@@ -214,7 +214,7 @@ namespace GS.Server.Properties.Profiles {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
         public double AutoHomeAxisX {
             get {
                 return ((double)(this["AutoHomeAxisX"]));
@@ -223,7 +223,7 @@ namespace GS.Server.Properties.Profiles {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
         public double AutoHomeAxisY {
             get {
                 return ((double)(this["AutoHomeAxisY"]));

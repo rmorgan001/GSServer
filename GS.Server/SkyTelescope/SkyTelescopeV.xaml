@@ -26,6 +26,7 @@
         <domain:InverseBooleanConverter x:Key="InvertBool" />
         <domain:EnumToVisibilityConverter x:Key="EnumToVis" />
         <domain:BoolToVisClapConverter x:Key="BoolToVisClap"/>
+        <BooleanToVisibilityConverter  x:Key="BoolToVis" />
         <domain1:EnumValueToDescriptionConverter x:Key="EnumToDesc" />
     </UserControl.Resources>
     <md:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" CloseOnClickAway="True"  >
@@ -35,7 +36,7 @@
                 <!--IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}"-->
                 <md:DrawerHost.LeftDrawerContent>
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                        <Grid Width="750" Height="420" Margin="10,0,10,0" VerticalAlignment="Top" IsEnabled="{Binding SettingsGridEnabled}">
+                        <Grid Width="800" Height="420" Margin="10,0,10,0" VerticalAlignment="Top" IsEnabled="{Binding SettingsGridEnabled}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
@@ -52,7 +53,7 @@
                                 <ColumnDefinition/>
                                 <ColumnDefinition/>
                                 <ColumnDefinition/>
-                                <ColumnDefinition/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5">
                                 <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" Content="{StaticResource skySettings}"/>
@@ -124,7 +125,7 @@
                                         </DataTemplate>
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
-                                <ComboBox md:HintAssist.Hint="{StaticResource skyAlignment}" Margin="10,0,0,0" HorizontalAlignment="Left"  VerticalAlignment="Center" ToolTip="{StaticResource skyAlignment}" ItemsSource="{Binding Source={domain1:EnumValueBindingSourceExtension {x:Type deviceInterface:AlignmentModes}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEnabled="True">
+                                <ComboBox md:HintAssist.Hint="{StaticResource skyAlignment}" Margin="10,0,0,0" HorizontalAlignment="Right"  VerticalAlignment="Center" ToolTip="{StaticResource skyAlignment}" ItemsSource="{Binding Source={domain1:EnumValueBindingSourceExtension {x:Type deviceInterface:AlignmentModes}}}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" MinWidth="100" IsEnabled="True">
                                     <ComboBox.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <VirtualizingStackPanel />
@@ -283,6 +284,10 @@
                                 <Button Margin="5,0,5,0" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}" ToolTip="{StaticResource mhlButtonToolTip}" Command="{Binding OpenHardwareLimitsWindowCmd}" Foreground="{StaticResource PrimaryHueMidBrush}">
                                     <md:PackIcon Kind="WifiStrengthOutline" Height="25" Width="25"/>
                                 </Button>
+                                <Button Margin="5,0,5,0" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}" ToolTip="{StaticResource mhlButtonToolTip}" Command="{Binding OpenHomeSettingsDialogCmd}" Foreground="{StaticResource PrimaryHueMidBrush}"
+                                        Visibility="{Binding HomeSettingsDialogIsVisible, Converter={StaticResource BoolToVis}, Mode=OneWay}">
+                                    <md:PackIcon Kind="HomeEditOutline" Height="30" Width="30"/>
+                                </Button>
                             </StackPanel>
                             <ComboBox Grid.Row="2" Grid.Column="2" md:HintAssist.Hint="{StaticResource skyST4}" MinWidth="10" Margin="10,0,0,0" VerticalAlignment="Center"  ToolTip="{StaticResource skyST4}" 
                                       ItemsSource="{Binding St4GuideRates}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
@@ -439,7 +444,7 @@
                                     <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource mntAdv}" />
                                 </StackPanel>
                             </StackPanel>
-                            <Border Margin="0,0,4,0" Grid.Row="8" Grid.Column="3" Grid.ColumnSpan="2" BorderThickness="3" BorderBrush="DimGray" CornerRadius="5"
+                            <Border Margin="0,0,4,0" Grid.Row="8" Grid.Column="2" Grid.ColumnSpan="2" BorderThickness="3" BorderBrush="DimGray" CornerRadius="5"
                                         Background="{StaticResource MaterialDesignToolBarBackground}">
                                 <StackPanel Orientation="Horizontal" >
                                     <ComboBox md:HintAssist.Hint="{StaticResource btnTipParkPos}" Margin="15,0,0,0" ToolTip="{StaticResource btnTipParkPos}" Width="125"
@@ -650,7 +655,7 @@
                                     </StackPanel>
                                 </Grid>
                             </Border>
-                            <StackPanel Orientation="Horizontal" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Center"  HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Grid.Row="8" Grid.Column="4" VerticalAlignment="Center"  HorizontalAlignment="Right">
                                 <Button Margin="10 0" Width="100" Content="{StaticResource skyClose}" ToolTip="{StaticResource skyCloseSave}"
                                         Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickCloseSettingsCommand}"/>
                             </StackPanel>

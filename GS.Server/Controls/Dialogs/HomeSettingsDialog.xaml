@@ -1,0 +1,93 @@
+﻿<UserControl x:Class="GS.Server.Controls.Dialogs.HomeSettingsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:domain="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
+        xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+        xmlns:domain1="clr-namespace:GS.Server.Domain"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}">
+    <UserControl.Resources>
+        <domain1:EnumToBoolConverter  x:Key="EnumToBool" />
+        <domain1:BoolToVisConverter  x:Key="BoolToVis" />
+    </UserControl.Resources>
+    <GroupBox Header="{StaticResource homeSettings}" Margin="5" >
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical" VerticalAlignment="Top" Margin="10">
+                <TextBlock Text="{StaticResource lbHomePosition}" Margin="0,0,0,20"/>
+                <TextBlock Margin="0,0,0,10">
+                    <Run Text="{StaticResource lbAxisX}"/>
+                    <Run Text="{Binding HomeAxisX}"/>
+                </TextBlock>
+                <TextBlock Text="{StaticResource lbAxisY}" Margin="0,0,0,10"/>
+                <ComboBox MinWidth="150"  Margin="0,0,0,10" VerticalAlignment="Center" ToolTip="{StaticResource lbHomePositionToolTipHome}" 
+                          ItemsSource="{Binding HomeAxisAltList}">
+                    <ComboBox.SelectedValue>
+                        <Binding Path="HomeAxisY" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </ComboBox.SelectedValue>
+                    <ComboBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </ComboBox.ItemsPanel>
+                </ComboBox>
+            </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Width="10">
+                <Rectangle Fill="{StaticResource MaterialDesignDivider}" Width="2" Height="220"/>
+            </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical" VerticalAlignment="Top" Margin="10">
+                <TextBlock Text="{StaticResource lbAutoHomePosition}" Margin="0,0,0,20"/>
+                <RadioButton GroupName="AutoHomePosition"
+                             Content="{StaticResource lbAutoHomeDefault}"
+                             IsChecked="{Binding SelectedAutoHomePosition, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static skyTelescope:AutoHomePositionType.DefaultGEM}}" />
+                <!--<RadioButton GroupName="AutoHomePosition" Margin="0,10,0,0"
+                             Content="{StaticResource lbAutoHomePositionPolarRADec}"
+                             IsChecked="{Binding SelectedAutoHomePosition, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static skyTelescope:AutoHomePositionType.PolarRADec}}" />-->
+                <RadioButton GroupName="AutoHomePosition" Margin="0,10,0,0"
+                             Content="{StaticResource lbAutoHomePositionPolarAzAlt}"
+                             IsChecked="{Binding SelectedAutoHomePosition, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static skyTelescope:AutoHomePositionType.PolarAzAlt}}" />
+                <StackPanel Visibility="{Binding Path=CustomAutoHomeSettingsIsVisible, Mode=OneWay, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Margin="0,20,0,10">
+                        <Run Text="{StaticResource lbAxisX}"/>
+                        <Run Text="{Binding HomeAxisX}"/>
+                    </TextBlock>
+                    <TextBlock Text="{StaticResource lbAxisY}" Margin="0,0,0,10"/>
+                    <ComboBox MinWidth="150"  Margin="0,0,0,10" VerticalAlignment="Center" ToolTip="{StaticResource lbAutoHomeLocationTooltip}" 
+                              ItemsSource="{Binding HomeAxisAltList}">
+                        <ComboBox.SelectedValue>
+                            <Binding Path="AutoHomeAxisAlt" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </ComboBox.SelectedValue>
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                    </ComboBox>
+                </StackPanel>
+            </StackPanel>            
+            <StackPanel Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5">
+                <Button IsDefault="False" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaAccept}" Command="{Binding AcceptHomeSettingsDialogCmd}"/>
+                <Button IsCancel="True" IsDefault="True" Margin="8,0,0,0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaCancel}" Command="{Binding CancelHomeSettingsDialogCmd}" />
+            </StackPanel>
+        </Grid>
+    </GroupBox>
+    </UserControl>
+ 
