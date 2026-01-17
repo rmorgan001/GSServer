@@ -1517,8 +1517,9 @@ namespace ASCOM.GS.Sky.Telescope
         public void SlewToAltAzAsync(double az, double alt)
         {
             if (!SkyServer.AsComOn) return;
+
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(az, "\u00B0 ", ":", "", 2)}|{_util.DegreesToDMS(alt, "\u00B0 ", ":", "", 2)}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(az, "\u00B0 ", ":", "", 2)}|{_util.DegreesToDMS(alt, "\u00B0 ", ":", "", 2)}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             CheckCapability(SkySettings.CanSlewAltAzAsync, "SlewToAltAzAsync");
@@ -1527,7 +1528,15 @@ namespace ASCOM.GS.Sky.Telescope
             CheckRange(az, 0, 360, "SlewToAltAzAsync", "Azimuth");
             CheckRange(alt, -90, 90, "SlewToAltAzAsync", "Altitude");
             CheckReachable(az, alt, SlewType.SlewAltAz);
-            SkyServer.SlewAltAz(alt, az);
+
+            // Create event to signal when slew has started (IsSlewing = true)
+            var slewStartedEvent = new ManualResetEvent(false);
+
+            // Start the slew - SlewMount will wait for IsSlewing to be set
+            SkyServer.SlewAltAz(alt, az, slewStartedEvent);
+
+            // Clean up
+            slewStartedEvent.Dispose();
         }
 
         public void SlewToCoordinates(double ra, double dec)
@@ -1579,14 +1588,13 @@ namespace ASCOM.GS.Sky.Telescope
             var raDec = Transforms.CoordTypeToInternal(ra, dec);
             SkyServer.CycleOnTracking(true);
 
-            // Create event to wait for slew to actually start (IsSlewing = true)
+            // Create event to signal when slew has started (IsSlewing = true)
             var slewStartedEvent = new ManualResetEvent(false);
 
-            // Start the slew, passing the event handle
+            // Start the slew - SlewMount will wait for IsSlewing to be set
             SkyServer.SlewRaDec(raDec.X, raDec.Y, true, slewStartedEvent);
 
-            // Wait for IsSlewing to be set to true (with 5 second timeout)
-            slewStartedEvent.WaitOne(5000); // <-- Use WaitOne(), not Wait()!
+            // Clean up
             slewStartedEvent.Dispose();
         }
 
@@ -1649,14 +1657,13 @@ namespace ASCOM.GS.Sky.Telescope
 
             var raDec = Transforms.CoordTypeToInternal(ra, dec);
 
-            // Create event to wait for slew to actually start (IsSlewing = true)
+            // Create event to signal when slew has started (IsSlewing = true)
             var slewStartedEvent = new ManualResetEvent(false);
 
-            // Start the slew, passing the event handle
+            // Start the slew - SlewMount will wait for IsSlewing to be set
             SkyServer.SlewRaDec(raDec.X, raDec.Y, true, slewStartedEvent);
 
-            // Wait for IsSlewing to be set to true (with 5 second timeout)
-            slewStartedEvent.WaitOne(5000);
+            // Clean up
             slewStartedEvent.Dispose();
         }
 

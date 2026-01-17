@@ -6144,9 +6144,10 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         /// <param name="altitude"></param>
         /// <param name="azimuth"></param>
-        public static void SlewAltAz(double altitude, double azimuth)
+        /// <param name="slewStartedEvent">Optional event to signal when slew has started</param>
+        public static void SlewAltAz(double altitude, double azimuth, ManualResetEvent slewStartedEvent = null)
         {
-            SlewMount(new Vector(azimuth, altitude), SlewType.SlewAltAz);
+            SlewMount(new Vector(azimuth, altitude), SlewType.SlewAltAz, false, true, slewStartedEvent);
         }
 
         /// <summary>
@@ -6202,15 +6203,11 @@ namespace GS.Server.SkyTelescope
             Action goTo = () =>
                 GoToAsync(new[] { targetPosition.X, targetPosition.Y }, slewState, goToStartedEvent, tracking);
             Task goToTask = new Task(goTo);
+            Thread.Sleep(10); // brief pause to allow task to start
 
-            // Start the go to
+            // Start the go to and ALWAYS wait for the started event - IsSlewing will be set
             goToTask.Start();
-
-            // Only wait internally if no external event was provided
-            if (externalSlewStartedEvent == null)
-            {
-                goToStartedEvent.WaitOne(5000); // Timeout for the event to be set
-            }
+            goToStartedEvent.WaitOne(5000); // Timeout for the event to be set
 
             if (!slewAsync) goToTask.Wait();
 
