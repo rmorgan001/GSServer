@@ -1347,9 +1347,8 @@ namespace GS.SkyWatcher
         {
             var ratePad = '0';
 
-            //var irateInSteps = AngleToStep(axis, rateInRadian * 1024);
-            //irateInSteps *= _resolutionFactor[(int)axis];
-            var irateInSteps = AngleToStep(axis, rateInRadian * 1024 * _resolutionFactor[(int)axis]);
+            var irateInSteps = AngleToStep(axis, rateInRadian * 1024);
+            irateInSteps *= _resolutionFactor[(int)axis];
 
             if (rateInRadian < 0) { ratePad = 'F'; } // F for negative numbers
             var szCmd = "02" + irateInSteps.ToString("X").PadLeft(16, ratePad);
@@ -1378,15 +1377,13 @@ namespace GS.SkyWatcher
         internal void AxisSlewTo_Advanced(AxisId axis, double targetInRadian, double rateInRadian = 0)
         {
             var targetPad = '0';
-            //var itargetInSteps = AngleToStep(axis, targetInRadian);
-            //itargetInSteps *= _resolutionFactor[(int)axis];
-            var itargetInSteps = AngleToStep(axis, targetInRadian * _resolutionFactor[(int)axis]);
+            var itargetInSteps = AngleToStep(axis, targetInRadian);
+            itargetInSteps *= _resolutionFactor[(int)axis];
             if (itargetInSteps < 0) { targetPad = 'F'; } // F for negative numbers
 
             var ratePad = '0';
-            //var irateInSteps = AngleToStep(axis, rateInRadian * 1024);
-            //irateInSteps *= _resolutionFactor[(int)axis];
-            var irateInSteps = AngleToStep(axis, rateInRadian * 1024 * _resolutionFactor[(int)axis]);
+            var irateInSteps = AngleToStep(axis, rateInRadian * 1024);
+            irateInSteps *= _resolutionFactor[(int)axis];
             if (irateInSteps < 0) { ratePad = 'F'; } // F for negative numbers
 
             var szCmd = "04" + itargetInSteps.ToString("X").PadLeft(8, targetPad) + irateInSteps.ToString("X").PadLeft(16, ratePad);
