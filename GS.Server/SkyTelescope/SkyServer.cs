@@ -6736,8 +6736,6 @@ namespace GS.Server.SkyTelescope
                     break;
                 case "Latitude":
                     AlignmentModel.SiteLatitude = SkySettings.Latitude;
-                    // Reset latitude based park positions for Polar mode
-                    if (SkySettings.AlignmentMode == AlignmentModes.algPolar) SkySettings.ResetParkPositions();
                     break;
                 case "Longitude":
                     AlignmentModel.SiteLongitude = SkySettings.Longitude;
