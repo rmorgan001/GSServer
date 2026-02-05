@@ -3699,7 +3699,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"Home position,{name}|{_homeAxes.X}|{_homeAxes.Y}"
+                Message = $"Home position,{name}|{_homeAxes.X}|{_homeAxes.Y}|{SkySettings.HomeAxisX}|{SkySettings.HomeAxisY}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -6046,49 +6046,126 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
+        /// Gets both possible axis positions (normal and through-pole) for target coordinates.
+        /// </summary>
+        /// <param name="position">Target axis position</param>
+        /// <returns>
+        /// Tuple containing:
+        ///   normalPosition - axis coordinates for normal orientation (or null if violates limits)
+        ///   throughPolePosition - axis coordinates for through-pole orientation (or null if violates limits)
+        /// </returns>
+        private static (double[] normalPosition, double[] throughPolePosition)
+            GetBothAxisPositionsPolar(double[] position)
+        {
+            double[] pos1 = position;
+            double[] pos2 = Axes.GetAltAxisPosition(position);
+
+            // Range pos2 properly for polar
+            pos2[0] = Range.Range180(pos2[0]);
+
+            // Determine which is which
+            bool pos1IsThroughPole = Axes.DetermineIfThroughPole(pos1[0], pos1[1]);
+
+            double[] normalPos;
+            double[] throughPolePos;
+
+            if (pos1IsThroughPole)
+            {
+                normalPos = pos2;
+                throughPolePos = pos1;
+            }
+            else
+            {
+                normalPos = pos1;
+                throughPolePos = pos2;
+            }
+
+            // Validate against hardware limits
+            bool normalOk = IsTargetWithinLimits(normalPos);
+            bool throughPoleOk = IsTargetWithinLimits(throughPolePos);
+
+            return (
+                normalOk ? normalPos : null,
+                throughPoleOk ? throughPolePos : null
+            );
+        }
+
+        /// <summary>
+        /// Chooses the position nearest to current mount location.
+        /// </summary>
+        /// <param name="currentPosition">Current mount axis position [x, y]</param>
+        /// <param name="option1">First position option (or null if invalid)</param>
+        /// <param name="option2">Second position option (or null if invalid)</param>
+        /// <returns>Nearest valid position, or null if both invalid</returns>
+        private static double[] ChooseNearestAxisPosition(
+            double[] currentPosition,
+            double[] option1,
+            double[] option2)
+        {
+            if (option1 == null && option2 == null) return null;
+            if (option1 == null) return option2;
+            if (option2 == null) return option1;
+
+            // Both valid, choose nearest using existing logic
+            string choice = ChooseClosestPositionPolar(currentPosition, option1, option2);
+            return choice == "a" ? option1 : option2;
+        }
+
+        /// <summary>
         /// Within hardware limits and flip angle get alternate position
         /// </summary>
         /// <param name="position">Ra and Dec position</param>
-        /// <returns>null or alternate position</returns>
+        /// <returns>null or alternate position</returns>0
         private static double[] GetAlternatePositionPolar(double[] position)
         {
-            // Check Forced flip for a goto
+            // Check forced flip for a goto
             var flipGoto = FlipOnNextGoto;
             FlipOnNextGoto = false;
 
-            var alt = Axes.GetAltAxisPosition(position);
-            alt[0] = Range.Range180(alt[0]); // convert to polar position
+            // Get both possible positions using new helper
+            var (normalPos, throughPolePos) = GetBothAxisPositionsPolar(position);
 
-            // Check target and altTarget are within hardware limits
-            var altOk = IsTargetWithinLimits(alt);
-            var posOk = IsTargetWithinLimits(position);
-
-            if (!altOk) return null; // alternate target position not within limits, return null
-            if (posOk && altOk)
+            // If forced flip, choose opposite of nearest
+            if (flipGoto)
             {
-                var cl = ChooseClosestPositionPolar(new[] { ActualAxisX, ActualAxisY }, position, alt);  //choose the closest angle to slew 
-                if (flipGoto) // implement the forced flip for a goto
+                var nearest = ChooseNearestAxisPosition(
+                    new[] { ActualAxisX, ActualAxisY },
+                    normalPos,
+                    throughPolePos);
+
+                // Log the flip
+                var monitorItem = new MonitorEntry
                 {
-                    cl = cl == "a" ? "b" : "a"; //choose the farthest angle to slew which will flip
-                    var monitorItem = new MonitorEntry
-                    {
-                        Datetime = HiResDateTime.UtcNow,
-                        Device = MonitorDevice.Server,
-                        Category = MonitorCategory.Server,
-                        Type = MonitorType.Information,
-                        Method = MethodBase.GetCurrentMethod()?.Name,
-                        Thread = Thread.CurrentThread.ManagedThreadId,
-                        Message = $"flip|{cl}|{ActualAxisX}|{position[0]}|{position[1]}|{alt[0]}|{alt[1]}"
-                    };
-                    MonitorLog.LogToMonitor(monitorItem);
-                }
-                if (cl != "b") { return null; }
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"ForcedFlip|Nearest:{(nearest == normalPos ? "Normal" : "TP")}|Selected:{(nearest == normalPos ? "TP" : "Normal")}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
 
-                return alt;
+                // Return the farther one (opposite of nearest)
+                if (nearest == normalPos && throughPolePos != null) return throughPolePos;
+                if (nearest == throughPolePos && normalPos != null) return normalPos;
+                return null;  // Can't flip if only one valid
             }
-            return alt;
-        }
 
+            // Normal behavior: choose nearest to current position
+            var chosen = ChooseNearestAxisPosition(
+                new[] { ActualAxisX, ActualAxisY },
+                normalPos,
+                throughPolePos);
+
+            // Return alternate only if different from input
+            if (chosen != null && chosen != position)
+            {
+                return chosen;
+            }
+
+            return null;  // No change needed
+        }
         /// <summary>
         /// Calculates if axis position is within the defined flip angle
         /// </summary>
@@ -6535,7 +6612,7 @@ namespace GS.Server.SkyTelescope
             return target;
         }
 
-        private static bool IsTargetWithinLimits(double[] target)
+        internal static bool IsTargetWithinLimits(double[] target)
         {
             const double oneArcSec = 1.0 / 3600;
             var axisUpperLimitY = SkySettings.AxisUpperLimitY;
