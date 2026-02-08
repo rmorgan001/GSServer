@@ -3254,7 +3254,14 @@ namespace GS.Server.SkyTelescope
                     if (parked)
                     {
                         SkyServer.AtPark = false;
-                        SkyServer.Tracking = AlignmentMode != AlignmentModes.algAltAz;
+                        if (SkySettings.TrackAfterUnpark)
+                        {
+                            SkyServer.Tracking = (AlignmentMode != AlignmentModes.algAltAz);
+                        }
+                        else
+                        {
+                            SkyServer.Tracking = false;
+                        }
                     }
                     else
                     {
@@ -6799,6 +6806,17 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        public bool TrackAfterUnpark    
+        {
+            get => SkySettings.TrackAfterUnpark;
+            set
+            {
+                if (value == SkySettings.TrackAfterUnpark) return;
+                SkySettings.TrackAfterUnpark = value;
+                OnPropertyChanged();
+            }
+        }
+
         private ICommand _openCapDialogCmd;
         public ICommand OpenCapDialogCmd
         {
@@ -7293,9 +7311,13 @@ namespace GS.Server.SkyTelescope
                 using (new WaitCursor())
                 {
                     if (ParkSelectionSetting == null) return;
-                    //if (ParkPositions.Count == 1) return;
-                    ParkPositions.Remove(ParkSelectionSetting);
-                    SkySettings.ParkPositions = ParkPositions;
+                    // Create NEW list to avoid modifying cached reference in settings which does not trigger property changed
+                    var newList = new List<ParkPosition>(ParkPositions);
+                    newList.Remove(ParkSelectionSetting);
+                    // Assign new list - setter will correctly convert since all itemns are Axis coords
+                    SkySettings.ParkPositions = newList;
+                    // Update UI
+                    OnPropertyChanged(nameof(ParkPositions));
                     ParkSelectionSetting = ParkPositions.FirstOrDefault();
                     ParkSelection = ParkPositions.FirstOrDefault();
                     IsDialogOpen = false;
@@ -7443,8 +7465,19 @@ namespace GS.Server.SkyTelescope
                 {
                     if (string.IsNullOrEmpty(ParkNewName)) return;
                     var pp = new ParkPosition { Name = ParkNewName.Trim() };
-                    ParkPositions.Add(pp);
-                    SkySettings.ParkPositions = ParkPositions;
+                    if (SkySettings.AlignmentMode == AlignmentModes.algPolar)
+                    {
+                        // Get current position in mount axesand store as park position
+                        var axes = Axes.MountAxis2Mount();
+                        pp.X = axes[0];
+                        pp.Y = axes[1];
+                    }
+                    // Create NEW list to avoid modifying cached reference in settings which does not trigger property changed
+                    var newList = new List<ParkPosition>(ParkPositions);
+                    newList.Add(pp);
+                    // Assign new list - setter will correctly convert since all itemns are Axis coords
+                    ParkPositions = newList;
+                    OnPropertyChanged(nameof(ParkPositions));
                     ParkSelectionSetting = pp;
                     ParkSelection = ParkPositions.FirstOrDefault();
                     IsDialogOpen = false;
@@ -11464,13 +11497,13 @@ namespace GS.Server.SkyTelescope
                         var autoHome = Coordinate.AltAz2HaDec(AutoHomeAxisAlt, AutoHomeAxisAz, SkySettings.Latitude);
                         if (SkyServer.SouthernHemisphere)
                         {
-                            AutoHomeAxisX = Math.Round(180.0 - autoHome[0] * 15.0, 6); // Convert from Hour Angle
-                            AutoHomeAxisY = Math.Round(-1.0 * autoHome[1], 6);
+                            AutoHomeAxisX = Math.Round(180.0 - autoHome[0] * 15.0, 5); // Convert from Hour Angle
+                            AutoHomeAxisY = Math.Round(-1.0 * autoHome[1], 5);
                         }
                         else
                         {
-                            AutoHomeAxisX = Math.Round(autoHome[0] * 15.0, 6); // Convert from Hour Angle
-                            AutoHomeAxisY = Math.Round(autoHome[1], 6); // Round value of AutoHomeAxisY
+                            AutoHomeAxisX = Math.Round(autoHome[0] * 15.0, 5); // Convert from Hour Angle
+                            AutoHomeAxisY = Math.Round(autoHome[1], 5); // Round value of AutoHomeAxisY
                         }
                         break;
                     case AutoHomePositionType.PolarRADec:

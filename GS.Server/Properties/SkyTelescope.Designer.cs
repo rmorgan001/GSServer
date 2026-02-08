@@ -1723,5 +1723,17 @@ namespace GS.Server.Properties {
                 this["AutoHomeAxisY"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool TrackAfterUnpark {
+            get {
+                return ((bool)(this["TrackAfterUnpark"]));
+            }
+            set {
+                this["TrackAfterUnpark"] = value;
+            }
+        }
     }
 }

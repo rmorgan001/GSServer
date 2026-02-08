@@ -1764,10 +1764,17 @@ namespace ASCOM.GS.Sky.Telescope
         {
             CheckCapability(SkySettings.CanUnPark, "UnPark");
             SkyServer.AtPark = false;
-            SkyServer.Tracking = (AlignmentMode != AlignmentModes.algAltAz);
+            if (SkySettings.TrackAfterUnpark)
+            {
+                SkyServer.Tracking = (AlignmentMode != AlignmentModes.algAltAz);
+            }
+            else
+            {
+                SkyServer.Tracking = false;
+            }
 
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Finished" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Finished" };
             MonitorLog.LogToMonitor(monitorItem);
         }
 

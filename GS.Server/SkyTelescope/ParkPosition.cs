@@ -29,7 +29,9 @@ namespace GS.Server.SkyTelescope
                     X = 0; Y = 0;
                     break;
                 case AlignmentModes.algPolar:
-                    X = 0; Y = 0;
+                    var axes = Axes.AzAltToPolarPark(SkyServer.SouthernHemisphere ? 0 : 180, 0);
+                    X = axes[0];
+                    Y = axes[1];
                     break;
                 case AlignmentModes.algGermanPolar:
                     X = 90; Y = 90;

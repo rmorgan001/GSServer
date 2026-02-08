@@ -6,7 +6,11 @@
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10">
                 <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource capCanSetPark}" IsChecked="{Binding CanSetPark, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource capCanSetPark}" />
-             </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10">
+                <ToggleButton Style="{StaticResource MaterialDesignActionLightToggleButton}" HorizontalAlignment="Center" Width="25" Height="25" ToolTip="{StaticResource capTrackAfterUnpark}" IsChecked="{Binding TrackAfterUnpark, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Content="{StaticResource capTrackAfterUnpark}" />
+            </StackPanel>
             <Button Margin="10" IsDefault="True" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding ClickOkCapDialogCmd}" Content="{StaticResource diaOk}" />
         </StackPanel>
     </GroupBox>

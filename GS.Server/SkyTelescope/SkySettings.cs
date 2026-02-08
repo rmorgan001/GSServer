@@ -657,6 +657,20 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static bool _unParkTracking;
+        public static bool TrackAfterUnpark
+        {
+            get => _unParkTracking;
+            set
+            {
+                if (_unParkTracking == value) return;
+                _unParkTracking = value;
+                Properties.SkyTelescope.Default.TrackAfterUnpark = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static FrontGraphic _frontGraphic;
         public static FrontGraphic FrontGraphic
         {
@@ -1519,8 +1533,8 @@ namespace GS.Server.SkyTelescope
                     if (Math.Abs(_parkAxes[0] - value[0]) <= 0.0000000000001 && Math.Abs(_parkAxes[1] - value[1]) <= 0.0000000000001)
                         return;
                     _parkAxes = value;
-                    value[0] = Math.Round(value[0], 6);
-                    value[1] = Math.Round(value[1], 6);
+                    value[0] = Math.Round(value[0], 5);
+                    value[1] = Math.Round(value[1], 5);
                     Properties.SkyTelescope.Default.ParkAxes = JsonConvert.SerializeObject(value);
                     LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value[0]},{value[1]}");
                     OnStaticPropertyChanged();
@@ -2331,6 +2345,7 @@ namespace GS.Server.SkyTelescope
             SyncLimit = Properties.SkyTelescope.Default.SyncLimit;
             SyncLimitOn = Properties.SkyTelescope.Default.SyncLimitOn;
             Temperature = Properties.SkyTelescope.Default.Temperature;
+            TrackAfterUnpark = Properties.SkyTelescope.Default.TrackAfterUnpark;
             AltAzTrackingUpdateInterval = Properties.SkyTelescope.Default.AltAzTrackingUpdateInterval;
             Enum.TryParse<Model3DType>(Properties.SkyTelescope.Default.ModelType, true, out var mtParse);
             Settings.Settings.ModelType = mtParse;
