@@ -820,8 +820,19 @@ namespace GS.Server.Windows
                 {
                     if (string.IsNullOrEmpty(ParkNewName)) return;
                     var pp = new ParkPosition { Name = ParkNewName.Trim() };
-                    ParkPositions.Add(pp);
-                    SkySettings.ParkPositions = ParkPositions;
+                    if (SkySettings.AlignmentMode == AlignmentModes.algPolar)
+                    {
+                        // Get current position in mount axesand store as park position
+                        var axes = Axes.MountAxis2Mount();
+                        pp.X = axes[0];
+                        pp.Y = axes[1];
+                    }
+                    // Create NEW list to avoid modifying cached reference in settings which does not trigger property changed
+                    var newList = new List<ParkPosition>(ParkPositions);
+                    newList.Add(pp);
+                    // Assign new list - setter will correctly convert since all itemns are Axis coords
+                    ParkPositions = newList;
+                    OnPropertyChanged(nameof(ParkPositions));
                     ParkSelectionSetting = pp;
                     ParkSelection = ParkPositions.FirstOrDefault();
                     IsParkAddDialogOpen = false;
@@ -975,9 +986,13 @@ namespace GS.Server.Windows
                 using (new WaitCursor())
                 {
                     if (ParkSelectionSetting == null) return;
-                    //if (ParkPositions.Count == 1) return;
-                    ParkPositions.Remove(ParkSelectionSetting);
-                    SkySettings.ParkPositions = ParkPositions;
+                    // Create NEW list to avoid modifying cached reference in settings which does not trigger property changed
+                    var newList = new List<ParkPosition>(ParkPositions);
+                    newList.Remove(ParkSelectionSetting);
+                    // Assign new list - setter will correctly convert since all itemns are Axis coords
+                    SkySettings.ParkPositions = newList;
+                    // Update UI
+                    OnPropertyChanged(nameof(ParkPositions));
                     ParkSelectionSetting = ParkPositions.FirstOrDefault();
                     ParkSelection = ParkPositions.FirstOrDefault();
                     IsParkDeleteDialogOpen = false;
@@ -1067,7 +1082,14 @@ namespace GS.Server.Windows
                     if (parked)
                     {
                         SkyServer.AtPark = false;
-                        SkyServer.Tracking = true;
+                        if (SkySettings.TrackAfterUnpark)
+                        {
+                            SkyServer.Tracking = (SkySettings.AlignmentMode != AlignmentModes.algAltAz);
+                        }
+                        else
+                        {
+                            SkyServer.Tracking = false;
+                        }
                     }
                     else
                     {

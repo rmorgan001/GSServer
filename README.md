@@ -48,13 +48,13 @@ GS Server is SkyWatcher ASCOM telescope driver for use with astronomy software a
 
 ## Built With
 
-* Visual Studio 2017 Community edition
-* .Net Framework 4.6.1
+* Visual Studio 2022 Community edition
+* .Net Framework 4.8.1
 * DarkSkyApi for weather information https://darksky.net/dev
 * Live Charts and Live Charts Geared - for plotting https://lvcharts.net/
 * Material Design In XAML - https://github.com/MaterialDesignInXAML
 * SharpDX - gamepad support http://sharpdx.org/
-* ASCOM platform 6.4 and developer tools
+* ASCOM platform 7 and developer tools
 * Inno Setup Compiler version 5.5.8 http://www.innosetup.com
 * Microsoft.Xaml.Behaviors.Wpf
 * Newtonsoft.Json

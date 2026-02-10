@@ -431,5 +431,8 @@
     <Setting Name="AutoHomeAxisY" Type="System.Double" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="TrackAfterUnpark" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

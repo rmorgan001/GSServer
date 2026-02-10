@@ -1,4 +1,4 @@
-/* Copyright(C) 2019-2025 Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2025 Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -375,6 +375,185 @@ namespace GS.Server.SkyTelescope
             return new[] { altAz[1], altAz[0] };
         }
 
+        #region Polar Park Position Conversion
+
+        /// <summary>
+        /// Converts current axis position to Az/Alt with sign convention for Polar park storage.
+        /// Normal positions: Az ∈ [0..360)
+        /// ThroughPole positions: Az ∈ [-360..0)
+        /// </summary>
+        /// <param name="axisX">Current RA axis position (degrees)</param>
+        /// <param name="axisY">Current Dec axis position (degrees)</param>
+        /// <returns>double[] { azStorage, altStorage } with sign convention applied</returns>
+        internal static double[] PolarParkToAzAlt(double axisX, double axisY)
+        {
+            // 1. Convert axis to local Az/Alt using existing function
+            double[] azAlt = AxesXyToAzAlt(new[] { axisX, axisY });
+            double azLocal = azAlt[0];
+            double altLocal = azAlt[1];
+
+            // 2. Determine if current position is through-pole
+            bool isThroughPole = DetermineIfThroughPole(axisX, axisY);
+
+            // 3. Adjust for NH storage convention (for SH observatories)
+            double azStorage = azLocal;
+            if (SkySettings.Latitude < 0)
+            {
+                azStorage = Range.Range360(azLocal + 180.0);
+            }
+
+            // 4. Apply sign convention
+            if (isThroughPole)
+            {
+                // Ensure range [-360..0)
+                if (azStorage == 0.0 || azStorage == 360.0)
+                {
+                    azStorage = -360.0;  // Special case: 0° through-pole → -360°
+                }
+                else
+                {
+                    azStorage = -azStorage;  // Negate for through-pole
+                }
+            }
+            // else: azStorage ∈ [0..360) for normal (already in this range)
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Debug,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"AxisToStorage: [{axisX:F2},{axisY:F2}] → Az={azStorage:F2}, Alt={altLocal:F2}, TP={isThroughPole}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            return new[] { azStorage, altLocal };
+        }
+
+        /// <summary>
+        /// Converts stored Az/Alt with sign convention to axis coordinates for Polar park.
+        /// Respects orientation intent from sign: positive = normal, negative = through-pole.
+        /// </summary>
+        /// <param name="azStorage">Stored azimuth with sign (+ = normal, - = through-pole)</param>
+        /// <param name="altStorage">Stored altitude (degrees)</param>
+        /// <returns>double[] { axisX, axisY } in requested orientation</returns>
+        /// <exception cref="InvalidOperationException">If requested position violates hardware limits</exception>
+        internal static double[] AzAltToPolarPark(double azStorage, double altStorage)
+        {
+            // 1. Detect orientation from sign
+            bool requestThroughPole = (azStorage < 0);
+
+            // 2. Get absolute value (NH convention)
+            double azNH = Math.Abs(azStorage);
+
+            // 3. Adjust for local hemisphere (reverse storage convention)
+            double azLocal = azNH;
+            if (SkySettings.Latitude < 0)
+            {
+                azLocal = Range.Range360(azNH + 180.0);
+            }
+
+            // 4. Convert to axis coordinates using existing function
+            //    This will return one of the two possible positions
+            double[] axes = AzAltToAxesXy(new[] { azLocal, altStorage });
+
+            // 5. Check if we got the right orientation
+            bool resultIsThroughPole = DetermineIfThroughPole(axes[0], axes[1]);
+
+            // 6. If orientation doesn't match request, flip to alternate
+            if (requestThroughPole != resultIsThroughPole)
+            {
+                double[] altAxes = GetAltAxisPosition(axes);
+
+                // Validate alternate is within limits
+                if (!SkyServer.IsTargetWithinLimits(altAxes))
+                {
+                    throw new InvalidOperationException(
+                        $"Requested park orientation (ThroughPole={requestThroughPole}) " +
+                        $"exceeds hardware limits at Az={azLocal:F2}°, Alt={altStorage:F2}°");
+                }
+
+                axes = altAxes;
+            }
+
+            // 7. Final validation
+            if (!SkyServer.IsTargetWithinLimits(axes))
+            {
+                throw new InvalidOperationException(
+                    $"Park position exceeds hardware limits at Az={azLocal:F2}°, Alt={altStorage:F2}°");
+            }
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Debug,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"StorageToAxis: Az={azStorage:F2}, Alt={altStorage:F2}, TP={requestThroughPole} → [{axes[0]:F2},{axes[1]:F2}]"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            return axes;
+        }
+
+        /// <summary>
+        /// Determines if given axis coordinates represent a through-pole position.
+        /// </summary>
+        /// <param name="axisX">RA axis position (degrees)</param>
+        /// <param name="axisY">Dec axis position (degrees)</param>
+        /// <returns>True if through-pole orientation, false if normal orientation</returns>
+        internal static bool DetermineIfThroughPole(double axisX, double axisY)
+        {
+            switch (SkySettings.AlignmentMode)
+            {
+                case AlignmentModes.algPolar:
+                    // Polar mount through-pole detection
+                    // This is mount-type and hemisphere specific
+
+                    if (SkyServer.SouthernHemisphere)
+                    {
+                        // Southern Hemisphere logic
+                        // Through-pole when RA axis > 90° (mount pointing "backwards")
+                        return axisX > 90.0;
+                    }
+                    else
+                    {
+                        // Northern Hemisphere logic
+                        // Through-pole indicated by:
+                        // 1. RA axis > 90° (past meridian), OR
+                        // 2. Dec axis in through-pole range
+
+                        if (axisX > 90.0)
+                        {
+                            return true;  // Past meridian, likely through pole
+                        }
+
+                        // Check Dec axis range for through-pole indicators
+                        // Through-pole Dec ranges: [90..180) or [-180..-90)
+                        if ((axisY >= 90.0 && axisY < 180.0) ||
+                            (axisY >= -180.0 && axisY < -90.0))
+                        {
+                            return true;
+                        }
+
+                        return false;  // Normal position
+                    }
+
+                case AlignmentModes.algGermanPolar:
+                    // For German Equatorial Mounts, use side of pier
+                    return SkyServer.SideOfPier == PierSide.pierWest;
+
+                default:
+                    return false;
+            }
+        }
+
+        #endregion
+        
         /// <summary>
         /// Conversion of mount axis positions in degrees to Ra and Dec
         /// </summary>
