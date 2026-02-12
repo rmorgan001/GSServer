@@ -872,6 +872,13 @@ namespace GS.Server.SkyTelescope
             get => _parkSelected;
             set
             {
+                if (value == null)
+                {
+                    _parkSelected = null;
+                    OnStaticPropertyChanged();
+                    return;
+                }
+
                 if (_parkSelected != null)
                 {
                     if (_parkSelected.Name == value.Name && Math.Abs(_parkSelected.X - value.X) < 0 &&
@@ -5943,36 +5950,6 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Calculates which pair of axis positions is closer to a given position
-        /// </summary>
-        /// <param name="position">X axis position</param>
-        /// <param name="a">First pair of positions</param>
-        /// <param name="b">Seconds pair of positions</param>
-        /// <returns>a or b as string</returns>
-        private static string ChooseClosestPosition(double position, IReadOnlyList<double> a, IReadOnlyList<double> b)
-        {
-            var val1 = Math.Abs(a[0] - position);
-            var val2 = Math.Abs(b[0] - position);
-            if (!(Math.Abs(val1 - val2) > 0)) { return "a"; }
-            return val1 < val2 ? "a" : "b";
-        }
-
-        /// <summary>
-        /// Calculates which pair of axis positions is closer to a given position
-        /// </summary>
-        /// <param name="position">X and Y axis positions</param>
-        /// <param name="a">First pair of positions</param>
-        /// <param name="b">Seconds pair of positions</param>
-        /// <returns>a or b as string</returns>
-        private static string ChooseClosestPositionPolar(IReadOnlyList<double> position, IReadOnlyList<double> a, IReadOnlyList<double> b)
-        {
-            var val1 = Math.Max(Math.Abs(a[0] - position[0]), Math.Abs(a[1] - position[1]));
-            var val2 = Math.Max(Math.Abs(b[0] - position[0]), Math.Abs(b[1] - position[1]));
-            if (!(Math.Abs(val1 - val2) > 0)) { return "a"; }
-            return val1 < val2 ? "a" : "b";
-        }
-
-        /// <summary>
         /// Within the meridian limits will check for closest slew
         /// </summary>
         /// <param name="position"></param>
@@ -6007,6 +5984,56 @@ namespace GS.Server.SkyTelescope
 
             if (cl != "b") { return null; }
             return alt;
+        }
+
+        /// <summary>
+        /// Within hardware limits and flip angle get alternate position
+        /// </summary>
+        /// <param name="position">Ra and Dec position</param>
+        /// <returns>null or alternate position</returns>0
+        private static double[] GetAlternatePositionPolar(double[] position)
+        {
+            // Check forced flip for a goto
+            var flipGoto = FlipOnNextGoto;
+            FlipOnNextGoto = false;
+
+            // Get both possible positions using new helper
+            var (normalPos, throughPolePos) = GetBothAxisPositionsPolar(position);
+            var nearest = ChooseNearestAxisPosition(
+                new[] { ActualAxisX, ActualAxisY },
+                normalPos,
+                throughPolePos);
+
+            // If forced flip, choose opposite of nearest
+            if (flipGoto)
+            {
+                // Log the flip
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"ForcedFlip|Nearest:{(nearest == normalPos ? "Normal" : "TP")}|Selected:{(nearest == normalPos ? "TP" : "Normal")}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                // Return the farther one (opposite of nearest)
+                if (nearest == normalPos && throughPolePos != null) return throughPolePos;
+                if (nearest == throughPolePos && normalPos != null) return normalPos;
+                return null;  // Can't flip if only one valid
+            }
+
+            // Normal behavior: choose nearest to current position
+            // Return alternate only if different from input
+            if (nearest != null && nearest != position)
+            {
+                return nearest;
+            }
+
+            return null;  // No change needed
         }
 
         /// <summary>
@@ -6046,6 +6073,36 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
+        /// Calculates which pair of axis positions is closer to a given position
+        /// </summary>
+        /// <param name="position">X axis position</param>
+        /// <param name="a">First pair of positions</param>
+        /// <param name="b">Seconds pair of positions</param>
+        /// <returns>a or b as string</returns>
+        private static string ChooseClosestPosition(double position, IReadOnlyList<double> a, IReadOnlyList<double> b)
+        {
+            var val1 = Math.Abs(a[0] - position);
+            var val2 = Math.Abs(b[0] - position);
+            if (!(Math.Abs(val1 - val2) > 0)) { return "a"; }
+            return val1 < val2 ? "a" : "b";
+        }
+
+        /// <summary>
+        /// Calculates which pair of axis positions is closer to a given position
+        /// </summary>
+        /// <param name="position">X and Y axis positions</param>
+        /// <param name="a">First pair of positions</param>
+        /// <param name="b">Seconds pair of positions</param>
+        /// <returns>a or b as string</returns>
+        private static string ChooseClosestPositionPolar(IReadOnlyList<double> position, IReadOnlyList<double> a, IReadOnlyList<double> b)
+        {
+            var val1 = Math.Max(Math.Abs(a[0] - position[0]), Math.Abs(a[1] - position[1]));
+            var val2 = Math.Max(Math.Abs(b[0] - position[0]), Math.Abs(b[1] - position[1]));
+            if (!(Math.Abs(val1 - val2) > 0)) { return "a"; }
+            return val1 < val2 ? "a" : "b";
+        }
+
+        /// <summary>
         /// Gets both possible axis positions (normal and through-pole) for target coordinates.
         /// </summary>
         /// <param name="position">Target axis position</param>
@@ -6054,8 +6111,7 @@ namespace GS.Server.SkyTelescope
         ///   normalPosition - axis coordinates for normal orientation (or null if violates limits)
         ///   throughPolePosition - axis coordinates for through-pole orientation (or null if violates limits)
         /// </returns>
-        private static (double[] normalPosition, double[] throughPolePosition)
-            GetBothAxisPositionsPolar(double[] position)
+        private static (double[] normalPosition, double[] throughPolePosition) GetBothAxisPositionsPolar(double[] position)
         {
             double[] pos1 = position;
             double[] pos2 = Axes.GetAltAxisPosition(position);
@@ -6111,61 +6167,6 @@ namespace GS.Server.SkyTelescope
             return choice == "a" ? option1 : option2;
         }
 
-        /// <summary>
-        /// Within hardware limits and flip angle get alternate position
-        /// </summary>
-        /// <param name="position">Ra and Dec position</param>
-        /// <returns>null or alternate position</returns>0
-        private static double[] GetAlternatePositionPolar(double[] position)
-        {
-            // Check forced flip for a goto
-            var flipGoto = FlipOnNextGoto;
-            FlipOnNextGoto = false;
-
-            // Get both possible positions using new helper
-            var (normalPos, throughPolePos) = GetBothAxisPositionsPolar(position);
-
-            // If forced flip, choose opposite of nearest
-            if (flipGoto)
-            {
-                var nearest = ChooseNearestAxisPosition(
-                    new[] { ActualAxisX, ActualAxisY },
-                    normalPos,
-                    throughPolePos);
-
-                // Log the flip
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
-                    Category = MonitorCategory.Server,
-                    Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"ForcedFlip|Nearest:{(nearest == normalPos ? "Normal" : "TP")}|Selected:{(nearest == normalPos ? "TP" : "Normal")}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
-                // Return the farther one (opposite of nearest)
-                if (nearest == normalPos && throughPolePos != null) return throughPolePos;
-                if (nearest == throughPolePos && normalPos != null) return normalPos;
-                return null;  // Can't flip if only one valid
-            }
-
-            // Normal behavior: choose nearest to current position
-            var chosen = ChooseNearestAxisPosition(
-                new[] { ActualAxisX, ActualAxisY },
-                normalPos,
-                throughPolePos);
-
-            // Return alternate only if different from input
-            if (chosen != null && chosen != position)
-            {
-                return chosen;
-            }
-
-            return null;  // No change needed
-        }
         /// <summary>
         /// Calculates if axis position is within the defined flip angle
         /// </summary>

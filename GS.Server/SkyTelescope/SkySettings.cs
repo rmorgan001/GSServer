@@ -29,7 +29,6 @@ using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Xml.Linq;
 
 namespace GS.Server.SkyTelescope
 {
@@ -1551,9 +1550,9 @@ namespace GS.Server.SkyTelescope
                 // Round and serialize Az/Alt with sign to user.config
                 var azAltArray = new[]
                 {
-            Math.Round(azAlt[0], 6),  // May be negative for through-pole
-            Math.Round(azAlt[1], 6)
-        };
+                    Math.Round(azAlt[0], 5),  // May be negative for through-pole
+                    Math.Round(azAlt[1], 5)
+                };
                 Properties.SkyTelescope.Default.ParkAxes = JsonConvert.SerializeObject(azAltArray);
 
                 // Cache axis coordinates in memory
@@ -2033,9 +2032,8 @@ namespace GS.Server.SkyTelescope
                 {
                     try
                     {
-                        // NEW: Use park-specific conversion that respects sign convention
+                        // Use park-specific conversion that respects sign convention
                         double[] axes = Axes.AzAltToPolarPark(stored.X, stored.Y);
-
                         axisPositions.Add(new ParkPosition
                         {
                             Name = stored.Name,
@@ -2082,7 +2080,7 @@ namespace GS.Server.SkyTelescope
                 var azAltPositions = new List<ParkPosition>();
                 foreach (var axisPos in value)
                 {
-                    // NEW: Use park-specific conversion that applies sign convention
+                    // Use park-specific conversion that applies sign convention
                     double[] azAlt = Axes.PolarParkToAzAlt(axisPos.X, axisPos.Y);
 
                     azAltPositions.Add(new ParkPosition
@@ -2451,20 +2449,47 @@ namespace GS.Server.SkyTelescope
                                         Convert.ChangeType(settingsProperty.DefaultValue, settingsProperty.PropertyType);
                                 }
                             }
-                            // Force write of setting to user.config
-                            Properties.SkyTelescope.Default.PropertyValues[name].IsDirty = true;
+                        // Force write of setting to user.config
+                        Properties.SkyTelescope.Default.PropertyValues[name].IsDirty = true;
                         }
-                        Properties.SkyTelescope.Default.Version = currentVersion;
-                        Properties.SkyTelescope.Default.PropertyValues["Version"].IsDirty = true;
-                        if (isAlphaProfile && mountType == "algPolar")
+                    Properties.SkyTelescope.Default.Version = currentVersion;
+                    Properties.SkyTelescope.Default.PropertyValues["Version"].IsDirty = true;
+                        if (mountType == "algPolar")
                         {
-                            // Fix up alpha profile settings: ParkPositions, AtPark, ParkName
-                            // Initialize from Polar.settings directly (no latitude transformation)
-                            Properties.SkyTelescope.Default.ParkPositions = Properties.Profiles.Polar.Default.ParkPositions;
-                            Properties.SkyTelescope.Default.AtPark = false;
-                            Properties.SkyTelescope.Default.ParkName = "Default";
+                            if (isAlphaProfile)
+                            {
+                                // Fix up alpha profile settings: ParkPositions, AtPark, ParkName
+                                // Initialize from Polar.settings directly (no latitude transformation)
+                                Properties.SkyTelescope.Default.ParkPositions = Properties.Profiles.Polar.Default.ParkPositions;
+                                Properties.SkyTelescope.Default.AtPark = false;
+                                Properties.SkyTelescope.Default.ParkName = "Default";
+                            }
+                            else if (earlierVersion <= new Version("1.2.1.2"))
+                            {
+                                // Migrate ParkPositions for Polar mode from earlier version that was stored in App coordinates
+                                // Polar mode: Convert axis coordinates to Az/Alt with sign convention
+                                var storedRaDec = JsonConvert.DeserializeObject<List<ParkPosition>>(Properties.SkyTelescope.Default.ParkPositions);
+                                var axisPositions = new List<ParkPosition>();
+                                SkySettings.Latitude = Properties.SkyTelescope.Default.Latitude;
+                                SkySettings.AlignmentMode = AlignmentModes.algPolar;
+                                foreach (var stored in storedRaDec)
+                                {
+                                    // Use park-specific conversion that respects sign convention
+                                    double[] axes = Axes.PolarParkToAzAlt(stored.X, stored.Y);
+                                    axisPositions.Add(new ParkPosition
+                                    {
+                                        Name = stored.Name,
+                                        X = Math.Round(axes[0], 5),
+                                        Y = Math.Round(axes[1], 5)
+                                    });
+                                }
+                                Properties.SkyTelescope.Default.ParkPositions = JsonConvert.SerializeObject(axisPositions);
+                                var storedParkAxes = JsonConvert.DeserializeObject<double []>(Properties.SkyTelescope.Default.ParkAxes);
+                                storedParkAxes = Axes.PolarParkToAzAlt(storedParkAxes[0], storedParkAxes[1]);
+                                Properties.SkyTelescope.Default.ParkAxes = JsonConvert.SerializeObject(storedParkAxes);
+                            }
                         }
-                        Properties.SkyTelescope.Default.Save();
+                    Properties.SkyTelescope.Default.Save();
                     }
                     Properties.SkyTelescope.Default.SettingsKey = Properties.Profile.Default.Current;
                 }
