@@ -6167,6 +6167,8 @@ namespace GS.Server.SkyTelescope
             return choice == "a" ? option1 : option2;
         }
 
+            return null;  // No change needed
+        }
         /// <summary>
         /// Calculates if axis position is within the defined flip angle
         /// </summary>
