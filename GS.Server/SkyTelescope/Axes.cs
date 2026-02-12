@@ -387,13 +387,13 @@ namespace GS.Server.SkyTelescope
         /// <returns>double[] { azStorage, altStorage } with sign convention applied</returns>
         internal static double[] PolarParkToAzAlt(double axisX, double axisY)
         {
-            // 1. Convert axis to local Az/Alt using existing function
+            // Convert app axes to Az/Alt
             double[] azAlt = AxesXyToAzAlt(new[] { axisX, axisY });
             double azLocal = azAlt[0];
             double altLocal = azAlt[1];
 
-            // 2. Determine if current position is through-pole
-            bool isThroughPole = DetermineIfThroughPole(axisX, axisY);
+            // Determine if current position is through-pole
+            bool isThroughPole = Math.Abs(axisY) > 90.0;
 
             // 3. Adjust for NH storage convention (for SH observatories)
             double azStorage = azLocal;
@@ -442,47 +442,33 @@ namespace GS.Server.SkyTelescope
         /// <exception cref="InvalidOperationException">If requested position violates hardware limits</exception>
         internal static double[] AzAltToPolarPark(double azStorage, double altStorage)
         {
-            // 1. Detect orientation from sign
-            bool requestThroughPole = (azStorage < 0);
+            double[] axes = new double[2];
+            // Detect orientation from sign
+            bool isThroughPole = azStorage < 0;
 
-            // 2. Get absolute value (NH convention)
-            double azNH = Math.Abs(azStorage);
+            // Get absolute value (Northern Hemisphere convention)
+            double az = Math.Abs(azStorage);
+            double alt = altStorage;
 
-            // 3. Adjust for local hemisphere (reverse storage convention)
-            double azLocal = azNH;
-            if (SkySettings.Latitude < 0)
+            // Adjust for local hemisphere (reverse storage convention)
+            if (SkySettings.Latitude < 0) az = Range.Range360(az + 180.0);
+
+            // Convert to axis coordinates
+            axes = Coordinate.AltAz2HaDec(alt, az, SkySettings.Latitude);
+
+            // Convert hours to degrees
+            axes[0] = Range.Range360(15.0 * axes[0]);
+            if (SkyServer.SouthernHemisphere) axes[1] = -axes[1];
+            // Axes[0] is in range [-180,,180], Axes[1] is in range [-90..90] or [-180..-90] U [90..180]
+            axes[0] = Range.Range180(axes[0]);
+            axes[1] = Range.Range270(axes[1]);
+
+            if (isThroughPole) // adjust axes to be through the pole
             {
-                azLocal = Range.Range360(azNH + 180.0);
-            }
-
-            // 4. Convert to axis coordinates using existing function
-            //    This will return one of the two possible positions
-            double[] axes = AzAltToAxesXy(new[] { azLocal, altStorage });
-
-            // 5. Check if we got the right orientation
-            bool resultIsThroughPole = DetermineIfThroughPole(axes[0], axes[1]);
-
-            // 6. If orientation doesn't match request, flip to alternate
-            if (requestThroughPole != resultIsThroughPole)
-            {
-                double[] altAxes = GetAltAxisPosition(axes);
-
-                // Validate alternate is within limits
-                if (!SkyServer.IsTargetWithinLimits(altAxes))
-                {
-                    throw new InvalidOperationException(
-                        $"Requested park orientation (ThroughPole={requestThroughPole}) " +
-                        $"exceeds hardware limits at Az={azLocal:F2}°, Alt={altStorage:F2}°");
-                }
-
-                axes = altAxes;
-            }
-
-            // 7. Final validation
-            if (!SkyServer.IsTargetWithinLimits(axes))
-            {
-                throw new InvalidOperationException(
-                    $"Park position exceeds hardware limits at Az={azLocal:F2}°, Alt={altStorage:F2}°");
+                axes[0] += 180;
+                axes[1] = 180 - axes[1];
+                axes[0] = Range.Range180(axes[0]);
+                axes[1] = Range.Range270(axes[1]);
             }
 
             var monitorItem = new MonitorEntry
@@ -493,10 +479,9 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Debug,
                 Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"StorageToAxis: Az={azStorage:F2}, Alt={altStorage:F2}, TP={requestThroughPole} → [{axes[0]:F2},{axes[1]:F2}]"
+                Message = $"StorageToAxis: Az={azStorage:F2}, Alt={altStorage:F2}, TP={isThroughPole} → Mount[{axes[0]:F2},{axes[1]:F2}]"
             };
             MonitorLog.LogToMonitor(monitorItem);
-
             return axes;
         }
 
