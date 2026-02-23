@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019-2025 Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2026 Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -21,6 +21,7 @@ using GS.Shared;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
 using System.IO.Ports;
@@ -1995,55 +1996,64 @@ namespace GS.Server.SkyTelescope
         //    }
         // }
 
-        private static List<ParkPosition> _parkPositions;
+        private static ObservableCollection<ParkPosition> _parkPositions;
         /// <summary>
         /// Park positions in mount axes values
         /// Polar mode: Stored as Az/Alt (NH convention) in user.config, converted to/from axis coordinates
         /// AltAz and German Polar modes: Stored directly as axis coordinates
         /// </summary>
-        public static List<ParkPosition> ParkPositions
+        public static ObservableCollection<ParkPosition> ParkPositions
         {
             get
             {
-                // AltAz and German Polar: Return cached axis coordinates directly
-                if (AlignmentMode != AlignmentModes.algPolar)
+                if (_parkPositions == null || _parkPositions.Count == 0)
                 {
-                    return _parkPositions;
+                    var isNull = _parkPositions == null;
+                    var count = _parkPositions?.Count ?? -1;
+                    LogSetting("ParkPositions.Getter", $"Triggering LoadParkPositions - _parkPositions==null: {isNull}, Count: {count}");
+                    LoadParkPositions();
                 }
+                return _parkPositions;
+            }
 
-                // Polar mode: Return cached axis coordinates if available
-                if (_parkPositions != null && _parkPositions.Count > 0)
-                {
-                    return _parkPositions;
-                }
+            set
+            {
+                _parkPositions = value;
+                SaveParkPositions(value.ToList());
+                OnStaticPropertyChanged();
+            }
+        }
 
-                // Load from storage
-                var storedAzAlt = JsonConvert.DeserializeObject<List<ParkPosition>>(
-                    Properties.SkyTelescope.Default.ParkPositions);
+        private static void LoadParkPositions()
+        {
+            var storedJson = Properties.SkyTelescope.Default.ParkPositions;
+            var storedList = JsonConvert.DeserializeObject<List<ParkPosition>>(storedJson);
 
-                if (storedAzAlt == null || storedAzAlt.Count == 0)
-                {
-                    return new List<ParkPosition>();
-                }
+            if (storedList == null || storedList.Count == 0)
+            {
+                _parkPositions = new ObservableCollection<ParkPosition>();
+                return;
+            }
 
-                // Convert stored Az/Alt to axis coordinates using new park-specific function
-                var axisPositions = new List<ParkPosition>();
-                foreach (var stored in storedAzAlt)
+            // Convert from storage format if in Polar mode
+            List<ParkPosition> axisPositions;
+            if (AlignmentMode == AlignmentModes.algPolar)
+            {
+                axisPositions = new List<ParkPosition>();
+                foreach (var storedItem in storedList)
                 {
                     try
                     {
-                        // Use park-specific conversion that respects sign convention
-                        double[] axes = Axes.AzAltToPolarPark(stored.X, stored.Y);
+                        double[] axes = Axes.AzAltToPolarPark(storedItem.X, storedItem.Y);
                         axisPositions.Add(new ParkPosition
                         {
-                            Name = stored.Name,
+                            Name = storedItem.Name,
                             X = axes[0],
                             Y = axes[1]
                         });
                     }
                     catch (InvalidOperationException ex)
                     {
-                        // Log invalid park position and skip it
                         var monitorItem = new MonitorEntry
                         {
                             Datetime = HiResDateTime.UtcNow,
@@ -2052,56 +2062,53 @@ namespace GS.Server.SkyTelescope
                             Type = MonitorType.Warning,
                             Method = MethodBase.GetCurrentMethod()?.Name,
                             Thread = Thread.CurrentThread.ManagedThreadId,
-                            Message = $"Invalid park position: {stored.Name} - {ex.Message}"
+                            Message = $"Invalid park position: {storedItem.Name} - {ex.Message}"
                         };
                         MonitorLog.LogToMonitor(monitorItem);
                     }
                 }
-
-                // Cache axis coordinates for performance
-                _parkPositions = axisPositions;
-                return _parkPositions;
+            }
+            else
+            {
+                axisPositions = storedList;
             }
 
-            set
+            _parkPositions = new ObservableCollection<ParkPosition>(
+                axisPositions.OrderBy(p => p.Name));
+        }
+
+        public static void SaveParkPositions(List<ParkPosition> positions)
+        {
+            if (positions == null)
             {
-                // AltAz and German Polar: Store axis coordinates directly
-                if (AlignmentMode != AlignmentModes.algPolar)
-                {
-                    _parkPositions = value.OrderBy(parkPosition => parkPosition.Name).ToList();
-                    var output = JsonConvert.SerializeObject(_parkPositions);
-                    Properties.SkyTelescope.Default.ParkPositions = output;
-                    LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{output}");
-                    OnStaticPropertyChanged();
-                    return;
-                }
+                positions = new List<ParkPosition>();
+            }
 
-                // Polar mode: Convert axis coordinates to Az/Alt with sign convention
-                var azAltPositions = new List<ParkPosition>();
-                foreach (var axisPos in value)
+            // Convert to storage format if in Polar mode
+            List<ParkPosition> toStore;
+            if (AlignmentMode == AlignmentModes.algPolar)
+            {
+                toStore = new List<ParkPosition>();
+                foreach (var axisPos in positions)
                 {
-                    // Use park-specific conversion that applies sign convention
                     double[] azAlt = Axes.PolarParkToAzAlt(axisPos.X, axisPos.Y);
-
-                    azAltPositions.Add(new ParkPosition
+                    toStore.Add(new ParkPosition
                     {
                         Name = axisPos.Name,
-                        X = Math.Round(azAlt[0], 6),  // May be negative for through-pole
+                        X = Math.Round(azAlt[0], 6),
                         Y = Math.Round(azAlt[1], 6)
                     });
                 }
-
-                // Serialize Az/Alt to user.config
-                var orderedList = azAltPositions.OrderBy(parkPosition => parkPosition.Name).ToList();
-                var azAltOutput = JsonConvert.SerializeObject(orderedList);
-                Properties.SkyTelescope.Default.ParkPositions = azAltOutput;
-
-                // Cache axis coordinates in memory for performance
-                _parkPositions = value.OrderBy(parkPosition => parkPosition.Name).ToList();
-
-                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{azAltOutput}");
-                OnStaticPropertyChanged();
             }
+            else
+            {
+                toStore = positions;
+            }
+
+            var orderedList = toStore.OrderBy(p => p.Name).ToList();
+            var output = JsonConvert.SerializeObject(orderedList);
+            Properties.SkyTelescope.Default.ParkPositions = output;
+            LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{output}");
         }
 
         private static string _parkName;
@@ -2353,20 +2360,11 @@ namespace GS.Server.SkyTelescope
             HomeAxisY = Properties.SkyTelescope.Default.HomeAxisY;
             AutoHomeAxisX = Properties.SkyTelescope.Default.AutoHomeAxisX;
             AutoHomeAxisY = Properties.SkyTelescope.Default.AutoHomeAxisY;
-            // ParkPositions = JsonConvert.DeserializeObject<List<ParkPosition>>(Properties.SkyTelescope.Default.ParkPositions);
+
+            _parkPositions = null;  // Clear cache - getter will load and convert on next access
+
             if (AlignmentMode == AlignmentModes.algPolar)
             {
-                // _parkPositions = JsonConvert.DeserializeObject<List<ParkPosition>>(Properties.SkyTelescope.Default.ParkPositions);
-                _parkPositions = null;  // Clear cache - getter will load and convert on next access
-            }
-            else
-            {
-                ParkPositions = JsonConvert.DeserializeObject<List<ParkPosition>>(Properties.SkyTelescope.Default.ParkPositions);
-            }
-            // ParkAxes = JsonConvert.DeserializeObject<double[]>(Properties.SkyTelescope.Default.ParkAxes);
-            if (AlignmentMode == AlignmentModes.algPolar)
-            {
-                // _parkAxes = JsonConvert.DeserializeObject<double[]>(Properties.SkyTelescope.Default.ParkAxes);
                 _parkAxes = new[] { double.NaN, double.NaN };  // Clear cache - getter will load and convert on next access
             }
             else

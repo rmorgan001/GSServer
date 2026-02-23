@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019-2025 Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2026 Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -19,6 +19,7 @@ using GS.Shared;
 using GS.SkyWatcher;
 using GS.Simulator;
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -755,7 +756,7 @@ namespace GS.SkyApi
                 throw new Exception("Parked");
             }
 
-            var found = SkySettings.ParkPositions.Find(x => x.Name == SkyServer.ParkSelected.Name);
+            var found = SkySettings.ParkPositions.FirstOrDefault(x => x.Name == SkyServer.ParkSelected.Name);
             if (found != null)
             {
                 SkyServer.GoToPark();
@@ -778,7 +779,7 @@ namespace GS.SkyApi
                 if (IsMountRunning == false) { return; }
 
                 if (string.IsNullOrEmpty(value)) return;
-                var found = SkySettings.ParkPositions.Find(x => x.Name == value);
+                var found = SkySettings.ParkPositions.FirstOrDefault(x => x.Name == value);
                 if (found != null)
                 {
                     SkyServer.ParkSelected = found;

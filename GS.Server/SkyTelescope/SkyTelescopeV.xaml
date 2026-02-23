@@ -11,6 +11,7 @@
              xmlns:controls="clr-namespace:GS.Server.Controls"
              xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}">
     <b:Interaction.Triggers>
@@ -28,6 +29,11 @@
         <domain:BoolToVisClapConverter x:Key="BoolToVisClap"/>
         <BooleanToVisibilityConverter  x:Key="BoolToVis" />
         <domain1:EnumValueToDescriptionConverter x:Key="EnumToDesc" />
+        <CollectionViewSource x:Key="SortedParkPositions" Source="{Binding ParkPositions}">
+            <CollectionViewSource.SortDescriptions>
+                <componentModel:SortDescription PropertyName="Name" Direction="Ascending"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
     </UserControl.Resources>
     <md:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}" CloseOnClickAway="True"  >
         <Grid MinWidth="800">
@@ -448,14 +454,10 @@
                                         Background="{StaticResource MaterialDesignToolBarBackground}">
                                 <StackPanel Orientation="Horizontal" >
                                     <ComboBox md:HintAssist.Hint="{StaticResource btnTipParkPos}" Margin="15,0,0,0" ToolTip="{StaticResource btnTipParkPos}" Width="125"
-                                              ItemsSource="{Binding ParkPositions}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEditable="False">
-                                        <ComboBox.SelectedItem>
-                                            <Binding Path="ParkSelectionSetting" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
-                                                <Binding.ValidationRules>
-                                                    <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
-                                                </Binding.ValidationRules>
-                                            </Binding>
-                                        </ComboBox.SelectedItem>
+                                              ItemsSource="{Binding Source={StaticResource SortedParkPositions}}"
+                                              SelectedItem="{Binding ParkSelectionSetting, Mode=TwoWay}"
+                                              IsSynchronizedWithCurrentItem="True"
+                                              Style="{StaticResource MaterialDesignFloatingHintComboBox}" IsEditable="False">
                                         <ComboBox.ItemTemplate>
                                             <DataTemplate DataType="skyTelescope:ParkPosition">
                                                 <TextBlock Text="{Binding Name}"/>
