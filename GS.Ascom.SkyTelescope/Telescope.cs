@@ -1340,7 +1340,7 @@ namespace ASCOM.GS.Sky.Telescope
             if (InterfaceVersion >= 4) return;
             while (SkyServer.SlewState == SlewType.SlewHome || SkyServer.SlewState == SlewType.SlewSettle)
             {
-                Thread.Sleep(1);
+                Thread.Sleep(10);
                 DoEvents();
             }
         }
@@ -1507,7 +1507,7 @@ namespace ASCOM.GS.Sky.Telescope
             Thread.Sleep(250); // Wait for asynchronous slewing to start
             while (SkyServer.SlewState == SlewType.SlewAltAz || SkyServer.SlewState == SlewType.SlewSettle)
             {
-                Thread.Sleep(1);
+                Thread.Sleep(10);
                 DoEvents();
             }
             DelayInterval();
@@ -1561,7 +1561,7 @@ namespace ASCOM.GS.Sky.Telescope
             Thread.Sleep(250); // Wait for asynchronous slewing to start
             while (SkyServer.SlewState == SlewType.SlewRaDec || SkyServer.SlewState == SlewType.SlewSettle)
             {
-                Thread.Sleep(1);
+                Thread.Sleep(10);
                 DoEvents();
             }
             DelayInterval();
@@ -1630,7 +1630,7 @@ namespace ASCOM.GS.Sky.Telescope
             Thread.Sleep(250); // Wait for asynchronous slewing to start
             while (SkyServer.SlewState == SlewType.SlewRaDec || SkyServer.SlewState == SlewType.SlewSettle)
             {
-                Thread.Sleep(1);
+                Thread.Sleep(10);
                 DoEvents();
             }
             DelayInterval();
