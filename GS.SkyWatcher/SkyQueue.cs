@@ -283,6 +283,7 @@ namespace GS.SkyWatcher
         {
             // Check once if diagnostic logging is enabled to avoid overhead
             var diagnosticsEnabled = MonitorLog.InTypes(MonitorType.Debug);
+            var commandTypesToLog = new string[] {"SkyAxisPulse"};
 
             // Always capture basic metrics for Warning/Information detection (minimal overhead)
             var dequeuedAt = HiResDateTime.UtcNow;
@@ -295,6 +296,17 @@ namespace GS.SkyWatcher
             if (diagnosticsEnabled)
             {
                 commandType = command.GetType().Name;
+                // Check if command type should be logged
+                bool shouldLog = false;
+                for (int i = 0; i < commandTypesToLog.Length; i++)
+                {
+                    if (commandType == commandTypesToLog[i])
+                    {
+                        shouldLog = true;
+                        break;
+                    }
+                }
+                if (!shouldLog) diagnosticsEnabled = false;
             }
 
             try

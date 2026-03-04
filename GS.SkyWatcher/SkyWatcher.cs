@@ -273,11 +273,11 @@ namespace GS.SkyWatcher
             {
                 var datetime = HiResDateTime.UtcNow;
                 var monitorItem = new MonitorEntry // setup to log the pulse
-                { Datetime = datetime, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MonitorLog.GetCurrentMethod(), Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{guideRate}|{duration}|{backlashSteps}|{MinPulseDurationRa}|{MinPulseDurationDec}|{DecPulseGoTo}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MonitorLog.GetCurrentMethod()+"_Enter", Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{guideRate}|{duration}|{backlashSteps}|{MinPulseDurationRa}|{MinPulseDurationDec}|{DecPulseGoTo}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 var pulseEntry = new PulseEntry // setup to graph the pulse
-                { Axis = (int)axis, Duration = duration, Rate = guideRate, Rejected = false, StartTime = datetime, };
+                { Axis = (int)axis, Duration = duration, Rate = guideRate, Rejected = false, StartTime = HiResDateTime.UtcNow, };
 
                 backlashSteps = Math.Abs(backlashSteps);
                 var arcSecs = duration / 1000.0 * Math.Abs(guideRate) * 3600.0;
@@ -525,11 +525,11 @@ namespace GS.SkyWatcher
                                         token.ThrowIfCancellationRequested();
 
                                         // Check if it's time to update steps
-                                        if (sw3.Elapsed.TotalMilliseconds >= nextUpdateTime)
-                                        {
-                                            UpdateSteps();
-                                            nextUpdateTime += 200.0; // Schedule next update
-                                        }
+                                        //if (sw3.Elapsed.TotalMilliseconds >= nextUpdateTime)
+                                        //{
+                                            //UpdateSteps();
+                                            //nextUpdateTime += 200.0; // Schedule next update
+                                        //}
 
                                         // Sleep for 10ms to yield CPU - maintains good timing precision
                                         Thread.Sleep(10);
@@ -562,6 +562,11 @@ namespace GS.SkyWatcher
                     SkyQueue.IsPulseGuidingDec = false;
                         throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
                 }
+
+                var executionTime = HiResDateTime.UtcNow - datetime;
+                monitorItem = new MonitorEntry // setup to log pulse completion
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MonitorLog.GetCurrentMethod()+"_Exit ", Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{executionTime.TotalMilliseconds:F1}|{axis}|{guideRate}|{duration}|{backlashSteps}|{MinPulseDurationRa}|{MinPulseDurationDec}|{DecPulseGoTo}" };
+                MonitorLog.LogToMonitor(monitorItem);
 
                 if (!MonitorPulse) return;
                 pulseEntry.Duration = duration;
