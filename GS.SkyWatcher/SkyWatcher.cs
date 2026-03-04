@@ -354,11 +354,22 @@ namespace GS.SkyWatcher
                             if (raSpan > 0 && raSpan < duration) // checking duration is met
                             {
                                 var sw1 = Stopwatch.StartNew();
+                                var nextUpdateTime = 200.0; // Next time to call UpdateSteps in milliseconds
+
                                 while (sw1.Elapsed.TotalMilliseconds < raSpan)
                                 {
                                     // check for cancellation
                                     token.ThrowIfCancellationRequested();
-                                    if (sw1.ElapsedMilliseconds % 200 == 0) { UpdateSteps(); } // Process positions while waiting
+
+                                    // Check if it's time to update steps
+                                    //if (sw1.Elapsed.TotalMilliseconds >= nextUpdateTime)
+                                    //{
+                                        //UpdateSteps();
+                                    //    nextUpdateTime += 200.0; // Schedule next update
+                                    //}
+
+                                    // Sleep for 10ms to yield CPU - maintains good timing precision
+                                    Thread.Sleep(10);
                                 }
                             }
                         }
@@ -506,11 +517,22 @@ namespace GS.SkyWatcher
                                 if (decSpan > 0 && decSpan < duration) // checking duration is met
                                 {
                                     var sw3 = Stopwatch.StartNew();
+                                    var nextUpdateTime = 200.0; // Next time to call UpdateSteps in milliseconds
+
                                     while (sw3.Elapsed.TotalMilliseconds < decSpan)
                                     {
                                         // check for cancellation
                                         token.ThrowIfCancellationRequested();
-                                        if (sw3.ElapsedMilliseconds % 200 == 0) { UpdateSteps(); } // Process positions while waiting
+
+                                        // Check if it's time to update steps
+                                        if (sw3.Elapsed.TotalMilliseconds >= nextUpdateTime)
+                                        {
+                                            UpdateSteps();
+                                            nextUpdateTime += 200.0; // Schedule next update
+                                        }
+
+                                        // Sleep for 10ms to yield CPU - maintains good timing precision
+                                        Thread.Sleep(10);
                                     }
                                 }
                             }
