@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019-2025 Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2026 Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -271,7 +271,6 @@ namespace GS.Simulator
             var queueDepth = _commandBlockingCollection.Count;
 
             // Only capture detailed data if diagnostics enabled
-            DateTime executionStart = default;
             string commandType = null;
 
             if (diagnosticsEnabled)
@@ -293,7 +292,7 @@ namespace GS.Simulator
                 }
                 else
                 {
-                    executionStart = HiResDateTime.UtcNow;
+                    var executionStart = HiResDateTime.UtcNow;
 
                     command.Execute(_actions);
 

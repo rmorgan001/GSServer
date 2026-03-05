@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019-2025 Rob  Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2026 Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -205,7 +205,7 @@ namespace GS.SkyWatcher
                 }
 
                 var speedInt = CalculateSpeed(axis, internalSpeed); // Calculate mount speed
-                speedInt = Math.Min(speedInt, (long)0x00ffffff); // I command parameter must fit in 24 bits
+                speedInt = Math.Min(speedInt, 0x00ffffff); // I command parameter must fit in 24 bits
 
                 SetRates(axis, rate);
 
@@ -354,7 +354,7 @@ namespace GS.SkyWatcher
                             if (raSpan > 0 && raSpan < duration) // checking duration is met
                             {
                                 var sw1 = Stopwatch.StartNew();
-                                var nextUpdateTime = 200.0; // Next time to call UpdateSteps in milliseconds
+                                //var nextUpdateTime = 200.0; // Next time to call UpdateSteps in milliseconds
 
                                 while (sw1.Elapsed.TotalMilliseconds < raSpan)
                                 {
@@ -517,7 +517,7 @@ namespace GS.SkyWatcher
                                 if (decSpan > 0 && decSpan < duration) // checking duration is met
                                 {
                                     var sw3 = Stopwatch.StartNew();
-                                    var nextUpdateTime = 200.0; // Next time to call UpdateSteps in milliseconds
+                                    //var nextUpdateTime = 200.0; // Next time to call UpdateSteps in milliseconds
 
                                     while (sw3.Elapsed.TotalMilliseconds < decSpan)
                                     {

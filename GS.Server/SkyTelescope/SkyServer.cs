@@ -2707,7 +2707,7 @@ namespace GS.Server.SkyTelescope
         {
             // Set up event handle and task for checking slew started
             EventWaitHandle abortSlewStartedEvent = new ManualResetEvent(false);
-            Action abortSlew = () => AbortSlew(speak, abortSlewStartedEvent);
+            void abortSlew() => AbortSlew(speak, abortSlewStartedEvent);
             Task abortSlewTask = new Task(abortSlew);
             // Start the Abort Slew and wait for the started event
             abortSlewTask.Start();
@@ -2722,7 +2722,8 @@ namespace GS.Server.SkyTelescope
         {
             if (!IsMountRunning)
             {
-                if (abortSlewStarted != null) abortSlewStarted.Set();
+                if (abortSlewStarted == null) return;
+                abortSlewStarted.Set();
                 return;
             }
 
@@ -2738,7 +2739,14 @@ namespace GS.Server.SkyTelescope
             };
             MonitorLog.LogToMonitor(monitorItem);
 
-            if (abortSlewStarted != null) abortSlewStarted.Set();
+            if (abortSlewStarted == null)
+            {
+            }
+            else
+            {
+                abortSlewStarted.Set();
+            }
+
             //IsSlewing = false;
             var tracking = Tracking || SlewState == SlewType.SlewRaDec || MoveAxisActive;
             Tracking = false; //added back in for spec "Tracking is returned to its pre-slew state"
@@ -3698,10 +3706,11 @@ namespace GS.Server.SkyTelescope
         private static double[] GetDefaultPositions()
         {
             // set default home position or get home override from the settings 
-            double[] positions = {0, 0};
+            double[] positions; // positions = new double[]{0, 0};
             string name = String.Empty;
             // home axes are mount values
             _homeAxes = GetHomeAxes(SkySettings.HomeAxisX, SkySettings.HomeAxisY);
+
 
             var monitorItem = new MonitorEntry
             {
@@ -3833,7 +3842,7 @@ namespace GS.Server.SkyTelescope
         }
 
         private static DateTime lastUpdateStepsTime = DateTime.MinValue;
-        private static object lastUpdateLock = new object();
+        private static readonly object lastUpdateLock = new object();
 
         /// <summary>
         /// Main get for the Steps
@@ -6285,7 +6294,7 @@ namespace GS.Server.SkyTelescope
             // Use external event if provided, otherwise create internal one
             EventWaitHandle goToStartedEvent = externalSlewStartedEvent ?? new ManualResetEvent(false);
 
-            Action goTo = () =>
+            void goTo() =>
                 GoToAsync(new[] { targetPosition.X, targetPosition.Y }, slewState, goToStartedEvent, tracking);
             Task goToTask = new Task(goTo);
             Thread.Sleep(10); // brief pause to allow task to start

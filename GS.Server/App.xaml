@@ -13,42 +13,42 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Grey.xaml" />
                 Select colors set, options are material, metro, blue, white and black-->
 
-                <!--Material design colors-->
-               <ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Colors/material.xaml" />
-                <!--Metro colors-->
+                <!--  Material design colors  -->
+                <ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Colors/material.xaml" />
+                <!--  Metro colors  -->
                 <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Colors/metro.xaml" />-->
-                <!--Blue gradient-->
+                <!--  Blue gradient  -->
                 <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Colors/blue.xaml" />-->
-                <!--white gradient-->
+                <!--  white gradient  -->
                 <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Colors/white.xaml" />-->
-                <!--black gradient-->
+                <!--  black gradient  -->
                 <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Colors/black.xaml" />-->
 
-                <!--Select size, options are small, medium and large-->
+                <!--  Select size, options are small, medium and large  -->
 
-                <!--small-->
+                <!--  small  -->
                 <ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Size/s.xaml" />
-                <!--medium-->
+                <!--  medium  -->
                 <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Size/m.xaml" />-->
-                <!--large-->
+                <!--  large  -->
                 <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Size/l.xaml" />-->
 
-                <!--Select weight, options are light, normal and bold-->
-                <!--light-->
+                <!--  Select weight, options are light, normal and bold  -->
+                <!--  light  -->
                 <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Weight/light.xaml" />-->
-                <!--normal-->
+                <!--  normal  -->
                 <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Weight/normal.xaml" />-->
-                <!--bold-->
+                <!--  bold  -->
                 <ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Weight/bold.xaml" />
 
-                <!--Also add the base theme, this is required always-->
+                <!--  Also add the base theme, this is required always  -->
                 <ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/base.xaml" />
 
-               <!-- Add resources from GS.Shared so that they are available at design time -->
-            <ResourceDictionary Source="pack://application:,,,/GS.Shared;component/Languages/StringResChart_en-us.xaml"/>
-            <ResourceDictionary Source="pack://application:,,,/GS.Shared;component/Languages/StringResServer_en-us.xaml"/>
-            <ResourceDictionary Source="pack://application:,,,/GS.Shared;component/Languages/StringResUtil_en-us.xaml"/>
-            <ResourceDictionary Source="pack://application:,,,/GS.Server;component/Resources/Vectors.xaml" />
+                <!--  Add resources from GS.Shared so that they are available at design time  -->
+                <ResourceDictionary Source="pack://application:,,,/GS.Shared;component/Languages/StringResChart_en-us.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/GS.Shared;component/Languages/StringResServer_en-us.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/GS.Shared;component/Languages/StringResUtil_en-us.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/GS.Server;component/Resources/Vectors.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

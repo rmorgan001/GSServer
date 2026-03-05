@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019-2025 Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2026 Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -25,14 +25,14 @@ namespace GS.Server.GamePad
 {
     public sealed class GamePadDirectX: GamePad
     {
-        private bool _IsAvailable;
-        public override bool IsAvailable { get => _IsAvailable ; }
+        private bool _isAvailable;
+        public override bool IsAvailable => _isAvailable;
 
-        private Joystick joystick;
-        private readonly DirectInput directInput;
+        private Joystick _joystick;
+        private readonly DirectInput _directInput;
         private JoystickState State { get; set; }
-        private Guid joystickGuid;
-        private bool[] axisAvailable = new bool[]
+        private Guid _joystickGuid;
+        private readonly bool[] _axisAvailable = new bool[]
         {
             false,      // X-axis
             false,      // Y-axis
@@ -42,17 +42,17 @@ namespace GS.Server.GamePad
             false       // Z-rotation
         };
 
-        private readonly IntPtr hWnd;
+        private readonly IntPtr _hWnd;
 
         /// <summary>
         /// Constructor sets up and find a joystick
         /// </summary>
-        /// <param name="window_handle"></param>
-        public GamePadDirectX(IntPtr window_handle)
+        /// <param name="windowHandle"></param>
+        public GamePadDirectX(IntPtr windowHandle)
         {
-            hWnd = window_handle;
-            directInput = new DirectInput();
-            joystickGuid = Guid.Empty;
+            _hWnd = windowHandle;
+            _directInput = new DirectInput();
+            _joystickGuid = Guid.Empty;
             Find();
         }
 
@@ -64,18 +64,18 @@ namespace GS.Server.GamePad
         {
             try
             {
-                foreach (var deviceInstance in directInput.GetDevices(DeviceType.Gamepad, DeviceEnumerationFlags.AttachedOnly))
-                    joystickGuid = deviceInstance.InstanceGuid;
+                foreach (var deviceInstance in _directInput.GetDevices(DeviceType.Gamepad, DeviceEnumerationFlags.AttachedOnly))
+                    _joystickGuid = deviceInstance.InstanceGuid;
 
                 // If Game pad not found, look for a Joystick
-                if (joystickGuid == Guid.Empty)
-                    foreach (var deviceInstance in directInput.GetDevices(DeviceType.Joystick, DeviceEnumerationFlags.AttachedOnly))
-                        joystickGuid = deviceInstance.InstanceGuid;
+                if (_joystickGuid == Guid.Empty)
+                    foreach (var deviceInstance in _directInput.GetDevices(DeviceType.Joystick, DeviceEnumerationFlags.AttachedOnly))
+                        _joystickGuid = deviceInstance.InstanceGuid;
 
                 // If Joystick not found, throws an error
-                if (joystickGuid == Guid.Empty)
+                if (_joystickGuid == Guid.Empty)
                 {
-                    _IsAvailable = false;
+                    _isAvailable = false;
                     var monitorItem = new MonitorEntry
                     {
                         Datetime = HiResDateTime.UtcNow,
@@ -84,25 +84,25 @@ namespace GS.Server.GamePad
                         Type = MonitorType.Information,
                         Method = MethodBase.GetCurrentMethod()?.Name,
                         Thread = Thread.CurrentThread.ManagedThreadId,
-                        Message = $"|DirectX|{_IsAvailable}"
+                        Message = $"|DirectX|{_isAvailable}"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
                     return;
                 }
 
                 // Instantiate the joystick
-                joystick = new Joystick(directInput, joystickGuid);
-                joystick.SetCooperativeLevel(hWnd, CooperativeLevel.Background | CooperativeLevel.Exclusive);
+                _joystick = new Joystick(_directInput, _joystickGuid);
+                _joystick.SetCooperativeLevel(_hWnd, CooperativeLevel.Background | CooperativeLevel.Exclusive);
 
                 // Query supported info
                 //var allEffects = joystick.GetEffects();
-                var deviceObjects = joystick.GetObjects();
-                axisAvailable[0] = deviceObjects.Any(o => o.Name == "X Axis");
-                axisAvailable[1] = deviceObjects.Any(o => o.Name == "Y Axis");
-                axisAvailable[2] = deviceObjects.Any(o => o.Name == "Z Axis");
-                axisAvailable[3] = deviceObjects.Any(o => o.Name == "X Rotation");
-                axisAvailable[4] = deviceObjects.Any(o => o.Name == "Y Rotation");
-                axisAvailable[5] = deviceObjects.Any(o => o.Name == "Z Rotation");
+                var deviceObjects = _joystick.GetObjects();
+                _axisAvailable[0] = deviceObjects.Any(o => o.Name == "X Axis");
+                _axisAvailable[1] = deviceObjects.Any(o => o.Name == "Y Axis");
+                _axisAvailable[2] = deviceObjects.Any(o => o.Name == "Z Axis");
+                _axisAvailable[3] = deviceObjects.Any(o => o.Name == "X Rotation");
+                _axisAvailable[4] = deviceObjects.Any(o => o.Name == "Y Rotation");
+                _axisAvailable[5] = deviceObjects.Any(o => o.Name == "Z Rotation");
 
                 //var deviceInfo = joystick.Information;
                 //var cps = joystick.Capabilities;
@@ -111,19 +111,19 @@ namespace GS.Server.GamePad
                 //var deviceFlags = cps.Flags;
 
                 // Set BufferSize in order to use buffered data.
-                joystick.Properties.BufferSize = 128;
+                _joystick.Properties.BufferSize = 128;
 
                 // Acquire the joystick
-                joystick.Acquire();
+                _joystick.Acquire();
 
-                _IsAvailable = true;
+                _isAvailable = true;
             }
             catch (Exception ex)
             {
-                _IsAvailable = false;
+                _isAvailable = false;
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
@@ -156,23 +156,23 @@ namespace GS.Server.GamePad
                 // joystick.Acquire();
                 // joystick.Poll();
                 State = null;
-                State = joystick.GetCurrentState();
+                State = _joystick.GetCurrentState();
                 Buttons = State.Buttons;
                 POVs = State.PointOfViewControllers;
-                XAxis = axisAvailable[0] ? (int?)State.X: null;
-                YAxis = axisAvailable[1] ? (int?)State.Y : null;
-                ZAxis = axisAvailable[2] ? (int?)State.Z : null;
-                XRotation = axisAvailable[3] ? (int?)State.RotationX : null;
-                YRotation = axisAvailable[4] ? (int?)State.RotationY : null;
-                ZRotation = axisAvailable[5] ? (int?)State.RotationZ : null;
+                XAxis = _axisAvailable[0] ? (int?)State.X: null;
+                YAxis = _axisAvailable[1] ? (int?)State.Y : null;
+                ZAxis = _axisAvailable[2] ? (int?)State.Z : null;
+                XRotation = _axisAvailable[3] ? (int?)State.RotationX : null;
+                YRotation = _axisAvailable[4] ? (int?)State.RotationY : null;
+                ZRotation = _axisAvailable[5] ? (int?)State.RotationZ : null;
                 // Data = joystick.GetBufferedData();
             }
             catch (Exception ex)
             {
-                _IsAvailable = false;
+                _isAvailable = false;
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
@@ -199,7 +199,7 @@ namespace GS.Server.GamePad
         /// </summary>
         private void Release()
         {
-            joystick?.Unacquire();
+            _joystick?.Unacquire();
         }
 
         /// <inheritdoc />
@@ -209,8 +209,8 @@ namespace GS.Server.GamePad
         public override void Dispose()
         {
             Release();
-            joystick.Dispose();
-            directInput.Dispose();
+            _joystick.Dispose();
+            _directInput.Dispose();
         }
 
     }

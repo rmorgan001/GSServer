@@ -11279,9 +11279,11 @@ namespace GS.Server.SkyTelescope
                     var polarMode = SkySettings.PolarMode;
                     var win = Application.Current.Windows.OfType<HardwareLimitsV>().FirstOrDefault();
                     if (win != null) return;
-                    var window = new HardwareLimitsV();
-                    // Set by code before window is shown but after constructor is called
-                    window.Owner = App.Current.MainWindow;
+                    var window = new HardwareLimitsV
+                    {
+                        // Set by code before window is shown but after constructor is called
+                        Owner = App.Current.MainWindow
+                    };
                     window.ShowDialog();
                     // If Polar Mode has changed and update settings and views
                     if (SkySettings.PolarMode != polarMode)
