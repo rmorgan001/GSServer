@@ -48,8 +48,8 @@ namespace GS.Server
         private static readonly object LockObject = new object();
         private static bool _removeProfile;
         private static BackgroundWorker _bgWorker;
-        private const string _driverName = "ASCOM.GS.Sky.Telescope.dll";
-        private const string _apiName = "GS.SkyApi.dll";
+        private const string DriverName = "ASCOM.GS.Sky.Telescope.dll";
+        private const string ApiName = "GS.SkyApi.dll";
 
         #endregion
 
@@ -208,10 +208,10 @@ namespace GS.Server
 
             var dir = new DirectoryInfo(assyPath);
             var files = new List<FileInfo>();
-            var driverpath = dir + "\\" + _driverName;
+            var driverpath = dir + "\\" + DriverName;
             if (File.Exists(driverpath)) { files.Add(new FileInfo(driverpath)); }
 
-            var apipath = dir + "\\" + _apiName;
+            var apipath = dir + "\\" + ApiName;
             if (File.Exists(apipath)) { files.Add(new FileInfo(apipath)); }
 
             var dllfiles = files.ToArray();
@@ -773,10 +773,10 @@ namespace GS.Server
             {
                 var msg = new System.Text.StringBuilder();
 
-                var HKLMWinNTCurrent = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion";
+                var hklmWinNtCurrent = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion";
                 
-                msg.AppendFormat("{0}{1}", ", ProductName:", Registry.GetValue(HKLMWinNTCurrent, "productName", ""));
-                msg.AppendFormat("{0}{1}", ", ReleaseId:", Registry.GetValue(HKLMWinNTCurrent, "ReleaseId", ""));
+                msg.AppendFormat("{0}{1}", ", ProductName:", Registry.GetValue(hklmWinNtCurrent, "productName", ""));
+                msg.AppendFormat("{0}{1}", ", ReleaseId:", Registry.GetValue(hklmWinNtCurrent, "ReleaseId", ""));
                 msg.AppendFormat("{0}{1}", ", Platform:", Environment.OSVersion.Platform);
                 msg.AppendFormat("{0}{1}", ", Version:", Environment.OSVersion.VersionString);
                 msg.AppendFormat("{0}{1}", ", ServicePack:", Environment.OSVersion.ServicePack);
