@@ -273,11 +273,11 @@ namespace GS.SkyWatcher
             {
                 var datetime = HiResDateTime.UtcNow;
                 var monitorItem = new MonitorEntry // setup to log the pulse
-                { Datetime = datetime, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MonitorLog.GetCurrentMethod(), Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{guideRate}|{duration}|{backlashSteps}|{MinPulseDurationRa}|{MinPulseDurationDec}|{DecPulseGoTo}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MonitorLog.GetCurrentMethod()+"_Enter", Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{guideRate}|{duration}|{backlashSteps}|{MinPulseDurationRa}|{MinPulseDurationDec}|{DecPulseGoTo}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 var pulseEntry = new PulseEntry // setup to graph the pulse
-                { Axis = (int)axis, Duration = duration, Rate = guideRate, Rejected = false, StartTime = datetime, };
+                { Axis = (int)axis, Duration = duration, Rate = guideRate, Rejected = false, StartTime = HiResDateTime.UtcNow, };
 
                 backlashSteps = Math.Abs(backlashSteps);
                 var arcSecs = duration / 1000.0 * Math.Abs(guideRate) * 3600.0;
@@ -354,11 +354,22 @@ namespace GS.SkyWatcher
                             if (raSpan > 0 && raSpan < duration) // checking duration is met
                             {
                                 var sw1 = Stopwatch.StartNew();
+                                var nextUpdateTime = 200.0; // Next time to call UpdateSteps in milliseconds
+
                                 while (sw1.Elapsed.TotalMilliseconds < raSpan)
                                 {
                                     // check for cancellation
                                     token.ThrowIfCancellationRequested();
-                                    if (sw1.ElapsedMilliseconds % 200 == 0) { UpdateSteps(); } // Process positions while waiting
+
+                                    // Check if it's time to update steps
+                                    //if (sw1.Elapsed.TotalMilliseconds >= nextUpdateTime)
+                                    //{
+                                        //UpdateSteps();
+                                    //    nextUpdateTime += 200.0; // Schedule next update
+                                    //}
+
+                                    // Sleep for 10ms to yield CPU - maintains good timing precision
+                                    Thread.Sleep(10);
                                 }
                             }
                         }
@@ -506,11 +517,22 @@ namespace GS.SkyWatcher
                                 if (decSpan > 0 && decSpan < duration) // checking duration is met
                                 {
                                     var sw3 = Stopwatch.StartNew();
+                                    var nextUpdateTime = 200.0; // Next time to call UpdateSteps in milliseconds
+
                                     while (sw3.Elapsed.TotalMilliseconds < decSpan)
                                     {
                                         // check for cancellation
                                         token.ThrowIfCancellationRequested();
-                                        if (sw3.ElapsedMilliseconds % 200 == 0) { UpdateSteps(); } // Process positions while waiting
+
+                                        // Check if it's time to update steps
+                                        //if (sw3.Elapsed.TotalMilliseconds >= nextUpdateTime)
+                                        //{
+                                            //UpdateSteps();
+                                            //nextUpdateTime += 200.0; // Schedule next update
+                                        //}
+
+                                        // Sleep for 10ms to yield CPU - maintains good timing precision
+                                        Thread.Sleep(10);
                                     }
                                 }
                             }
@@ -540,6 +562,11 @@ namespace GS.SkyWatcher
                     SkyQueue.IsPulseGuidingDec = false;
                         throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
                 }
+
+                var executionTime = HiResDateTime.UtcNow - datetime;
+                monitorItem = new MonitorEntry // setup to log pulse completion
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MonitorLog.GetCurrentMethod()+"_Exit ", Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{executionTime.TotalMilliseconds:F1}|{axis}|{guideRate}|{duration}|{backlashSteps}|{MinPulseDurationRa}|{MinPulseDurationDec}|{DecPulseGoTo}" };
+                MonitorLog.LogToMonitor(monitorItem);
 
                 if (!MonitorPulse) return;
                 pulseEntry.Duration = duration;

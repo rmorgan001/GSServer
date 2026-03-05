@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019-2025 Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2026 Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -113,6 +113,7 @@ namespace GS.Server.SkyTelescope
                     SkySettings.StaticPropertyChanged += PropertyChangedSkySettings;
                     Shared.Settings.StaticPropertyChanged += PropertyChangedMonitorLog;
                     Settings.Settings.StaticPropertyChanged += PropertyChangedSettings;
+                    ParkPositionViewModel.Instance.PropertyChanged += PropertyChangedParkPositionViewModel;
                     GlobalStopOn = SkySettings.GlobalStopOn;
 
                     // dropdown lists
@@ -146,11 +147,30 @@ namespace GS.Server.SkyTelescope
 
                     // defaults
                     AtPark = SkyServer.AtPark;
-                    ParkPositions = SkySettings.ParkPositions;
                     ConnectButtonContent = Application.Current.Resources["skyConnect"].ToString();
                     VoiceState = Settings.Settings.VoiceActive;
-                    ParkSelection = AtPark ? SkyServer.GetStoredParkPosition() : ParkPositions.FirstOrDefault();
-                    ParkSelectionSetting = ParkPositions.FirstOrDefault();
+
+                    if (AtPark)
+                    {
+                        var parkedName = SkySettings.ParkName;
+                        var parkedPosition = ParkPositions.FirstOrDefault(p => p.Name == parkedName);
+                        if (parkedPosition != null)
+                        {
+                            ParkSelection = parkedPosition;
+                            ParkSelectionSetting = parkedPosition;
+                        }
+                        else
+                        {
+                            ParkSelection = ParkPositions.FirstOrDefault();
+                            ParkSelectionSetting = ParkPositions.FirstOrDefault();
+                        }
+                    }
+                    else
+                    {
+                        ParkSelection = ParkPositions.FirstOrDefault();
+                        ParkSelectionSetting = ParkPositions.FirstOrDefault();
+                    }
+
                     SetHcFlipsVisibility();
                     RightAscension = "00h 00m 00s";
                     Declination = "00\xb0 00m 00s";
@@ -425,7 +445,10 @@ namespace GS.Server.SkyTelescope
                          break;
                      case "ParkPositions":
                          OnPropertyChanged("ParkPositions");
-                         ParkSelectionSetting = ParkPositions.FirstOrDefault();
+                         if (ParkSelectionSetting == null && ParkPositions.Count > 0)
+                         {
+                             ParkSelectionSetting = ParkPositions.FirstOrDefault();
+                         }
                          break;
                      case "DecBacklash":
                          DecBacklash = SkySettings.DecBacklash;
@@ -534,9 +557,12 @@ namespace GS.Server.SkyTelescope
         void UpdateSkyTelescopeVM()
         {
             // Set Park combo box information
-            ParkPositions = SkySettings.ParkPositions;
-            ParkSelection = ParkPositions.FirstOrDefault();
-            ParkSelectionSetting = ParkSelection;
+            OnPropertyChanged(nameof(ParkPositions));
+            if (ParkPositions.Count > 0)
+            {
+                ParkSelection = ParkPositions.FirstOrDefault();
+                ParkSelectionSetting = ParkSelection;
+            }
             AtPark = SkyServer.AtPark;
 
             // Settings drawer items
@@ -857,6 +883,40 @@ namespace GS.Server.SkyTelescope
                                 break;
                         }
                     });
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private void PropertyChangedParkPositionViewModel(object sender, PropertyChangedEventArgs e)
+        {
+            try
+            {
+                // Forward PropertyChanged immediately without async invoke to ensure synchronous notification
+                switch (e.PropertyName)
+                {
+                    case "SettingsSelection":
+                        OnPropertyChanged(nameof(ParkSelectionSetting));
+                        break;
+                    case "Selection":
+                        OnPropertyChanged(nameof(ParkSelection));
+                        break;
+                }
             }
             catch (Exception ex)
             {
@@ -1504,17 +1564,15 @@ namespace GS.Server.SkyTelescope
                         OpenDialog($"{Application.Current.Resources["skyNoSelected"]}");
                         return;
                     }
+
                     var parkCoords = Axes.MountAxis2Mount();
-                    ParkSelectionSetting.X = parkCoords[0];
-                    ParkSelectionSetting.Y = parkCoords[1];
+                    if (parkCoords == null) return;
 
-                    var parkToUpdate = ParkPositions.FirstOrDefault(p => p.Name == ParkSelectionSetting.Name);
-                    if (parkToUpdate == null) return;
+                    // Capture position before UpdatePosition to avoid property re-evaluation after binding changes
+                    var positionToUpdate = ParkSelectionSetting;
 
-                    parkToUpdate.X = parkCoords[0];
-                    parkToUpdate.Y = parkCoords[1];
-                    SkySettings.ParkPositions = ParkPositions;
-                    OpenDialog($"{Application.Current.Resources["skyParkSaved"]} {parkToUpdate.Name}");
+                    ParkPositionViewModel.Instance.UpdatePosition(positionToUpdate, parkCoords[0], parkCoords[1]);
+                    OpenDialog($"{Application.Current.Resources["skyParkSaved"]} {positionToUpdate.Name}");
                     Synthesizer.Speak(Application.Current.Resources["vceParkSet"].ToString());
                 }
             }
@@ -3166,55 +3224,27 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private List<ParkPosition> _parkPositions;
-        public List<ParkPosition> ParkPositions
-        {
-            get => SkySettings.ParkPositions;
-            set
-            {
-                if (_parkPositions == value) return;
-                _parkPositions = value;
-                SkySettings.ParkPositions = value;
-                OnPropertyChanged();
-            }
-        }
+        public ObservableCollection<ParkPosition> ParkPositions => ParkPositionViewModel.Instance.Positions;
 
-        private ParkPosition _parkSelection;
         public ParkPosition ParkSelection
         {
-            get => _parkSelection;
-            set
-            {
-                if (_parkSelection == value) return;
-
-                var found = ParkPositions.Find(x => x.Name == value.Name && Math.Abs(x.X - value.X) <= 0.00001 && Math.Abs(x.Y - value.Y) <= 0.00001);
-                if (found == null) // did not find match in list
-                {
-                    ParkPositions.Add(value);
-                    _parkSelection = value;
-                    SkyServer.ParkSelected = value;
-                }
-                else
-                {
-                    _parkSelection = found;
-                    SkyServer.ParkSelected = found;
-                }
-                OnPropertyChanged();
-            }
+            get => ParkPositionViewModel.Instance.Selection;
+            set => ParkPositionViewModel.Instance.Selection = value;
         }
 
-        private ParkPosition _parkSelectionSetting;
         public ParkPosition ParkSelectionSetting
         {
-            get => _parkSelectionSetting;
+            get
+            {
+                var value = ParkPositionViewModel.Instance.SettingsSelection;
+                return value;
+            }
             set
             {
-                if (_parkSelectionSetting == value) return;
-                _parkSelectionSetting = value;
-                OnPropertyChanged();
+                ParkPositionViewModel.Instance.SettingsSelection = value;
             }
         }
-        
+
         private bool _pecOn;
         public bool PecOn
         {
@@ -7074,7 +7104,7 @@ namespace GS.Server.SkyTelescope
             {
                 if (_reSyncParkSelection == value) { return; }
 
-                var found = ParkPositions.Find(x => x.Name == value.Name && Math.Abs(x.X - value.X) <= 0.00001 && Math.Abs(x.Y - value.Y) <= 0.00001);
+                var found = ParkPositions.FirstOrDefault(x => x.Name == value.Name && Math.Abs(x.X - value.X) <= 0.00001 && Math.Abs(x.Y - value.Y) <= 0.00001);
                 if (found == null) // did not find match in list
                 {
                     ParkPositions.Add(value);
@@ -7311,15 +7341,7 @@ namespace GS.Server.SkyTelescope
                 using (new WaitCursor())
                 {
                     if (ParkSelectionSetting == null) return;
-                    // Create NEW list to avoid modifying cached reference in settings which does not trigger property changed
-                    var newList = new List<ParkPosition>(ParkPositions);
-                    newList.Remove(ParkSelectionSetting);
-                    // Assign new list - setter will correctly convert since all itemns are Axis coords
-                    SkySettings.ParkPositions = newList;
-                    // Update UI
-                    OnPropertyChanged(nameof(ParkPositions));
-                    ParkSelectionSetting = ParkPositions.FirstOrDefault();
-                    ParkSelection = ParkPositions.FirstOrDefault();
+                    ParkPositionViewModel.Instance.DeletePosition(ParkSelectionSetting);
                     IsDialogOpen = false;
                 }
             }
@@ -7464,24 +7486,30 @@ namespace GS.Server.SkyTelescope
                 using (new WaitCursor())
                 {
                     if (string.IsNullOrEmpty(ParkNewName)) return;
-                    var pp = new ParkPosition { Name = ParkNewName.Trim() };
-                    if (SkySettings.AlignmentMode == AlignmentModes.algPolar)
-                    {
-                        // Get current position in mount axesand store as park position
-                        var axes = Axes.MountAxis2Mount();
-                        pp.X = axes[0];
-                        pp.Y = axes[1];
-                    }
-                    // Create NEW list to avoid modifying cached reference in settings which does not trigger property changed
-                    var newList = new List<ParkPosition>(ParkPositions);
-                    newList.Add(pp);
-                    // Assign new list - setter will correctly convert since all itemns are Axis coords
-                    ParkPositions = newList;
-                    OnPropertyChanged(nameof(ParkPositions));
-                    ParkSelectionSetting = pp;
-                    ParkSelection = ParkPositions.FirstOrDefault();
+
+                    var axes = Axes.MountAxis2Mount();
+                    if (axes == null) return;
+
+                    ParkPositionViewModel.Instance.AddPosition(ParkNewName.Trim(), axes[0], axes[1]);
                     IsDialogOpen = false;
                 }
+            }
+            catch (InvalidOperationException ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Warning,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = ex.Message
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
             catch (Exception ex)
             {
@@ -9292,7 +9320,7 @@ namespace GS.Server.SkyTelescope
         // Meridian Limits Options
         private void SetParkLimitSelection(string name)
         {
-            var found = ParkPositions.Find(x => x.Name == name);
+            var found = ParkPositions.FirstOrDefault(x => x.Name == name);
             ParkLimitSelection = found ?? ParkPositions.FirstOrDefault();
         }
 
@@ -9347,7 +9375,7 @@ namespace GS.Server.SkyTelescope
         // Horizon Limits Options
         private void SetParkHzLimitSelection(string name)
         {
-            var found = ParkPositions.Find(x => x.Name == name);
+            var found = ParkPositions.FirstOrDefault(x => x.Name == name);
             ParkHzLimitSelection = found ?? ParkPositions.FirstOrDefault();
         }
 

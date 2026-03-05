@@ -112,17 +112,17 @@ namespace GS.Server.SkyTelescope
             RateDec = 0;
             ReferenceTime = DateTime.MaxValue;
 
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Server,
-                Category = MonitorCategory.Server,
-                Type = MonitorType.Debug,
-                Method = "P." + MethodBase.GetCurrentMethod()?.Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{ReferenceTime.ToLocalTime():yyyy-MM-dd HH:mm:ss}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
+            //var monitorItem = new MonitorEntry
+            //{
+            //    Datetime = HiResDateTime.UtcNow,
+            //    Device = MonitorDevice.Server,
+            //    Category = MonitorCategory.Server,
+            //    Type = MonitorType.Debug,
+            //    Method = "P." + MethodBase.GetCurrentMethod()?.Name,
+            //    Thread = Thread.CurrentThread.ManagedThreadId,
+            //    Message = $"{ReferenceTime.ToLocalTime():yyyy-MM-dd HH:mm:ss}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
+            //};
+            //MonitorLog.LogToMonitor(monitorItem);
 
         }
 
@@ -141,17 +141,17 @@ namespace GS.Server.SkyTelescope
             Dec = dec;
             ReferenceTime = HiResDateTime.UtcNow;
 
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Server,
-                Category = MonitorCategory.Server,
-                Type = MonitorType.Debug,
-                Method = "P." + MethodBase.GetCurrentMethod()?.Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{ReferenceTime.ToLocalTime():yyyy-MM-dd HH:mm:ss}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
+            //var monitorItem = new MonitorEntry
+            //{
+            //    Datetime = HiResDateTime.UtcNow,
+            //    Device = MonitorDevice.Server,
+            //    Category = MonitorCategory.Server,
+            //    Type = MonitorType.Debug,
+            //    Method = "P." + MethodBase.GetCurrentMethod()?.Name,
+            //    Thread = Thread.CurrentThread.ManagedThreadId,
+            //    Message = $"{ReferenceTime.ToLocalTime():yyyy-MM-dd HH:mm:ss}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
+            //};
+            //MonitorLog.LogToMonitor(monitorItem);
 
         }
 
@@ -186,17 +186,17 @@ namespace GS.Server.SkyTelescope
                     result[1] = Dec + deltaTime * _rateDec;
                 }
 
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Server,
-                Category = MonitorCategory.Server,
-                Type = MonitorType.Debug,
-                Method = "P." + MethodBase.GetCurrentMethod()?.Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{ReferenceTime.ToLocalTime():yyyy-MM-dd HH:mm:ss}|{result[0]}|{result[1]}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
+            //var monitorItem = new MonitorEntry
+            //{
+            //    Datetime = HiResDateTime.UtcNow,
+            //    Device = MonitorDevice.Server,
+            //    Category = MonitorCategory.Server,
+            //    Type = MonitorType.Debug,
+            //    Method = "P." + MethodBase.GetCurrentMethod()?.Name,
+            //    Thread = Thread.CurrentThread.ManagedThreadId,
+            //    Message = $"{ReferenceTime.ToLocalTime():yyyy-MM-dd HH:mm:ss}|{result[0]}|{result[1]}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
+            //};
+            //MonitorLog.LogToMonitor(monitorItem);
 
             return result;
         }
@@ -227,17 +227,17 @@ namespace GS.Server.SkyTelescope
                 }
             }
 
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Server,
-                Category = MonitorCategory.Server,
-                Type = MonitorType.Debug,
-                Method = "P." + MethodBase.GetCurrentMethod()?.Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{ReferenceTime.ToLocalTime():yyyy-MM-dd HH:mm:ss}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
+            //var monitorItem = new MonitorEntry
+            //{
+            //    Datetime = HiResDateTime.UtcNow,
+            //    Device = MonitorDevice.Server,
+            //    Category = MonitorCategory.Server,
+            //    Type = MonitorType.Debug,
+            //    Method = "P." + MethodBase.GetCurrentMethod()?.Name,
+            //    Thread = Thread.CurrentThread.ManagedThreadId,
+            //    Message = $"{ReferenceTime.ToLocalTime():yyyy-MM-dd HH:mm:ss}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
+            //};
+            //MonitorLog.LogToMonitor(monitorItem);
         }
 
         /// <summary>
@@ -255,17 +255,17 @@ namespace GS.Server.SkyTelescope
                 ReferenceTime = timeNow;
             }
 
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Server,
-                Category = MonitorCategory.Server,
-                Type = MonitorType.Debug,
-                Method = "P." + MethodBase.GetCurrentMethod()?.Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"{ReferenceTime.ToLocalTime():yyyy-MM-dd HH:mm:ss}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
+            //var monitorItem = new MonitorEntry
+            //{
+            //    Datetime = HiResDateTime.UtcNow,
+            //    Device = MonitorDevice.Server,
+            //    Category = MonitorCategory.Server,
+            //    Type = MonitorType.Debug,
+            //    Method = "P." + MethodBase.GetCurrentMethod()?.Name,
+            //    Thread = Thread.CurrentThread.ManagedThreadId,
+            //    Message = $"{ReferenceTime.ToLocalTime():yyyy-MM-dd HH:mm:ss}|{_ra}|{_dec}|{_rateRa}|{_rateDec}"
+            //};
+            //MonitorLog.LogToMonitor(monitorItem);
         }
 
     }

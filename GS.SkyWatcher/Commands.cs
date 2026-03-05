@@ -1901,10 +1901,10 @@ namespace GS.SkyWatcher
                     value += (long)(int.Parse(str.Substring(i, 2), NumberStyles.AllowHexSpecifier) * Math.Pow(16, i - 1));
                 }
 
-                var msg = $"|{str}|{value}";
-                var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = msg };
-                MonitorLog.LogToMonitor(monitorItem);
+                //var msg = $"|{str}|{value}";
+                //var monitorItem = new MonitorEntry
+                //    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = msg };
+                //MonitorLog.LogToMonitor(monitorItem);
 
                 return value;
             }
@@ -1976,10 +1976,10 @@ namespace GS.SkyWatcher
                 var parsed = int.Parse(response, NumberStyles.HexNumber);
                 var a = parsed / divFactor;
 
-                var msg = $"|{response}|{parseFirst}|{divFactor}|{a}";
-                var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = msg };
-                MonitorLog.LogToMonitor(monitorItem);
+                //var msg = $"|{response}|{parseFirst}|{divFactor}|{a}";
+                //var monitorItem = new MonitorEntry
+                //    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = msg };
+                //MonitorLog.LogToMonitor(monitorItem);
                 return a;
             }
             catch (Exception ex)

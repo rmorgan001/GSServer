@@ -1,4 +1,4 @@
-﻿/* Copyright(C) 2019-2025 Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2026 Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -865,7 +865,7 @@ namespace GS.Server.SkyTelescope
         public static bool OpenSetupDialogFinished { get; set; }
 
         /// <summary>
-        /// Park position selected set from UI or ASCOM, set using deep copy
+        /// Park position selected set from UI or ASCOM
         /// </summary>
         public static ParkPosition ParkSelected
         {
@@ -881,10 +881,15 @@ namespace GS.Server.SkyTelescope
 
                 if (_parkSelected != null)
                 {
-                    if (_parkSelected.Name == value.Name && Math.Abs(_parkSelected.X - value.X) < 0 &&
-                        Math.Abs(_parkSelected.Y - value.Y) < 0) { return; }
+                    if (_parkSelected.Name == value.Name && 
+                        Math.Abs(_parkSelected.X - value.X) <= 0.001 &&
+                        Math.Abs(_parkSelected.Y - value.Y) <= 0.001)
+                    {
+                        return;
+                    }
                 }
-                _parkSelected = new ParkPosition(value.Name, value.X, value.Y);
+
+                _parkSelected = value;
 
                 var monitorItem = new MonitorEntry
                 {
@@ -3118,7 +3123,7 @@ namespace GS.Server.SkyTelescope
 
                 if (SkySettings.LimitPark && SlewState != SlewType.SlewPark) // only hit this once while in limit
                 {
-                    var found = SkySettings.ParkPositions.Find(x => x.Name == SkySettings.ParkLimitName);
+                    var found = SkySettings.ParkPositions.FirstOrDefault(x => x.Name == SkySettings.ParkLimitName);
                     if (found == null)
                     {
                         StopAxes();
@@ -3144,7 +3149,7 @@ namespace GS.Server.SkyTelescope
 
                 if (SkySettings.HzLimitPark && SlewState != SlewType.SlewPark) // only hit this once while in limit
                 {
-                    var found = SkySettings.ParkPositions.Find(x => x.Name == SkySettings.ParkHzLimitName);
+                    var found = SkySettings.ParkPositions.FirstOrDefault(x => x.Name == SkySettings.ParkHzLimitName);
                     if (found == null)
                     {
                         StopAxes();

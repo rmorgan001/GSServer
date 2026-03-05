@@ -1,5 +1,21 @@
-﻿using System;
+﻿/* Copyright(C) 2019-2026 Rob Morgan (robert.morgan.e@gmail.com)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -39,14 +55,18 @@ namespace GS.Server.Windows
                     _skyTelescopeVM = SkyTelescopeVm.ASkyTelescopeVm;
                     SkyServer.StaticPropertyChanged += PropertyChangedSkyServer;
                     SkySettings.StaticPropertyChanged += PropertyChangedSkySettings;
+                    ParkPositionViewModel.Instance.PropertyChanged += PropertyChangedParkPositionViewModel;
 
                     Title = "GS";
                     ScreenEnabled = SkyServer.IsMountRunning;
                     ButtonsWinVisibility = false;
                     TopMost = true;
 
-                    ParkSelection = ParkPositions.FirstOrDefault();
-                    ParkSelectionSetting = ParkPositions.FirstOrDefault();
+                    if (ParkPositions.Count > 0)
+                    {
+                        ParkSelection = ParkPositions.FirstOrDefault();
+                        ParkSelectionSetting = ParkPositions.FirstOrDefault();
+                    }
                     AtPark = SkyServer.AtPark;
                     IsHome = SkyServer.IsHome;
                     IsTracking = SkyServer.Tracking || SkyServer.SlewState == SlewType.SlewRaDec;
@@ -214,10 +234,13 @@ namespace GS.Server.Windows
                          //HcSpeed = (double)SkySettings.HcSpeed;
                          break;
                      case "AlignmentMode":
-                         ParkPositions = SkySettings.ParkPositions;
-                         ParkSelection = ParkPositions.FirstOrDefault();
-                         ParkSelectionSetting = ParkSelection;
-                         switch (SkySettings.AlignmentMode)
+                        OnPropertyChanged(nameof(ParkPositions));
+                        if (ParkPositions.Count > 0)
+                        {
+                            ParkSelection = ParkPositions.FirstOrDefault();
+                            ParkSelectionSetting = ParkPositions.FirstOrDefault();
+                        }
+                        switch (SkySettings.AlignmentMode)
                          {
                              case AlignmentModes.algAltAz:
                                  SkySettings.CanSetPierSide = false;
@@ -230,6 +253,43 @@ namespace GS.Server.Windows
                          }
                          // ReSharper disable ExplicitCallerInfoArgument
                          OnPropertyChanged($"ParkPositions");
+                         break;
+                 }
+             });
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private void PropertyChangedParkPositionViewModel(object sender, PropertyChangedEventArgs e)
+        {
+            try
+            {
+                ThreadContext.BeginInvokeOnUiThread(
+             delegate
+             {
+                 switch (e.PropertyName)
+                 {
+                     case "SettingsSelection":
+                         OnPropertyChanged(nameof(ParkSelectionSetting));
+                         break;
+                     case "Selection":
+                         OnPropertyChanged(nameof(ParkSelection));
                          break;
                  }
              });
@@ -522,53 +582,18 @@ namespace GS.Server.Windows
             }
         }
 
-        private List<ParkPosition> _parkPositions;
-        public List<ParkPosition> ParkPositions
-        {
-            get => SkySettings.ParkPositions;
-            set
-            {
-                if (_parkPositions == value) return;
-                _parkPositions = value;
-                SkySettings.ParkPositions = value;
-                OnPropertyChanged();
-            }
-        }
+        public ObservableCollection<ParkPosition> ParkPositions => ParkPositionViewModel.Instance.Positions;
 
-        private ParkPosition _parkSelection;
         public ParkPosition ParkSelection
         {
-            get => _parkSelection;
-            set
-            {
-                if (_parkSelection == value) return;
-
-                var found = ParkPositions.Find(x => x.Name == value.Name && Math.Abs(x.X - value.X) <= 0.00001 && Math.Abs(x.Y - value.Y) <= 0.00001);
-                if (found == null) // did not find match in list
-                {
-                    ParkPositions.Add(value);
-                    _parkSelection = value;
-                    SkyServer.ParkSelected = value;
-                }
-                else
-                {
-                    _parkSelection = found;
-                    SkyServer.ParkSelected = found;
-                }
-                OnPropertyChanged();
-            }
+            get => ParkPositionViewModel.Instance.Selection;
+            set => ParkPositionViewModel.Instance.Selection = value;
         }
 
-        private ParkPosition _parkSelectionSetting;
         public ParkPosition ParkSelectionSetting
         {
-            get => _parkSelectionSetting;
-            set
-            {
-                if (_parkSelectionSetting == value) return;
-                _parkSelectionSetting = value;
-                OnPropertyChanged();
-            }
+            get => ParkPositionViewModel.Instance.SettingsSelection;
+            set => ParkPositionViewModel.Instance.SettingsSelection = value;
         }
 
         private string _parkNewName;
@@ -819,24 +844,30 @@ namespace GS.Server.Windows
                 using (new WaitCursor())
                 {
                     if (string.IsNullOrEmpty(ParkNewName)) return;
-                    var pp = new ParkPosition { Name = ParkNewName.Trim() };
-                    if (SkySettings.AlignmentMode == AlignmentModes.algPolar)
-                    {
-                        // Get current position in mount axesand store as park position
-                        var axes = Axes.MountAxis2Mount();
-                        pp.X = axes[0];
-                        pp.Y = axes[1];
-                    }
-                    // Create NEW list to avoid modifying cached reference in settings which does not trigger property changed
-                    var newList = new List<ParkPosition>(ParkPositions);
-                    newList.Add(pp);
-                    // Assign new list - setter will correctly convert since all itemns are Axis coords
-                    ParkPositions = newList;
-                    OnPropertyChanged(nameof(ParkPositions));
-                    ParkSelectionSetting = pp;
-                    ParkSelection = ParkPositions.FirstOrDefault();
+
+                    var axes = Axes.MountAxis2Mount();
+                    if (axes == null) return;
+
+                    ParkPositionViewModel.Instance.AddPosition(ParkNewName.Trim(), axes[0], axes[1]);
                     IsParkAddDialogOpen = false;
                 }
+            }
+            catch (InvalidOperationException ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Warning,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = ex.Message
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
             catch (Exception ex)
             {
@@ -986,15 +1017,7 @@ namespace GS.Server.Windows
                 using (new WaitCursor())
                 {
                     if (ParkSelectionSetting == null) return;
-                    // Create NEW list to avoid modifying cached reference in settings which does not trigger property changed
-                    var newList = new List<ParkPosition>(ParkPositions);
-                    newList.Remove(ParkSelectionSetting);
-                    // Assign new list - setter will correctly convert since all itemns are Axis coords
-                    SkySettings.ParkPositions = newList;
-                    // Update UI
-                    OnPropertyChanged(nameof(ParkPositions));
-                    ParkSelectionSetting = ParkPositions.FirstOrDefault();
-                    ParkSelection = ParkPositions.FirstOrDefault();
+                    ParkPositionViewModel.Instance.DeletePosition(ParkSelectionSetting);
                     IsParkDeleteDialogOpen = false;
                 }
             }
@@ -1656,7 +1679,7 @@ namespace GS.Server.Windows
             {
                 if (_reSyncParkSelection == value) { return; }
 
-                var found = ParkPositions.Find(x => x.Name == value.Name && Math.Abs(x.X - value.X) <= 0.00001 && Math.Abs(x.Y - value.Y) <= 0.00001);
+                var found = ParkPositions.FirstOrDefault(x => x.Name == value.Name && Math.Abs(x.X - value.X) <= 0.00001 && Math.Abs(x.Y - value.Y) <= 0.00001);
                 if (found == null) // did not find match in list
                 {
                     ParkPositions.Add(value);

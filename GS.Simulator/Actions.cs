@@ -189,15 +189,27 @@ namespace GS.Simulator
                 }
 
                 // execute pulse
-                var sw = Stopwatch.StartNew();
+                var sw = new Stopwatch();
                 try
                 {
                     _ioSerial.Send($"pulse|{axis}|{guideRate}");
+                    sw.Start();
+                    //var nextUpdateTime = 200.0; // Next time to call AxesSteps in milliseconds
+
                     while (sw.Elapsed.TotalMilliseconds < duration)
                     {
                         // check for cancellation
                         token.ThrowIfCancellationRequested();
-                        if (sw.ElapsedMilliseconds % 200 == 0) { AxesSteps(); } // Process positions while waiting
+
+                        // Check if it's time to update steps
+                        //if (sw.Elapsed.TotalMilliseconds >= nextUpdateTime)
+                        //{
+                            // AxesSteps();
+                        //    nextUpdateTime += 200.0; // Schedule next update
+                        //}
+
+                        // Sleep for 10ms to yield CPU - maintains good timing precision
+                        Thread.Sleep(10);
                     }
                 }
                 catch (OperationCanceledException)

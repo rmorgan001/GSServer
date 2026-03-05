@@ -1,14 +1,15 @@
-﻿using System;
+﻿using GS.Server.Main;
+using GS.Shared;
+using GS.Shared.EnvironmentInfo;
+using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-using GS.Server.Main;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
-using GS.Shared;
-using System.Text;
-using System.IO;
 
 namespace GS.Server
 {
@@ -63,6 +64,7 @@ namespace GS.Server
             }
             base.OnStartup(e);
             Languages.SetLanguageDictionary(false, LanguageApp.GsServer, Shared.Settings.Language);
+            _ = EnvironmentHelper.LogToDefaultLocationAsync();
             var app = new MainWindow();
             var context = new MainWindowVm();
             app.DataContext = context;

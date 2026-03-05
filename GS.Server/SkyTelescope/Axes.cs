@@ -143,13 +143,13 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
 
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server,
-                Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name,
-                Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axes[0]}|{axes[1]}|{a[0]}|{a[1]}"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
+            //var monitorItem = new MonitorEntry
+            //{
+            //    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server,
+            //    Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name,
+            //    Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axes[0]}|{axes[1]}|{a[0]}|{a[1]}"
+            //};
+            //MonitorLog.LogToMonitor(monitorItem);
             return a;
         }
 
@@ -327,13 +327,13 @@ namespace GS.Server.SkyTelescope
                     throw new ArgumentOutOfRangeException();
             }
 
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server,
-                Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name,
-                Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Range:{axes[0]}|{axes[1]}"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
+            //var monitorItem = new MonitorEntry
+            //{
+            //    Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server,
+            //    Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name,
+            //    Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Range:{axes[0]}|{axes[1]}"
+            //};
+            //MonitorLog.LogToMonitor(monitorItem);
             return new[] { axes[0], axes[1] };
         }
 
@@ -417,17 +417,17 @@ namespace GS.Server.SkyTelescope
             }
             // else: azStorage ∈ [0..360) for normal (already in this range)
 
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Server,
-                Category = MonitorCategory.Server,
-                Type = MonitorType.Debug,
-                Method = MethodBase.GetCurrentMethod()?.Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"AxisToStorage: [{axisX:F2},{axisY:F2}] → Az={azStorage:F2}, Alt={altLocal:F2}, TP={isThroughPole}"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
+            //var monitorItem = new MonitorEntry
+            //{
+            //    Datetime = HiResDateTime.UtcNow,
+            //    Device = MonitorDevice.Server,
+            //    Category = MonitorCategory.Server,
+            //    Type = MonitorType.Debug,
+            //    Method = MethodBase.GetCurrentMethod()?.Name,
+            //    Thread = Thread.CurrentThread.ManagedThreadId,
+            //    Message = $"AxisToStorage: [{axisX:F2},{axisY:F2}] → Az={azStorage:F2}, Alt={altLocal:F2}, TP={isThroughPole}"
+            //};
+            //MonitorLog.LogToMonitor(monitorItem);
 
             return new[] { azStorage, altLocal };
         }
@@ -471,17 +471,17 @@ namespace GS.Server.SkyTelescope
                 axes[1] = Range.Range270(axes[1]);
             }
 
-            var monitorItem = new MonitorEntry
-            {
-                Datetime = HiResDateTime.UtcNow,
-                Device = MonitorDevice.Server,
-                Category = MonitorCategory.Server,
-                Type = MonitorType.Debug,
-                Method = MethodBase.GetCurrentMethod()?.Name,
-                Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"StorageToAxis: Az={azStorage:F2}, Alt={altStorage:F2}, TP={isThroughPole} → Mount[{axes[0]:F2},{axes[1]:F2}]"
-            };
-            MonitorLog.LogToMonitor(monitorItem);
+            //var monitorItem = new MonitorEntry
+            //{
+            //    Datetime = HiResDateTime.UtcNow,
+            //    Device = MonitorDevice.Server,
+            //    Category = MonitorCategory.Server,
+            //    Type = MonitorType.Debug,
+            //    Method = MethodBase.GetCurrentMethod()?.Name,
+            //    Thread = Thread.CurrentThread.ManagedThreadId,
+            //    Message = $"StorageToAxis: Az={azStorage:F2}, Alt={altStorage:F2}, TP={isThroughPole} → Mount[{axes[0]:F2},{axes[1]:F2}]"
+            //};
+            //MonitorLog.LogToMonitor(monitorItem);
             return axes;
         }
 

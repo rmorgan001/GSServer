@@ -1,4 +1,4 @@
-﻿/*Copyright(C) 2019-2025 Rob Morgan (robert.morgan.e@gmail.com)
+﻿/*Copyright(C) 2019-2026 Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -1173,7 +1173,7 @@ namespace ASCOM.GS.Sky.Telescope
                 // ReSharper disable once StringLiteralTypo
                 case string str when str.Equals("telescope:setparkposition", StringComparison.InvariantCultureIgnoreCase):
                     if (SkyServer.IsMountRunning == false) { throw new NotConnectedException("Mount Not Connected"); }
-                    var found = SkySettings.ParkPositions.Find(x => string.Equals(x.Name, actionParameters, StringComparison.InvariantCultureIgnoreCase));
+                    var found = SkySettings.ParkPositions.FirstOrDefault(x => string.Equals(x.Name, actionParameters, StringComparison.InvariantCultureIgnoreCase));
                     if (found == null)
                     {
                         var parkPositions = SkySettings.ParkPositions.OrderBy(parkPosition => parkPosition.Name).ToList();
@@ -1340,7 +1340,7 @@ namespace ASCOM.GS.Sky.Telescope
             if (InterfaceVersion >= 4) return;
             while (SkyServer.SlewState == SlewType.SlewHome || SkyServer.SlewState == SlewType.SlewSettle)
             {
-                Thread.Sleep(1);
+                Thread.Sleep(10);
                 DoEvents();
             }
         }
@@ -1507,7 +1507,7 @@ namespace ASCOM.GS.Sky.Telescope
             Thread.Sleep(250); // Wait for asynchronous slewing to start
             while (SkyServer.SlewState == SlewType.SlewAltAz || SkyServer.SlewState == SlewType.SlewSettle)
             {
-                Thread.Sleep(1);
+                Thread.Sleep(10);
                 DoEvents();
             }
             DelayInterval();
@@ -1561,7 +1561,7 @@ namespace ASCOM.GS.Sky.Telescope
             Thread.Sleep(250); // Wait for asynchronous slewing to start
             while (SkyServer.SlewState == SlewType.SlewRaDec || SkyServer.SlewState == SlewType.SlewSettle)
             {
-                Thread.Sleep(1);
+                Thread.Sleep(10);
                 DoEvents();
             }
             DelayInterval();
@@ -1630,7 +1630,7 @@ namespace ASCOM.GS.Sky.Telescope
             Thread.Sleep(250); // Wait for asynchronous slewing to start
             while (SkyServer.SlewState == SlewType.SlewRaDec || SkyServer.SlewState == SlewType.SlewSettle)
             {
-                Thread.Sleep(1);
+                Thread.Sleep(10);
                 DoEvents();
             }
             DelayInterval();
