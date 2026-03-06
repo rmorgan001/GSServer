@@ -25,32 +25,48 @@ namespace GS.Simulator
         bool Successful { get; set; }
         Exception Exception { get; set; }
         dynamic Result { get; }
+        ManualResetEventSlim CompletionEvent { get; }
         void Execute(Actions actions);
+    }
+
+    /// <summary>
+    /// Base class for mount commands providing synchronization infrastructure
+    /// </summary>
+    public abstract class MountCommandBase : IMountCommand
+    {
+        private readonly ManualResetEventSlim _completionEvent = new ManualResetEventSlim(false);
+
+        protected MountCommandBase(long id)
+        {
+            Id = id;
+            CreatedUtc = Principles.HiResDateTime.UtcNow;
+            Successful = false;
+        }
+
+        public long Id { get; }
+        public DateTime CreatedUtc { get; }
+        public bool Successful { get; set; }
+        public Exception Exception { get; set; }
+        public virtual dynamic Result { get; protected set; }
+        public ManualResetEventSlim CompletionEvent => _completionEvent;
+
+        public abstract void Execute(Actions actions);
     }
 
     /// <summary>
     /// 
     /// </summary>
-    public class CmdRaDecRate : IMountCommand
+    public class CmdRaDecRate : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; }
         private readonly Axis _axis;
         private readonly double _rate;
-        public CmdRaDecRate(long id, Axis axis, double rate)
+        public CmdRaDecRate(long id, Axis axis, double rate) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
             _axis = axis;
             _rate = rate;
-            Successful = false;
-            Result = null;
             MountQueue.AddCommand(this);
         }
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -68,26 +84,17 @@ namespace GS.Simulator
     /// <summary>
     /// 
     /// </summary>
-    public class CmdMoveAxisRate : IMountCommand
+    public class CmdMoveAxisRate : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; }
         private readonly Axis _axis;
         private readonly double _rate;
-        public CmdMoveAxisRate(long id, Axis axis, double rate)
+        public CmdMoveAxisRate(long id, Axis axis, double rate) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
             _axis = axis;
             _rate = rate;
-            Successful = false;
-            Result = null;
             MountQueue.AddCommand(this);
         }
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -102,24 +109,15 @@ namespace GS.Simulator
         }
     }
 
-    public class CmdGotoSpeed : IMountCommand
+    public class CmdGotoSpeed : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
         private readonly int _rate;
-        public CmdGotoSpeed(long id, int rate)
+        public CmdGotoSpeed(long id, int rate) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
             _rate = rate;
-            Successful = false;
-            Result = null;
             MountQueue.AddCommand(this);
         }
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -172,23 +170,14 @@ namespace GS.Simulator
     /// <summary>
     /// 
     /// </summary>
-    public class CmdAxesDegrees : IMountCommand
+    public class CmdAxesDegrees : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
-
-        public CmdAxesDegrees(long id)
+        public CmdAxesDegrees(long id) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
-            Successful = false;
             MountQueue.AddCommand(this);
         }
 
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -203,24 +192,14 @@ namespace GS.Simulator
         }
     }
 
-    public class CmdAxesSteps : IMountCommand
+    public class CmdAxesSteps : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; }
-
-        public CmdAxesSteps(long id)
+        public CmdAxesSteps(long id) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
-            Successful = false;
-            Result = null;
             MountQueue.AddCommand(this);
         }
 
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -238,23 +217,14 @@ namespace GS.Simulator
     /// <summary>
     /// 
     /// </summary>
-    public class CmdAxisSteps : IMountCommand
+    public class CmdAxisSteps : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
-
-        public CmdAxisSteps(long id)
+        public CmdAxisSteps(long id) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
-            Successful = false;
             MountQueue.AddCommand(this);
         }
 
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -269,26 +239,17 @@ namespace GS.Simulator
         }
     }
 
-    public class AxisStepsDt : IMountCommand
+    public class AxisStepsDt : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
         private readonly Axis _axis;
 
-        public AxisStepsDt(long id, Axis axis)
+        public AxisStepsDt(long id, Axis axis) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
             _axis = axis;
-            Successful = false;
-            Result = null;
             MountQueue.AddCommand(this);
         }
 
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -306,26 +267,17 @@ namespace GS.Simulator
     /// <summary>
     /// 
     /// </summary>
-    public class CmdAxisStop : IMountCommand
+    public class CmdAxisStop : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; }
         private readonly Axis _axis;
 
-        public CmdAxisStop(long id, Axis axis)
+        public CmdAxisStop(long id, Axis axis) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
             _axis = axis;
-            Successful = false;
-            Result = null;
             MountQueue.AddCommand(this);
         }
 
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -343,26 +295,17 @@ namespace GS.Simulator
     /// <summary>
     /// 
     /// </summary>
-    public class CmdHcSlew : IMountCommand
+    public class CmdHcSlew : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; }
         private readonly Axis _axis;
         private readonly double _rate;
-        public CmdHcSlew(long id, Axis axis, double rate)
+        public CmdHcSlew(long id, Axis axis, double rate) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
             _axis = axis;
             _rate = rate;
-            Successful = false;
-            Result = null;
             MountQueue.AddCommand(this);
         }
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -380,26 +323,17 @@ namespace GS.Simulator
     /// <summary>
     /// 
     /// </summary>
-    public class CmdAxisTracking : IMountCommand
+    public class CmdAxisTracking : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; }
         private readonly Axis _axis;
         private readonly double _rate;
-        public CmdAxisTracking(long id, Axis axis, double rate)
+        public CmdAxisTracking(long id, Axis axis, double rate) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
             _axis = axis;
             _rate = rate;
-            Successful = false;
-            Result = null;
             MountQueue.AddCommand(this);
         }
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -417,28 +351,19 @@ namespace GS.Simulator
     /// <summary>
     /// 
     /// </summary>
-    public class CmdAxisGoToTarget : IMountCommand
+    public class CmdAxisGoToTarget : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; }
         private readonly Axis _axis;
         private readonly double _targetPosition;
 
-        public CmdAxisGoToTarget(long id, Axis axis, double targetPosition)
+        public CmdAxisGoToTarget(long id, Axis axis, double targetPosition) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
             _axis = axis;
             _targetPosition = targetPosition;
-            Successful = false;
-            Result = null;
             MountQueue.AddCommand(this);
         }
 
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -456,28 +381,19 @@ namespace GS.Simulator
     /// <summary>
     /// 
     /// </summary>
-    public class CmdAxisToDegrees : IMountCommand
+    public class CmdAxisToDegrees : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; }
         private readonly Axis _axis;
         private readonly double _degrees;
 
-        public CmdAxisToDegrees(long id, Axis axis, double degrees)
+        public CmdAxisToDegrees(long id, Axis axis, double degrees) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
             _axis = axis;
             _degrees = degrees;
-            Successful = false;
-            Result = null;
             MountQueue.AddCommand(this);
         }
 
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -495,25 +411,17 @@ namespace GS.Simulator
     /// <summary>
     /// 
     /// </summary>
-    public class CmdAxisStatus : IMountCommand
+    public class CmdAxisStatus : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
         private readonly Axis _axis;
 
-        public CmdAxisStatus(long id, Axis axis)
+        public CmdAxisStatus(long id, Axis axis) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
             _axis = axis;
-            Successful = false;
             MountQueue.AddCommand(this);
         }
 
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -531,23 +439,14 @@ namespace GS.Simulator
     /// <summary>
     /// 
     /// </summary>
-    public class GetHomeSensorCapability : IMountCommand
+    public class GetHomeSensorCapability : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
-
-        public GetHomeSensorCapability(long id)
+        public GetHomeSensorCapability(long id) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
-            Successful = false;
             MountQueue.AddCommand(this);
         }
 
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -565,36 +464,23 @@ namespace GS.Simulator
     /// <summary>
     /// 
     /// </summary>
-    public class CmdAxisPulse : IMountCommand
+    public class CmdAxisPulse : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
         private readonly Axis _axis;
         private readonly double _guideRate;
         private readonly int _duration;
         private readonly CancellationToken _token;
-        //private readonly int _backlash;
-        //private readonly double _declination;
 
-        public CmdAxisPulse(long id, Axis axis, double guideRate, int duration, CancellationToken token)
+        public CmdAxisPulse(long id, Axis axis, double guideRate, int duration, CancellationToken token) : base(id)
         {
-            Id = id;
-            //_backlash = backlash;
-            //_declination = declination;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
             _axis = axis;
             _guideRate = guideRate;
             _duration = duration;
             _token = token;
-            Successful = false;
-            Result = null;
             MountQueue.AddCommand(this);
         }
 
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -613,25 +499,17 @@ namespace GS.Simulator
     /// <summary>
     /// Get Home Sensor Status
     /// </summary>
-    public class CmdHomeSensor : IMountCommand
+    public class CmdHomeSensor : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
         private readonly Axis _axis;
 
-        public CmdHomeSensor(long id, Axis axis)
+        public CmdHomeSensor(long id, Axis axis) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
             _axis = axis;
-            Successful = false;
             MountQueue.AddCommand(this);
         }
 
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -649,26 +527,17 @@ namespace GS.Simulator
     /// <summary>
     /// Reset home sensor
     /// </summary>
-    public class CmdHomeSensorReset : IMountCommand
+    public class CmdHomeSensorReset : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; }
         private readonly Axis _axis;
 
-        public CmdHomeSensorReset(long id, Axis axis)
+        public CmdHomeSensorReset(long id, Axis axis) : base(id)
         {
-            Id = id;
             _axis = axis;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
-            Successful = false;
-            Result = null;
             MountQueue.AddCommand(this);
         }
 
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -686,23 +555,14 @@ namespace GS.Simulator
     /// <summary>
     /// 
     /// </summary>
-    public class CmdFactorSteps : IMountCommand
+    public class CmdFactorSteps : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
-
-        public CmdFactorSteps(long id)
+        public CmdFactorSteps(long id) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
-            Successful = false;
             MountQueue.AddCommand(this);
         }
 
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -721,23 +581,14 @@ namespace GS.Simulator
     /// <summary>
     /// Get Mount Name
     /// </summary>
-    public class CmdMountName : IMountCommand
+    public class CmdMountName : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
-
-        public CmdMountName(long id)
+        public CmdMountName(long id) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
-            Successful = false;
             MountQueue.AddCommand(this);
         }
 
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -755,23 +606,14 @@ namespace GS.Simulator
     /// <summary>
     /// Get Mount Version
     /// </summary>
-    public class CmdMountVersion : IMountCommand
+    public class CmdMountVersion : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
-
-        public CmdMountVersion(long id)
+        public CmdMountVersion(long id) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
-            Successful = false;
             MountQueue.AddCommand(this);
         }
 
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -850,26 +692,17 @@ namespace GS.Simulator
     //    }
     //}
 
-    public class CmdSnapPort : IMountCommand
+    public class CmdSnapPort : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; }
         private readonly int _port;
         private readonly bool _on;
-        public CmdSnapPort(long id, int port, bool on)
+        public CmdSnapPort(long id, int port, bool on) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
             _port = port;
             _on = on;
-            Successful = false;
-            Result = null;
             MountQueue.AddCommand(this);
         }
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -887,23 +720,14 @@ namespace GS.Simulator
     /// <summary>
     /// Gets Steps Per Revolution
     /// </summary>
-    public class CmdSpr : IMountCommand
+    public class CmdSpr : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
-
-        public CmdSpr(long id)
+        public CmdSpr(long id) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
-            Successful = false;
             MountQueue.AddCommand(this);
         }
 
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -921,23 +745,14 @@ namespace GS.Simulator
     /// <summary>
     /// Gets Steps Per Worm Revolution
     /// </summary>
-    public class CmdSpw : IMountCommand
+    public class CmdSpw : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; private set; }
-
-        public CmdSpw(long id)
+        public CmdSpw(long id) : base(id)
         {
-            Id = id;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
-            Successful = false;
             MountQueue.AddCommand(this);
         }
 
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
@@ -955,26 +770,17 @@ namespace GS.Simulator
     /// <summary>
     /// Gets Steps Per Revolution
     /// </summary>
-    public class CmdSetMonitorPulse : IMountCommand
+    public class CmdSetMonitorPulse : MountCommandBase
     {
-        public long Id { get; }
-        public DateTime CreatedUtc { get; }
-        public bool Successful { get; set; }
-        public Exception Exception { get; set; }
-        public dynamic Result { get; }
         private readonly bool _on;
 
-        public CmdSetMonitorPulse(long id, bool on)
+        public CmdSetMonitorPulse(long id, bool on) : base(id)
         {
-            Id = id;
             _on = on;
-            CreatedUtc = Principles.HiResDateTime.UtcNow;
-            Successful = false;
-            Result = null;
             MountQueue.AddCommand(this);
         }
 
-        public void Execute(Actions actions)
+        public override void Execute(Actions actions)
         {
             try
             {
