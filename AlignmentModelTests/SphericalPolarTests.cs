@@ -42,7 +42,7 @@ namespace AlignmentModelTests
         //[DataRow(39.5056752076461, 27.1335995026076)]
         //[DataRow(33.7936498434583, 38.8532364127109)]
         [DataRow(4.06386877968907, 3.33107709884644)]
-        [DataTestMethod]
+        [TestMethod]
         public void Test_EQ_SphericalPolar(double testRA, double testDec)
         {
             Type type = _alignmentModel.GetType();

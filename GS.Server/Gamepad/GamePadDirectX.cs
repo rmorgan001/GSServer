@@ -81,7 +81,7 @@ namespace GS.Server.GamePad
                         Datetime = HiResDateTime.UtcNow,
                         Device = MonitorDevice.Ui,
                         Category = MonitorCategory.Server,
-                        Type = MonitorType.Information,
+                        Type = MonitorType.Data,
                         Method = MethodBase.GetCurrentMethod()?.Name,
                         Thread = Thread.CurrentThread.ManagedThreadId,
                         Message = $"|DirectX|{_isAvailable}"

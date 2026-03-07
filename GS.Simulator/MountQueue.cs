@@ -18,7 +18,7 @@ using GS.Shared;
 using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
-using System.Diagnostics;
+//using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -171,10 +171,9 @@ namespace GS.Simulator
             _statistics?.IncrementTotalProcessed();
 
             // Declare variables outside try-catch so they're accessible in catch block
-            bool diagnosticsEnabled = false;
+            var diagnosticsEnabled = false;
             DateTime dequeuedAt = default;
-            int queueDepth = 0;
-            DateTime executionStart = default;
+            var queueDepth = 0;
             string commandType = null;
 
             try
@@ -199,7 +198,7 @@ namespace GS.Simulator
                 }
                 else
                 {
-                    executionStart = HiResDateTime.UtcNow;
+                    var executionStart = HiResDateTime.UtcNow;
 
                     command.Execute(_actions);
 
@@ -220,7 +219,7 @@ namespace GS.Simulator
                     {
                         var executionMs = (HiResDateTime.UtcNow - executionStart).TotalMilliseconds;
 
-                        var diagItem = new MonitorEntry
+                        var diagnosticItem = new MonitorEntry
                         {
                             Datetime = HiResDateTime.UtcNow,
                             Device = MonitorDevice.Server,
@@ -230,7 +229,7 @@ namespace GS.Simulator
                             Thread = Thread.CurrentThread.ManagedThreadId,
                             Message = $"CmdId:{command.Id}|Type:{commandType}|QueueWait:{queueWaitMs:F3}ms|Execution:{executionMs:F3}ms|Total:{(queueWaitMs + executionMs):F3}ms|QueueDepth:{queueDepth}|Success:{command.Successful}"
                         };
-                        MonitorLog.LogToMonitor(diagItem);
+                        MonitorLog.LogToMonitor(diagnosticItem);
                     }
 
                     // Check for performance degradation (always check, regardless of debug logging)
@@ -282,7 +281,7 @@ namespace GS.Simulator
                     var queueWaitMs = (dequeuedAt != default ? (dequeuedAt - command.CreatedUtc).TotalMilliseconds : 0);
                     var executionMs = (dequeuedAt != default ? (HiResDateTime.UtcNow - dequeuedAt).TotalMilliseconds : 0);
 
-                    var diagItem = new MonitorEntry
+                    var diagnosticItem = new MonitorEntry
                     {
                         Datetime = HiResDateTime.UtcNow,
                         Device = MonitorDevice.Server,
@@ -292,7 +291,7 @@ namespace GS.Simulator
                         Thread = Thread.CurrentThread.ManagedThreadId,
                         Message = $"CmdId:{command.Id}|Type:{commandType ?? "Unknown"}|QueueWait:{queueWaitMs:F3}ms|Execution:{executionMs:F3}ms|Total:{(queueWaitMs + executionMs):F3}ms|QueueDepth:{queueDepth}|Success:False|Exception:{e.Message}"
                     };
-                    MonitorLog.LogToMonitor(diagItem);
+                    MonitorLog.LogToMonitor(diagnosticItem);
                 }
             }
             finally
@@ -339,6 +338,18 @@ namespace GS.Simulator
             }
             catch (Exception ex)
             {
+                
+                var diagnosticItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Mount,
+                    Type = MonitorType.Debug,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"Exception:{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(diagnosticItem);
                 throw;
             }
         }

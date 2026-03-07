@@ -45,7 +45,7 @@ namespace AlignmentModelTests
         [DataRow(12253584.6011247, 19611013.1941131)]
         [DataRow(11170002.8731509, 19030684.0924693)]
         [DataRow(11360902.2465664, 19916367.8300746)]
-        [DataTestMethod]
+        [TestMethod]
         public void Test_EQ_Polar2Cartes(double testX, double testY)
         {
             SphericalCoord test = new SphericalCoord(testX, testY);

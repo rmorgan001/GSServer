@@ -1,9 +1,9 @@
 ﻿using GS.Server.Alignment;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Reflection;
 using GS.Server.SkyTelescope;
 
+[assembly: Parallelize(Scope = ExecutionScope.MethodLevel)]
 namespace AlignmentModelTests
 {
     [TestClass]
@@ -73,10 +73,10 @@ namespace AlignmentModelTests
         [DataRow(38, 166.957052564248, 130.054588317871, 7152803.69502901, -9904122.47596046, 167.699808075733, 132.505309164462, 8679639.19245728, -8432986.69565104, "2023-02-22T16:47:51.8233376+00:00")]
         [DataRow(39, 180.642392088193, 159.463901519775, 10349540.867592, 183864.092471194, 180.64244012648, 159.463901519775, 10349540.5896989, 183877.838664585, "2023-02-26T21:05:39.0586382+00:00")]
         [DataRow(40, 187.496527047362, 163.621063232422, 9837826.67216066, 1920792.19567023, 187.49534086064, 163.621063232422, 9837893.52708983, 1920496.56004675, "2023-02-26T21:06:37.6198267+00:00")]
-        [DataTestMethod]
-        public void Test_AddingPoints(int id, double unsyncedRA, double unsyncedDec, double unsynchedX, double unsyncedY, double syncedRA, double syncedDec, double synchedX, double syncedY, string syncTime)
+        [TestMethod]
+        public void Test_AddingPoints(int id, double unsyncedRa, double unsyncedDec, double unsynchedX, double unsyncedY, double syncedRa, double syncedDec, double synchedX, double syncedY, string syncTime)
         {
-            _alignmentModel.SyncToRaDec(new double[] { unsyncedRA, unsyncedDec }, new double[] { syncedRA, syncedDec }, DateTime.Parse(syncTime));
+            _alignmentModel.SyncToRaDec(new[] { unsyncedRa, unsyncedDec }, new[] { syncedRa, syncedDec }, DateTime.Parse(syncTime));
 
         }
 
@@ -121,10 +121,10 @@ namespace AlignmentModelTests
         [DataRow(39, 180.642392088193, 159.463901519775, 10349540.867592, 183864.092471194, 180.64244012648, 159.463901519775, 10349540.5896989, 183877.838664585, "2023-02-26T21:05:39.0586382+00:00")]
         [DataRow(40, 187.496527047362, 163.621063232422, 9837826.67216066, 1920792.19567023, 187.49534086064, 163.621063232422, 9837893.52708983, 1920496.56004675, "2023-02-26T21:06:37.6198267+00:00")]
 
-        [DataTestMethod]
-        public void TestSP2CSRoundTip(int id, double unsyncedRA, double unsyncedDec, double unsynchedX, double unsyncedY, double syncedRA, double syncedDec, double synchedX, double syncedY, string syncTime)
+        [TestMethod]
+        public void TestSp2CsRoundTip(int id, double unsyncedRa, double unsyncedDec, double unsynchedX, double unsyncedY, double syncedRa, double syncedDec, double synchedX, double syncedY, string syncTime)
         {
-            AxisPosition testInput = new AxisPosition(unsyncedRA, unsyncedDec);
+            AxisPosition testInput = new AxisPosition(unsyncedRa, unsyncedDec);
             CartesCoord resultC = _alignmentModel.EQ_sp2Cs(testInput);
             AxisPosition resultAp = _alignmentModel.EQ_cs2Sp(resultC, resultC);
             Assert.AreEqual(testInput.RA, resultAp.RA, DoubleDelta, "RAs differ!");

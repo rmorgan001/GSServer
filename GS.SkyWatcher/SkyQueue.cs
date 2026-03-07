@@ -19,7 +19,7 @@ using GS.Shared.Transport;
 using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
-using System.Diagnostics;
+//using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -132,14 +132,6 @@ namespace GS.SkyWatcher
         /// Mount data results
         /// </summary>
         /// <remarks>
-        /// There could be timing issues between this method and timeouts for commands reading mount data
-        /// </remarks>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        /// <summary>
-        /// Mount data results
-        /// </summary>
-        /// <remarks>
         /// Waits for command completion using the command's embedded completion event
         /// </remarks>
         /// <param name="command"></param>
@@ -198,28 +190,25 @@ namespace GS.SkyWatcher
 
             // Check once if diagnostic logging is enabled to avoid overhead
             var diagnosticsEnabled = MonitorLog.InTypes(MonitorType.Debug);
-            var commandTypesToLog = new string[] {"SkyAxisPulse"};
+            var commandTypesToLog = new[] {"SkyAxisPulse"};
 
             // Always capture basic metrics for Warning/Information detection (minimal overhead)
             var dequeuedAt = HiResDateTime.UtcNow;
             var queueDepth = _commandBlockingCollection.Count;
 
             // Only capture detailed data if diagnostics enabled
-            DateTime executionStart = default;
             string commandType = null;
 
             if (diagnosticsEnabled)
             {
                 commandType = command.GetType().Name;
                 // Check if command type should be logged
-                bool shouldLog = false;
-                for (int i = 0; i < commandTypesToLog.Length; i++)
+                var shouldLog = false;
+                for (var i = 0; i < commandTypesToLog.Length; i++)
                 {
-                    if (commandType == commandTypesToLog[i])
-                    {
-                        shouldLog = true;
-                        break;
-                    }
+                    if (commandType != commandTypesToLog[i]) continue;
+                    shouldLog = true;
+                    break;
                 }
                 if (!shouldLog) diagnosticsEnabled = false;
             }
@@ -235,7 +224,7 @@ namespace GS.SkyWatcher
                 }
                 else
                 {
-                    executionStart = HiResDateTime.UtcNow;
+                    var executionStart = HiResDateTime.UtcNow;
 
                     command.Execute(_skyWatcher);
 
@@ -263,7 +252,7 @@ namespace GS.SkyWatcher
                     {
                         var executionMs = (HiResDateTime.UtcNow - executionStart).TotalMilliseconds;
 
-                        var diagItem = new MonitorEntry
+                        var diagnosticItem = new MonitorEntry
                         {
                             Datetime = HiResDateTime.UtcNow,
                             Device = MonitorDevice.Telescope,
@@ -273,7 +262,7 @@ namespace GS.SkyWatcher
                             Thread = Thread.CurrentThread.ManagedThreadId,
                             Message = $"CmdId:{command.Id}|Type:{commandType}|QueueWait:{queueWaitMs:F3}ms|Execution:{executionMs:F3}ms|Total:{(queueWaitMs + executionMs):F3}ms|QueueDepth:{queueDepth}|Success:{command.Successful}"
                         };
-                        MonitorLog.LogToMonitor(diagItem);
+                        MonitorLog.LogToMonitor(diagnosticItem);
                     }
 
                     // Check for performance degradation (always check, regardless of debug logging)
@@ -325,7 +314,7 @@ namespace GS.SkyWatcher
                     var queueWaitMs = (dequeuedAt != default ? (dequeuedAt - command.CreatedUtc).TotalMilliseconds : 0);
                     var executionMs = (dequeuedAt != default ? (HiResDateTime.UtcNow - dequeuedAt).TotalMilliseconds : 0);
 
-                    var diagItem = new MonitorEntry
+                    var diagnosticItem = new MonitorEntry
                     {
                         Datetime = HiResDateTime.UtcNow,
                         Device = MonitorDevice.Telescope,
@@ -335,7 +324,7 @@ namespace GS.SkyWatcher
                         Thread = Thread.CurrentThread.ManagedThreadId,
                         Message = $"CmdId:{command.Id}|Type:{commandType ?? "Unknown"}|QueueWait:{queueWaitMs:F3}ms|Execution:{executionMs:F3}ms|Total:{(queueWaitMs + executionMs):F3}ms|QueueDepth:{queueDepth}|Success:False|Exception:{e.Message}"
                     };
-                    MonitorLog.LogToMonitor(diagItem);
+                    MonitorLog.LogToMonitor(diagnosticItem);
                 }
             }
             finally
@@ -383,6 +372,7 @@ namespace GS.SkyWatcher
                     try
                     {
                         // Signal that background task is ready to consume commands
+                        // ReSharper disable once AccessToDisposedClosure
                         _taskReadySignal?.Set();
 
                         foreach (var command in _commandBlockingCollection.GetConsumingEnumerable(ct))

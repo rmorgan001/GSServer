@@ -42,7 +42,7 @@ using System;
 using System.Reflection;
 using System.Threading;
 using GS.Principles;
-using GS.Server.Properties;
+//using GS.Server.Properties;
 using GS.Shared;
 using XInputDotNetPure;
 
@@ -50,12 +50,12 @@ namespace GS.Server.GamePad
 {
     public sealed class GamePadXInput : GamePad
     {
-        private bool _IsAvailable;
+        private bool _isAvailable;
 
-        public override bool IsAvailable => _IsAvailable;
+        public override bool IsAvailable => _isAvailable;
 
-        private GamePadState gamePadState;
-        private uint lastPacketNumber;
+        private GamePadState _gamePadState;
+        private uint _lastPacketNumber;
 
         private GamePadDeadZone DeadZone { get; }
 
@@ -72,8 +72,8 @@ namespace GS.Server.GamePad
         {
             try
             {
-                gamePadState = XInputDotNetPure.GamePad.GetState(PlayerIndex.One, DeadZone);
-                _IsAvailable = gamePadState.IsConnected;
+                _gamePadState = XInputDotNetPure.GamePad.GetState(PlayerIndex.One, DeadZone);
+                _isAvailable = _gamePadState.IsConnected;
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
@@ -82,17 +82,17 @@ namespace GS.Server.GamePad
                     Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"|XInput|{_IsAvailable}"
+                    Message = $"|XInput|{_isAvailable}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
             }
             catch (Exception ex)
             {
-                _IsAvailable = false;
+                _isAvailable = false;
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
@@ -110,15 +110,15 @@ namespace GS.Server.GamePad
         {
             try
             {
-                gamePadState = XInputDotNetPure.GamePad.GetState(PlayerIndex.One, DeadZone);
-                if (gamePadState.IsConnected)
+                _gamePadState = XInputDotNetPure.GamePad.GetState(PlayerIndex.One, DeadZone);
+                if (_gamePadState.IsConnected)
                 {
 
                     bool changed = false;
 
-                    if (gamePadState.PacketNumber != lastPacketNumber)
+                    if (_gamePadState.PacketNumber != _lastPacketNumber)
                     {
-                        lastPacketNumber = gamePadState.PacketNumber;
+                        _lastPacketNumber = _gamePadState.PacketNumber;
                         changed = true;
                     }
 
@@ -127,19 +127,19 @@ namespace GS.Server.GamePad
                     {
                         UpdateState();
                     }
-                    _IsAvailable = true;
+                    _isAvailable = true;
                 }
                 else
                 {
-                    _IsAvailable = false;
+                    _isAvailable = false;
                 }
             }
             catch (Exception ex)
             {
-                _IsAvailable = false;
+                _isAvailable = false;
                 var monitorItem = new MonitorEntry
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
+                    Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
                     Type = MonitorType.Error,
@@ -156,16 +156,16 @@ namespace GS.Server.GamePad
             //  checkGuide.Checked = reporterState.LastActiveState.Buttons.Guide == XInputDotNetPure.ButtonState.Pressed;
             Buttons = new[]
             {
-                gamePadState.Buttons.A == ButtonState.Pressed,
-                gamePadState.Buttons.B == ButtonState.Pressed,
-                gamePadState.Buttons.X == ButtonState.Pressed,
-                gamePadState.Buttons.Y == ButtonState.Pressed,
-                gamePadState.Buttons.LeftShoulder == ButtonState.Pressed,
-                gamePadState.Buttons.RightShoulder == ButtonState.Pressed,
-                gamePadState.Buttons.Back == ButtonState.Pressed,
-                gamePadState.Buttons.Start == ButtonState.Pressed,
-                gamePadState.Buttons.LeftStick == ButtonState.Pressed,
-                gamePadState.Buttons.RightStick == ButtonState.Pressed
+                _gamePadState.Buttons.A == ButtonState.Pressed,
+                _gamePadState.Buttons.B == ButtonState.Pressed,
+                _gamePadState.Buttons.X == ButtonState.Pressed,
+                _gamePadState.Buttons.Y == ButtonState.Pressed,
+                _gamePadState.Buttons.LeftShoulder == ButtonState.Pressed,
+                _gamePadState.Buttons.RightShoulder == ButtonState.Pressed,
+                _gamePadState.Buttons.Back == ButtonState.Pressed,
+                _gamePadState.Buttons.Start == ButtonState.Pressed,
+                _gamePadState.Buttons.LeftStick == ButtonState.Pressed,
+                _gamePadState.Buttons.RightStick == ButtonState.Pressed
             };
 
             //checkDPadUp.Checked = reporterState.LastActiveState.DPad.Up == XInputDotNetPure.ButtonState.Pressed;
@@ -173,48 +173,48 @@ namespace GS.Server.GamePad
             //checkDPadDown.Checked = reporterState.LastActiveState.DPad.Down == XInputDotNetPure.ButtonState.Pressed;
             //checkDPadLeft.Checked = reporterState.LastActiveState.DPad.Left == XInputDotNetPure.ButtonState.Pressed;
             int povState = -1;
-            if (gamePadState.DPad.Up == ButtonState.Pressed
-                && gamePadState.DPad.Right != ButtonState.Pressed
-                && gamePadState.DPad.Left != ButtonState.Pressed)
+            if (_gamePadState.DPad.Up == ButtonState.Pressed
+                && _gamePadState.DPad.Right != ButtonState.Pressed
+                && _gamePadState.DPad.Left != ButtonState.Pressed)
             {
                 povState = 0;
             }
-            else if (gamePadState.DPad.Up == ButtonState.Pressed
-                     && gamePadState.DPad.Right == ButtonState.Pressed)
+            else if (_gamePadState.DPad.Up == ButtonState.Pressed
+                     && _gamePadState.DPad.Right == ButtonState.Pressed)
             {
                 povState = 4500;
             }
-            else if (gamePadState.DPad.Right == ButtonState.Pressed
-                     && gamePadState.DPad.Up != ButtonState.Pressed
-                     && gamePadState.DPad.Down != ButtonState.Pressed)
+            else if (_gamePadState.DPad.Right == ButtonState.Pressed
+                     && _gamePadState.DPad.Up != ButtonState.Pressed
+                     && _gamePadState.DPad.Down != ButtonState.Pressed)
             {
                 povState = 9000;
             }
-            else if (gamePadState.DPad.Right == ButtonState.Pressed
-                     && gamePadState.DPad.Down == ButtonState.Pressed)
+            else if (_gamePadState.DPad.Right == ButtonState.Pressed
+                     && _gamePadState.DPad.Down == ButtonState.Pressed)
             {
                 povState = 13500;
             }
 
-            else if (gamePadState.DPad.Down == ButtonState.Pressed
-                && gamePadState.DPad.Right != ButtonState.Pressed
-                && gamePadState.DPad.Left != ButtonState.Pressed)
+            else if (_gamePadState.DPad.Down == ButtonState.Pressed
+                && _gamePadState.DPad.Right != ButtonState.Pressed
+                && _gamePadState.DPad.Left != ButtonState.Pressed)
             {
                 povState = 18000;
             }
-            else if (gamePadState.DPad.Down == ButtonState.Pressed
-                     && gamePadState.DPad.Left == ButtonState.Pressed)
+            else if (_gamePadState.DPad.Down == ButtonState.Pressed
+                     && _gamePadState.DPad.Left == ButtonState.Pressed)
             {
                 povState = 22500;
             }
-            else if (gamePadState.DPad.Left == ButtonState.Pressed
-                    && gamePadState.DPad.Up != ButtonState.Pressed
-                     && gamePadState.DPad.Down != ButtonState.Pressed)
+            else if (_gamePadState.DPad.Left == ButtonState.Pressed
+                    && _gamePadState.DPad.Up != ButtonState.Pressed
+                     && _gamePadState.DPad.Down != ButtonState.Pressed)
             {
                 povState = 27000;
             }
-            else if (gamePadState.DPad.Left == ButtonState.Pressed
-                     && gamePadState.DPad.Up == ButtonState.Pressed)
+            else if (_gamePadState.DPad.Left == ButtonState.Pressed
+                     && _gamePadState.DPad.Up == ButtonState.Pressed)
             {
                 povState = 31500;
             }
@@ -222,18 +222,18 @@ namespace GS.Server.GamePad
 
             //labelTriggerLeft.Text = FormatFloat(reporterState.LastActiveState.Triggers.Left);
             //labelTriggerRight.Text = FormatFloat(reporterState.LastActiveState.Triggers.Right);
-            ZAxis = RangeForDirectX(-gamePadState.Triggers.Left + gamePadState.Triggers.Right);
+            ZAxis = RangeForDirectX(-_gamePadState.Triggers.Left + _gamePadState.Triggers.Right);
 
             //labelStickLeftX.Text = FormatFloat(reporterState.LastActiveState.ThumbSticks.Left.X);
             //labelStickLeftY.Text = FormatFloat(reporterState.LastActiveState.ThumbSticks.Left.Y);
 
-            XAxis = RangeForDirectX(gamePadState.ThumbSticks.Left.X);    
-            YAxis = RangeForDirectX(gamePadState.ThumbSticks.Left.Y);
+            XAxis = RangeForDirectX(_gamePadState.ThumbSticks.Left.X);    
+            YAxis = RangeForDirectX(_gamePadState.ThumbSticks.Left.Y);
 
             //labelStickRightX.Text = FormatFloat(reporterState.LastActiveState.ThumbSticks.Right.X);
             //labelStickRightY.Text = FormatFloat(reporterState.LastActiveState.ThumbSticks.Right.Y);
-            XRotation = RangeForDirectX(gamePadState.ThumbSticks.Right.X);
-            YRotation = RangeForDirectX(gamePadState.ThumbSticks.Right.Y);
+            XRotation = RangeForDirectX(_gamePadState.ThumbSticks.Right.X);
+            YRotation = RangeForDirectX(_gamePadState.ThumbSticks.Right.Y);
             ZRotation = null;
         }
 
