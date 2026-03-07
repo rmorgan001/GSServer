@@ -37,6 +37,7 @@ namespace GS.SkyWatcher
         private static Task _processingTask;
         private static bool _isInWarningState;
         private static ManualResetEventSlim _taskReadySignal;
+        private static CommandQueueStatistics _statistics;
         public static event PropertyChangedEventHandler StaticPropertyChanged;
 
         private static long _id;
@@ -68,6 +69,10 @@ namespace GS.SkyWatcher
         /// Locking id
         /// </summary>
         public static long NewId => Interlocked.Increment(ref _id);
+        /// <summary>
+        /// Gets the current session statistics for the sky command queue
+        /// </summary>
+        public static CommandQueueStatistics Statistics => _statistics;
         /// <summary>
         /// status for Dec Pulse
         /// </summary>
@@ -161,6 +166,7 @@ namespace GS.SkyWatcher
                 }
 
                 // Timeout occurred
+                _statistics?.IncrementTimedOut();
                 var ex = new MountControlException(ErrorCode.ErrQueueFailed, $"Queue Read Timeout {command.Id}, {command}");
                 command.Exception = ex;
                 command.Successful = false;
@@ -168,12 +174,14 @@ namespace GS.SkyWatcher
             }
             catch (OperationCanceledException)
             {
+                _statistics?.IncrementExceptions();
                 command.Exception = new MountControlException(ErrorCode.ErrQueueFailed, "Operation cancelled");
                 command.Successful = false;
                 return command;
             }
             catch (Exception e)
             {
+                _statistics?.IncrementExceptions();
                 command.Exception = e;
                 command.Successful = false;
                 return command;
@@ -186,6 +194,8 @@ namespace GS.SkyWatcher
         /// <param name="command"></param>
         private static void ProcessCommandQueue(ISkyCommand command)
         {
+            _statistics?.IncrementTotalProcessed();
+
             // Check once if diagnostic logging is enabled to avoid overhead
             var diagnosticsEnabled = MonitorLog.InTypes(MonitorType.Debug);
             var commandTypesToLog = new string[] {"SkyAxisPulse"};
@@ -221,12 +231,22 @@ namespace GS.SkyWatcher
                 {
                     command.Exception = new MountControlException(ErrorCode.ErrQueueFailed, "Queue stopped or not connected");
                     command.Successful = false;
+                    _statistics?.IncrementFailed();
                 }
                 else
                 {
                     executionStart = HiResDateTime.UtcNow;
 
                     command.Execute(_skyWatcher);
+
+                    if (command.Successful)
+                    {
+                        _statistics?.IncrementSuccessful();
+                    }
+                    else
+                    {
+                        _statistics?.IncrementFailed();
+                    }
 
                     if (command.Exception != null)
                     {
@@ -296,6 +316,8 @@ namespace GS.SkyWatcher
             {
                 command.Exception = e;
                 command.Successful = false;
+                _statistics?.IncrementFailed();
+                _statistics?.IncrementExceptions();
 
                 // Log diagnostic timing info even on exception - only when Debug monitoring is enabled
                 if (diagnosticsEnabled)
@@ -349,6 +371,12 @@ namespace GS.SkyWatcher
                 _skyWatcher.LowVoltageEvent += lowVoltageEventHandler;
                 _commandBlockingCollection = new BlockingCollection<ISkyCommand>();
                 _taskReadySignal = new ManualResetEventSlim(false);
+
+                if (_statistics == null)
+                {
+                    _statistics = new CommandQueueStatistics();
+                }
+                _statistics.Reset();
 
                 _processingTask = Task.Factory.StartNew(() =>
                 {

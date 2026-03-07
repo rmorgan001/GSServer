@@ -35,6 +35,7 @@ namespace GS.Simulator
         private static CancellationTokenSource _cts;
         private static Task _processingTask;
         private static bool _isInWarningState;
+        private static CommandQueueStatistics _statistics;
         public static event PropertyChangedEventHandler StaticPropertyChanged;
 
         #endregion
@@ -44,6 +45,11 @@ namespace GS.Simulator
         public static bool IsRunning { get; private set; }
         private static long _id;
         public static long NewId => Interlocked.Increment(ref _id);
+
+        /// <summary>
+        /// Gets the current session statistics for the mount command queue
+        /// </summary>
+        public static CommandQueueStatistics Statistics => _statistics;
 
         private static bool _isPulseGuidingDec;
         /// <summary>
@@ -134,6 +140,7 @@ namespace GS.Simulator
                 }
 
                 // Timeout occurred
+                _statistics?.IncrementTimedOut();
                 var ex = new MountException(ErrorCode.ErrQueueFailed, $"Queue Read Timeout {command.Id}, {command}");
                 command.Exception = ex;
                 command.Successful = false;
@@ -141,12 +148,14 @@ namespace GS.Simulator
             }
             catch (OperationCanceledException)
             {
+                _statistics?.IncrementExceptions();
                 command.Exception = new MountException(ErrorCode.ErrQueueFailed, "Operation cancelled");
                 command.Successful = false;
                 return command;
             }
             catch (Exception e)
             {
+                _statistics?.IncrementExceptions();
                 command.Exception = e;
                 command.Successful = false;
                 return command;
@@ -159,6 +168,8 @@ namespace GS.Simulator
         /// <param name="command"></param>
         private static void ProcessCommandQueue(IMountCommand command)
         {
+            _statistics?.IncrementTotalProcessed();
+
             // Declare variables outside try-catch so they're accessible in catch block
             bool diagnosticsEnabled = false;
             DateTime dequeuedAt = default;
@@ -184,12 +195,22 @@ namespace GS.Simulator
                 {
                     command.Exception = new MountException(ErrorCode.ErrQueueFailed, "Queue stopped or not connected");
                     command.Successful = false;
+                    _statistics?.IncrementFailed();
                 }
                 else
                 {
-                    var executionStart = HiResDateTime.UtcNow;
+                    executionStart = HiResDateTime.UtcNow;
 
                     command.Execute(_actions);
+
+                    if (command.Successful)
+                    {
+                        _statistics?.IncrementSuccessful();
+                    }
+                    else
+                    {
+                        _statistics?.IncrementFailed();
+                    }
 
                     // Calculate queue wait time for both diagnostic logging and performance monitoring
                     var queueWaitMs = (executionStart - dequeuedAt).TotalMilliseconds;
@@ -252,6 +273,8 @@ namespace GS.Simulator
             {
                 command.Exception = e;
                 command.Successful = false;
+                _statistics?.IncrementFailed();
+                _statistics?.IncrementExceptions();
 
                 // Log diagnostic timing info even on exception - only when Debug monitoring is enabled
                 if (diagnosticsEnabled)
@@ -290,6 +313,13 @@ namespace GS.Simulator
                 _actions = new Actions();
                 _actions.InitializeAxes();
                 _commandBlockingCollection = new BlockingCollection<IMountCommand>();
+
+                if (_statistics == null)
+                {
+                    _statistics = new CommandQueueStatistics();
+                }
+                _statistics.Reset();
+
                 IsRunning = true;
 
                 _processingTask = Task.Factory.StartNew(() =>

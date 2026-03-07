@@ -5312,9 +5312,44 @@ namespace GS.Server.SkyTelescope
             while (sw.Elapsed.TotalMilliseconds < 1000) { } //change
             sw.Stop();
 
-            if (MountQueue.IsRunning) { MountQueue.Stop(); }
+            if (MountQueue.IsRunning)
+            {
+                var mountStats = MountQueue.Statistics;
+                if (mountStats != null)
+                {
+                    var mountStatsItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Server,
+                        Category = MonitorCategory.Server,
+                        Type = MonitorType.Information,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"MountQueue Session Statistics: {mountStats}"
+                    };
+                    MonitorLog.LogToMonitor(mountStatsItem);
+                }
+                MountQueue.Stop();
+            }
 
             if (!SkyQueue.IsRunning) return;
+
+            var skyStats = SkyQueue.Statistics;
+            if (skyStats != null)
+            {
+                var skyStatsItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"SkyQueue Session Statistics: {skyStats}"
+                };
+                MonitorLog.LogToMonitor(skyStatsItem);
+            }
+
             SkyQueue.Stop();
             SkySystem.ConnectSerial = false;
         }
