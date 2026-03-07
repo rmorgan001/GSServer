@@ -32,12 +32,12 @@ namespace GS.SkyWatcher
         #region Fields
 
         private static BlockingCollection<ISkyCommand> _commandBlockingCollection;
-        private static ConcurrentDictionary<long, (ISkyCommand command, ManualResetEventSlim waitHandle)> _resultsDictionary;
         private static SkyWatcher _skyWatcher;
         private static CancellationTokenSource _cts;
         private static Task _processingTask;
-        private static int _cleanupCounter;
         private static bool _isInWarningState;
+        private static ManualResetEventSlim _taskReadySignal;
+        private static CommandQueueStatistics _statistics;
         public static event PropertyChangedEventHandler StaticPropertyChanged;
 
         private static long _id;
@@ -69,6 +69,10 @@ namespace GS.SkyWatcher
         /// Locking id
         /// </summary>
         public static long NewId => Interlocked.Increment(ref _id);
+        /// <summary>
+        /// Gets the current session statistics for the sky command queue
+        /// </summary>
+        public static CommandQueueStatistics Statistics => _statistics;
         /// <summary>
         /// status for Dec Pulse
         /// </summary>
@@ -116,51 +120,11 @@ namespace GS.SkyWatcher
         /// <param name="command"></param>
         public static void AddCommand(ISkyCommand command)
         {
-            if (!IsRunning || _cts.IsCancellationRequested || _skyWatcher?.IsConnected != true) return;
-
-            // Clean every 20 commands instead of every command
-            if (Interlocked.Increment(ref _cleanupCounter) % 20 == 0)
-            {
-                CleanResults(40, 180);
-            }
+            if (!IsRunning || _cts.IsCancellationRequested) return;
 
             if (_commandBlockingCollection.TryAdd(command) == false)
             {
                 throw new MountControlException(ErrorCode.ErrQueueFailed, $"Unable to Add Command {command.Id}, {command}");
-            }
-        }
-
-        /// <summary>
-        /// Cleans up the results dictionary
-        /// </summary>
-        /// <param name="count"></param>
-        /// <param name="seconds"></param>
-        private static void CleanResults(int count, int seconds)
-        {
-            if (!IsRunning || _cts.IsCancellationRequested || _skyWatcher?.IsConnected != true) return;
-            if (_resultsDictionary.IsEmpty) return;
-            var recordsCount = _resultsDictionary.Count;
-            if (recordsCount == 0) return;
-            if (count == 0 && seconds == 0)
-            {
-                foreach (var kvp in _resultsDictionary)
-                {
-                    kvp.Value.waitHandle?.Dispose();
-                }
-                _resultsDictionary.Clear();
-                return;
-            }
-
-            if (recordsCount < count) return;
-            var now = HiResDateTime.UtcNow;
-            foreach (var result in _resultsDictionary)
-            {
-                if (result.Value.command == null) continue;
-                if (result.Value.command.CreatedUtc.AddSeconds(seconds) >= now) continue;
-                if (_resultsDictionary.TryRemove(result.Key, out var removed))
-                {
-                    removed.waitHandle?.Dispose();
-                }
             }
         }
 
@@ -172,13 +136,21 @@ namespace GS.SkyWatcher
         /// </remarks>
         /// <param name="command"></param>
         /// <returns></returns>
+        /// <summary>
+        /// Mount data results
+        /// </summary>
+        /// <remarks>
+        /// Waits for command completion using the command's embedded completion event
+        /// </remarks>
+        /// <param name="command"></param>
+        /// <returns></returns>
         public static ISkyCommand GetCommandResult(ISkyCommand command)
         {
             try
             {
                 if (!IsRunning || _cts?.IsCancellationRequested != false)
                 {
-                    var a = "Queue | IsRunning:" + IsRunning + "| IsCancel:" + _cts?.IsCancellationRequested + "| IsConnected:" + (_skyWatcher?.IsConnected == true);
+                    var a = "Queue | IsRunning:" + IsRunning + "| IsCancel:" + _cts?.IsCancellationRequested;
                     if (command.Exception != null) { a += "| Ex:" + command.Exception.Message; }
                     var e = new MountControlException(ErrorCode.ErrQueueFailed, a);
                     command.Exception = e;
@@ -186,89 +158,30 @@ namespace GS.SkyWatcher
                     return command;
                 }
 
-                var dict = _resultsDictionary;
-                if (dict == null)
+                // Wait for command to complete with 40 second timeout
+                if (command.CompletionEvent.Wait(40000, _cts.Token))
                 {
-                    var e = new MountControlException(ErrorCode.ErrQueueFailed, "Queue stopped");
-                    command.Exception = e;
-                    command.Successful = false;
+                    // Command completed - return it
                     return command;
                 }
 
-                // Fast path: check if already completed
-                if (dict.TryGetValue(command.Id, out var existing) && existing.command != null)
-                {
-                    if (dict.TryRemove(command.Id, out var completed))
-                    {
-                        completed.waitHandle?.Dispose();
-                        return completed.command;
-                    }
-                }
-
-                // Not completed yet - register wait handle
-                var waitHandle = new ManualResetEventSlim(false);
-                if (!dict.TryAdd(command.Id, (null, waitHandle)))
-                {
-                    // Another thread registered - try to get the result
-                    waitHandle.Dispose();
-                    if (dict.TryRemove(command.Id, out var result))
-                    {
-                        result.waitHandle?.Dispose();
-                        return result.command ?? command;
-                    }
-                    return command;
-                }
-
-                // Double-check: command might have completed between first check and registration
-                if (dict.TryGetValue(command.Id, out var doubleCheck) && doubleCheck.command != null)
-                {
-                    if (dict.TryRemove(command.Id, out var completed))
-                    {
-                        waitHandle.Dispose();
-                        completed.waitHandle?.Dispose();
-                        return completed.command;
-                    }
-                }
-
-                try
-                {
-                    // Wait for command to complete with 40 second timeout
-                    if (waitHandle.Wait(40000, _cts.Token))
-                    {
-                        // Command completed - retrieve result
-                        if (dict.TryRemove(command.Id, out var result))
-                        {
-                            return result.command ?? command;
-                        }
-                    }
-
-                    // Timeout occurred
-                    if (dict.TryRemove(command.Id, out _))
-                    {
-                        var ex = new MountControlException(ErrorCode.ErrQueueFailed, $"Queue Read Timeout {command.Id}, {command}");
-                        command.Exception = ex;
-                        command.Successful = false;
-                    }
-                    return command;
-                }
-                catch (OperationCanceledException)
-                {
-                    dict.TryRemove(command.Id, out _);
-                    command.Exception = new MountControlException(ErrorCode.ErrQueueFailed, "Operation cancelled");
-                    command.Successful = false;
-                    return command;
-                }
-                finally
-                {
-                    waitHandle.Dispose();
-                }
+                // Timeout occurred
+                _statistics?.IncrementTimedOut();
+                var ex = new MountControlException(ErrorCode.ErrQueueFailed, $"Queue Read Timeout {command.Id}, {command}");
+                command.Exception = ex;
+                command.Successful = false;
+                return command;
+            }
+            catch (OperationCanceledException)
+            {
+                _statistics?.IncrementExceptions();
+                command.Exception = new MountControlException(ErrorCode.ErrQueueFailed, "Operation cancelled");
+                command.Successful = false;
+                return command;
             }
             catch (Exception e)
             {
-                var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{command.Id}|{e.Message}" };
-                MonitorLog.LogToMonitor(monitorItem);
-
+                _statistics?.IncrementExceptions();
                 command.Exception = e;
                 command.Successful = false;
                 return command;
@@ -281,6 +194,8 @@ namespace GS.SkyWatcher
         /// <param name="command"></param>
         private static void ProcessCommandQueue(ISkyCommand command)
         {
+            _statistics?.IncrementTotalProcessed();
+
             // Check once if diagnostic logging is enabled to avoid overhead
             var diagnosticsEnabled = MonitorLog.InTypes(MonitorType.Debug);
             var commandTypesToLog = new string[] {"SkyAxisPulse"};
@@ -311,21 +226,27 @@ namespace GS.SkyWatcher
 
             try
             {
-                if (!IsRunning || _cts.IsCancellationRequested)
+
+                if (!IsRunning || _cts.IsCancellationRequested || _skyWatcher?.IsConnected != true)
                 {
-                    command.Exception = new MountControlException(ErrorCode.ErrQueueFailed, "Queue stopped");
+                    command.Exception = new MountControlException(ErrorCode.ErrQueueFailed, "Queue stopped or not connected");
                     command.Successful = false;
-                }
-                else if (_skyWatcher?.IsConnected != true)
-                {
-                    command.Exception = new MountControlException(ErrorCode.ErrQueueFailed, "Not connected");
-                    command.Successful = false;
+                    _statistics?.IncrementFailed();
                 }
                 else
                 {
                     executionStart = HiResDateTime.UtcNow;
 
                     command.Execute(_skyWatcher);
+
+                    if (command.Successful)
+                    {
+                        _statistics?.IncrementSuccessful();
+                    }
+                    else
+                    {
+                        _statistics?.IncrementFailed();
+                    }
 
                     if (command.Exception != null)
                     {
@@ -390,35 +311,13 @@ namespace GS.SkyWatcher
                         MonitorLog.LogToMonitor(infoItem);
                     }
                 }
-
-                // Always store result if command has an ID, even if execution failed
-                if (command.Id > 0)
-                {
-                    var dict = _resultsDictionary;
-                    if (dict != null)
-                    {
-                        if (dict.TryGetValue(command.Id, out var entry))
-                        {
-                            // Wait handle already registered - update and signal
-                            dict.TryUpdate(command.Id, (command, entry.waitHandle), entry);
-                            entry.waitHandle?.Set();
-                        }
-                        else
-                        {
-                            // No waiter yet - store result for fast-path retrieval
-                            dict.TryAdd(command.Id, (command, null));
-                        }
-                    }
-                }
             }
             catch (Exception e)
             {
-                var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{command.Id}|{e.Message}" };
-                MonitorLog.LogToMonitor(monitorItem);
-
                 command.Exception = e;
                 command.Successful = false;
+                _statistics?.IncrementFailed();
+                _statistics?.IncrementExceptions();
 
                 // Log diagnostic timing info even on exception - only when Debug monitoring is enabled
                 if (diagnosticsEnabled)
@@ -438,24 +337,11 @@ namespace GS.SkyWatcher
                     };
                     MonitorLog.LogToMonitor(diagItem);
                 }
-
-                // Still store result even on exception
-                if (command.Id > 0)
-                {
-                    var dict = _resultsDictionary;
-                    if (dict != null)
-                    {
-                        if (dict.TryGetValue(command.Id, out var entry))
-                        {
-                            dict.TryUpdate(command.Id, (command, entry.waitHandle), entry);
-                            entry.waitHandle?.Set();
-                        }
-                        else
-                        {
-                            dict.TryAdd(command.Id, (command, null));
-                        }
-                    }
-                }
+            }
+            finally
+            {
+                // Always signal completion - success or failure
+                command.CompletionEvent.Set();
             }
         }
 
@@ -483,14 +369,22 @@ namespace GS.SkyWatcher
 
                 _skyWatcher = new SkyWatcher();
                 _skyWatcher.LowVoltageEvent += lowVoltageEventHandler;
-                _resultsDictionary = new ConcurrentDictionary<long, (ISkyCommand command, ManualResetEventSlim waitHandle)>();
                 _commandBlockingCollection = new BlockingCollection<ISkyCommand>();
-                IsRunning = true;
+                _taskReadySignal = new ManualResetEventSlim(false);
+
+                if (_statistics == null)
+                {
+                    _statistics = new CommandQueueStatistics();
+                }
+                _statistics.Reset();
 
                 _processingTask = Task.Factory.StartNew(() =>
                 {
                     try
                     {
+                        // Signal that background task is ready to consume commands
+                        _taskReadySignal?.Set();
+
                         foreach (var command in _commandBlockingCollection.GetConsumingEnumerable(ct))
                         {
                             ProcessCommandQueue(command);
@@ -501,6 +395,24 @@ namespace GS.SkyWatcher
                         // Expected during shutdown
                     }
                 }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+
+                // Wait for background task to be ready to consume commands
+                if (_taskReadySignal.Wait(TimeSpan.FromSeconds(5)))
+                {
+                    IsRunning = true;
+                    // Pragmatic delay to ensure queue is fully operational
+                    Thread.Sleep(100);
+                }
+                else
+                {
+                    // Background task failed to start - clean up
+                    Stop();
+                    throw new MountControlException(ErrorCode.ErrQueueFailed, 
+                        "Background processing task failed to start within timeout");
+                }
+
+                _taskReadySignal?.Dispose();
+                _taskReadySignal = null;
             }
             catch (Exception ex)
             {
@@ -523,26 +435,6 @@ namespace GS.SkyWatcher
 
             _cts?.Cancel();
 
-            // Wake up all waiting threads and dispose wait handles safely
-            var dict = _resultsDictionary;
-            if (dict != null)
-            {
-                // First pass: wake up all waiters
-                foreach (var kvp in dict)
-                {
-                    kvp.Value.waitHandle?.Set();
-                }
-
-                // Brief delay to let threads wake up and clean up their entries
-                Thread.Sleep(10);
-
-                // Second pass: dispose all wait handles
-                foreach (var kvp in dict)
-                {
-                    kvp.Value.waitHandle?.Dispose();
-                }
-            }
-
             // Wait for processing task to complete
             if (_processingTask != null)
             {
@@ -557,10 +449,9 @@ namespace GS.SkyWatcher
                 _processingTask = null;
             }
 
+            _skyWatcher = null;
             _cts?.Dispose();
             _cts = null;
-            _skyWatcher = null;
-            _resultsDictionary = null;
             _commandBlockingCollection?.Dispose();
             _commandBlockingCollection = null;
         }
