@@ -35,23 +35,27 @@ namespace GS.Simulator
         private static CancellationTokenSource _cts;
         private static Task _processingTask;
         private static bool _isInWarningState;
-        private static CommandQueueStatistics _statistics;
+        private static ManualResetEventSlim _taskReadySignal;
         public static event PropertyChangedEventHandler StaticPropertyChanged;
+
+        private static long _id;
+        private static bool _isPulseGuidingDec;
+        private static bool _isPulseGuidingRa;
+        private static double[] _steps;
 
         #endregion
 
         #region properties
 
         public static bool IsRunning { get; private set; }
-        private static long _id;
+        
         public static long NewId => Interlocked.Increment(ref _id);
 
         /// <summary>
         /// Gets the current session statistics for the mount command queue
         /// </summary>
-        public static CommandQueueStatistics Statistics => _statistics;
+        public static CommandQueueStatistics Statistics { get; private set; }
 
-        private static bool _isPulseGuidingDec;
         /// <summary>
         /// status for Dec Pulse
         /// </summary>
@@ -65,7 +69,6 @@ namespace GS.Simulator
             }
         }
 
-        private static bool _isPulseGuidingRa;
         /// <summary>
         /// status for Dec Pulse
         /// </summary>
@@ -79,7 +82,6 @@ namespace GS.Simulator
             }
         }
 
-        private static double[] _steps;
         /// <summary>
         /// current micro steps, used to update SkyServer and UI
         /// </summary>
@@ -140,7 +142,7 @@ namespace GS.Simulator
                 }
 
                 // Timeout occurred
-                _statistics?.IncrementTimedOut();
+                Statistics?.IncrementTimedOut();
                 var ex = new MountException(ErrorCode.ErrQueueFailed, $"Queue Read Timeout {command.Id}, {command}");
                 command.Exception = ex;
                 command.Successful = false;
@@ -148,14 +150,14 @@ namespace GS.Simulator
             }
             catch (OperationCanceledException)
             {
-                _statistics?.IncrementExceptions();
+                Statistics?.IncrementExceptions();
                 command.Exception = new MountException(ErrorCode.ErrQueueFailed, "Operation cancelled");
                 command.Successful = false;
                 return command;
             }
             catch (Exception e)
             {
-                _statistics?.IncrementExceptions();
+                Statistics?.IncrementExceptions();
                 command.Exception = e;
                 command.Successful = false;
                 return command;
@@ -168,33 +170,44 @@ namespace GS.Simulator
         /// <param name="command"></param>
         private static void ProcessCommandQueue(IMountCommand command)
         {
-            _statistics?.IncrementTotalProcessed();
+            Statistics?.IncrementTotalProcessed();
 
-            // Declare variables outside try-catch so they're accessible in catch block
-            var diagnosticsEnabled = false;
+            // Check once if diagnostic logging is enabled to avoid overhead
+            var diagnosticsEnabled = MonitorLog.InTypes(MonitorType.Debug);
+            
+            //todo switch comment to turn on/off specific command types
+            var commandTypesToLog = new[]{ "CmdAxisPulse"};
+            //var commandTypesToLog = new string[]{};
+
+            // Always capture basic metrics for Warning/Information detection (minimal overhead)
             DateTime dequeuedAt = default;
-            var queueDepth = 0;
+            var queueDepth = _commandBlockingCollection.Count;
+
+            // Only capture detailed data if diagnostics enabled
             string commandType = null;
+
+            if (diagnosticsEnabled)
+            {
+                commandType = command.GetType().Name;
+                // Check if command type should be logged
+                var shouldLog = false;
+                for (var i = commandTypesToLog.Length - 1; i >= 0; i--)
+                {
+                    if (commandType != commandTypesToLog[i]) continue;
+                    shouldLog = true;
+                    break;
+                }
+                if (!shouldLog) diagnosticsEnabled = false;
+            }
 
             try
             {
-                // Check once if diagnostic logging is enabled to avoid overhead
-                diagnosticsEnabled = MonitorLog.InTypes(MonitorType.Debug);
-
-                // Always capture basic metrics for Warning/Information detection (minimal overhead)
-                dequeuedAt = HiResDateTime.UtcNow;
-                queueDepth = _commandBlockingCollection.Count;
-
-                if (diagnosticsEnabled)
-                {
-                    commandType = command.GetType().Name;
-                }
 
                 if (!IsRunning || _cts.IsCancellationRequested || !Actions.IsConnected)
                 {
                     command.Exception = new MountException(ErrorCode.ErrQueueFailed, "Queue stopped or not connected");
                     command.Successful = false;
-                    _statistics?.IncrementFailed();
+                    Statistics?.IncrementFailed();
                 }
                 else
                 {
@@ -204,11 +217,18 @@ namespace GS.Simulator
 
                     if (command.Successful)
                     {
-                        _statistics?.IncrementSuccessful();
+                        Statistics?.IncrementSuccessful();
                     }
                     else
                     {
-                        _statistics?.IncrementFailed();
+                        Statistics?.IncrementFailed();
+                    }
+
+                    if (command.Exception != null)
+                    {
+                        var monitorItem = new MonitorEntry
+                            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{command.Exception.Message}|{command.Exception.StackTrace}" };
+                        MonitorLog.LogToMonitor(monitorItem);
                     }
 
                     // Calculate queue wait time for both diagnostic logging and performance monitoring
@@ -219,6 +239,13 @@ namespace GS.Simulator
                     {
                         var executionMs = (HiResDateTime.UtcNow - executionStart).TotalMilliseconds;
 
+                        ThreadPool.GetAvailableThreads(out var worker, out var io);
+                        var threadMsg = $"|Worker threads:{worker:N0}|Asynchronous I/O threads:{io:N0}";
+                        ThreadPool.GetMinThreads(out var minWorker, out var minIoc);       
+                        threadMsg += $"|Min Worker threads:{minWorker:N0}|Min Asynchronous I/O threads:{minIoc:N0}";
+                        ThreadPool.GetMaxThreads(out var maxWorker, out var portThreads);
+                        threadMsg += $"|Max Worker threads:{maxWorker:N0}|Max completion port threads:{portThreads:N0}";
+
                         var diagnosticItem = new MonitorEntry
                         {
                             Datetime = HiResDateTime.UtcNow,
@@ -227,7 +254,7 @@ namespace GS.Simulator
                             Type = MonitorType.Debug,
                             Method = MethodBase.GetCurrentMethod()?.Name,
                             Thread = Thread.CurrentThread.ManagedThreadId,
-                            Message = $"CmdId:{command.Id}|Type:{commandType}|QueueWait:{queueWaitMs:F3}ms|Execution:{executionMs:F3}ms|Total:{(queueWaitMs + executionMs):F3}ms|QueueDepth:{queueDepth}|Success:{command.Successful}"
+                            Message = $"CmdId:{command.Id}|Type:{commandType}|QueueWait:{queueWaitMs:F3}ms|Execution:{executionMs:F3}ms|Total:{(queueWaitMs + executionMs):F3}ms|QueueDepth:{queueDepth}|Success:{command.Successful}|{threadMsg}"
                         };
                         MonitorLog.LogToMonitor(diagnosticItem);
                     }
@@ -236,35 +263,40 @@ namespace GS.Simulator
                     // Monitor record only created when state transition occurs
                     var isSlowOrDeep = queueDepth > 10 || queueWaitMs > 100.0;
 
-                    if (isSlowOrDeep && !_isInWarningState)
+                    switch (isSlowOrDeep)
                     {
-                        _isInWarningState = true;
-                        var warnItem = new MonitorEntry
+                        case true when !_isInWarningState:
                         {
-                            Datetime = HiResDateTime.UtcNow,
-                            Device = MonitorDevice.Server,
-                            Category = MonitorCategory.Mount,
-                            Type = MonitorType.Warning,
-                            Method = MethodBase.GetCurrentMethod()?.Name,
-                            Thread = Thread.CurrentThread.ManagedThreadId,
-                            Message = $"Queue performance degraded - QueueDepth:{queueDepth}|QueueWait:{queueWaitMs:F3}ms"
-                        };
-                        MonitorLog.LogToMonitor(warnItem);
-                    }
-                    else if (!isSlowOrDeep && _isInWarningState)
-                    {
-                        _isInWarningState = false;
-                        var infoItem = new MonitorEntry
+                            _isInWarningState = true;
+                            var warnItem = new MonitorEntry
+                            {
+                                Datetime = HiResDateTime.UtcNow,
+                                Device = MonitorDevice.Server,
+                                Category = MonitorCategory.Mount,
+                                Type = MonitorType.Warning,
+                                Method = MethodBase.GetCurrentMethod()?.Name,
+                                Thread = Thread.CurrentThread.ManagedThreadId,
+                                Message = $"Queue performance degraded - QueueDepth:{queueDepth}|QueueWait:{queueWaitMs:F3}ms"
+                            };
+                            MonitorLog.LogToMonitor(warnItem);
+                            break;
+                        }
+                        case false when _isInWarningState:
                         {
-                            Datetime = HiResDateTime.UtcNow,
-                            Device = MonitorDevice.Server,
-                            Category = MonitorCategory.Mount,
-                            Type = MonitorType.Information,
-                            Method = MethodBase.GetCurrentMethod()?.Name,
-                            Thread = Thread.CurrentThread.ManagedThreadId,
-                            Message = $"Queue performance normal - QueueDepth:{queueDepth}|QueueWait:{queueWaitMs:F3}ms"
-                        };
-                        MonitorLog.LogToMonitor(infoItem);
+                            _isInWarningState = false;
+                            var infoItem = new MonitorEntry
+                            {
+                                Datetime = HiResDateTime.UtcNow,
+                                Device = MonitorDevice.Server,
+                                Category = MonitorCategory.Mount,
+                                Type = MonitorType.Information,
+                                Method = MethodBase.GetCurrentMethod()?.Name,
+                                Thread = Thread.CurrentThread.ManagedThreadId,
+                                Message = $"Queue performance normal - QueueDepth:{queueDepth}|QueueWait:{queueWaitMs:F3}ms"
+                            };
+                            MonitorLog.LogToMonitor(infoItem);
+                            break;
+                        }
                     }
                 }
             }
@@ -272,8 +304,8 @@ namespace GS.Simulator
             {
                 command.Exception = e;
                 command.Successful = false;
-                _statistics?.IncrementFailed();
-                _statistics?.IncrementExceptions();
+                Statistics?.IncrementFailed();
+                Statistics?.IncrementExceptions();
 
                 // Log diagnostic timing info even on exception - only when Debug monitoring is enabled
                 if (diagnosticsEnabled)
@@ -312,12 +344,13 @@ namespace GS.Simulator
                 _actions = new Actions();
                 _actions.InitializeAxes();
                 _commandBlockingCollection = new BlockingCollection<IMountCommand>();
+                _taskReadySignal = new ManualResetEventSlim(false);
 
-                if (_statistics == null)
+                if (Statistics == null)
                 {
-                    _statistics = new CommandQueueStatistics();
+                    Statistics = new CommandQueueStatistics();
                 }
-                _statistics.Reset();
+                Statistics.Reset();
 
                 IsRunning = true;
 
@@ -325,6 +358,10 @@ namespace GS.Simulator
                 {
                     try
                     {
+                        // Signal that background task is ready to consume commands
+                        // ReSharper disable once AccessToDisposedClosure
+                        _taskReadySignal?.Set();
+
                         foreach (var command in _commandBlockingCollection.GetConsumingEnumerable(ct))
                         {
                             ProcessCommandQueue(command);
@@ -335,21 +372,30 @@ namespace GS.Simulator
                         // Expected when ct is cancelled
                     }
                 }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+
+                // Wait for background task to be ready to consume commands
+                if (_taskReadySignal.Wait(TimeSpan.FromSeconds(5)))
+                {
+                    IsRunning = true;
+                    // Pragmatic delay to ensure queue is fully operational
+                    Thread.Sleep(100);
+                }
+                else
+                {
+                    // Background task failed to start - clean up
+                    Stop();
+                    throw new MountException(ErrorCode.ErrQueueFailed, 
+                        "Background processing task failed to start within timeout");
+                }
+
+                _taskReadySignal?.Dispose();
+                _taskReadySignal = null;
             }
             catch (Exception ex)
             {
-                
-                var diagnosticItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
-                    Category = MonitorCategory.Mount,
-                    Type = MonitorType.Debug,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Exception:{ex.Message}"
-                };
-                MonitorLog.LogToMonitor(diagnosticItem);
+                var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Exception:|{ex}" };
+                MonitorLog.LogToMonitor(monitorItem);
                 throw;
             }
         }

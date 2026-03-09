@@ -37,7 +37,6 @@ namespace GS.SkyWatcher
         private static Task _processingTask;
         private static bool _isInWarningState;
         private static ManualResetEventSlim _taskReadySignal;
-        private static CommandQueueStatistics _statistics;
         public static event PropertyChangedEventHandler StaticPropertyChanged;
 
         private static long _id;
@@ -72,7 +71,8 @@ namespace GS.SkyWatcher
         /// <summary>
         /// Gets the current session statistics for the sky command queue
         /// </summary>
-        public static CommandQueueStatistics Statistics => _statistics;
+        public static CommandQueueStatistics Statistics { get; private set; }
+
         /// <summary>
         /// status for Dec Pulse
         /// </summary>
@@ -158,7 +158,7 @@ namespace GS.SkyWatcher
                 }
 
                 // Timeout occurred
-                _statistics?.IncrementTimedOut();
+                Statistics?.IncrementTimedOut();
                 var ex = new MountControlException(ErrorCode.ErrQueueFailed, $"Queue Read Timeout {command.Id}, {command}");
                 command.Exception = ex;
                 command.Successful = false;
@@ -166,14 +166,14 @@ namespace GS.SkyWatcher
             }
             catch (OperationCanceledException)
             {
-                _statistics?.IncrementExceptions();
+                Statistics?.IncrementExceptions();
                 command.Exception = new MountControlException(ErrorCode.ErrQueueFailed, "Operation cancelled");
                 command.Successful = false;
                 return command;
             }
             catch (Exception e)
             {
-                _statistics?.IncrementExceptions();
+                Statistics?.IncrementExceptions();
                 command.Exception = e;
                 command.Successful = false;
                 return command;
@@ -186,11 +186,14 @@ namespace GS.SkyWatcher
         /// <param name="command"></param>
         private static void ProcessCommandQueue(ISkyCommand command)
         {
-            _statistics?.IncrementTotalProcessed();
+            Statistics?.IncrementTotalProcessed();
 
             // Check once if diagnostic logging is enabled to avoid overhead
             var diagnosticsEnabled = MonitorLog.InTypes(MonitorType.Debug);
-            var commandTypesToLog = new[] {"SkyAxisPulse"};
+
+            //todo switch comment to turn on/off specific command types
+            var commandTypesToLog = new[]{ "SkyAxisPulse"};
+            //var commandTypesToLog = new string[]{};
 
             // Always capture basic metrics for Warning/Information detection (minimal overhead)
             var dequeuedAt = HiResDateTime.UtcNow;
@@ -204,7 +207,7 @@ namespace GS.SkyWatcher
                 commandType = command.GetType().Name;
                 // Check if command type should be logged
                 var shouldLog = false;
-                for (var i = 0; i < commandTypesToLog.Length; i++)
+                for (var i = commandTypesToLog.Length - 1; i >= 0; i--)
                 {
                     if (commandType != commandTypesToLog[i]) continue;
                     shouldLog = true;
@@ -220,7 +223,7 @@ namespace GS.SkyWatcher
                 {
                     command.Exception = new MountControlException(ErrorCode.ErrQueueFailed, "Queue stopped or not connected");
                     command.Successful = false;
-                    _statistics?.IncrementFailed();
+                    Statistics?.IncrementFailed();
                 }
                 else
                 {
@@ -230,11 +233,11 @@ namespace GS.SkyWatcher
 
                     if (command.Successful)
                     {
-                        _statistics?.IncrementSuccessful();
+                        Statistics?.IncrementSuccessful();
                     }
                     else
                     {
-                        _statistics?.IncrementFailed();
+                        Statistics?.IncrementFailed();
                     }
 
                     if (command.Exception != null)
@@ -252,6 +255,14 @@ namespace GS.SkyWatcher
                     {
                         var executionMs = (HiResDateTime.UtcNow - executionStart).TotalMilliseconds;
 
+                        ThreadPool.GetAvailableThreads(out var worker, out var io);
+                        var threadMsg = $"|Worker threads:{worker:N0}|Asynchronous I/O threads:{io:N0}";
+                        ThreadPool.GetMinThreads(out var minWorker, out var minIoc);       
+                        threadMsg += $"|Min Worker threads:{minWorker:N0}|Min Asynchronous I/O threads:{minIoc:N0}";
+                        ThreadPool.GetMaxThreads(out var maxWorker, out var portThreads);
+                        threadMsg += $"|Max Worker threads:{maxWorker:N0}|Max completion port threads:{portThreads:N0}";
+
+
                         var diagnosticItem = new MonitorEntry
                         {
                             Datetime = HiResDateTime.UtcNow,
@@ -260,7 +271,7 @@ namespace GS.SkyWatcher
                             Type = MonitorType.Debug,
                             Method = MethodBase.GetCurrentMethod()?.Name,
                             Thread = Thread.CurrentThread.ManagedThreadId,
-                            Message = $"CmdId:{command.Id}|Type:{commandType}|QueueWait:{queueWaitMs:F3}ms|Execution:{executionMs:F3}ms|Total:{(queueWaitMs + executionMs):F3}ms|QueueDepth:{queueDepth}|Success:{command.Successful}"
+                            Message = $"CmdId:{command.Id}|Type:{commandType}|QueueWait:{queueWaitMs:F3}ms|Execution:{executionMs:F3}ms|Total:{(queueWaitMs + executionMs):F3}ms|QueueDepth:{queueDepth}|Success:{command.Successful}|{threadMsg}"
                         };
                         MonitorLog.LogToMonitor(diagnosticItem);
                     }
@@ -269,35 +280,40 @@ namespace GS.SkyWatcher
                     // Monitor record only created when state transition occurs
                     var isSlowOrDeep = queueDepth > 10 || queueWaitMs > 100.0;
 
-                    if (isSlowOrDeep && !_isInWarningState)
+                    switch (isSlowOrDeep)
                     {
-                        _isInWarningState = true;
-                        var warnItem = new MonitorEntry
+                        case true when !_isInWarningState:
                         {
-                            Datetime = HiResDateTime.UtcNow,
-                            Device = MonitorDevice.Telescope,
-                            Category = MonitorCategory.Mount,
-                            Type = MonitorType.Warning,
-                            Method = MethodBase.GetCurrentMethod()?.Name,
-                            Thread = Thread.CurrentThread.ManagedThreadId,
-                            Message = $"Queue performance degraded - QueueDepth:{queueDepth}|QueueWait:{queueWaitMs:F3}ms"
-                        };
-                        MonitorLog.LogToMonitor(warnItem);
-                    }
-                    else if (!isSlowOrDeep && _isInWarningState)
-                    {
-                        _isInWarningState = false;
-                        var infoItem = new MonitorEntry
+                            _isInWarningState = true;
+                            var warnItem = new MonitorEntry
+                            {
+                                Datetime = HiResDateTime.UtcNow,
+                                Device = MonitorDevice.Telescope,
+                                Category = MonitorCategory.Mount,
+                                Type = MonitorType.Warning,
+                                Method = MethodBase.GetCurrentMethod()?.Name,
+                                Thread = Thread.CurrentThread.ManagedThreadId,
+                                Message = $"Queue performance degraded - QueueDepth:{queueDepth}|QueueWait:{queueWaitMs:F3}ms"
+                            };
+                            MonitorLog.LogToMonitor(warnItem);
+                            break;
+                        }
+                        case false when _isInWarningState:
                         {
-                            Datetime = HiResDateTime.UtcNow,
-                            Device = MonitorDevice.Telescope,
-                            Category = MonitorCategory.Mount,
-                            Type = MonitorType.Information,
-                            Method = MethodBase.GetCurrentMethod()?.Name,
-                            Thread = Thread.CurrentThread.ManagedThreadId,
-                            Message = $"Queue performance normal - QueueDepth:{queueDepth}|QueueWait:{queueWaitMs:F3}ms"
-                        };
-                        MonitorLog.LogToMonitor(infoItem);
+                            _isInWarningState = false;
+                            var infoItem = new MonitorEntry
+                            {
+                                Datetime = HiResDateTime.UtcNow,
+                                Device = MonitorDevice.Telescope,
+                                Category = MonitorCategory.Mount,
+                                Type = MonitorType.Information,
+                                Method = MethodBase.GetCurrentMethod()?.Name,
+                                Thread = Thread.CurrentThread.ManagedThreadId,
+                                Message = $"Queue performance normal - QueueDepth:{queueDepth}|QueueWait:{queueWaitMs:F3}ms"
+                            };
+                            MonitorLog.LogToMonitor(infoItem);
+                            break;
+                        }
                     }
                 }
             }
@@ -305,8 +321,8 @@ namespace GS.SkyWatcher
             {
                 command.Exception = e;
                 command.Successful = false;
-                _statistics?.IncrementFailed();
-                _statistics?.IncrementExceptions();
+                Statistics?.IncrementFailed();
+                Statistics?.IncrementExceptions();
 
                 // Log diagnostic timing info even on exception - only when Debug monitoring is enabled
                 if (diagnosticsEnabled)
@@ -361,11 +377,11 @@ namespace GS.SkyWatcher
                 _commandBlockingCollection = new BlockingCollection<ISkyCommand>();
                 _taskReadySignal = new ManualResetEventSlim(false);
 
-                if (_statistics == null)
+                if (Statistics == null)
                 {
-                    _statistics = new CommandQueueStatistics();
+                    Statistics = new CommandQueueStatistics();
                 }
-                _statistics.Reset();
+                Statistics.Reset();
 
                 _processingTask = Task.Factory.StartNew(() =>
                 {
@@ -407,7 +423,7 @@ namespace GS.SkyWatcher
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{IsRunning}|{ex}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Exception:|{ex}" };
                 MonitorLog.LogToMonitor(monitorItem);
                 throw;
             }
