@@ -34,6 +34,7 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
 
                             <RowDefinition Height="50" />
                         </Grid.RowDefinitions>
@@ -420,8 +421,73 @@
                             </b:EventTrigger>
                         </b:Interaction.Triggers>
                     </TextBox>
+                        <!--Row 4 - Diagonal-->
+                        <TextBox Grid.Row="4" Grid.Column="0" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSlewNE}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                            <TextBox.Text>
+                                <Binding Path="NE" Mode="OneWay" />
+                            </TextBox.Text>
+                            <b:Interaction.Triggers>
+                                <b:EventTrigger EventName="GotFocus">
+                                    <b:InvokeCommandAction Command="{Binding ClickTextBoxGotFocusCommand}" CommandParameter="northeast" />
+                                </b:EventTrigger>
+                                <b:EventTrigger EventName="LostFocus">
+                                    <b:InvokeCommandAction Command="{Binding ClickTextBoxLostFocusCommand}" />
+                                </b:EventTrigger>
+                                <b:EventTrigger EventName="PreviewMouseDoubleClick">
+                                    <b:InvokeCommandAction Command="{Binding ClickPreviewMouseDoubleClickCommand}" CommandParameter="northeast" />
+                                </b:EventTrigger>
+                            </b:Interaction.Triggers>
+                        </TextBox>
+                        <TextBox Grid.Row="4" Grid.Column="1" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSlewNW}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                            <TextBox.Text>
+                                <Binding Path="NW" Mode="OneWay" />
+                            </TextBox.Text>
+                            <b:Interaction.Triggers>
+                                <b:EventTrigger EventName="GotFocus">
+                                    <b:InvokeCommandAction Command="{Binding ClickTextBoxGotFocusCommand}" CommandParameter="northwest" />
+                                </b:EventTrigger>
+                                <b:EventTrigger EventName="LostFocus">
+                                    <b:InvokeCommandAction Command="{Binding ClickTextBoxLostFocusCommand}" />
+                                </b:EventTrigger>
+                                <b:EventTrigger EventName="PreviewMouseDoubleClick">
+                                    <b:InvokeCommandAction Command="{Binding ClickPreviewMouseDoubleClickCommand}" CommandParameter="northwest" />
+                                </b:EventTrigger>
+                            </b:Interaction.Triggers>
+                        </TextBox>
+                        <TextBox Grid.Row="4" Grid.Column="2" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSlewSE}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                            <TextBox.Text>
+                                <Binding Path="SE" Mode="OneWay" />
+                            </TextBox.Text>
+                            <b:Interaction.Triggers>
+                                <b:EventTrigger EventName="GotFocus">
+                                    <b:InvokeCommandAction Command="{Binding ClickTextBoxGotFocusCommand}" CommandParameter="southeast" />
+                                </b:EventTrigger>
+                                <b:EventTrigger EventName="LostFocus">
+                                    <b:InvokeCommandAction Command="{Binding ClickTextBoxLostFocusCommand}" />
+                                </b:EventTrigger>
+                                <b:EventTrigger EventName="PreviewMouseDoubleClick">
+                                    <b:InvokeCommandAction Command="{Binding ClickPreviewMouseDoubleClickCommand}" CommandParameter="southeast" />
+                                </b:EventTrigger>
+                            </b:Interaction.Triggers>
+                        </TextBox>
+                        <TextBox Grid.Row="4" Grid.Column="3" Width="125" Margin="0,10,0,0" IsReadOnly="True" md:HintAssist.Hint="{StaticResource gpSlewSW}" Style="{StaticResource MaterialDesignFilledTextBox}" IsEnabled="{Binding EnableTextBoxes}">
+                            <TextBox.Text>
+                                <Binding Path="SW" Mode="OneWay" />
+                            </TextBox.Text>
+                            <b:Interaction.Triggers>
+                                <b:EventTrigger EventName="GotFocus">
+                                    <b:InvokeCommandAction Command="{Binding ClickTextBoxGotFocusCommand}" CommandParameter="southwest" />
+                                </b:EventTrigger>
+                                <b:EventTrigger EventName="LostFocus">
+                                    <b:InvokeCommandAction Command="{Binding ClickTextBoxLostFocusCommand}" />
+                                </b:EventTrigger>
+                                <b:EventTrigger EventName="PreviewMouseDoubleClick">
+                                    <b:InvokeCommandAction Command="{Binding ClickPreviewMouseDoubleClickCommand}" CommandParameter="southwest" />
+                                </b:EventTrigger>
+                            </b:Interaction.Triggers>
+                        </TextBox>
 
-                    <Button Grid.Row="4" Grid.ColumnSpan="6" Grid.Column="0" HorizontalAlignment="Center" Content="{StaticResource gpSave}" IsEnabled="{Binding EnableTextBoxes}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSaveCommand}" />
+                    <Button Grid.Row="5" Grid.ColumnSpan="6" Grid.Column="0" HorizontalAlignment="Center" Content="{StaticResource gpSave}" IsEnabled="{Binding EnableTextBoxes}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Command="{Binding ClickSaveCommand}" />
                     </Grid>
                 </ScrollViewer>
             </Grid>

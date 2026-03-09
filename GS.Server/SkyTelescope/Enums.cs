@@ -60,6 +60,10 @@ namespace GS.Server.SkyTelescope
         SlewDown,
         SlewLeft,
         SlewRight,
+        SlewNorthEast,
+        SlewNorthWest,
+        SlewSouthEast,
+        SlewSouthWest,
         SlewNoneRa,
         SlewNoneDec
     }
