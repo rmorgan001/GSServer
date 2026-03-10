@@ -11528,16 +11528,16 @@ namespace GS.Server.SkyTelescope
                         break;
                     case AutoHomePositionType.PolarAzAlt:
                         var autoHome = Coordinate.AltAz2HaDec(AutoHomeAxisAlt, AutoHomeAxisAz, SkySettings.Latitude);
-                        if (SkyServer.SouthernHemisphere)
-                        {
-                            AutoHomeAxisX = Math.Round(180.0 - autoHome[0] * 15.0, 5); // Convert from Hour Angle
-                            AutoHomeAxisY = Math.Round(-1.0 * autoHome[1], 5);
-                        }
-                        else
-                        {
-                            AutoHomeAxisX = Math.Round(autoHome[0] * 15.0, 5); // Convert from Hour Angle
-                            AutoHomeAxisY = Math.Round(autoHome[1], 5); // Round value of AutoHomeAxisY
-                        }
+                        // Check Southern Hemisphere
+                        var isSouthern = SkyServer.SouthernHemisphere;
+
+                        // Save Auto Home Position
+                        AutoHomeAxisX = Math.Round((isSouthern ? 180.0 - autoHome[0] * 15.0 : autoHome[0] * 15.0), 5); // Convert from Hour Angle
+                        AutoHomeAxisY = Math.Round(isSouthern ? -autoHome[1] : autoHome[1], 5);
+
+                        // Save Home Position
+                        SkySettings.HomeAxisX = HomeAxisX + (isSouthern ? 180 : 0);   // reverse the display offset when southern
+                        SkySettings.HomeAxisY = HomeAxisY;
                         break;
                     case AutoHomePositionType.PolarRADec:
                         break;
