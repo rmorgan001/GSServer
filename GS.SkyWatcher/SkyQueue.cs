@@ -306,7 +306,7 @@ namespace GS.SkyWatcher
                                 Datetime = HiResDateTime.UtcNow,
                                 Device = MonitorDevice.Telescope,
                                 Category = MonitorCategory.Mount,
-                                Type = MonitorType.Information,
+                                Type = MonitorType.Warning,
                                 Method = MethodBase.GetCurrentMethod()?.Name,
                                 Thread = Thread.CurrentThread.ManagedThreadId,
                                 Message = $"Queue performance normal - QueueDepth:{queueDepth}|QueueWait:{queueWaitMs:F3}ms"

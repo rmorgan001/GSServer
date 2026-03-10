@@ -62,10 +62,10 @@ namespace GS.SkyWatcher
 
         #region Properties
 
-        public DateTime LastI1RunTime { get; private set; }
+      //  public DateTime LastI1RunTime { get; private set; }
         public DateTime LastJ1RunTime { get; private set; }
         public DateTime LastJ2ARunTime { get; private set; }
-        public DateTime LastJ2RunTime { get; private set; }
+      //  public DateTime LastJ2RunTime { get; private set; }
         private bool MountConnected { get; set; }
 
         /// <summary>
@@ -266,7 +266,7 @@ namespace GS.SkyWatcher
         {
             string response, msg;
             MonitorEntry monitorItem;
-            var newMsg = $"Adv:N/A;N/A";
+            var newMsg = "Adv:N/A;N/A";
             long[] revOld = { 0, 0 };
             long[] revNew = { 0, 0 };
 
@@ -311,7 +311,7 @@ namespace GS.SkyWatcher
 
             // default _resolutionFactor is already set to 1
             if (revOld[0] > 0) { _resolutionFactor[0] = (int)(revNew[0] / revOld[0]); }
-            if (_resolutionFactor[0] == 0) { _resolutionFactor[0] = 1; } //make sure its not 0
+            if (_resolutionFactor[0] == 0) { _resolutionFactor[0] = 1; } //make sure it's not 0
 
             if (revOld[1] > 0) { _resolutionFactor[1] = (int)(revNew[1] / revOld[1]); }
             if (_resolutionFactor[1] == 0) { _resolutionFactor[1] = 1; } //make sure it's not 0
@@ -358,7 +358,7 @@ namespace GS.SkyWatcher
                 msg = "a";
                 response = CmdToMount(axis, 'a', null);
                 var gearRatio = StringToLong(response);
-                // There is a issue in the earlier version firmware(Before 2.00) of motor controller MC001.
+                // There is an issue in the earlier version firmware(Before 2.00) of motor controller MC001.
                 // Overwrite the GearRatio reported by the MC for 80GT mount and 114GT mount.
                 if (axis == AxisId.Axis1)
                 {
@@ -1086,7 +1086,7 @@ namespace GS.SkyWatcher
                     msg = ":F|Axis2";
                 }
                 monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Initialized|" + msg };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Initialized|" + msg };
                 MonitorLog.LogToMonitor(monitorItem);
             }
 
@@ -1590,10 +1590,10 @@ namespace GS.SkyWatcher
                     LastJ2ARunTime = dt;
                     break;
                 case 'J' when axis == AxisId.Axis2:
-                    LastJ2RunTime = dt;
+                  //  LastJ2RunTime = dt;
                     break;
                 case 'I' when axis == AxisId.Axis1:
-                    LastI1RunTime = dt;
+                   // LastI1RunTime = dt;
                     break;
                 case 'X':
                     if (cmdDataStr == "0003")
@@ -1615,10 +1615,10 @@ namespace GS.SkyWatcher
                         switch (axis)
                         {
                             case AxisId.Axis1:
-                                LastI1RunTime = dt;
+                             //   LastI1RunTime = dt;
                                 break;
                             case AxisId.Axis2:
-                                LastJ2RunTime = dt;
+                             //   LastJ2RunTime = dt;
                                 break;
                             default:
                                 throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
@@ -1837,7 +1837,7 @@ namespace GS.SkyWatcher
         }
 
         ///// <summary>
-        ///// Sends :e1 to the mounts and evaluates response to see its an appropriate response.
+        ///// Sends :e1 to the mounts and evaluates response to see it's an appropriate response.
         ///// </summary>
         //internal void TestSerial()
         //{

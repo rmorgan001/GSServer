@@ -330,7 +330,7 @@ namespace GS.SkyWatcher
                             else
                             {
                                 var speedInt = CalculateSpeed(AxisId.Axis1, applyRate);  // Calculate required mount speed
-                                AxisStatus axesStatus = _commands.GetAxisStatus(AxisId.Axis1); // Get axis status
+                                var axesStatus = _commands.GetAxisStatus(AxisId.Axis1); // Get axis status
                                 slewingForward = axesStatus.SlewingForward; // Get current direction of motion
                                 changeDirection = slewingForward != (applyRate >= 0.0);
                                 if (changeDirection) // Need to change direction of motion
@@ -346,17 +346,17 @@ namespace GS.SkyWatcher
                                 }
                             }
 
-                            pulseEntry.StartTime = _commands.LastI1RunTime; // get the last :I start time
+                            //pulseEntry.StartTime = _commands.LastI1RunTime; // get the last :I start time
 
-                            var raPulseTime = HiResDateTime.UtcNow - pulseEntry.StartTime; // possible use for min pulse duration time
-                            var raSpan = duration - raPulseTime.TotalMilliseconds;
+                            //var raPulseTime = HiResDateTime.UtcNow - pulseEntry.StartTime; // possible use for min pulse duration time
+                            //var raSpan = duration - raPulseTime.TotalMilliseconds;
 
-                            if (raSpan > 0 && raSpan < duration) // checking duration is met
-                            {
+                            //if (raSpan > 0 && raSpan < duration) // checking duration is met
+                            // {
                                 var sw1 = Stopwatch.StartNew();
                                 //var nextUpdateTime = 200.0; // Next time to call UpdateSteps in milliseconds
 
-                                while (sw1.Elapsed.TotalMilliseconds < raSpan)
+                                while (sw1.Elapsed.TotalMilliseconds < duration)
                                 {
                                     // check for cancellation
                                     token.ThrowIfCancellationRequested();
@@ -371,7 +371,7 @@ namespace GS.SkyWatcher
                                     // Sleep for 10ms to yield CPU - maintains good timing precision
                                     Thread.Sleep(10);
                                 }
-                            }
+                            // }
                         }
                         catch (OperationCanceledException)
                         {
@@ -510,31 +510,24 @@ namespace GS.SkyWatcher
                                 // check for cancellation
                                 token.ThrowIfCancellationRequested();
                                 AxisSlew(AxisId.Axis2, guideRate); // Send pulse to axis 
-                                pulseEntry.StartTime = _commands.LastJ2RunTime; // last :J2 start time
-                                var decPulseTime = HiResDateTime.UtcNow - pulseEntry.StartTime; // possible use for min pulse duration time
-                                var decSpan = duration - decPulseTime.TotalMilliseconds;
+                                //pulseEntry.StartTime = _commands.LastJ2RunTime; // last :J2 start time
+                                //var decPulseTime = HiResDateTime.UtcNow - pulseEntry.StartTime; // possible use for min pulse duration time
+                                //var decSpan = duration - decPulseTime.TotalMilliseconds;
 
-                                if (decSpan > 0 && decSpan < duration) // checking duration is met
-                                {
+                                //if (decSpan > 0 && decSpan < duration) // checking duration is met
+                                //{
                                     var sw3 = Stopwatch.StartNew();
-                                    //var nextUpdateTime = 200.0; // Next time to call UpdateSteps in milliseconds
+                                //    //var nextUpdateTime = 200.0; // Next time to call UpdateSteps in milliseconds
 
-                                    while (sw3.Elapsed.TotalMilliseconds < decSpan)
+                                    while (sw3.Elapsed.TotalMilliseconds < duration)
                                     {
                                         // check for cancellation
                                         token.ThrowIfCancellationRequested();
 
-                                        // Check if it's time to update steps
-                                        //if (sw3.Elapsed.TotalMilliseconds >= nextUpdateTime)
-                                        //{
-                                            //UpdateSteps();
-                                            //nextUpdateTime += 200.0; // Schedule next update
-                                        //}
-
                                         // Sleep for 10ms to yield CPU - maintains good timing precision
                                         Thread.Sleep(10);
                                     }
-                                }
+                                //  }
                             }
                             catch (OperationCanceledException)
                             {

@@ -78,17 +78,17 @@ namespace GS.Simulator
             var x = Convert.ToDouble(_ioSerial.Send($"degrees|{Axis.Axis1}"));
 
             //put in for capture tracking in charts
-            var stepsx = _ioSerial.Send($"steps|{Axis.Axis1}");
+            var stepsX = _ioSerial.Send($"steps|{Axis.Axis1}");
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps1|{null}|{stepsx}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps1|{null}|{stepsX}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             var y = Convert.ToDouble(_ioSerial.Send($"degrees|{Axis.Axis2}"));
 
             //put in for capture tracking in charts
-            var stepsy = _ioSerial.Send($"steps|{Axis.Axis2}");
+            var stepYy = _ioSerial.Send($"steps|{Axis.Axis2}");
             monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps2|{null}|{stepsy}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps2|{null}|{stepYy}" };
             MonitorLog.LogToMonitor(monitorItem);
 
 
@@ -106,17 +106,17 @@ namespace GS.Simulator
             var x = Convert.ToDouble(_ioSerial.Send($"degrees|{Axis.Axis1}")) * z;
 
             //put in for capture tracking in charts
-            var stepsx = _ioSerial.Send($"steps|{Axis.Axis1}");
+            var stepsX = _ioSerial.Send($"steps|{Axis.Axis1}");
             var monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps1|{null}|{stepsx}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps1|{null}|{stepsX}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             var y = Convert.ToDouble(_ioSerial.Send($"degrees|{Axis.Axis2}")) * z;
 
             //put in for capture tracking in charts
-            var stepsy = _ioSerial.Send($"steps|{Axis.Axis2}");
+            var stepsY = _ioSerial.Send($"steps|{Axis.Axis2}");
             monitorItem = new MonitorEntry
-            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps2|{null}|{stepsy}" };
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"steps2|{null}|{stepsY}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             var d = new[] { x , y };
@@ -156,23 +156,16 @@ namespace GS.Simulator
             Task.Run(() =>
             {
                 var arcSecs = duration / 1000.0 * Conversions.Deg2ArcSec(Math.Abs(guideRate));
-                bool deltaOk = arcSecs > 0.0002;
+                var deltaOk = arcSecs > 0.0002;
                 if (axis == Axis.Axis1)
                 {
-                    MountQueue.IsPulseGuidingRa = true && deltaOk;
-//                    MountQueue.IsPulseGuidingDec = false;
+                    MountQueue.IsPulseGuidingRa = deltaOk;
                 }
                 else
                 {
-                    MountQueue.IsPulseGuidingDec = true && deltaOk;
-//                    MountQueue.IsPulseGuidingRa = false;
+                    MountQueue.IsPulseGuidingDec = deltaOk;
                 }
 
-                //if (arcSecs < .0002)
-                //{
-                //    MountQueue.IsPulseGuidingRa = false;
-                //    MountQueue.IsPulseGuidingDec = false;
-                //}
 
                 // check for cancellation
                 token.ThrowIfCancellationRequested();
@@ -194,19 +187,10 @@ namespace GS.Simulator
                 {
                     _ioSerial.Send($"pulse|{axis}|{guideRate}");
                     sw.Start();
-                    //var nextUpdateTime = 200.0; // Next time to call AxesSteps in milliseconds
-
                     while (sw.Elapsed.TotalMilliseconds < duration)
                     {
                         // check for cancellation
                         token.ThrowIfCancellationRequested();
-
-                        // Check if it's time to update steps
-                        //if (sw.Elapsed.TotalMilliseconds >= nextUpdateTime)
-                        //{
-                            // AxesSteps();
-                        //    nextUpdateTime += 200.0; // Schedule next update
-                        //}
 
                         // Sleep for 10ms to yield CPU - maintains good timing precision
                         Thread.Sleep(10);
@@ -330,7 +314,7 @@ namespace GS.Simulator
         /// <returns></returns>
         internal int FactorSteps()
         {
-            var x = Convert.ToInt32(_ioSerial.Send($"FactorSteps"));
+            var x = Convert.ToInt32(_ioSerial.Send("FactorSteps"));
             return x;
         }
 
