@@ -39,6 +39,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 using static System.Math;
 using AxisStatus = GS.Simulator.AxisStatus;
 using Range = GS.Principles.Range;
@@ -4128,9 +4129,10 @@ namespace GS.Server.SkyTelescope
                             $"{SlewState} finished|code|{returnCode}|{Util.HoursToHMS(RightAscensionXForm, "h ", ":", "", 2)}|{Util.DegreesToDMS(DeclinationXForm, " ", ":", "", 2)}|Actual|{ActualAxisX}|{ActualAxisY}"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
+                    Tracking = trackingState;
+                    if (Tracking) Thread.Sleep(1000);
                     SlewState = SlewType.SlewNone;
                     SpeakSlewEnd(startingState);
-                    Tracking = trackingState;
                     TrackingSpeak = true;
                 }
                 else
