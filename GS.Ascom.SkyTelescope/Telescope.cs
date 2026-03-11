@@ -518,6 +518,7 @@ namespace ASCOM.GS.Sky.Telescope
                 }
                 SkyServer.RateDecOrg = value;
                 SkyServer.RateDec = Conversions.ArcSec2Deg(value);
+                Thread.Sleep(10);
             }
         }
 
@@ -825,6 +826,7 @@ namespace ASCOM.GS.Sky.Telescope
                 }
                 SkyServer.RateRaOrg = value;
                 SkyServer.RateRa = Conversions.ArcSec2Deg(Conversions.SideSec2ArcSec(value));
+                Thread.Sleep(5);
             }
         }
 
