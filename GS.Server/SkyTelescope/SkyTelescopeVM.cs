@@ -147,6 +147,8 @@ namespace GS.Server.SkyTelescope
                     AxisTrackingLimits = new List<double>(Numbers.InclusiveRange(0, 15, 1));
                     AxisHzTrackingLimits = new List<double>(Numbers.InclusiveRange(-20, 20, 1));
                     HomeAxisAltList = new List<int>(Numbers.InclusiveIntRange(-10, 10, 1));
+                    HomeParkAzList  = new List<int>(Numbers.InclusiveIntRange(0, 360, 1));
+                    HomeParkAltList = new List<int>(Numbers.InclusiveIntRange(-90, 90, 1));
 
                     // defaults
                     AtPark = SkyServer.AtPark;
@@ -211,6 +213,27 @@ namespace GS.Server.SkyTelescope
                         AutoHomeAxisAz = Convert.ToInt32(autoHome[1]) - (SkyServer.SouthernHemisphere ? 180 : 0);
                         AutoHomeAxisAlt = Convert.ToInt32(autoHome[0]);
                         SelectedAutoHomePosition = AutoHomePositionType.PolarAzAlt;
+                    }
+
+                    // Home Park Position panel initialisation
+                    var existingHomePark = SkySettings.ParkPositions?
+                        .FirstOrDefault(p => string.Equals(p.Name, "Home", StringComparison.OrdinalIgnoreCase));
+                    if (existingHomePark != null)
+                    {
+                        var azAlt = Axes.PolarParkToAzAlt(existingHomePark.X, existingHomePark.Y);
+                        double displayAz = Math.Abs(azAlt[0]);
+                        if (SkyServer.SouthernHemisphere)
+                            displayAz = Range.Range360(displayAz + 180.0);
+                        HomeParkAz  = Convert.ToInt32(displayAz);
+                        HomeParkAlt = Convert.ToInt32(azAlt[1]);
+                        var isDefault = Math.Abs(azAlt[1] - Math.Abs(SkySettings.Latitude)) < 0.00001;
+                        SelectedHomeParkPosition = isDefault ? HomeParkPositionType.Default : HomeParkPositionType.Custom;
+                    }
+                    else
+                    {
+                        HomeParkAz  = SkyServer.SouthernHemisphere ? 180 : 360;
+                        HomeParkAlt = Convert.ToInt32(Math.Abs(SkySettings.Latitude));
+                        SelectedHomeParkPosition = HomeParkPositionType.Default;
                     }
 
                     SetShowUI();
@@ -11428,6 +11451,58 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private HomeParkPositionType _selectedHomeParkPosition;
+        /// <summary>
+        /// Selected option for the Home Park Position panel — Default or Custom Az/Alt
+        /// </summary>
+        public HomeParkPositionType SelectedHomeParkPosition
+        {
+            get => _selectedHomeParkPosition;
+            set
+            {
+                if (_selectedHomeParkPosition == value) return;
+                _selectedHomeParkPosition = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(CustomHomeParkSettingsIsVisible));
+            }
+        }
+
+        /// <summary>
+        /// Controls visibility of the custom Az/Alt input controls in the Home Park Position panel
+        /// </summary>
+        public bool CustomHomeParkSettingsIsVisible =>
+            SelectedHomeParkPosition == HomeParkPositionType.Custom;
+
+        private int _homeParkAz;
+        /// <summary>
+        /// User-entered azimuth (0-360 degrees) for the custom Home park position
+        /// </summary>
+        public int HomeParkAz
+        {
+            get => _homeParkAz;
+            set
+            {
+                if (_homeParkAz == value) return;
+                _homeParkAz = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _homeParkAlt;
+        /// <summary>
+        /// User-entered altitude (-90 to 90 degrees) for the custom Home park position
+        /// </summary>
+        public int HomeParkAlt
+        {
+            get => _homeParkAlt;
+            set
+            {
+                if (_homeParkAlt == value) return;
+                _homeParkAlt = value;
+                OnPropertyChanged();
+            }
+        }
+
         private int _homeAxisX;
         public int HomeAxisX
         {
@@ -11453,6 +11528,16 @@ namespace GS.Server.SkyTelescope
         }
 
         public IList<int> HomeAxisAltList { get; }
+
+        /// <summary>
+        /// Azimuth selection list (0 to 360 degrees, integer steps)
+        /// </summary>
+        public IList<int> HomeParkAzList { get; }
+
+        /// <summary>
+        /// Altitude selection list (-90 to 90 degrees, integer steps)
+        /// </summary>
+        public IList<int> HomeParkAltList { get; }
 
         // Commands
         private ICommand _openHomeSettingsDialogCmd;
@@ -11544,6 +11629,36 @@ namespace GS.Server.SkyTelescope
                     default:
                         break;
                 }
+
+                // Determine final Az/Alt for the Home park position
+                double homeParkAzDeg;
+                double homeParkAltDeg;
+
+                if (SelectedHomeParkPosition == HomeParkPositionType.Default)
+                {
+                    homeParkAzDeg  = SkyServer.SouthernHemisphere ? 180.0 : 360.0;
+                    homeParkAltDeg = Math.Abs(SkySettings.Latitude);
+                }
+                else
+                {
+                    homeParkAzDeg  = HomeParkAz;
+                    homeParkAltDeg = HomeParkAlt;
+                }
+
+                var homeParkAxes = Axes.AzAltToPolarPark(homeParkAzDeg, homeParkAltDeg);
+
+                var existingHomePark = ParkPositionViewModel.Instance.Positions
+                    .FirstOrDefault(p => string.Equals(p.Name, "Home", StringComparison.OrdinalIgnoreCase));
+
+                if (existingHomePark != null)
+                {
+                    ParkPositionViewModel.Instance.UpdatePosition(existingHomePark, homeParkAxes[0], homeParkAxes[1]);
+                }
+                else
+                {
+                    ParkPositionViewModel.Instance.AddPosition("Home", homeParkAxes[0], homeParkAxes[1]);
+                }
+
                 using (new WaitCursor())
                 {
                     IsDialogOpen = false;

@@ -228,4 +228,10 @@ namespace GS.Server.SkyTelescope
         PolarAzAlt
     }
 
+    public enum HomeParkPositionType
+    {
+        Default,
+        Custom
+    }
+
 }
