@@ -39,7 +39,6 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls.Primitives;
 using static System.Math;
 using AxisStatus = GS.Simulator.AxisStatus;
 using Range = GS.Principles.Range;

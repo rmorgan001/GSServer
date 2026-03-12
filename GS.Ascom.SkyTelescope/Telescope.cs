@@ -14,7 +14,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ASCOM.DeviceInterface;
-using ASCOM.DriverAccess;
 using ASCOM.Utilities;
 using GS.Principles;
 using GS.Server.Helpers;
