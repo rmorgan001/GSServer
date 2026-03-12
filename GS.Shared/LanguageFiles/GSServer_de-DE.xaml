@@ -826,7 +826,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--1.2.1.8 -->
     <!--Home Park Position -->
     <system:String x:Key="lbHomeParkPosition">Home-Parkposition</system:String>
-    <system:String x:Key="lbHomeParkDefault">Standard</system:String>
+    <system:String x:Key="lbHomeParkDefault">Standard (90, 90)</system:String>
     <system:String x:Key="lbHomeParkCustom">Benutzerdefiniertes Az / Alt</system:String>
     <system:String x:Key="lbHomeParkAz">Azimut (0 - 360):</system:String>
     <system:String x:Key="lbHomeParkAlt">Höhe (-90 - 90):</system:String>

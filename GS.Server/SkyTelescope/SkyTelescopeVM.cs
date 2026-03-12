@@ -221,6 +221,11 @@ namespace GS.Server.SkyTelescope
                     if (existingHomePark != null)
                     {
                         var azAlt = Axes.PolarParkToAzAlt(existingHomePark.X, existingHomePark.Y);
+                        if (Math.Abs(existingHomePark.X - 90.0) < 0.00001 && Math.Abs(existingHomePark.Y - 90.0) < 0.00001)
+                        {
+                            azAlt[0] = 0.0;
+                            azAlt[1] = Math.Abs(SkySettings.Latitude);
+                        }
                         double displayAz = Math.Abs(azAlt[0]);
                         if (SkyServer.SouthernHemisphere)
                             displayAz = Range.Range360(displayAz + 180.0);
@@ -11646,6 +11651,11 @@ namespace GS.Server.SkyTelescope
                 }
 
                 var homeParkAxes = Axes.AzAltToPolarPark(homeParkAzDeg, homeParkAltDeg);
+                if (SelectedHomeParkPosition == HomeParkPositionType.Default)
+                {
+                    homeParkAxes[0] = 90.0;
+                    homeParkAxes[1] = 90.0;
+                }
 
                 var existingHomePark = ParkPositionViewModel.Instance.Positions
                     .FirstOrDefault(p => string.Equals(p.Name, "Home", StringComparison.OrdinalIgnoreCase));
