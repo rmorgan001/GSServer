@@ -834,6 +834,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="ttHomeParkCustom">Inserire un azimut e un'altitudine personalizzati per la posizione di parcheggio Home.</system:String>
     <system:String x:Key="ttHomeParkAz">Azimut della posizione di parcheggio Home in gradi (0 a 360).</system:String>
     <system:String x:Key="ttHomeParkAlt">Altitudine della posizione di parcheggio Home in gradi (-90 a 90).</system:String>
+    <system:String x:Key="homeSettingsParkOutsideLimits">La posizione di parcheggio Home è fuori dai limiti degli assi. Scegliere una posizione diversa.</system:String>
+    <system:String x:Key="homeSettingsParkThroughPole">La posizione di parcheggio Home richiede uno spostamento attraverso il polo e non è consentita. Scegliere una posizione diversa.</system:String>
 
 </ResourceDictionary>
  

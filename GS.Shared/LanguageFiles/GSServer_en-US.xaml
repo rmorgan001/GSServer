@@ -837,6 +837,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="ttHomeParkCustom">Enter a custom azimuth and altitude for the Home park position.</system:String>
     <system:String x:Key="ttHomeParkAz">Azimuth of the Home park position in degrees (0 to 360).</system:String>
     <system:String x:Key="ttHomeParkAlt">Altitude of the Home park position in degrees (-90 to 90).</system:String>
+    <system:String x:Key="homeSettingsParkOutsideLimits">Home park position is outside the axis limits. Please choose a different position.</system:String>
+    <system:String x:Key="homeSettingsParkThroughPole">Home park position requires a through-pole slew and is not permitted. Please choose a different position.</system:String>
 
 </ResourceDictionary>
  
