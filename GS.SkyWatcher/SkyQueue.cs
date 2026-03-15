@@ -387,6 +387,7 @@ namespace GS.SkyWatcher
                 {
                     try
                     {
+                        // Thread.CurrentThread.Priority = ThreadPriority.AboveNormal;
                         // Signal that background task is ready to consume commands
                         // ReSharper disable once AccessToDisposedClosure
                         _taskReadySignal?.Set();

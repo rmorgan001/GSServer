@@ -150,8 +150,9 @@ namespace GS.Simulator
         /// <param name="guideRate">>Guide rate degrees, 15.041/3600*.5, negative value denotes direction</param>
         /// <param name="duration">length of pulse in milliseconds, always positive numbers</param>
         /// <param name="token">Token source used to cancel pulse guide operation</param>
+        /// <param name="startedEvent">Optional event signalled when the hardware command has been sent</param>
         /// <returns></returns>
-        internal void AxisPulse(Axis axis, double guideRate, int duration, CancellationToken token)
+        internal void AxisPulse(Axis axis, double guideRate, int duration, CancellationToken token, ManualResetEventSlim startedEvent = null)
         {
             Task.Run(() =>
             {
@@ -186,6 +187,7 @@ namespace GS.Simulator
                 try
                 {
                     _ioSerial.Send($"pulse|{axis}|{guideRate}");
+                    startedEvent?.Set(); // Signal: hardware command sent to simulator
                     sw.Start();
                     while (sw.Elapsed.TotalMilliseconds < duration)
                     {
@@ -223,6 +225,8 @@ namespace GS.Simulator
                     {
                         MountQueue.IsPulseGuidingDec = false;
                     }
+
+                    if (startedEvent != null && !startedEvent.IsSet) startedEvent.Set();
 
                     if (MonitorPulse)
                     {

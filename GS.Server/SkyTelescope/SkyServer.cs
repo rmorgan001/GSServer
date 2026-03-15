@@ -4129,7 +4129,7 @@ namespace GS.Server.SkyTelescope
                     };
                     MonitorLog.LogToMonitor(monitorItem);
                     Tracking = trackingState;
-                    if (Tracking) Thread.Sleep(1000);
+                    if (Tracking) Thread.Sleep(1500);
                     SlewState = SlewType.SlewNone;
                     SpeakSlewEnd(startingState);
                     TrackingSpeak = true;
@@ -5383,7 +5383,7 @@ namespace GS.Server.SkyTelescope
         /// <param name="duration"></param>
         /// <param name="pulseGoTo"></param>
         /// <param name="token"></param>
-        private static void PulseGuideAltAz(int axis, double guideRate, int duration, Action<CancellationToken> pulseGoTo, CancellationToken token)
+        private static void PulseGuideAltAz(int axis, double guideRate, int duration, Action<CancellationToken> pulseGoTo, CancellationToken token, ManualResetEventSlim startedEvent = null)
         {
             Task.Run(() =>
             {
@@ -5418,6 +5418,7 @@ namespace GS.Server.SkyTelescope
                     pulseEntry.StartTime = pulseStartTime;
                 }
                 // execute pulse
+                startedEvent?.Set(); // Signal: mount is about to move
                 pulseGoTo(token);
                 // pulse movement finished or cancelled so resume tracking
                 SetTracking();
@@ -5471,7 +5472,7 @@ namespace GS.Server.SkyTelescope
         /// <param name="direction">GuideDirections</param>
         /// <param name="duration">in milliseconds</param>
         /// /// <param name="altRate">alternate rate to replace the guide rate</param>
-        public static void PulseGuide(GuideDirections direction, int duration, double altRate)
+        public static ManualResetEventSlim PulseGuide(GuideDirections direction, int duration, double altRate)
         {
             if (!IsMountRunning) { throw new Exception("Mount not running"); }
 
@@ -5488,9 +5489,8 @@ namespace GS.Server.SkyTelescope
                     if (duration == 0)
                     {
                         IsPulseGuidingDec = false;
-                        return;
+                        return new ManualResetEventSlim(true);
                     }
-                    IsPulseGuidingDec = true;
                     HcResetPrevMove(MountAxis.Dec);
                     var decGuideRate = useAltRate ? altRate : Math.Abs(GuideRateDec);
                     switch (SkySettings.AlignmentMode)
@@ -5526,6 +5526,7 @@ namespace GS.Server.SkyTelescope
                     if (direction != LastDecDirection) decBacklashAmount = SkySettings.DecBacklash;
                     LastDecDirection = direction;
                     _ctsPulseGuideDec = new CancellationTokenSource();
+                    var decStartedEvent = new ManualResetEventSlim(false);
 
                     switch (SkySettings.Mount)
                     {
@@ -5533,17 +5534,18 @@ namespace GS.Server.SkyTelescope
                             switch (SkySettings.AlignmentMode)
                             {
                                 case AlignmentModes.algAltAz:
-                                    PulseGuideAltAz((int)Axis.Axis2, decGuideRate, duration, SimPulseGoto, _ctsPulseGuideDec.Token);
+                                    IsPulseGuidingDec = true;
+                                    PulseGuideAltAz((int)Axis.Axis2, decGuideRate, duration, SimPulseGoto, _ctsPulseGuideDec.Token, decStartedEvent);
                                     break;
                                 case AlignmentModes.algPolar:
                                     if (!SouthernHemisphere) decGuideRate = decGuideRate > 0 ? -Math.Abs(decGuideRate) : Math.Abs(decGuideRate);
                                     _ = new CmdAxisPulse(0, Axis.Axis2, decGuideRate, duration,
-                                        _ctsPulseGuideDec.Token);
+                                        _ctsPulseGuideDec.Token, decStartedEvent);
                                     break;
                                 case AlignmentModes.algGermanPolar:
                                     if (!SouthernHemisphere) decGuideRate = decGuideRate > 0 ? -Math.Abs(decGuideRate) : Math.Abs(decGuideRate);
                                     _ = new CmdAxisPulse(0, Axis.Axis2, decGuideRate, duration,
-                                        _ctsPulseGuideDec.Token);
+                                        _ctsPulseGuideDec.Token, decStartedEvent);
                                     break;
                             }
                             break;
@@ -5551,29 +5553,29 @@ namespace GS.Server.SkyTelescope
                             switch (SkySettings.AlignmentMode)
                             {
                                 case AlignmentModes.algAltAz:
-                                    PulseGuideAltAz((int)AxisId.Axis2, decGuideRate, duration, SkyPulseGoto, _ctsPulseGuideDec.Token);
+                                    IsPulseGuidingDec = true;
+                                    PulseGuideAltAz((int)AxisId.Axis2, decGuideRate, duration, SkyPulseGoto, _ctsPulseGuideDec.Token, decStartedEvent);
                                     break;
                                 case AlignmentModes.algPolar:
                                     if (!SouthernHemisphere) decGuideRate = decGuideRate > 0 ? -Math.Abs(decGuideRate) : Math.Abs(decGuideRate);
-                                    _ = new SkyAxisPulse(0, AxisId.Axis2, decGuideRate, duration, decBacklashAmount, _ctsPulseGuideDec.Token);
+                                    _ = new SkyAxisPulse(0, AxisId.Axis2, decGuideRate, duration, decBacklashAmount, _ctsPulseGuideDec.Token, decStartedEvent);
                                     break;
                                 case AlignmentModes.algGermanPolar:
-                                    _ = new SkyAxisPulse(0, AxisId.Axis2, decGuideRate, duration, decBacklashAmount, _ctsPulseGuideDec.Token);
+                                    _ = new SkyAxisPulse(0, AxisId.Axis2, decGuideRate, duration, decBacklashAmount, _ctsPulseGuideDec.Token, decStartedEvent);
                                     break;
                             }
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
-                    break;
+                    return decStartedEvent;
                 case GuideDirections.guideEast:
                 case GuideDirections.guideWest:
                     if (duration == 0)
                     {
                         IsPulseGuidingRa = false;
-                        return;
+                        return new ManualResetEventSlim(true);
                     }
-                    IsPulseGuidingRa = true;
                     HcResetPrevMove(MountAxis.Ra);
                     var raGuideRate = useAltRate ? altRate : Math.Abs(GuideRateRa);
                     if (SkySettings.AlignmentMode != AlignmentModes.algAltAz)
@@ -5593,33 +5595,36 @@ namespace GS.Server.SkyTelescope
                     }
 
                     _ctsPulseGuideRa = new CancellationTokenSource();
+                    var raStartedEvent = new ManualResetEventSlim(false);
                     switch (SkySettings.Mount)
                     {
                         case MountType.Simulator:
                             if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
                             {
-                                PulseGuideAltAz((int)Axis.Axis1, raGuideRate, duration, SimPulseGoto, _ctsPulseGuideRa.Token);
+                                IsPulseGuidingRa = true;
+                                PulseGuideAltAz((int)Axis.Axis1, raGuideRate, duration, SimPulseGoto, _ctsPulseGuideRa.Token, raStartedEvent);
                             }
                             else
                             {
-                                _ = new CmdAxisPulse(0, Axis.Axis1, raGuideRate, duration, _ctsPulseGuideRa.Token);
+                                _ = new CmdAxisPulse(0, Axis.Axis1, raGuideRate, duration, _ctsPulseGuideRa.Token, raStartedEvent);
                             }
 
                             break;
                         case MountType.SkyWatcher:
                             if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
                             {
-                                PulseGuideAltAz((int)AxisId.Axis1, raGuideRate, duration, SkyPulseGoto, _ctsPulseGuideRa.Token);
+                                IsPulseGuidingRa = true;
+                                PulseGuideAltAz((int)AxisId.Axis1, raGuideRate, duration, SkyPulseGoto, _ctsPulseGuideRa.Token, raStartedEvent);
                             }
                             else
                             {
-                                _ = new SkyAxisPulse(0, AxisId.Axis1, raGuideRate, duration, 0, _ctsPulseGuideRa.Token);
+                                _ = new SkyAxisPulse(0, AxisId.Axis1, raGuideRate, duration, 0, _ctsPulseGuideRa.Token, raStartedEvent);
                             }
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
-                    break;
+                    return raStartedEvent;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
             }
