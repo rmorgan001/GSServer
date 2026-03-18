@@ -470,13 +470,15 @@ namespace GS.Simulator
         private readonly double _guideRate;
         private readonly int _duration;
         private readonly CancellationToken _token;
+        private readonly ManualResetEventSlim _pulseStartedEvent;
 
-        public CmdAxisPulse(long id, Axis axis, double guideRate, int duration, CancellationToken token) : base(id)
+        public CmdAxisPulse(long id, Axis axis, double guideRate, int duration, CancellationToken token, ManualResetEventSlim pulseStartedEvent = null) : base(id)
         {
             _axis = axis;
             _guideRate = guideRate;
             _duration = duration;
             _token = token;
+            _pulseStartedEvent = pulseStartedEvent;
             MountQueue.AddCommand(this);
         }
 
@@ -484,11 +486,12 @@ namespace GS.Simulator
         {
             try
             {
-                actions.AxisPulse(_axis, _guideRate, _duration, _token);
+                actions.AxisPulse(_axis, _guideRate, _duration, _token, _pulseStartedEvent);
                 Successful = true;
             }
             catch (Exception e)
             {
+                if (_pulseStartedEvent != null && !_pulseStartedEvent.IsSet) _pulseStartedEvent.Set();
                 Successful = false;
                 Exception = e;
             }

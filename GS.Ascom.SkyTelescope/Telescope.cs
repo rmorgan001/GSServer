@@ -517,7 +517,7 @@ namespace ASCOM.GS.Sky.Telescope
                 }
                 SkyServer.RateDecOrg = value;
                 SkyServer.RateDec = Conversions.ArcSec2Deg(value);
-                Thread.Sleep(10);
+                Thread.Sleep(20);
             }
         }
 
@@ -825,7 +825,7 @@ namespace ASCOM.GS.Sky.Telescope
                 }
                 SkyServer.RateRaOrg = value;
                 SkyServer.RateRa = Conversions.ArcSec2Deg(Conversions.SideSec2ArcSec(value));
-                Thread.Sleep(5);
+                Thread.Sleep(20);
             }
         }
 
@@ -1418,6 +1418,7 @@ namespace ASCOM.GS.Sky.Telescope
 
         public void PulseGuide(GuideDirections direction, int duration)
         {
+            ManualResetEventSlim startedEvent = null;
             try
             {
                 if (!SkyServer.AsComOn) { throw new InvalidOperationException("Not accepting commands"); }
@@ -1432,21 +1433,16 @@ namespace ASCOM.GS.Sky.Telescope
                 CheckCapability(SkySettings.CanPulseGuide, "PulseGuide");
                 CheckRange(duration, 0, 30000, "PulseGuide", "Duration");
 
-                switch (direction)
-                {
-                    case GuideDirections.guideNorth:
-                    case GuideDirections.guideSouth:
-                        SkyServer.IsPulseGuidingDec = true;
-                        break;
-                    case GuideDirections.guideEast:
-                    case GuideDirections.guideWest:
-                        SkyServer.IsPulseGuidingRa = true;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
-                }
+                startedEvent = SkyServer.PulseGuide(direction, duration, 0);
 
-                SkyServer.PulseGuide(direction, duration, 0);
+                // Block until hardware command has been issued (or timeout after 5 s).
+                const int pulseStartTimeoutMs = 5000;
+                if (!startedEvent.Wait(pulseStartTimeoutMs))
+                {
+                    var warnItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"PulseGuide start timeout|{direction}|{duration}") };
+                    MonitorLog.LogToMonitor(warnItem);
+                }
             }
             catch (Exception e)
             {
@@ -1456,6 +1452,10 @@ namespace ASCOM.GS.Sky.Telescope
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{e.Message}") };
                 MonitorLog.LogToMonitor(monitorItem);
                 throw;
+            }
+            finally
+            {
+                startedEvent?.Dispose();
             }
         }
 
