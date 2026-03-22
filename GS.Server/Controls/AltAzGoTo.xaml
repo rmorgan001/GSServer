@@ -1,100 +1,83 @@
 ﻿<UserControl x:Class="GS.Server.Controls.AltAzGoTo"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:GS.Server.Domain"
              xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
-             mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}">
-    <Border Margin="0,0,10,0" BorderBrush="DimGray"  BorderThickness="2" CornerRadius="5">
-        <Grid Background="{StaticResource MaterialDesignToolBarBackground}" ShowGridLines="False"
+             d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}"
+             mc:Ignorable="d">
+    <Border Margin="0,0,10,0"
+            BorderBrush="DimGray"
+            BorderThickness="2"
+            CornerRadius="5">
+        <Grid Background="{StaticResource MaterialDesignToolBarBackground}"
+              ShowGridLines="False"
               ToolTip="{StaticResource goChangeToRaDec}">
             <Grid.RowDefinitions>
-                <RowDefinition Height="47"/>
-                <RowDefinition Height="47"/>
+                <RowDefinition Height="47" />
+                <RowDefinition Height="47" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80"/>
-                <ColumnDefinition Width="40"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="40" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Orientation="Vertical" VerticalAlignment="Center">
-                <Button Margin="0,0,0,0" Height="20" Padding="-5" Width="75" ToolTip="{StaticResource goTipCopy}" Command="{Binding PopulateGoToAzAltCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource goCopy}" />
-                <Button Margin="0,2,0,0" Height="20" Padding="-5" Width="75" ToolTip="{StaticResource goTipGoTo}" Command="{Binding OpenAzGoToDialogCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="{StaticResource goGoTo}" />
+            <StackPanel Grid.Row="0"
+                        Grid.RowSpan="2"
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        Orientation="Vertical">
+                <Button Width="75"
+                        Height="20"
+                        Margin="0,0,0,0"
+                        Padding="-5"
+                        Command="{Binding PopulateGoToAzAltCommand}"
+                        Content="{StaticResource goCopy}"
+                        Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                        ToolTip="{StaticResource goTipCopy}" />
+                <Button Width="75"
+                        Height="20"
+                        Margin="0,2,0,0"
+                        Padding="-5"
+                        Command="{Binding OpenAzGoToDialogCommand}"
+                        Content="{StaticResource goGoTo}"
+                        Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                        ToolTip="{StaticResource goTipGoTo}" />
             </StackPanel>
-            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" >
+            <StackPanel Grid.Row="0"
+                        Grid.Column="1"
+                        Orientation="Horizontal">
                 <StackPanel>
-                        <Label Content="{StaticResource goAz}" />
-                    <Button Margin="-5,0,0,0" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding OpenAzDecimalDialogCmd}" Width="18" Height="18" >
-                        <md:PackIcon Kind="Plus" />
-                        </Button>
-                    </StackPanel>
-            </StackPanel>
-            <ComboBox Grid.Row="0" Grid.Column="2" md:HintAssist.Hint="{StaticResource edDegrees}" IsEditable="True" md:HintAssist.FloatingScale="1" Margin="2" ItemsSource="{Binding AzRange}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
-            <ComboBox.Text>
-                <Binding Path="AzDegrees" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
-                    <Binding.ValidationRules>
-                        <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
-                        <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
-                    </Binding.ValidationRules>
-                </Binding>
-            </ComboBox.Text>
-            <ComboBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel />
-                </ItemsPanelTemplate>
-            </ComboBox.ItemsPanel>
-            </ComboBox>
-            <ComboBox Grid.Row="0" Grid.Column="3" md:HintAssist.Hint="{StaticResource edMinutes}" IsEditable="True" md:HintAssist.FloatingScale="1" Margin="2"
-                                ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
-                <ComboBox.Text>
-                    <Binding Path="AzMinutes" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
-                        <Binding.ValidationRules>
-                            <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
-                            <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
-                        </Binding.ValidationRules>
-                    </Binding>
-                </ComboBox.Text>
-                <ComboBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel />
-                    </ItemsPanelTemplate>
-                </ComboBox.ItemsPanel>
-            </ComboBox>
-            <ComboBox Grid.Row="0" Grid.Column="4" md:HintAssist.Hint="{StaticResource edSeconds}" IsEditable="True" md:HintAssist.FloatingScale="1" Margin="2"
-                                ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
-                <ComboBox.Text>
-                    <Binding Path="AzSeconds" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
-                        <Binding.ValidationRules>
-                            <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
-                            <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
-                        </Binding.ValidationRules>
-                    </Binding>
-                </ComboBox.Text>
-                <ComboBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel />
-                    </ItemsPanelTemplate>
-                </ComboBox.ItemsPanel>
-            </ComboBox>
-            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" >
-                <StackPanel>
-                    <Label Content="{StaticResource goAlt}" />
-                    <Button Margin="-10,0,0,0"  Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding OpenAltDecimalDialogCmd}" Width="18" Height="18">
+                    <Label Content="{StaticResource goAz}" />
+                    <Button Width="18"
+                            Height="18"
+                            Margin="-5,0,0,0"
+                            Command="{Binding OpenAzDecimalDialogCmd}"
+                            Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}">
                         <md:PackIcon Kind="Plus" />
                     </Button>
                 </StackPanel>
             </StackPanel>
-            <ComboBox Grid.Row="1" Grid.Column="2" md:HintAssist.Hint="{StaticResource edDegrees}" md:HintAssist.FloatingScale="1" IsEditable="True" Margin="2" ItemsSource="{Binding AltRange}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
+            <ComboBox Grid.Row="0"
+                      Grid.Column="2"
+                      Margin="2"
+                      md:HintAssist.FloatingScale="1"
+                      md:HintAssist.Hint="{StaticResource edDegrees}"
+                      IsEditable="True"
+                      ItemsSource="{Binding AzRange}"
+                      Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                 <ComboBox.Text>
-                    <Binding Path="AltDegrees" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                    <Binding Mode="TwoWay"
+                             Path="AzDegrees"
+                             UpdateSourceTrigger="LostFocus">
                         <Binding.ValidationRules>
-                            <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
-                            <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
+                            <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                            <domain:DoubleValidationRule ValidatesOnTargetUpdated="True" />
                         </Binding.ValidationRules>
                     </Binding>
                 </ComboBox.Text>
@@ -104,13 +87,21 @@
                     </ItemsPanelTemplate>
                 </ComboBox.ItemsPanel>
             </ComboBox>
-            <ComboBox Grid.Row="1" Grid.Column="3" md:HintAssist.Hint="{StaticResource edMinutes}" IsEditable="True" md:HintAssist.FloatingScale="1" Margin="2"
-                                      ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
+            <ComboBox Grid.Row="0"
+                      Grid.Column="3"
+                      Margin="2"
+                      md:HintAssist.FloatingScale="1"
+                      md:HintAssist.Hint="{StaticResource edMinutes}"
+                      IsEditable="True"
+                      ItemsSource="{Binding Range60}"
+                      Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                 <ComboBox.Text>
-                    <Binding Path="AltMinutes" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                    <Binding Mode="TwoWay"
+                             Path="AzMinutes"
+                             UpdateSourceTrigger="LostFocus">
                         <Binding.ValidationRules>
-                            <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
-                            <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
+                            <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                            <domain:DoubleValidationRule ValidatesOnTargetUpdated="True" />
                         </Binding.ValidationRules>
                     </Binding>
                 </ComboBox.Text>
@@ -120,13 +111,107 @@
                     </ItemsPanelTemplate>
                 </ComboBox.ItemsPanel>
             </ComboBox>
-            <ComboBox Grid.Row="1" Grid.Column="4" md:HintAssist.Hint="{StaticResource edSeconds}" IsEditable="True" md:HintAssist.FloatingScale="1" Margin="2"
-                      ItemsSource="{Binding Range60}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
+            <ComboBox Grid.Row="0"
+                      Grid.Column="4"
+                      Margin="2"
+                      md:HintAssist.FloatingScale="1"
+                      md:HintAssist.Hint="{StaticResource edSeconds}"
+                      IsEditable="True"
+                      ItemsSource="{Binding Range60}"
+                      Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                 <ComboBox.Text>
-                    <Binding Path="AltSeconds" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                    <Binding Mode="TwoWay"
+                             Path="AzSeconds"
+                             UpdateSourceTrigger="LostFocus">
                         <Binding.ValidationRules>
-                            <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
-                            <domain:DoubleValidationRule ValidatesOnTargetUpdated="True"/>
+                            <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                            <domain:DoubleValidationRule ValidatesOnTargetUpdated="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </ComboBox.Text>
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
+            <StackPanel Grid.Row="1"
+                        Grid.Column="1"
+                        Orientation="Horizontal">
+                <StackPanel>
+                    <Label Content="{StaticResource goAlt}" />
+                    <Button Width="18"
+                            Height="18"
+                            Margin="-10,0,0,0"
+                            Command="{Binding OpenAltDecimalDialogCmd}"
+                            Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}">
+                        <md:PackIcon Kind="Plus" />
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+            <ComboBox Grid.Row="1"
+                      Grid.Column="2"
+                      Margin="2"
+                      md:HintAssist.FloatingScale="1"
+                      md:HintAssist.Hint="{StaticResource edDegrees}"
+                      IsEditable="True"
+                      ItemsSource="{Binding AltRange}"
+                      Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                <ComboBox.Text>
+                    <Binding Mode="TwoWay"
+                             Path="AltDegrees"
+                             UpdateSourceTrigger="LostFocus">
+                        <Binding.ValidationRules>
+                            <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                            <domain:DoubleValidationRule ValidatesOnTargetUpdated="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </ComboBox.Text>
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
+            <ComboBox Grid.Row="1"
+                      Grid.Column="3"
+                      Margin="2"
+                      md:HintAssist.FloatingScale="1"
+                      md:HintAssist.Hint="{StaticResource edMinutes}"
+                      IsEditable="True"
+                      ItemsSource="{Binding Range60}"
+                      Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                <ComboBox.Text>
+                    <Binding Mode="TwoWay"
+                             Path="AltMinutes"
+                             UpdateSourceTrigger="LostFocus">
+                        <Binding.ValidationRules>
+                            <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                            <domain:DoubleValidationRule ValidatesOnTargetUpdated="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </ComboBox.Text>
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
+            <ComboBox Grid.Row="1"
+                      Grid.Column="4"
+                      Margin="2"
+                      md:HintAssist.FloatingScale="1"
+                      md:HintAssist.Hint="{StaticResource edSeconds}"
+                      IsEditable="True"
+                      ItemsSource="{Binding Range60}"
+                      Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                <ComboBox.Text>
+                    <Binding Mode="TwoWay"
+                             Path="AltSeconds"
+                             UpdateSourceTrigger="LostFocus">
+                        <Binding.ValidationRules>
+                            <domain1:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                            <domain:DoubleValidationRule ValidatesOnTargetUpdated="True" />
                         </Binding.ValidationRules>
                     </Binding>
                 </ComboBox.Text>

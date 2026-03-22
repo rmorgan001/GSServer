@@ -1,7 +1,7 @@
 ﻿using ASCOM.Utilities;
 using ColorPicker;
-using DarkSkyApi;
-using DarkSkyApi.Models;
+//using DarkSkyApi;
+//using DarkSkyApi.Models;
 using GS.Principles;
 using GS.Server.SkyTelescope;
 using GS.Shared;
@@ -16,7 +16,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -35,10 +34,10 @@ namespace GS.Server.Notes
     {
         //3f69788eb1c931a32cc83059783a60f5
         private static string _fileName;
-        private static readonly string _myDocs = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        private static readonly string _filePath = Path.Combine(_myDocs, "GSServer\\");
+        private static readonly string MyDocs = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        private static readonly string FilePath = Path.Combine(MyDocs, "GSServer\\");
         private readonly Util _util = new Util();
-        private const string _newline = "\u2028";
+        private const string Newline = "\u2028";
         private static SolidColorBrush _fontForeGroundColor;
         private static SolidColorBrush _fontBackGroundColor;
 
@@ -49,26 +48,26 @@ namespace GS.Server.Notes
                 InitializeComponent();
 
                 //sets the line spacing
-                if (rtbEditor.Document.Blocks.FirstBlock is Paragraph p) p.LineHeight = 1;
+                if (RtbEditor.Document.Blocks.FirstBlock is Paragraph p) p.LineHeight = 1;
 
-                if (rtbEditor.Foreground == null)
+                if (RtbEditor.Foreground == null)
                 {
                     _fontForeGroundColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFFFFFFF"));
                 }
                 else
                 {
-                    _fontForeGroundColor = (SolidColorBrush)rtbEditor.Foreground;
+                    _fontForeGroundColor = (SolidColorBrush)RtbEditor.Foreground;
                 }
                 Paintbrush.Foreground = _fontForeGroundColor;
 
 
-                if (rtbEditor.Background == null)
+                if (RtbEditor.Background == null)
                 {
                     _fontBackGroundColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FF000000"));
                 }
                 else
                 {
-                    _fontBackGroundColor = (SolidColorBrush)rtbEditor.Background;
+                    _fontBackGroundColor = (SolidColorBrush)RtbEditor.Background;
                 }
                 ColorLens.Background = _fontBackGroundColor;
 
@@ -78,19 +77,19 @@ namespace GS.Server.Notes
                 {
                     using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(SkyServer.Notes)))
                     {
-                        var range = new TextRange(rtbEditor?.Document.ContentStart, rtbEditor?.Document.ContentEnd);
+                        var range = new TextRange(RtbEditor?.Document.ContentStart, RtbEditor?.Document.ContentEnd);
                         range.Load(ms, DataFormats.Rtf);
                     }
                 }
 
                 // cbSkySettings.ItemsSource = AllSkySettings();
 
-                _fileName = _filePath + "Notes.rtf";
-                cbFontFamily.ItemsSource = Fonts.SystemFontFamilies.OrderBy(f => f.Source);
-                cbFontSize.ItemsSource = new List<double>() { 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72 };
-                cbFontFamily.SelectedItem = rtbEditor?.Selection.GetPropertyValue(TextElement.FontFamilyProperty);
-                cbFontSize.Text = rtbEditor?.Selection.GetPropertyValue(TextElement.FontSizeProperty).ToString();
-                rtbEditor?.Focus();
+                _fileName = FilePath + "Notes.rtf";
+                CbFontFamily.ItemsSource = Fonts.SystemFontFamilies.OrderBy(f => f.Source);
+                CbFontSize.ItemsSource = new List<double>() { 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72 };
+                CbFontFamily.SelectedItem = RtbEditor?.Selection.GetPropertyValue(TextElement.FontFamilyProperty);
+                CbFontSize.Text = RtbEditor?.Selection.GetPropertyValue(TextElement.FontSizeProperty).ToString();
+                RtbEditor?.Focus();
             }
             catch (Exception ex)
             {
@@ -127,14 +126,14 @@ namespace GS.Server.Notes
             }
         }
 
-        private string _DialogMsg;
+        private string _dialogMsg;
         public string DialogMsg
         {
-            get => _DialogMsg;
+            get => _dialogMsg;
             set
             {
-                if (_DialogMsg == value) return;
-                _DialogMsg = value;
+                if (_dialogMsg == value) return;
+                _dialogMsg = value;
                 OnPropertyChanged();
             }
         }
@@ -147,261 +146,268 @@ namespace GS.Server.Notes
             IsDialogOpen = true;
         }
 
-        private async Task DarkSkyTask()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    var client = new DarkSkyService(Settings.Settings.DarkSkyKey);
-                    var exclusionList = new List<Exclude> { Exclude.Minutely, Exclude.Hourly, Exclude.Daily, Exclude.Daily };
-                    var task = client.GetWeatherDataAsync(SkySettings.Latitude, SkySettings.Longitude, Unit.Auto, exclusionList);
-                    const int timeout = 10000;
-                    if (await Task.WhenAny(task, Task.Delay(timeout)) == task)
-                    {
-                        var result = task.Result;
-                        if (result != null)
-                        {
-                            var unit = (Unit)Enum.Parse(typeof(Unit), $"{result.Flags.Units.Trim().ToUpper()}");
 
-                            var str = $"Dark Sky Weather Service ({client.ApiCallsMade}): Units {unit} {_newline}";
-                            str += $"DateTime: {ConvertDSField(result, unit, "Time")} {_newline}";
-                            str += $"Temperature: {ConvertDSField(result, unit, "Temperature")} {_newline}";
-                            str += $"ApparentTemperature: {ConvertDSField(result, unit, "ApparentTemperature")} {_newline}";
-                            str += $"CloudCover: {ConvertDSField(result, unit, "CloudCover")} {_newline}";
-                            str += $"DewPoint: {ConvertDSField(result, unit, "DewPoint")} {_newline}";
-                            str += $"Humidity: {ConvertDSField(result, unit, "Humidity")} {_newline}";
-                            str += $"NearestStormBearing: {ConvertDSField(result, unit, "NearestStormBearing")} {_newline}";
-                            str += $"NearestStormDistance: {ConvertDSField(result, unit, "NearestStormDistance")} {_newline}";
-                            str += $"Ozone: {ConvertDSField(result, unit, "Ozone")} {_newline}";
-                            str += $"PrecipitationType: {ConvertDSField(result, unit, "PrecipitationType")} {_newline}";
-                            str += $"PrecipitationIntensity: {ConvertDSField(result, unit, "PrecipitationIntensity")} {_newline}";
-                            str += $"PrecipitationProbability: {ConvertDSField(result, unit, "PrecipitationProbability")} {_newline}";
-                            str += $"Pressure: {ConvertDSField(result, unit, "Pressure")} {_newline}";
-                            str += $"Visibility: {ConvertDSField(result, unit, "Visibility")} {_newline}";
-                            str += $"UVIndex: {ConvertDSField(result, unit, "UVIndex")} {_newline}";
-                            str += $"WindSpeed: {ConvertDSField(result, unit, "WindSpeed")} {_newline}";
-                            str += $"WindGust: {ConvertDSField(result, unit, "WindGust")} {_newline}";
-                            str += $"WindBearing: {ConvertDSField(result, unit, "WindBearing")} {_newline}";
-                            str += $"Summary: {ConvertDSField(result, unit, "Summary")} {_newline}";
-                            if (rtbEditor == null) return;
-                            rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
-                            rtbEditor.CaretPosition?.InsertTextInRun(str);
-                            return;
-                        }
-                        OpenDialog1($"{Application.Current.Resources["notNoData"]}");
-                    }
-                    else
-                    {
-                        OpenDialog1($"{Application.Current.Resources["notTimeout"]}");
-                    }
-                }
 
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
-                    Category = MonitorCategory.Notes,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}|{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog1(ex.Message);
-            }
-        }
+        // this could be changed over to OpenWeather
+        // How to migrate from Dark Sky API to OpenWeather One Call API 3.0
+        // https://openweathermap.org/darksky-openweather-3#what
 
-        private string ConvertDSField(Forecast forCast, Unit unit, string field)
-        {
-            string a;
-            string b = null;
-            switch (field.ToLower())
-            {
-                case "time":
-                    a = $"{Time.UnixTimeStampToDateTime(forCast.Currently.Time.ToUnixTime()) }";
-                    break;
-                case "temperature":
-                    a = $"{forCast.Currently.Temperature}";
-                    switch (unit)
-                    {
-                        case Unit.US:
-                            b = "f";
-                            break;
-                        case Unit.SI:
-                        case Unit.CA:
-                        case Unit.UK:
-                        case Unit.UK2:
-                            b = "c";
-                            break;
-                    }
-                    break;
-                case "apparenttemperature":
-                    a = $"{forCast.Currently.ApparentTemperature}";
-                    switch (unit)
-                    {
-                        case Unit.US:
-                            b = "f";
-                            break;
-                        case Unit.SI:
-                        case Unit.CA:
-                        case Unit.UK:
-                        case Unit.UK2:
-                            b = "c";
-                            break;
-                    }
-                    break;
-                case "cloudcover":
-                    a = $"{forCast.Currently.CloudCover * 100}";
-                    b = "%";
-                    break;
-                case "dewpoint":
-                    a = $"{forCast.Currently.DewPoint}";
-                    switch (unit)
-                    {
-                        case Unit.US:
-                            b = "f";
-                            break;
-                        case Unit.SI:
-                        case Unit.CA:
-                        case Unit.UK:
-                        case Unit.UK2:
-                            b = "c";
-                            break;
-                    }
-                    break;
-                case "humidity":
-                    a = $"{forCast.Currently.Humidity * 100}";
-                    b = "%";
-                    break;
-                case "neareststormbearing":
-                    a = $"{forCast.Currently.NearestStormBearing}";
-                    b = "°";
-                    break;
-                case "neareststormdistance":
-                    a = $"{forCast.Currently.NearestStormDistance}";
-                    switch (unit)
-                    {
-                        case Unit.UK2:
-                        case Unit.US:
-                            b = "mi";
-                            break;
-                        case Unit.SI:
-                        case Unit.CA:
-                        case Unit.UK:
-                            b = "k";
-                            break;
-                    }
-                    break;
-                case "ozone":
-                    a = $"{forCast.Currently.Ozone}";
-                    b = "du";
-                    break;
-                case "precipitationtype":
-                    a = $"{forCast.Currently.PrecipitationType}";
-                    break;
-                case "precipitationintensity":
-                    a = $"{forCast.Currently.PrecipitationIntensity}";
-                    switch (unit)
-                    {
-                        case Unit.US:
-                            b = "ip/h";
-                            break;
-                        case Unit.SI:
-                        case Unit.CA:
-                        case Unit.UK2:
-                        case Unit.UK:
-                            b = "mm/h";
-                            break;
-                    }
-                    break;
-                case "precipitationprobability":
-                    a = $"{forCast.Currently.PrecipitationProbability * 100}";
-                    b = "%";
-                    break;
-                case "pressure":
-                    a = $"{forCast.Currently.Pressure}";
-                    switch (unit)
-                    {
-                        case Unit.US:
-                            b = "mbar";
-                            break;
-                        case Unit.SI:
-                        case Unit.CA:
-                        case Unit.UK2:
-                        case Unit.UK:
-                            b = "hPa";
-                            break;
-                    }
-                    break;
-                case "visibility":
-                    a = $"{forCast.Currently.Visibility}";
-                    switch (unit)
-                    {
-                        case Unit.UK2:
-                        case Unit.US:
-                            b = "mi";
-                            break;
-                        case Unit.SI:
-                        case Unit.CA:
-                        case Unit.UK:
-                            b = "km";
-                            break;
-                    }
-                    break;
-                case "uvindex":
-                    a = $"{forCast.Currently.UVIndex}";
-                    break;
-                case "windspeed":
-                    a = $"{forCast.Currently.WindSpeed}";
-                    switch (unit)
-                    {
-                        case Unit.UK2:
-                        case Unit.US:
-                            b = "mph";
-                            break;
-                        case Unit.CA:
-                            b = "km/h";
-                            break;
-                        case Unit.SI:
-                        case Unit.UK:
-                            b = "mps";
-                            break;
-                    }
-                    break;
-                case "windgust":
-                    a = $"{forCast.Currently.WindGust}";
-                    switch (unit)
-                    {
-                        case Unit.UK2:
-                        case Unit.US:
-                            b = "mph";
-                            break;
-                        case Unit.CA:
-                            b = "km/h";
-                            break;
-                        case Unit.SI:
-                        case Unit.UK:
-                            b = "mps";
-                            break;
-                    }
-                    break;
-                case "windbearing":
-                    a = $"{forCast.Currently.WindBearing}";
-                    b = "°";
-                    break;
-                case "summary":
-                    a = $"{forCast.Currently.Summary}";
-                    break;
-                default:
-                    a = "Blank";
-                    break;
-            }
-            return $"{a}{b}";
-        }
+
+        //private async Task DarkSkyTask()
+        //{
+        //    try
+        //    {
+        //        using (new WaitCursor())
+        //        {
+        //            var client = new DarkSkyService(Settings.Settings.DarkSkyKey);
+        //            var exclusionList = new List<Exclude> { Exclude.Minutely, Exclude.Hourly, Exclude.Daily, Exclude.Daily };
+        //            var task = client.GetWeatherDataAsync(SkySettings.Latitude, SkySettings.Longitude, Unit.Auto, exclusionList);
+        //            const int timeout = 10000;
+        //            if (await Task.WhenAny(task, Task.Delay(timeout)) == task)
+        //            {
+        //                var result = task.Result;
+        //                if (result != null)
+        //                {
+        //                    var unit = (Unit)Enum.Parse(typeof(Unit), $"{result.Flags.Units.Trim().ToUpper()}");
+
+        //                    var str = $"Dark Sky Weather Service ({client.ApiCallsMade}): Units {unit} {Newline}";
+        //                    str += $"DateTime: {ConvertDsField(result, unit, "Time")} {Newline}";
+        //                    str += $"Temperature: {ConvertDsField(result, unit, "Temperature")} {Newline}";
+        //                    str += $"ApparentTemperature: {ConvertDsField(result, unit, "ApparentTemperature")} {Newline}";
+        //                    str += $"CloudCover: {ConvertDsField(result, unit, "CloudCover")} {Newline}";
+        //                    str += $"DewPoint: {ConvertDsField(result, unit, "DewPoint")} {Newline}";
+        //                    str += $"Humidity: {ConvertDsField(result, unit, "Humidity")} {Newline}";
+        //                    str += $"NearestStormBearing: {ConvertDsField(result, unit, "NearestStormBearing")} {Newline}";
+        //                    str += $"NearestStormDistance: {ConvertDsField(result, unit, "NearestStormDistance")} {Newline}";
+        //                    str += $"Ozone: {ConvertDsField(result, unit, "Ozone")} {Newline}";
+        //                    str += $"PrecipitationType: {ConvertDsField(result, unit, "PrecipitationType")} {Newline}";
+        //                    str += $"PrecipitationIntensity: {ConvertDsField(result, unit, "PrecipitationIntensity")} {Newline}";
+        //                    str += $"PrecipitationProbability: {ConvertDsField(result, unit, "PrecipitationProbability")} {Newline}";
+        //                    str += $"Pressure: {ConvertDsField(result, unit, "Pressure")} {Newline}";
+        //                    str += $"Visibility: {ConvertDsField(result, unit, "Visibility")} {Newline}";
+        //                    str += $"UVIndex: {ConvertDsField(result, unit, "UVIndex")} {Newline}";
+        //                    str += $"WindSpeed: {ConvertDsField(result, unit, "WindSpeed")} {Newline}";
+        //                    str += $"WindGust: {ConvertDsField(result, unit, "WindGust")} {Newline}";
+        //                    str += $"WindBearing: {ConvertDsField(result, unit, "WindBearing")} {Newline}";
+        //                    str += $"Summary: {ConvertDsField(result, unit, "Summary")} {Newline}";
+        //                    if (RtbEditor == null) return;
+        //                    RtbEditor.CaretPosition = RtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
+        //                    RtbEditor?.CaretPosition?.InsertTextInRun(str);
+        //                    return;
+        //                }
+        //                OpenDialog1($"{Application.Current.Resources["notNoData"]}");
+        //            }
+        //            else
+        //            {
+        //                OpenDialog1($"{Application.Current.Resources["notTimeout"]}");
+        //            }
+        //        }
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var monitorItem = new MonitorEntry
+        //        {
+        //            Datetime = HiResDateTime.UtcNow,
+        //            Device = MonitorDevice.Server,
+        //            Category = MonitorCategory.Notes,
+        //            Type = MonitorType.Error,
+        //            Method = MethodBase.GetCurrentMethod()?.Name,
+        //            Thread = Thread.CurrentThread.ManagedThreadId,
+        //            Message = $"{ex.Message}|{ex.StackTrace}"
+        //        };
+        //        MonitorLog.LogToMonitor(monitorItem);
+        //        OpenDialog1(ex.Message);
+        //    }
+        //}
+
+        //private string ConvertDsField(Forecast forCast, Unit unit, string field)
+        //{
+        //    string a;
+        //    string b = null;
+        //    switch (field.ToLower())
+        //    {
+        //        case "time":
+        //            a = $"{Time.UnixTimeStampToDateTime(forCast.Currently.Time.ToUnixTime()) }";
+        //            break;
+        //        case "temperature":
+        //            a = $"{forCast.Currently.Temperature}";
+        //            switch (unit)
+        //            {
+        //                case Unit.US:
+        //                    b = "f";
+        //                    break;
+        //                case Unit.SI:
+        //                case Unit.CA:
+        //                case Unit.UK:
+        //                case Unit.UK2:
+        //                    b = "c";
+        //                    break;
+        //            }
+        //            break;
+        //        case "apparenttemperature":
+        //            a = $"{forCast.Currently.ApparentTemperature}";
+        //            switch (unit)
+        //            {
+        //                case Unit.US:
+        //                    b = "f";
+        //                    break;
+        //                case Unit.SI:
+        //                case Unit.CA:
+        //                case Unit.UK:
+        //                case Unit.UK2:
+        //                    b = "c";
+        //                    break;
+        //            }
+        //            break;
+        //        case "cloudcover":
+        //            a = $"{forCast.Currently.CloudCover * 100}";
+        //            b = "%";
+        //            break;
+        //        case "dewpoint":
+        //            a = $"{forCast.Currently.DewPoint}";
+        //            switch (unit)
+        //            {
+        //                case Unit.US:
+        //                    b = "f";
+        //                    break;
+        //                case Unit.SI:
+        //                case Unit.CA:
+        //                case Unit.UK:
+        //                case Unit.UK2:
+        //                    b = "c";
+        //                    break;
+        //            }
+        //            break;
+        //        case "humidity":
+        //            a = $"{forCast.Currently.Humidity * 100}";
+        //            b = "%";
+        //            break;
+        //        case "neareststormbearing":
+        //            a = $"{forCast.Currently.NearestStormBearing}";
+        //            b = "°";
+        //            break;
+        //        case "neareststormdistance":
+        //            a = $"{forCast.Currently.NearestStormDistance}";
+        //            switch (unit)
+        //            {
+        //                case Unit.UK2:
+        //                case Unit.US:
+        //                    b = "mi";
+        //                    break;
+        //                case Unit.SI:
+        //                case Unit.CA:
+        //                case Unit.UK:
+        //                    b = "k";
+        //                    break;
+        //            }
+        //            break;
+        //        case "ozone":
+        //            a = $"{forCast.Currently.Ozone}";
+        //            b = "du";
+        //            break;
+        //        case "precipitationtype":
+        //            a = $"{forCast.Currently.PrecipitationType}";
+        //            break;
+        //        case "precipitationintensity":
+        //            a = $"{forCast.Currently.PrecipitationIntensity}";
+        //            switch (unit)
+        //            {
+        //                case Unit.US:
+        //                    b = "ip/h";
+        //                    break;
+        //                case Unit.SI:
+        //                case Unit.CA:
+        //                case Unit.UK2:
+        //                case Unit.UK:
+        //                    b = "mm/h";
+        //                    break;
+        //            }
+        //            break;
+        //        case "precipitationprobability":
+        //            a = $"{forCast.Currently.PrecipitationProbability * 100}";
+        //            b = "%";
+        //            break;
+        //        case "pressure":
+        //            a = $"{forCast.Currently.Pressure}";
+        //            switch (unit)
+        //            {
+        //                case Unit.US:
+        //                    b = "mbar";
+        //                    break;
+        //                case Unit.SI:
+        //                case Unit.CA:
+        //                case Unit.UK2:
+        //                case Unit.UK:
+        //                    b = "hPa";
+        //                    break;
+        //            }
+        //            break;
+        //        case "visibility":
+        //            a = $"{forCast.Currently.Visibility}";
+        //            switch (unit)
+        //            {
+        //                case Unit.UK2:
+        //                case Unit.US:
+        //                    b = "mi";
+        //                    break;
+        //                case Unit.SI:
+        //                case Unit.CA:
+        //                case Unit.UK:
+        //                    b = "km";
+        //                    break;
+        //            }
+        //            break;
+        //        case "uvindex":
+        //            a = $"{forCast.Currently.UVIndex}";
+        //            break;
+        //        case "windspeed":
+        //            a = $"{forCast.Currently.WindSpeed}";
+        //            switch (unit)
+        //            {
+        //                case Unit.UK2:
+        //                case Unit.US:
+        //                    b = "mph";
+        //                    break;
+        //                case Unit.CA:
+        //                    b = "km/h";
+        //                    break;
+        //                case Unit.SI:
+        //                case Unit.UK:
+        //                    b = "mps";
+        //                    break;
+        //            }
+        //            break;
+        //        case "windgust":
+        //            a = $"{forCast.Currently.WindGust}";
+        //            switch (unit)
+        //            {
+        //                case Unit.UK2:
+        //                case Unit.US:
+        //                    b = "mph";
+        //                    break;
+        //                case Unit.CA:
+        //                    b = "km/h";
+        //                    break;
+        //                case Unit.SI:
+        //                case Unit.UK:
+        //                    b = "mps";
+        //                    break;
+        //            }
+        //            break;
+        //        case "windbearing":
+        //            a = $"{forCast.Currently.WindBearing}";
+        //            b = "°";
+        //            break;
+        //        case "summary":
+        //            a = $"{forCast.Currently.Summary}";
+        //            break;
+        //        default:
+        //            a = "Blank";
+        //            break;
+        //    }
+        //    return $"{a}{b}";
+        //}
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -422,7 +428,7 @@ namespace GS.Server.Notes
                 if (dlg.ShowDialog() != true) return;
                 using (var stream = File.Open(dlg.FileName, FileMode.Open))
                 {
-                    var range = new TextRange(rtbEditor.Document.ContentStart, rtbEditor.Document.ContentEnd);
+                    var range = new TextRange(RtbEditor.Document.ContentStart, RtbEditor.Document.ContentEnd);
                     range.Load(stream, DataFormats.Rtf);
                 }
                 _fileName = dlg.FileName;
@@ -445,7 +451,7 @@ namespace GS.Server.Notes
                 if (dlg.ShowDialog() != true) return;
                 using (var stream = File.Open(dlg.FileName, FileMode.OpenOrCreate))
                 {
-                    var range = new TextRange(rtbEditor.Document.ContentStart, rtbEditor.Document.ContentEnd);
+                    var range = new TextRange(RtbEditor.Document.ContentStart, RtbEditor.Document.ContentEnd);
                     range.Save(stream, DataFormats.Rtf);
                 }
                 _fileName = dlg.FileName;
@@ -465,7 +471,7 @@ namespace GS.Server.Notes
             {
                 using (var stream = File.Open(_fileName, FileMode.Create))
                 {
-                    var range = new TextRange(rtbEditor.Document.ContentStart, rtbEditor.Document.ContentEnd);
+                    var range = new TextRange(RtbEditor.Document.ContentStart, RtbEditor.Document.ContentEnd);
                     range.Save(stream, DataFormats.Rtf);
                 }
             }
@@ -491,7 +497,7 @@ namespace GS.Server.Notes
 
                     using (var ms = new MemoryStream())
                     {
-                        var range = new TextRange(rtbEditor?.Document.ContentStart, rtbEditor?.Document.ContentEnd);
+                        var range = new TextRange(RtbEditor?.Document.ContentStart, RtbEditor?.Document.ContentEnd);
                         range.Save(ms, DataFormats.Rtf);
 
                         var copy = new FlowDocument();
@@ -527,11 +533,11 @@ namespace GS.Server.Notes
 
         private void TbLeft_OnClick(object sender, RoutedEventArgs e)
         {
-            switch (tbLeft.IsChecked)
+            switch (TbLeft.IsChecked)
             {
                 case true:
-                    tbRight.IsChecked = false;
-                    tbCenter.IsChecked = false;
+                    TbRight.IsChecked = false;
+                    TbCenter.IsChecked = false;
                     //tbLeft.IsChecked = false;
                     break;
             }
@@ -539,41 +545,41 @@ namespace GS.Server.Notes
 
         private void TbCenter_OnClick(object sender, RoutedEventArgs e)
         {
-            switch (tbCenter.IsChecked)
+            switch (TbCenter.IsChecked)
             {
                 case true:
-                    tbRight.IsChecked = false;
+                    TbRight.IsChecked = false;
                     //tbCenter.IsChecked = false;
-                    tbLeft.IsChecked = false;
+                    TbLeft.IsChecked = false;
                     break;
             }
         }
 
         private void TbRight_OnClick(object sender, RoutedEventArgs e)
         {
-            switch (tbRight.IsChecked)
+            switch (TbRight.IsChecked)
             {
                 case true:
                     //tbRight.IsChecked = false;
-                    tbCenter.IsChecked = false;
-                    tbLeft.IsChecked = false;
+                    TbCenter.IsChecked = false;
+                    TbLeft.IsChecked = false;
                     break;
             }
         }
 
         private void CbFontFamily_DropDownClosed(object sender, EventArgs e)
         {
-            rtbEditor?.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, cbFontFamily.SelectedItem);
-            rtbEditor?.Focus();
+            RtbEditor?.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, CbFontFamily.SelectedItem);
+            RtbEditor?.Focus();
         }
 
         private void CbFontSize_DropDownClosed(object sender, EventArgs e)
         {
-            rtbEditor?.Selection.ApplyPropertyValue(TextElement.FontSizeProperty, cbFontSize.SelectedItem.ToString());
-            rtbEditor?.Focus();
+            RtbEditor?.Selection.ApplyPropertyValue(TextElement.FontSizeProperty, CbFontSize.SelectedItem.ToString());
+            RtbEditor?.Focus();
         }
 
-        private void BtForground_Click(object sender, RoutedEventArgs e)
+        private void BtForGround_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -585,10 +591,10 @@ namespace GS.Server.Notes
                 var b = colorDialog.ShowDialog();
                 if (b == null) return;
                 if ((bool)!b) return;
-                if (rtbEditor == null) return;
+                if (RtbEditor == null) return;
                 _fontForeGroundColor = new SolidColorBrush(colorDialog.SelectedColor);
-                rtbEditor?.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, _fontForeGroundColor);
-                rtbEditor?.Focus();
+                RtbEditor?.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, _fontForeGroundColor);
+                RtbEditor?.Focus();
                 Paintbrush.Foreground = _fontForeGroundColor;
 
             }
@@ -622,11 +628,11 @@ namespace GS.Server.Notes
                 var b = colorDialog.ShowDialog();
                 if (b == null) return;
                 if ((bool)!b) return;
-                if (rtbEditor != null)
+                if (RtbEditor != null)
                 {
                     _fontBackGroundColor = new SolidColorBrush(colorDialog.SelectedColor);
-                    rtbEditor?.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, _fontBackGroundColor);
-                    rtbEditor?.Focus();
+                    RtbEditor?.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, _fontBackGroundColor);
+                    RtbEditor?.Focus();
                 }
                 ColorLens.Background = new SolidColorBrush(colorDialog.SelectedColor);
             }
@@ -657,9 +663,9 @@ namespace GS.Server.Notes
             try
             {
                 var str = $" { Application.Current.Resources["notDate"]}: {DateTime.Now:D}";
-                if (rtbEditor == null) return;
-                rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
-                rtbEditor.CaretPosition?.InsertTextInRun(str);
+                if (RtbEditor == null) return;
+                RtbEditor.CaretPosition = RtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
+                RtbEditor?.CaretPosition?.InsertTextInRun(str);
             }
             catch (Exception ex)
             {
@@ -684,9 +690,9 @@ namespace GS.Server.Notes
             try
             {
                 var str = $" { Application.Current.Resources["notTime"]}: {DateTime.Now:T}";
-                if (rtbEditor == null) return;
-                rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
-                rtbEditor.CaretPosition?.InsertTextInRun(str);
+                if (RtbEditor == null) return;
+                RtbEditor.CaretPosition = RtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
+                RtbEditor?.CaretPosition?.InsertTextInRun(str);
             }
             catch (Exception ex)
             {
@@ -711,9 +717,9 @@ namespace GS.Server.Notes
             try
             {
                 var str = $" { Application.Current.Resources["notRa"]}: {_util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2)}";
-                if (rtbEditor == null) return;
-                rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
-                rtbEditor.CaretPosition?.InsertTextInRun(str);
+                if (RtbEditor == null) return;
+                RtbEditor.CaretPosition = RtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
+                RtbEditor?.CaretPosition?.InsertTextInRun(str);
             }
             catch (Exception ex)
             {
@@ -738,9 +744,9 @@ namespace GS.Server.Notes
             try
             {
                 var str = $" { Application.Current.Resources["notDec"]}: {_util.DegreesToDMS(SkyServer.DeclinationXForm, "° ", ":", "", 2)}";
-                if (rtbEditor == null) return;
-                rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
-                rtbEditor.CaretPosition?.InsertTextInRun(str);
+                if (RtbEditor == null) return;
+                RtbEditor.CaretPosition = RtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
+                RtbEditor?.CaretPosition?.InsertTextInRun(str);
             }
             catch (Exception ex)
             {
@@ -765,9 +771,9 @@ namespace GS.Server.Notes
             try
             {
                 var str = $" { Application.Current.Resources["notAlt"]}: {_util.DegreesToDMS(SkyServer.Altitude, "° ", ":", "", 2)}";
-                if (rtbEditor == null) return;
-                rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
-                rtbEditor.CaretPosition?.InsertTextInRun(str);
+                if (RtbEditor == null) return;
+                RtbEditor.CaretPosition = RtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
+                RtbEditor?.CaretPosition?.InsertTextInRun(str);
             }
             catch (Exception ex)
             {
@@ -784,9 +790,9 @@ namespace GS.Server.Notes
             try
             {
                 var str = $" { Application.Current.Resources["notAz"]}: {_util.DegreesToDMS(SkyServer.Azimuth, "° ", ":", "", 2)}";
-                if (rtbEditor == null) return;
-                rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
-                rtbEditor.CaretPosition?.InsertTextInRun(str);
+                if (RtbEditor == null) return;
+                RtbEditor.CaretPosition = RtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
+                RtbEditor?.CaretPosition?.InsertTextInRun(str);
             }
             catch (Exception ex)
             {
@@ -833,9 +839,9 @@ namespace GS.Server.Notes
                 }
 
                 var str = $" {Application.Current.Resources["notMoon"]}: {phase} ";
-                if (rtbEditor == null) return;
-                rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
-                rtbEditor.CaretPosition?.InsertTextInRun(str);
+                if (RtbEditor == null) return;
+                RtbEditor.CaretPosition = RtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
+                RtbEditor?.CaretPosition?.InsertTextInRun(str);
             }
             catch (Exception ex)
             {
@@ -859,9 +865,9 @@ namespace GS.Server.Notes
             try
             {
                 var str = $"{Application.Current.Resources["notLogEntry"]}: {Application.Current.Resources["notDate"]} {DateTime.Now:D} {Application.Current.Resources["notTime"]} {DateTime.Now:T}";
-                if (rtbEditor == null) return;
-                rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
-                rtbEditor.CaretPosition?.InsertTextInRun(str);
+                if (RtbEditor == null) return;
+                RtbEditor.CaretPosition = RtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
+                RtbEditor?.CaretPosition?.InsertTextInRun(str);
             }
             catch (Exception ex)
             {
@@ -885,9 +891,9 @@ namespace GS.Server.Notes
             try
             {
                 var str = $"{ Application.Current.Resources["notAlignmentMode"]}: { SkySettings.AlignmentMode}";
-                if (rtbEditor == null) return;
-                rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
-                rtbEditor.CaretPosition?.InsertTextInRun(str);
+                if (RtbEditor == null) return;
+                RtbEditor.CaretPosition = RtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
+                RtbEditor?.CaretPosition?.InsertTextInRun(str);
             }
             catch (Exception ex)
             {
@@ -912,9 +918,9 @@ namespace GS.Server.Notes
             try
             {
                 var str = $"{ Application.Current.Resources["notCoordinateType"]}: {SkySettings.EquatorialCoordinateType}";
-                if (rtbEditor == null) return;
-                rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
-                rtbEditor.CaretPosition?.InsertTextInRun(str);
+                if (RtbEditor == null) return;
+                RtbEditor.CaretPosition = RtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
+                RtbEditor?.CaretPosition?.InsertTextInRun(str);
             }
             catch (Exception ex)
             {
@@ -939,9 +945,9 @@ namespace GS.Server.Notes
             try
             {
                 var str = $"{ Application.Current.Resources["notObservatory"]} { Application.Current.Resources["notLat"]}: {_util.DegreesToDMS(SkySettings.Latitude, "° ", ":", "", 2)} { Application.Current.Resources["notLong"]}: {_util.DegreesToDMS(SkySettings.Longitude, "° ", ":", "", 2)}";
-                if (rtbEditor == null) return;
-                rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
-                rtbEditor.CaretPosition?.InsertTextInRun(str);
+                if (RtbEditor == null) return;
+                RtbEditor.CaretPosition = RtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
+                RtbEditor?.CaretPosition?.InsertTextInRun(str);
             }
             catch (Exception ex)
             {
@@ -961,40 +967,40 @@ namespace GS.Server.Notes
 
         }
 
-        private async void BtWeather_OnClick(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                await DarkSkyTask();
-                // Jerome Cheng jcheng31 https://github.com/jcheng31/DarkSkyApi
-                // current conditions url "https://api.darksky.net/forecast/{0}/{1},{2}?units={3}&extend={4}&exclude={5}&lang={6}"
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
-                    Category = MonitorCategory.Notes,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}|{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-                OpenDialog1(ex.Message);
-            }
+        //private async void BtWeather_OnClick(object sender, RoutedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        await DarkSkyTask();
+        //        // Jerome Cheng jcheng31 https://github.com/jcheng31/DarkSkyApi
+        //        // current conditions url "https://api.darksky.net/forecast/{0}/{1},{2}?units={3}&extend={4}&exclude={5}&lang={6}"
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var monitorItem = new MonitorEntry
+        //        {
+        //            Datetime = HiResDateTime.UtcNow,
+        //            Device = MonitorDevice.Server,
+        //            Category = MonitorCategory.Notes,
+        //            Type = MonitorType.Error,
+        //            Method = MethodBase.GetCurrentMethod()?.Name,
+        //            Thread = Thread.CurrentThread.ManagedThreadId,
+        //            Message = $"{ex.Message}|{ex.StackTrace}"
+        //        };
+        //        MonitorLog.LogToMonitor(monitorItem);
+        //        OpenDialog1(ex.Message);
+        //    }
 
-        }
+        //}
 
         private void BtSidereal_OnClick(object sender, RoutedEventArgs e)
         {
             try
             {
                 var str = $" { Application.Current.Resources["notSiderealTime"]}: {_util.HoursToHMS(SkyServer.SiderealTime)}";
-                if (rtbEditor == null) return;
-                rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
-                rtbEditor.CaretPosition?.InsertTextInRun(str);
+                if (RtbEditor == null) return;
+                RtbEditor.CaretPosition = RtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
+                RtbEditor?.CaretPosition?.InsertTextInRun(str);
             }
             catch (Exception ex)
             {
@@ -1019,9 +1025,9 @@ namespace GS.Server.Notes
             try
             {
                 var str = $" { Application.Current.Resources["notHa"]}: {_util.HoursToHMS(Coordinate.Ra2Ha12(SkyServer.RightAscensionXForm,SkyServer.SiderealTime))}";
-                if (rtbEditor == null) return;
-                rtbEditor.CaretPosition = rtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
-                rtbEditor.CaretPosition?.InsertTextInRun(str);
+                if (RtbEditor == null) return;
+                RtbEditor.CaretPosition = RtbEditor?.CaretPosition.GetPositionAtOffset(0, LogicalDirection.Forward);
+                RtbEditor?.CaretPosition?.InsertTextInRun(str);
             }
             catch (Exception ex)
             {
@@ -1049,42 +1055,42 @@ namespace GS.Server.Notes
         {
             try
             {
-                var temp = rtbEditor.Selection.GetPropertyValue(TextElement.FontWeightProperty);
-                tbBold.IsChecked = (temp != DependencyProperty.UnsetValue) && (temp.Equals(FontWeights.Bold));
-                temp = rtbEditor.Selection.GetPropertyValue(TextElement.FontStyleProperty);
-                tbItalic.IsChecked = (temp != DependencyProperty.UnsetValue) && (temp.Equals(FontStyles.Italic));
-                temp = rtbEditor.Selection.GetPropertyValue(Inline.TextDecorationsProperty);
-                tbUnderline.IsChecked = (temp != DependencyProperty.UnsetValue) && (temp.Equals(TextDecorations.Underline));
+                var temp = RtbEditor.Selection.GetPropertyValue(TextElement.FontWeightProperty);
+                TbBold.IsChecked = (temp != DependencyProperty.UnsetValue) && (temp.Equals(FontWeights.Bold));
+                temp = RtbEditor.Selection.GetPropertyValue(TextElement.FontStyleProperty);
+                TbItalic.IsChecked = (temp != DependencyProperty.UnsetValue) && (temp.Equals(FontStyles.Italic));
+                temp = RtbEditor.Selection.GetPropertyValue(Inline.TextDecorationsProperty);
+                TbUnderline.IsChecked = (temp != DependencyProperty.UnsetValue) && (temp.Equals(TextDecorations.Underline));
 
-                temp = rtbEditor.Selection.GetPropertyValue(FlowDocument.TextAlignmentProperty);
-                tbLeft.IsChecked = (temp != DependencyProperty.UnsetValue) && (temp.Equals(TextAlignment.Left));
-                tbCenter.IsChecked = (temp != DependencyProperty.UnsetValue) && (temp.Equals(TextAlignment.Center));
-                tbRight.IsChecked = (temp != DependencyProperty.UnsetValue) && (temp.Equals(TextAlignment.Right));
+                temp = RtbEditor.Selection.GetPropertyValue(FlowDocument.TextAlignmentProperty);
+                TbLeft.IsChecked = (temp != DependencyProperty.UnsetValue) && (temp.Equals(TextAlignment.Left));
+                TbCenter.IsChecked = (temp != DependencyProperty.UnsetValue) && (temp.Equals(TextAlignment.Center));
+                TbRight.IsChecked = (temp != DependencyProperty.UnsetValue) && (temp.Equals(TextAlignment.Right));
 
-                temp = rtbEditor.Selection.GetPropertyValue(TextElement.FontFamilyProperty);
-                if (temp != null) cbFontFamily.SelectedItem = temp;
-                temp = rtbEditor.Selection.GetPropertyValue(TextElement.FontSizeProperty);
+                temp = RtbEditor.Selection.GetPropertyValue(TextElement.FontFamilyProperty);
+                if (temp != null) CbFontFamily.SelectedItem = temp;
+                temp = RtbEditor.Selection.GetPropertyValue(TextElement.FontSizeProperty);
                 int.TryParse(temp.ToString(), out var siz);
-                if (siz > 0) cbFontSize.Text = siz.ToString();
-                rtbEditor.SpellCheck.IsEnabled = tbSpell.IsChecked == true;
+                if (siz > 0) CbFontSize.Text = siz.ToString();
+                RtbEditor.SpellCheck.IsEnabled = TbSpell.IsChecked == true;
 
-                var fg = rtbEditor.Selection.GetPropertyValue(TextElement.ForegroundProperty);
-                if (fg is SolidColorBrush fgbrush)
+                var fg = RtbEditor.Selection.GetPropertyValue(TextElement.ForegroundProperty);
+                if (fg is SolidColorBrush fgBrush)
                 {
-                    _fontForeGroundColor = fgbrush;
+                    _fontForeGroundColor = fgBrush;
                     Paintbrush.Foreground = _fontForeGroundColor;
                 }
 
-                var bg = rtbEditor.Selection.GetPropertyValue(TextElement.BackgroundProperty);
-                if (bg is SolidColorBrush bgbrush)
+                var bg = RtbEditor.Selection.GetPropertyValue(TextElement.BackgroundProperty);
+                if (bg is SolidColorBrush bgBrush)
                 {
-                    _fontBackGroundColor = bgbrush;
+                    _fontBackGroundColor = bgBrush;
                     ColorLens.Background = _fontBackGroundColor;
                 }
 
                 using (var ms = new MemoryStream())
                 {
-                    var range = new TextRange(rtbEditor.Document.ContentStart, rtbEditor.Document.ContentEnd);
+                    var range = new TextRange(RtbEditor.Document.ContentStart, RtbEditor.Document.ContentEnd);
                     range.Save(ms, DataFormats.Rtf);
                     ms.Seek(0, SeekOrigin.Begin);
                     using (var sr = new StreamReader(ms))
@@ -1113,10 +1119,10 @@ namespace GS.Server.Notes
                 //if (fs != null) { range.ApplyPropertyValue(TextElement.FontSizeProperty, fs.ToString()); }
                 //else { cbFontSize.SelectedItem = rtbEditor?.Selection.GetPropertyValue(TextElement.FontFamilyProperty); }
 
-                rtbEditor?.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, cbFontFamily.SelectedItem);
-                rtbEditor?.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, _fontForeGroundColor);
-                rtbEditor?.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, _fontBackGroundColor);
-                rtbEditor?.Selection.ApplyPropertyValue(TextElement.FontSizeProperty, cbFontSize.SelectedItem.ToString());
+                RtbEditor?.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, CbFontFamily.SelectedItem);
+                RtbEditor?.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, _fontForeGroundColor);
+                RtbEditor?.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, _fontBackGroundColor);
+                RtbEditor?.Selection.ApplyPropertyValue(TextElement.FontSizeProperty, CbFontSize.SelectedItem.ToString());
 
             }
             catch (Exception ex)
@@ -1138,13 +1144,13 @@ namespace GS.Server.Notes
 
         private void TbSpell_OnClick(object sender, RoutedEventArgs e)
         {
-            rtbEditor.SpellCheck.IsEnabled = tbSpell.IsChecked == true;
-            rtbEditor?.Focus();
+            RtbEditor.SpellCheck.IsEnabled = TbSpell.IsChecked == true;
+            RtbEditor?.Focus();
         }
 
         private void NotesV_OnLoaded(object sender, RoutedEventArgs e)
         {
-            rtbEditor?.Focus();
+            RtbEditor?.Focus();
         }
 
         private void RtbEditor_OnUnloaded(object sender, RoutedEventArgs e)
@@ -1153,7 +1159,7 @@ namespace GS.Server.Notes
             {
                 using (var ms = new MemoryStream())
                 {
-                    var range = new TextRange(rtbEditor.Document.ContentStart, rtbEditor.Document.ContentEnd);
+                    var range = new TextRange(RtbEditor.Document.ContentStart, RtbEditor.Document.ContentEnd);
                     range.Save(ms, DataFormats.Rtf);
                     ms.Seek(0, SeekOrigin.Begin);
                     using (var sr = new StreamReader(ms))

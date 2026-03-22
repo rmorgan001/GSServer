@@ -13,6 +13,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+#region Usings
 using ASCOM.DeviceInterface;
 using ASCOM.Utilities;
 using GS.Principles;
@@ -62,6 +64,7 @@ using System.Threading;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using Vector = System.Windows.Vector;
 using GS.Server.Pulses;
+#endregion
 
 namespace GS.Server.SkyTelescope
 {

@@ -46,7 +46,7 @@
         <DataTemplate DataType="{x:Type focuser:FocuserVm}">
             <focuser:FocuserView />
         </DataTemplate>
-        <DataTemplate DataType="{x:Type notes:NotesVM}">
+        <DataTemplate DataType="{x:Type notes:NotesVm}">
             <notes:NotesV />
         </DataTemplate>
         <DataTemplate DataType="{x:Type settings:SettingsVm}">

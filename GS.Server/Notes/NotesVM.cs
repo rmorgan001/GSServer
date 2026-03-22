@@ -28,13 +28,13 @@ using GS.Shared.Command;
 
 namespace GS.Server.Notes
 {
-    public sealed class NotesVM : ObservableObject, IPageVM, IDisposable
+    public sealed class NotesVm : ObservableObject, IPageVM, IDisposable
     {
         public string TopName => "Notes";
         public string BottomName => "";
         public int Uid => 1;
 
-        public NotesVM()
+        public NotesVm()
         {
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Interface, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Loading NotesVM" };
@@ -43,14 +43,14 @@ namespace GS.Server.Notes
 
         #region Dialog  
 
-        private string _DialogMsg;
+        private string _dialogMsg;
         public string DialogMsg
         {
-            get => _DialogMsg;
+            get => _dialogMsg;
             set
             {
-                if (_DialogMsg == value) return;
-                _DialogMsg = value;
+                if (_dialogMsg == value) return;
+                _dialogMsg = value;
                 OnPropertyChanged();
             }
         }
@@ -180,7 +180,7 @@ namespace GS.Server.Notes
         // NOTE: Leave out the finalizer altogether if this class doesn't
         // own unmanaged resources itself, but leave the other methods
         // exactly as they are.
-        ~NotesVM()
+        ~NotesVm()
         {
             // Finalizer calls Dispose(false)
             Dispose(false);

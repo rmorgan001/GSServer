@@ -53,7 +53,7 @@ namespace GS.Server.Main
         private List<IPageVM> _pageViewModels;
         private SkyTelescopeVm _skyTelescopeVm;
         private FocuserVm _focuserVm;
-        private NotesVM _notesVm;
+        private NotesVm _notesVm;
         private SettingsVm _settingsVm;
         private GamePadVM _gamePadVm;
         private Model3Dvm _model3dVm;
@@ -214,7 +214,7 @@ namespace GS.Server.Main
                     {
                         if (!PageViewModels.Contains(_notesVm))
                         {
-                            _notesVm = new NotesVM();
+                            _notesVm = new NotesVm();
                             PageViewModels.Add(_notesVm);
                         }
                         NotesRadioVisible = true;

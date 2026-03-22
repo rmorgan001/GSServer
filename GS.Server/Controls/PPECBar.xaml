@@ -1,12 +1,16 @@
 ﻿<UserControl x:Class="GS.Server.Controls.PPecBar"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
-             mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}">
-    <StackPanel Margin="0,5,0,0" Orientation="Horizontal" VerticalAlignment="Center"  IsEnabled="{Binding PPecEnabled}">
+             d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}"
+             mc:Ignorable="d">
+    <StackPanel Margin="0,5,0,0"
+                VerticalAlignment="Center"
+                IsEnabled="{Binding PPecEnabled}"
+                Orientation="Horizontal">
         <StackPanel.Style>
             <Style TargetType="StackPanel">
                 <Style.Triggers>
@@ -19,18 +23,30 @@
                 </Style.Triggers>
             </Style>
         </StackPanel.Style>
-        <ToggleButton Width="20" Height="20" ToolTip="{StaticResource ppOnOff}" Style="{StaticResource MaterialDesignActionLightToggleButton}" IsChecked="{Binding PPecOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        <Label Content="{StaticResource ppPec}"/>
-        <ToggleButton  HorizontalAlignment="Center" Width="20" Height="20" ToolTip="{StaticResource ppStartTrainingMode}"
-                       IsChecked="{Binding PecTrainOn}" Style="{StaticResource MaterialDesignActionLightToggleButton}"
-                       Command="{Binding OpenPPecDialogCommand}"/>
-        <Label Content="{StaticResource ppTraining}"/>
-        <md:PackIcon Kind="Timer" Width="20" Height="20" ToolTip="{StaticResource ppTipPecTimer}" VerticalAlignment="Center">
+        <ToggleButton Width="20"
+                      Height="20"
+                      IsChecked="{Binding PPecOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      Style="{StaticResource MaterialDesignActionLightToggleButton}"
+                      ToolTip="{StaticResource ppOnOff}" />
+        <Label Content="{StaticResource ppPec}" />
+        <ToggleButton Width="20"
+                      Height="20"
+                      HorizontalAlignment="Center"
+                      Command="{Binding OpenPPecDialogCommand}"
+                      IsChecked="{Binding PecTrainOn}"
+                      Style="{StaticResource MaterialDesignActionLightToggleButton}"
+                      ToolTip="{StaticResource ppStartTrainingMode}" />
+        <Label Content="{StaticResource ppTraining}" />
+        <md:PackIcon Width="20"
+                     Height="20"
+                     VerticalAlignment="Center"
+                     Kind="Timer"
+                     ToolTip="{StaticResource ppTipPecTimer}">
             <md:PackIcon.Style>
                 <Style TargetType="md:PackIcon">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding PecTrainInProgress}" Value="True">
-                            <Setter Property="Foreground" Value="LimeGreen"></Setter>
+                            <Setter Property="Foreground" Value="LimeGreen" />
                         </DataTrigger>
                         <DataTrigger Binding="{Binding PecTrainInProgress}" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource PrimaryHueDarkBrush}" />
@@ -39,6 +55,6 @@
                 </Style>
             </md:PackIcon.Style>
         </md:PackIcon>
-        <Label Content="{StaticResource ppInTraining}"/>
+        <Label Content="{StaticResource ppInTraining}" />
     </StackPanel>
 </UserControl>

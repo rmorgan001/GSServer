@@ -1,10 +1,12 @@
 ﻿<UserControl x:Class="GS.Server.Notes.NotesV"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes" Loaded="NotesV_OnLoaded"
-             mc:Ignorable="d" DataContext="{Binding RelativeSource={RelativeSource Self}}">
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             DataContext="{Binding RelativeSource={RelativeSource Self}}"
+             Loaded="NotesV_OnLoaded"
+             mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -17,168 +19,327 @@
         <CommandBinding Command="ApplicationCommands.SaveAs" Executed="SaveAs_Executed" />
         <CommandBinding Command="ApplicationCommands.Save" Executed="Save_Executed" />
     </UserControl.CommandBindings>
-    <md:DialogHost HorizontalAlignment="Center" CloseOnClickAway="True" Name="DialogHost" IsOpen="{Binding Path=IsDialogOpen}" DialogContent="{Binding Path=DialogContent}">
-    <Grid>
-        
-        <!--<md:DrawerHost HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="2" 
-            IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" 
-            BorderBrush="{StaticResource MaterialDesignDivider}">
-            <md:DrawerHost.LeftDrawerContent>
-            <Grid Width="700">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="40" />
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <Grid Grid.Row="0" Grid.Column="0" >
-                    <Label HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18"  Foreground="{StaticResource PrimaryHueMidBrush}">Settings</Label>
-                    <ToggleButton DockPanel.Dock="Top" HorizontalAlignment="Right" Margin="5" 
-                        Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
-                        Command="{x:Static md:DrawerHost.CloseDrawerCommand}"
-                        CommandParameter="{x:Static Dock.Left}"
-                        IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"/>
-                </Grid>
-            </Grid>
-        </md:DrawerHost.LeftDrawerContent>-->
+    <md:DialogHost Name="DialogHost"
+                   HorizontalAlignment="Center"
+                   CloseOnClickAway="True"
+                   DialogContent="{Binding Path=DialogContent}"
+                   IsOpen="{Binding Path=IsDialogOpen}">
         <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="30"/>
-                <RowDefinition Height="30"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <!--<StackPanel Grid.Row="0" Orientation="Horizontal">
-                <ToggleButton HorizontalAlignment="Left" VerticalAlignment="Top"
-                        Command="{x:Static md:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}"
-                        Style="{StaticResource MaterialDesignHamburgerToggleButton}" IsChecked="False" x:Name="MenuToggleButton"/>
-            </StackPanel>-->
-            <md:ColorZone Grid.Row="0" Mode="Standard">
-                <ToolBarTray VerticalAlignment="Stretch" IsLocked="True" >
-                    <ToolBar Background="Transparent">
-                        <Button Padding="2" Command="Open" ToolTip="{StaticResource notOpen}"><md:PackIcon Kind="FileDocumentOutline"/></Button>
-                        <Button Padding="2" Command="Save" ToolTip="{StaticResource notSave}"><md:PackIcon Kind="ContentSave"/></Button>
-                        <Button Padding="2" Command="SaveAs" ToolTip="{StaticResource notSaveAs}"><md:PackIcon Kind="FileReplace"/></Button>
-                        <Button Name="btPrint" Padding="2" ToolTip="{StaticResource notPrint}" Click="BtPrint_OnClick"><md:PackIcon Kind="Printer"/></Button>
-                        <Button Padding="2" Command="Cut" ToolTip="{StaticResource notCut}" ToolBar.OverflowMode="AsNeeded"><md:PackIcon Kind="ContentCut"/></Button>
-                        <Button Padding="2" Command="Copy" ToolTip="{StaticResource notCopy}" ToolBar.OverflowMode="AsNeeded"><md:PackIcon Kind="ContentCopy"/></Button>
-                        <Button Padding="2" Command="Paste" ToolTip="{StaticResource notPaste}" ToolBar.OverflowMode="AsNeeded">
-                                        <md:PackIcon Kind="ContentPaste"/></Button>
-                        <Button Padding="2" Command="Redo"  ToolTip="{StaticResource notRedo}" ToolBar.OverflowMode="AsNeeded">
-                                        <md:PackIcon Kind="Arrow"/></Button>
-                        <Button Padding="2" Command="Undo"  ToolTip="{StaticResource notUndo}" ToolBar.OverflowMode="AsNeeded">
-                                        <md:PackIcon Kind="Undo"/>
-                                    </Button>
-                        <Button Padding="2" Command="ToggleNumbering"  ToolTip="{StaticResource notNumbering}" ToolBar.OverflowMode="AsNeeded">
-                                        <md:PackIcon Kind="FormatListNumbered"/>
-                                    </Button>
-                        <Button Padding="2" Command="ToggleBullets"  ToolTip="{StaticResource notBullets}" ToolBar.OverflowMode="AsNeeded">
-                                        <md:PackIcon Kind="FormatListBulleted"/>
-                                    </Button>
-                        <Button Padding="2" Command="DecreaseIndentation"  ToolTip="{StaticResource notIndent}" ToolBar.OverflowMode="AsNeeded">
-                                        <md:PackIcon Kind="FormatIndentDecrease"/>
-                                    </Button>
-                        <Button Padding="2" Command="IncreaseIndentation"  ToolTip="{StaticResource notInIndent}" ToolBar.OverflowMode="AsNeeded">
-                                        <md:PackIcon Kind="FormatIndentIncrease"/>
-                                    </Button>
-                        <ToggleButton Name="tbLeft" Command="EditingCommands.AlignLeft" Padding="2" ToolTip="{StaticResource notLeftAlign}" ToolBar.OverflowMode="AsNeeded" Height="20" Width="20" Margin="2"
-                                                  Style="{StaticResource MaterialDesignActionToggleButton}" Click="TbLeft_OnClick">
-                                        <ToggleButton.Content>
-                                            <md:PackIcon Kind="FormatAlignLeft" />
-                                        </ToggleButton.Content>
-                                        <md:ToggleButtonAssist.OnContent>
-                                            <md:PackIcon Kind="FormatAlignLeft" Background="{StaticResource SecondaryHueMidBrush}" />
-                                        </md:ToggleButtonAssist.OnContent>
-                                    </ToggleButton>
-                        <ToggleButton Name="tbCenter" Command="EditingCommands.AlignCenter" Padding="2" ToolTip="{StaticResource notCenterAlign}" ToolBar.OverflowMode="AsNeeded" Height="20" Width="20" Margin="2"
-                                                  Style="{StaticResource MaterialDesignActionToggleButton}" Click="TbCenter_OnClick">
-                                        <ToggleButton.Content>
-                                            <md:PackIcon Kind="FormatAlignCenter" />
-                                        </ToggleButton.Content>
-                                        <md:ToggleButtonAssist.OnContent>
-                                            <md:PackIcon Kind="FormatAlignCenter" Background="{StaticResource SecondaryHueMidBrush}" />
-                                        </md:ToggleButtonAssist.OnContent>
-                                    </ToggleButton>
-                        <ToggleButton Name="tbRight" Command="EditingCommands.AlignRight" Padding="2" ToolTip="{StaticResource notRightAlign}" ToolBar.OverflowMode="AsNeeded" Height="20" Width="20" Margin="2"
-                                                  Style="{StaticResource MaterialDesignActionToggleButton}" Click="TbRight_OnClick">
-                                        <ToggleButton.Content>
-                                            <md:PackIcon Kind="FormatAlignRight" />
-                                        </ToggleButton.Content>
-                                        <md:ToggleButtonAssist.OnContent>
-                                            <md:PackIcon Kind="FormatAlignRight" Background="{StaticResource SecondaryHueMidBrush}" />
-                                        </md:ToggleButtonAssist.OnContent>
-                                    </ToggleButton>
-                        <ToggleButton Name="tbBold" Command="ToggleBold" Padding="2" ToolTip="{StaticResource notBold}" ToolBar.OverflowMode="AsNeeded" Height="20" Width="20" Margin="2"
-                                                  Style="{StaticResource MaterialDesignActionToggleButton}">
-                                        <ToggleButton.Content><md:PackIcon Kind="FormatBold" /></ToggleButton.Content>
-                                        <md:ToggleButtonAssist.OnContent>
-                                            <md:PackIcon Kind="FormatBold" Background="{StaticResource SecondaryHueMidBrush}" /></md:ToggleButtonAssist.OnContent>
-                                    </ToggleButton>
-                        <ToggleButton Name="tbItalic" Command="ToggleItalic" ToolTip="{StaticResource notInItalic}" ToolBar.OverflowMode="AsNeeded" Height="20" Width="20" Margin="2"
-                                                  Style="{StaticResource MaterialDesignActionToggleButton}">
-                                        <ToggleButton.Content>
-                                            <md:PackIcon Kind="FormatItalic" />
-                                        </ToggleButton.Content>
-                                        <md:ToggleButtonAssist.OnContent>
-                                            <md:PackIcon Kind="FormatItalic" Background="{StaticResource SecondaryHueMidBrush}" />
-                                        </md:ToggleButtonAssist.OnContent>
-                                    </ToggleButton>
-                        <ToggleButton Name="tbUnderline" Command="EditingCommands.ToggleUnderline" ToolBar.OverflowMode="AsNeeded" ToolTip="{StaticResource notUnderline}" Height="20" Width="20" Margin="2"
-                                                  Style="{StaticResource MaterialDesignActionToggleButton}">
-                                        <ToggleButton.Content>
-                                            <md:PackIcon Kind="FormatUnderline" />
-                                        </ToggleButton.Content>
-                                        <md:ToggleButtonAssist.OnContent>
-                                            <md:PackIcon Kind="FormatUnderline" Background="{StaticResource SecondaryHueMidBrush}" />
-                                        </md:ToggleButtonAssist.OnContent>
-                                    </ToggleButton>
-                        <ComboBox Name="cbFontFamily" ToolTip="{StaticResource notFont}" Width="100" DropDownClosed="CbFontFamily_DropDownClosed" />
-                        <ComboBox Name="cbFontSize" ToolTip="{StaticResource notFontSize}" DropDownClosed="CbFontSize_DropDownClosed" />
-                        <Button Padding="2" Click="BtForground_Click" ToolTip="{StaticResource notFontForGround}" ToolBar.OverflowMode="AsNeeded">
-                            <md:PackIcon Kind="Paintbrush" Name="Paintbrush"/>
-                                    </Button>
-                        <Button Padding="2" Click="BtBackground_Click" ToolTip="{StaticResource notFontBackground}" ToolBar.OverflowMode="AsNeeded">
-                                <md:PackIcon Kind="ColorLens" Name="ColorLens"/>
-                                    </Button>
-                        <ToggleButton Name="tbSpell" Padding="2" ToolTip="{StaticResource notSpellCheck}" ToolBar.OverflowMode="AsNeeded" Height="20" Width="20" Margin="2"
-                                                  Style="{StaticResource MaterialDesignActionToggleButton}" Click="TbSpell_OnClick">
-                                        <ToggleButton.Content>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <md:ColorZone Grid.Row="0" Mode="Standard">
+                    <ToolBarTray VerticalAlignment="Stretch" IsLocked="True">
+                        <ToolBar Background="Transparent">
+                            <Button Padding="2"
+                                    Command="Open"
+                                    ToolTip="{StaticResource notOpen}">
+                                <md:PackIcon Kind="FileDocumentOutline" />
+                            </Button>
+                            <Button Padding="2"
+                                    Command="Save"
+                                    ToolTip="{StaticResource notSave}">
+                                <md:PackIcon Kind="ContentSave" />
+                            </Button>
+                            <Button Padding="2"
+                                    Command="SaveAs"
+                                    ToolTip="{StaticResource notSaveAs}">
+                                <md:PackIcon Kind="FileReplace" />
+                            </Button>
+                            <Button Name="BtPrint"
+                                    Padding="2"
+                                    Click="BtPrint_OnClick"
+                                    ToolTip="{StaticResource notPrint}">
+                                <md:PackIcon Kind="Printer" />
+                            </Button>
+                            <Button Padding="2"
+                                    Command="Cut"
+                                    ToolBar.OverflowMode="AsNeeded"
+                                    ToolTip="{StaticResource notCut}">
+                                <md:PackIcon Kind="ContentCut" />
+                            </Button>
+                            <Button Padding="2"
+                                    Command="Copy"
+                                    ToolBar.OverflowMode="AsNeeded"
+                                    ToolTip="{StaticResource notCopy}">
+                                <md:PackIcon Kind="ContentCopy" />
+                            </Button>
+                            <Button Padding="2"
+                                    Command="Paste"
+                                    ToolBar.OverflowMode="AsNeeded"
+                                    ToolTip="{StaticResource notPaste}">
+                                <md:PackIcon Kind="ContentPaste" />
+                            </Button>
+                            <Button Padding="2"
+                                    Command="Redo"
+                                    ToolBar.OverflowMode="AsNeeded"
+                                    ToolTip="{StaticResource notRedo}">
+                                <md:PackIcon Kind="Arrow" />
+                            </Button>
+                            <Button Padding="2"
+                                    Command="Undo"
+                                    ToolBar.OverflowMode="AsNeeded"
+                                    ToolTip="{StaticResource notUndo}">
+                                <md:PackIcon Kind="Undo" />
+                            </Button>
+                            <Button Padding="2"
+                                    Command="ToggleNumbering"
+                                    ToolBar.OverflowMode="AsNeeded"
+                                    ToolTip="{StaticResource notNumbering}">
+                                <md:PackIcon Kind="FormatListNumbered" />
+                            </Button>
+                            <Button Padding="2"
+                                    Command="ToggleBullets"
+                                    ToolBar.OverflowMode="AsNeeded"
+                                    ToolTip="{StaticResource notBullets}">
+                                <md:PackIcon Kind="FormatListBulleted" />
+                            </Button>
+                            <Button Padding="2"
+                                    Command="DecreaseIndentation"
+                                    ToolBar.OverflowMode="AsNeeded"
+                                    ToolTip="{StaticResource notIndent}">
+                                <md:PackIcon Kind="FormatIndentDecrease" />
+                            </Button>
+                            <Button Padding="2"
+                                    Command="IncreaseIndentation"
+                                    ToolBar.OverflowMode="AsNeeded"
+                                    ToolTip="{StaticResource notInIndent}">
+                                <md:PackIcon Kind="FormatIndentIncrease" />
+                            </Button>
+                            <ToggleButton Name="TbLeft"
+                                          Width="20"
+                                          Height="20"
+                                          Margin="2"
+                                          Padding="2"
+                                          Click="TbLeft_OnClick"
+                                          Command="EditingCommands.AlignLeft"
+                                          Style="{StaticResource MaterialDesignActionToggleButton}"
+                                          ToolBar.OverflowMode="AsNeeded"
+                                          ToolTip="{StaticResource notLeftAlign}">
+                                <ToggleButton.Content>
+                                    <md:PackIcon Kind="FormatAlignLeft" />
+                                </ToggleButton.Content>
+                                <md:ToggleButtonAssist.OnContent>
+                                    <md:PackIcon Background="{StaticResource SecondaryHueMidBrush}" Kind="FormatAlignLeft" />
+                                </md:ToggleButtonAssist.OnContent>
+                            </ToggleButton>
+                            <ToggleButton Name="TbCenter"
+                                          Width="20"
+                                          Height="20"
+                                          Margin="2"
+                                          Padding="2"
+                                          Click="TbCenter_OnClick"
+                                          Command="EditingCommands.AlignCenter"
+                                          Style="{StaticResource MaterialDesignActionToggleButton}"
+                                          ToolBar.OverflowMode="AsNeeded"
+                                          ToolTip="{StaticResource notCenterAlign}">
+                                <ToggleButton.Content>
+                                    <md:PackIcon Kind="FormatAlignCenter" />
+                                </ToggleButton.Content>
+                                <md:ToggleButtonAssist.OnContent>
+                                    <md:PackIcon Background="{StaticResource SecondaryHueMidBrush}" Kind="FormatAlignCenter" />
+                                </md:ToggleButtonAssist.OnContent>
+                            </ToggleButton>
+                            <ToggleButton Name="TbRight"
+                                          Width="20"
+                                          Height="20"
+                                          Margin="2"
+                                          Padding="2"
+                                          Click="TbRight_OnClick"
+                                          Command="EditingCommands.AlignRight"
+                                          Style="{StaticResource MaterialDesignActionToggleButton}"
+                                          ToolBar.OverflowMode="AsNeeded"
+                                          ToolTip="{StaticResource notRightAlign}">
+                                <ToggleButton.Content>
+                                    <md:PackIcon Kind="FormatAlignRight" />
+                                </ToggleButton.Content>
+                                <md:ToggleButtonAssist.OnContent>
+                                    <md:PackIcon Background="{StaticResource SecondaryHueMidBrush}" Kind="FormatAlignRight" />
+                                </md:ToggleButtonAssist.OnContent>
+                            </ToggleButton>
+                            <ToggleButton Name="TbBold"
+                                          Width="20"
+                                          Height="20"
+                                          Margin="2"
+                                          Padding="2"
+                                          Command="ToggleBold"
+                                          Style="{StaticResource MaterialDesignActionToggleButton}"
+                                          ToolBar.OverflowMode="AsNeeded"
+                                          ToolTip="{StaticResource notBold}">
+                                <ToggleButton.Content>
+                                    <md:PackIcon Kind="FormatBold" />
+                                </ToggleButton.Content>
+                                <md:ToggleButtonAssist.OnContent>
+                                    <md:PackIcon Background="{StaticResource SecondaryHueMidBrush}" Kind="FormatBold" />
+                                </md:ToggleButtonAssist.OnContent>
+                            </ToggleButton>
+                            <ToggleButton Name="TbItalic"
+                                          Width="20"
+                                          Height="20"
+                                          Margin="2"
+                                          Command="ToggleItalic"
+                                          Style="{StaticResource MaterialDesignActionToggleButton}"
+                                          ToolBar.OverflowMode="AsNeeded"
+                                          ToolTip="{StaticResource notInItalic}">
+                                <ToggleButton.Content>
+                                    <md:PackIcon Kind="FormatItalic" />
+                                </ToggleButton.Content>
+                                <md:ToggleButtonAssist.OnContent>
+                                    <md:PackIcon Background="{StaticResource SecondaryHueMidBrush}" Kind="FormatItalic" />
+                                </md:ToggleButtonAssist.OnContent>
+                            </ToggleButton>
+                            <ToggleButton Name="TbUnderline"
+                                          Width="20"
+                                          Height="20"
+                                          Margin="2"
+                                          Command="EditingCommands.ToggleUnderline"
+                                          Style="{StaticResource MaterialDesignActionToggleButton}"
+                                          ToolBar.OverflowMode="AsNeeded"
+                                          ToolTip="{StaticResource notUnderline}">
+                                <ToggleButton.Content>
+                                    <md:PackIcon Kind="FormatUnderline" />
+                                </ToggleButton.Content>
+                                <md:ToggleButtonAssist.OnContent>
+                                    <md:PackIcon Background="{StaticResource SecondaryHueMidBrush}" Kind="FormatUnderline" />
+                                </md:ToggleButtonAssist.OnContent>
+                            </ToggleButton>
+                            <ComboBox Name="CbFontFamily"
+                                      Width="100"
+                                      DropDownClosed="CbFontFamily_DropDownClosed"
+                                      ToolTip="{StaticResource notFont}" />
+                            <ComboBox Name="CbFontSize"
+                                      DropDownClosed="CbFontSize_DropDownClosed"
+                                      ToolTip="{StaticResource notFontSize}" />
+                            <Button Padding="2"
+                                    Click="BtForGround_Click"
+                                    ToolBar.OverflowMode="AsNeeded"
+                                    ToolTip="{StaticResource notFontForGround}">
+                                <md:PackIcon Name="Paintbrush" Kind="Paintbrush" />
+                            </Button>
+                            <Button Padding="2"
+                                    Click="BtBackground_Click"
+                                    ToolBar.OverflowMode="AsNeeded"
+                                    ToolTip="{StaticResource notFontBackground}">
+                                <md:PackIcon Name="ColorLens" Kind="ColorLens" />
+                            </Button>
+                            <ToggleButton Name="TbSpell"
+                                          Width="20"
+                                          Height="20"
+                                          Margin="2"
+                                          Padding="2"
+                                          Click="TbSpell_OnClick"
+                                          Style="{StaticResource MaterialDesignActionToggleButton}"
+                                          ToolBar.OverflowMode="AsNeeded"
+                                          ToolTip="{StaticResource notSpellCheck}">
+                                <ToggleButton.Content>
                                     <md:PackIcon Kind="Spellcheck" />
-                                        </ToggleButton.Content>
-                                        <md:ToggleButtonAssist.OnContent>
-                                    <md:PackIcon Kind="Spellcheck" Background="{StaticResource SecondaryHueMidBrush}" />
-                                        </md:ToggleButtonAssist.OnContent>
-                                    </ToggleButton>
+                                </ToggleButton.Content>
+                                <md:ToggleButtonAssist.OnContent>
+                                    <md:PackIcon Background="{StaticResource SecondaryHueMidBrush}" Kind="Spellcheck" />
+                                </md:ToggleButtonAssist.OnContent>
+                            </ToggleButton>
                         </ToolBar>
-                        </ToolBarTray>
-            </md:ColorZone>
-            <md:ColorZone Grid.Row="1" Mode="Standard">
-            <ToolBarTray VerticalAlignment="Stretch" IsLocked="True">
-                <ToolBar Background="Transparent" Margin="5,0,0,0">
-                        <Label VerticalAlignment="Center" Padding="0" Content="{StaticResource notShortcuts}"/>
-                        <Button ToolTip="{StaticResource notDate}" Padding="2" Click="BtDate_OnClick"><md:PackIcon Kind="DateRange"/></Button>
-                        <Button ToolTip="{StaticResource notTime}" Padding="2" Click="BtTime_OnClick"><md:PackIcon Kind="EventTime"/></Button>
-                        <Button ToolTip="{StaticResource notRa}" Click="Ra_OnClick" Margin="1" Padding="2" Content="{StaticResource notRa}"/>
-                        <Button ToolTip="{StaticResource notDec}" Click="Dec_OnClick"  Margin="1" Padding="2" Content="{StaticResource notDec}"/>
-                        <Button ToolTip="{StaticResource notAlt}" Click="BtAlt_OnClick" Margin="1" Padding="2" Content="{StaticResource notAlt}"/>
-                        <Button ToolTip="{StaticResource notAz}" Click="BtAz_OnClick" Margin="1" Padding="2" Content="{StaticResource notAz}"/>
-                        <Button ToolTip="{StaticResource notPhase}" Click="BtMoon_OnClick" Margin="1" Padding="2" Content="{StaticResource notMoon}"/>
-                        <Button ToolTip="{StaticResource notEntry}" Click="BtLog_OnClick" Margin="1" Padding="2" Content="{StaticResource notLog}"/>
-                        <Button ToolTip="{StaticResource notAlignmentMode}" Click="BtAlignmentMode_OnClick" Margin="1" Padding="2" Content="{StaticResource notAlignment}"/>
-                        <Button ToolTip="{StaticResource notEqType}" Click="BtEqSystem_OnClick" Margin="1" Padding="2" Content="{StaticResource notEq}"/>
-                        <Button ToolTip="{StaticResource notObLoc}" Click="BtObservatory_OnClick" Margin="1" Padding="2" Content="{StaticResource notOb}"/>
-                        <Button ToolTip="{StaticResource notWeather}" Click="BtWeather_OnClick" HorizontalAlignment="Left"  Margin="1" Padding="2" Content="{StaticResource notWeather}"/>
-                        <Button ToolTip="{StaticResource notSidereal}" Padding="2" Click="BtSidereal_OnClick"><md:PackIcon Kind="Earth" /></Button>
-                        <Button ToolTip="{StaticResource notAngle}" Click="Ha_OnClick" Margin="1" Padding="2" Content="{StaticResource notHa}" />
-                        <!--<ComboBox Name="cbSkySettings" ToolTip="Font" Width="100" />-->
-                    </ToolBar>
-            </ToolBarTray>
-            </md:ColorZone>
-            <RichTextBox Grid.Row="2" x:Name="rtbEditor" AcceptsTab="True" AcceptsReturn="True" SpellCheck.IsEnabled="False" 
-                         FontFamily="Segoe UI" FontSize="14" VerticalScrollBarVisibility="Auto" Unloaded="RtbEditor_OnUnloaded" 
-                             TextOptions.TextRenderingMode="Auto"  MinHeight="200" MinWidth="700" Foreground="{StaticResource MaterialDesignBody}" 
-                             KeyDown="RtbEditor_OnKeyDown" SelectionChanged="RtbEditor_SelectionChanged" Background="{StaticResource MaterialDesignPaper}"/>
-        </Grid>
-        
-    <!--</md:DrawerHost>-->
+                    </ToolBarTray>
+                </md:ColorZone>
+                <md:ColorZone Grid.Row="1" Mode="Standard">
+                    <ToolBarTray VerticalAlignment="Stretch" IsLocked="True">
+                        <ToolBar Margin="5,0,0,0" Background="Transparent">
+                            <Label Padding="0"
+                                   VerticalAlignment="Center"
+                                   Content="{StaticResource notShortcuts}" />
+                            <Button Padding="2"
+                                    Click="BtDate_OnClick"
+                                    ToolTip="{StaticResource notDate}">
+                                <md:PackIcon Kind="DateRange" />
+                            </Button>
+                            <Button Padding="2"
+                                    Click="BtTime_OnClick"
+                                    ToolTip="{StaticResource notTime}">
+                                <md:PackIcon Kind="EventTime" />
+                            </Button>
+                            <Button Margin="1"
+                                    Padding="2"
+                                    Click="Ra_OnClick"
+                                    Content="{StaticResource notRa}"
+                                    ToolTip="{StaticResource notRa}" />
+                            <Button Margin="1"
+                                    Padding="2"
+                                    Click="Dec_OnClick"
+                                    Content="{StaticResource notDec}"
+                                    ToolTip="{StaticResource notDec}" />
+                            <Button Margin="1"
+                                    Padding="2"
+                                    Click="BtAlt_OnClick"
+                                    Content="{StaticResource notAlt}"
+                                    ToolTip="{StaticResource notAlt}" />
+                            <Button Margin="1"
+                                    Padding="2"
+                                    Click="BtAz_OnClick"
+                                    Content="{StaticResource notAz}"
+                                    ToolTip="{StaticResource notAz}" />
+                            <Button Margin="1"
+                                    Padding="2"
+                                    Click="BtMoon_OnClick"
+                                    Content="{StaticResource notMoon}"
+                                    ToolTip="{StaticResource notPhase}" />
+                            <Button Margin="1"
+                                    Padding="2"
+                                    Click="BtLog_OnClick"
+                                    Content="{StaticResource notLog}"
+                                    ToolTip="{StaticResource notEntry}" />
+                            <Button Margin="1"
+                                    Padding="2"
+                                    Click="BtAlignmentMode_OnClick"
+                                    Content="{StaticResource notAlignment}"
+                                    ToolTip="{StaticResource notAlignmentMode}" />
+                            <Button Margin="1"
+                                    Padding="2"
+                                    Click="BtEqSystem_OnClick"
+                                    Content="{StaticResource notEq}"
+                                    ToolTip="{StaticResource notEqType}" />
+                            <Button Margin="1"
+                                    Padding="2"
+                                    Click="BtObservatory_OnClick"
+                                    Content="{StaticResource notOb}"
+                                    ToolTip="{StaticResource notObLoc}" />
+                            <!--<Button ToolTip="{StaticResource notWeather}" Click="BtWeather_OnClick" HorizontalAlignment="Left"  Margin="1" Padding="2" Content="{StaticResource notWeather}"/>-->
+                            <Button Padding="2"
+                                    Click="BtSidereal_OnClick"
+                                    ToolTip="{StaticResource notSidereal}">
+                                <md:PackIcon Kind="Earth" />
+                            </Button>
+                            <Button Margin="1"
+                                    Padding="2"
+                                    Click="Ha_OnClick"
+                                    Content="{StaticResource notHa}"
+                                    ToolTip="{StaticResource notAngle}" />
+                            <!--<ComboBox Name="cbSkySettings" ToolTip="Font" Width="100" />-->
+                        </ToolBar>
+                    </ToolBarTray>
+                </md:ColorZone>
+                <RichTextBox x:Name="RtbEditor"
+                             VerticalContentAlignment="Top"
+                             Grid.Row="2"
+                             MinWidth="700"
+                             MinHeight="200"
+                             AcceptsReturn="True"
+                             AcceptsTab="True"
+                             Background="{StaticResource MaterialDesignPaper}"
+                             FontFamily="Segoe UI"
+                             FontSize="14"
+                             Foreground="{StaticResource MaterialDesignBody}"
+                             KeyDown="RtbEditor_OnKeyDown"
+                             SelectionChanged="RtbEditor_SelectionChanged"
+                             SpellCheck.IsEnabled="False"
+                             TextOptions.TextRenderingMode="Auto"
+                             Unloaded="RtbEditor_OnUnloaded"
+                             VerticalScrollBarVisibility="Auto" />
+            </Grid>
+
+            <!--</md:DrawerHost>-->
         </Grid>
     </md:DialogHost>
 </UserControl>

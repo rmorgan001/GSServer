@@ -1,27 +1,31 @@
-﻿<UserControl x:Class="GS.Server.Controls.TabBar" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+﻿<UserControl x:Class="GS.Server.Controls.TabBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:main="clr-namespace:GS.Server.Main"
-             mc:Ignorable="d" d:DataContext="{d:DesignInstance main:MainWindowVm }">
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             d:DataContext="{d:DesignInstance main:MainWindowVm}"
+             mc:Ignorable="d">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>
     <md:ColorZone Mode="PrimaryDark">
-        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" FlowDirection="LeftToRight">
+        <ScrollViewer FlowDirection="LeftToRight"
+                      HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Disabled">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
@@ -30,24 +34,117 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40" />
                 </Grid.RowDefinitions>
-                <Button Grid.Column="0" MinWidth="0" Padding="10,0,0,0" Command="{Binding ResetWindowCommand}" Style="{StaticResource MaterialDesignFlatButton}" ToolTip="{StaticResource tabWindowFlip}">
-                    <md:PackIcon Kind="Resize" Width="20" Height="20" />
+                <Button Grid.Column="0"
+                        MinWidth="0"
+                        Padding="10,0,0,0"
+                        Command="{Binding ResetWindowCommand}"
+                        Style="{StaticResource MaterialDesignFlatButton}"
+                        ToolTip="{StaticResource tabWindowFlip}">
+                    <md:PackIcon Width="20"
+                                 Height="20"
+                                 Kind="Resize" />
                 </Button>
-                <RadioButton Grid.Column="1" FontSize="16" MinWidth="0" Padding="10,0,10,0" IsChecked="{Binding SkyWatcherVmRadio}" Visibility="{Binding Path=SkyWatcherRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource tabMain}"/>
-                <RadioButton Grid.Column="2" FontSize="16" MinWidth="0" Padding="10,0,10,0"  IsChecked="{Binding NotesVmRadioRadio}" Visibility="{Binding Path=NotesRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource tabNotes}" />
-                <RadioButton Grid.Column="3" FontSize="16" MinWidth="0" Padding="10,0,10,0"  IsChecked="{Binding SettingsVmRadio}" Visibility="{Binding Path=SettingsRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource tabOptions}" />
-                <RadioButton Grid.Column="4" FontSize="16" MinWidth="0" Padding="10,0,10,0" IsChecked="{Binding GamePadVmRadioRadio}" Visibility="{Binding Path=GamePadRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource tabGamePad}" />
-                <RadioButton Grid.Column="5" FontSize="16" MinWidth="0" Padding="10,0,10,0" IsChecked="{Binding Model3DvmRadioRadio}" Visibility="{Binding Path=Model3DRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource tabModel3D}" />
-                <RadioButton Grid.Column="6" FontSize="16" MinWidth="0" Padding="10,0,10,0" IsChecked="{Binding PecVmRadioRadio}" Visibility="{Binding Path=PecRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource Pec}" />
-                <RadioButton Grid.Column="7" FontSize="16" MinWidth="0" Padding="10,0,10,0" IsChecked="{Binding PlotVmRadioRadio}" Visibility="{Binding Path=PlotRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource tabPlot}" />
-                <RadioButton Grid.Column="8" FontSize="16" MinWidth="0" Padding="10,0,10,0" IsChecked="{Binding PoleLocatorVmRadioRadio}" Visibility="{Binding Path=PoleLocatorRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource tabPole}" />
-                <RadioButton Grid.Column="9" FontSize="16" MinWidth="0" Padding="10,0,10,0" IsChecked="{Binding PulsesVmRadioRadio}" Visibility="{Binding Path=PulsesRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource tabPulses}" />
-                <RadioButton Grid.Column="10" FontSize="16" MinWidth="0" Padding="10,0,10,0" IsChecked="{Binding SnapVmRadioRadio}" Visibility="{Binding Path=SnapRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource tabSnap}" />
-                <RadioButton Grid.Column="11" FontSize="16" MinWidth="0" Padding="10,0,10,0" IsChecked="{Binding FocuserVmRadioRadio}" Visibility="{Binding Path=FocuserRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}" Content="{StaticResource tabFocuser}" />
-                <RadioButton Grid.Column="12" FontSize="16" MinWidth="0" Padding="10,0,10,0" IsChecked="{Binding AlignmentVmRadioRadio}" Visibility="{Binding Path=AlignmentRadioVisible, Converter={StaticResource BoolToVis}}" Style="{StaticResource MaterialDesignTabRadioButton}">
+                <RadioButton Grid.Column="1"
+                             MinWidth="0"
+                             Padding="10,0,10,0"
+                             Content="{StaticResource tabMain}"
+                             FontSize="16"
+                             IsChecked="{Binding SkyWatcherVmRadio}"
+                             Style="{StaticResource MaterialDesignTabRadioButton}"
+                             Visibility="{Binding Path=SkyWatcherRadioVisible, Converter={StaticResource BoolToVis}}" />
+                <RadioButton Grid.Column="2"
+                             MinWidth="0"
+                             Padding="10,0,10,0"
+                             Content="{StaticResource tabNotes}"
+                             FontSize="16"
+                             IsChecked="{Binding NotesVmRadioRadio}"
+                             Style="{StaticResource MaterialDesignTabRadioButton}"
+                             Visibility="{Binding Path=NotesRadioVisible, Converter={StaticResource BoolToVis}}" />
+                <RadioButton Grid.Column="3"
+                             MinWidth="0"
+                             Padding="10,0,10,0"
+                             Content="{StaticResource tabOptions}"
+                             FontSize="16"
+                             IsChecked="{Binding SettingsVmRadio}"
+                             Style="{StaticResource MaterialDesignTabRadioButton}"
+                             Visibility="{Binding Path=SettingsRadioVisible, Converter={StaticResource BoolToVis}}" />
+                <RadioButton Grid.Column="4"
+                             MinWidth="0"
+                             Padding="10,0,10,0"
+                             Content="{StaticResource tabGamePad}"
+                             FontSize="16"
+                             IsChecked="{Binding GamePadVmRadioRadio}"
+                             Style="{StaticResource MaterialDesignTabRadioButton}"
+                             Visibility="{Binding Path=GamePadRadioVisible, Converter={StaticResource BoolToVis}}" />
+                <RadioButton Grid.Column="5"
+                             MinWidth="0"
+                             Padding="10,0,10,0"
+                             Content="{StaticResource tabModel3D}"
+                             FontSize="16"
+                             IsChecked="{Binding Model3DvmRadioRadio}"
+                             Style="{StaticResource MaterialDesignTabRadioButton}"
+                             Visibility="{Binding Path=Model3DRadioVisible, Converter={StaticResource BoolToVis}}" />
+                <RadioButton Grid.Column="6"
+                             MinWidth="0"
+                             Padding="10,0,10,0"
+                             Content="{StaticResource Pec}"
+                             FontSize="16"
+                             IsChecked="{Binding PecVmRadioRadio}"
+                             Style="{StaticResource MaterialDesignTabRadioButton}"
+                             Visibility="{Binding Path=PecRadioVisible, Converter={StaticResource BoolToVis}}" />
+                <RadioButton Grid.Column="7"
+                             MinWidth="0"
+                             Padding="10,0,10,0"
+                             Content="{StaticResource tabPlot}"
+                             FontSize="16"
+                             IsChecked="{Binding PlotVmRadioRadio}"
+                             Style="{StaticResource MaterialDesignTabRadioButton}"
+                             Visibility="{Binding Path=PlotRadioVisible, Converter={StaticResource BoolToVis}}" />
+                <RadioButton Grid.Column="8"
+                             MinWidth="0"
+                             Padding="10,0,10,0"
+                             Content="{StaticResource tabPole}"
+                             FontSize="16"
+                             IsChecked="{Binding PoleLocatorVmRadioRadio}"
+                             Style="{StaticResource MaterialDesignTabRadioButton}"
+                             Visibility="{Binding Path=PoleLocatorRadioVisible, Converter={StaticResource BoolToVis}}" />
+                <RadioButton Grid.Column="9"
+                             MinWidth="0"
+                             Padding="10,0,10,0"
+                             Content="{StaticResource tabPulses}"
+                             FontSize="16"
+                             IsChecked="{Binding PulsesVmRadioRadio}"
+                             Style="{StaticResource MaterialDesignTabRadioButton}"
+                             Visibility="{Binding Path=PulsesRadioVisible, Converter={StaticResource BoolToVis}}" />
+                <RadioButton Grid.Column="10"
+                             MinWidth="0"
+                             Padding="10,0,10,0"
+                             Content="{StaticResource tabSnap}"
+                             FontSize="16"
+                             IsChecked="{Binding SnapVmRadioRadio}"
+                             Style="{StaticResource MaterialDesignTabRadioButton}"
+                             Visibility="{Binding Path=SnapRadioVisible, Converter={StaticResource BoolToVis}}" />
+                <RadioButton Grid.Column="11"
+                             MinWidth="0"
+                             Padding="10,0,10,0"
+                             Content="{StaticResource tabFocuser}"
+                             FontSize="16"
+                             IsChecked="{Binding FocuserVmRadioRadio}"
+                             Style="{StaticResource MaterialDesignTabRadioButton}"
+                             Visibility="{Binding Path=FocuserRadioVisible, Converter={StaticResource BoolToVis}}" />
+                <RadioButton Grid.Column="12"
+                             MinWidth="0"
+                             Padding="10,0,10,0"
+                             FontSize="16"
+                             IsChecked="{Binding AlignmentVmRadioRadio}"
+                             Style="{StaticResource MaterialDesignTabRadioButton}"
+                             Visibility="{Binding Path=AlignmentRadioVisible, Converter={StaticResource BoolToVis}}">
                     <RadioButton.Content>
-                        <md:Badged   Badge="{Binding AlignmentAlertBadge}" BadgePlacementMode="Right" BadgeBackground="Gold" ToolTip="{StaticResource aliAlertTooltip}">
-                            <TextBlock Text="{StaticResource tabAlignment}"/>
+                        <md:Badged Badge="{Binding AlignmentAlertBadge}"
+                                   BadgeBackground="Gold"
+                                   BadgePlacementMode="Right"
+                                   ToolTip="{StaticResource aliAlertTooltip}">
+                            <TextBlock Text="{StaticResource tabAlignment}" />
                         </md:Badged>
                     </RadioButton.Content>
                 </RadioButton>

@@ -1,16 +1,24 @@
 ﻿<UserControl x:Class="GS.Server.Controls.HandController"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
-             xmlns:b="http://schemas.microsoft.com/xaml/behaviors" mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}">
+             d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}"
+             mc:Ignorable="d">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>
-    <Border BorderBrush="DimGray"  BorderThickness="2" CornerRadius="5" Background="{DynamicResource MaterialDesignToolBarBackground}">
-        <Grid Width="320" Height="175" Margin="4"  HorizontalAlignment="Left">
+    <Border Background="{DynamicResource MaterialDesignToolBarBackground}"
+            BorderBrush="DimGray"
+            BorderThickness="2"
+            CornerRadius="5">
+        <Grid Width="320"
+              Height="175"
+              Margin="4"
+              HorizontalAlignment="Left">
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition />
@@ -20,10 +28,14 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition />
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Row="1" Grid.Column="0" Width="50" Height="50" ToolTipService.Placement="Center">
+            <Button Grid.Row="1"
+                    Grid.Column="0"
+                    Width="50"
+                    Height="50"
+                    ToolTipService.Placement="Center">
                 <Button.ToolTip>
                     <TextBlock Text="{Binding HcToolTipW}" />
                 </Button.ToolTip>
@@ -37,7 +49,11 @@
                 </b:Interaction.Triggers>
                 <md:PackIcon Kind="ArrowLeft" />
             </Button>
-            <Button Grid.Row="0" Grid.Column="1" Width="50" Height="50" ToolTipService.Placement="Center">
+            <Button Grid.Row="0"
+                    Grid.Column="1"
+                    Width="50"
+                    Height="50"
+                    ToolTipService.Placement="Center">
                 <Button.ToolTip>
                     <TextBlock Text="{Binding HcToolTipN}" />
                 </Button.ToolTip>
@@ -51,7 +67,11 @@
                 </b:Interaction.Triggers>
                 <md:PackIcon Kind="ArrowUp" />
             </Button>
-            <Button Grid.Row="1" Grid.Column="2" Width="50" Height="50" ToolTipService.Placement="Center">
+            <Button Grid.Row="1"
+                    Grid.Column="2"
+                    Width="50"
+                    Height="50"
+                    ToolTipService.Placement="Center">
                 <Button.ToolTip>
                     <TextBlock Text="{Binding HcToolTipE}" />
                 </Button.ToolTip>
@@ -65,7 +85,11 @@
                 </b:Interaction.Triggers>
                 <md:PackIcon Kind="ArrowRight" />
             </Button>
-            <Button Grid.Row="2" Grid.Column="1" Width="50" Height="50" ToolTipService.Placement="Center">
+            <Button Grid.Row="2"
+                    Grid.Column="1"
+                    Width="50"
+                    Height="50"
+                    ToolTipService.Placement="Center">
                 <Button.ToolTip>
                     <TextBlock Text="{Binding HcToolTipS}" />
                 </Button.ToolTip>
@@ -79,7 +103,13 @@
                 </b:Interaction.Triggers>
                 <md:PackIcon Kind="ArrowDown" />
             </Button>
-            <Button Grid.Row="1" Grid.Column="1" Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{StaticResource vceAbortSlew}" Style="{StaticResource MaterialDesignRaisedLightButton}" >
+            <Button Grid.Row="1"
+                    Grid.Column="1"
+                    Width="50"
+                    Height="50"
+                    Style="{StaticResource MaterialDesignRaisedLightButton}"
+                    ToolTip="{StaticResource vceAbortSlew}"
+                    ToolTipService.Placement="Center">
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
                         <b:InvokeCommandAction Command="{Binding HcMouseDownStopCommand}" PassEventArgsToCommand="True" />
@@ -87,20 +117,35 @@
                 </b:Interaction.Triggers>
                 <md:PackIcon Kind="ArrowAll" />
             </Button>
-            <StackPanel Margin="10,0,10,0" Orientation="Vertical" Grid.Row="0" Grid.Column="3" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Top" Width="50">
-                <Button Margin="0,0,0,0" ToolTip="{StaticResource hcOpenWin}" Command="{Binding OpenHcWindowCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}"
+            <StackPanel Grid.Row="0"
+                        Grid.RowSpan="3"
+                        Grid.Column="3"
+                        Width="50"
+                        Margin="10,0,10,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        Orientation="Vertical">
+                <Button Margin="0,0,0,0"
+                        Command="{Binding OpenHcWindowCmd}"
+                        Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                        ToolTip="{StaticResource hcOpenWin}"
                         Visibility="{Binding HcWinVisibility, Converter={StaticResource BoolToVis}}">
                     <md:PackIcon Kind="OpenInNew" />
                 </Button>
-                <Button Margin="0,3,0,0" ToolTip="{StaticResource optServerSettings}" Command="{Binding OpenHcOptionsDialogCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}">
+                <Button Margin="0,3,0,0"
+                        Command="{Binding OpenHcOptionsDialogCmd}"
+                        Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                        ToolTip="{StaticResource optServerSettings}">
                     <md:PackIcon Kind="settings" />
                 </Button>
-                <Button Margin="0,3,0,0" ToolTip="{StaticResource tabPulses}"   Command="{Binding OpenPulseGuidesDialogCmd}" >
+                <Button Margin="0,3,0,0"
+                        Command="{Binding OpenPulseGuidesDialogCmd}"
+                        ToolTip="{StaticResource tabPulses}">
                     <Button.Style>
-                        <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedDarkButton}">
+                        <Style BasedOn="{StaticResource MaterialDesignRaisedDarkButton}" TargetType="Button">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding HcPulseDone}" Value="True">
-                                    <Setter Property="Background" Value="{StaticResource SecondaryHueMidBrush }"/>
+                                    <Setter Property="Background" Value="{StaticResource SecondaryHueMidBrush}" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding HcPulseDone}" Value="False">
                                     <Setter Property="Background" Value="{StaticResource PrimaryHueDarkBrush}" />
@@ -108,17 +153,23 @@
                             </Style.Triggers>
                         </Style>
                     </Button.Style>
-                    <md:PackIcon Kind="Pulse" /> 
+                    <md:PackIcon Kind="Pulse" />
                 </Button>
-                <Button Margin="0,3,0,0" ToolTip="{StaticResource 1021SpiralSearch}" Command="{Binding OpenSpiralWindowCmd}" Style="{StaticResource MaterialDesignRaisedDarkButton}">
+                <Button Margin="0,3,0,0"
+                        Command="{Binding OpenSpiralWindowCmd}"
+                        Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                        ToolTip="{StaticResource 1021SpiralSearch}">
                     <Canvas Width="18" Height="20">
                         <Canvas.RenderTransform>
                             <TranslateTransform X="-365" Y="-7879" />
                         </Canvas.RenderTransform>
-                        <Polygon Points="383 7879 383 7893.105 383 7895 369 7895 369 7883 379 7883 379 7891 373 7891 373 7887 375 7887 375 7889 377 7889 377 7885 371 7885 371 7893 381 7893 381 7881 367 7881 367 7897 383 7897 383 7899 365 7899 365 7879" Fill="{StaticResource PrimaryHueLightBrush}" />
+                        <Polygon Fill="{StaticResource PrimaryHueLightBrush}" Points="383 7879 383 7893.105 383 7895 369 7895 369 7883 379 7883 379 7891 373 7891 373 7887 375 7887 375 7889 377 7889 377 7885 371 7885 371 7893 381 7893 381 7881 367 7881 367 7897 383 7897 383 7899 365 7899 365 7879" />
                     </Canvas>
                 </Button>
-                <Button Margin="0,3,0,0"  ToolTip="{StaticResource 1018LockMouse}"  Style="{StaticResource MaterialDesignRaisedDarkButton}" Visibility="{Binding HcWinVisibility, Converter={StaticResource BoolToVis}}">
+                <Button Margin="0,3,0,0"
+                        Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                        ToolTip="{StaticResource 1018LockMouse}"
+                        Visibility="{Binding HcWinVisibility, Converter={StaticResource BoolToVis}}">
                     <md:PackIcon Kind="MouseVariant">
                         <md:PackIcon.Style>
                             <Style TargetType="md:PackIcon">
@@ -132,7 +183,7 @@
                     </md:PackIcon>
                     <b:Interaction.Triggers>
                         <b:EventTrigger EventName="PreviewMouseWheel">
-                            <b:InvokeCommandAction Command="{Binding ScrollMouseWheelCmd}" PassEventArgsToCommand="True"/>
+                            <b:InvokeCommandAction Command="{Binding ScrollMouseWheelCmd}" PassEventArgsToCommand="True" />
                         </b:EventTrigger>
                         <b:EventTrigger EventName="PreviewMouseDown">
                             <b:InvokeCommandAction Command="{Binding ClickLockedMouseDownCmd}" PassEventArgsToCommand="True" />
@@ -143,18 +194,44 @@
                     </b:Interaction.Triggers>
                 </Button>
             </StackPanel>
-            <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="4" Grid.RowSpan="3" >
+            <StackPanel Grid.Row="0"
+                        Grid.RowSpan="3"
+                        Grid.Column="4"
+                        Orientation="Vertical">
                 <StackPanel Orientation="Vertical">
-                    <Label Content="{StaticResource hcSpeed}" HorizontalAlignment="Center" FontSize="12" />
-                    <Slider MinHeight="127"  HorizontalAlignment="Center" IsSnapToTickEnabled="True" TickFrequency="1" TickPlacement="Both"  Orientation="Vertical" Minimum="1" Maximum="8" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" Value="{Binding HcSpeed, Mode=TwoWay, Delay=800}" ToolTip="{StaticResource hcTipSpeed}" />
-                    <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                        <Button Margin="3,0,0,0" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding HcSpeedupCommand}" Width="18" Height="18">
+                    <Label HorizontalAlignment="Center"
+                           Content="{StaticResource hcSpeed}"
+                           FontSize="12" />
+                    <Slider MinHeight="127"
+                            HorizontalAlignment="Center"
+                            AutoToolTipPlacement="TopLeft"
+                            AutoToolTipPrecision="0"
+                            IsSnapToTickEnabled="True"
+                            Maximum="8"
+                            Minimum="1"
+                            Orientation="Vertical"
+                            TickFrequency="1"
+                            TickPlacement="Both"
+                            ToolTip="{StaticResource hcTipSpeed}"
+                            Value="{Binding HcSpeed, Mode=TwoWay, Delay=800}" />
+                    <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                        <Button Width="18"
+                                Height="18"
+                                Margin="3,0,0,0"
+                                Command="{Binding HcSpeedupCommand}"
+                                Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}">
                             <md:PackIcon Kind="Plus" />
                         </Button>
-                        <Border Margin="5,0,0,0" BorderThickness="1" BorderBrush="{StaticResource  SecondaryHueMidBrush}">
-                            <TextBlock Margin="3,0,3,0"  Text="{Binding HcSpeed}" />
+                        <Border Margin="5,0,0,0"
+                                BorderBrush="{StaticResource SecondaryHueMidBrush}"
+                                BorderThickness="1">
+                            <TextBlock Margin="3,0,3,0" Text="{Binding HcSpeed}" />
                         </Border>
-                        <Button Margin="5,0,0,0" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Command="{Binding HcSpeedDownCommand}" Width="18" Height="18">
+                        <Button Width="18"
+                                Height="18"
+                                Margin="5,0,0,0"
+                                Command="{Binding HcSpeedDownCommand}"
+                                Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}">
                             <md:PackIcon Kind="minus" />
                         </Button>
                     </StackPanel>
