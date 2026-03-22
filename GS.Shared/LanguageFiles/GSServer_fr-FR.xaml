@@ -822,10 +822,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--Park Settings -->
     <system:String x:Key="capTrackAfterUnpark">Suivre après déparkage</system:String>
 
-    <!--1.2.1.8 -->
+    <!--1.2.2.0 -->
     <!--Home Park Position -->
     <system:String x:Key="lbHomeParkPosition">Position de parking Home</system:String>
-    <system:String x:Key="lbHomeParkDefault">Défaut (90, 90)</system:String>
+    <system:String x:Key="lbHomeParkDefault">Défaut GEM (90, 90)</system:String>
     <system:String x:Key="lbHomeParkCustom">Az / Alt personnalisés</system:String>
     <system:String x:Key="lbHomeParkAz">Azimut (0 - 360) :</system:String>
     <system:String x:Key="lbHomeParkAlt">Altitude (-90 - 90) :</system:String>

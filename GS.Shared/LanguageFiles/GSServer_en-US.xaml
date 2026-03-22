@@ -825,10 +825,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--Park Settings -->
     <system:String x:Key="capTrackAfterUnpark">Track After Unpark</system:String>
 
-    <!--1.2.1.8 -->
+    <!--1.2.2.0 -->
     <!--Home Park Position -->
     <system:String x:Key="lbHomeParkPosition">Home Park Position</system:String>
-    <system:String x:Key="lbHomeParkDefault">Default (90, 90)</system:String>
+    <system:String x:Key="lbHomeParkDefault">Default GEM (90, 90)</system:String>
     <system:String x:Key="lbHomeParkCustom">Custom Az / Alt</system:String>
     <system:String x:Key="lbHomeParkAz">Azimuth (0 - 360):</system:String>
     <system:String x:Key="lbHomeParkAlt">Altitude (-90 - 90):</system:String>

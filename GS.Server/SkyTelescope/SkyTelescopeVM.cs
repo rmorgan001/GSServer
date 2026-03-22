@@ -543,6 +543,8 @@ namespace GS.Server.SkyTelescope
                          Properties.Profile.Default.Save();
                          // Disconnect mount if currently connected. User must reconnect
                          if (SkyServer.IsMountRunning) ClickConnect();
+                         // Load all settimngs for new alignment mnode
+                         SkySettings.Load();
                          // Reset mount without connecting
                          SkyServer.MountReset();
                          // Update View Model with new settings

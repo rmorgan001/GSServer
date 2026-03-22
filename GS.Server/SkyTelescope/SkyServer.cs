@@ -5390,13 +5390,22 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Execute single axis pulse guide for AltAz using predictor
+        /// Executes a pulse guide movement on the specified axis using AltAz coordinates for a given duration and guide
+        /// rate.
         /// </summary>
-        /// <param name="axis"></param>
-        /// <param name="guideRate"></param>
-        /// <param name="duration"></param>
-        /// <param name="pulseGoTo"></param>
-        /// <param name="token"></param>
+        /// <remarks>This method runs the pulse guide operation asynchronously and resumes tracking after
+        /// the movement completes or is cancelled. If monitoring is enabled, pulse events are logged for diagnostic or
+        /// visualization purposes. The method is intended for use in telescope mount control scenarios where precise,
+        /// time-limited adjustments are required.</remarks>
+        /// <param name="axis">The axis to pulse guide. Specify 0 for Declination or 1 for Right Ascension.</param>
+        /// <param name="guideRate">The guide rate to apply during the pulse, expressed as a multiplier of the sidereal rate.</param>
+        /// <param name="duration">The duration of the pulse guide movement, in milliseconds. Must be a positive value.</param>
+        /// <param name="pulseGoTo">An action to perform the pulse guide movement. Receives a cancellation token to support cooperative
+        /// cancellation.</param>
+        /// <param name="token">A cancellation token that can be used to cancel the pulse guide operation.</param>
+        /// <param name="startedEvent">An optional event that is set when the pulse guide movement is about to begin. Can be null if notification
+        /// is not required.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the specified axis is not 0 (Declination) or 1 (Right Ascension).</exception>
         private static void PulseGuideAltAz(int axis, double guideRate, int duration, Action<CancellationToken> pulseGoTo, CancellationToken token, ManualResetEventSlim startedEvent = null)
         {
             Task.Run(() =>
