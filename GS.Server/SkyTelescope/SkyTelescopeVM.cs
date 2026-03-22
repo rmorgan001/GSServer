@@ -146,7 +146,7 @@ namespace GS.Server.SkyTelescope
                     DecBacklashList = DecBacklashList.Concat(extendedList);
                     AxisTrackingLimits = new List<double>(Numbers.InclusiveRange(0, 15, 1));
                     AxisHzTrackingLimits = new List<double>(Numbers.InclusiveRange(-20, 20, 1));
-                    HomeAxisAltList = new List<int>(Numbers.InclusiveIntRange(-90, 90, 1));
+                    HomeAxisAltList = new List<int>(Numbers.InclusiveIntRange(-30, 30, 1));
                     HomeParkAzList  = new List<int>(Numbers.InclusiveIntRange(0, 360, 1));
                     HomeParkAltList = new List<int>(Numbers.InclusiveIntRange(-90, 90, 1));
 
