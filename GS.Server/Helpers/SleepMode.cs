@@ -116,8 +116,22 @@ namespace GS.Server.Helpers
                 dwExtraInfo = (IntPtr)0
             };
 
-            if (NativeMethods.SendInput(1, ref inp, Marshal.SizeOf(inp)) != 1)
-                throw new Win32Exception();
+            var result = NativeMethods.SendInput(1, ref inp, Marshal.SizeOf(inp));
+            var errorCode = Marshal.GetLastWin32Error();
+            if (result != 1)
+            {
+                switch (errorCode)
+                {
+                    case 5:
+                        // ERROR_ACCESS_DENIED (desktop boundary)
+                        break;
+                    case 0:
+                        // UIPI block (SendInput returns 0, no error set)
+                        break;
+                    default:
+                        throw new Win32Exception(errorCode);
+                }
+            }
         }
     }
 }
