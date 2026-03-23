@@ -103,7 +103,11 @@
                 </b:Interaction.Triggers>
                 <md:PackIcon Kind="ArrowDown" />
             </Button>
-            <Button Grid.Row="0" Grid.Column="0" Width="50" Height="50">
+            <Button Grid.Row="0" 
+                    Grid.Column="0" 
+                    Width="50" 
+                    Height="50"
+                    ToolTipService.Placement="Center">
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
                         <b:InvokeCommandAction Command="{Binding HcMouseDownNWCommand}" PassEventArgsToCommand="True" />
@@ -114,7 +118,11 @@
                 </b:Interaction.Triggers>
                 <md:PackIcon Kind="ArrowTopLeft" />
             </Button>
-            <Button Grid.Row="0" Grid.Column="2" Width="50" Height="50">
+            <Button Grid.Row="0" 
+                    Grid.Column="2" 
+                    Width="50" 
+                    Height="50"
+                    ToolTipService.Placement="Center">
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
                         <b:InvokeCommandAction Command="{Binding HcMouseDownNECommand}" PassEventArgsToCommand="True" />
@@ -125,7 +133,11 @@
                 </b:Interaction.Triggers>
                 <md:PackIcon Kind="ArrowTopRight" />
             </Button>
-            <Button Grid.Row="2" Grid.Column="0" Width="50" Height="50">
+            <Button Grid.Row="2" 
+                    Grid.Column="0" 
+                    Width="50" 
+                    Height="50"
+                    ToolTipService.Placement="Center">
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
                         <b:InvokeCommandAction Command="{Binding HcMouseDownSWCommand}" PassEventArgsToCommand="True" />
@@ -136,7 +148,11 @@
                 </b:Interaction.Triggers>
                 <md:PackIcon Kind="ArrowBottomLeft" />
             </Button>
-            <Button Grid.Row="2" Grid.Column="2" Width="50" Height="50">
+            <Button Grid.Row="2" 
+                    Grid.Column="2" 
+                    Width="50" 
+                    Height="50"
+                    ToolTipService.Placement="Center">
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
                         <b:InvokeCommandAction Command="{Binding HcMouseDownSECommand}" PassEventArgsToCommand="True" />
@@ -147,7 +163,13 @@
                 </b:Interaction.Triggers>
                 <md:PackIcon Kind="ArrowBottomRight" />
             </Button>
-            <Button Grid.Row="1" Grid.Column="1" Width="50" Height="50" ToolTipService.Placement="Center" ToolTip="{StaticResource vceAbortSlew}" Style="{StaticResource MaterialDesignRaisedLightButton}" >
+            <Button Grid.Row="1" 
+                    Grid.Column="1" 
+                    Width="50" 
+                    Height="50" 
+                    Style="{StaticResource MaterialDesignRaisedLightButton}"
+                    ToolTip="{StaticResource vceAbortSlew}" 
+                    ToolTipService.Placement="Center">
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
                         <b:InvokeCommandAction Command="{Binding HcMouseDownStopCommand}" PassEventArgsToCommand="True" />
