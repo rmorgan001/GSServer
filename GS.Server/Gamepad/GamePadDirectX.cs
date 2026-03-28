@@ -42,6 +42,7 @@ namespace GS.Server.GamePad
             false       // Z-rotation
         };
 
+        private bool _previousAvailability;
         private readonly IntPtr _hWnd;
 
         /// <summary>
@@ -76,17 +77,23 @@ namespace GS.Server.GamePad
                 if (_joystickGuid == Guid.Empty)
                 {
                     _isAvailable = false;
-                    var monitorItem = new MonitorEntry
+
+                    // Only log if state changed (was available, now not)
+                    if (_previousAvailability != _isAvailable)
                     {
-                        Datetime = HiResDateTime.UtcNow,
-                        Device = MonitorDevice.Ui,
-                        Category = MonitorCategory.Server,
-                        Type = MonitorType.Data,
-                        Method = MethodBase.GetCurrentMethod()?.Name,
-                        Thread = Thread.CurrentThread.ManagedThreadId,
-                        Message = $"|DirectX|{_isAvailable}"
-                    };
-                    MonitorLog.LogToMonitor(monitorItem);
+                        var monitorItem = new MonitorEntry
+                        {
+                            Datetime = HiResDateTime.UtcNow,
+                            Device = MonitorDevice.Ui,
+                            Category = MonitorCategory.Server,
+                            Type = MonitorType.Data,
+                            Method = MethodBase.GetCurrentMethod()?.Name,
+                            Thread = Thread.CurrentThread.ManagedThreadId,
+                            Message = $"|DirectX|{_isAvailable}|Not Found"
+                        };
+                        MonitorLog.LogToMonitor(monitorItem);
+                        _previousAvailability = _isAvailable;
+                    }
                     return;
                 }
 
@@ -117,6 +124,23 @@ namespace GS.Server.GamePad
                 _joystick.Acquire();
 
                 _isAvailable = true;
+
+                // Log if state changed (was not available, now is)
+                if (_previousAvailability != _isAvailable)
+                {
+                    var monitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Ui,
+                        Category = MonitorCategory.Server,
+                        Type = MonitorType.Data,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = $"|DirectX|{_isAvailable}|Device Found"
+                    };
+                    MonitorLog.LogToMonitor(monitorItem);
+                    _previousAvailability = _isAvailable;
+                }
             }
             catch (Exception ex)
             {

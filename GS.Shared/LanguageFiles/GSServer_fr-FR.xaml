@@ -197,6 +197,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="gpSlewDown">Déplacement vers le bas</system:String>
     <system:String x:Key="gpSlewLeft">Déplacement vers la gauche</system:String>
     <system:String x:Key="gpSlewRight">Déplacement vers la droite</system:String>
+    <system:String x:Key="gpSlewNE">Déplacement vers le NE</system:String>
+    <system:String x:Key="gpSlewNW">Déplacement vers le NO</system:String>
+    <system:String x:Key="gpSlewSE">Déplacement vers le SE</system:String>
+    <system:String x:Key="gpSlewSW">Déplacement vers le SO</system:String>
     <system:String x:Key="gpSave">Sauver</system:String>
     <system:String x:Key="gpSidereal">vitesse Sidérale</system:String>
     <system:String x:Key="gpLunar">vitesse Lunaire</system:String>

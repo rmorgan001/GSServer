@@ -56,7 +56,7 @@ namespace GS.Server.GamePad
             if (key == null) return;
             key = key.Trim().ToLower();
             value = value.ToLower().Trim();
-            if (!value.Contains("button") && !key.Contains("pov") && !key.Contains("x") && !key.Contains("y") && !key.Contains("z")) return;
+            if (!value.Contains("button") && !value.Contains("pov") && !key.Contains("pov") && !key.Contains("x") && !key.Contains("y") && !key.Contains("z")) return;
             _settingsDict.Add(key, value);
         }
 
@@ -174,6 +174,23 @@ namespace GS.Server.GamePad
         {
             Key = key;
             Value = value;
+        }
+    }
+
+    /// <summary>
+    /// Used to store diagonal button pair commands
+    /// </summary>
+    internal readonly struct DiagPair
+    {
+        public readonly int VertIdx;
+        public readonly int HorizIdx;
+        public readonly string Cmd;
+
+        public DiagPair(int vertIdx, int horizIdx, string cmd)
+        {
+            VertIdx = vertIdx;
+            HorizIdx = horizIdx;
+            Cmd = cmd;
         }
     }
 }

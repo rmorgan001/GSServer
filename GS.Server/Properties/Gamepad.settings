@@ -83,5 +83,17 @@
     <Setting Name="focusout" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="northeast" Type="System.String" Scope="User">
+      <Value Profile="(Default)">pov northeast</Value>
+    </Setting>
+    <Setting Name="northwest" Type="System.String" Scope="User">
+      <Value Profile="(Default)">pov northwest</Value>
+    </Setting>
+    <Setting Name="southeast" Type="System.String" Scope="User">
+      <Value Profile="(Default)">pov southeast</Value>
+    </Setting>
+    <Setting Name="southwest" Type="System.String" Scope="User">
+      <Value Profile="(Default)">pov southwest</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -197,6 +197,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="gpSlewDown">Nach unten bewegen</system:String>
     <system:String x:Key="gpSlewLeft">Nach links bewegen</system:String>
     <system:String x:Key="gpSlewRight">Nach rechts bewegen</system:String>
+    <system:String x:Key="gpSlewNE">Nach NO bewegen</system:String>
+    <system:String x:Key="gpSlewNW">Nach NW bewegen</system:String>
+    <system:String x:Key="gpSlewSE">Nach SO bewegen</system:String>
+    <system:String x:Key="gpSlewSW">Nach SW bewegen</system:String>
     <system:String x:Key="gpSave">Speichern</system:String>
     <system:String x:Key="gpSidereal">Sternzeit-Geschw.</system:String>
     <system:String x:Key="gpLunar">Lunar-Geschw.</system:String>

@@ -255,6 +255,22 @@ namespace GS.Server.GamePad
                         Properties.Gamepad.Default.focusout = setting.Value;
                         LogSetting(MethodBase.GetCurrentMethod()?.Name, $"focusout {setting.Value}");
                         break;
+                    case "northeast":
+                        Properties.Gamepad.Default.northeast = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"northeast {setting.Value}");
+                        break;
+                    case "northwest":
+                        Properties.Gamepad.Default.northwest = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"northwest {setting.Value}");
+                        break;
+                    case "southeast":
+                        Properties.Gamepad.Default.southeast = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"southeast {setting.Value}");
+                        break;
+                    case "southwest":
+                        Properties.Gamepad.Default.southwest = setting.Value;
+                        LogSetting(MethodBase.GetCurrentMethod()?.Name, $"southwest {setting.Value}");
+                        break;
                 }
             }
             Save();

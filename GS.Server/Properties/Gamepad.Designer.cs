@@ -346,5 +346,53 @@ namespace GS.Server.Properties {
                 this["focusout"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("pov northeast")]
+        public string northeast {
+            get {
+                return ((string)(this["northeast"]));
+            }
+            set {
+                this["northeast"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("pov northwest")]
+        public string northwest {
+            get {
+                return ((string)(this["northwest"]));
+            }
+            set {
+                this["northwest"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("pov southeast")]
+        public string southeast {
+            get {
+                return ((string)(this["southeast"]));
+            }
+            set {
+                this["southeast"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("pov southwest")]
+        public string southwest {
+            get {
+                return ((string)(this["southwest"]));
+            }
+            set {
+                this["southwest"] = value;
+            }
+        }
     }
 }

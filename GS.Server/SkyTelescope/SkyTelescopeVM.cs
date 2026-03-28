@@ -4949,6 +4949,366 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private ICommand _hcMouseDownNECommand;
+        public ICommand HcMouseDownNECommand
+        {
+            get
+            {
+                var command = _hcMouseDownNECommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseDownNECommand = new RelayCommand(param => HcMouseDownNE());
+            }
+            set => _hcMouseDownNECommand = value;
+        }
+        private void HcMouseDownNE()
+        {
+            try
+            {
+                if (SkyServer.AtPark)
+                {
+                    BlinkParked();
+                    Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
+                    return;
+                }
+                var ns = FlipNs && NsEnabled;
+                var ew = FlipEw && EwEnabled;
+                StartSlew(!ns && !ew ? SlewDirection.SlewNorthEast :
+                           ns && !ew ? SlewDirection.SlewSouthEast :
+                          !ns &&  ew ? SlewDirection.SlewNorthWest :
+                                       SlewDirection.SlewSouthWest);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _hcMouseUpNECommand;
+        public ICommand HcMouseUpNECommand
+        {
+            get
+            {
+                var command = _hcMouseUpNECommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseUpNECommand = new RelayCommand(param => HcMouseUpNE());
+            }
+            set => _hcMouseUpNECommand = value;
+        }
+        private void HcMouseUpNE()
+        {
+            try
+            {
+                StartSlew(SlewDirection.SlewNoneDec);
+                StartSlew(SlewDirection.SlewNoneRa);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _hcMouseDownNWCommand;
+        public ICommand HcMouseDownNWCommand
+        {
+            get
+            {
+                var command = _hcMouseDownNWCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseDownNWCommand = new RelayCommand(param => HcMouseDownNW());
+            }
+            set => _hcMouseDownNWCommand = value;
+        }
+        private void HcMouseDownNW()
+        {
+            try
+            {
+                if (SkyServer.AtPark)
+                {
+                    BlinkParked();
+                    Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
+                    return;
+                }
+                var ns = FlipNs && NsEnabled;
+                var ew = FlipEw && EwEnabled;
+                StartSlew(!ns && !ew ? SlewDirection.SlewNorthWest :
+                           ns && !ew ? SlewDirection.SlewSouthWest :
+                          !ns &&  ew ? SlewDirection.SlewNorthEast :
+                                       SlewDirection.SlewSouthEast);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _hcMouseUpNWCommand;
+        public ICommand HcMouseUpNWCommand
+        {
+            get
+            {
+                var command = _hcMouseUpNWCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseUpNWCommand = new RelayCommand(param => HcMouseUpNW());
+            }
+            set => _hcMouseUpNWCommand = value;
+        }
+        private void HcMouseUpNW()
+        {
+            try
+            {
+                StartSlew(SlewDirection.SlewNoneDec);
+                StartSlew(SlewDirection.SlewNoneRa);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _hcMouseDownSECommand;
+        public ICommand HcMouseDownSECommand
+        {
+            get
+            {
+                var command = _hcMouseDownSECommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseDownSECommand = new RelayCommand(param => HcMouseDownSE());
+            }
+            set => _hcMouseDownSECommand = value;
+        }
+        private void HcMouseDownSE()
+        {
+            try
+            {
+                if (SkyServer.AtPark)
+                {
+                    BlinkParked();
+                    Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
+                    return;
+                }
+                var ns = FlipNs && NsEnabled;
+                var ew = FlipEw && EwEnabled;
+                StartSlew(!ns && !ew ? SlewDirection.SlewSouthEast :
+                           ns && !ew ? SlewDirection.SlewNorthEast :
+                          !ns &&  ew ? SlewDirection.SlewSouthWest :
+                                       SlewDirection.SlewNorthWest);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _hcMouseUpSECommand;
+        public ICommand HcMouseUpSECommand
+        {
+            get
+            {
+                var command = _hcMouseUpSECommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseUpSECommand = new RelayCommand(param => HcMouseUpSE());
+            }
+            set => _hcMouseUpSECommand = value;
+        }
+        private void HcMouseUpSE()
+        {
+            try
+            {
+                StartSlew(SlewDirection.SlewNoneDec);
+                StartSlew(SlewDirection.SlewNoneRa);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _hcMouseDownSWCommand;
+        public ICommand HcMouseDownSWCommand
+        {
+            get
+            {
+                var command = _hcMouseDownSWCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseDownSWCommand = new RelayCommand(param => HcMouseDownSW());
+            }
+            set => _hcMouseDownSWCommand = value;
+        }
+        private void HcMouseDownSW()
+        {
+            try
+            {
+                if (SkyServer.AtPark)
+                {
+                    BlinkParked();
+                    Synthesizer.Speak(Application.Current.Resources["vceParked"].ToString());
+                    return;
+                }
+                var ns = FlipNs && NsEnabled;
+                var ew = FlipEw && EwEnabled;
+                StartSlew(!ns && !ew ? SlewDirection.SlewSouthWest :
+                           ns && !ew ? SlewDirection.SlewNorthWest :
+                          !ns &&  ew ? SlewDirection.SlewSouthEast :
+                                       SlewDirection.SlewNorthEast);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _hcMouseUpSWCommand;
+        public ICommand HcMouseUpSWCommand
+        {
+            get
+            {
+                var command = _hcMouseUpSWCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _hcMouseUpSWCommand = new RelayCommand(param => HcMouseUpSW());
+            }
+            set => _hcMouseUpSWCommand = value;
+        }
+        private void HcMouseUpSW()
+        {
+            try
+            {
+                StartSlew(SlewDirection.SlewNoneDec);
+                StartSlew(SlewDirection.SlewNoneRa);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
         private ICommand _openHcWindowCmd;
         public ICommand OpenHcWindowCmd
         {
@@ -5153,11 +5513,23 @@ namespace GS.Server.SkyTelescope
                 case SlewDirection.SlewNoneDec:
                     SkyServer.HcMoves(speed, SlewDirection.SlewNoneDec, HcMode, HcAntiRa, HcAntiDec, RaBacklash, DecBacklash);
                     break;
+                case SlewDirection.SlewNorthEast:
+                    SkyServer.HcMoves(speed, SlewDirection.SlewNorthEast, HcMode, HcAntiRa, HcAntiDec, RaBacklash, DecBacklash);
+                    break;
+                case SlewDirection.SlewNorthWest:
+                    SkyServer.HcMoves(speed, SlewDirection.SlewNorthWest, HcMode, HcAntiRa, HcAntiDec, RaBacklash, DecBacklash);
+                    break;
+                case SlewDirection.SlewSouthEast:
+                    SkyServer.HcMoves(speed, SlewDirection.SlewSouthEast, HcMode, HcAntiRa, HcAntiDec, RaBacklash, DecBacklash);
+                    break;
+                case SlewDirection.SlewSouthWest:
+                    SkyServer.HcMoves(speed, SlewDirection.SlewSouthWest, HcMode, HcAntiRa, HcAntiDec, RaBacklash, DecBacklash);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
-        
+
         #endregion
 
         #region HC Locked Mouse
