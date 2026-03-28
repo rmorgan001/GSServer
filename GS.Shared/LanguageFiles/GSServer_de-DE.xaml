@@ -80,7 +80,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnHintDecOffset">Grad</system:String>
     <system:String x:Key="btnSensorPositions">AutoHome-Sensorpositionen:</system:String>
     <system:String x:Key="btnHintRaSensorPos">RA-Achse (Grad)</system:String>
-    <system:String x:Key="btnHintDecSensorPos">DEC-Achse (Grad)</system:String>
+    <system:String x:Key="btnHintDecSensorPos">Dec-Achse (Grad)</system:String>
     <system:String x:Key="btnTipSensorPos">Autohome-Sensorposition ändern</system:String>
     <system:String x:Key="btnResetSensorPos">Zurücksetzen</system:String>
     <system:String x:Key="btnTipResetSensorPos">Sensorpositionen auf Standard zurücksetzen (90.0, 90.0)</system:String>

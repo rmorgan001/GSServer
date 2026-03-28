@@ -80,7 +80,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnHintDecOffset">Degrés</system:String>
     <system:String x:Key="btnSensorPositions">Positions des capteurs AutoHome:</system:String>
     <system:String x:Key="btnHintRaSensorPos">Axe RA (degrés)</system:String>
-    <system:String x:Key="btnHintDecSensorPos">Axe DEC (degrés)</system:String>
+    <system:String x:Key="btnHintDecSensorPos">Axe Dec (degrés)</system:String>
     <system:String x:Key="btnTipSensorPos">Modifier la position du capteur autohome</system:String>
     <system:String x:Key="btnResetSensorPos">Réinitialiser</system:String>
     <system:String x:Key="btnTipResetSensorPos">Réinitialiser les positions des capteurs par défaut (90.0, 90.0)</system:String>
