@@ -1504,6 +1504,11 @@ namespace GS.Server.SkyTelescope
                 {
                     // Convert stored Az/Alt (with sign) to axis coordinates using new park function
                     double[] axes = Axes.AzAltToPolarPark(storedAzAlt[0], storedAzAlt[1]);
+                    if (Math.Abs(storedAzAlt[0]) < 0.00001 && Math.Abs(storedAzAlt[1] - Math.Abs(Latitude)) < 0.00001)
+                    {
+                        axes[0] = 90.0;
+                        axes[1] = 90.0;
+                    }
                     _parkAxes = axes;
                     return _parkAxes;
                 }
@@ -1547,6 +1552,11 @@ namespace GS.Server.SkyTelescope
 
                 // Convert axis coordinates to Az/Alt with sign convention for storage
                 double[] azAlt = Axes.PolarParkToAzAlt(value[0], value[1]);
+                if (Math.Abs(value[0] - 90.0) < 0.00001 && Math.Abs(value[1] - 90.0) < 0.00001)
+                {
+                    azAlt[0] = 0.0;
+                    azAlt[1] = Math.Abs(Latitude);
+                }
 
                 // Round and serialize Az/Alt with sign to user.config
                 var azAltArray = new[]
@@ -2045,6 +2055,11 @@ namespace GS.Server.SkyTelescope
                     try
                     {
                         double[] axes = Axes.AzAltToPolarPark(storedItem.X, storedItem.Y);
+                        if (Math.Abs(storedItem.X) < 0.00001 && Math.Abs(storedItem.Y - Math.Abs(Latitude)) < 0.00001)
+                        {
+                            axes[0] = 90.0;
+                            axes[1] = 90.0;
+                        }
                         axisPositions.Add(new ParkPosition
                         {
                             Name = storedItem.Name,
@@ -2092,6 +2107,11 @@ namespace GS.Server.SkyTelescope
                 foreach (var axisPos in positions)
                 {
                     double[] azAlt = Axes.PolarParkToAzAlt(axisPos.X, axisPos.Y);
+                    if (Math.Abs(axisPos.X - 90.0) < 0.00001 && Math.Abs(axisPos.Y - 90.0) < 0.00001)
+                    {
+                        azAlt[0] = 0.0;
+                        azAlt[1] = Math.Abs(Latitude);
+                    }
                     toStore.Add(new ParkPosition
                     {
                         Name = axisPos.Name,
@@ -2474,6 +2494,11 @@ namespace GS.Server.SkyTelescope
                                 {
                                     // Use park-specific conversion that respects sign convention
                                     double[] axes = Axes.PolarParkToAzAlt(stored.X, stored.Y);
+                                    if (Math.Abs(stored.X - 90.0) < 0.00001 && Math.Abs(stored.Y - 90.0) < 0.00001)
+                                    {
+                                        axes[0] = 0.0;
+                                        axes[1] = Math.Abs(Latitude);
+                                    }
                                     axisPositions.Add(new ParkPosition
                                     {
                                         Name = stored.Name,
@@ -2483,7 +2508,9 @@ namespace GS.Server.SkyTelescope
                                 }
                                 Properties.SkyTelescope.Default.ParkPositions = JsonConvert.SerializeObject(axisPositions);
                                 var storedParkAxes = JsonConvert.DeserializeObject<double []>(Properties.SkyTelescope.Default.ParkAxes);
+                                var isPoleAxes = Math.Abs(storedParkAxes[0] - 90.0) < 0.00001 && Math.Abs(storedParkAxes[1] - 90.0) < 0.00001;
                                 storedParkAxes = Axes.PolarParkToAzAlt(storedParkAxes[0], storedParkAxes[1]);
+                                if (isPoleAxes) { storedParkAxes[0] = 0.0; storedParkAxes[1] = Math.Abs(Latitude); }
                                 Properties.SkyTelescope.Default.ParkAxes = JsonConvert.SerializeObject(storedParkAxes);
                             }
                         }
