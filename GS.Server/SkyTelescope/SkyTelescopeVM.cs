@@ -147,7 +147,9 @@ namespace GS.Server.SkyTelescope
                     DecBacklashList = DecBacklashList.Concat(extendedList);
                     AxisTrackingLimits = new List<double>(Numbers.InclusiveRange(0, 15, 1));
                     AxisHzTrackingLimits = new List<double>(Numbers.InclusiveRange(-20, 20, 1));
-                    HomeAxisAltList = new List<int>(Numbers.InclusiveIntRange(-10, 10, 1));
+                    HomeAxisAltList = new List<int>(Numbers.InclusiveIntRange(-30, 30, 1));
+                    HomeParkAzList  = new List<int>(Numbers.InclusiveIntRange(0, 360, 1));
+                    HomeParkAltList = new List<int>(Numbers.InclusiveIntRange(-90, 90, 1));
 
                     // defaults
                     AtPark = SkyServer.AtPark;
@@ -195,10 +197,7 @@ namespace GS.Server.SkyTelescope
                     FlipDialogHeader = GetResourceByMode("btnFlip");
                     FlipDialogText = GetResourceByMode("btnContinueFlip");
                     // Home and AutoHome Settings Dialog
-                    HomeAxisX = (int) SkySettings.HomeAxisX;
-                    var angleOffset = SkyServer.SouthernHemisphere ? 180 : 0;
-                    HomeAxisX -= angleOffset;
-                    HomeAxisY = (int) SkySettings.HomeAxisY;
+                     RefreshHomeAxisDisplay();
                     if (SkySettings.AutoHomeAxisX == 90.0 && SkySettings.AutoHomeAxisY == 90.0) // Factory default
                     {
                         AutoHomeAxisAz = SkyServer.SouthernHemisphere ? 0 : 180;
@@ -212,6 +211,32 @@ namespace GS.Server.SkyTelescope
                         AutoHomeAxisAz = Convert.ToInt32(autoHome[1]) - (SkyServer.SouthernHemisphere ? 180 : 0);
                         AutoHomeAxisAlt = Convert.ToInt32(autoHome[0]);
                         SelectedAutoHomePosition = AutoHomePositionType.PolarAzAlt;
+                    }
+
+                    // Home Park Position panel initialisation
+                    var existingHomePark = SkySettings.ParkPositions?
+                        .FirstOrDefault(p => string.Equals(p.Name, "Home", StringComparison.OrdinalIgnoreCase));
+                    if (existingHomePark != null)
+                    {
+                        var azAlt = Axes.PolarParkToAzAlt(existingHomePark.X, existingHomePark.Y);
+                        if (Math.Abs(existingHomePark.X - 90.0) < 0.00001 && Math.Abs(existingHomePark.Y - 90.0) < 0.00001)
+                        {
+                            azAlt[0] = 0.0;
+                            azAlt[1] = Math.Abs(SkySettings.Latitude);
+                        }
+                        double displayAz = Math.Abs(azAlt[0]);
+                        if (SkyServer.SouthernHemisphere)
+                            displayAz = Range.Range360(displayAz + 180.0);
+                        HomeParkAz  = Convert.ToInt32(displayAz);
+                        HomeParkAlt = Convert.ToInt32(azAlt[1]);
+                        var isDefault = Math.Abs(azAlt[1] - Math.Abs(SkySettings.Latitude)) < 0.00001;
+                        SelectedHomeParkPosition = isDefault ? HomeParkPositionType.Default : HomeParkPositionType.Custom;
+                    }
+                    else
+                    {
+                        HomeParkAz  = SkyServer.SouthernHemisphere ? 180 : 360;
+                        HomeParkAlt = Convert.ToInt32(Math.Abs(SkySettings.Latitude));
+                        SelectedHomeParkPosition = HomeParkPositionType.Default;
                     }
 
                     SetShowUI();
@@ -252,6 +277,18 @@ namespace GS.Server.SkyTelescope
                 SkyServer.IsMountRunning = false;
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
+        }
+
+        /// <summary>
+        /// Refreshes HomeAxisX and HomeAxisY VM properties from the current SkySettings values.
+        /// Called from the constructor and whenever AlignmentMode changes.
+        /// </summary>
+        private void RefreshHomeAxisDisplay()
+        {
+            HomeAxisX = (int)SkySettings.HomeAxisX;
+            var angleOffset = SkyServer.SouthernHemisphere ? 180 : 0;
+            HomeAxisX -= angleOffset;
+            HomeAxisY = (int)SkySettings.HomeAxisY;
         }
 
         /// <summary>
@@ -508,10 +545,14 @@ namespace GS.Server.SkyTelescope
                          Properties.Profile.Default.Save();
                          // Disconnect mount if currently connected. User must reconnect
                          if (SkyServer.IsMountRunning) ClickConnect();
+                         // Load all settimngs for new alignment mnode
+                         SkySettings.Load();
                          // Reset mount without connecting
                          SkyServer.MountReset();
                          // Update View Model with new settings
                          UpdateSkyTelescopeVM();
+                         // Refresh home axis display for new alignment mode
+                         RefreshHomeAxisDisplay();
                          // Set side of pier, flip and other alignment mode dependent UI elements
                          SideOfPierUIToolTip = GetResourceByMode("botTipSOP");
                          // Flip Button
@@ -7091,6 +7132,8 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
+        // When set, ClickOkDialog restores this content instead of closing the dialog
+        private object _returnDialogContent;
 
         private ICommand _openDialogCommand;
         public ICommand OpenDialogCommand
@@ -7160,8 +7203,16 @@ namespace GS.Server.SkyTelescope
         }
         private void ClickOkDialog()
         {
-            IsDialogOpen = false;
-            LockOn = false;
+            if (_returnDialogContent != null)
+            {
+                DialogContent = _returnDialogContent;
+                _returnDialogContent = null;
+            }
+            else
+            {
+                IsDialogOpen = false;
+                LockOn = false;
+            }
         }
 
         private ICommand _clickCancelDialogCommand;
@@ -11876,6 +11927,58 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private HomeParkPositionType _selectedHomeParkPosition;
+        /// <summary>
+        /// Selected option for the Home Park Position panel — Default or Custom Az/Alt
+        /// </summary>
+        public HomeParkPositionType SelectedHomeParkPosition
+        {
+            get => _selectedHomeParkPosition;
+            set
+            {
+                if (_selectedHomeParkPosition == value) return;
+                _selectedHomeParkPosition = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(CustomHomeParkSettingsIsVisible));
+            }
+        }
+
+        /// <summary>
+        /// Controls visibility of the custom Az/Alt input controls in the Home Park Position panel
+        /// </summary>
+        public bool CustomHomeParkSettingsIsVisible =>
+            SelectedHomeParkPosition == HomeParkPositionType.Custom;
+
+        private int _homeParkAz;
+        /// <summary>
+        /// User-entered azimuth (0-360 degrees) for the custom Home park position
+        /// </summary>
+        public int HomeParkAz
+        {
+            get => _homeParkAz;
+            set
+            {
+                if (_homeParkAz == value) return;
+                _homeParkAz = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _homeParkAlt;
+        /// <summary>
+        /// User-entered altitude (-90 to 90 degrees) for the custom Home park position
+        /// </summary>
+        public int HomeParkAlt
+        {
+            get => _homeParkAlt;
+            set
+            {
+                if (_homeParkAlt == value) return;
+                _homeParkAlt = value;
+                OnPropertyChanged();
+            }
+        }
+
         private int _homeAxisX;
         public int HomeAxisX
         {
@@ -11901,6 +12004,16 @@ namespace GS.Server.SkyTelescope
         }
 
         public IList<int> HomeAxisAltList { get; }
+
+        /// <summary>
+        /// Azimuth selection list (0 to 360 degrees, integer steps)
+        /// </summary>
+        public IList<int> HomeParkAzList { get; }
+
+        /// <summary>
+        /// Altitude selection list (-90 to 90 degrees, integer steps)
+        /// </summary>
+        public IList<int> HomeParkAltList { get; }
 
         // Commands
         private ICommand _openHomeSettingsDialogCmd;
@@ -11976,22 +12089,84 @@ namespace GS.Server.SkyTelescope
                         break;
                     case AutoHomePositionType.PolarAzAlt:
                         var autoHome = Coordinate.AltAz2HaDec(AutoHomeAxisAlt, AutoHomeAxisAz, SkySettings.Latitude);
-                        if (SkyServer.SouthernHemisphere)
-                        {
-                            AutoHomeAxisX = Math.Round(180.0 - autoHome[0] * 15.0, 5); // Convert from Hour Angle
-                            AutoHomeAxisY = Math.Round(-1.0 * autoHome[1], 5);
-                        }
-                        else
-                        {
-                            AutoHomeAxisX = Math.Round(autoHome[0] * 15.0, 5); // Convert from Hour Angle
-                            AutoHomeAxisY = Math.Round(autoHome[1], 5); // Round value of AutoHomeAxisY
-                        }
+                        // Check Southern Hemisphere
+                        var isSouthern = SkyServer.SouthernHemisphere;
+
+                        // Save Auto Home Position
+                        AutoHomeAxisX = Math.Round((isSouthern ? 180.0 - autoHome[0] * 15.0 : autoHome[0] * 15.0), 5); // Convert from Hour Angle
+                        AutoHomeAxisY = Math.Round(isSouthern ? -autoHome[1] : autoHome[1], 5);
+
+                        // Save Home Position
+                        SkySettings.HomeAxisX = HomeAxisX + (isSouthern ? 180 : 0);   // reverse the display offset when southern
+                        SkySettings.HomeAxisY = HomeAxisY;
                         break;
                     case AutoHomePositionType.PolarRADec:
                         break;
                     default:
                         break;
                 }
+
+                // Determine final Az/Alt for the Home park position
+                double homeParkAzDeg;
+                double homeParkAltDeg;
+
+                if (SelectedHomeParkPosition == HomeParkPositionType.Default)
+                {
+                    homeParkAzDeg  = SkyServer.SouthernHemisphere ? 180.0 : 360.0;
+                    homeParkAltDeg = Math.Abs(SkySettings.Latitude);
+                }
+                else
+                {
+                    homeParkAzDeg  = HomeParkAz;
+                    homeParkAltDeg = HomeParkAlt;
+                }
+
+                var homeParkAxes = Axes.AzAltToPolarPark(homeParkAzDeg, homeParkAltDeg);
+                if (SelectedHomeParkPosition == HomeParkPositionType.Default)
+                {
+                    homeParkAxes[0] = 90.0;
+                    homeParkAxes[1] = 90.0;
+                }
+
+                // Validate custom park position is reachable with a normal slew
+                if (SelectedHomeParkPosition == HomeParkPositionType.Custom)
+                {
+                    var physicalTarget = SkyServer.MapSlewTargetToAxes(
+                        new[] { homeParkAxes[0], homeParkAxes[1] }, SlewType.SlewPark);
+
+                    if (!SkyServer.IsTargetWithinLimits(physicalTarget))
+                    {
+                        _returnDialogContent = new HomeSettingsDialog();
+                        DialogMsg = $"{Application.Current.Resources["homeSettingsParkOutsideLimits"]}";
+                        DialogCaption = $"{Application.Current.Resources["exError"]}";
+                        DialogContent = new DialogOK();
+                        IsDialogOpen = true;
+                        return;
+                    }
+
+                    if (Axes.DetermineIfThroughPole(physicalTarget[0], physicalTarget[1]))
+                    {
+                        _returnDialogContent = new HomeSettingsDialog();
+                        DialogMsg = $"{Application.Current.Resources["homeSettingsParkThroughPole"]}";
+                        DialogCaption = $"{Application.Current.Resources["exError"]}";
+                        DialogContent = new DialogOK();
+                        IsDialogOpen = true;
+                        return;
+                    }
+                }
+
+                var existingHomePark = ParkPositionViewModel.Instance.Positions
+                    .FirstOrDefault(p => string.Equals(p.Name, "Home", StringComparison.OrdinalIgnoreCase));
+
+                if (existingHomePark != null)
+                {
+                    ParkPositionViewModel.Instance.UpdatePosition(existingHomePark, homeParkAxes[0], homeParkAxes[1]);
+                }
+                else
+                {
+                    ParkPositionViewModel.Instance.AddPosition("Home", homeParkAxes[0], homeParkAxes[1]);
+                }
+
                 using (new WaitCursor())
                 {
                     IsDialogOpen = false;

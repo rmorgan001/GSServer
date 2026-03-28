@@ -80,6 +80,7 @@ namespace GS.Server.SkyTelescope
         private static readonly IList<double> HcPrevMovesDec = new List<double>();
 
         private static Vector _homeAxes;
+        private static volatile bool _homeAxesValid;
         // App axes derived from mount axes by AxesMountToApp
         private static Vector _appAxes;
         //private static Vector _targetAxes;
@@ -301,7 +302,7 @@ namespace GS.Server.SkyTelescope
             get
             {
                 // Home axis values are mount values internally
-                var home = Axes.AxesMountToApp(new[] { _homeAxes.X, _homeAxes.Y });
+                var home = Axes.AxesMountToApp(new[] { HomeAxes.X, HomeAxes.Y });
                 var h = new Vector(home[0], home[1]);
                 var m = new Vector(_appAxes.X, _appAxes.Y);
                 double dX = Abs(m.X - h.X);
@@ -463,6 +464,22 @@ namespace GS.Server.SkyTelescope
         /// Factor to convert steps, Sky Watcher in rad
         /// </summary>
         private static double[] FactorStep { get; set; }
+
+        /// <summary>
+        /// Home axes in mount coordinate space, computed from SkySettings and cached until invalidated.
+        /// </summary>
+        private static Vector HomeAxes
+        {
+            get
+            {
+                if (!_homeAxesValid)
+                {
+                    _homeAxes = GetHomeAxes(SkySettings.HomeAxisX, SkySettings.HomeAxisY);
+                    _homeAxesValid = true;
+                }
+                return _homeAxes;
+            }
+        }
 
         /// <summary>
         /// UI Checkbox option to flip on the next goto
@@ -1963,8 +1980,8 @@ namespace GS.Server.SkyTelescope
                             StepsWormPerRevolution = new[] { spwNum, spwNum };
                             break;
                         case MountTaskName.SetHomePositions:
-                            _ = new CmdAxisToDegrees(0, Axis.Axis1, _homeAxes.X);
-                            _ = new CmdAxisToDegrees(0, Axis.Axis2, _homeAxes.Y);
+                            _ = new CmdAxisToDegrees(0, Axis.Axis1, HomeAxes.X);
+                            _ = new CmdAxisToDegrees(0, Axis.Axis2, HomeAxes.Y);
                             break;
                         case MountTaskName.GetFactorStep:
                             var factorStep = new CmdFactorSteps(MountQueue.NewId);
@@ -2563,8 +2580,8 @@ namespace GS.Server.SkyTelescope
                             StepsTimeFreq = (long[])SkyQueue.GetCommandResult(skyStepTimeFreq).Result;
                             break;
                         case MountTaskName.SetHomePositions:
-                            _ = new SkySetAxisPosition(0, AxisId.Axis1, _homeAxes.X);
-                            _ = new SkySetAxisPosition(0, AxisId.Axis2, _homeAxes.Y);
+                            _ = new SkySetAxisPosition(0, AxisId.Axis1, HomeAxes.X);
+                            _ = new SkySetAxisPosition(0, AxisId.Axis2, HomeAxes.Y);
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -3694,10 +3711,7 @@ namespace GS.Server.SkyTelescope
             // set default home position or get home override from the settings 
             double[] positions; // positions = new double[]{0, 0};
             string name = String.Empty;
-            // home axes are mount values
-            _homeAxes = GetHomeAxes(SkySettings.HomeAxisX, SkySettings.HomeAxisY);
-
-
+            // home axes are mount values - computed lazily via HomeAxes property
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
@@ -3706,7 +3720,7 @@ namespace GS.Server.SkyTelescope
                 Type = MonitorType.Information,
                 Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = $"Home position,{name}|{_homeAxes.X}|{_homeAxes.Y}|{SkySettings.HomeAxisX}|{SkySettings.HomeAxisY}"
+                Message = $"Home position,{name}|{HomeAxes.X}|{HomeAxes.Y}|{SkySettings.HomeAxisX}|{SkySettings.HomeAxisY}"
             };
             MonitorLog.LogToMonitor(monitorItem);
 
@@ -3735,7 +3749,7 @@ namespace GS.Server.SkyTelescope
             }
             else
             {
-                positions = new[] { _homeAxes.X, _homeAxes.Y };
+                positions = new[] { HomeAxes.X, HomeAxes.Y };
             }
 
             monitorItem = new MonitorEntry
@@ -4220,7 +4234,7 @@ namespace GS.Server.SkyTelescope
                 Message = "Slew to Home"
             };
             MonitorLog.LogToMonitor(monitorItem);
-            SlewMount(new Vector(_homeAxes.X, _homeAxes.Y), SlewType.SlewHome);
+            SlewMount(HomeAxes, SlewType.SlewHome);
         }
 
         /// <summary>
@@ -5500,21 +5514,30 @@ namespace GS.Server.SkyTelescope
         {
             // Load all settings
             SkySettings.Load();
-            // Set home positions
-            _homeAxes = GetHomeAxes(SkySettings.HomeAxisX, SkySettings.HomeAxisY);
+            // Invalidate home axes cache so they are recomputed from updated settings
+            _homeAxesValid = false;
             // Set axis positions
-            _appAxisX = _homeAxes.X;
-            _appAxisY = _homeAxes.Y;
+            _appAxisX = HomeAxes.X;
+            _appAxisY = HomeAxes.Y;
         }
 
         /// <summary>
-        /// Execute single axis pulse guide for AltAz using predictor
+        /// Executes a pulse guide movement on the specified axis using AltAz coordinates for a given duration and guide
+        /// rate.
         /// </summary>
-        /// <param name="axis"></param>
-        /// <param name="guideRate"></param>
-        /// <param name="duration"></param>
-        /// <param name="pulseGoTo"></param>
-        /// <param name="token"></param>
+        /// <remarks>This method runs the pulse guide operation asynchronously and resumes tracking after
+        /// the movement completes or is cancelled. If monitoring is enabled, pulse events are logged for diagnostic or
+        /// visualization purposes. The method is intended for use in telescope mount control scenarios where precise,
+        /// time-limited adjustments are required.</remarks>
+        /// <param name="axis">The axis to pulse guide. Specify 0 for Declination or 1 for Right Ascension.</param>
+        /// <param name="guideRate">The guide rate to apply during the pulse, expressed as a multiplier of the sidereal rate.</param>
+        /// <param name="duration">The duration of the pulse guide movement, in milliseconds. Must be a positive value.</param>
+        /// <param name="pulseGoTo">An action to perform the pulse guide movement. Receives a cancellation token to support cooperative
+        /// cancellation.</param>
+        /// <param name="token">A cancellation token that can be used to cancel the pulse guide operation.</param>
+        /// <param name="startedEvent">An optional event that is set when the pulse guide movement is about to begin. Can be null if notification
+        /// is not required.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the specified axis is not 0 (Declination) or 1 (Right Ascension).</exception>
         private static void PulseGuideAltAz(int axis, double guideRate, int duration, Action<CancellationToken> pulseGoTo, CancellationToken token, ManualResetEventSlim startedEvent = null)
         {
             Task.Run(() =>
@@ -5774,7 +5797,7 @@ namespace GS.Server.SkyTelescope
             StopAxes();
 
             //set to home position
-            double[] position = { _homeAxes.X, _homeAxes.Y };
+            double[] position = { HomeAxes.X, HomeAxes.Y };
             var name = "home";
 
             //set to park position
@@ -6830,7 +6853,7 @@ namespace GS.Server.SkyTelescope
 
         private static void ConnectAlignmentModel()
         {
-            AlignmentModel.Connect(_homeAxes.X, _homeAxes.Y, StepsPerRevolution, AlignmentSettings.ClearModelOnStartup);
+            AlignmentModel.Connect(HomeAxes.X, HomeAxes.Y, StepsPerRevolution, AlignmentSettings.ClearModelOnStartup);
         }
 
         private static void AlignmentModel_Notification(object sender, NotificationEventArgs e)
@@ -6985,8 +7008,13 @@ namespace GS.Server.SkyTelescope
                 case "AtPark":
                     if (AtPark != SkySettings.AtPark) AtPark = SkySettings.AtPark;
                     break;
+                case "HomeAxisX":
+                case "HomeAxisY":
+                    _homeAxesValid = false;
+                    break;
                 case "Latitude":
                     AlignmentModel.SiteLatitude = SkySettings.Latitude;
+                    _homeAxesValid = false;
                     break;
                 case "Longitude":
                     AlignmentModel.SiteLongitude = SkySettings.Longitude;
@@ -6997,6 +7025,7 @@ namespace GS.Server.SkyTelescope
                 case "AlignmentMode":
                     Tracking = false;
                     SkyPredictor.Reset();
+                    _homeAxesValid = false;
                     break;
             }
         }
