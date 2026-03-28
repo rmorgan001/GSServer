@@ -80,6 +80,12 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnHintAutoHomeLimit">Degrees</system:String>
     <system:String x:Key="btnDecOffset">Side Saddle Offset:</system:String>
     <system:String x:Key="btnHintDecOffset">Degrees</system:String>
+    <system:String x:Key="btnSensorPositions">AutoHome Sensor Positions:</system:String>
+    <system:String x:Key="btnHintRaSensorPos">RA Axis (degrees)</system:String>
+    <system:String x:Key="btnHintDecSensorPos">Dec Axis (degrees)</system:String>
+    <system:String x:Key="btnTipSensorPos">Change autohome sensor position</system:String>
+    <system:String x:Key="btnResetSensorPos">Reset</system:String>
+    <system:String x:Key="btnTipResetSensorPos">Reset sensor positions to default (90.0, 90.0)</system:String>
     <system:String x:Key="btnTipScheduler">Scheduler</system:String>
     <system:String x:Key="btnScheduler">Scheduler</system:String>
 
