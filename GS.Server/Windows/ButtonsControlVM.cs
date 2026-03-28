@@ -76,8 +76,10 @@ namespace GS.Server.Windows
 
                     AutoHomeLimits = new List<int>(Enumerable.Range(20, 160));
                     DecOffsets = new List<int>() { 0, -90, 90 };
+                    AutoHomeAxisValues = new List<double>(Numbers.InclusiveRange(85.0, 95.0, 0.1));
                     AutoHomeEnabled = SkyServer.CanHomeSensor;
                     AutoHomeProgressBar = SkyServer.AutoHomeProgressBar;
+                    IsGermanPolarMode = (SkySettings.AlignmentMode == AlignmentModes.algGermanPolar);
                     // Pec button
                     PecShow = SkyServer.PecShow;
                     PecOn = SkyServer.PecOn;
@@ -2399,6 +2401,93 @@ namespace GS.Server.Windows
                 if (_autoHomeLimit == value) return;
                 _autoHomeLimit = value;
                 OnPropertyChanged();
+            }
+        }
+
+        private bool _isGermanPolarMode;
+        public bool IsGermanPolarMode
+        {
+            get => _isGermanPolarMode;
+            set
+            {
+                if (_isGermanPolarMode == value) return;
+                _isGermanPolarMode = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public IList<double> AutoHomeAxisValues { get; }
+
+        public double AutoHomeAxisX
+        {
+            get => _skyTelescopeVM.AutoHomeAxisX;
+            set
+            {
+                _skyTelescopeVM.AutoHomeAxisX = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double AutoHomeAxisY
+        {
+            get => _skyTelescopeVM.AutoHomeAxisY;
+            set
+            {
+                _skyTelescopeVM.AutoHomeAxisY = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _resetSensorPositionCommand;
+        public ICommand ResetSensorPositionCommand
+        {
+            get
+            {
+                var command = _resetSensorPositionCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _resetSensorPositionCommand = new RelayCommand(
+                    param => ResetSensorPosition()
+                );
+            }
+        }
+        private void ResetSensorPosition()
+        {
+            try
+            {
+                AutoHomeAxisX = 90.0;
+                AutoHomeAxisY = 90.0;
+
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = "AutoHome sensor positions reset to default: Ra=90.0, Dec=90.0"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
         }
 

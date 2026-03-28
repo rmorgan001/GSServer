@@ -50,6 +50,48 @@
                     </ComboBox.ItemsPanel>
                 </ComboBox>
             </StackPanel>
+
+            <!-- Autohome Sensor Position Adjustment Section -->
+            <StackPanel Orientation="Vertical" Margin="0,10,0,0" IsEnabled="{Binding StartEnabled}" Visibility="{Binding IsGermanPolarMode, Mode=OneWay, Converter={StaticResource BoolToVis}}">
+                <Label Content="{StaticResource btnSensorPositions}" VerticalAlignment="Bottom"/>
+                <ComboBox md:HintAssist.Hint="{StaticResource btnHintRaSensorPos}" MinWidth="10" ToolTip="{StaticResource btnTipSensorPos}"
+                          ItemsSource="{Binding AutoHomeAxisValues}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                    <ComboBox.SelectedItem>
+                        <Binding Path="AutoHomeAxisX" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </ComboBox.SelectedItem>
+                    <ComboBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </ComboBox.ItemsPanel>
+                </ComboBox>
+                <ComboBox md:HintAssist.Hint="{StaticResource btnHintDecSensorPos}" MinWidth="10" ToolTip="{StaticResource btnTipSensorPos}" Margin="0,10,0,0"
+                          ItemsSource="{Binding AutoHomeAxisValues}" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                    <ComboBox.SelectedItem>
+                        <Binding Path="AutoHomeAxisY" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </ComboBox.SelectedItem>
+                    <ComboBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </ComboBox.ItemsPanel>
+                </ComboBox>
+                <Button Content="{StaticResource btnResetSensorPos}" 
+                        Command="{Binding ResetSensorPositionCommand}"
+                        ToolTip="{StaticResource btnTipResetSensorPos}"
+                        Style="{StaticResource MaterialDesignFlatButton}"
+                        HorizontalAlignment="Center"
+                        Margin="0,10,0,0"/>
+            </StackPanel>
+
             <StackPanel Orientation="Horizontal" Margin="0 10 0 0" HorizontalAlignment="Center">
                     <Button IsEnabled="{Binding StartEnabled}" IsDefault="False" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding StartAutoHomeDialogCommand}" Content="{StaticResource diaStart}"/>
                     <Button IsCancel="True" IsDefault="True"  Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CancelAutoHomeDialogCommand}" Content="{StaticResource diaCancel}"/>
