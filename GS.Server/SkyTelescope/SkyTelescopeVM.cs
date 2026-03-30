@@ -678,6 +678,9 @@ namespace GS.Server.SkyTelescope
                                 case "IsHome":
                                     IsHome = SkyServer.IsHome;
                                     break;
+                                case "IsLimits":
+                                    IsLimits= SkyServer.IsLimits;
+                                    break;
                                 case "AtPark":
                                     AtPark = SkyServer.AtPark;
                                     break;
@@ -3428,6 +3431,31 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private string _limitsBadgeContent;
+        public string LimitsBadgeContent
+        {
+            get => _limitsBadgeContent;
+            set
+            {
+                if (LimitsBadgeContent == value) return;
+                _limitsBadgeContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isLimits;
+        public bool IsLimits
+        {
+            get => _isLimits;
+            set
+            {
+                if (IsLimits == value) return;
+                _isLimits = value;
+                LimitsBadgeContent = value ? Application.Current.Resources["btnHintTracking"].ToString() : "";
+                OnPropertyChanged();
+            }
+        }
+
         private ICommand _clickHomeCmd;
         public ICommand ClickHomeCommand
         {
@@ -3585,6 +3613,50 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private ICommand _clickLimitsCmd;
+        public ICommand ClickLimitsCommand
+        {
+            get
+            {
+                var command = _clickLimitsCmd;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickLimitsCmd = new RelayCommand(
+                    param => ClickLimits()
+                );
+            }
+        }
+        private void ClickLimits()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    SkyServer.IsLimits = !SkyServer.IsLimits;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+        
         private ICommand _clickPecOnCmd;
         public ICommand ClickPecOnCmd
         {

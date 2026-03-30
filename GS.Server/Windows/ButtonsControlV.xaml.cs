@@ -9,7 +9,7 @@ namespace GS.Server.Windows
     {
         public ButtonsControlV()
         {
-            DataContext = new ButtonsControlVM(); 
+            DataContext = new ButtonsControlVm(); 
             InitializeComponent();
         }
 

@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:deviceInterface="clr-namespace:ASCOM.DeviceInterface;assembly=ASCOM.DeviceInterfaces"
              xmlns:domain="clr-namespace:GS.Server.Domain"
-             xmlns:domain1="clr-namespace:GS.Shared.Domain;assembly=GS.Shared"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
@@ -93,7 +92,7 @@
                 Style="{StaticResource MaterialDesignRaisedDarkButton}"
                 ToolTip="{StaticResource btnTipStop}" />
         <StackPanel Orientation="Horizontal">
-            <md:PopupBox Margin="-10,5,-10,0" StaysOpen="False">
+            <md:PopupBox Margin="-10,0,-10,0" StaysOpen="False">
                 <GroupBox Margin="5,0,5,0" Header="Tracking Rate">
                     <StackPanel Orientation="Vertical">
                         <RadioButton Margin="5"
@@ -199,7 +198,42 @@
                         Visibility="{Binding SchedulerShow, Converter={StaticResource BoolToClap}}" />
             </md:Badged>
         </md:DialogHost>
-        <md:Badged Badge="{Binding PecBadgeContent}"
+        <StackPanel Orientation="Horizontal">
+            <Button Padding="-5"
+                    Command="{Binding OpenLimitDialogCommand}"
+                    IsEnabled="{Binding TrackingLimitSettingsEnable}"
+                    Style="{StaticResource MaterialDesignFlatButton}"
+                    ToolTip="{StaticResource botTipAxisLimit}">
+                <md:PackIcon Width="25"
+                             Height="30"
+                             Margin="0"
+                             HorizontalAlignment="Left"
+                             VerticalAlignment="Center"
+                             Kind="EllipsisVertical">
+                </md:PackIcon>
+            </Button>
+            <md:Badged Badge="{Binding LimitsBadgeContent}" BadgePlacementMode="Right">
+                <md:Badged.Style>
+                    <Style TargetType="md:Badged">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsLimits}" Value="True">
+                                <Setter Property="BadgeBackground" Value="{StaticResource SecondaryHueMidBrush}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </md:Badged.Style>
+                <Button Width="91"
+                        Height="25"
+                        Margin="0,6,0,0"
+                        Padding="-5"
+                        HorizontalAlignment="Left"
+                        Command="{Binding ClickLimitsCommand}"
+                        Content="{StaticResource btnLimits}"
+                        Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                        ToolTip="{StaticResource btnLimits}" />
+            </md:Badged>
+        </StackPanel>
+        <!--<md:Badged Badge="{Binding PecBadgeContent}"
                    BadgePlacementMode="Right"
                    Visibility="{Binding PecShow, Converter={StaticResource BoolToClap}}">
             <Button Width="100"
@@ -211,6 +245,6 @@
                     Content="{StaticResource Pec}"
                     Style="{StaticResource MaterialDesignRaisedDarkButton}"
                     ToolTip="{StaticResource Pec}" />
-        </md:Badged>
+        </md:Badged>-->
     </StackPanel>
 </UserControl>
