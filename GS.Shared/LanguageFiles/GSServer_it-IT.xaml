@@ -78,6 +78,12 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnHintAutoHomeLimit">Gradi</system:String>
     <system:String x:Key="btnDecOffset">Side Saddle Offset:</system:String>
     <system:String x:Key="btnHintDecOffset">Gradi</system:String>
+    <system:String x:Key="btnSensorPositions">Posizioni dei sensori AutoHome:</system:String>
+    <system:String x:Key="btnHintRaSensorPos">Asse RA (gradi)</system:String>
+    <system:String x:Key="btnHintDecSensorPos">Asse Dec (gradi)</system:String>
+    <system:String x:Key="btnTipSensorPos">Cambia posizione sensore autohome</system:String>
+    <system:String x:Key="btnResetSensorPos">Ripristina</system:String>
+    <system:String x:Key="btnTipResetSensorPos">Ripristina le posizioni dei sensori ai valori predefiniti (90.0, 90.0)</system:String>
     <system:String x:Key="btnTipScheduler">Schedulatore</system:String>
     <system:String x:Key="btnScheduler">Schedulatore</system:String>
 
@@ -197,6 +203,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="gpSlewDown">Muovi Giù</system:String>
     <system:String x:Key="gpSlewLeft">Muovi a Sinistra</system:String>
     <system:String x:Key="gpSlewRight">Muovi a Destra</system:String>
+    <system:String x:Key="gpSlewNE">Muovi NE</system:String>
+    <system:String x:Key="gpSlewNW">Muovi NO</system:String>
+    <system:String x:Key="gpSlewSE">Muovi SE</system:String>
+    <system:String x:Key="gpSlewSW">Muovi SO</system:String>
     <system:String x:Key="gpSave">Salva</system:String>
     <system:String x:Key="gpSidereal">Velocità Siderale</system:String>
     <system:String x:Key="gpLunar">Velocità Lunare</system:String>
