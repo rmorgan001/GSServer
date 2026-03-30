@@ -104,8 +104,8 @@ namespace GS.SkyWatcher
         internal void LoadMountDefaults()
         {
             MountConnected = true;
-            GetAxisVersion(AxisId.Axis1);
             GetAxisVersion(AxisId.Axis2);
+            GetAxisVersion(AxisId.Axis1); // this is last so the primary axis will set the advanced set check
             //calculate resolution needed
             GetResolutionFactors();
             // Inquire Gear Rate
