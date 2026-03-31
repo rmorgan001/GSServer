@@ -24,8 +24,8 @@
                 Orientation="Vertical">
         <Button Width="20"
                 Height="20"
-                Margin="5,0,0,5"
-                HorizontalAlignment="Left"
+                Margin="5,0,0,0"
+                HorizontalAlignment="Right"
                 VerticalAlignment="Top"
                 HorizontalContentAlignment="Left"
                 VerticalContentAlignment="Top"
@@ -55,9 +55,9 @@
                        DialogContent="{Binding ParkContent}"
                        IsOpen="{Binding IsParkDialogOpen}">
             <md:Badged Badge="{Binding ParkBadgeContent}" BadgePlacementMode="Right">
-                <Button Width="100"
+                <Button Width="105"
                         Height="25"
-                        Margin="5,1,0,0"
+                        Margin="0,5,0,0"
                         Padding="-5"
                         HorizontalAlignment="Left"
                         Command="{Binding OpenParkDialogCmd}"
@@ -71,9 +71,9 @@
                        DialogContent="{Binding HomeContent}"
                        IsOpen="{Binding IsHomeDialogOpen}">
             <md:Badged Badge="{Binding HomeBadgeContent}" BadgePlacementMode="Right">
-                <Button Width="100"
+                <Button Width="105"
                         Height="25"
-                        Margin="5,6,0,0"
+                        Margin="0,3,0,0"
                         Padding="-5"
                         HorizontalAlignment="Left"
                         Command="{Binding OpenHomeDialogCmd}"
@@ -82,9 +82,9 @@
                         ToolTip="{StaticResource btnTipHome}" />
             </md:Badged>
         </md:DialogHost>
-        <Button Width="100"
+        <Button Width="105"
                 Height="25"
-                Margin="5,6,0,0"
+                Margin="0,3,0,0"
                 Padding="-5"
                 HorizontalAlignment="Left"
                 Command="{Binding ClickStopCommand}"
@@ -92,8 +92,8 @@
                 Style="{StaticResource MaterialDesignRaisedDarkButton}"
                 ToolTip="{StaticResource btnTipStop}" />
         <StackPanel Orientation="Horizontal">
-            <md:PopupBox Margin="-10,0,-10,0" StaysOpen="False">
-                <GroupBox Margin="5,0,5,0" Header="Tracking Rate">
+            <md:PopupBox Margin="-14,0,-10,0" StaysOpen="False" >
+                <GroupBox Margin="0,0,5,0" Header="Tracking Rate">
                     <StackPanel Orientation="Vertical">
                         <RadioButton Margin="5"
                                      Content="{StaticResource skySidereal}"
@@ -128,9 +128,9 @@
                         </Style.Triggers>
                     </Style>
                 </md:Badged.Style>
-                <Button Width="90"
+                <Button Width="95"
                         Height="25"
-                        Margin="0,6,0,0"
+                        Margin="0,3,0,0"
                         Padding="-5"
                         HorizontalAlignment="Left"
                         Command="{Binding ClickTrackingCommand}"
@@ -143,9 +143,9 @@
                        CloseOnClickAway="True"
                        DialogContent="{Binding HomeResetContent}"
                        IsOpen="{Binding IsHomeResetDialogOpen}">
-            <Button Width="100"
+            <Button Width="105"
                     Height="25"
-                    Margin="5,6,0,0"
+                    Margin="0,3,0,0"
                     Padding="-5"
                     HorizontalAlignment="Left"
                     Command="{Binding OpenReSyncDialogCmd}"
@@ -157,9 +157,9 @@
                        CloseOnClickAway="True"
                        DialogContent="{Binding FlipContent}"
                        IsOpen="{Binding IsFlipDialogOpen}">
-            <Button Width="100"
+            <Button Width="105"
                     Height="25"
-                    Margin="5,6,0,0"
+                    Margin="0,3,0,0"
                     Padding="-5"
                     HorizontalAlignment="Left"
                     Command="{Binding OpenFlipDialogCommand}"
@@ -170,9 +170,9 @@
         <md:DialogHost VerticalAlignment="Bottom"
                        DialogContent="{Binding AutoHomeContent}"
                        IsOpen="{Binding IsAutoHomeDialogOpen}">
-            <Button Width="100"
+            <Button Width="105"
                     Height="25"
-                    Margin="5,6,0,0"
+                    Margin="0,3,0,0"
                     Padding="-5"
                     HorizontalAlignment="Left"
                     Command="{Binding OpenAutoHomeDialogCommand}"
@@ -186,9 +186,9 @@
                        DialogContent="{Binding SchedulerContent}"
                        IsOpen="{Binding IsSchedulerDialogOpen}">
             <md:Badged Badge="{Binding SchedulerBadgeContent}" BadgePlacementMode="Right">
-                <Button Width="100"
+                <Button Width="105"
                         Height="25"
-                        Margin="5,6,0,0"
+                        Margin="0,3,0,0"
                         Padding="-5"
                         HorizontalAlignment="Left"
                         Command="{Binding OpenSchedulerDialogCmd}"
@@ -199,14 +199,14 @@
             </md:Badged>
         </md:DialogHost>
         <StackPanel Orientation="Horizontal">
-            <Button Padding="-5"
+            <Button Padding="-9"
                     Command="{Binding OpenLimitDialogCommand}"
                     IsEnabled="{Binding TrackingLimitSettingsEnable}"
                     Style="{StaticResource MaterialDesignFlatButton}"
                     ToolTip="{StaticResource botTipAxisLimit}">
-                <md:PackIcon Width="25"
+                <md:PackIcon Width="28"
                              Height="30"
-                             Margin="0"
+                             Margin="-2,0,1,0"
                              HorizontalAlignment="Left"
                              VerticalAlignment="Center"
                              Kind="EllipsisVertical">
@@ -222,9 +222,9 @@
                         </Style.Triggers>
                     </Style>
                 </md:Badged.Style>
-                <Button Width="91"
+                <Button Width="96"
                         Height="25"
-                        Margin="0,6,0,0"
+                        Margin="0,3,0,0"
                         Padding="-5"
                         HorizontalAlignment="Left"
                         Command="{Binding ClickLimitsCommand}"
