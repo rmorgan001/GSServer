@@ -1392,6 +1392,20 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static bool _limitsOn;
+        public static bool LimitsOn
+        {
+            get => _limitsOn;
+            set
+            {
+                if (_limitsOn == value) return;
+                _limitsOn = value;
+                Properties.SkyTelescope.Default.LimitsOn = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static double _longitude;
         public static double Longitude
         {
@@ -2341,6 +2355,7 @@ namespace GS.Server.SkyTelescope
             Latitude = Properties.SkyTelescope.Default.Latitude;
             LimitTracking = Properties.SkyTelescope.Default.LimitTracking;
             LimitPark = Properties.SkyTelescope.Default.LimitPark;
+            LimitsOn = Properties.SkyTelescope.Default.LimitsOn;
             Longitude = Properties.SkyTelescope.Default.Longitude;
             LunarRate = Properties.SkyTelescope.Default.LunarRate;
             MaxSlewRate = Properties.SkyTelescope.Default.MaximumSlewRate;
@@ -2467,11 +2482,11 @@ namespace GS.Server.SkyTelescope
                                         Convert.ChangeType(settingsProperty.DefaultValue, settingsProperty.PropertyType);
                                 }
                             }
-                        // Force write of setting to user.config
-                        Properties.SkyTelescope.Default.PropertyValues[name].IsDirty = true;
+                            // Force write of setting to user.config
+                            Properties.SkyTelescope.Default.PropertyValues[name].IsDirty = true;
                         }
-                    Properties.SkyTelescope.Default.Version = currentVersion;
-                    Properties.SkyTelescope.Default.PropertyValues["Version"].IsDirty = true;
+                        Properties.SkyTelescope.Default.Version = currentVersion;
+                        Properties.SkyTelescope.Default.PropertyValues["Version"].IsDirty = true;
                         if (mountType == "algPolar")
                         {
                             if (isAlphaProfile)
@@ -2514,7 +2529,7 @@ namespace GS.Server.SkyTelescope
                                 Properties.SkyTelescope.Default.ParkAxes = JsonConvert.SerializeObject(storedParkAxes);
                             }
                         }
-                    Properties.SkyTelescope.Default.Save();
+                        Properties.SkyTelescope.Default.Save();
                     }
                     Properties.SkyTelescope.Default.SettingsKey = Properties.Profile.Default.Current;
                 }

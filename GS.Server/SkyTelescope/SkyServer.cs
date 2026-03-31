@@ -185,7 +185,6 @@ namespace GS.Server.SkyTelescope
         private static Vector _guideRate;
         private static bool _isAutoHomeRunning;
         private static bool _isHome;
-        private static bool _isLimits;
         private static bool _isPulseGuidingDec;
         private static bool _isPulseGuidingRa;
         private static PierSide _isSideOfPier;
@@ -564,20 +563,6 @@ namespace GS.Server.SkyTelescope
             {
                 if (value == _isHome) { return; }
                 _isHome = value;
-                OnStaticPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// UI indicator for at Limits button
-        /// </summary>
-        public static bool IsLimits
-        {
-            get => _isLimits;
-            set
-            {
-                if (IsLimits == value) return;
-                _isLimits = value;
                 OnStaticPropertyChanged();
             }
         }
@@ -3020,7 +3005,7 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         private static void CheckAxisLimits()
         {
-            if (!IsLimits) // if user shut off the Limits just return
+            if (!SkySettings.LimitsOn) // if user shut off the Limits just return
             {
                 LimitAlarm = false;
                 return;
@@ -5123,7 +5108,6 @@ namespace GS.Server.SkyTelescope
             int raWormTeeth;
             int decWormTeeth;
             bool positionsSet = false;
-            IsLimits = true;
             MonitorEntry monitorItem;
             string msg;
 

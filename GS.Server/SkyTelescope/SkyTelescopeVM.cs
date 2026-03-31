@@ -153,6 +153,7 @@ namespace GS.Server.SkyTelescope
 
                     // defaults
                     AtPark = SkyServer.AtPark;
+                    IsLimits = SkySettings.LimitsOn;
                     ConnectButtonContent = Application.Current.Resources["skyConnect"].ToString();
                     VoiceState = Settings.Settings.VoiceActive;
 
@@ -485,6 +486,9 @@ namespace GS.Server.SkyTelescope
                      case "Elevation":
                          Elevation = SkySettings.Elevation;
                          break;
+                     case "LimitsOn":
+                         IsLimits= SkySettings.LimitsOn;
+                         break;
                      case "ParkPositions":
                          OnPropertyChanged("ParkPositions");
                          if (ParkSelectionSetting == null && ParkPositions.Count > 0)
@@ -677,9 +681,6 @@ namespace GS.Server.SkyTelescope
                                     break;
                                 case "IsHome":
                                     IsHome = SkyServer.IsHome;
-                                    break;
-                                case "IsLimits":
-                                    IsLimits= SkyServer.IsLimits;
                                     break;
                                 case "AtPark":
                                     AtPark = SkyServer.AtPark;
@@ -3449,8 +3450,9 @@ namespace GS.Server.SkyTelescope
             get => _isLimits;
             set
             {
-                if (IsLimits == value) return;
+
                 _isLimits = value;
+                SkySettings.LimitsOn = value;
                 LimitsBadgeContent = value ? Application.Current.Resources["btnHintTracking"].ToString() : "";
                 OnPropertyChanged();
             }
@@ -3635,7 +3637,7 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    SkyServer.IsLimits = !SkyServer.IsLimits;
+                    SkySettings.LimitsOn = !SkySettings.LimitsOn;
                 }
             }
             catch (Exception ex)

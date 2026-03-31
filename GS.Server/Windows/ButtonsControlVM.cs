@@ -69,7 +69,7 @@ namespace GS.Server.Windows
                     }
                     AtPark = SkyServer.AtPark;
                     IsHome = SkyServer.IsHome;
-                    IsLimits = SkyServer.IsLimits;
+                    IsLimits = SkySettings.LimitsOn;
                     IsTracking = SkyServer.Tracking || SkyServer.SlewState == SlewType.SlewRaDec;
                     IsMoveAxisActive = SkyServer.Tracking && SkyServer.MoveAxisActive;
                     TrackingRate = SkySettings.TrackingRate;
@@ -185,9 +185,6 @@ namespace GS.Server.Windows
                      case "IsHome":
                          IsHome = SkyServer.IsHome;
                          break;
-                     case "IsLimits":
-                         IsLimits= SkyServer.IsLimits;
-                         break;
                      case "IsMountRunning":
                          ScreenEnabled = SkyServer.IsMountRunning;
                          break;
@@ -234,6 +231,9 @@ namespace GS.Server.Windows
              {
                  switch (e.PropertyName)
                  {
+                     case "LimitsOn":
+                         IsLimits= SkySettings.LimitsOn;
+                         break;
                      case "TrackingRate":
                          TrackingRate = SkySettings.TrackingRate;
                          break;
@@ -510,8 +510,8 @@ namespace GS.Server.Windows
             get => _isLimits;
             set
             {
-                if (IsLimits == value) return;
                 _isLimits = value;
+                SkySettings.LimitsOn = value;
                 LimitsBadgeContent = value ? Application.Current.Resources["btnHintTracking"].ToString() : "";
                 OnPropertyChanged();
             }
@@ -1874,7 +1874,7 @@ namespace GS.Server.Windows
             {
                 using (new WaitCursor())
                 {
-                    SkyServer.IsLimits = !SkyServer.IsLimits;
+                    SkySettings.LimitsOn = !SkySettings.LimitsOn;
                 }
             }
             catch (Exception ex)
