@@ -851,4 +851,6 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!--  1.2.2.1  -->
     <system:String x:Key="btnLimits">Limites</system:String>
+    <system:String x:Key="vceLimitsOff">Limites désactivées</system:String>
+    <system:String x:Key="vceLimitsOn">Limites sur</system:String>
 </ResourceDictionary>

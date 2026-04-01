@@ -17,16 +17,23 @@
 #region Usings
 using ASCOM.DeviceInterface;
 using ASCOM.Utilities;
+using Gma.System.MouseKeyHook;
+using GS.FitsImageManager;
 using GS.Principles;
 using GS.Server.Cdc;
+using GS.Server.Controls.Dialogs;
 using GS.Server.Gps;
 using GS.Server.Helpers;
 using GS.Server.Main;
+using GS.Server.Pulses;
+using GS.Server.Windows;
 using GS.Shared;
-using GS.FitsImageManager;
+using GS.Shared.Command;
+using GS.Shared.Transport;
 using HelixToolkit.Wpf;
 using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -37,33 +44,27 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Numerics;
+using System.Reflection;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
-using Gma.System.MouseKeyHook;
-using GS.Server.Controls.Dialogs;
-using GS.Server.Windows;
-using GS.Shared.Command;
 using Application = System.Windows.Application;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 using Color = System.Windows.Media.Color;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using NativeMethods = GS.Server.Helpers.NativeMethods;
 using Point = System.Windows.Point;
-using GS.Shared.Transport;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using Vector = System.Windows.Vector;
-using GS.Server.Pulses;
 #endregion
 
 namespace GS.Server.SkyTelescope
@@ -3638,6 +3639,7 @@ namespace GS.Server.SkyTelescope
                 using (new WaitCursor())
                 {
                     SkySettings.LimitsOn = !SkySettings.LimitsOn;
+                    Synthesizer.Speak(SkySettings.LimitsOn ? Application.Current.Resources["vceLimitsOn"].ToString() : Application.Current.Resources["vceLimitsOff"].ToString());
                 }
             }
             catch (Exception ex)

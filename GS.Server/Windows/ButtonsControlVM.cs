@@ -1875,6 +1875,7 @@ namespace GS.Server.Windows
                 using (new WaitCursor())
                 {
                     SkySettings.LimitsOn = !SkySettings.LimitsOn;
+                    Synthesizer.Speak(SkySettings.LimitsOn ? Application.Current.Resources["vceLimitsOn"].ToString() : Application.Current.Resources["vceLimitsOff"].ToString());
                 }
             }
             catch (Exception ex)

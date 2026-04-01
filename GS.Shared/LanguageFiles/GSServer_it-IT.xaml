@@ -853,4 +853,6 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!--  1.2.2.0  -->
     <system:String x:Key="btnLimits">Limiti</system:String>
+    <system:String x:Key="vceLimitsOff">Limiti disattivati</system:String>
+    <system:String x:Key="vceLimitsOn">Limiti su</system:String>
 </ResourceDictionary>
