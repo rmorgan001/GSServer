@@ -495,33 +495,34 @@ namespace GS.SkyWatcher
                 _axisStringVersion[0] = mountVersion;
                 _axisVersion[0] = intVersion;
                 _axisModel[0] = mountModel;
+                
+                var version = new Version(first, second);
+                // Exclude AZ GTI in EQ mode prior version 3.40
+                if (mountModel == 165 && version < AzgTiAdvancedSetSupportedVersion)
+                {
+                    SupportAdvancedCommandSet = false;
+                }
+                // SW recommends no support for single axis trackers 0x07, 0x08, 0x0A, and 0x0F
+                // "Star Adventurer Mount" advanced firmware 3.130.07 exclude
+                else if (intVersion == 0x038207)
+                {
+                    SupportAdvancedCommandSet = false;
+                }
+                else if (intVersion > 0x032200)  //205312
+                {
+                    SupportAdvancedCommandSet = true;
+                }
+                else
+                {
+                    SupportAdvancedCommandSet = false;
+                }
             }
             else
             {
+                // The secondary axis version is not used for advanced command set check, newer mounts it's used for WiFi version
                 _axisStringVersion[1] = mountVersion;
                 _axisVersion[1] = intVersion;
                 _axisModel[1] = mountModel;
-            }
-
-            var version = new Version(first, second);
-            // Exclude AZ GTI in EQ mode prior version 3.40
-            if (mountModel == 165 && version < AzgTiAdvancedSetSupportedVersion)
-            {
-                SupportAdvancedCommandSet = false;
-            }
-            // SW recommends no support for single axis trackers 0x07, 0x08, 0x0A, and 0x0F
-            // "Star Adventurer Mount" advanced firmware 3.130.07 exclude
-            else if (intVersion == 0x038207)
-            {
-                SupportAdvancedCommandSet = false;
-            }
-            else if (intVersion > 0x032200)  //205312
-            {
-                SupportAdvancedCommandSet = true;
-            }
-            else
-            {
-                SupportAdvancedCommandSet = false;
             }
 
             var monitorItem = new MonitorEntry
