@@ -85,7 +85,6 @@ namespace GS.Server.SkyTelescope
         private static Vector _appAxes;
         //private static Vector _targetAxes;
         private static Vector _altAzSync;
-
         public static readonly List<SpiralPoint> SpiralCollection;
 
         // AlignmentModel
@@ -179,6 +178,7 @@ namespace GS.Server.SkyTelescope
         private static int _autoHomeProgressBar;
         private static bool _autoHomeStop;
         private static bool _asComOn;
+        private static string[] _axesVersion;
         private static bool _canHomeSensor;
         private static string _capabilities;
         private static double _declinationXForm;
@@ -389,6 +389,18 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(monitorItem);
 
+                OnStaticPropertyChanged();
+            }
+        }
+
+        
+        public static string[] AxesVersion
+        {
+            get => _axesVersion;
+            set
+            {
+                if (_axesVersion == value) { return; }
+                _axesVersion = value;
                 OnStaticPropertyChanged();
             }
         }
@@ -2550,7 +2562,7 @@ namespace GS.Server.SkyTelescope
                         case MountTaskName.GetAxisVersions:
                             var skyAxisVersions = new SkyGetAxisStringVersions(SkyQueue.NewId);
                             // Not used atm
-                            _ = (long[])SkyQueue.GetCommandResult(skyAxisVersions).Result;
+                            AxesVersion = (string[])SkyQueue.GetCommandResult(skyAxisVersions).Result;
                             break;
                         case MountTaskName.GetAxisStrVersions:
                             var skyAxisStrVersions = new SkyGetAxisStringVersions(SkyQueue.NewId);
@@ -5206,6 +5218,7 @@ namespace GS.Server.SkyTelescope
                         SkyTasks(MountTaskName.AllowAdvancedCommandSet);
                     }
                     SkyTasks(MountTaskName.LoadDefaults);
+                    SkyTasks(MountTaskName.GetAxisVersions);
                     SkyTasks(MountTaskName.StepsPerRevolution);
                     SkyTasks(MountTaskName.StepsWormPerRevolution);
                     SkyTasks(MountTaskName.StopAxes);
@@ -7143,6 +7156,7 @@ namespace GS.Server.SkyTelescope
             TrackingSpeak = true;
            
             StepsTimeFreq = new long[2];
+            AxesVersion = new[] { "X", "Y" };
         }
 
         /// <summary>

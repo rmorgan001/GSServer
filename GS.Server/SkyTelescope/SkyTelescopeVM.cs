@@ -6736,6 +6736,15 @@ namespace GS.Server.SkyTelescope
 
         #region Bottom Bar Control
 
+        public string Axis0Version
+        {
+            get => SkyServer.AxesVersion[0];
+        }
+        public string Axis1Version
+        {
+            get => SkyServer.AxesVersion[1];
+        }
+
         private bool _isHome;
         public bool IsHome
         {

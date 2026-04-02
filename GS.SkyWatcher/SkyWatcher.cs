@@ -1114,15 +1114,11 @@ namespace GS.SkyWatcher
             {
                 switch (axis)
                 {
+                    case AxisId.Axis2:
                     case AxisId.Axis1:
                         MountVersion = versions[0];
                         MountType = GetEnumDescription((McModel)models[0]);
                         MountNum = models[0];
-                        break;
-                    case AxisId.Axis2:
-                        MountVersion = versions[1];
-                        MountType = GetEnumDescription((McModel)models[1]);
-                        MountNum = models[1];
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(axis), axis, null);

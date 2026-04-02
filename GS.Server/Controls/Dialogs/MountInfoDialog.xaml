@@ -71,13 +71,20 @@
             <Label Margin="-3" Grid.Row="4" Grid.Column="6" Content="{Binding LowVoltageError}" HorizontalAlignment="Left" />
             <Label Margin="-3" Grid.Row="5" Grid.Column="4" Content="{StaticResource mntVoltage}" HorizontalAlignment="Right" />
             <Label Margin="-3" Grid.Row="5" Grid.Column="6" Content="{Binding ControllerVoltage}" HorizontalAlignment="Left" />
-            <Label Margin="-3" Grid.Row="6" Grid.Column="4" HorizontalAlignment="Right" >
-                <TextBlock>
-                    <Run Text="{StaticResource mntAdv}" />
-                    <Run Text=":" />
-                </TextBlock>
-            </Label>
+            <Label Margin="-3" Grid.Row="6" Grid.Column="4" HorizontalAlignment="Right"> <TextBlock> <Run Text="{StaticResource mntAdv}" /> <Run Text=":" /></TextBlock></Label>
             <Label Margin="-3" Grid.Row="6" Grid.Column="6" Content="{Binding CanAdvancedCmdSupport}" HorizontalAlignment="Left" />
+            <Label Margin="-3"
+                   Grid.Row="7"
+                   Grid.Column="4"
+                   Content="{StaticResource mntVersion}"
+                   ContentStringFormat='{}{0} X'
+                   HorizontalAlignment="Right" />
+            <Label Margin="-3" Grid.Row="7" Grid.Column="6" Content="{Binding Axis0Version}" HorizontalAlignment="Left" />
+            <Label Margin="-3" Grid.Row="8" Grid.Column="4" Content="{StaticResource mntVersion}"
+                   ContentStringFormat='{}{0} Y'
+                   HorizontalAlignment="Right" />
+            <Label Margin="-3" Grid.Row="8" Grid.Column="6" Content="{Binding Axis1Version}" HorizontalAlignment="Left" />
+
 
             <Button IsDefault="True" IsCancel="True" Grid.Row="15" Grid.Column="0" Grid.ColumnSpan="7" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding OkMountInfoDialogCmd}" Content="{StaticResource diaOk}" />
         </Grid>
