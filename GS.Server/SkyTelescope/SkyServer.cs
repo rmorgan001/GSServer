@@ -2136,22 +2136,30 @@ namespace GS.Server.SkyTelescope
             // time could be off a bit may need to deal with each axis separate
             _ = new SkyAxisGoToTarget(0, AxisId.Axis1, skyTarget[0]);
             _ = new SkyAxisGoToTarget(0, AxisId.Axis2, skyTarget[1]);
+            var axis1Stopped = false;
+            var axis2Stopped = false;
 
             while (stopwatch.Elapsed.TotalSeconds <= timer)
             {
-                Thread.Sleep(50);
-                token.ThrowIfCancellationRequested(); // check for a stop
+                if (!axis1Stopped)
+                {
+                    token.WaitHandle.WaitOne(250);
+                    token.ThrowIfCancellationRequested(); // check for a stop
 
-                var statusX = new SkyIsAxisFullStop(SkyQueue.NewId, AxisId.Axis1);
-                var x = SkyQueue.GetCommandResult(statusX);
-                var axis1Stopped = Convert.ToBoolean(x.Result);
+                    var statusX = new SkyIsAxisFullStop(SkyQueue.NewId, AxisId.Axis1);
+                    var x = SkyQueue.GetCommandResult(statusX);
+                    axis1Stopped = Convert.ToBoolean(x.Result);
+                }
 
-                Thread.Sleep(50);
-                token.ThrowIfCancellationRequested(); // check for a stop
+                if (!axis2Stopped)
+                {
+                    token.WaitHandle.WaitOne(250);
+                    token.ThrowIfCancellationRequested(); // check for a stop
 
-                var statusy = new SkyIsAxisFullStop(SkyQueue.NewId, AxisId.Axis2);
-                var y = SkyQueue.GetCommandResult(statusy);
-                var axis2Stopped = Convert.ToBoolean(y.Result);
+                    var statusY = new SkyIsAxisFullStop(SkyQueue.NewId, AxisId.Axis2);
+                    var y = SkyQueue.GetCommandResult(statusY);
+                    axis2Stopped = Convert.ToBoolean(y.Result);
+                }
 
                 if (!axis1Stopped || !axis2Stopped) { continue; }
 

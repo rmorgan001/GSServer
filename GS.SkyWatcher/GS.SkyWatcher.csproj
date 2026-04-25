@@ -40,6 +40,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="System.Management" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
