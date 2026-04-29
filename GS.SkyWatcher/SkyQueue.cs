@@ -17,6 +17,7 @@ using GS.Principles;
 using GS.Shared;
 using GS.Shared.Transport;
 using System;
+using System.Management;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 //using System.Diagnostics;
@@ -43,6 +44,8 @@ namespace GS.SkyWatcher
         private static bool _isPulseGuidingDec;
         private static bool _isPulseGuidingRa;
         private static double[] _steps;
+        private static ManagementEventWatcher _usbWatcher;
+        private static string _monitoredPortName;
 
         #endregion
 
@@ -407,6 +410,9 @@ namespace GS.SkyWatcher
                 if (_taskReadySignal.Wait(TimeSpan.FromSeconds(5)))
                 {
                     IsRunning = true;
+                    // Start USB hardware disconnect monitoring
+                    var sp = serial as System.IO.Ports.SerialPort;
+                    if (sp != null) StartUsbWatcher(sp.PortName);
                     // Pragmatic delay to ensure queue is fully operational
                     Thread.Sleep(100);
                 }
@@ -435,6 +441,7 @@ namespace GS.SkyWatcher
         /// </summary>
         public static void Stop()
         {
+            StopUsbWatcher();
             IsRunning = false;
 
             // Signal completion to BlockingCollection
@@ -471,6 +478,150 @@ namespace GS.SkyWatcher
         {
             StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));
         }
+
+        /// <summary>
+        /// Subscribes to WMI Win32_DeviceChangeEvent (kernel-push, no polling) to detect USB hardware removal.
+        /// Called after a successful COM port connection.
+        /// </summary>
+        private static void StartUsbWatcher(string portName)
+        {
+            StopUsbWatcher(); // ensure no prior subscription leaks
+            _monitoredPortName = portName;
+            try
+            {
+                var query = new WqlEventQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 3");
+                _usbWatcher = new ManagementEventWatcher(query);
+                _usbWatcher.EventArrived += OnUsbDeviceChanged;
+                _usbWatcher.Start();
+
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Mount,
+                    Type = MonitorType.Information,
+                    Method = "StartUsbWatcher",
+                    Thread = System.Threading.Thread.CurrentThread.ManagedThreadId,
+                    Message = $"USB disconnect monitoring started for port {portName}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Mount,
+                    Type = MonitorType.Warning,
+                    Method = "StartUsbWatcher",
+                    Thread = System.Threading.Thread.CurrentThread.ManagedThreadId,
+                    Message = $"USB disconnect monitoring failed to start: {ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+        }
+
+        /// <summary>
+        /// Stops and disposes the WMI event watcher to release the subscription.
+        /// </summary>
+        private static void StopUsbWatcher()
+        {
+            if (_usbWatcher == null) return;
+            try
+            {
+                _usbWatcher.EventArrived -= OnUsbDeviceChanged;
+                _usbWatcher.Stop();
+                _usbWatcher.Dispose();
+
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Mount,
+                    Type = MonitorType.Information,
+                    Method = "StopUsbWatcher",
+                    Thread = System.Threading.Thread.CurrentThread.ManagedThreadId,
+                    Message = $"USB disconnect monitoring stopped for port {_monitoredPortName}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Mount,
+                    Type = MonitorType.Warning,
+                    Method = "StopUsbWatcher",
+                    Thread = System.Threading.Thread.CurrentThread.ManagedThreadId,
+                    Message = $"USB disconnect monitoring stop error: {ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+            finally
+            {
+                _usbWatcher = null;
+                _monitoredPortName = null;
+            }
+        }
+
+        /// <summary>
+        /// WMI EventArrived callback. Win32_DeviceChangeEvent fires for every device removal;
+        /// a one-shot ManagementObjectSearcher on Win32_PnPEntity confirms whether the monitored
+        /// COM port has actually disappeared before logging the warning.
+        /// </summary>
+        private static void OnUsbDeviceChanged(object sender, EventArrivedEventArgs e)
+        {
+            // Atomically take the port name — only the first callback that claims it will proceed.
+            // Windows fires one Win32_DeviceChangeEvent per device node (composite device, serial
+            // function, COM port), so a single unplug produces 3+ events within milliseconds.
+            var portName = Interlocked.Exchange(ref _monitoredPortName, null);
+            if (string.IsNullOrEmpty(portName)) return;
+
+            try
+            {
+                var portQuery = $"SELECT * FROM Win32_PnPEntity WHERE Name LIKE '%({portName})%'";
+                using (var searcher = new ManagementObjectSearcher(portQuery))
+                using (var results = searcher.Get())
+                {
+                    if (results.Count > 0)
+                    {
+                        // Port is still present — restore the name so future events can check again.
+                        Interlocked.CompareExchange(ref _monitoredPortName, portName, null);
+                        return;
+                    }
+                }
+
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Mount,
+                    Type = MonitorType.Warning,
+                    Method = "OnUsbDeviceChanged",
+                    Thread = System.Threading.Thread.CurrentThread.ManagedThreadId,
+                    Message = $"USB hardware disconnect detected — port {portName} no longer present in system device list"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Telescope,
+                    Category = MonitorCategory.Mount,
+                    Type = MonitorType.Warning,
+                    Method = "OnUsbDeviceChanged",
+                    Thread = System.Threading.Thread.CurrentThread.ManagedThreadId,
+                    Message = $"USB device change confirmation error: {ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+        }
+
         #endregion
     }
 }

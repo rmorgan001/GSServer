@@ -2604,7 +2604,8 @@ namespace GS.Server.SkyTelescope
                             RestoreParkSettings(previousSettings, "algGermanPolar", "ParkPositions", "ParkAxisX", "ParkAxisY");
                         }
                         Properties.SkyTelescope.Default.SettingsKey = Properties.Profile.Default.Current;
-                        Properties.SkyTelescope.Default.AtPark = (bool)previousSettings["AtPark"];
+                        Properties.SkyTelescope.Default.AtPark =
+                            previousSettings.TryGetValue("AtPark", out var value) && value is bool v && v;
                     }
                     // Scenario 4: user.config does not exist, no previous user.config
                     // Initialize Polar ParkPositions directly from Polar.settings (no latitude transformation)

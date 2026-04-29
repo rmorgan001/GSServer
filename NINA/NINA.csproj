@@ -6,7 +6,7 @@
 		<Platform Condition=" '$(Platform)' == '' ">x86</Platform>
 		<ProductVersion>8.0.30703</ProductVersion>
 		<ProjectGuid>{6770B884-0C92-4615-BE0D-7FBE55D2D0EE}</ProjectGuid>
-		<TargetFramework>net472</TargetFramework>
+		<TargetFramework>net481</TargetFramework>
 		<OutputPath>..\Builds\$(Configuration)\</OutputPath>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>

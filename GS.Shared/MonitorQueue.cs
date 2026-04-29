@@ -405,7 +405,7 @@ namespace GS.Shared
                 Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? throw new InvalidOperationException());
                 using (var stream = new FileStream(filePath, append ? FileMode.Append : FileMode.Create,
                     FileAccess.Write, FileShare.None, 4096, true))
-                using (var sw = new StreamWriter(stream))
+                using (var sw = new StreamWriter(stream, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: true)))
                 {
                     await sw.WriteLineAsync(message);
                 }
