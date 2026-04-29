@@ -4,7 +4,7 @@
     <Title>GS.Simulator</Title>
     <Description>GS.Simulator</Description>
     <ProjectGuid>{E463EC96-56DA-447B-8719-F68C33771185}</ProjectGuid>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net481</TargetFramework>
     <OutputPath>..\Builds\$(Configuration)\</OutputPath>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>

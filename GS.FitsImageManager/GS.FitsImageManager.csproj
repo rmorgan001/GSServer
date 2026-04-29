@@ -4,7 +4,7 @@
     <Title>GS.FitsImageManager</Title>
     <Description>GS.FitsImageManager</Description>
     <ProjectGuid>{74B0434D-F37A-4B53-967C-85881529D45C}</ProjectGuid>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net481</TargetFramework>
     <OutputPath>..\Builds\$(Configuration)\</OutputPath>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>

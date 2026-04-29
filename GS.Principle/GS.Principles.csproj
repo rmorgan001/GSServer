@@ -4,7 +4,7 @@
     <Title>GS.Principles</Title>
     <Description>GS.Principles</Description>
     <ProjectGuid>{C2BC2641-3B32-4940-B124-61ADEC0DAC28}</ProjectGuid>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net481</TargetFramework>
     <OutputPath>..\Builds\$(Configuration)\</OutputPath>
     <PostBuildEvent />
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
