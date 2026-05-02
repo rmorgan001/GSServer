@@ -419,6 +419,7 @@ namespace GS.Server.Model3D
                 Settings.Settings.ModelUpDirection1 = UpDirection;
                 Settings.Settings.ModelPosition1 = Position;
                 Settings.Settings.Save();
+                OpenDialog($"{Application.Current.Resources["gpSave"]}", $"{Application.Current.Resources["gpSave"]}");
             }
             catch (Exception ex)
             {

@@ -3094,6 +3094,7 @@ namespace GS.Server.SkyTelescope
                 Settings.Settings.ModelUpDirection2 = UpDirection;
                 Settings.Settings.ModelPosition2 = Position;
                 Settings.Settings.Save();
+                OpenDialog($"{Application.Current.Resources["gpSave"]}", $"{Application.Current.Resources["gpSave"]}");
             }
             catch (Exception ex)
             {
