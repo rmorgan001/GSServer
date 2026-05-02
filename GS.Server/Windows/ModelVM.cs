@@ -926,7 +926,22 @@ namespace GS.Server.Windows
         {
             try
             {
-                LoadTelescopeModel();
+                // Repair persisted settings for both slots in case of NaN/zero.
+                if (Numbers.IsNaNVector3D(Settings.Settings.ModelLookDirection1) || Numbers.Is0Vector3D(Settings.Settings.ModelLookDirection1))
+                    Settings.Settings.ModelLookDirection1 = new Vector3D(-900, -1100, -400);
+                if (Numbers.IsNaNVector3D(Settings.Settings.ModelUpDirection1) || Numbers.Is0Vector3D(Settings.Settings.ModelUpDirection1))
+                    Settings.Settings.ModelUpDirection1 = new Vector3D(.35, .43, .82);
+                if (Numbers.IsNaNPoint3D(Settings.Settings.ModelPosition1) || Numbers.Is0Point3D(Settings.Settings.ModelPosition1))
+                    Settings.Settings.ModelPosition1 = new Point3D(900, 1100, 800);
+
+                if (Numbers.IsNaNVector3D(Settings.Settings.ModelLookDirection2) || Numbers.Is0Vector3D(Settings.Settings.ModelLookDirection2))
+                    Settings.Settings.ModelLookDirection2 = new Vector3D(-900, -1100, -400);
+                if (Numbers.IsNaNVector3D(Settings.Settings.ModelUpDirection2) || Numbers.Is0Vector3D(Settings.Settings.ModelUpDirection2))
+                    Settings.Settings.ModelUpDirection2 = new Vector3D(.35, .43, .82);
+                if (Numbers.IsNaNPoint3D(Settings.Settings.ModelPosition2) || Numbers.Is0Point3D(Settings.Settings.ModelPosition2))
+                    Settings.Settings.ModelPosition2 = new Point3D(900, 1100, 800);
+
+                RefreshView();
             }
             catch (Exception ex)
             {
@@ -983,6 +998,31 @@ namespace GS.Server.Windows
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
+        }
+
+        /// <summary>
+        /// Restores the saved camera position/direction from Settings onto the VM properties
+        /// and re-applies the current telescope axis rotation. Does NOT reload the .obj model.
+        /// The VM property changes trigger SyncCameraFromViewModel in HelixViewport3D.xaml.cs.
+        /// </summary>
+        private void RefreshView()
+        {
+            if (CameraIndex == 1)
+            {
+                LookDirection = Settings.Settings.ModelLookDirection1;
+                UpDirection   = Settings.Settings.ModelUpDirection1;
+                Position      = Settings.Settings.ModelPosition1;
+            }
+            else
+            {
+                LookDirection = Settings.Settings.ModelLookDirection2;
+                UpDirection   = Settings.Settings.ModelUpDirection2;
+                Position      = Settings.Settings.ModelPosition2;
+            }
+
+            // Re-apply telescope rotation to current axis positions.
+            Rotate();
+            SetPierSideIndicator();
         }
         #endregion
 

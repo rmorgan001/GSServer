@@ -325,11 +325,12 @@ namespace GS.Server.Model3D
                 var modelVm = ModelVm.Model1Vm;
                 modelVm.WinHeight = 220;
                 modelVm.WinWidth = 250;
+                // Set camera values BEFORE Show() so SyncCameraFromViewModel fires with correct data.
+                modelVm.CameraIndex = 1;
                 modelVm.Position = Position;
                 modelVm.LookDirection = LookDirection;
                 modelVm.UpDirection = UpDirection;
                 modelVm.ImageFile = ImageFile;
-                modelVm.CameraIndex = 1;
                 bWin.Show();
             }
             catch (Exception ex)
@@ -367,24 +368,17 @@ namespace GS.Server.Model3D
         {
             try
             {
-                if (Numbers.IsNaNVector3D(LookDirection) || Numbers.Is0Vector3D(LookDirection))
-                {
-                    Settings.Settings.ModelLookDirection2 = new Vector3D(-900, -1100, -400);
-                }
+                // Repair persisted settings if they are invalid before restoring.
+                if (Numbers.IsNaNVector3D(Settings.Settings.ModelLookDirection1) || Numbers.Is0Vector3D(Settings.Settings.ModelLookDirection1))
+                    Settings.Settings.ModelLookDirection1 = new Vector3D(-900, -1100, -400);
 
-                if (Numbers.IsNaNVector3D(UpDirection) || Numbers.Is0Vector3D(UpDirection))
-                {
-                    Settings.Settings.ModelUpDirection2 = new Vector3D(.35, .43, .82);
-                }
+                if (Numbers.IsNaNVector3D(Settings.Settings.ModelUpDirection1) || Numbers.Is0Vector3D(Settings.Settings.ModelUpDirection1))
+                    Settings.Settings.ModelUpDirection1 = new Vector3D(.35, .43, .82);
 
-                if (Numbers.IsNaNPoint3D(Position) || Numbers.Is0Point3D(Position))
-                {
-                    Settings.Settings.ModelPosition2 = new Point3D(900, 1100, 800);
-                }
+                if (Numbers.IsNaNPoint3D(Settings.Settings.ModelPosition1) || Numbers.Is0Point3D(Settings.Settings.ModelPosition1))
+                    Settings.Settings.ModelPosition1 = new Point3D(900, 1100, 800);
 
-                LoadTelescopeModel();
-                Rotate();
-                SetPierSideIndicator();
+                RefreshView();
             }
             catch (Exception ex)
             {
@@ -441,7 +435,24 @@ namespace GS.Server.Model3D
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
-        
+
+        }
+
+        /// <summary>
+        /// Restores the saved camera position/direction from Settings onto the VM properties
+        /// and re-applies the current telescope axis rotation. Does NOT reload the .obj model.
+        /// The VM property changes trigger SyncCameraFromViewModel in HelixViewport3D.xaml.cs.
+        /// </summary>
+        private void RefreshView()
+        {
+            // Restore camera from persisted settings slot 1 (Model3Dvm always uses slot 1).
+            LookDirection = Settings.Settings.ModelLookDirection1;
+            UpDirection   = Settings.Settings.ModelUpDirection1;
+            Position      = Settings.Settings.ModelPosition1;
+
+            // Re-apply telescope rotation to current axis positions.
+            Rotate();
+            SetPierSideIndicator();
         }
 
         /// <summary>
