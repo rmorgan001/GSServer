@@ -3000,11 +3000,12 @@ namespace GS.Server.SkyTelescope
                 var modelVm = ModelVm.Model1Vm;
                 modelVm.WinHeight = 320;
                 modelVm.WinWidth = 250;
+                // Set camera values BEFORE Show() so SyncCameraFromViewModel fires with correct data.
+                modelVm.CameraIndex = 2;
                 modelVm.Position = Position;
                 modelVm.LookDirection = LookDirection;
                 modelVm.UpDirection = UpDirection;
                 modelVm.ImageFile = ImageFile;
-                modelVm.CameraIndex = 2;
                 bWin.Show();
             }
             catch (Exception ex)
@@ -3042,22 +3043,17 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
-                if (Numbers.IsNaNVector3D(LookDirection) || Numbers.Is0Vector3D(LookDirection))
-                {
+                // Repair persisted settings if they are invalid before restoring.
+                if (Numbers.IsNaNVector3D(Settings.Settings.ModelLookDirection2) || Numbers.Is0Vector3D(Settings.Settings.ModelLookDirection2))
                     Settings.Settings.ModelLookDirection2 = new Vector3D(-900, -1100, -400);
-                }
 
-                if (Numbers.IsNaNVector3D(UpDirection) || Numbers.Is0Vector3D(UpDirection))
-                {
+                if (Numbers.IsNaNVector3D(Settings.Settings.ModelUpDirection2) || Numbers.Is0Vector3D(Settings.Settings.ModelUpDirection2))
                     Settings.Settings.ModelUpDirection2 = new Vector3D(.35, .43, .82);
-                }
 
-                if (Numbers.IsNaNPoint3D(Position) || Numbers.Is0Point3D(Position))
-                {
+                if (Numbers.IsNaNPoint3D(Settings.Settings.ModelPosition2) || Numbers.Is0Point3D(Settings.Settings.ModelPosition2))
                     Settings.Settings.ModelPosition2 = new Point3D(900, 1100, 800);
-                }
 
-                LoadTelescopeModel();
+                RefreshView();
             }
             catch (Exception ex)
             {
@@ -3114,6 +3110,23 @@ namespace GS.Server.SkyTelescope
                 MonitorLog.LogToMonitor(monitorItem);
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
+        }
+
+        /// <summary>
+        /// Restores the saved camera position/direction from Settings onto the VM properties
+        /// and re-applies the current telescope axis rotation. Does NOT reload the .obj model.
+        /// The VM property changes trigger SyncCameraFromViewModel in HelixViewport3D.xaml.cs.
+        /// </summary>
+        private void RefreshView()
+        {
+            // Restore camera from persisted settings slot 2 (SkyTelescopeVm always uses slot 2).
+            LookDirection = Settings.Settings.ModelLookDirection2;
+            UpDirection   = Settings.Settings.ModelUpDirection2;
+            Position      = Settings.Settings.ModelPosition2;
+
+            // Re-apply telescope rotation to current axis positions.
+            Rotate();
+            SetPierSideIndicator();
         }
 
         #endregion
