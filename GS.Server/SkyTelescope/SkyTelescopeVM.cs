@@ -9112,12 +9112,12 @@ namespace GS.Server.SkyTelescope
                         Message = $"From|{SkyServer.ActualAxisX}|{SkyServer.ActualAxisY}|to|{radec.X}|{radec.Y}"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
-                    if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
-                    {
+                    //if (SkySettings.AlignmentMode == AlignmentModes.algAltAz)
+                    //{
                         SkyServer.TargetRa = GoToRa;
                         SkyServer.TargetDec = GoToDec;
                         SkyServer.Tracking = true;
-                    }
+                    //}
                     SkyServer.SlewRaDec(radec.X, radec.Y, SkyServer.Tracking);
                     IsDialogOpen = false;
                 }
