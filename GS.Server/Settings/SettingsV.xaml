@@ -228,10 +228,10 @@
                                     <CheckBox Height="25" Width="25" IsChecked="{Binding Focuser}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource tabFocuserTooltip}"/>
                                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource tabFocuser}"/>
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal" Width="Auto">
+                                <!--<StackPanel Orientation="Horizontal" Width="Auto"> todo alignment not working
                                     <CheckBox Height="25" Width="25" IsChecked="{Binding AlignmentTabVisible}" Style="{StaticResource MaterialDesignActionLightToggleButton}" ToolTip="{StaticResource aliAlignment}" IsEnabled="{Binding AlignmentOptionEnabled}"/>
                                     <TextBlock Margin="10 0" VerticalAlignment="Center" Text="{StaticResource aliAlignment}"/>
-                                </StackPanel>
+                                </StackPanel>-->
                             </StackPanel>
                             <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" >
                                 <TextBlock Margin="0,0,0,5" VerticalAlignment="Center" Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" HorizontalAlignment="Left" Foreground="{DynamicResource MaterialDesignColumnHeader}" Text="{StaticResource optOptions}"/>

@@ -14,10 +14,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using ASCOM.DeviceInterface;
+using GS.Principles;
+using GS.Server.Alignment;
+using GS.Server.Controls.Dialogs;
 using GS.Server.Helpers;
 using GS.Server.Main;
 using GS.Server.SkyTelescope;
+using GS.Server.Windows;
 using GS.Shared;
+using GS.Shared.Command;
 using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
 using Microsoft.Win32;
@@ -33,11 +39,6 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
-using GS.Principles;
-using GS.Server.Controls.Dialogs;
-using GS.Server.Windows;
-using GS.Shared.Command;
-using ASCOM.DeviceInterface;
 
 namespace GS.Server.Settings
 {
@@ -134,6 +135,10 @@ namespace GS.Server.Settings
                     CurrentVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
                     Settings.SkyWatcher = true;
                     PecShow = SkyServer.PecShow;
+                    
+                    // Turn off alignment for now
+                    Settings.AlignmentTabVisible = false; // todo alignment not working
+                    AlignmentSettings.IsAlignmentOn = false; // todo alignment not working
 
                 }
             }
@@ -1492,7 +1497,7 @@ namespace GS.Server.Settings
         }
         private void ClosingMessageEventHandler(object sender, DialogClosingEventArgs eventArgs)
         {
-            Console.WriteLine("You can intercept the closing event, and cancel here.");
+            Console.WriteLine(@"You can intercept the closing event, and cancel here.");
         }
 
         #endregion
