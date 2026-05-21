@@ -44,7 +44,10 @@ on:
   pull_request:
     branches: [ master ]
   schedule:
-    - cron: "0 18 * * 0" 
+    - cron: "0 18 * * 0"
+    
+env:
+    FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
@@ -52,6 +55,7 @@ jobs:
       matrix:
         configuration: [Debug,Release]
 
+    # runs-on: windows-2025-vs2026 # this was tested on 5/12/26
     runs-on: windows-latest  # For a list of available runner types, refer to 
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
                              
@@ -67,7 +71,7 @@ jobs:
           dotnet nuget locals all --clear
           
       - name: Checkout
-        uses: actions/checkout@v4 #v3 to v4
+        uses: actions/checkout@v5 #v3 to v4
         with:
           fetch-depth: 0
           
@@ -78,13 +82,13 @@ jobs:
 
     # Install the .NET Core workload
       - name: Install .NET Core
-        uses: actions/setup-dotnet@v4 #v3 to v4
+        uses: actions/setup-dotnet@v5 #v3 to v4
         with:
           dotnet-version: 3.1.x
 
     # Add MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v2 #2008f912f56e61277eefaac6d1888b750582aa16 v1.1 to v2
+        uses: microsoft/setup-msbuild@v3 #2008f912f56e61277eefaac6d1888b750582aa16 v1.1 to v2
         
     # Restore the application to populate the obj folder with RuntimeIdentifiers
       - name: Restore the application
