@@ -33,17 +33,17 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="tabModel3D">3D</system:String>
     <system:String x:Key="tabPole">极轴</system:String>
     <system:String x:Key="tabPulses">脉冲</system:String>
-    <system:String x:Key="tabAlignment">对准</system:String>
+    <system:String x:Key="tabAlignment">校准</system:String>
     <system:String x:Key="tabPlot">曲线</system:String>
     <system:String x:Key="tabWindowFlip">切换窗口大小</system:String>
 
     <!--  Top bar  -->
     <system:String x:Key="topRa">赤经：</system:String>
-    <system:String x:Key="topRaShort">RA：</system:String>
+    <system:String x:Key="topRaShort">赤经：</system:String>
     <system:String x:Key="topDec">赤纬：</system:String>
-    <system:String x:Key="topDecShort">Dec：</system:String>
-    <system:String x:Key="topAz">方位：</system:String>
-    <system:String x:Key="topAlt">高度：</system:String>
+    <system:String x:Key="topDecShort">赤纬：</system:String>
+    <system:String x:Key="topAz">方位角：</system:String>
+    <system:String x:Key="topAlt">高度角：</system:String>
     <system:String x:Key="topLHA">地方时角：</system:String>
 
     <!--  Button bar  -->
@@ -61,15 +61,15 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnHintTracking">开</system:String>
     <!--<system:String x:Key="btnSetHome">设为归位</system:String>-->
     <system:String x:Key="btnTipSetHome">将轴位置重置为归位</system:String>
-    <system:String x:Key="btnFlip">翻转 Pier 侧</system:String>
-    <system:String x:Key="btnTipFlip">翻转赤道仪 Pier 侧</system:String>
-    <system:String x:Key="btnFlipAz">翻转方位</system:String>
-    <system:String x:Key="btnTipFlipAz">翻转方位转动方向</system:String>
+    <system:String x:Key="btnFlip">翻转镜筒偏向</system:String>
+    <system:String x:Key="btnTipFlip">翻转镜筒偏向</system:String>
+    <system:String x:Key="btnFlipAz">翻转方位角</system:String>
+    <system:String x:Key="btnTipFlipAz">翻转方位角转动方向</system:String>
     <system:String x:Key="btnFlipPolar">翻越极点</system:String>
     <system:String x:Key="btnTipFlipPolar">让赤道仪经极点翻转</system:String>
     <!--<system:String x:Key="btnHomeReset">确认将赤道仪位置重置为归位位置</system:String>-->
     <system:String x:Key="btnContinueFlip">确认翻转赤道仪</system:String>
-    <system:String x:Key="btnContinueFlipAz">确认切换方位侧。赤道仪将转动 360 度</system:String>
+    <system:String x:Key="btnContinueFlipAz">确认切换方位角方向。赤道仪将转动 360 度</system:String>
     <system:String x:Key="btnContinueFlipPolar">确认翻转轴。赤道仪将越过极点转动</system:String>
     <system:String x:Key="btnTipParkPos">停放位置</system:String>
     <system:String x:Key="btnAutoHome">自动归位</system:String>
@@ -78,11 +78,11 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="btnAutoHomeLimit">最大移动角度：</system:String>
     <system:String x:Key="btnTipAutoHomeLimit">角度限制</system:String>
     <system:String x:Key="btnHintAutoHomeLimit">度</system:String>
-    <system:String x:Key="btnDecOffset">侧挂鞍座偏移：</system:String>
+    <system:String x:Key="btnDecOffset">侧挂赤纬偏移：</system:String>
     <system:String x:Key="btnHintDecOffset">度</system:String>
     <system:String x:Key="btnSensorPositions">自动归位传感器位置：</system:String>
-    <system:String x:Key="btnHintRaSensorPos">RA 轴（度）</system:String>
-    <system:String x:Key="btnHintDecSensorPos">Dec 轴（度）</system:String>
+    <system:String x:Key="btnHintRaSensorPos">赤经轴（度）</system:String>
+    <system:String x:Key="btnHintDecSensorPos">赤纬轴（度）</system:String>
     <system:String x:Key="btnTipSensorPos">更改自动归位传感器位置</system:String>
     <system:String x:Key="btnResetSensorPos">重置</system:String>
     <system:String x:Key="btnTipResetSensorPos">将传感器位置重置为默认值 (90.0, 90.0)</system:String>
@@ -98,8 +98,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="botTipSlewing">转动中</system:String>
     <system:String x:Key="botTracking">跟踪</system:String>
     <system:String x:Key="botTipTracking">跟踪</system:String>
-    <system:String x:Key="botTipSOP">Pier 侧</system:String>
-    <system:String x:Key="botTipSOPAz">方位转动方向</system:String>
+    <system:String x:Key="botTipSOP">镜筒偏向</system:String>
+    <system:String x:Key="botTipSOPAz">方位角转动方向</system:String>
     <system:String x:Key="botTipSOPPolar">赤纬轴方向</system:String>
     <system:String x:Key="botTipAxisLimit">轴限位，点击查看选项</system:String>
     <system:String x:Key="botTipWarnings">警告，点击重置</system:String>
@@ -151,22 +151,22 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="mntNotSupported">不支持</system:String>
     <system:String x:Key="mntMount">赤道仪：</system:String>
     <system:String x:Key="mntVersion">版本：</system:String>
-    <system:String x:Key="mntStepsRa">RA 步数：</system:String>
-    <system:String x:Key="mntStepsDec">Dec 步数：</system:String>
+    <system:String x:Key="mntStepsRa">赤经步数：</system:String>
+    <system:String x:Key="mntStepsDec">赤纬步数：</system:String>
     <system:String x:Key="mntPEC">PPEC：</system:String>
     <system:String x:Key="mntHomeSensor">归位传感器：</system:String>
-    <system:String x:Key="mntRaSteps">RA 步/角秒：</system:String>
-    <system:String x:Key="mntDecSteps">Dec 步/角秒：</system:String>
+    <system:String x:Key="mntRaSteps">赤经步/角秒：</system:String>
+    <system:String x:Key="mntDecSteps">赤纬步/角秒：</system:String>
     <system:String x:Key="mntInfo">赤道仪信息</system:String>
     <system:String x:Key="mntVoltage">控制器电压：</system:String>
     <system:String x:Key="mntVoltageError">低电压错误：</system:String>
 
     <!--  GoTo bar  -->
     <system:String x:Key="goAcpCoords">确认坐标？</system:String>
-    <system:String x:Key="goRa">RA：</system:String>
-    <system:String x:Key="goDec">Dec：</system:String>
-    <system:String x:Key="goAz">方位：</system:String>
-    <system:String x:Key="goAlt">高度：</system:String>
+    <system:String x:Key="goRa">赤经：</system:String>
+    <system:String x:Key="goDec">赤纬：</system:String>
+    <system:String x:Key="goAz">方位角：</system:String>
+    <system:String x:Key="goAlt">高度角：</system:String>
     <system:String x:Key="goCopy">复制</system:String>
     <system:String x:Key="goTipCopy">填入当前位置</system:String>
     <system:String x:Key="goGoTo">GoTo</system:String>
@@ -177,15 +177,15 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="goSyncWarning">警告：请确认坐标！</system:String>
     <system:String x:Key="goSlewing">赤道仪正在转动</system:String>
     <system:String x:Key="goOutLimits">超出同步限制</system:String>
-    <system:String x:Key="goChangeToRaDec">右键输入 RA/Dec 坐标</system:String>
-    <system:String x:Key="goChangeToAzAlt">右键输入方位/高度坐标</system:String>
+    <system:String x:Key="goChangeToRaDec">右键输入赤经/赤纬坐标</system:String>
+    <system:String x:Key="goChangeToAzAlt">右键输入方位角/高度角坐标</system:String>
 
     <!--  Backlash  -->
-    <system:String x:Key="bacDecLash">Dec 回差</system:String>
+    <system:String x:Key="bacDecLash">赤纬回差</system:String>
     <system:String x:Key="bacLashComp">回差补偿：</system:String>
-    <system:String x:Key="bacDec">Dec</system:String>
-    <system:String x:Key="bacRa">RA</system:String>
-    <system:String x:Key="bacRaLash">RA 回差</system:String>
+    <system:String x:Key="bacDec">赤纬</system:String>
+    <system:String x:Key="bacRa">赤经</system:String>
+    <system:String x:Key="bacRaLash">赤经回差</system:String>
 
     <!--  Debug bar  -->
     <system:String x:Key="bugSiderealTime">恒星时：</system:String>
@@ -278,7 +278,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="vceStop">停止</system:String>
     <system:String x:Key="vceAbortSlew">中止</system:String>
     <system:String x:Key="vceParkSet">停放位置已设置</system:String>
-    <system:String x:Key="vceSyncAz">正在同步到方位</system:String>
+    <system:String x:Key="vceSyncAz">正在同步到方位角</system:String>
     <system:String x:Key="vceSyncCoords">正在同步到坐标</system:String>
     <system:String x:Key="vceSlewing">转动中</system:String>
     <system:String x:Key="vceSlewCoords">正在转到坐标</system:String>
@@ -291,13 +291,13 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="vceSolar">太阳</system:String>
     <system:String x:Key="vceLunar">月球</system:String>
     <system:String x:Key="vceKing">King</system:String>
-    <system:String x:Key="vceSopUnknown">Pier 侧未知</system:String>
-    <system:String x:Key="vceSopEast">Pier 东侧</system:String>
-    <system:String x:Key="vceSopWest">Pier 西侧</system:String>
-    <system:String x:Key="vceSopNormal">Dec 轴正常</system:String>
-    <system:String x:Key="vceSopThroughPole">Dec 轴越过极点</system:String>
-    <system:String x:Key="vceSopAzEast">方位向东转动</system:String>
-    <system:String x:Key="vceSopAzWest">方位向西转动</system:String>
+    <system:String x:Key="vceSopUnknown">镜筒偏向未知</system:String>
+    <system:String x:Key="vceSopEast">镜筒偏东</system:String>
+    <system:String x:Key="vceSopWest">镜筒偏西</system:String>
+    <system:String x:Key="vceSopNormal">赤纬轴正常</system:String>
+    <system:String x:Key="vceSopThroughPole">赤纬轴越过极点</system:String>
+    <system:String x:Key="vceSopAzEast">方位角向东转动</system:String>
+    <system:String x:Key="vceSopAzWest">方位角向西转动</system:String>
 
     <!--  Converters  -->
     <system:String x:Key="cvtInvNumber">数字无效</system:String>
@@ -338,10 +338,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="notSpellCheck">拼写检查</system:String>
     <system:String x:Key="notDate">日期</system:String>
     <system:String x:Key="notTime">时间</system:String>
-    <system:String x:Key="notRa">RA</system:String>
-    <system:String x:Key="notDec">Dec</system:String>
-    <system:String x:Key="notAlt">高度</system:String>
-    <system:String x:Key="notAz">方位</system:String>
+    <system:String x:Key="notRa">赤经</system:String>
+    <system:String x:Key="notDec">赤纬</system:String>
+    <system:String x:Key="notAlt">高度角</system:String>
+    <system:String x:Key="notAz">方位角</system:String>
     <system:String x:Key="notPhase">月相</system:String>
     <system:String x:Key="notEntry">日志条目</system:String>
     <system:String x:Key="notAlignmentMode">对准模式</system:String>
@@ -380,10 +380,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skyBaud">波特率</system:String>
     <system:String x:Key="skyEquatorial">赤道坐标系统</system:String>
     <system:String x:Key="skyAlignment">对准模式</system:String>
-    <system:String x:Key="skyRaGuiding">RA 导星速率 %</system:String>
-    <system:String x:Key="skyDecGuiding">Dec 导星速率 %</system:String>
+    <system:String x:Key="skyRaGuiding">赤经导星速率 %</system:String>
+    <system:String x:Key="skyDecGuiding">赤纬导星速率 %</system:String>
     <system:String x:Key="skyMount">赤道仪类型</system:String>
-    <system:String x:Key="skyMaxSlew">最大转动速率 度/秒</system:String>
+    <system:String x:Key="skyMaxSlew">最大指向速率 度/秒</system:String>
     <system:String x:Key="skyMeridian">中天限位（度）</system:String>
     <system:String x:Key="skyTracking">跟踪速率</system:String>
     <system:String x:Key="skyST4">ST4 导星速率</system:String>
@@ -393,7 +393,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skyEncoders">编码器</system:String>
     <system:String x:Key="skyAltPpEC">备用 PPEC</system:String>
     <system:String x:Key="skyFullCurrent">全电流</system:String>
-    <system:String x:Key="skyGoToDecPulse">GoTo Dec 脉冲</system:String>
+    <system:String x:Key="skyGoToDecPulse">GoTo 赤纬脉冲</system:String>
     <system:String x:Key="skyDiagnostics">诊断</system:String>
     <system:String x:Key="skySetPark">将当前位置设为停放位置</system:String>
     <system:String x:Key="skyOBL">观测站位置</system:String>
@@ -413,7 +413,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skySiderealRate">恒星速率</system:String>
     <system:String x:Key="skySolarRate">太阳速率</system:String>
     <system:String x:Key="skyLunarRate">月球速率</system:String>
-    <system:String x:Key="skyKingRate">King 速率</system:String>
+    <system:String x:Key="skyKingRate">King 跟踪速率</system:String>
     <system:String x:Key="skyConnect">连接</system:String>
     <system:String x:Key="skyDisconnect">断开</system:String>
     <system:String x:Key="skyHome1">正常启动时，请将赤道仪置于“归位”位置。</system:String>
@@ -425,8 +425,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skyLat01">南/北</system:String>
     <system:String x:Key="skyLong0">东或西</system:String>
     <system:String x:Key="skyLong01">东/西</system:String>
-    <system:String x:Key="skyMinPulseDec">最小 Dec 脉冲</system:String>
-    <system:String x:Key="skyMinPulseRa">最小 RA 脉冲</system:String>
+    <system:String x:Key="skyMinPulseDec">最小赤纬脉冲</system:String>
+    <system:String x:Key="skyMinPulseRa">最小赤经脉冲</system:String>
     <system:String x:Key="skySchCol1">开/关</system:String>
     <system:String x:Key="skySchCol2">动作</system:String>
     <system:String x:Key="skySchCol3">日期</system:String>
@@ -528,8 +528,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="3dHud">坐标</system:String>
     <system:String x:Key="3dEdit">编辑</system:String>
     <system:String x:Key="3dCamera">相机信息</system:String>
-    <system:String x:Key="3dRaAxis">赤道仪 RA/方位轴：</system:String>
-    <system:String x:Key="3dDecAxis">赤道仪 Dec/高度轴：</system:String>
+    <system:String x:Key="3dRaAxis">赤道仪赤经/方位角轴：</system:String>
+    <system:String x:Key="3dDecAxis">赤道仪赤纬/高度角轴：</system:String>
     <system:String x:Key="3dTopBar">顶部坐标栏</system:String>
     <system:String x:Key="3dModel">GSS 3D 模型</system:String>
     <system:String x:Key="3dResetView">重置视图</system:String>
@@ -632,9 +632,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--  1.0.2.5  -->
     <system:String x:Key="aliOpenTooltip">打开</system:String>
     <system:String x:Key="aliCloseTooltip">关闭</system:String>
-    <system:String x:Key="aliAlignment">对准</system:String>
-    <system:String x:Key="aliAlignmentOn">对准开启</system:String>
-    <system:String x:Key="aliAlignmentOnTooltip">开启星点对准模型</system:String>
+    <system:String x:Key="aliAlignment">校准</system:String>
+    <system:String x:Key="aliAlignmentOn">校准开启</system:String>
+    <system:String x:Key="aliAlignmentOnTooltip">开启星点校准模型</system:String>
     <system:String x:Key="aliClearModelOnStartup">启动时清除模型</system:String>
     <system:String x:Key="aliAlignmentSettings">设置</system:String>
     <system:String x:Key="aliProximityLimitTooltip">同步点彼此多近时替换较早的点（角秒）。</system:String>
@@ -643,31 +643,31 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliThreePointAlgorithmTooltip">如何选择三点：最近点三角形，或中心最近的三角形。</system:String>
     <system:String x:Key="aliClearModelOnStartupTooltip">如果希望每次重新连接时创建新模型，请勾选。</system:String>
     <system:String x:Key="aliClearAll">全部清除</system:String>
-    <system:String x:Key="aliClearAllTooltip">点击此按钮清除模型中的所有对准点。</system:String>
+    <system:String x:Key="aliClearAllTooltip">点击此按钮清除模型中的所有校准点。</system:String>
     <system:String x:Key="aliDelete">删除</system:String>
-    <system:String x:Key="aliDeleteTooltip">点击此按钮删除所选对准点。</system:String>
-    <system:String x:Key="optAlignment">对准</system:String>
-    <system:String x:Key="optProximityLimit">邻近阈值</system:String>
-    <system:String x:Key="optAlignmentMode">对准行为</system:String>
-    <system:String x:Key="optActivePoints">对准点过滤器</system:String>
+    <system:String x:Key="aliDeleteTooltip">点击此按钮删除所选校准点。</system:String>
+    <system:String x:Key="optAlignment">校准</system:String>
+    <system:String x:Key="optProximityLimit">邻近限值</system:String>
+    <system:String x:Key="optAlignmentMode">校准行为</system:String>
+    <system:String x:Key="optActivePoints">校准点过滤器</system:String>
     <system:String x:Key="optThreePointAlgorithm">三点选择</system:String>
 
     <!--  1.0.3.2  -->
     <system:String x:Key="customGears">自定义齿轮参数</system:String>
-    <system:String x:Key="raTotalSteps">RA 总步数</system:String>
-    <system:String x:Key="decTotalSteps">Dec 总步数</system:String>
-    <system:String x:Key="raWormTeeth">RA 蜗轮齿数</system:String>
-    <system:String x:Key="decWormTeeth">Dec 蜗轮齿数</system:String>
-    <system:String x:Key="raTrackingOffset">RA 跟踪偏移</system:String>
-    <system:String x:Key="decTrackingOffset">Dec 跟踪偏移</system:String>
+    <system:String x:Key="raTotalSteps">赤经总步数</system:String>
+    <system:String x:Key="decTotalSteps">赤纬总步数</system:String>
+    <system:String x:Key="raWormTeeth">赤经蜗轮齿数</system:String>
+    <system:String x:Key="decWormTeeth">赤纬蜗轮齿数</system:String>
+    <system:String x:Key="raTrackingOffset">赤经跟踪偏移</system:String>
+    <system:String x:Key="decTrackingOffset">赤纬跟踪偏移</system:String>
     <system:String x:Key="gearingConnect">重新连接后更改生效</system:String>
     <system:String x:Key="applyGearing">应用自定义齿轮参数？</system:String>
-    <system:String x:Key="mntWormStepsRa">RA 蜗杆步数：</system:String>
-    <system:String x:Key="mntWormStepsDec">Dec 蜗杆步数：</system:String>
-    <system:String x:Key="mntCustomOffsetRa">RA 自定义偏移：</system:String>
-    <system:String x:Key="mntCustomOffsetDec">Dec 自定义偏移：</system:String>
-    <system:String x:Key="mntFreqRa">RA 频率：</system:String>
-    <system:String x:Key="mntFreqDec">Dec 频率：</system:String>
+    <system:String x:Key="mntWormStepsRa">赤经蜗杆步数：</system:String>
+    <system:String x:Key="mntWormStepsDec">赤纬蜗杆步数：</system:String>
+    <system:String x:Key="mntCustomOffsetRa">赤经自定义偏移：</system:String>
+    <system:String x:Key="mntCustomOffsetDec">赤纬自定义偏移：</system:String>
+    <system:String x:Key="mntFreqRa">赤经频率：</system:String>
+    <system:String x:Key="mntFreqDec">赤纬频率：</system:String>
 
     <!--  1.0.3.4  -->
     <system:String x:Key="btnReSyncEnc">重新同步编码器</system:String>
@@ -685,12 +685,12 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="aliExportTooltip">点击此按钮导出当前点模型。</system:String>
     <system:String x:Key="aliImport">导入</system:String>
     <system:String x:Key="aliImportTooltip">点击此按钮导入先前导出的点模型。</system:String>
-    <system:String x:Key="aliConfirmClearAllCaption">清除对准点</system:String>
-    <system:String x:Key="aliConfirmClearAllMessage">确认清除所有对准点。</system:String>
-    <system:String x:Key="aliConfirmDeleteCaption">删除对准点</system:String>
-    <system:String x:Key="aliConfirmDeleteMessage">确认删除所选对准点。</system:String>
-    <system:String x:Key="aliConfirmImportCaption">导入对准点</system:String>
-    <system:String x:Key="aliConfirmImportMessage">确认导入先前保存的对准点。这会清除现有对准点。</system:String>
+    <system:String x:Key="aliConfirmClearAllCaption">清除校准点</system:String>
+    <system:String x:Key="aliConfirmClearAllMessage">确认清除所有校准点。</system:String>
+    <system:String x:Key="aliConfirmDeleteCaption">删除校准点</system:String>
+    <system:String x:Key="aliConfirmDeleteMessage">确认删除所选校准点。</system:String>
+    <system:String x:Key="aliConfirmImportCaption">导入校准点</system:String>
+    <system:String x:Key="aliConfirmImportMessage">确认导入先前保存的校准点。这会清除现有校准点。</system:String>
     <system:String x:Key="aliAcceptButtonCaption">确认</system:String>
     <system:String x:Key="aliCancelButtonCaption">取消</system:String>
     <system:String x:Key="aliPointModelFileFilter">点模型文件 (*.GssPointModel)|*.GssPointModel|所有文件 (*.*)|*.*</system:String>
@@ -736,8 +736,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="RbAltAz">地平式</system:String>
     <system:String x:Key="RbRaDec">赤经/赤纬</system:String>
     <system:String x:Key="Rb3D">3D</system:String>
-    <system:String x:Key="lbAz">方位</system:String>
-    <system:String x:Key="lbAlt">高度</system:String>
+    <system:String x:Key="lbAz">方位角</system:String>
+    <system:String x:Key="lbAlt">高度角</system:String>
 
     <!--  1.0.4.7  -->
     <system:String x:Key="gpsDecimals">输入小数</system:String>
@@ -750,10 +750,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="mntAdv">高级设置</system:String>
 
     <!--  1.0.?.?  -->
-    <system:String x:Key="aliAlertTooltip">由于偏移异常过大，对准模型已关闭。</system:String>
-    <system:String x:Key="aliCancelAlert">取消对准警报</system:String>
-    <system:String x:Key="aliCancelAlertTooltip">点击此按钮取消对准警报。</system:String>
-    <system:String x:Key="vceAlignmentAlert">对准警报</system:String>
+    <system:String x:Key="aliAlertTooltip">由于偏移异常过大，校准模型已关闭。</system:String>
+    <system:String x:Key="aliCancelAlert">取消校准警报</system:String>
+    <system:String x:Key="aliCancelAlertTooltip">点击此按钮取消校准警报。</system:String>
+    <system:String x:Key="vceAlignmentAlert">校准警报</system:String>
 
     <!--  1.0.6.3  -->
     <system:String x:Key="btnContinueHome">确认转到归位</system:String>
@@ -762,7 +762,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!--  1.0.6.4  -->
     <system:String x:Key="optAlignmentWarningThreshold">警告阈值</system:String>
-    <system:String x:Key="aliWarningThresholdTooltip">触发对准警告的级别（已记录最大同步偏移距离的倍数）。</system:String>
+    <system:String x:Key="aliWarningThresholdTooltip">触发校准警告的级别（已记录最大同步偏移距离的倍数）。</system:String>
 
     <!--  1.0.7.8  -->
     <system:String x:Key="optLogPath">日志路径</system:String>
@@ -789,7 +789,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--  1.0.9.1  -->
     <system:String x:Key="HcInt">间隔</system:String>
     <system:String x:Key="HcRate">速率</system:String>
-    <system:String x:Key="PlotNormalize">去除 RA 跟踪量</system:String>
+    <system:String x:Key="PlotNormalize">去除赤经跟踪量</system:String>
     <system:String x:Key="DisableKeysOnGoTo">方向键关闭</system:String>
     <system:String x:Key="DisableKeysOnGoToToolTip">GoTo 期间禁用方向键</system:String>
 
@@ -803,8 +803,8 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="mhlButton">硬件限位</system:String>
     <system:String x:Key="mhlButtonToolTip">赤道仪轴限位</system:String>
     <system:String x:Key="mhlSettingsLabel">赤道仪硬件设置</system:String>
-    <system:String x:Key="mhlRaAz">赤经 / 方位</system:String>
-    <system:String x:Key="mhlDecAlt">赤纬 / 高度</system:String>
+    <system:String x:Key="mhlRaAz">赤经 / 方位角</system:String>
+    <system:String x:Key="mhlDecAlt">赤纬 / 高度角</system:String>
     <system:String x:Key="lbAxisLowerLimitY">下限（度）</system:String>
     <system:String x:Key="lbAxisUpperLimitY">上限（度）</system:String>
     <system:String x:Key="lbAxisLimitX">限位（度）</system:String>
@@ -824,14 +824,14 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="lbHomePosition">归位位置</system:String>
     <system:String x:Key="lbAutoHomePosition">自动归位传感器位置</system:String>
     <system:String x:Key="lbAutoHomeDefault">出厂设置</system:String>
-    <system:String x:Key="lbAutoHomePositionGEM">RA=90&#x00B0;，Dec=90&#x00B0;</system:String>
-    <system:String x:Key="lbAutoHomePositionPolarRADec">自定义 RA/Dec 设置</system:String>
-    <system:String x:Key="lbAutoHomePositionPolarAzAlt">自定义方位/高度设置</system:String>
-    <system:String x:Key="lbAxisX">方位：</system:String>
-    <system:String x:Key="lbAxisY">高度：</system:String>
-    <system:String x:Key="lbHomePositionPolar">方位 = 180，高度 [-10 .. 10]（极轴）</system:String>
-    <system:String x:Key="lbHomePositionToolTipHome">归位位置高度（度）</system:String>
-    <system:String x:Key="lbAutoHomeLocationTooltip">自动归位传感器位置高度（度）</system:String>
+    <system:String x:Key="lbAutoHomePositionGEM">赤经=90&#x00B0;，赤纬=90&#x00B0;</system:String>
+    <system:String x:Key="lbAutoHomePositionPolarRADec">自定义赤经/赤纬设置</system:String>
+    <system:String x:Key="lbAutoHomePositionPolarAzAlt">自定义方位角/高度角设置</system:String>
+    <system:String x:Key="lbAxisX">方位角：</system:String>
+    <system:String x:Key="lbAxisY">高度角：</system:String>
+    <system:String x:Key="lbHomePositionPolar">方位角 = 180，高度角 [-10 .. 10]（极轴）</system:String>
+    <system:String x:Key="lbHomePositionToolTipHome">归位位置高度角（度）</system:String>
+    <system:String x:Key="lbAutoHomeLocationTooltip">自动归位传感器位置高度角（度）</system:String>
 
     <!--  1.2.1.3  -->
     <!--  Park Settings  -->
@@ -841,12 +841,12 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <!--  Home Park Position  -->
     <system:String x:Key="lbHomeParkPosition">归位停放位置</system:String>
     <system:String x:Key="lbHomeParkDefault">默认 GEM (90, 90)</system:String>
-    <system:String x:Key="lbHomeParkCustom">自定义方位 / 高度</system:String>
-    <system:String x:Key="lbHomeParkAz">方位（0 - 360）：</system:String>
-    <system:String x:Key="lbHomeParkAlt">高度（-90 - 90）：</system:String>
+    <system:String x:Key="lbHomeParkCustom">自定义方位角 / 高度角</system:String>
+    <system:String x:Key="lbHomeParkAz">方位角（0 - 360）：</system:String>
+    <system:String x:Key="lbHomeParkAlt">高度角（-90 - 90）：</system:String>
     <system:String x:Key="ttHomeParkPosition">设置请求“归位”时使用的停放位置。仅适用于极轴模式。</system:String>
-    <system:String x:Key="ttHomeParkDefault">使用默认归位停放位置：方位朝向天极，高度等于站点纬度。</system:String>
-    <system:String x:Key="ttHomeParkCustom">为归位停放位置输入自定义方位和高度。</system:String>
+    <system:String x:Key="ttHomeParkDefault">使用默认归位停放位置：方位角朝向天极，高度角等于站点纬度。</system:String>
+    <system:String x:Key="ttHomeParkCustom">为归位停放位置输入自定义方位角和高度角。</system:String>
     <system:String x:Key="ttHomeParkAz">归位停放位置的方位角，单位为度（0 到 360）。</system:String>
     <system:String x:Key="ttHomeParkAlt">归位停放位置的高度角，单位为度（-90 到 90）。</system:String>
     <system:String x:Key="homeSettingsParkOutsideLimits">归位停放位置超出轴限位。请选择其他位置。</system:String>
