@@ -1,0 +1,862 @@
+﻿<!--/* Copyright(C) 2019-2026 Rob Morgan (robert.morgan.e@gmail.com)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see<https://www.gnu.org/licenses/> .
+*/-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!--  Title bar  -->
+    <system:String x:Key="titleName">GS Server</system:String>
+    <system:String x:Key="titleApps">已连接应用：</system:String>
+    <system:String x:Key="titleCloseApps">仍有应用处于连接状态。仍要关闭吗？</system:String>
+    <system:String x:Key="titleDescription">GreenSwamp Server</system:String>
+    <system:String x:Key="titleClose">关闭 GS Server</system:String>
+
+    <!--  Tab bar  -->
+    <system:String x:Key="tabSkyWatcher">SkyWatcher</system:String>
+    <system:String x:Key="tabFocuser">调焦器</system:String>
+    <system:String x:Key="tabNotes">笔记</system:String>
+    <system:String x:Key="tabOptions">选项</system:String>
+    <system:String x:Key="tabGamePad">手柄</system:String>
+    <system:String x:Key="tabModel3D">3D</system:String>
+    <system:String x:Key="tabPole">极轴</system:String>
+    <system:String x:Key="tabPulses">脉冲</system:String>
+    <system:String x:Key="tabAlignment">校准</system:String>
+    <system:String x:Key="tabPlot">曲线</system:String>
+    <system:String x:Key="tabWindowFlip">切换窗口大小</system:String>
+
+    <!--  Top bar  -->
+    <system:String x:Key="topRa">赤经：</system:String>
+    <system:String x:Key="topRaShort">赤经：</system:String>
+    <system:String x:Key="topDec">赤纬：</system:String>
+    <system:String x:Key="topDecShort">赤纬：</system:String>
+    <system:String x:Key="topAz">方位角：</system:String>
+    <system:String x:Key="topAlt">高度角：</system:String>
+    <system:String x:Key="topLHA">地方时角：</system:String>
+
+    <!--  Button bar  -->
+    <system:String x:Key="btnHome">归位</system:String>
+    <system:String x:Key="btnBadgeHome">归位</system:String>
+    <system:String x:Key="btnTipHome">转到归位位置</system:String>
+    <system:String x:Key="btnPark">停放</system:String>
+    <system:String x:Key="btnUnPark">解除停放</system:String>
+    <system:String x:Key="btnHintPark">已停放</system:String>
+    <system:String x:Key="btnTipPark">停放赤道仪</system:String>
+    <system:String x:Key="btnStop">停止</system:String>
+    <system:String x:Key="btnTipStop">停止赤道仪</system:String>
+    <system:String x:Key="btnTracking">跟踪</system:String>
+    <system:String x:Key="btnTipTracking">跟踪开/关</system:String>
+    <system:String x:Key="btnHintTracking">开</system:String>
+    <!--<system:String x:Key="btnSetHome">设为归位</system:String>-->
+    <system:String x:Key="btnTipSetHome">将轴位置重置为归位</system:String>
+    <system:String x:Key="btnFlip">翻转镜筒偏向</system:String>
+    <system:String x:Key="btnTipFlip">翻转镜筒偏向</system:String>
+    <system:String x:Key="btnFlipAz">翻转方位角</system:String>
+    <system:String x:Key="btnTipFlipAz">翻转方位角转动方向</system:String>
+    <system:String x:Key="btnFlipPolar">翻越极点</system:String>
+    <system:String x:Key="btnTipFlipPolar">让赤道仪经极点翻转</system:String>
+    <!--<system:String x:Key="btnHomeReset">确认将赤道仪位置重置为归位位置</system:String>-->
+    <system:String x:Key="btnContinueFlip">确认翻转赤道仪</system:String>
+    <system:String x:Key="btnContinueFlipAz">确认切换方位角方向。赤道仪将转动 360 度</system:String>
+    <system:String x:Key="btnContinueFlipPolar">确认翻转轴。赤道仪将越过极点转动</system:String>
+    <system:String x:Key="btnTipParkPos">停放位置</system:String>
+    <system:String x:Key="btnAutoHome">自动归位</system:String>
+    <system:String x:Key="btnAutoHomeComplete">自动归位完成</system:String>
+    <system:String x:Key="btnAutoHomeStart">开始</system:String>
+    <system:String x:Key="btnAutoHomeLimit">最大移动角度：</system:String>
+    <system:String x:Key="btnTipAutoHomeLimit">角度限制</system:String>
+    <system:String x:Key="btnHintAutoHomeLimit">度</system:String>
+    <system:String x:Key="btnDecOffset">侧挂赤纬偏移：</system:String>
+    <system:String x:Key="btnHintDecOffset">度</system:String>
+    <system:String x:Key="btnSensorPositions">自动归位传感器位置：</system:String>
+    <system:String x:Key="btnHintRaSensorPos">赤经轴（度）</system:String>
+    <system:String x:Key="btnHintDecSensorPos">赤纬轴（度）</system:String>
+    <system:String x:Key="btnTipSensorPos">更改自动归位传感器位置</system:String>
+    <system:String x:Key="btnResetSensorPos">重置</system:String>
+    <system:String x:Key="btnTipResetSensorPos">将传感器位置重置为默认值 (90.0, 90.0)</system:String>
+    <system:String x:Key="btnTipScheduler">计划任务</system:String>
+    <system:String x:Key="btnScheduler">计划任务</system:String>
+
+    <!--  Bottom bar  -->
+    <system:String x:Key="botHome">归位</system:String>
+    <system:String x:Key="botTipHome">归位</system:String>
+    <system:String x:Key="botParked">已停放</system:String>
+    <system:String x:Key="botTipParked">停放</system:String>
+    <system:String x:Key="botSlewing">转动中</system:String>
+    <system:String x:Key="botTipSlewing">转动中</system:String>
+    <system:String x:Key="botTracking">跟踪</system:String>
+    <system:String x:Key="botTipTracking">跟踪</system:String>
+    <system:String x:Key="botTipSOP">镜筒偏向</system:String>
+    <system:String x:Key="botTipSOPAz">方位角转动方向</system:String>
+    <system:String x:Key="botTipSOPPolar">赤纬轴方向</system:String>
+    <system:String x:Key="botTipAxisLimit">轴限位，点击查看选项</system:String>
+    <system:String x:Key="botTipWarnings">警告，点击重置</system:String>
+    <system:String x:Key="botTipErrors">错误，点击重置</system:String>
+    <system:String x:Key="botTipVoice">语音</system:String>
+    <system:String x:Key="botTipMonitor">监视器</system:String>
+    <system:String x:Key="botTipConnected">点击查看赤道仪信息</system:String>
+    <system:String x:Key="botLimitOptions">限位选项</system:String>
+    <system:String x:Key="botLimitTracking">关闭跟踪</system:String>
+
+    <!--  Hand Controller  -->
+    <system:String x:Key="hcTipW">西</system:String>
+    <system:String x:Key="hcTipN">北</system:String>
+    <system:String x:Key="hcTipE">东</system:String>
+    <system:String x:Key="hcTipS">南</system:String>
+    <system:String x:Key="hcTipL">左</system:String>
+    <system:String x:Key="hcTipU">上</system:String>
+    <system:String x:Key="hcTipR">右</system:String>
+    <system:String x:Key="hcTipD">下</system:String>
+    <system:String x:Key="hcTipStop">停止</system:String>
+    <system:String x:Key="hcSpeed">速度</system:String>
+    <system:String x:Key="hcTipSpeed">转动速度</system:String>
+    <system:String x:Key="hcTipFlipNS">反转南/北方向</system:String>
+    <system:String x:Key="hcFlipNS">南/北</system:String>
+    <system:String x:Key="hcFlip">反转方向</system:String>
+    <system:String x:Key="hcTipFlipEW">反转东/西方向</system:String>
+    <system:String x:Key="hcFlipEW">东/西</system:String>
+    <system:String x:Key="hcMode">模式</system:String>
+    <system:String x:Key="hcTipMode">方向模式</system:String>
+    <system:String x:Key="hcBacklash">回差补偿</system:String>
+    <system:String x:Key="hcTipHcAntiBacklash">回差补偿</system:String>
+    <system:String x:Key="hcRa">东/西</system:String>
+    <system:String x:Key="hcDec">南/北</system:String>
+    <system:String x:Key="hcHc">GSS 手控器</system:String>
+    <system:String x:Key="hcOpenWin">打开窗口</system:String>
+
+    <!--  pPEC bar  -->
+    <system:String x:Key="ppStartTraining">确认开始训练</system:String>
+    <system:String x:Key="ppStartTrainingMode">启动 PPEC 训练模式</system:String>
+    <system:String x:Key="ppOnOff">PPEC 开/关</system:String>
+    <system:String x:Key="ppPec">PPEC</system:String>
+    <system:String x:Key="ppTraining">PPEC 训练</system:String>
+    <system:String x:Key="ppTipPecTimer">显示赤道仪是否处于 PPEC 训练模式</system:String>
+    <system:String x:Key="ppInTraining">训练中</system:String>
+    <system:String x:Key="ppTrackingOn">必须先开启跟踪</system:String>
+
+    <!--  Mount Info  -->
+    <system:String x:Key="mntSupported">支持</system:String>
+    <system:String x:Key="mntNotSupported">不支持</system:String>
+    <system:String x:Key="mntMount">赤道仪：</system:String>
+    <system:String x:Key="mntVersion">版本：</system:String>
+    <system:String x:Key="mntStepsRa">赤经步数：</system:String>
+    <system:String x:Key="mntStepsDec">赤纬步数：</system:String>
+    <system:String x:Key="mntPEC">PPEC：</system:String>
+    <system:String x:Key="mntHomeSensor">归位传感器：</system:String>
+    <system:String x:Key="mntRaSteps">赤经步/角秒：</system:String>
+    <system:String x:Key="mntDecSteps">赤纬步/角秒：</system:String>
+    <system:String x:Key="mntInfo">赤道仪信息</system:String>
+    <system:String x:Key="mntVoltage">控制器电压：</system:String>
+    <system:String x:Key="mntVoltageError">低电压错误：</system:String>
+
+    <!--  GoTo bar  -->
+    <system:String x:Key="goAcpCoords">确认坐标？</system:String>
+    <system:String x:Key="goRa">赤经：</system:String>
+    <system:String x:Key="goDec">赤纬：</system:String>
+    <system:String x:Key="goAz">方位角：</system:String>
+    <system:String x:Key="goAlt">高度角：</system:String>
+    <system:String x:Key="goCopy">复制</system:String>
+    <system:String x:Key="goTipCopy">填入当前位置</system:String>
+    <system:String x:Key="goGoTo">GoTo</system:String>
+    <system:String x:Key="goTipGoTo">转到坐标</system:String>
+    <system:String x:Key="goTargetBelow">目标低于地平线</system:String>
+    <system:String x:Key="goTargetLimits">目标超出硬件限位</system:String>
+    <system:String x:Key="goSync">同步</system:String>
+    <system:String x:Key="goSyncWarning">警告：请确认坐标！</system:String>
+    <system:String x:Key="goSlewing">赤道仪正在转动</system:String>
+    <system:String x:Key="goOutLimits">超出同步限制</system:String>
+    <system:String x:Key="goChangeToRaDec">右键输入赤经/赤纬坐标</system:String>
+    <system:String x:Key="goChangeToAzAlt">右键输入方位角/高度角坐标</system:String>
+
+    <!--  Backlash  -->
+    <system:String x:Key="bacDecLash">赤纬回差</system:String>
+    <system:String x:Key="bacLashComp">回差补偿：</system:String>
+    <system:String x:Key="bacDec">赤纬</system:String>
+    <system:String x:Key="bacRa">赤经</system:String>
+    <system:String x:Key="bacRaLash">赤经回差</system:String>
+
+    <!--  Debug bar  -->
+    <system:String x:Key="bugSiderealTime">恒星时：</system:String>
+
+    <!--  Gamepad  -->
+    <system:String x:Key="gpOn">手柄开启</system:String>
+    <system:String x:Key="gpSen">灵敏度：</system:String>
+    <system:String x:Key="gpDoubleClickSpeed">双击速度：</system:String>
+    <system:String x:Key="gpTracking">跟踪</system:String>
+    <system:String x:Key="gpStop">停止</system:String>
+    <system:String x:Key="gpPark">停放</system:String>
+    <system:String x:Key="gpHome">归位</system:String>
+    <system:String x:Key="gpSpeedUp">提高速度</system:String>
+    <system:String x:Key="gpSpeedDown">降低速度</system:String>
+    <system:String x:Key="gpVolumeUp">增大音量</system:String>
+    <system:String x:Key="gpVolumeDown">减小音量</system:String>
+    <system:String x:Key="gpSlewUp">向上转动</system:String>
+    <system:String x:Key="gpSlewDown">向下转动</system:String>
+    <system:String x:Key="gpSlewLeft">向左转动</system:String>
+    <system:String x:Key="gpSlewRight">向右转动</system:String>
+    <system:String x:Key="gpSlewNE">向东北转动</system:String>
+    <system:String x:Key="gpSlewNW">向西北转动</system:String>
+    <system:String x:Key="gpSlewSE">向东南转动</system:String>
+    <system:String x:Key="gpSlewSW">向西南转动</system:String>
+    <system:String x:Key="gpSave">保存</system:String>
+    <system:String x:Key="gpSidereal">恒星速率</system:String>
+    <system:String x:Key="gpLunar">月球速率</system:String>
+    <system:String x:Key="gpSolar">太阳速率</system:String>
+    <system:String x:Key="gpKing">King 速率</system:String>
+
+    <!--  GPS  -->
+    <system:String x:Key="gpsCom">串口</system:String>
+    <system:String x:Key="gpsBaud">波特率</system:String>
+    <system:String x:Key="gpsRetrieve">读取</system:String>
+    <system:String x:Key="gpsNmEA">NMEA：</system:String>
+    <system:String x:Key="gpsLat">纬度：</system:String>
+    <system:String x:Key="gpsLong">经度：</system:String>
+    <system:String x:Key="gpsEle">海拔：</system:String>
+    <system:String x:Key="gpsAccept">确认坐标？</system:String>
+    <system:String x:Key="gpsNoData">数据缺失或无效</system:String>
+    <system:String x:Key="gpsGGA">GGA</system:String>
+    <system:String x:Key="gpsRMC">RMC</system:String>
+    <system:String x:Key="gpsLocal">本地时间差异</system:String>
+    <system:String x:Key="gpsPC">电脑：</system:String>
+    <system:String x:Key="gpsGPS">GPS：</system:String>
+    <system:String x:Key="gpsDeviation">偏差：</system:String>
+    <system:String x:Key="gpsChangeTime">更新系统时间？</system:String>
+    <system:String x:Key="gpsTimeLimit">超出可更改时间范围</system:String>
+    <system:String x:Key="gpsTimeError">时间错误</system:String>
+
+    <!--  CdC  -->
+    <system:String x:Key="cdcIP">IP 地址</system:String>
+    <system:String x:Key="cdcPort">端口号</system:String>
+    <system:String x:Key="cdcRetrieve">读取</system:String>
+    <system:String x:Key="cdcSend">发送</system:String>
+    <system:String x:Key="cdcNmEA">NMEA：</system:String>
+    <system:String x:Key="cdcLat">纬度：</system:String>
+    <system:String x:Key="cdcLong">经度：</system:String>
+    <system:String x:Key="cdcEle">海拔：</system:String>
+    <system:String x:Key="cdcAccept">确认坐标？</system:String>
+    <system:String x:Key="cdcOBNotFound">未找到观测站信息。</system:String>
+    <system:String x:Key="cdcNotFound">未找到服务器。</system:String>
+
+    <!--  Edits  -->
+    <system:String x:Key="edHours">小时</system:String>
+    <system:String x:Key="edMinutes">分钟</system:String>
+    <system:String x:Key="edSeconds">秒</system:String>
+    <system:String x:Key="edDegrees">度</system:String>
+
+    <!--  Dialog  -->
+    <system:String x:Key="diaAccept">确认</system:String>
+    <system:String x:Key="diaCancel">取消</system:String>
+    <system:String x:Key="diaOk">确定</system:String>
+    <system:String x:Key="diaStart">开始</system:String>
+    <system:String x:Key="diaStop">停止</system:String>
+    <system:String x:Key="diaDialog">GS Server</system:String>
+
+    <!--  Synthesizer  -->
+    <system:String x:Key="vceParked">已停放</system:String>
+    <system:String x:Key="vceUnParked">已解除停放</system:String>
+    <system:String x:Key="vceActive">语音已启用</system:String>
+    <system:String x:Key="vceError">错误</system:String>
+    <system:String x:Key="vceLimit">限位警告</system:String>
+    <system:String x:Key="vceTrackingOn">跟踪开启</system:String>
+    <system:String x:Key="vceTrackingOff">跟踪关闭</system:String>
+    <system:String x:Key="vcePeckOn">PEC 开启</system:String>
+    <system:String x:Key="vcePeckOff">PEC 关闭</system:String>
+    <system:String x:Key="vcePeckTrainOn">PEC 训练开启</system:String>
+    <system:String x:Key="vcePeckTrainOff">PEC 训练关闭</system:String>
+    <system:String x:Key="vceStop">停止</system:String>
+    <system:String x:Key="vceAbortSlew">中止</system:String>
+    <system:String x:Key="vceParkSet">停放位置已设置</system:String>
+    <system:String x:Key="vceSyncAz">正在同步到方位角</system:String>
+    <system:String x:Key="vceSyncCoords">正在同步到坐标</system:String>
+    <system:String x:Key="vceSlewing">转动中</system:String>
+    <system:String x:Key="vceSlewCoords">正在转到坐标</system:String>
+    <system:String x:Key="vceSlewPark">正在转到停放位置</system:String>
+    <system:String x:Key="vceSlewHome">正在归位</system:String>
+    <system:String x:Key="vceSlewComplete">转动完成</system:String>
+    <system:String x:Key="vceHome">归位</system:String>
+    <!--<system:String x:Key="vceHomeSet">归位已设置</system:String>-->
+    <system:String x:Key="vceSidereal">恒星</system:String>
+    <system:String x:Key="vceSolar">太阳</system:String>
+    <system:String x:Key="vceLunar">月球</system:String>
+    <system:String x:Key="vceKing">King</system:String>
+    <system:String x:Key="vceSopUnknown">镜筒偏向未知</system:String>
+    <system:String x:Key="vceSopEast">镜筒偏东</system:String>
+    <system:String x:Key="vceSopWest">镜筒偏西</system:String>
+    <system:String x:Key="vceSopNormal">赤纬轴正常</system:String>
+    <system:String x:Key="vceSopThroughPole">赤纬轴越过极点</system:String>
+    <system:String x:Key="vceSopAzEast">方位角向东转动</system:String>
+    <system:String x:Key="vceSopAzWest">方位角向西转动</system:String>
+
+    <!--  Converters  -->
+    <system:String x:Key="cvtInvNumber">数字无效</system:String>
+    <system:String x:Key="cvtColorToBrush">ColorToBrushConverter 只支持从 Color 和 String 转换</system:String>
+    <system:String x:Key="cvtEnumErr1">类型必须是枚举</system:String>
+    <system:String x:Key="cvtEnumErr2">必须指定 EnumType</system:String>
+    <system:String x:Key="cvtInvIP">IP 无效</system:String>
+    <system:String x:Key="cvtRequired">必填</system:String>
+    <system:String x:Key="cvtInvalid">日期无效</system:String>
+    <system:String x:Key="cvtFutureDate">需要未来日期</system:String>
+    <system:String x:Key="cvtMustBool">必须是布尔值</system:String>
+
+    <!--  Notes  -->
+    <system:String x:Key="notShortcuts">快捷键：</system:String>
+    <system:String x:Key="notOpen">打开</system:String>
+    <system:String x:Key="notSave">保存</system:String>
+    <system:String x:Key="notSaveAs">另存为</system:String>
+    <system:String x:Key="notPrint">打印</system:String>
+    <system:String x:Key="notCut">剪切</system:String>
+    <system:String x:Key="notCopy">复制</system:String>
+    <system:String x:Key="notPaste">粘贴</system:String>
+    <system:String x:Key="notRedo">重做</system:String>
+    <system:String x:Key="notUndo">撤销</system:String>
+    <system:String x:Key="notNumbering">编号</system:String>
+    <system:String x:Key="notBullets">项目符号</system:String>
+    <system:String x:Key="notIndent">减少缩进</system:String>
+    <system:String x:Key="notInIndent">增加缩进</system:String>
+    <system:String x:Key="notLeftAlign">左对齐</system:String>
+    <system:String x:Key="notCenterAlign">居中对齐</system:String>
+    <system:String x:Key="notRightAlign">右对齐</system:String>
+    <system:String x:Key="notBold">加粗</system:String>
+    <system:String x:Key="notInItalic">斜体</system:String>
+    <system:String x:Key="notUnderline">下划线</system:String>
+    <system:String x:Key="notFont">字体</system:String>
+    <system:String x:Key="notFontSize">字号</system:String>
+    <system:String x:Key="notFontForGround">字体前景色</system:String>
+    <system:String x:Key="notFontBackground">字体背景色</system:String>
+    <system:String x:Key="notSpellCheck">拼写检查</system:String>
+    <system:String x:Key="notDate">日期</system:String>
+    <system:String x:Key="notTime">时间</system:String>
+    <system:String x:Key="notRa">赤经</system:String>
+    <system:String x:Key="notDec">赤纬</system:String>
+    <system:String x:Key="notAlt">高度角</system:String>
+    <system:String x:Key="notAz">方位角</system:String>
+    <system:String x:Key="notPhase">月相</system:String>
+    <system:String x:Key="notEntry">日志条目</system:String>
+    <system:String x:Key="notAlignmentMode">对准模式</system:String>
+    <system:String x:Key="notEqType">赤道坐标类型</system:String>
+    <system:String x:Key="notObLoc">观测站位置</system:String>
+    <system:String x:Key="notWeather">天气</system:String>
+    <system:String x:Key="notMoon">月球</system:String>
+    <system:String x:Key="notLog">日志</system:String>
+    <system:String x:Key="notAlignment">对准</system:String>
+    <system:String x:Key="notEq">赤道</system:String>
+    <system:String x:Key="notOb">观测站</system:String>
+    <system:String x:Key="notSidereal">恒星时</system:String>
+    <system:String x:Key="notHa">时角</system:String>
+    <system:String x:Key="notAngle">时角</system:String>
+    <system:String x:Key="notNoData">未找到数据</system:String>
+    <system:String x:Key="notTimeout">操作已超时</system:String>
+    <system:String x:Key="notFullMoon">满月</system:String>
+    <system:String x:Key="notWaningGibbous">亏凸月</system:String>
+    <system:String x:Key="notLastQuarter">下弦月</system:String>
+    <system:String x:Key="notWaningCrescent">残月</system:String>
+    <system:String x:Key="notNewMoon">新月</system:String>
+    <system:String x:Key="notWaxingCrescent">娥眉月</system:String>
+    <system:String x:Key="notFirstQuarter">上弦月</system:String>
+    <system:String x:Key="notWaxingGibbous">盈凸月</system:String>
+    <system:String x:Key="notLogEntry">日志条目</system:String>
+    <system:String x:Key="notCoordinateType">坐标类型</system:String>
+    <system:String x:Key="notObservatory">观测站</system:String>
+    <system:String x:Key="notLat">纬度</system:String>
+    <system:String x:Key="notLong">经度</system:String>
+    <system:String x:Key="notSiderealTime">恒星时</system:String>
+
+    <!--  SkyWatcher  -->
+    <system:String x:Key="skySettings">设置</system:String>
+    <system:String x:Key="skyClose">关闭</system:String>
+    <system:String x:Key="skyPorts">串口</system:String>
+    <system:String x:Key="skyBaud">波特率</system:String>
+    <system:String x:Key="skyEquatorial">赤道坐标系统</system:String>
+    <system:String x:Key="skyAlignment">对准模式</system:String>
+    <system:String x:Key="skyRaGuiding">赤经导星速率 %</system:String>
+    <system:String x:Key="skyDecGuiding">赤纬导星速率 %</system:String>
+    <system:String x:Key="skyMount">赤道仪类型</system:String>
+    <system:String x:Key="skyMaxSlew">最大指向速率 度/秒</system:String>
+    <system:String x:Key="skyMeridian">中天限位（度）</system:String>
+    <system:String x:Key="skyTracking">跟踪速率</system:String>
+    <system:String x:Key="skyST4">ST4 导星速率</system:String>
+    <system:String x:Key="skyReset">重置</system:String>
+    <system:String x:Key="SkyResetDef">重置为默认值？</system:String>
+    <system:String x:Key="skyRefraction">大气折射</system:String>
+    <system:String x:Key="skyEncoders">编码器</system:String>
+    <system:String x:Key="skyAltPpEC">备用 PPEC</system:String>
+    <system:String x:Key="skyFullCurrent">全电流</system:String>
+    <system:String x:Key="skyGoToDecPulse">GoTo 赤纬脉冲</system:String>
+    <system:String x:Key="skyDiagnostics">诊断</system:String>
+    <system:String x:Key="skySetPark">将当前位置设为停放位置</system:String>
+    <system:String x:Key="skyOBL">观测站位置</system:String>
+    <system:String x:Key="skyLatitude">纬度：</system:String>
+    <system:String x:Key="skyLongitude">经度：</system:String>
+    <system:String x:Key="skyTemperature">温度</system:String>
+    <system:String x:Key="skyAmbTemp">环境温度（摄氏度）</system:String>
+    <system:String x:Key="skyElevation">海拔</system:String>
+    <system:String x:Key="skyMeters">米</system:String>
+    <system:String x:Key="skyGPS">GPS</system:String>
+    <system:String x:Key="skyGPSCon">连接 GPS 设备</system:String>
+    <system:String x:Key="skyCdC">CdC</system:String>
+    <system:String x:Key="skyCdCCon">连接 CdC 服务器</system:String>
+    <system:String x:Key="skyCloseSave">关闭并保存</system:String>
+    <system:String x:Key="skyOpen">打开</system:String>
+    <system:String x:Key="skyConnectDis">连接/断开赤道仪</system:String>
+    <system:String x:Key="skySiderealRate">恒星速率</system:String>
+    <system:String x:Key="skySolarRate">太阳速率</system:String>
+    <system:String x:Key="skyLunarRate">月球速率</system:String>
+    <system:String x:Key="skyKingRate">King 跟踪速率</system:String>
+    <system:String x:Key="skyConnect">连接</system:String>
+    <system:String x:Key="skyDisconnect">断开</system:String>
+    <system:String x:Key="skyHome1">正常启动时，请将赤道仪置于“归位”位置。</system:String>
+    <system:String x:Key="skyHome2">归位位置为重锤杆朝下，赤纬轴指向天极。</system:String>
+    <system:String x:Key="skyHome2AltAz">归位位置为镜筒水平并指向真北。</system:String>
+    <system:String x:Key="skyParkNewName">添加新的停放位置</system:String>
+    <system:String x:Key="skyParkDelete">删除停放位置？</system:String>
+    <system:String x:Key="skyLat0">北或南</system:String>
+    <system:String x:Key="skyLat01">南/北</system:String>
+    <system:String x:Key="skyLong0">东或西</system:String>
+    <system:String x:Key="skyLong01">东/西</system:String>
+    <system:String x:Key="skyMinPulseDec">最小赤纬脉冲</system:String>
+    <system:String x:Key="skyMinPulseRa">最小赤经脉冲</system:String>
+    <system:String x:Key="skySchCol1">开/关</system:String>
+    <system:String x:Key="skySchCol2">动作</system:String>
+    <system:String x:Key="skySchCol3">日期</system:String>
+    <system:String x:Key="skySchCol4">时间</system:String>
+    <system:String x:Key="skySidereal">恒星</system:String>
+    <system:String x:Key="skySolar">太阳</system:String>
+    <system:String x:Key="skyLunar">月球</system:String>
+    <system:String x:Key="skyKing">King</system:String>
+    <system:String x:Key="skyNoSelected">未选择任何项</system:String>
+    <system:String x:Key="skyParkSaved">位置已保存到</system:String>
+    <system:String x:Key="skyParkEvent1">时间无效</system:String>
+    <system:String x:Key="skyParkEvent2">日期无效</system:String>
+    <system:String x:Key="skyParkEvent3">日期和时间无效</system:String>
+
+    <!--  Exceptions  -->
+    <system:String x:Key="exParked">请先解除停放</system:String>
+    <system:String x:Key="exHardwareLimit">转动超出硬件限位</system:String>
+    <system:String x:Key="exError">错误</system:String>
+
+    <!--  Options and Monitor  -->
+    <system:String x:Key="optMonitor">监视器</system:String>
+    <system:String x:Key="optClose">关闭</system:String>
+    <system:String x:Key="optDevice">设备：</system:String>
+    <system:String x:Key="optServer">服务器</system:String>
+    <system:String x:Key="optTelescope">望远镜</system:String>
+    <system:String x:Key="optCategory">类别：</system:String>
+    <system:String x:Key="optDriver">驱动</system:String>
+    <system:String x:Key="optInterface">接口</system:String>
+    <system:String x:Key="optServer1">服务器</system:String>
+    <system:String x:Key="optMount">赤道仪</system:String>
+    <system:String x:Key="optType">类型：</system:String>
+    <system:String x:Key="optInfo">信息</system:String>
+    <system:String x:Key="optData">数据</system:String>
+    <system:String x:Key="optWarning">警告</system:String>
+    <system:String x:Key="optError">错误</system:String>
+    <system:String x:Key="optSessionLogOn">开启/关闭会话日志</system:String>
+    <system:String x:Key="optSessionLog">会话日志</system:String>
+    <system:String x:Key="optWriteFile">将文本项写入文件</system:String>
+    <system:String x:Key="optLogFile">记录到文件</system:String>
+    <system:String x:Key="optStartStop">开始/停止监视</system:String>
+    <system:String x:Key="optClear">清除</system:String>
+    <system:String x:Key="optClearText">清除文本项</system:String>
+    <system:String x:Key="optExport">导出</system:String>
+    <system:String x:Key="optExportText">将文本导出到文件</system:String>
+    <system:String x:Key="optCopy">复制</system:String>
+    <system:String x:Key="optCopyClip">复制到剪贴板</system:String>
+    <system:String x:Key="optTotal">文本总行数</system:String>
+    <system:String x:Key="optTabs">可用标签页</system:String>
+    <system:String x:Key="optOptions">选项</system:String>
+    <system:String x:Key="optVoice">语音</system:String>
+    <system:String x:Key="optColors">主题颜色</system:String>
+    <system:String x:Key="optPerf">性能</system:String>
+    <system:String x:Key="optSkyWatcher">SkyWatcher</system:String>
+    <system:String x:Key="optCharts">图表</system:String>
+    <system:String x:Key="optNotes">笔记</system:String>
+    <system:String x:Key="optGamePad">手柄</system:String>
+    <system:String x:Key="optModel3D">3D 模型</system:String>
+    <system:String x:Key="optSleepMode">禁止睡眠模式</system:String>
+    <system:String x:Key="optStartMin">启动时最小化</system:String>
+    <system:String x:Key="optStartTop">启动时窗口置顶</system:String>
+    <system:String x:Key="optHomeWarning">归位警告开启</system:String>
+    <system:String x:Key="optVoiceSpeech">语音</system:String>
+    <system:String x:Key="optVoiceName">语音名称</system:String>
+    <system:String x:Key="optVolumeLevel">音量</system:String>
+    <system:String x:Key="optVolume">音量</system:String>
+    <system:String x:Key="optLight">浅色</system:String>
+    <system:String x:Key="optDark">深色</system:String>
+    <system:String x:Key="optPrimaryColor">主色</system:String>
+    <system:String x:Key="optAccentColor">强调色</system:String>
+    <system:String x:Key="optDisplayInterval">显示间隔（毫秒）</system:String>
+    <system:String x:Key="optRestart">设置已重置。请重启 GS Server</system:String>
+    <system:String x:Key="optAcceptResetSettings">确认重置所选设置</system:String>
+    <system:String x:Key="optResetSettings">重置设置</system:String>
+    <system:String x:Key="optNoResetSettings">未选择设置</system:String>
+    <system:String x:Key="optServerSettings">选项</system:String>
+    <system:String x:Key="optSkyTelescopeSettings">SkyWatcher</system:String>
+    <system:String x:Key="optChartsSettings">图表</system:String>
+    <system:String x:Key="optMonitorSettings">监视器</system:String>
+    <system:String x:Key="optSettings">重置设置</system:String>
+    <system:String x:Key="optReset">重置</system:String>
+    <system:String x:Key="optLanguage">语言</system:String>
+    <system:String x:Key="optHardware">关闭加速</system:String>
+    <system:String x:Key="optRender">渲染能力</system:String>
+    <system:String x:Key="optUTCOffset">UTC 偏移</system:String>
+    <system:String x:Key="optLSTAdjusted">UTC 修正日期：</system:String>
+    <system:String x:Key="optLocalAdjusted">本地修正日期：</system:String>
+    <system:String x:Key="optDownload">下载</system:String>
+    <system:String x:Key="optUpdateVer">可用版本：</system:String>
+    <system:String x:Key="optCurrentVer">已安装版本：</system:String>
+    <system:String x:Key="optCheckUpdates">检查更新</system:String>
+    <system:String x:Key="optNotAvail">没有可用更新</system:String>
+    <system:String x:Key="optNotFound">未找到更新</system:String>
+    <system:String x:Key="optDisconnects">运行前请断开赤道仪和已连接应用</system:String>
+    <system:String x:Key="optPole">极轴定位器</system:String>
+    <system:String x:Key="optCopiedClip">已复制到剪贴板</system:String>
+
+    <!--  3DModel  -->
+    <system:String x:Key="3dSettings">设置</system:String>
+    <system:String x:Key="3dHud">坐标</system:String>
+    <system:String x:Key="3dEdit">编辑</system:String>
+    <system:String x:Key="3dCamera">相机信息</system:String>
+    <system:String x:Key="3dRaAxis">赤道仪赤经/方位角轴：</system:String>
+    <system:String x:Key="3dDecAxis">赤道仪赤纬/高度角轴：</system:String>
+    <system:String x:Key="3dTopBar">顶部坐标栏</system:String>
+    <system:String x:Key="3dModel">GSS 3D 模型</system:String>
+    <system:String x:Key="3dResetView">重置视图</system:String>
+    <system:String x:Key="3dModelType">模型类型</system:String>
+
+    <!--  Pulses  -->
+    <system:String x:Key="pulPulses">脉冲</system:String>
+    <system:String x:Key="pulStart">开始</system:String>
+    <system:String x:Key="pulClear">清除</system:String>
+    <system:String x:Key="pulSize">适配</system:String>
+    <system:String x:Key="pulOn">开</system:String>
+    <system:String x:Key="pulPause">暂停</system:String>
+    <system:String x:Key="pulOpen">打开</system:String>
+
+    <!--  Plot  -->
+    <system:String x:Key="pltPlot">曲线</system:String>
+    <system:String x:Key="pltStart">开始</system:String>
+    <system:String x:Key="pltClear">清除</system:String>
+    <system:String x:Key="pltSize">适配</system:String>
+    <system:String x:Key="pltOn">开</system:String>
+    <system:String x:Key="pltPause">暂停</system:String>
+    <system:String x:Key="pltZero">基准轴归零</system:String>
+    <system:String x:Key="pltYScale">Y 轴缩放</system:String>
+    <system:String x:Key="pltQuality">缩放质量</system:String>
+    <system:String x:Key="pltMaxPltPoints">最大曲线点数</system:String>
+    <system:String x:Key="pltMaxPoints">最大点数</system:String>
+    <system:String x:Key="pltLogging">记录到 GSChartLog</system:String>
+
+    <!--  Pole Locator  -->
+    <system:String x:Key="polLat">纬度：</system:String>
+    <system:String x:Key="polLong">经度：</system:String>
+    <system:String x:Key="polLST">恒星时：</system:String>
+    <system:String x:Key="polHADeg">时角：</system:String>
+    <system:String x:Key="polHAFlipDeg">HA 翻转：</system:String>
+    <system:String x:Key="polLDate">本地日期：</system:String>
+    <system:String x:Key="polLTime">本地时间：</system:String>
+    <system:String x:Key="polMirrorFlip">翻转视图</system:String>
+    <system:String x:Key="polPolaris">北极星</system:String>
+    <system:String x:Key="polOct">南极座σ星</system:String>
+
+    <!--  1.0.1.8  -->
+    <system:String x:Key="1018MouseLock">鼠标已锁定</system:String>
+    <system:String x:Key="1018LockMouse">锁定鼠标，按任意键解锁</system:String>
+
+    <!--  1.0.2.1  -->
+    <system:String x:Key="1021SpiralSearch">螺旋搜索</system:String>
+    <system:String x:Key="1021In">向内</system:String>
+    <system:String x:Key="1021Out">向外</system:String>
+    <system:String x:Key="1021Abort">中止</system:String>
+    <system:String x:Key="1021New">新建</system:String>
+    <system:String x:Key="1021Clear">清除</system:String>
+    <system:String x:Key="1021Calculate">计算</system:String>
+    <system:String x:Key="1021WidthA">宽度（角秒）</system:String>
+    <system:String x:Key="1021HeightA">高度（角秒）</system:String>
+    <system:String x:Key="1021LimitsOn">限位开启</system:String>
+    <system:String x:Key="1021Distance">距离：</system:String>
+    <system:String x:Key="1021MM">（毫米）</system:String>
+    <system:String x:Key="1021FovHeader">计算（视场）</system:String>
+    <system:String x:Key="1021CameraWidth">相机宽度</system:String>
+    <system:String x:Key="1021CameraHeight">相机高度</system:String>
+    <system:String x:Key="1021EyepieceFS">目镜视场光阑</system:String>
+    <system:String x:Key="1021OtaFL">镜筒焦距</system:String>
+    <system:String x:Key="1021Eyepiece">目镜</system:String>
+    <system:String x:Key="1021Camera">相机</system:String>
+    <system:String x:Key="1021Width">宽度</system:String>
+    <system:String x:Key="1021Height">高度</system:String>
+    <system:String x:Key="1021FlipLimit">翻转限位</system:String>
+    <system:String x:Key="1021NoHomeSensor">赤道仪不支持归位传感器</system:String>
+    <system:String x:Key="1021Center">居中</system:String>
+    <system:String x:Key="1021End">结束</system:String>
+
+    <!--  1.0.2.3  -->
+    <system:String x:Key="botTipPec">PEC 状态</system:String>
+    <system:String x:Key="Pec">PEC</system:String>
+    <system:String x:Key="tabMain">主界面</system:String>
+    <system:String x:Key="PecBadge">开</system:String>
+    <system:String x:Key="PecStatus">PEC 状态</system:String>
+
+    <!--  1.0.2.4  -->
+    <system:String x:Key="LimitNothing">不执行</system:String>
+    <system:String x:Key="tabSnap">快门</system:String>
+    <system:String x:Key="snapOn">开</system:String>
+    <system:String x:Key="snapPause">暂停</system:String>
+    <system:String x:Key="snap1">快门端口 1：</system:String>
+    <system:String x:Key="snap2">快门端口 2：</system:String>
+    <system:String x:Key="snapTimer">计时器</system:String>
+    <system:String x:Key="snapCounter">计数器</system:String>
+    <system:String x:Key="snapLoops">循环</system:String>
+    <system:String x:Key="snapDelay">延迟</system:String>
+    <system:String x:Key="snapTimerEr">设置计时器数值</system:String>
+    <system:String x:Key="snapEnable">启用快门</system:String>
+    <system:String x:Key="snapConn">未连接赤道仪</system:String>
+    <system:String x:Key="snapSupport">此赤道仪不支持</system:String>
+    <system:String x:Key="skySyncLimitOn">同步限制</system:String>
+    <system:String x:Key="diaImport">导入</system:String>
+    <system:String x:Key="msgValue">未找到值</system:String>
+    <system:String x:Key="msgKey">未找到键</system:String>
+
+    <!--  Alignment  -->
+    <!--  1.0.2.5  -->
+    <system:String x:Key="aliOpenTooltip">打开</system:String>
+    <system:String x:Key="aliCloseTooltip">关闭</system:String>
+    <system:String x:Key="aliAlignment">校准</system:String>
+    <system:String x:Key="aliAlignmentOn">校准开启</system:String>
+    <system:String x:Key="aliAlignmentOnTooltip">开启星点校准模型</system:String>
+    <system:String x:Key="aliClearModelOnStartup">启动时清除模型</system:String>
+    <system:String x:Key="aliAlignmentSettings">设置</system:String>
+    <system:String x:Key="aliProximityLimitTooltip">同步点彼此多近时替换较早的点（角秒）。</system:String>
+    <system:String x:Key="aliSampleSizeTooltip">计算位置时使用多少个附近同步点。</system:String>
+    <system:String x:Key="aliNearbyLimitTooltip">同步点多近时用于计算（度）。</system:String>
+    <system:String x:Key="aliThreePointAlgorithmTooltip">如何选择三点：最近点三角形，或中心最近的三角形。</system:String>
+    <system:String x:Key="aliClearModelOnStartupTooltip">如果希望每次重新连接时创建新模型，请勾选。</system:String>
+    <system:String x:Key="aliClearAll">全部清除</system:String>
+    <system:String x:Key="aliClearAllTooltip">点击此按钮清除模型中的所有校准点。</system:String>
+    <system:String x:Key="aliDelete">删除</system:String>
+    <system:String x:Key="aliDeleteTooltip">点击此按钮删除所选校准点。</system:String>
+    <system:String x:Key="optAlignment">校准</system:String>
+    <system:String x:Key="optProximityLimit">邻近限值</system:String>
+    <system:String x:Key="optAlignmentMode">校准行为</system:String>
+    <system:String x:Key="optActivePoints">校准点过滤器</system:String>
+    <system:String x:Key="optThreePointAlgorithm">三点选择</system:String>
+
+    <!--  1.0.3.2  -->
+    <system:String x:Key="customGears">自定义齿轮参数</system:String>
+    <system:String x:Key="raTotalSteps">赤经总步数</system:String>
+    <system:String x:Key="decTotalSteps">赤纬总步数</system:String>
+    <system:String x:Key="raWormTeeth">赤经蜗轮齿数</system:String>
+    <system:String x:Key="decWormTeeth">赤纬蜗轮齿数</system:String>
+    <system:String x:Key="raTrackingOffset">赤经跟踪偏移</system:String>
+    <system:String x:Key="decTrackingOffset">赤纬跟踪偏移</system:String>
+    <system:String x:Key="gearingConnect">重新连接后更改生效</system:String>
+    <system:String x:Key="applyGearing">应用自定义齿轮参数？</system:String>
+    <system:String x:Key="mntWormStepsRa">赤经蜗杆步数：</system:String>
+    <system:String x:Key="mntWormStepsDec">赤纬蜗杆步数：</system:String>
+    <system:String x:Key="mntCustomOffsetRa">赤经自定义偏移：</system:String>
+    <system:String x:Key="mntCustomOffsetDec">赤纬自定义偏移：</system:String>
+    <system:String x:Key="mntFreqRa">赤经频率：</system:String>
+    <system:String x:Key="mntFreqDec">赤纬频率：</system:String>
+
+    <!--  1.0.3.4  -->
+    <system:String x:Key="btnReSyncEnc">重新同步编码器</system:String>
+    <system:String x:Key="btnReSyncHome">归位位置</system:String>
+    <system:String x:Key="btnReSyncAccept">确认重置赤道仪位置</system:String>
+    <system:String x:Key="btnReSync">重新同步</system:String>
+    <system:String x:Key="vceSync">已同步</system:String>
+    <system:String x:Key="skyGlobalStopOn">全局停止（Esc）</system:String>
+    <system:String x:Key="btnCap">外部能力</system:String>
+    <system:String x:Key="capCanSetPark">可设置停放</system:String>
+    <system:String x:Key="skyStopMount">赤道仪必须停止</system:String>
+
+    <!--  1.0.3.8  -->
+    <system:String x:Key="aliExport">导出</system:String>
+    <system:String x:Key="aliExportTooltip">点击此按钮导出当前点模型。</system:String>
+    <system:String x:Key="aliImport">导入</system:String>
+    <system:String x:Key="aliImportTooltip">点击此按钮导入先前导出的点模型。</system:String>
+    <system:String x:Key="aliConfirmClearAllCaption">清除校准点</system:String>
+    <system:String x:Key="aliConfirmClearAllMessage">确认清除所有校准点。</system:String>
+    <system:String x:Key="aliConfirmDeleteCaption">删除校准点</system:String>
+    <system:String x:Key="aliConfirmDeleteMessage">确认删除所选校准点。</system:String>
+    <system:String x:Key="aliConfirmImportCaption">导入校准点</system:String>
+    <system:String x:Key="aliConfirmImportMessage">确认导入先前保存的校准点。这会清除现有校准点。</system:String>
+    <system:String x:Key="aliAcceptButtonCaption">确认</system:String>
+    <system:String x:Key="aliCancelButtonCaption">取消</system:String>
+    <system:String x:Key="aliPointModelFileFilter">点模型文件 (*.GssPointModel)|*.GssPointModel|所有文件 (*.*)|*.*</system:String>
+
+    <system:String x:Key="tabFocuserTooltip">显示调焦器面板</system:String>
+    <system:String x:Key="focuserSettings">调焦器设置</system:String>
+    <system:String x:Key="focuserCloseTooltip">关闭调焦器设置面板</system:String>
+    <system:String x:Key="focuserIn">向内</system:String>
+    <system:String x:Key="focuserOut">向外</system:String>
+    <system:String x:Key="focuserConnected">已连接</system:String>
+    <system:String x:Key="focuserPosition">当前位置</system:String>
+    <system:String x:Key="focuserRefresh">刷新</system:String>
+    <system:String x:Key="focuserRefreshTooltip">刷新可用调焦器列表</system:String>
+    <system:String x:Key="focuserSetup">设置</system:String>
+    <system:String x:Key="focuserSetupTooltip">打开所选调焦器的 ASCOM 设置对话框</system:String>
+    <system:String x:Key="focuserConnect">连接</system:String>
+    <system:String x:Key="focuserConnectTooltip">连接到所选调焦器</system:String>
+    <system:String x:Key="focuserDisconnect">断开</system:String>
+    <system:String x:Key="focuserDisconnectTooltip">断开调焦器连接</system:String>
+    <system:String x:Key="focuserStepSizeHint">步长</system:String>
+    <system:String x:Key="focuserStepSizeTooltip">每次按键的调焦器位置增量</system:String>
+    <system:String x:Key="focuserSelectTooltip">选择要连接的调焦器</system:String>
+    <system:String x:Key="focuserSelectHint">调焦器</system:String>
+
+    <system:String x:Key="focuserReverseDirectionTooltip">勾选此项后，按下按钮时反转调焦器方向。</system:String>
+    <system:String x:Key="focuserReverseDirection">反转方向</system:String>
+
+    <!--  1.0.4.2  -->
+    <system:String x:Key="mntPolarLed">极轴镜 LED：</system:String>
+    <system:String x:Key="skyPolarLedLevel">极轴镜 LED 亮度</system:String>
+    <system:String x:Key="optAllowBeeps">蜂鸣</system:String>
+    <system:String x:Key="optFreq">频率</system:String>
+    <system:String x:Key="optDur">持续时间</system:String>
+
+    <!--  1.0.4.3  -->
+    <system:String x:Key="optUI">界面</system:String>
+    <system:String x:Key="lbEast">东</system:String>
+    <system:String x:Key="lbWest">西</system:String>
+    <system:String x:Key="lbNorth">北</system:String>
+    <system:String x:Key="lbSouth">南</system:String>
+    <system:String x:Key="lbOptics">镜筒</system:String>
+    <system:String x:Key="RbNone">无</system:String>
+    <system:String x:Key="RbAltAz">地平式</system:String>
+    <system:String x:Key="RbRaDec">赤经/赤纬</system:String>
+    <system:String x:Key="Rb3D">3D</system:String>
+    <system:String x:Key="lbAz">方位角</system:String>
+    <system:String x:Key="lbAlt">高度角</system:String>
+
+    <!--  1.0.4.7  -->
+    <system:String x:Key="gpsDecimals">输入小数</system:String>
+    <system:String x:Key="InvCord">坐标无效</system:String>
+
+    <!--  1.0.4.8  -->
+    <system:String x:Key="skyFlipAng">翻转角（度）</system:String>
+    <system:String x:Key="lbAxisTrackingLimit">跟踪限位（度）</system:String>
+    <system:String x:Key="mntCap">功能：</system:String>
+    <system:String x:Key="mntAdv">高级设置</system:String>
+
+    <!--  1.0.?.?  -->
+    <system:String x:Key="aliAlertTooltip">由于偏移异常过大，校准模型已关闭。</system:String>
+    <system:String x:Key="aliCancelAlert">取消校准警报</system:String>
+    <system:String x:Key="aliCancelAlertTooltip">点击此按钮取消校准警报。</system:String>
+    <system:String x:Key="vceAlignmentAlert">校准警报</system:String>
+
+    <!--  1.0.6.3  -->
+    <system:String x:Key="btnContinueHome">确认转到归位</system:String>
+    <system:String x:Key="btnContinuePark">确认停放</system:String>
+    <system:String x:Key="FlipOnNextGoto">下次 GoTo 强制翻转</system:String>
+
+    <!--  1.0.6.4  -->
+    <system:String x:Key="optAlignmentWarningThreshold">警告阈值</system:String>
+    <system:String x:Key="aliWarningThresholdTooltip">触发校准警告的级别（已记录最大同步偏移距离的倍数）。</system:String>
+
+    <!--  1.0.7.8  -->
+    <system:String x:Key="optLogPath">日志路径</system:String>
+
+    <!--  1.0.7.9  -->
+    <system:String x:Key="snpDither">抖动</system:String>
+    <system:String x:Key="snpDitherOn">开</system:String>
+    <system:String x:Key="snpPhdOnOff">开/关</system:String>
+    <system:String x:Key="snpIntLoops">间隔循环</system:String>
+    <system:String x:Key="snpHostIp">主机 / IP</system:String>
+    <system:String x:Key="snpDitPix">抖动像素</system:String>
+    <system:String x:Key="snpSetPix">稳定像素</system:String>
+    <system:String x:Key="snpSetSec">稳定秒数</system:String>
+    <system:String x:Key="snpTimeSec">超时秒数</system:String>
+
+    <!--  1.0.8.5  -->
+    <system:String x:Key="Meridian">中天线</system:String>
+    <system:String x:Key="Horizon">地平线</system:String>
+
+    <!--  1.0.8.6  -->
+    <system:String x:Key="HomeDialog">归位对话框开启</system:String>
+    <system:String x:Key="ParkDialog">停放对话框开启</system:String>
+
+    <!--  1.0.9.1  -->
+    <system:String x:Key="HcInt">间隔</system:String>
+    <system:String x:Key="HcRate">速率</system:String>
+    <system:String x:Key="PlotNormalize">去除赤经跟踪量</system:String>
+    <system:String x:Key="DisableKeysOnGoTo">方向键关闭</system:String>
+    <system:String x:Key="DisableKeysOnGoToToolTip">GoTo 期间禁用方向键</system:String>
+
+    <!--  1.1.0.1  -->
+    <system:String x:Key="Stopped">赤道仪已停止</system:String>
+    <system:String x:Key="LowVoltage">电压偏低：请检查电源和接线</system:String>
+    <system:String x:Key="CheckMount">检查赤道仪连接、电源和波特率</system:String>
+
+    <!--  1.1.0.3  -->
+    <!--  Mount Hardware Setup  -->
+    <system:String x:Key="mhlButton">硬件限位</system:String>
+    <system:String x:Key="mhlButtonToolTip">赤道仪轴限位</system:String>
+    <system:String x:Key="mhlSettingsLabel">赤道仪硬件设置</system:String>
+    <system:String x:Key="mhlRaAz">赤经 / 方位角</system:String>
+    <system:String x:Key="mhlDecAlt">赤纬 / 高度角</system:String>
+    <system:String x:Key="lbAxisLowerLimitY">下限（度）</system:String>
+    <system:String x:Key="lbAxisUpperLimitY">上限（度）</system:String>
+    <system:String x:Key="lbAxisLimitX">限位（度）</system:String>
+    <system:String x:Key="mhlButtonChange">更改</system:String>
+    <system:String x:Key="mhlTipChangeSide">点击在东/西侧之间切换</system:String>
+    <system:String x:Key="mhlPolarHome">归位位置位于地平线上方 5 度</system:String>
+    <system:String x:Key="mhlPolarHomeText">主镜筒位于 {0} 侧并指向 {1}</system:String>
+    <system:String x:Key="mhlHomeButtonToolTip">归位设置</system:String>
+
+
+    <system:String x:Key="focuserAutoConnect">自动连接</system:String>
+    <system:String x:Key="focuserAutoConnectTooltip">随赤道仪自动连接</system:String>
+
+    <!--  1.2.1.1  -->
+    <!--  Home Settings  -->
+    <system:String x:Key="homeSettings">归位设置</system:String>
+    <system:String x:Key="lbHomePosition">归位位置</system:String>
+    <system:String x:Key="lbAutoHomePosition">自动归位传感器位置</system:String>
+    <system:String x:Key="lbAutoHomeDefault">出厂设置</system:String>
+    <system:String x:Key="lbAutoHomePositionGEM">赤经=90&#x00B0;，赤纬=90&#x00B0;</system:String>
+    <system:String x:Key="lbAutoHomePositionPolarRADec">自定义赤经/赤纬设置</system:String>
+    <system:String x:Key="lbAutoHomePositionPolarAzAlt">自定义方位角/高度角设置</system:String>
+    <system:String x:Key="lbAxisX">方位角：</system:String>
+    <system:String x:Key="lbAxisY">高度角：</system:String>
+    <system:String x:Key="lbHomePositionPolar">方位角 = 180，高度角 [-10 .. 10]（极轴）</system:String>
+    <system:String x:Key="lbHomePositionToolTipHome">归位位置高度角（度）</system:String>
+    <system:String x:Key="lbAutoHomeLocationTooltip">自动归位传感器位置高度角（度）</system:String>
+
+    <!--  1.2.1.3  -->
+    <!--  Park Settings  -->
+    <system:String x:Key="capTrackAfterUnpark">解除停放后跟踪</system:String>
+
+    <!--  1.2.2.0  -->
+    <!--  Home Park Position  -->
+    <system:String x:Key="lbHomeParkPosition">归位停放位置</system:String>
+    <system:String x:Key="lbHomeParkDefault">默认 GEM (90, 90)</system:String>
+    <system:String x:Key="lbHomeParkCustom">自定义方位角 / 高度角</system:String>
+    <system:String x:Key="lbHomeParkAz">方位角（0 - 360）：</system:String>
+    <system:String x:Key="lbHomeParkAlt">高度角（-90 - 90）：</system:String>
+    <system:String x:Key="ttHomeParkPosition">设置请求“归位”时使用的停放位置。仅适用于极轴模式。</system:String>
+    <system:String x:Key="ttHomeParkDefault">使用默认归位停放位置：方位角朝向天极，高度角等于站点纬度。</system:String>
+    <system:String x:Key="ttHomeParkCustom">为归位停放位置输入自定义方位角和高度角。</system:String>
+    <system:String x:Key="ttHomeParkAz">归位停放位置的方位角，单位为度（0 到 360）。</system:String>
+    <system:String x:Key="ttHomeParkAlt">归位停放位置的高度角，单位为度（-90 到 90）。</system:String>
+    <system:String x:Key="homeSettingsParkOutsideLimits">归位停放位置超出轴限位。请选择其他位置。</system:String>
+    <system:String x:Key="homeSettingsParkThroughPole">归位停放位置需要越过极点转动，不允许使用。请选择其他位置。</system:String>
+
+    <!--  1.2.2.1  -->
+    <system:String x:Key="btnLimits">限位</system:String>
+    <system:String x:Key="vceLimitsOff">限位关闭</system:String>
+    <system:String x:Key="vceLimitsOn">限位开启</system:String>
+
+    <!--  1.2.2.2  -->
+    <system:String x:Key="lbOneClickStart">一键启动</system:String>
+</ResourceDictionary>
