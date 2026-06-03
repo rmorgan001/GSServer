@@ -1457,6 +1457,11 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
+        /// used by command-line argument /autoconnect to connect to the mount when the server starts
+        /// </summary>
+        public static bool StartConnected { get; set; }
+
+        /// <summary>
         /// Dec target for slewing, epoch is same as EquatorialSystem Property
         /// convert to top-o-centric for any internal calculations
         /// </summary>

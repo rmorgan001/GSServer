@@ -612,6 +612,10 @@ namespace GS.Server
                     switch (arg.ToLower())
                     {
                         // should the profile be removed?
+                        case "-autoconnect":
+                        case @"/autoconnect":
+                            SkyServer.StartConnected = true;
+                            break;
                         case "-unprofile":
                         case @"/unprofile":
                             _removeProfile = true;

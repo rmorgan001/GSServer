@@ -260,6 +260,22 @@ namespace GS.Server.SkyTelescope
                     IsGermanPolarMode = (SkySettings.AlignmentMode == AlignmentModes.algGermanPolar);
 
                     DiscoverySetup();
+
+                    if (SkyServer.StartConnected)
+                    {
+                        monitorItem = new MonitorEntry
+                        {
+                            Datetime = HiResDateTime.UtcNow,
+                            Device = MonitorDevice.Ui,
+                            Category = MonitorCategory.Interface,
+                            Type = MonitorType.Error,
+                            Method = MethodBase.GetCurrentMethod()?.Name,
+                            Thread = Thread.CurrentThread.ManagedThreadId,
+                            Message = $"command-line AutoConnect|{SkyServer.StartConnected}"
+                        };
+                        MonitorLog.LogToMonitor(monitorItem);
+                        ClickConnect();
+                    }
                 }
 
                 // check to make sure window is visible then connect if requested.
