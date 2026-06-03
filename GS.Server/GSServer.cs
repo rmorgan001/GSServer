@@ -169,7 +169,7 @@ namespace GS.Server
                 SaveAllAppSettings();
 
                 var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer: Exiting" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "GSServer: Exiting" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 var wParam = new UIntPtr(0);
@@ -208,14 +208,14 @@ namespace GS.Server
 
             var dir = new DirectoryInfo(assyPath);
             var files = new List<FileInfo>();
-            var driverpath = dir + "\\" + DriverName;
-            if (File.Exists(driverpath)) { files.Add(new FileInfo(driverpath)); }
+            var driverPath = dir + "\\" + DriverName;
+            if (File.Exists(driverPath)) { files.Add(new FileInfo(driverPath)); }
 
-            var apipath = dir + "\\" + ApiName;
-            if (File.Exists(apipath)) { files.Add(new FileInfo(apipath)); }
+            var apiPath = dir + "\\" + ApiName;
+            if (File.Exists(apiPath)) { files.Add(new FileInfo(apiPath)); }
 
-            var dllfiles = files.ToArray();
-            if (dllfiles.Length == 0)
+            var dllFiles = files.ToArray();
+            if (dllFiles.Length == 0)
             {
                 var msg = @"Unable to locate any drivers - " + assyPath;
 
@@ -226,7 +226,7 @@ namespace GS.Server
                 return false;
             }
 
-            foreach (var fi in dllfiles)
+            foreach (var fi in dllFiles)
             {
                 var aPath = fi.FullName;
                 //
@@ -244,8 +244,8 @@ namespace GS.Server
                         // Check to see if the type has the ServedClassName attribute, only use it if it does.
                         MemberInfo info = type;
 
-                        var attrbutes = info.GetCustomAttributes(typeof(ServedClassNameAttribute), false);
-                        if (attrbutes.Length > 0)
+                        var attributes = info.GetCustomAttributes(typeof(ServedClassNameAttribute), false);
+                        if (attributes.Length > 0)
                         {
                             var monitorItem = new MonitorEntry
                             { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{type.Assembly}" };
@@ -253,10 +253,10 @@ namespace GS.Server
 
                             _comObjectTypes.Add(type); //PWGS - much simpler
                         }
-                        var gssAttrbutes = info.GetCustomAttributes(typeof(GssAttribute), false);
-                        if (gssAttrbutes.Length > 0)
+                        var gssAttributes = info.GetCustomAttributes(typeof(GssAttribute), false);
+                        if (gssAttributes.Length > 0)
                         {
-                            var a = (GssAttribute)gssAttrbutes[0];
+                            var a = (GssAttribute)gssAttributes[0];
 
                             var monitorItem = new MonitorEntry
                             { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{type.Assembly}|{a.DisplayName}" };
@@ -345,9 +345,9 @@ namespace GS.Server
         //
         // Using the list of COM object types generated during dynamic
         // assembly loading, it registers each one for COM as served by our
-        // exe/local server, as well as registering it for ASCOM. It also
+        // exe/local server, as well as registering it for asCom. It also
         // adds DCOM info for the local server itself, so it can be activated
-        // via an outboiud connection from TheSky.
+        // via an outBound connection from TheSky.
         private static void RegisterObjects()
         {
             if (!IsAdministrator)
@@ -607,7 +607,7 @@ namespace GS.Server
             var bRet = true;
             if (args.Count > 0)
             {
-                foreach (string arg in args)
+                foreach (var arg in args)
                 {
                     switch (arg.ToLower())
                     {
@@ -663,7 +663,7 @@ namespace GS.Server
                             break;
                         default:
                             MessageBox.Show(
-                                @"Unknown argument: '" + arg.ToLower() + @"' Valid: /unprofile, /register, /unregister, /embedding, /pec, /english, /french, /german, /italian, /chinese",
+                                @"Unknown argument: '" + arg.ToLower() + @"' Valid: /autoconnect, /unprofile, /register, /unregister, /embedding, /pec, /english, /french, /german, /italian, /chinese",
                                 @"GSServer", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                             break;
                     }
@@ -708,7 +708,7 @@ namespace GS.Server
             LogSystemInfo(args);
 
             var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer: Starting Main Thread" };
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "GSServer: Starting Main Thread" };
             MonitorLog.LogToMonitor(monitorItem);
 
             if (!LoadComObjectAssemblies()) return; // Load served COM class assemblies, get types
@@ -736,7 +736,7 @@ namespace GS.Server
                 app.Run();
 
                 monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"GSServer: Shutdown" };
+                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "GSServer: Shutdown" };
                 MonitorLog.LogToMonitor(monitorItem);
 
             }
