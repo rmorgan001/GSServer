@@ -279,7 +279,7 @@ namespace GS.Server.Main
                             _model3DVm = new Model3Dvm();
                             PageViewModels.Add(_model3DVm);
                         }
-                        Model3DVmRadioVisible = true;
+                        Model3DRadioVisible = true;
                     }
                     else
                     {
@@ -287,7 +287,7 @@ namespace GS.Server.Main
                         {
                             PageViewModels.Remove(_model3DVm);
                         }
-                        Model3DVmRadioVisible = false;
+                        Model3DRadioVisible = false;
                     }
                     break;
                 case "Plot":
@@ -606,14 +606,14 @@ namespace GS.Server.Main
             }
         }
 
-        private bool _model3DVmRadioVisible;
-        public bool Model3DVmRadioVisible
+        private bool _model3DRadioVisible;
+        public bool Model3DRadioVisible
         {
-            get => _model3DVmRadioVisible;
+            get => _model3DRadioVisible;
             set
             {
-                if (_model3DVmRadioVisible == value) return;
-                _model3DVmRadioVisible = value;
+                if (_model3DRadioVisible == value) return;
+                _model3DRadioVisible = value;
                 OnPropertyChanged();
             }
         }
