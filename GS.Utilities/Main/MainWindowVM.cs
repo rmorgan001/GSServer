@@ -13,11 +13,20 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using ASCOM.DriverAccess;
+using GS.Shared;
+using GS.Shared.Command;
+using GS.Utilities.Controls.Dialogs;
+using GS.Utilities.Helpers;
+using MaterialDesignThemes.Wpf;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.IO.Ports;
 using System.Linq;
 using System.Reflection;
@@ -26,18 +35,15 @@ using System.Threading;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
-using ASCOM.DriverAccess;
-using GS.Shared;
-using GS.Shared.Command;
-using GS.Utilities.Controls.Dialogs;
-using GS.Utilities.Helpers;
-using MaterialDesignThemes.Wpf;
+using Path = System.IO.Path;
 using Timer = System.Timers.Timer;
 
 namespace GS.Utilities.Main
 {
     internal class MainWindowVm : ObservableObject, IDisposable
     {
+        #region Fields
+        
         private static readonly string DocDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         private static readonly string LogDir = Path.Combine(DocDir, "GSServer");
 
@@ -58,6 +64,8 @@ namespace GS.Utilities.Main
         private bool _axis;
         private const string Zoom = "Zoom Zoom...";
         private Stopwatch _startTime;
+        
+        #endregion
 
         public MainWindowVm()
         {
@@ -76,6 +84,10 @@ namespace GS.Utilities.Main
         }
 
         #region Settings
+        
+        public ObservableCollection<FolderItem> Folders { get; set; }
+        
+        public List<string> Languages => Shared.Languages.SupportedLanguages;
 
         private string _version;
         public string Version
@@ -100,8 +112,6 @@ namespace GS.Utilities.Main
             }
         }
 
-        public List<string> Languages => Shared.Languages.SupportedLanguages;
-
         public string Lang
         {
             get => Properties.Utilities.Default.Language;
@@ -116,6 +126,53 @@ namespace GS.Utilities.Main
         #endregion
 
         #region Methods
+        
+        private void CreateFolderList()
+        {
+            Folders.Clear();
+            if (Directory.Exists(LogDir))
+            {
+                var total = GetFilesCount(LogDir);
+                var name = $"{Application.Current.Resources["utilLogFiles"]}";
+                Folders.Add(new FolderItem { Name = name, NameCount = name + $" ({total})", Path = LogDir, IsSelected = false });
+            }
+
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
+            var configDirPath = Path.GetFullPath(Path.Combine(config.FilePath, @"..\..\..\"));
+            var gssFolder = Directory.GetDirectories(configDirPath, "GS.Server.exe_StrongName*");
+            if (!(gssFolder.Length > 0)) return ;
+            
+            var directoryInfo = new DirectoryInfo(gssFolder[0]);
+            var subFolders = directoryInfo.GetDirectories();
+            if (!(subFolders.Length > 0)) return ;
+            
+            foreach (var item in subFolders)
+            {
+                var cnt = GetFilesCount(item.FullName);
+                var folder = new FolderItem()
+                {
+                    Name = item.Name,
+                    NameCount = item.Name + $" ({cnt})",
+                    Path = item.FullName,
+                    IsSelected = false
+                };
+                Folders.Add(folder);
+            }
+        }
+
+        private int GetFilesCount(string folder)
+        {
+            var directory = new DirectoryInfo(folder);
+            if (!directory.Exists){ return 0; }
+            
+            // Count all files recursively
+            var totalFiles = Directory.EnumerateFiles(folder, "*", SearchOption.AllDirectories).Count();
+
+            // Count all subfolders recursively
+            var totalFolders = Directory.EnumerateDirectories(folder, "*", SearchOption.AllDirectories).Count();
+
+            return totalFiles + totalFolders;
+        }
 
         private void Exit()
         {
@@ -136,14 +193,95 @@ namespace GS.Utilities.Main
             Interval = 300.0;
             ComPort = 1;
             BaudRate = 9600;
+            Folders = new ObservableCollection<FolderItem>();
+            CreateFolderList();
         }
 
         private static bool IsGsAppOpen(string name)
         {
             return Process.GetProcesses().Any(clsProcess => clsProcess.ProcessName.Contains(name));
         }
+        
+        private int ZipMixedItemsWithDialog()
+        {
+            var saveFileDialog = new SaveFileDialog
+            {
+                InitialDirectory = LogDir,
+                FileName = "GSS Archive " + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".zip",
+                Filter = "ZIP Archive (*.zip)|*.zip",
+                DefaultExt = "zip",
+                AddExtension = true
+            };
 
+            if (saveFileDialog.ShowDialog() != true) return 0;
+            var destinationZipPath = saveFileDialog.FileName;
+            var cnt = 0;
+            
+            try
+            {
+                // Open/Create the zip archive stream
+                using (var zipToOpen = new FileStream(destinationZipPath, FileMode.Create))
+                {
+                    using (var archive = new ZipArchive(zipToOpen, ZipArchiveMode.Create))
+                    {
+                        // 1. Add individual files to the root of the ZIP
+                        //foreach (var filePath in filePaths)
+                        //{
+                        //    if (File.Exists(filePath))
+                        //    {
+                        //        var entryName = Path.GetFileName(filePath);
+                        //        archive.CreateEntryFromFile(filePath, entryName);
+                        //    }
+                        //}
 
+                        // 2. Add folders (and all their underlying contents)
+                        foreach (var folder in Folders)
+                        {
+                            var path = Directory.Exists(folder.Path);
+                            if (!path) continue;
+                            if (!folder.IsSelected) continue;
+                                
+                            var dirInfo = new DirectoryInfo(folder.Path);
+                            var rootFolderName = dirInfo.Name;
+
+                            // Grab all files inside this folder recursively
+                            var filesInfo = Directory.GetFiles(folder.Path, "*.*", SearchOption.AllDirectories);
+                            foreach (var file in filesInfo)
+                            {
+                                // Create relative path structure within the ZIP file
+                                var relativePath = file.Substring(folder.Path.Length + 1);
+                                var entryName = Path.Combine(rootFolderName, relativePath);
+                                    
+                                archive.CreateEntryFromFile(file, entryName);
+                            }
+                        }
+                    }
+                }
+
+                cnt = GetZipFileCount(destinationZipPath);
+            }
+            catch (Exception)
+            {
+                return cnt;
+            }
+            return cnt;
+        }
+        
+        static int GetZipFileCount(string zipFilePath)
+        {
+            // Open the zip file in Read mode
+            using (ZipArchive archive = ZipFile.OpenRead(zipFilePath))
+            {
+                // Filter out entries where the Name is empty (which represents directories)
+                return archive.Entries.Count(entry => !string.IsNullOrEmpty(entry.Name));
+            }
+        }
+        
+        public void Dispose()
+        {
+            _serial?.Dispose();
+            _aTimer?.Stop();
+        }
 
         #endregion
 
@@ -356,18 +494,18 @@ namespace GS.Utilities.Main
                     throw new Exception($"{Application.Current.Resources["utilTimeout"]} {_counter}");
                 }
 
-                var zoomtxt = string.Empty;
+                var zoom = string.Empty;
                 if (Interval < 11.0 && ZoomCounter < 30)
                 {
                     ZoomCounter++;
-                    if (ZoomCounter < 12) zoomtxt = Zoom.Substring(0, ZoomCounter);
+                    if (ZoomCounter < 12) zoom = Zoom.Substring(0, ZoomCounter);
                 }
 
                 InvokeOnUiThread(
                     delegate
                     {
                         SerMsg =
-                            $"{Application.Current.Resources["utilCounter"]} {_counter} {Application.Current.Resources["utilTimer"]} {_startTime.Elapsed:hh\\:mm\\:ss\\.fff}, {commandStr} {receivedData} {zoomtxt}";
+                            $@"{Application.Current.Resources["utilCounter"]} {_counter} {Application.Current.Resources["utilTimer"]} {_startTime.Elapsed:hh\:mm\:ss\.fff}, {commandStr} {receivedData} {zoom}";
                     });
                 _aTimer.Interval = Interval;
 
@@ -589,8 +727,8 @@ namespace GS.Utilities.Main
                 if (progList.Count > 0)
                 {
                     msg += $" { Application.Current.Resources["utilLocks"]} { progList.Count}";
-                    var combindedString = string.Join(Environment.NewLine, progList);
-                    OpenDialog(combindedString);
+                    var combString = string.Join(Environment.NewLine, progList);
+                    OpenDialog(combString);
                 }
 
                 if (msg == string.Empty) { msg = $"{Application.Current.Resources["utilNothing"]}"; }
@@ -612,31 +750,7 @@ namespace GS.Utilities.Main
 
         #endregion
 
-        #region DelFiles
-
-        private bool _delLogFiles;
-        public bool DelLogFiles
-        {
-            get => _delLogFiles;
-            set
-            {
-                if (_delLogFiles == value) return;
-                _delLogFiles = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _delSettings;
-        public bool DelSettings
-        {
-            get => _delSettings;
-            set
-            {
-                if (_delSettings == value) return;
-                _delSettings = value;
-                OnPropertyChanged();
-            }
-        }
+        #region Delete Files
 
         private string _delDialogMsg;
         public string DelDialogMsg
@@ -695,18 +809,21 @@ namespace GS.Utilities.Main
         {
             using (new WaitCursor())
             {
-                if (!DelSettings && !DelLogFiles) return;
-
-                if (DelSettings || DelLogFiles)
+                if (IsGsAppOpen("GS.Server") || IsGsAppOpen("GS.ChartViewer"))
                 {
-                    if (IsGsAppOpen("GS.Server") || IsGsAppOpen("GS.ChartViewer"))
-                    {
-                        var str = $"{Application.Current.Resources["utilCloseApps"]}" + Environment.NewLine;
-                        OpenDialog(str);
-                        return;
-                    }
+                    var str = $"{Application.Current.Resources["utilCloseApps"]}" + Environment.NewLine;
+                    OpenDialog(str);
+                    return;
                 }
 
+                var c = Folders?.Count(f => f.IsSelected);
+                if ( c == 0)
+                {
+                    OpenDialog($"{Application.Current.Resources["utilNoneSelected"]}");
+                    CreateFolderList();
+                    return;
+                }
+                
                 if (msg != null) DelDialogMsg = msg;
                 DelDialogContent = new DelFilesDialog();
                 IsDelDialogOpen = true;
@@ -735,100 +852,29 @@ namespace GS.Utilities.Main
             {
                 using (new WaitCursor())
                 {
-                    var msg = string.Empty;
-                    var cntLogs = 0;
-                    if (DelLogFiles)
+                    var cnt = 0;
+                    foreach (var folder in Folders)
                     {
-                        if (Directory.Exists(LogDir))
+                        try
                         {
-                            foreach (var file in Directory.EnumerateFiles(LogDir, "GSMonitorLog*.txt"))
-                            {
-                                File.Delete(file);
-                                cntLogs++;
-                            }
-
-                            foreach (var file in Directory.EnumerateFiles(LogDir, "GSErrorLog*.txt"))
-                            {
-                                File.Delete(file);
-                                cntLogs++;
-                            }
-
-                            foreach (var file in Directory.EnumerateFiles(LogDir, "GSSessionLog*.txt"))
-                            {
-                                File.Delete(file);
-                                cntLogs++;
-
-                            }
-
-                            foreach (var file in Directory.EnumerateFiles(LogDir, "GSPulsesLog*.txt"))
-                            {
-                                File.Delete(file);
-                                cntLogs++;
-                            }
+                            var path = Directory.Exists(folder.Path);
+                            if (!path) continue;
+                            if (!folder.IsSelected) continue;
+                            Directory.Delete(folder.Path, true); //if explorer folder is open Dir Not Empty error
+                            cnt++;
                         }
-
-                        msg = $"{cntLogs} {Application.Current.Resources["utilDelLogFiles"]}" + Environment.NewLine;
-                    }
-
-                    var cntSettings = 0;
-                    var cntSettingsDir = 0;
-                    if (DelSettings)
-                    {
-                        var config =
-                            ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
-                        var configDirPath = Path.GetFullPath(Path.Combine(config.FilePath, @"..\..\..\"));
-
-                        if (Directory.Exists(configDirPath))
+                        catch (Exception e)
                         {
-                            foreach (var directory in Directory.GetDirectories(configDirPath,
-                                "GS.ChartViewer.exe_StrongName*"))
-                            {
-                                cntSettings += Directory.GetFiles(directory, "*", SearchOption.AllDirectories)
-                                    .Length;
-                                cntSettingsDir += Directory.GetDirectories(directory).Length;
-                                Directory.Delete(directory, true); //if explorer folder is open Dir Not Empty error
-                            }
-
-                            foreach (var directory in Directory.GetDirectories(configDirPath,
-                                "GS.LogView.exe_StrongName*"))
-                            {
-                                cntSettings += Directory.GetFiles(directory, "*", SearchOption.AllDirectories)
-                                    .Length;
-                                cntSettingsDir += Directory.GetDirectories(directory).Length;
-                                Directory.Delete(directory, true); //if explorer folder is open Dir Not Empty error
-                            }
-
-                            foreach (var directory in Directory.GetDirectories(configDirPath,
-                                "GS.Server.exe_StrongName*"))
-                            {
-                                cntSettings += Directory.GetFiles(directory, "*", SearchOption.AllDirectories).Length;
-                                cntSettingsDir += Directory.GetDirectories(directory).Length;
-                                Directory.Delete(directory, true); //if explorer folder is open Dir Not Empty error
-                            }
-
-                            foreach (var directory in Directory.GetDirectories(configDirPath,
-                                "GS.Utilities.exe_StrongName*"))
-                            {
-                                cntSettings += Directory.GetFiles(directory, "*", SearchOption.AllDirectories).Length;
-                                cntSettingsDir += Directory.GetDirectories(directory).Length;
-                                Directory.Delete(directory, true); //if explorer folder is open Dir Not Empty error
-                            }
+                            Console.WriteLine(e);
                         }
-
-                        msg += $"{cntSettings} {Application.Current.Resources["utilDelSettings"]}" + Environment.NewLine;
-                        msg += $"{cntSettingsDir} {Application.Current.Resources["utilDelSettingsVer"]}" +
-                               Environment.NewLine;
                     }
-
+                    CreateFolderList();
                     IsDelDialogOpen = false;
-
-                    if (DelSettings || DelLogFiles)
+                    var msg = cnt + $" {Application.Current.Resources["utilDeleted"]}"; 
+                    if (cnt > 0)
                     {
                         OpenDialog(msg);
-                        DelSettings = false;
-                        DelLogFiles = false;
                     }
-
                 }
             }
             catch (Exception ex)
@@ -857,6 +903,149 @@ namespace GS.Utilities.Main
         private void CancelDelDialog()
         {
             IsDelDialogOpen = false;
+        }
+
+        #endregion
+        
+        #region Zip Files
+
+        private string _zipDialogMsg;
+        public string ZipDialogMsg
+        {
+            get => _zipDialogMsg;
+            set
+            {
+                if (_zipDialogMsg == value) return;
+                _zipDialogMsg = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isZipDialogOpen;
+        public bool IsZipDialogOpen
+        {
+            get => _isZipDialogOpen;
+            set
+            {
+                if (_isZipDialogOpen == value) return;
+                _isZipDialogOpen = value;
+                ScreenEnabled = !value;
+                OnPropertyChanged();
+            }
+        }
+
+        private object _zipDialogContent;
+        public object ZipDialogContent
+        {
+            get => _zipDialogContent;
+            set
+            {
+                if (_zipDialogContent == value) return;
+                _zipDialogContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openZipDialogCommand;
+        public ICommand OpenZipDialogCommand
+        {
+            get
+            {
+                var command = _openZipDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return (_openZipDialogCommand = new RelayCommand(
+                    param => OpenZipDialog(null)
+                ));
+            }
+        }
+        private void OpenZipDialog(string msg)
+        {
+            using (new WaitCursor())
+            {
+                if (IsGsAppOpen("GS.Server") || IsGsAppOpen("GS.ChartViewer"))
+                {
+                    var str = $"{Application.Current.Resources["utilCloseApps"]}" + Environment.NewLine;
+                    OpenDialog(str);
+                    return;
+                }
+
+                var c = Folders?.Count(f => f.IsSelected);
+                if ( c == 0)
+                {
+                    OpenDialog($"{Application.Current.Resources["utilNoneSelected"]}");
+                    CreateFolderList();
+                    return;
+                }
+                
+                if (msg != null) ZipDialogMsg = msg;
+                ZipDialogContent = new ZipFilesDialog();
+                IsZipDialogOpen = true;
+            }
+        }
+
+        private ICommand _clickZipAcceptDialogCommand;
+        public ICommand ClickAcceptZipDialogCommand
+        {
+            get
+            {
+                var command = _clickZipAcceptDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return (_clickZipAcceptDialogCommand = new RelayCommand(
+                    param => ClickZipDialog()
+                ));
+            }
+        }
+        private void ClickZipDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    
+                    var cnt = ZipMixedItemsWithDialog();
+                    CreateFolderList();
+                    IsZipDialogOpen = false;
+                    var msg = cnt + $" {Application.Current.Resources["utilCreated"]}";
+                    if (cnt > 0)
+                    {
+                        OpenDialog(msg);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                IsZipDialogOpen = false;
+                OpenDialog(ex.Message);
+            }
+
+        }
+
+        private ICommand _cancelZipDialogCommand;
+        public ICommand CancelZipDialogCommand
+        {
+            get
+            {
+                var command = _cancelZipDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return (_cancelZipDialogCommand = new RelayCommand(
+                    param => CancelZipDialog()));
+            }
+        }
+        private void CancelZipDialog()
+        {
+            IsZipDialogOpen = false;
         }
 
         #endregion
@@ -997,11 +1186,5 @@ namespace GS.Utilities.Main
         }
 
         #endregion
-
-        public void Dispose()
-        {
-            _serial?.Dispose();
-            _aTimer?.Stop();
-        }
     }
 }

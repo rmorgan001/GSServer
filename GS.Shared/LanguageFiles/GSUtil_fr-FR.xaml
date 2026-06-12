@@ -13,16 +13,18 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see<https://www.gnu.org/licenses/> .
 */-->
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:system="clr-namespace:System;assembly=mscorlib">
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <!--Dialog -->
+    <!--  Dialog  -->
     <system:String x:Key="diaAccept">Valider</system:String>
     <system:String x:Key="diaCancel">Annuler</system:String>
     <system:String x:Key="diaOk">Ok</system:String>
     <system:String x:Key="diaStart">Démarrer</system:String>
     <system:String x:Key="diaStop">Arrêter</system:String>
 
-    <!--Converters -->
+    <!--  Converters  -->
     <system:String x:Key="cvtInvNumber">Nombre invalide</system:String>
     <system:String x:Key="cvtColorToBrush">colorToBrushConverter ne supporte que la conversion à partir de couleur et chaine</system:String>
     <system:String x:Key="cvtEnumErr1">Le type doit être pour un Enum</system:String>
@@ -30,7 +32,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="cvtInvIP">IP invalide</system:String>
     <system:String x:Key="cvtRequired">Requis</system:String>
 
-    <!--Utilities-->
+    <!--  Utilities  -->
     <system:String x:Key="utilLogFiles">Fichiers journal</system:String>
     <system:String x:Key="utilSettings">Paramètres</system:String>
     <system:String x:Key="utilDelete">Supprimer</system:String>
@@ -63,5 +65,13 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="utilNotFound">Non trouvé</system:String>
 
     <system:String x:Key="optLanguage">Langages</system:String>
+
+    <!--  1.2.2.4  -->
+    <system:String x:Key="utilGbName">GS Server Paramètres et fichiers journaux</system:String>
+    <system:String x:Key="utilZip">Archive ZIP</system:String>
+    <system:String x:Key="utilAccZipFiles">Acceptez-vous de créer une archive ZIP?</system:String>
+    <system:String x:Key="utilCreated">Créé</system:String>
+    <system:String x:Key="utilDeleted">Supprimé</system:String>
+    <system:String x:Key="utilNoneSelected">Aucune sélection</system:String>
+
 </ResourceDictionary>
- 

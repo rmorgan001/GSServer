@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="GS.Utilities.Controls.Dialogs.DelFilesDialog"
+﻿<UserControl x:Class="GS.Utilities.Controls.Dialogs.ZipFilesDialog"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -14,17 +14,17 @@
         <TextBlock Margin="10,0"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
-                   Text="{DynamicResource utilAccDelFiles}" />
+                   Text="{DynamicResource utilAccZipFiles}" />
         <StackPanel Grid.Row="1"
                     Margin="0,16,0,0"
                     HorizontalAlignment="Center"
                     Orientation="Horizontal">
-            <Button Command="{Binding ClickAcceptDelDialogCommand}"
+            <Button Command="{Binding ClickAcceptZipDialogCommand}"
                     Content="{DynamicResource diaAccept}"
                     IsDefault="True"
                     Style="{DynamicResource MaterialDesignFlatButton}" />
             <Button Margin="8,0,0,0"
-                    Command="{Binding CancelDelDialogCommand}"
+                    Command="{Binding CancelZipDialogCommand}"
                     Content="{DynamicResource diaCancel}"
                     IsCancel="True"
                     Style="{DynamicResource MaterialDesignFlatButton}" />

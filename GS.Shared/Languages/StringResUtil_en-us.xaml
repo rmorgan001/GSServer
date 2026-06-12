@@ -65,4 +65,13 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="utilNotFound">Not found</system:String>
 
     <system:String x:Key="optLanguage">Languages</system:String>
+
+    <!--  1.2.2.4  -->
+    <system:String x:Key="utilGbName">GS Server Settings and Log Files</system:String>
+    <system:String x:Key="utilZip">ZIP Archive</system:String>
+    <system:String x:Key="utilAccZipFiles">Accept to make a zip archive?</system:String>
+    <system:String x:Key="utilCreated">Created</system:String>
+    <system:String x:Key="utilDeleted">Deleted</system:String>
+    <system:String x:Key="utilNoneSelected">Nothing Selected</system:String>
+
 </ResourceDictionary>
