@@ -44,6 +44,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "french"; MessagesFile: "compiler:Languages\French.isl"
 Name: "german"; MessagesFile: "compiler:Languages\German.isl"
 Name: "italian"; MessagesFile: "compiler:Languages\Italian.isl"
+; Keep this script and ChineseSimplified.isl as UTF-8 with BOM when building with Inno Setup < 6.3.
 Name: "chinese"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
 
 [Dirs]
@@ -73,8 +74,8 @@ Source: "..\Manuals\GSS Manual.pdf"; DestDir: "{app}"; DestName:"{#ManualName}";
 [Messages]
 english.WelcomeLabel2={#MyAppName} {#MyAppVersion}%n%nThis will install {#MyAppName} {#MyAppVersion} on your computer.%n%nIt is recommended that you close all other applications that may be currently using {#MyAppName}
 french.WelcomeLabel2={#MyAppName} {#MyAppVersion}%n%nCela installera {#MyAppName} {#MyAppVersion} sur votre ordinateur.%n%nIl est recommandé de fermer toutes les autres applications qui utilisent actuellement {#MyAppName}
-german.WelcomeLabel2={#MyAppName} {#MyAppVersion}%n%nThis will install {#MyAppName} {#MyAppVersion} auf deinem Computer.%n%nEs wird empfohlen, alle anderen Anwendungen zu schließen, die derzeit möglicherweise verwendet werden {#MyAppName}
-italian.WelcomeLabel2={#MyAppName} {#MyAppVersion}%n%nThis will install {#MyAppName} {#MyAppVersion} sul tuo computer.%n%nSi consiglia di chiudere tutte le altre applicazioni attualmente in uso {#MyAppName}
+german.WelcomeLabel2={#MyAppName} {#MyAppVersion}%n%nDadurch wird {#MyAppName} {#MyAppVersion} auf deinem Computer.%n%nEs wird empfohlen, alle anderen Anwendungen zu schließen, die derzeit möglicherweise verwendet werden {#MyAppName}
+italian.WelcomeLabel2={#MyAppName} {#MyAppVersion}%n%nQuesto installerà {#MyAppName} {#MyAppVersion} sul tuo computer.%n%nSi consiglia di chiudere tutte le altre applicazioni attualmente in uso {#MyAppName}
 chinese.WelcomeLabel2={#MyAppName} {#MyAppVersion}%n%n这将在你的计算机上安装 {#MyAppName} {#MyAppVersion}。%n%n建议关闭当前可能正在使用 {#MyAppName} 的所有其他应用程序。
 
 [Tasks]
@@ -164,13 +165,21 @@ begin
       // Check whether an extry exists
       if RegQueryStringValue(HKLM, UninstallRegistry, 'UninstallString', UninstallExe) then
         begin // Entry exists and previous version is installed so run its uninstaller quietly after informing the user
-          if ActiveLanguage = 'en' then
+          if ActiveLanguage = 'english' then
           begin
             MsgBox('Setup will now remove the previous version.', mbInformation, MB_OK);
           end;
-          if ActiveLanguage = 'fr' then
+          if ActiveLanguage = 'french' then
           begin
             MsgBox('Le programme d''installation supprimera désormais la version précédente.', mbInformation, MB_OK);
+          end;
+          if ActiveLanguage = 'german' then
+          begin
+            MsgBox('Das Setup entfernt nun die vorherige Version.', mbInformation, MB_OK);
+          end;
+          if ActiveLanguage = 'itialian' then
+          begin
+            MsgBox('Il programma di installazione rimuoverà ora la versione precedente.', mbInformation, MB_OK);
           end;
           if ActiveLanguage = 'chinese' then
           begin
