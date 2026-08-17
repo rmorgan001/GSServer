@@ -836,7 +836,7 @@
                                     Grid.RowSpan="4"
                                     Grid.Column="2"
                                     Grid.ColumnSpan="3"
-                                    Margin="3"
+                                    Margin="0,0,0,4"
                                     Background="{StaticResource MaterialDesignToolBarBackground}"
                                     BorderBrush="DimGray"
                                     BorderThickness="3"
@@ -857,19 +857,19 @@
                                     </Grid.RowDefinitions>
                                     <Border Grid.Row="0"
                                             Grid.ColumnSpan="5"
-                                            Margin="0,0,4,0"
+                                            Margin="0,4,0,0"
                                             Background="{StaticResource MaterialDesignToolBarBackground}"
                                             BorderBrush="DimGray"
                                             BorderThickness="3"
                                             CornerRadius="5">
                                         <StackPanel Orientation="Horizontal">
                                             <ComboBox Width="125"
-                                                      Margin="15,0,0,0"
+                                                      Margin="15,0,0,4"
                                                       md:HintAssist.Hint="{StaticResource skyOBL}"
                                                       IsEditable="False"
                                                       IsSynchronizedWithCurrentItem="True"
                                                       ItemsSource="{Binding Source={StaticResource SortedObservatories}}"
-                                                      SelectedItem="{Binding ObservatorySelectionSetting, Mode=TwoWay}"
+                                                      SelectedItem="{Binding ObservatorySelection, Mode=TwoWay}"
                                                       Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                                                       ToolTip="{StaticResource skyOBL}">
                                                 <ComboBox.ItemTemplate>
@@ -896,11 +896,16 @@
                                                     Command="{Binding OpenObservatoryDeleteDialogCommand}"
                                                     Style="{StaticResource MaterialDesignFloatingActionLightButton}"
                                                     ToolTip="Delete">
-                                                <md:PackIcon Width="22"
-                                                             Height="22"
-                                                             Kind="Minus" />
-                                            </Button>
-                                        </StackPanel>
+                                                        <md:PackIcon Width="22"
+                                                                     Height="22"
+                                                                     Kind="Minus" />
+                                                    </Button>
+                                                    <Button Margin="10,0,0,0"
+                                                            Command="{Binding ClickSaveObservatoryCommand}"
+                                                            Content="Set"
+                                                            Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                                                            ToolTip="{StaticResource skySetObs}" />
+                                                </StackPanel>
                                     </Border>
                                     <Label Grid.Row="1"
                                            Grid.Column="0"

@@ -441,7 +441,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="Observatories" Type="System.String" Scope="User">
-      <Value Profile="(Default)">[{"Name":"Default","Latitude":56.76,"Longitude":-5.85,"Elevation":10}]</Value>
+      <Value Profile="(Default)">""</Value>
     </Setting>
     <Setting Name="ActiveObservatory" Type="System.String" Scope="User">
       <Value Profile="(Default)">Default</Value>

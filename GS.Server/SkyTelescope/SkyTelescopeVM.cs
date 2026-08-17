@@ -1065,6 +1065,10 @@ namespace GS.Server.SkyTelescope
                         break;
                     case "Selection":
                         OnPropertyChanged(nameof(ObservatorySelection));
+                        UpdateLatitude();
+                        UpdateLongitude();
+                        OnPropertyChanged(nameof(Elevation));
+                        OnPropertyChanged(nameof(Temperature));
                         break;
                 }
             }

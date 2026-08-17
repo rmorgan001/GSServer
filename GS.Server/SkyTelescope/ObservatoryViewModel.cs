@@ -24,7 +24,7 @@ namespace GS.Server.SkyTelescope
     /// Provides a singleton view model for managing observatory sites, including selection and CRUD operations.
     /// </summary>
     /// <remarks>Allows addition and deletion of named observatories. Selecting an observatory
-    /// immediately applies its latitude, longitude, and elevation to <see cref="SkySettings"/>.</remarks>
+    /// immediately applies its latitude, longitude, elevation and temperature to <see cref="SkySettings"/>.</remarks>
     public sealed class ObservatoryViewModel : ObservableObject
     {
         #region Singleton
@@ -80,6 +80,7 @@ namespace GS.Server.SkyTelescope
                 SkySettings.Latitude = value.Latitude;
                 SkySettings.Longitude = value.Longitude;
                 SkySettings.Elevation = value.Elevation;
+                SkySettings.Temperature = value.Temperature;
                 SkySettings.ActiveObservatory = value.Name;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(SettingsSelection));
@@ -117,7 +118,7 @@ namespace GS.Server.SkyTelescope
             if (Observatories.Any(o => string.Equals(o.Name, trimmedName, StringComparison.OrdinalIgnoreCase)))
                 throw new InvalidOperationException($"Observatory '{trimmedName}' already exists");
 
-            var obs = new Observatory(trimmedName, SkySettings.Latitude, SkySettings.Longitude, SkySettings.Elevation);
+            var obs = new Observatory(trimmedName, SkySettings.Latitude, SkySettings.Longitude, SkySettings.Elevation, SkySettings.Temperature);
             Observatories.Add(obs);
             SkySettings.SaveObservatories(Observatories.ToList());
             SettingsSelection = obs;
@@ -139,6 +140,7 @@ namespace GS.Server.SkyTelescope
             observatory.Latitude = SkySettings.Latitude;
             observatory.Longitude = SkySettings.Longitude;
             observatory.Elevation = SkySettings.Elevation;
+            observatory.Temperature = SkySettings.Temperature;
             SkySettings.SaveObservatories(Observatories.ToList());
         }
 

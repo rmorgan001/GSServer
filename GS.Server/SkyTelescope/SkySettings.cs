@@ -19,6 +19,7 @@ using GS.Principles;
 using GS.Server.Pulses;
 using GS.Shared;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -2196,14 +2197,17 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        private static void LoadObservatories()
+        public static void LoadObservatories()
         {
             var storedJson = Properties.SkyTelescope.Default.Observatories;
             var storedList = JsonConvert.DeserializeObject<List<Observatory>>(storedJson);
 
             if (storedList == null || storedList.Count == 0)
             {
-                _observatories = new ObservableCollection<Observatory>();
+                var observatory = new Observatory("Default", Latitude, Longitude, Elevation, Temperature);
+                _observatories = new ObservableCollection<Observatory>(new[] { observatory });
+                ActiveObservatory = "Default";
+                SaveObservatories(_observatories.ToList());
                 return;
             }
 
@@ -2216,12 +2220,18 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         public static void SaveObservatories(List<Observatory> observatories)
         {
-            if (observatories == null) observatories = new List<Observatory>();
+            if (observatories == null)
+            {
+                var observatory = new Observatory("Default", Latitude, Longitude, Elevation, Temperature);
+                observatories = new List<Observatory>(new[] { observatory });
+                ActiveObservatory = "Default";
+            }
 
             var orderedList = observatories.OrderBy(o => o.Name).ToList();
             var output = JsonConvert.SerializeObject(orderedList);
             Properties.SkyTelescope.Default.Observatories = output;
             LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{output}");
+            OnStaticPropertyChanged();
         }
 
         private static string _activeObservatory;
@@ -2472,6 +2482,9 @@ namespace GS.Server.SkyTelescope
             AltAzTrackingUpdateInterval = Properties.SkyTelescope.Default.AltAzTrackingUpdateInterval;
             Enum.TryParse<Model3DType>(Properties.SkyTelescope.Default.ModelType, true, out var mtParse);
             Settings.Settings.ModelType = mtParse;
+
+            // Load observatories and set active observatory
+            LoadObservatories();
 
             // Set home axis amd park position information once all mount properties are loaded
             HomeAxisX = Properties.SkyTelescope.Default.HomeAxisX;

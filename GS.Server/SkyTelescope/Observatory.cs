@@ -29,14 +29,16 @@ namespace GS.Server.SkyTelescope
             Latitude = 0;
             Longitude = 0;
             Elevation = 0;
+            Temperature = 0;
         }
 
-        public Observatory(string name, double latitude, double longitude, double elevation)
+        public Observatory(string name, double latitude, double longitude, double elevation, double temperature)
         {
             Name = name;
             Latitude = latitude;
             Longitude = longitude;
             Elevation = elevation;
+            Temperature = temperature;
         }
 
         public string Name { get; set; }
@@ -47,6 +49,8 @@ namespace GS.Server.SkyTelescope
 
         public double Elevation { get; set; }
 
+        public double Temperature { get; set; }
+
         public override bool Equals(object obj) => Equals(obj as Observatory);
 
         private bool Equals(Observatory o)
@@ -54,10 +58,10 @@ namespace GS.Server.SkyTelescope
             if (o is null) return false;
             if (ReferenceEquals(this, o)) return true;
             if (GetType() != o.GetType()) return false;
-            return Name == o.Name && Latitude == o.Latitude && Longitude == o.Longitude && Elevation == o.Elevation;
+            return Name == o.Name && Latitude == o.Latitude && Longitude == o.Longitude && Elevation == o.Elevation && Temperature == o.Temperature;
         }
 
-        public override int GetHashCode() => (Name, Latitude, Longitude, Elevation).GetHashCode();
+        public override int GetHashCode() => (Name, Latitude, Longitude, Elevation, Temperature).GetHashCode();
 
         public static bool operator ==(Observatory lhs, Observatory rhs)
         {
