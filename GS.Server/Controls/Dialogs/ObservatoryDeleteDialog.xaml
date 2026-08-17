@@ -1,0 +1,17 @@
+﻿<UserControl x:Class="GS.Server.Controls.Dialogs.ObservatoryDeleteDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:skyTelescope="clr-namespace:GS.Server.SkyTelescope"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance skyTelescope:SkyTelescopeVm}">
+    <GroupBox Header="{StaticResource skyObsDelete}" Margin="5">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
+            <TextBlock HorizontalAlignment="Center" Text="{Binding Path=ObservatorySelectionSetting.Name, StringFormat='&quot; {0} &quot;'}" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5">
+                <Button IsDefault="False"  Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaAccept}" Command="{Binding AcceptObservatoryDeleteDialogCommand}"/>
+                <Button IsCancel="True" IsDefault="True" Margin="8 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Content="{StaticResource diaCancel}" Command="{Binding CancelObservatoryDeleteDialogCommand}"/>
+            </StackPanel>
+        </StackPanel>
+    </GroupBox>
+</UserControl>

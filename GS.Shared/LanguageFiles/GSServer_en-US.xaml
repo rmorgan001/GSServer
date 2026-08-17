@@ -421,6 +421,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skyHome2AltAz">Home Position is telescope tube horizontal pointing true North.</system:String>
     <system:String x:Key="skyParkNewName">Add new park position</system:String>
     <system:String x:Key="skyParkDelete">Delete park position?</system:String>
+    <system:String x:Key="skyObsNewName">Add new observatory</system:String>
+    <system:String x:Key="skyObsDelete">Delete observatory?</system:String>
+    <system:String x:Key="skySetObs">Set Observatory to Current Location</system:String>
+    <system:String x:Key="skyObsSaved">Location saved to</system:String>
     <system:String x:Key="skyLat0">North or South</system:String>
     <system:String x:Key="skyLat01">N/S</system:String>
     <system:String x:Key="skyLong0">East or West</system:String>

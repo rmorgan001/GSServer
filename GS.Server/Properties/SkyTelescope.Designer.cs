@@ -12,7 +12,7 @@ namespace GS.Server.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "18.5.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "18.10.0.0")]
     internal sealed partial class SkyTelescope : global::System.Configuration.ApplicationSettingsBase {
         
         private static SkyTelescope defaultInstance = ((SkyTelescope)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new SkyTelescope())));
@@ -1757,6 +1757,30 @@ namespace GS.Server.Properties {
             }
             set {
                 this["HcOneClickStart"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\"\"")]
+        public string Observatories {
+            get {
+                return ((string)(this["Observatories"]));
+            }
+            set {
+                this["Observatories"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Default")]
+        public string ActiveObservatory {
+            get {
+                return ((string)(this["ActiveObservatory"]));
+            }
+            set {
+                this["ActiveObservatory"] = value;
             }
         }
     }

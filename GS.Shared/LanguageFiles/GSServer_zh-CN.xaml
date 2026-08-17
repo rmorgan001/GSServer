@@ -421,6 +421,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skyHome2AltAz">归位位置为镜筒水平并指向真北。</system:String>
     <system:String x:Key="skyParkNewName">添加新的停放位置</system:String>
     <system:String x:Key="skyParkDelete">删除停放位置？</system:String>
+    <system:String x:Key="skyObsNewName">添加新天文台</system:String>
+    <system:String x:Key="skyObsDelete">删除天文台？</system:String>
+    <system:String x:Key="skySetObs">将天文台设置为当前位置</system:String>
+    <system:String x:Key="skyObsSaved">位置已保存到</system:String>
     <system:String x:Key="skyLat0">北或南</system:String>
     <system:String x:Key="skyLat01">南/北</system:String>
     <system:String x:Key="skyLong0">东或西</system:String>

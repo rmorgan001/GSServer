@@ -420,6 +420,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skyHome2AltAz">La Position AutoHome est définie télescope horizontal pointant vers le nord géographique.</system:String>
     <system:String x:Key="skyParkNewName">Ajouter une nouvelle position de parking</system:String>
     <system:String x:Key="skyParkDelete">Supprimer la position de parking?</system:String>
+    <system:String x:Key="skyObsNewName">Ajouter un nouvel observatoire</system:String>
+    <system:String x:Key="skyObsDelete">Supprimer l'observatoire?</system:String>
+    <system:String x:Key="skySetObs">Définir l'observatoire sur l'emplacement actuel</system:String>
+    <system:String x:Key="skyObsSaved">Emplacement enregistré dans</system:String>
     <system:String x:Key="skyLat0">Nord ou Sud</system:String>
     <system:String x:Key="skyLat01">N/S</system:String>
     <system:String x:Key="skyLong0">Est ou Ouest</system:String>

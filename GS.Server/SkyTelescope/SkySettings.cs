@@ -19,6 +19,7 @@ using GS.Principles;
 using GS.Server.Pulses;
 using GS.Shared;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -2173,6 +2174,83 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static ObservableCollection<Observatory> _observatories;
+        /// <summary>
+        /// Named observatory sites, each with latitude, longitude, and elevation.
+        /// Stored as JSON in user.config.
+        /// </summary>
+        public static ObservableCollection<Observatory> Observatories
+        {
+            get
+            {
+                if (_observatories == null || _observatories.Count == 0)
+                {
+                    LoadObservatories();
+                }
+                return _observatories;
+            }
+            set
+            {
+                _observatories = value;
+                SaveObservatories(value.ToList());
+                OnStaticPropertyChanged();
+            }
+        }
+
+        public static void LoadObservatories()
+        {
+            var storedJson = Properties.SkyTelescope.Default.Observatories;
+            var storedList = JsonConvert.DeserializeObject<List<Observatory>>(storedJson);
+
+            if (storedList == null || storedList.Count == 0)
+            {
+                var observatory = new Observatory("Default", Latitude, Longitude, Elevation, Temperature);
+                _observatories = new ObservableCollection<Observatory>(new[] { observatory });
+                ActiveObservatory = "Default";
+                SaveObservatories(_observatories.ToList());
+                return;
+            }
+
+            _observatories = new ObservableCollection<Observatory>(
+                storedList.OrderBy(o => o.Name));
+        }
+
+        /// <summary>
+        /// Serialises the list of observatories to user.config.
+        /// </summary>
+        public static void SaveObservatories(List<Observatory> observatories)
+        {
+            if (observatories == null)
+            {
+                var observatory = new Observatory("Default", Latitude, Longitude, Elevation, Temperature);
+                observatories = new List<Observatory>(new[] { observatory });
+                ActiveObservatory = "Default";
+            }
+
+            var orderedList = observatories.OrderBy(o => o.Name).ToList();
+            var output = JsonConvert.SerializeObject(orderedList);
+            Properties.SkyTelescope.Default.Observatories = output;
+            LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{output}");
+            OnStaticPropertyChanged();
+        }
+
+        private static string _activeObservatory;
+        /// <summary>
+        /// The name of the currently active observatory.
+        /// </summary>
+        public static string ActiveObservatory
+        {
+            get => _activeObservatory;
+            set
+            {
+                if (_activeObservatory == value) return;
+                _activeObservatory = value;
+                Properties.SkyTelescope.Default.ActiveObservatory = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static string _parkLimitName;
         public static string ParkLimitName
         {
@@ -2404,6 +2482,9 @@ namespace GS.Server.SkyTelescope
             AltAzTrackingUpdateInterval = Properties.SkyTelescope.Default.AltAzTrackingUpdateInterval;
             Enum.TryParse<Model3DType>(Properties.SkyTelescope.Default.ModelType, true, out var mtParse);
             Settings.Settings.ModelType = mtParse;
+
+            // Load observatories and set active observatory
+            LoadObservatories();
 
             // Set home axis amd park position information once all mount properties are loaded
             HomeAxisX = Properties.SkyTelescope.Default.HomeAxisX;

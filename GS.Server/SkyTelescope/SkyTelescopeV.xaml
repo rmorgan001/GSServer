@@ -34,6 +34,11 @@
                 <componentModel:SortDescription Direction="Ascending" PropertyName="Name" />
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
+        <CollectionViewSource x:Key="SortedObservatories" Source="{Binding Observatories}">
+            <CollectionViewSource.SortDescriptions>
+                <componentModel:SortDescription Direction="Ascending" PropertyName="Name" />
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
     </UserControl.Resources>
     <md:DialogHost CloseOnClickAway="True"
                    DialogContent="{Binding DialogContent}"
@@ -831,7 +836,7 @@
                                     Grid.RowSpan="4"
                                     Grid.Column="2"
                                     Grid.ColumnSpan="3"
-                                    Margin="3"
+                                    Margin="0,0,0,4"
                                     Background="{StaticResource MaterialDesignToolBarBackground}"
                                     BorderBrush="DimGray"
                                     BorderThickness="3"
@@ -850,11 +855,58 @@
                                         <RowDefinition />
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <Label Grid.Row="0"
-                                           Grid.Column="0"
-                                           Grid.ColumnSpan="5"
-                                           HorizontalAlignment="Center"
-                                           Content="{StaticResource skyOBL}" />
+                                    <Border Grid.Row="0"
+                                            Grid.ColumnSpan="5"
+                                            Margin="0,4,0,0"
+                                            Background="{StaticResource MaterialDesignToolBarBackground}"
+                                            BorderBrush="DimGray"
+                                            BorderThickness="3"
+                                            CornerRadius="5">
+                                        <StackPanel Orientation="Horizontal">
+                                            <ComboBox Width="125"
+                                                      Margin="15,0,0,4"
+                                                      md:HintAssist.Hint="{StaticResource skyOBL}"
+                                                      IsEditable="False"
+                                                      IsSynchronizedWithCurrentItem="True"
+                                                      ItemsSource="{Binding Source={StaticResource SortedObservatories}}"
+                                                      SelectedItem="{Binding ObservatorySelection, Mode=TwoWay}"
+                                                      Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                                                      ToolTip="{StaticResource skyOBL}">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate DataType="skyTelescope:Observatory">
+                                                        <TextBlock Text="{Binding Name}" />
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
+                                            <Button Width="25"
+                                                    Height="25"
+                                                    Margin="10,0,0,0"
+                                                    VerticalAlignment="Center"
+                                                    Command="{Binding OpenObservatoryAddDialogCommand}"
+                                                    Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+                                                    ToolTip="Add">
+                                                <md:PackIcon Width="22"
+                                                             Height="22"
+                                                             Kind="Plus" />
+                                            </Button>
+                                            <Button Width="25"
+                                                    Height="25"
+                                                    Margin="10,0,0,0"
+                                                    VerticalAlignment="Center"
+                                                    Command="{Binding OpenObservatoryDeleteDialogCommand}"
+                                                    Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+                                                    ToolTip="Delete">
+                                                        <md:PackIcon Width="22"
+                                                                     Height="22"
+                                                                     Kind="Minus" />
+                                                    </Button>
+                                                    <Button Margin="10,0,0,0"
+                                                            Command="{Binding ClickSaveObservatoryCommand}"
+                                                            Content="Set"
+                                                            Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                                                            ToolTip="{StaticResource skySetObs}" />
+                                                </StackPanel>
+                                    </Border>
                                     <Label Grid.Row="1"
                                            Grid.Column="0"
                                            HorizontalAlignment="Right"
