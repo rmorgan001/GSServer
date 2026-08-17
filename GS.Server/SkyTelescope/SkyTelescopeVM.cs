@@ -118,6 +118,7 @@ namespace GS.Server.SkyTelescope
                     Shared.Settings.StaticPropertyChanged += PropertyChangedMonitorLog;
                     Settings.Settings.StaticPropertyChanged += PropertyChangedSettings;
                     ParkPositionViewModel.Instance.PropertyChanged += PropertyChangedParkPositionViewModel;
+                    ObservatoryViewModel.Instance.PropertyChanged += PropertyChangedObservatoryViewModel;
                     GlobalStopOn = SkySettings.GlobalStopOn;
 
                     // dropdown lists
@@ -1053,6 +1054,39 @@ namespace GS.Server.SkyTelescope
             if (e.KeyChar == (char)27) {ClickStop();}
         }
 
+        private void PropertyChangedObservatoryViewModel(object sender, PropertyChangedEventArgs e)
+        {
+            try
+            {
+                switch (e.PropertyName)
+                {
+                    case "SettingsSelection":
+                        OnPropertyChanged(nameof(ObservatorySelectionSetting));
+                        break;
+                    case "Selection":
+                        OnPropertyChanged(nameof(ObservatorySelection));
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
         /// <summary>
         /// Holds and shows reported error from the server
         /// </summary>
@@ -1684,6 +1718,57 @@ namespace GS.Server.SkyTelescope
                     ParkPositionViewModel.Instance.UpdatePosition(positionToUpdate, parkCoords[0], parkCoords[1]);
                     OpenDialog($"{Application.Current.Resources["skyParkSaved"]} {positionToUpdate.Name}");
                     Synthesizer.Speak(Application.Current.Resources["vceParkSet"].ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _clickSaveObservatoryCommand;
+        public ICommand ClickSaveObservatoryCommand
+        {
+            get
+            {
+                var command = _clickSaveObservatoryCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _clickSaveObservatoryCommand = new RelayCommand(
+                    param => ClickSaveObservatory()
+                );
+            }
+        }
+        private void ClickSaveObservatory()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (ObservatorySelectionSetting == null)
+                    {
+                        OpenDialog($"{Application.Current.Resources["skyNoSelected"]}");
+                        return;
+                    }
+
+                    var obsToUpdate = ObservatorySelectionSetting;
+                    ObservatoryViewModel.Instance.UpdateObservatory(obsToUpdate);
+                    OpenDialog($"{Application.Current.Resources["skyObsSaved"]} {obsToUpdate.Name}");
                 }
             }
             catch (Exception ex)
@@ -3367,6 +3452,20 @@ namespace GS.Server.SkyTelescope
             {
                 ParkPositionViewModel.Instance.SettingsSelection = value;
             }
+        }
+
+        public ObservableCollection<Observatory> Observatories => ObservatoryViewModel.Instance.Observatories;
+
+        public Observatory ObservatorySelection
+        {
+            get => ObservatoryViewModel.Instance.Selection;
+            set => ObservatoryViewModel.Instance.Selection = value;
+        }
+
+        public Observatory ObservatorySelectionSetting
+        {
+            get => ObservatoryViewModel.Instance.SettingsSelection;
+            set => ObservatoryViewModel.Instance.SettingsSelection = value;
         }
 
         private bool _pecOn;
@@ -8479,6 +8578,298 @@ namespace GS.Server.SkyTelescope
             }
         }
         private void CancelParkAddDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
+
+        #region Observatory Delete Dialog
+
+        private ICommand _openObservatoryDeleteDialogCommand;
+        public ICommand OpenObservatoryDeleteDialogCommand
+        {
+            get
+            {
+                var command = _openObservatoryDeleteDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openObservatoryDeleteDialogCommand = new RelayCommand(
+                    param => OpenObservatoryDeleteDialog()
+                );
+            }
+        }
+        private void OpenObservatoryDeleteDialog()
+        {
+            try
+            {
+                DialogContent = new ObservatoryDeleteDialog();
+                IsDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _acceptObservatoryDeleteDialogCommand;
+        public ICommand AcceptObservatoryDeleteDialogCommand
+        {
+            get
+            {
+                var command = _acceptObservatoryDeleteDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptObservatoryDeleteDialogCommand = new RelayCommand(
+                    param => AcceptObservatoryDeleteDialog()
+                );
+            }
+        }
+        private void AcceptObservatoryDeleteDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (ObservatorySelectionSetting == null) return;
+                    ObservatoryViewModel.Instance.DeleteObservatory(ObservatorySelectionSetting);
+                    IsDialogOpen = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelObservatoryDeleteDialogCommand;
+        public ICommand CancelObservatoryDeleteDialogCommand
+        {
+            get
+            {
+                var command = _cancelObservatoryDeleteDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelObservatoryDeleteDialogCommand = new RelayCommand(
+                    param => CancelObservatoryDeleteDialog()
+                );
+            }
+        }
+        private void CancelObservatoryDeleteDialog()
+        {
+            try
+            {
+                IsDialogOpen = false;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        #endregion
+
+        #region Observatory Add Dialog
+
+        private string _observatoryNewName;
+        public string ObservatoryNewName
+        {
+            get => _observatoryNewName;
+            set
+            {
+                if (_observatoryNewName == value) return;
+                _observatoryNewName = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICommand _openObservatoryAddDialogCommand;
+        public ICommand OpenObservatoryAddDialogCommand
+        {
+            get
+            {
+                var command = _openObservatoryAddDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _openObservatoryAddDialogCommand = new RelayCommand(
+                    param => OpenObservatoryAddDialog()
+                );
+            }
+        }
+        private void OpenObservatoryAddDialog()
+        {
+            try
+            {
+                ObservatoryNewName = null;
+                DialogContent = new ObservatoryAddDialog();
+                IsDialogOpen = true;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _acceptObservatoryAddDialogCommand;
+        public ICommand AcceptObservatoryAddDialogCommand
+        {
+            get
+            {
+                var command = _acceptObservatoryAddDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _acceptObservatoryAddDialogCommand = new RelayCommand(
+                    param => AcceptObservatoryAddDialog()
+                );
+            }
+        }
+        private void AcceptObservatoryAddDialog()
+        {
+            try
+            {
+                using (new WaitCursor())
+                {
+                    if (string.IsNullOrEmpty(ObservatoryNewName)) return;
+                    ObservatoryViewModel.Instance.AddObservatory(ObservatoryNewName.Trim());
+                    IsDialogOpen = false;
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Warning,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = ex.Message
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                SkyServer.AlertState = true;
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
+            }
+        }
+
+        private ICommand _cancelObservatoryAddDialogCommand;
+        public ICommand CancelObservatoryAddDialogCommand
+        {
+            get
+            {
+                var command = _cancelObservatoryAddDialogCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _cancelObservatoryAddDialogCommand = new RelayCommand(
+                    param => CancelObservatoryAddDialog()
+                );
+            }
+        }
+        private void CancelObservatoryAddDialog()
         {
             try
             {

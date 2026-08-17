@@ -420,6 +420,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skyHome2AltAz">La Posizione di home è il telescopio orizzontale che punta verso il nord geografico.</system:String>
     <system:String x:Key="skyParkNewName">Aggiungi posizione di parcheggio</system:String>
     <system:String x:Key="skyParkDelete">Eliminare la posizione di parcheggio?</system:String>
+    <system:String x:Key="skyObsNewName">Aggiungi nuovo osservatorio</system:String>
+    <system:String x:Key="skyObsDelete">Eliminare l'osservatorio?</system:String>
+    <system:String x:Key="skySetObs">Imposta osservatorio sulla posizione corrente</system:String>
+    <system:String x:Key="skyObsSaved">Posizione salvata in</system:String>
     <system:String x:Key="skyLat0">Nord o Sud</system:String>
     <system:String x:Key="skyLat01">N/S</system:String>
     <system:String x:Key="skyLong0">Est o Ovest</system:String>

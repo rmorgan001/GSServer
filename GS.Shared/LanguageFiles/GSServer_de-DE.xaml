@@ -1,4 +1,4 @@
-<!--/* Copyright(C) 2019-2026 Rob Morgan (robert.morgan.e@gmail.com)
+﻿<!--/* Copyright(C) 2019-2026 Rob Morgan (robert.morgan.e@gmail.com)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published
@@ -420,6 +420,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="skyHome2AltAz">Die Ausgangsposition ist die horizontale Ausrichtung des Teleskoptubus auf den geografischen Norden.</system:String>
     <system:String x:Key="skyParkNewName">Neue Parkposition hinzufügen</system:String>
     <system:String x:Key="skyParkDelete">Parkposition löschen?</system:String>
+    <system:String x:Key="skyObsNewName">Neue Sternwarte hinzufügen</system:String>
+    <system:String x:Key="skyObsDelete">Sternwarte löschen?</system:String>
+    <system:String x:Key="skySetObs">Sternwarte auf aktuellen Standort setzen</system:String>
+    <system:String x:Key="skyObsSaved">Standort gespeichert in</system:String>
     <system:String x:Key="skyLat0">Nord oder Süd</system:String>
     <system:String x:Key="skyLat01">N/S</system:String>
     <system:String x:Key="skyLong0">Ost oder West</system:String>

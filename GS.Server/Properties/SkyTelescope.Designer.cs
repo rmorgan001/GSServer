@@ -989,7 +989,31 @@ namespace GS.Server.Properties {
                 this["ParkName"] = value;
             }
         }
-        
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("[{\"Name\":\"Default\",\"Latitude\":56.76,\"Longitude\":-5.85,\"Elevation\":10}]")]
+        public string Observatories {
+            get {
+                return ((string)(this["Observatories"]));
+            }
+            set {
+                this["Observatories"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Default")]
+        public string ActiveObservatory {
+            get {
+                return ((string)(this["ActiveObservatory"]));
+            }
+            set {
+                this["ActiveObservatory"] = value;
+            }
+        }
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
