@@ -123,7 +123,7 @@ namespace GS.Server.SkyTelescope
 
                     // dropdown lists
                     GuideRateOffsetList = new List<double>(Numbers.InclusiveRange(10, 100, 10));
-                    MaxSlewRates = new List<double>(Numbers.InclusiveRange(2.0, 5));
+                    MaxSlewRates = new List<double>(Numbers.InclusiveRange(2.0, 8));
                     HourAngleLimits = new List<double>(Numbers.InclusiveRange(0, 90, 1));
                     Range90 = new List<int>(Enumerable.Range(0, 90));
                     Range179 = new List<int>(Enumerable.Range(0, 180));
