@@ -33,14 +33,12 @@ using GS.Shared.Transport;
 using HelixToolkit.Wpf;
 using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -63,7 +61,9 @@ using Color = System.Windows.Media.Color;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using NativeMethods = GS.Server.Helpers.NativeMethods;
+using Path = System.IO.Path;
 using Point = System.Windows.Point;
+using Rectangle = System.Drawing.Rectangle;
 using Vector = System.Windows.Vector;
 #endregion
 
@@ -140,7 +140,7 @@ namespace GS.Server.SkyTelescope
                     Temperatures = new List<double>(Numbers.InclusiveRange(-50, 60, 1.0));
                     AutoHomeLimits = new List<int>(Enumerable.Range(20, 160));
                     DecOffsets = new List<int>() { 0, -90, 90 };
-                    AutoHomeAxisValues = new List<double>(Numbers.InclusiveRange(85.0, 95.0, 0.1));
+                    AutoHomeAxisValues = new List<double>(Numbers.InclusiveRange(85.0, 95.0));
                     MinPulseList = new List<int>(Enumerable.Range(5, 46));
                     RaBacklashList = new List<int>(Enumerable.Range(0, 1001));
                     DecBacklashList = new List<int>(Enumerable.Range(0, 1001));
@@ -149,9 +149,9 @@ namespace GS.Server.SkyTelescope
                     DecBacklashList = DecBacklashList.Concat(extendedList);
                     AxisTrackingLimits = new List<double>(Numbers.InclusiveRange(0, 15, 1));
                     AxisHzTrackingLimits = new List<double>(Numbers.InclusiveRange(-20, 20, 1));
-                    HomeAxisAltList = new List<int>(Numbers.InclusiveIntRange(-30, 30, 1));
-                    HomeParkAzList  = new List<int>(Numbers.InclusiveIntRange(0, 360, 1));
-                    HomeParkAltList = new List<int>(Numbers.InclusiveIntRange(-90, 90, 1));
+                    HomeAxisAltList = new List<int>(Numbers.InclusiveIntRange(-30, 30));
+                    HomeParkAzList  = new List<int>(Numbers.InclusiveIntRange(0, 360));
+                    HomeParkAltList = new List<int>(Numbers.InclusiveIntRange(-90, 90));
 
                     // defaults
                     AtPark = SkyServer.AtPark;
@@ -1122,10 +1122,44 @@ namespace GS.Server.SkyTelescope
 
         private void LoadImages()
         {
-            if (!string.IsNullOrEmpty(ImageFile)) return;
-            var random = new Random();
-            ImageFiles = new List<string> { "M33.png", "Horsehead.png", "NGC6992.png", "Orion.png", "IC1396.png" };
-            ImageFile = "../Resources/" + ImageFiles[random.Next(ImageFiles.Count)];
+            try
+            {
+                if (!string.IsNullOrEmpty(ImageFile)) return;
+                var random = new Random();
+                var bGDir = AppDomain.CurrentDomain.BaseDirectory + "\\Models\\Bg\\";
+                
+                if (Directory.Exists(bGDir))
+                {
+                    var extensions = new[] { ".png", ".jpg", ".gif" };
+                    var userFiles = Directory.GetFiles(bGDir)
+                        .Where(f => extensions.Contains(Path.GetExtension(f).ToLower())).Select(Path.GetFileName)
+                        .ToList();
+                    if (userFiles.Count > 0)
+                    {
+                        ImageFiles = userFiles;
+                        ImageFile = bGDir + ImageFiles[random.Next(ImageFiles.Count)];
+                        return;
+                    }
+                }
+                
+                Directory.CreateDirectory(bGDir);
+                ImageFiles = new List<string> { "M33.png", "Horsehead.png", "NGC6992.png", "Orion.png", "IC1396.png" };
+                ImageFile = "../Resources/" + ImageFiles[random.Next(ImageFiles.Count)];
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Interface,
+                    Type = MonitorType.Warning,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.StackTrace}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
         }
 
         /// <summary>

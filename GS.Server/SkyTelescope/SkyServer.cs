@@ -3047,7 +3047,7 @@ namespace GS.Server.SkyTelescope
                 Datetime = HiResDateTime.UtcNow,
                 Device = MonitorDevice.Server,
                 Category = MonitorCategory.Server,
-                Type = MonitorType.Warning,
+                Type = MonitorType.Debug,
                 Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
                 Message = string.Empty
