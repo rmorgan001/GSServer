@@ -1775,12 +1775,12 @@ namespace GS.Server.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Default")]
-        public string ActiveObservatory {
+        public string ObservatoryName {
             get {
-                return ((string)(this["ActiveObservatory"]));
+                return ((string)(this["ObservatoryName"]));
             }
             set {
-                this["ActiveObservatory"] = value;
+                this["ObservatoryName"] = value;
             }
         }
     }

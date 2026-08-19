@@ -243,6 +243,9 @@ namespace GS.Server.SkyTelescope
                         SelectedHomeParkPosition = HomeParkPositionType.Default;
                     }
 
+                    // Observatory panel initialisation
+                    ObservatorySelection = Observatories.FirstOrDefault(o => o.Name == SkySettings.ObservatoryName);
+
                     SetShowUI();
 
                     SetMainColors();
@@ -544,6 +547,12 @@ namespace GS.Server.SkyTelescope
                          break;
                      case "Elevation":
                          Elevation = SkySettings.Elevation;
+                         break;
+                     case "Temperature":
+                         OnPropertyChanged(nameof(Temperature));
+                         break;
+                     case "ObservatoryName":
+                         OnPropertyChanged(nameof(ObservatoryName));
                          break;
                      case "LimitsOn":
                          IsLimits= SkySettings.LimitsOn;
@@ -1065,6 +1074,7 @@ namespace GS.Server.SkyTelescope
                         break;
                     case "Selection":
                         OnPropertyChanged(nameof(ObservatorySelection));
+                        OnPropertyChanged(nameof(ObservatoryName));
                         UpdateLatitude();
                         UpdateLongitude();
                         OnPropertyChanged(nameof(Elevation));
@@ -1522,6 +1532,7 @@ namespace GS.Server.SkyTelescope
         }
         public IList<int> Range179 { get; }
         public IList<int> Range90 { get; }
+
         public int Lat1
         {
             get
@@ -1576,6 +1587,16 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
+        public double Latitude
+        {
+            get
+            {
+                var latitude = Math.Abs(Principles.Units.Deg2Dou(Lat1, Lat2, Lat3));
+                if (Lat0 == "S") { latitude = -latitude; }
+                return latitude;
+            }
+        }
+
         public IList<string> LongitudeRangeEw { get; }
         public string Long0
         {
@@ -1640,6 +1661,16 @@ namespace GS.Server.SkyTelescope
                 OnPropertyChanged();
             }
         }
+        public double Longitude
+        {
+            get
+            {
+                var longitude = Math.Abs(Principles.Units.Deg2Dou(Long1, Long2, Long3));
+                if (Long0 == "W") { longitude = -longitude; }
+                return longitude;
+            }
+        }
+
         public bool GlobalStopOn
         {
             get => SkySettings.GlobalStopOn;
@@ -1798,13 +1829,13 @@ namespace GS.Server.SkyTelescope
             {
                 using (new WaitCursor())
                 {
-                    if (ObservatorySelectionSetting == null)
+                    if (ObservatorySelection == null)
                     {
                         OpenDialog($"{Application.Current.Resources["skyNoSelected"]}");
                         return;
                     }
 
-                    var obsToUpdate = ObservatorySelectionSetting;
+                    var obsToUpdate = new Observatory(ObservatorySelection.Name, Latitude, Longitude, Elevation, Temperature);
                     ObservatoryViewModel.Instance.UpdateObservatory(obsToUpdate);
                     OpenDialog($"{Application.Current.Resources["skyObsSaved"]} {obsToUpdate.Name}");
                 }
@@ -1822,51 +1853,6 @@ namespace GS.Server.SkyTelescope
                     Message = $"{ex.Message}|{ex.StackTrace}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
-                SkyServer.AlertState = true;
-                OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
-            }
-        }
-
-        private ICommand _clickSaveSettingCommand;
-        public ICommand ClickSaveSettingsCommand
-        {
-            get
-            {
-                var command = _clickSaveSettingCommand;
-                if (command != null)
-                {
-                    return command;
-                }
-
-                return _clickSaveSettingCommand = new RelayCommand(
-                    param => ClickSaveSettings()
-                );
-            }
-        }
-        private void ClickSaveSettings()
-        {
-            try
-            {
-                using (new WaitCursor())
-                {
-                    GSServer.SaveAllAppSettings();
-                    SkyServer.OpenSetupDialogFinished = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Ui,
-                    Category = MonitorCategory.Interface,
-                    Type = MonitorType.Error,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"{ex.Message}|{ex.StackTrace}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
-
                 SkyServer.AlertState = true;
                 OpenDialog(ex.Message, $"{Application.Current.Resources["exError"]}");
             }
@@ -3502,8 +3488,43 @@ namespace GS.Server.SkyTelescope
 
         public Observatory ObservatorySelectionSetting
         {
-            get => ObservatoryViewModel.Instance.SettingsSelection;
-            set => ObservatoryViewModel.Instance.SettingsSelection = value;
+            get
+            {
+                var value = ObservatoryViewModel.Instance.SettingsSelection;
+                return value;
+            } 
+            set
+            {
+                ObservatoryViewModel.Instance.SettingsSelection = value;
+            }
+        }
+
+        public string ObservatoryName
+        {
+            get => SkySettings.ObservatoryName;
+            set
+            {
+                // Always resolve the requested observatory first
+                var selected = Observatories?
+                    .FirstOrDefault(o => string.Equals(o.Name, value, StringComparison.OrdinalIgnoreCase));
+
+                if (selected == null) return;
+
+                // Keep VM selection in sync with dropdown selection
+                if (!ReferenceEquals(ObservatorySelection, selected))
+                {
+                    ObservatorySelection = selected; // ObservatoryViewModel.Selection setter updates SkySettings.ObservatoryName
+                    OnPropertyChanged(nameof(ObservatorySelection));
+                }
+
+                // Defensive: ensure setting reflects selected item
+                if (!string.Equals(SkySettings.ObservatoryName, selected.Name, StringComparison.OrdinalIgnoreCase))
+                {
+                    SkySettings.ObservatoryName = selected.Name;
+                }
+
+                OnPropertyChanged();
+            }
         }
 
         private bool _pecOn;

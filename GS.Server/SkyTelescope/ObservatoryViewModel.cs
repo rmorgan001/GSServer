@@ -13,10 +13,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using GS.Server.Helpers;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using GS.Server.Helpers;
 
 namespace GS.Server.SkyTelescope
 {
@@ -36,20 +37,6 @@ namespace GS.Server.SkyTelescope
 
         private ObservatoryViewModel()
         {
-            // Restore the previously active observatory by name without pushing values
-            // back to SkySettings (they are already persisted there).
-            var activeName = SkySettings.ActiveObservatory;
-            if (!string.IsNullOrWhiteSpace(activeName))
-            {
-                _selection = Observatories.FirstOrDefault(
-                    o => string.Equals(o.Name, activeName, StringComparison.OrdinalIgnoreCase));
-                _settingsSelection = _selection;
-            }
-            else
-            {
-                _selection = Observatories.FirstOrDefault();
-                _settingsSelection = _selection;
-            }
         }
 
         #endregion
@@ -81,9 +68,8 @@ namespace GS.Server.SkyTelescope
                 SkySettings.Longitude = value.Longitude;
                 SkySettings.Elevation = value.Elevation;
                 SkySettings.Temperature = value.Temperature;
-                SkySettings.ActiveObservatory = value.Name;
+                SkySettings.ObservatoryName = value.Name;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(SettingsSelection));
             }
         }
 
@@ -116,15 +102,20 @@ namespace GS.Server.SkyTelescope
             var trimmedName = name.Trim();
 
             if (Observatories.Any(o => string.Equals(o.Name, trimmedName, StringComparison.OrdinalIgnoreCase)))
+            {
                 throw new InvalidOperationException($"Observatory '{trimmedName}' already exists");
+            }
 
             var obs = new Observatory(trimmedName, SkySettings.Latitude, SkySettings.Longitude, SkySettings.Elevation, SkySettings.Temperature);
             Observatories.Add(obs);
             SkySettings.SaveObservatories(Observatories.ToList());
             SettingsSelection = obs;
-
+            // Update the default view's current item for any CollectionViewSources bound to this collection
             var view = System.Windows.Data.CollectionViewSource.GetDefaultView(Observatories);
-            view?.MoveCurrentTo(obs);
+            if (view != null)
+            {
+                view.MoveCurrentTo(obs);
+            }
 
             Selection = obs;
         }
@@ -137,10 +128,37 @@ namespace GS.Server.SkyTelescope
         {
             if (observatory == null) return;
 
-            observatory.Latitude = SkySettings.Latitude;
-            observatory.Longitude = SkySettings.Longitude;
-            observatory.Elevation = SkySettings.Elevation;
-            observatory.Temperature = SkySettings.Temperature;
+            var current = Observatories.FirstOrDefault(o => o.Name == observatory.Name);
+            var index = Observatories.IndexOf(current);
+            if (index < 0) return;
+
+            // Remember if this position is currently selected BEFORE RemoveAt changes the binding
+            var wasSettingsSelection = SettingsSelection.Name == observatory.Name;
+            var wasSelection = Selection.Name == observatory.Name;
+
+            // Remove old object from collection (clears WPF ComboBox cache)
+            // NOTE: This will trigger IsSynchronizedWithCurrentItem binding and change SettingsSelection/Selection
+            Observatories.RemoveAt(index);
+
+            // Create new object to avoid mutating hash code while in collection
+            var updated = new Observatory(observatory.Name, observatory.Latitude, observatory.Longitude, observatory.Elevation, observatory.Temperature);
+
+            // Insert at same position to maintain order
+            Observatories.Insert(index, updated);
+
+            // Restore references based on what they were BEFORE RemoveAt
+            if (wasSettingsSelection)
+                SettingsSelection = updated;
+            if (wasSelection)
+                Selection = updated;
+
+            // Update the CollectionView's current item for ComboBoxes with IsSynchronizedWithCurrentItem="True"
+            var view = System.Windows.Data.CollectionViewSource.GetDefaultView(Observatories);
+            if (view != null)
+            {
+                view.MoveCurrentTo(updated);
+            }
+
             SkySettings.SaveObservatories(Observatories.ToList());
         }
 
@@ -164,11 +182,15 @@ namespace GS.Server.SkyTelescope
             {
                 var newIndex = Math.Max(0, index - 1);
                 if (newIndex >= Observatories.Count)
+                {
                     newIndex = Observatories.Count - 1;
+                }
 
                 SettingsSelection = Observatories[newIndex];
                 if (ReferenceEquals(Selection, observatory))
+                {
                     Selection = Observatories.FirstOrDefault();
+                }
             }
         }
 

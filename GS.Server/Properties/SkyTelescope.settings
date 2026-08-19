@@ -443,7 +443,7 @@
     <Setting Name="Observatories" Type="System.String" Scope="User">
       <Value Profile="(Default)">""</Value>
     </Setting>
-    <Setting Name="ActiveObservatory" Type="System.String" Scope="User">
+    <Setting Name="ObservatoryName" Type="System.String" Scope="User">
       <Value Profile="(Default)">Default</Value>
     </Setting>
   </Settings>
