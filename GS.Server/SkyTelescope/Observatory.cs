@@ -18,9 +18,10 @@ using System;
 namespace GS.Server.SkyTelescope
 {
     /// <summary>
-    /// Represents a named observatory site with geographic coordinates.
+    /// Represents an observatory site with a name, geographic coordinates (latitude and longitude), elevation, and temperature.
     /// </summary>
-    /// <remarks>Instances are considered equal if their name and coordinates match.</remarks>
+    /// <remarks>Observatory instances can be compared for equality based on their properties. 
+    /// This class is useful for managing observatory data in telescope control applications.</remarks>
     public class Observatory
     {
         public Observatory()
@@ -56,8 +57,15 @@ namespace GS.Server.SkyTelescope
         private bool Equals(Observatory o)
         {
             if (o is null) return false;
+            // Optimization for a common success case.
             if (ReferenceEquals(this, o)) return true;
+
+            // If run-time types are not exactly the same, return false.
             if (GetType() != o.GetType()) return false;
+
+            // Return true if the fields match.
+            // Note that the base class is not invoked because it is
+            // System.Object, which defines Equals as reference equality.
             return Name == o.Name && Latitude == o.Latitude && Longitude == o.Longitude && Elevation == o.Elevation && Temperature == o.Temperature;
         }
 
