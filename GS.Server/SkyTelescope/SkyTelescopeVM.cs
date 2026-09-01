@@ -685,6 +685,8 @@ namespace GS.Server.SkyTelescope
             }
             AtPark = SkyServer.AtPark;
 
+            OnPropertyChanged(nameof(Observatories));
+
             // Settings drawer items
             string[] propertyList = { "ParkPositions",
                 "BaudRate", "SelectedDevice", "Mount", "EquatorialCoordinateType",

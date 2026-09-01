@@ -1,4 +1,4 @@
-/* Copyright(C) 2019-2026 Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2026 Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -26,7 +26,7 @@ namespace GS.Shared.EnvironmentInfo
     {
         private const string DefaultLogPattern = "GSSEnvironment*.log";
         private const int DefaultKeepCount = 3;
-        private const int DefaultTimeoutSeconds = 5;
+        private const int DefaultTimeoutSeconds = 30;
 
         /// <summary>
         /// Log environment to the standard GSServer location in Documents\GSServer

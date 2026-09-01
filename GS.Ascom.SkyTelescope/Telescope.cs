@@ -1537,7 +1537,7 @@ namespace ASCOM.GS.Sky.Telescope
             SkyServer.SlewAltAz(alt, az, slewStartedEvent);
 
             // Clean up
-            slewStartedEvent.Dispose();
+            DisposeSlewStartedEvent(slewStartedEvent);
         }
 
         public void SlewToCoordinates(double ra, double dec)
@@ -1596,7 +1596,7 @@ namespace ASCOM.GS.Sky.Telescope
             SkyServer.SlewRaDec(raDec.X, raDec.Y, true, slewStartedEvent);
 
             // Clean up
-            slewStartedEvent.Dispose();
+            DisposeSlewStartedEvent(slewStartedEvent);
         }
 
         public void SlewToTarget()
@@ -1665,7 +1665,7 @@ namespace ASCOM.GS.Sky.Telescope
             SkyServer.SlewRaDec(raDec.X, raDec.Y, true, slewStartedEvent);
 
             // Clean up
-            slewStartedEvent.Dispose();
+            DisposeSlewStartedEvent(slewStartedEvent);
         }
 
         public void SyncToAltAz(double az, double alt)
@@ -2102,6 +2102,24 @@ namespace ASCOM.GS.Sky.Telescope
             _util.Dispose();
             _util = null;
             // free native resources if there are any.
+        }
+
+        private void DisposeSlewStartedEvent(ManualResetEvent slewStartedEvent)
+        {
+            // Clean up
+            if (slewStartedEvent.WaitOne(0))
+            {
+                slewStartedEvent.Dispose();
+            }
+            else
+            {
+                ThreadPool.RegisterWaitForSingleObject(
+                    slewStartedEvent,
+                    (state, timedOut) => ((ManualResetEvent)state).Dispose(),
+                    slewStartedEvent,
+                    Timeout.Infinite,
+                    executeOnlyOnce: true);
+            }
         }
 
         #endregion

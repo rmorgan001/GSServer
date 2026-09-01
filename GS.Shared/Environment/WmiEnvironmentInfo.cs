@@ -1,4 +1,4 @@
-/* Copyright(C) 2019-2026 Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2026 Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -26,7 +26,7 @@ namespace GS.Shared.EnvironmentInfo
     /// </summary>
     internal static class WmiEnvironmentInfo
     {
-        private const int DefaultQueryTimeoutSeconds = 2;
+        private const int DefaultQueryTimeoutSeconds = 15;
 
         /// <summary>
         /// Log WMI-based environment information with timeout protection
