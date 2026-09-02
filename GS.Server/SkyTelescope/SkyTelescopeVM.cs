@@ -755,6 +755,9 @@ namespace GS.Server.SkyTelescope
                                 case "AtPark":
                                     AtPark = SkyServer.AtPark;
                                     break;
+                                case "IsInFlipZone":
+                                    IsInFlipZone = SkyServer.IsInFlipZone;
+                                    break;
                                 case "IsSlewing":
                                     IsSlewing = SkyServer.IsSlewing;
                                     IsTracking = SkyServer.Tracking || SkyServer.SlewState == SlewType.SlewRaDec;
@@ -9334,6 +9337,20 @@ namespace GS.Server.SkyTelescope
             {
                 _flipOnGoto = value;
                 OnPropertyChanged();
+            }
+        }
+
+        private bool _isInFlipZone;
+        public bool IsInFlipZone
+        {
+            get => _isInFlipZone;
+            set
+            {
+                {
+                    if (IsInFlipZone == value) return;
+                    _isInFlipZone = value;
+                    OnPropertyChanged();
+                }
             }
         }
 

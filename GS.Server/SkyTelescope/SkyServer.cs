@@ -189,6 +189,7 @@ namespace GS.Server.SkyTelescope
         private static bool _isPulseGuidingRa;
         private static PierSide _isSideOfPier;
         private static bool _isSlewing;
+        private static bool _isInFlipZone;
         private static Exception _lastAutoHomeError;
         private static double _lha;
         private static bool _limitAlarm;
@@ -616,6 +617,21 @@ namespace GS.Server.SkyTelescope
                     Message = $"{value}|{_appAxes.Y}|{_appAxes.Y < 90 || _appAxes.Y.IsEqualTo(90, 0.0000000001)}|{_appAxes.Y > -90 || _appAxes.Y.IsEqualTo(-90, 0.0000000001)} "
                 };
                 MonitorLog.LogToMonitor(monitorItem);
+            }
+        }
+
+        /// <summary>
+        /// UI indicator for flip zone
+        /// </summary>
+        public static bool IsInFlipZone
+        {
+            get => _isInFlipZone;
+
+            private set
+            {
+                if (_isInFlipZone == value) { return; }
+                _isInFlipZone = value;
+                OnStaticPropertyChanged();
             }
         }
 
@@ -3030,6 +3046,18 @@ namespace GS.Server.SkyTelescope
         /// </summary>
         private static void CheckAxisLimits()
         {
+            // Update GEM flip zone flag - axis must be withing flip angle of the meridian (0 or 180 degrees)
+            var axisX = SouthernHemisphere ? -_appAxisX : _appAxisX;
+            if (SkySettings.AlignmentMode == AlignmentModes.algGermanPolar)
+            {
+                IsInFlipZone = (-SkySettings.HourAngleLimit <= axisX && axisX <= SkySettings.HourAngleLimit)
+                    || (180 - SkySettings.HourAngleLimit <= axisX && axisX <= 180 + SkySettings.HourAngleLimit);
+            }
+            else
+            {
+                IsInFlipZone = false;
+            }
+
             if (!SkySettings.LimitsOn) // if user shut off the Limits just return
             {
                 LimitAlarm = false;

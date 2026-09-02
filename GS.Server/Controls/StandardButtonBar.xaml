@@ -13,6 +13,19 @@
         <domain:ComparisonConverter x:Key="Compare" />
         <domain:BoolToVisConverter x:Key="BoolToVis" />
         <domain:BoolToVisClapConverter x:Key="BoolToClap" />
+
+        <Style x:Key="FlipRaisedDarkButtonStyle"
+           TargetType="{x:Type ButtonBase}"
+           BasedOn="{StaticResource MaterialDesignRaisedDarkButton}">
+            <!-- default -->
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryHueDarkForegroundBrush}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsInFlipZone}" Value="True">
+                    <Setter Property="Foreground" Value="{DynamicResource SecondaryHueMidBrush}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <CollectionViewSource x:Key="SortedParkPositions" Source="{Binding ParkPositions}">
             <CollectionViewSource.SortDescriptions>
                 <componentModel:SortDescription Direction="Ascending" PropertyName="Name" />
@@ -164,7 +177,7 @@
                     HorizontalAlignment="Left"
                     Command="{Binding OpenFlipDialogCommand}"
                     Content="{Binding FlipButtonContent}"
-                    Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                    Style="{StaticResource FlipRaisedDarkButtonStyle}"
                     ToolTip="{Binding FlipButtonTip}" />
         </md:DialogHost>
         <md:DialogHost VerticalAlignment="Bottom"
