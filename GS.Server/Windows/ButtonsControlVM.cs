@@ -185,6 +185,9 @@ namespace GS.Server.Windows
                      case "IsHome":
                          IsHome = SkyServer.IsHome;
                          break;
+                     case "IsInFlipZone":
+                         IsInFlipZone = SkyServer.IsInFlipZone;
+                         break;
                      case "IsMountRunning":
                          ScreenEnabled = SkyServer.IsMountRunning;
                          break;
@@ -3191,6 +3194,20 @@ namespace GS.Server.Windows
             {
                 _flipOnGoto = value;
                 OnPropertyChanged();
+            }
+        }
+
+        private bool _isInFlipZone;
+        public bool IsInFlipZone
+        {
+            get => _isInFlipZone;
+            set
+            {
+                {
+                    if (IsInFlipZone == value) return;
+                    _isInFlipZone = value;
+                    OnPropertyChanged();
+                }
             }
         }
 
