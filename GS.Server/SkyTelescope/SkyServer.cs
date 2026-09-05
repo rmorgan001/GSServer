@@ -6475,17 +6475,40 @@ namespace GS.Server.SkyTelescope
         /// <see langword="false"/>.</returns>
         public static bool IsTargetReachable(double[] target, SlewType slewState)
         {
-            if (SkySettings.AlignmentMode == AlignmentModes.algGermanPolar) return true;
-            switch (slewState)
+            // Find altitude if Ra Dec slew, otherwise use target[1] for Alt Az slew
+            double altitude = (slewState == SlewType.SlewRaDec) ?
+                             Coordinate.RaDec2AltAz(target[0], target[1], SkyServer.SiderealTime, SkySettings.Latitude)[0] :
+                             target[1];
+
+            // Tracking limits horizon check - no slew below this limit for any mount type
+            if ((SkySettings.HzLimitPark || SkySettings.HzLimitTracking) 
+                && altitude < SkySettings.AxisHzTrackingLimit) return false;
+
+            // Mount hardware limits check
+            switch (SkySettings.AlignmentMode)
             {
-                case SlewType.SlewRaDec:
-                case SlewType.SlewAltAz:
-                    var flipOnNextGoto = FlipOnNextGoto; // Save and restore flip on next goto state
-                    var isTargetReachable = IsTargetWithinLimits(MapSlewTargetToAxes(target, slewState));
-                    FlipOnNextGoto = flipOnNextGoto;
-                    return isTargetReachable;
+                case AlignmentModes.algAltAz:
+                    // Horizon lower and upper limits
+                    return true;
+
+                case AlignmentModes.algPolar:
+                    // Check if target is within hardware limits for polar mount
+                    switch (slewState)
+                    {
+                        case SlewType.SlewRaDec:
+                        case SlewType.SlewAltAz:
+                            var flipOnNextGoto = FlipOnNextGoto; // Save and restore flip on next goto state
+                            var isTargetReachable = IsTargetWithinLimits(MapSlewTargetToAxes(target, slewState));
+                            FlipOnNextGoto = flipOnNextGoto;
+                            return isTargetReachable;
+                        default:
+                            return false; // Other slews not implemented yet
+                    }
+                case AlignmentModes.algGermanPolar:
+                    // No harwdare constraints for German mount
+                    return true;
                 default:
-                    return false; // Other slews not implemented yet
+                    return true;
             }
         }
 

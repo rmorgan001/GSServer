@@ -16,6 +16,7 @@
 using ASCOM.DeviceInterface;
 using ASCOM.Utilities;
 using GS.Principles;
+using GS.Server.Alignment;
 using GS.Server.Helpers;
 using GS.Server.SkyTelescope;
 using GS.Shared;
@@ -1310,7 +1311,7 @@ namespace ASCOM.GS.Sky.Telescope
             var raDec = Transforms.CoordTypeToInternal(ra, dec);
             CheckRange(raDec.X, 0, 24, "SlewToCoordinatesAsync", "RightAscension");
             CheckRange(raDec.Y, -90, 90, "SlewToCoordinatesAsync", "Declination");
-            CheckReachable(raDec.X, raDec.Y, SlewType.SlewRaDec);
+            CheckReachable(ra, dec, SlewType.SlewRaDec, "SlewToCoordinatesAsync");
             var r = SkyServer.DetermineSideOfPier(raDec.X, raDec.Y);
             return r;
         }
@@ -1500,10 +1501,11 @@ namespace ASCOM.GS.Sky.Telescope
             MonitorLog.LogToMonitor(monitorItem);
 
             CheckCapability(SkySettings.CanSlewAltAz, "SlewToAltAz");
-            CheckParked("SlewToAltAz");
-            CheckTracking(false, "SlewToAltAz");
             CheckRange(az, 0, 360, "SlewToAltAz", "azimuth");
             CheckRange(alt, -90, 90, "SlewToAltAz", "Altitude");
+            CheckReachable(az, alt, SlewType.SlewAltAz, "SlewToAltAz");
+            CheckParked("SlewToAltAz");
+            CheckTracking(false, "SlewToAltAz");
             SkyServer.SlewAltAz(alt, az);
             Thread.Sleep(250); // Wait for asynchronous slewing to start
             while (SkyServer.SlewState == SlewType.SlewAltAz || SkyServer.SlewState == SlewType.SlewSettle)
@@ -1523,12 +1525,12 @@ namespace ASCOM.GS.Sky.Telescope
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(az, "\u00B0 ", ":", "", 2)}|{_util.DegreesToDMS(alt, "\u00B0 ", ":", "", 2)}" };
             MonitorLog.LogToMonitor(monitorItem);
 
-            CheckCapability(SkySettings.CanSlewAltAzAsync, "SlewToAltAzAsync");
-            CheckParked("SlewToAltAz");
-            CheckTracking(false, "SlewToAltAzAsync");
-            CheckRange(az, 0, 360, "SlewToAltAzAsync", "Azimuth");
+            CheckCapability(SkySettings.CanSlewAltAz, "SlewToAltAzAsync");
+            CheckRange(az, 0, 360, "SlewToAltAzAsync", "azimuth");
             CheckRange(alt, -90, 90, "SlewToAltAzAsync", "Altitude");
-            CheckReachable(az, alt, SlewType.SlewAltAz);
+            CheckReachable(az, alt, SlewType.SlewAltAz, "SlewToAltAzAsync");
+            CheckParked("SlewToAltAzAsync");
+            CheckTracking(false, "SlewToAltAzAsync");
 
             // Create event to signal when slew has started (IsSlewing = true)
             var slewStartedEvent = new ManualResetEvent(false);
@@ -1551,9 +1553,9 @@ namespace ASCOM.GS.Sky.Telescope
             CheckCapability(SkySettings.CanSlew, "SlewToCoordinates");
             CheckRange(ra, 0, 24, "SlewToCoordinates", "RightAscension");
             CheckRange(dec, -90, 90, "SlewToCoordinates", "Declination");
+            CheckReachable(ra, dec, SlewType.SlewRaDec, "SlewToCoordinatesAsync");
             CheckParked("SlewToCoordinates");
             CheckTracking(true, "SlewToCoordinates");
-            CheckReachable(ra, dec, SlewType.SlewRaDec);
 
             TargetRightAscension = ra;
             TargetDeclination = dec;
@@ -1580,9 +1582,8 @@ namespace ASCOM.GS.Sky.Telescope
             CheckCapability(SkySettings.CanSlewAsync, "SlewToCoordinatesAsync");
             CheckRange(ra, 0, 24, "SlewToCoordinatesAsync", "RightAscension");
             CheckRange(dec, -90, 90, "SlewToCoordinatesAsync", "Declination");
+            CheckReachable(ra, dec, SlewType.SlewRaDec, "SlewToCoordinatesAsync");
             CheckParked("SlewToCoordinatesAsync");
-            // CheckTracking(true, "SlewToCoordinatesAsync");
-            CheckReachable(ra, dec, SlewType.SlewRaDec);
 
             TargetRightAscension = ra;
             TargetDeclination = dec;
@@ -1624,7 +1625,7 @@ namespace ASCOM.GS.Sky.Telescope
             CheckRange(dec, -90, 90, "SlewToTarget", "TargetDeclination");
             CheckParked("SlewToTarget");
             CheckTracking(true, "SlewToTarget");
-            CheckReachable(RightAscension, Declination, SlewType.SlewRaDec);
+            CheckReachable(RightAscension, Declination, SlewType.SlewRaDec, "SlewToTarget");
 
             var xy = Transforms.CoordTypeToInternal(ra, dec);
             SkyServer.SlewRaDec(xy.X, xy.Y, true);
@@ -1654,7 +1655,7 @@ namespace ASCOM.GS.Sky.Telescope
             CheckRange(dec, -90, 90, "SlewToTargetAsync", "TargetDeclination");
             CheckParked("SlewToTargetAsync");
             CheckTracking(true, "SlewToTargetAsync");
-            CheckReachable(RightAscension, Declination, SlewType.SlewRaDec);
+            CheckReachable(RightAscension, Declination, SlewType.SlewRaDec, "SlewToTargetAsync");
 
             var raDec = Transforms.CoordTypeToInternal(ra, dec);
 
@@ -2000,30 +2001,34 @@ namespace ASCOM.GS.Sky.Telescope
         /// <param name="axisY">The Y-axis coordinate of the target position.</param>
         /// <param name="slewType">The type of slew operation to perform, indicating the coordinate system used.</param>
         /// <exception cref="InvalidOperationException">Thrown if the target coordinates are outside the hardware limits for the specified slew type.</exception>
-        private static void CheckReachable(double axisX, double axisY, SlewType slewType)
+        private static void CheckReachable(double axisX, double axisY, SlewType slewType, string propertyOrMethod)
         {
-            string method;
-            switch (slewType)
+            MonitorEntry monitorItem = null;
+            // Find altitude if Ra Dec slew, otherwise use axisY for Alt Az slew
+            double altitude = (slewType == SlewType.SlewRaDec) ? 
+                             Coordinate.RaDec2AltAz(axisX, axisY, SkyServer.SiderealTime, SkySettings.Latitude)[0] : 
+                             axisY;
+
+            // Tracking limits horizon check - no slew below this limit
+            if ((SkySettings.HzLimitPark || SkySettings.HzLimitTracking) && altitude < SkySettings.AxisHzTrackingLimit)
             {
-                case SlewType.SlewAltAz: 
-                    method = "SlewToCoordinates";
-                    break;
-                case SlewType.SlewRaDec:
-                    method = "SlewToAltAz";
-                    break;
-                default:
-                    method = "Unknown Slew Type";
-                    break;
+                monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{axisX}|{axisY}|{slewType}|{propertyOrMethod}|{SkySettings.AxisHzTrackingLimit}") };
+                MonitorLog.LogToMonitor(monitorItem);
+
+                throw new InvalidValueException($"{propertyOrMethod}: ({axisX}, {axisY}) are below horizon limit of {SkySettings.AxisHzTrackingLimit}");
             }
-            // Only check for polar alignment mode
-            if (SkySettings.AlignmentMode != AlignmentModes.algPolar || 
-                SkyServer.IsTargetReachable(new[] { axisX, axisY }, slewType)) return;
 
-            var monitorItem = new MonitorEntry
+            // Mount hardware limits check
+            if (!SkyServer.IsTargetReachable(new[] { axisX, axisY }, slewType))
+            {
+                monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{axisX}|{axisY}|{slewType}") };
-            MonitorLog.LogToMonitor(monitorItem);
+                MonitorLog.LogToMonitor(monitorItem);
 
-            throw new InvalidOperationException($"{method} outside hardware limits");
+                throw new InvalidOperationException($"{propertyOrMethod}: ({axisX}, {axisY}) are outside telescope hardware axis limits");
+            }
+
         }
 
         /// <summary>
