@@ -1311,7 +1311,7 @@ namespace ASCOM.GS.Sky.Telescope
             var raDec = Transforms.CoordTypeToInternal(ra, dec);
             CheckRange(raDec.X, 0, 24, "SlewToCoordinatesAsync", "RightAscension");
             CheckRange(raDec.Y, -90, 90, "SlewToCoordinatesAsync", "Declination");
-            CheckReachable(ra, dec, SlewType.SlewRaDec, "SlewToCoordinatesAsync");
+            CheckReachable(raDec.X, raDec.Y, SlewType.SlewRaDec, "SlewToCoordinatesAsync");
             var r = SkyServer.DetermineSideOfPier(raDec.X, raDec.Y);
             return r;
         }
@@ -1525,7 +1525,7 @@ namespace ASCOM.GS.Sky.Telescope
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(az, "\u00B0 ", ":", "", 2)}|{_util.DegreesToDMS(alt, "\u00B0 ", ":", "", 2)}" };
             MonitorLog.LogToMonitor(monitorItem);
 
-            CheckCapability(SkySettings.CanSlewAltAz, "SlewToAltAzAsync");
+            CheckCapability(SkySettings.CanSlewAltAzAsync, "SlewToAltAzAsync");
             CheckRange(az, 0, 360, "SlewToAltAzAsync", "azimuth");
             CheckRange(alt, -90, 90, "SlewToAltAzAsync", "Altitude");
             CheckReachable(az, alt, SlewType.SlewAltAz, "SlewToAltAzAsync");
@@ -1553,7 +1553,7 @@ namespace ASCOM.GS.Sky.Telescope
             CheckCapability(SkySettings.CanSlew, "SlewToCoordinates");
             CheckRange(ra, 0, 24, "SlewToCoordinates", "RightAscension");
             CheckRange(dec, -90, 90, "SlewToCoordinates", "Declination");
-            CheckReachable(ra, dec, SlewType.SlewRaDec, "SlewToCoordinatesAsync");
+            CheckReachable(ra, dec, SlewType.SlewRaDec, "SlewToCoordinates");
             CheckParked("SlewToCoordinates");
             CheckTracking(true, "SlewToCoordinates");
 
