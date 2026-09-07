@@ -862,4 +862,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!--  1.2.2.2  -->
     <system:String x:Key="lbOneClickStart">Avvio con un clic</system:String>
+
+    <!--  1.2.2.6  -->
+    <system:String x:Key="lblHorizonSlew">Movimenti ASCOM</system:String>
+    <system:String x:Key="ttHorizonSlew">Abilita il limite dell'orizzonte per i movimenti ASCOM</system:String>
+    <system:String x:Key="btnHorizonSlew">Rifiuta i movimenti ASCOM sotto l'orizzonte</system:String>
 </ResourceDictionary>

@@ -1530,6 +1530,7 @@ namespace GS.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool HzLimitTracking {
             get {
                 return ((bool)(this["HzLimitTracking"]));
@@ -1781,6 +1782,18 @@ namespace GS.Server.Properties {
             }
             set {
                 this["ObservatoryName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool HzLimitSlewing {
+            get {
+                return ((bool)(this["HzLimitSlewing"]));
+            }
+            set {
+                this["HzLimitSlewing"] = value;
             }
         }
     }

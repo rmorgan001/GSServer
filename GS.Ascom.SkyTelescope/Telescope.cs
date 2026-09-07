@@ -2010,14 +2010,14 @@ namespace ASCOM.GS.Sky.Telescope
                              axisY;
 
             // Tracking limits horizon check - no slew below this limit
-            if ((SkySettings.HzLimitPark || SkySettings.HzLimitTracking) && altitude < SkySettings.AxisHzTrackingLimit)
-            {
-                monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{axisX}|{axisY}|{slewType}|{propertyOrMethod}|{SkySettings.AxisHzTrackingLimit}") };
-                MonitorLog.LogToMonitor(monitorItem);
+            if (SkySettings.HzLimitSlewing && altitude < SkySettings.AxisHzTrackingLimit)
+                {
+                    monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{axisX}|{axisY}|{slewType}|{propertyOrMethod}|{SkySettings.AxisHzTrackingLimit}") };
+                    MonitorLog.LogToMonitor(monitorItem);
 
-                throw new InvalidValueException($"{propertyOrMethod}: ({axisX}, {axisY}) are below horizon limit of {SkySettings.AxisHzTrackingLimit}");
-            }
+                    throw new InvalidValueException($"{propertyOrMethod}: ({axisX}, {axisY}) are below horizon limit of {SkySettings.AxisHzTrackingLimit}");
+                }
 
             // Mount hardware limits check
             if (!SkyServer.IsTargetReachable(new[] { axisX, axisY }, slewType))

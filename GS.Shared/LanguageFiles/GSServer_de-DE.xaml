@@ -860,5 +860,10 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="vceLimitsOn">Beschränkungen für</system:String>
 
     <!--  1.2.2.2  -->
-    <system:String x:Key="lbOneClickStart">One Click Start</system:String>
+    <system:String x:Key="lbOneClickStart">Ein-Klick-Start</system:String>
+
+    <!--  1.2.2.6  -->
+    <system:String x:Key="lblHorizonSlew">ASCOM-Bewegungen</system:String>
+    <system:String x:Key="ttHorizonSlew">Aktiviere die Horizontbegrenzung für ASCOM-Bewegungen</system:String>
+    <system:String x:Key="btnHorizonSlew">ASCOM-Bewegungen unterhalb des Horizonts ablehnen</system:String>
 </ResourceDictionary>

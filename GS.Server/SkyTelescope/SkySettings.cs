@@ -1292,7 +1292,21 @@ namespace GS.Server.SkyTelescope
                 OnStaticPropertyChanged();
             }
         }
-        
+
+        private static bool _hzLimitSlewing;
+        public static bool HzLimitSlewing
+        {
+            get => _hzLimitSlewing;
+            set
+            {
+                if (_hzLimitSlewing == value) return;
+                _hzLimitSlewing = value;
+                Properties.SkyTelescope.Default.HzLimitSlewing = value;
+                LogSetting(MethodBase.GetCurrentMethod()?.Name, $"{value}");
+                OnStaticPropertyChanged();
+            }
+        }
+
         private static bool _hzLimitTracking;
         public static bool HzLimitTracking
         {
@@ -2443,6 +2457,7 @@ namespace GS.Server.SkyTelescope
             InstrumentDescription = Properties.SkyTelescope.Default.InstrumentDescription;
             InstrumentName = Properties.SkyTelescope.Default.InstrumentName;
             KingRate = Properties.SkyTelescope.Default.KingRate;
+            HzLimitSlewing = Properties.SkyTelescope.Default.HzLimitSlewing;
             LimitTracking = Properties.SkyTelescope.Default.LimitTracking;
             LimitPark = Properties.SkyTelescope.Default.LimitPark;
             LimitsOn = Properties.SkyTelescope.Default.LimitsOn;

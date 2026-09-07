@@ -864,4 +864,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!--  1.2.2.2  -->
     <system:String x:Key="lbOneClickStart">One Click Start</system:String>
+    
+    <!--  1.2.2.6  -->
+    <system:String x:Key="lblHorizonSlew">ASCOM Slews</system:String>
+    <system:String x:Key="ttHorizonSlew">Enable horizon limit for ASCOM slews</system:String>
+    <system:String x:Key="btnHorizonSlew">Reject below horizon ASCOM slews</system:String>
 </ResourceDictionary>

@@ -753,7 +753,7 @@ namespace GS.Server.SkyTelescope
                                     IsHome = SkyServer.IsHome;
                                     break;
                                 case "IsSop":
-                                    IsSoP = SkyServer.IsSop;
+                                    IsSop = SkyServer.IsSop;
                                     break;
                                 case "AtPark":
                                     AtPark = SkyServer.AtPark;
@@ -7285,14 +7285,14 @@ namespace GS.Server.SkyTelescope
             }
         }
         
-        private bool _isSoP;
-        public bool IsSoP
+        private bool _isSop;
+        public bool IsSop
         {
-            get => _isSoP;
+            get => _isSop;
             set
             {
-                if (_isSoP == value) return;
-                _isSoP = value;
+                if (_isSop == value) return;
+                _isSop = value;
                 SopBadgeContent = value ? Application.Current.Resources["btnHintTracking"].ToString() : "";
                 OnPropertyChanged();
             }
@@ -10810,6 +10810,18 @@ namespace GS.Server.SkyTelescope
             ParkHzLimitSelection = found ?? ParkPositions.FirstOrDefault();
         }
 
+        private bool _hzlimitSlewing;
+        public bool HzLimitSlewing
+        {
+            get => _hzlimitSlewing;
+            set
+            {
+                _hzlimitSlewing = value;
+                SkySettings.HzLimitSlewing = value;
+                OnPropertyChanged();
+            }
+        }
+
         private bool _hzlimitTracking;
         public bool HzLimitTracking
         {
@@ -10888,6 +10900,7 @@ namespace GS.Server.SkyTelescope
                     if (!LimitPark && !LimitTracking) { LimitNothing = true; }
                     if (LimitPark || LimitTracking) { LimitNothing = false; }
                     //Horizon
+                    HzLimitSlewing = SkySettings.HzLimitSlewing;
                     HzLimitTracking = SkySettings.HzLimitTracking;
                     HzLimitPark = SkySettings.HzLimitPark;
                     SetParkHzLimitSelection(SkySettings.ParkHzLimitName);
@@ -12758,6 +12771,7 @@ namespace GS.Server.SkyTelescope
                         //Horizon
                         HzLimitTracking = SkySettings.HzLimitTracking;
                         HzLimitPark = SkySettings.HzLimitPark;
+                        HzLimitSlewing = SkySettings.HzLimitSlewing;
                         SetParkHzLimitSelection(SkySettings.ParkHzLimitName);
                         if (!HzLimitPark && !HzLimitTracking) { HzLimitNothing = true; }
                         if (HzLimitPark || HzLimitTracking) { HzLimitNothing = false; }

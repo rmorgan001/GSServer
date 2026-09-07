@@ -863,4 +863,9 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
 
     <!--  1.2.2.2  -->
     <system:String x:Key="lbOneClickStart">一键启动</system:String>
+
+    <!--  1.2.2.6  -->
+    <system:String x:Key="lblHorizonSlew">ASCOM 转动</system:String>
+    <system:String x:Key="ttHorizonSlew">为 ASCOM 转动启用地平线限制</system:String>
+    <system:String x:Key="btnHorizonSlew">拒绝地平线以下的 ASCOM 转动</system:String>
 </ResourceDictionary>
