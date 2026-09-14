@@ -1625,7 +1625,7 @@ namespace ASCOM.GS.Sky.Telescope
             CheckRange(dec, -90, 90, "SlewToTarget", "TargetDeclination");
             CheckParked("SlewToTarget");
             CheckTracking(true, "SlewToTarget");
-            CheckReachable(RightAscension, Declination, SlewType.SlewRaDec, "SlewToTarget");
+            CheckReachable(ra, dec, SlewType.SlewRaDec, "SlewToTarget");
 
             var xy = Transforms.CoordTypeToInternal(ra, dec);
             SkyServer.SlewRaDec(xy.X, xy.Y, true);
@@ -1655,7 +1655,7 @@ namespace ASCOM.GS.Sky.Telescope
             CheckRange(dec, -90, 90, "SlewToTargetAsync", "TargetDeclination");
             CheckParked("SlewToTargetAsync");
             CheckTracking(true, "SlewToTargetAsync");
-            CheckReachable(RightAscension, Declination, SlewType.SlewRaDec, "SlewToTargetAsync");
+            CheckReachable(ra, dec, SlewType.SlewRaDec, "SlewToTargetAsync");
 
             var raDec = Transforms.CoordTypeToInternal(ra, dec);
 
@@ -2009,8 +2009,10 @@ namespace ASCOM.GS.Sky.Telescope
                              Coordinate.RaDec2AltAz(axisX, axisY, SkyServer.SiderealTime, SkySettings.Latitude)[0] : 
                              axisY;
 
-            // Tracking limits horizon check - no slew below this limit
-            if (SkySettings.HzLimitSlewing && altitude < SkySettings.AxisHzTrackingLimit)
+            // Tracking limits horizon check - no ASCOM slew below this limit
+            if (SkySettings.LimitsOn
+                && SkySettings.HzLimitSlewing
+                && altitude < SkySettings.AxisHzTrackingLimit)
                 {
                     monitorItem = new MonitorEntry
                     { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{axisX}|{axisY}|{slewType}|{propertyOrMethod}|{SkySettings.AxisHzTrackingLimit}") };

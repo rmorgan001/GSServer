@@ -6480,10 +6480,6 @@ namespace GS.Server.SkyTelescope
                              Coordinate.RaDec2AltAz(target[0], target[1], SkyServer.SiderealTime, SkySettings.Latitude)[0] :
                              target[1];
 
-            // Tracking limits horizon check - no slew below this limit for any mount type
-            if ((SkySettings.HzLimitPark || SkySettings.HzLimitTracking) 
-                && altitude < SkySettings.AxisHzTrackingLimit) return false;
-
             // Mount hardware limits check
             switch (SkySettings.AlignmentMode)
             {
