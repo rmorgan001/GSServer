@@ -45,6 +45,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="topAz">Az:</system:String>
     <system:String x:Key="topAlt">Alt:</system:String>
     <system:String x:Key="topLHA">LHA:</system:String>
+    <system:String x:Key="topLST">LST:</system:String>
 
     <!--  Button bar  -->
     <system:String x:Key="btnHome">Home</system:String>

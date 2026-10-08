@@ -187,6 +187,9 @@ namespace GS.Server.SkyTelescope
                     Azimuth = "00\xb0 00m 00s";
                     Altitude = "00\xb0 00m 00s";
                     Lha = "00h 00m 00s";
+                    Lst = "00h 00m 00s";
+                    ShowLst = false;
+                    DisplayedSiderealValue = Lha;
                     Graphic = SkySettings.FrontGraphic;
                     SetTrackingIcon(SkySettings.TrackingRate);
                     SetParkLimitSelection(SkySettings.ParkLimitName);
@@ -737,6 +740,10 @@ namespace GS.Server.SkyTelescope
                                     OpenSetupDialog = SkyServer.OpenSetupDialog;
                                     break;
                                 case "Lha":
+                                    Lha = Util.HoursToHMS(SkyServer.Lha, "h ", ":", "", 2);
+                                    break;
+                                case "SiderealTime":
+                                    Lst = Util.HoursToHMS(SkyServer.SiderealTime, "h ", ":", "", 2);
                                     Lha = Util.HoursToHMS(SkyServer.Lha, "h ", ":", "", 2);
                                     break;
                                 case "RightAscensionXForm":
@@ -3353,6 +3360,44 @@ namespace GS.Server.SkyTelescope
                 if (value == _lha) return;
                 _lha = value;
                 OnPropertyChanged();
+                if (!ShowLst) DisplayedSiderealValue = _lha;
+            }
+        }
+
+        private string _lst;
+        public string Lst
+        {
+            get => _lst;
+            set
+            {
+                if (value == _lst) return;
+                _lst = value;
+                OnPropertyChanged();
+                if (ShowLst) DisplayedSiderealValue = _lst;
+            }
+        }
+
+        private bool _showLst;
+        public bool ShowLst
+        {
+            get => _showLst;
+            set
+            {
+                if (value == _showLst) return;
+                _showLst = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _displayedSiderealValue = "00h 00m 00s";
+        public string DisplayedSiderealValue
+        {
+            get => _displayedSiderealValue;
+            set
+            {
+                if (value == _displayedSiderealValue) return;
+                _displayedSiderealValue = value;
+                OnPropertyChanged();
             }
         }
 
@@ -3431,6 +3476,48 @@ namespace GS.Server.SkyTelescope
             try
             {
                 _raInDegrees = !_raInDegrees;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message);
+            }
+        }
+
+        private ICommand _lhaLstDoubleClickCommand;
+
+        public ICommand LhaLstDoubleClickCommand
+        {
+            get
+            {
+                var command = _lhaLstDoubleClickCommand;
+                if (command != null)
+                {
+                    return command;
+                }
+
+                return _lhaLstDoubleClickCommand = new RelayCommand(
+                    ClickLhaLstDoubleClickCommand
+                );
+            }
+        }
+
+        private void ClickLhaLstDoubleClickCommand  (object parameter)
+        {
+            try
+            {
+                ShowLst = !ShowLst;
+                DisplayedSiderealValue = ShowLst ? Lst : Lha;
             }
             catch (Exception ex)
             {

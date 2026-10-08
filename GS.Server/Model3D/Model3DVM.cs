@@ -108,52 +108,51 @@ namespace GS.Server.Model3D
                 ThreadContext.BeginInvokeOnUiThread(
              delegate
              {
-                 switch (e.PropertyName)
-                 {
-                     case "Altitude":
-                         if (!AltVis) return;
-                         Altitude = _util.DegreesToDMS(SkyServer.Altitude, "° ", ":", "", 2);
-                         break;
-                     case "Azimuth":
-                         if (!AzVis) return;
-                         Azimuth = _util.DegreesToDMS(SkyServer.Azimuth, "° ", ":", "", 2);
-                         break;
-                     case "DeclinationXForm":
-                         if (!DecVis) return;
-                         Declination = _util.DegreesToDMS(SkyServer.DeclinationXForm, "° ", ":", "", 2);
-                         break;
-                     case "Lha":
-                         Lha = _util.HoursToHMS(SkyServer.Lha, "h ", ":", "", 2);
-                         break;
-                     case "RightAscensionXForm":
-                         var ra = _util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
-                         RightAscension = _raInDegrees ? _util.DegreesToDMS(_util.HMSToDegrees(ra), "° ", ":", "", 2) : ra;
-                         //RightAscension = _util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
-                         break;
-                     case "Rotate3DModel":
-                         Rotate();
-                         SetPierSideIndicator();
-                         break;
-                     case "IsMountRunning":
-                         ScreenEnabled = SkyServer.IsMountRunning;
-                         break;
-                     case "SiderealTime":
-                         if (!SideVis) return;
-                         SiderealTime = _util.HoursToHMS(SkyServer.SiderealTime);
-                         break;
-                     case "ActualAxisX":
-                         if (!RaAxisVis) return;
-                         ActualAxisX = $"{Numbers.TruncateD(SkyServer.ActualAxisX, 3):F3}";
-                         break;
-                     case "ActualAxisY":
-                         if (!DecAxisVis) return;
-                         ActualAxisY = $"{Numbers.TruncateD(SkyServer.ActualAxisY, 3):F3}";
-                         break;
-                     case "Steps":
-                         RawAxisX = $"{SkyServer.Steps[0],10:+00000000;-00000000; 00000000}";
-                         RawAxisY = $"{SkyServer.Steps[1],10:+00000000;-00000000; 00000000}";
-                         break;
-                 }
+                     switch (e.PropertyName)
+                     {
+                         case "Altitude":
+                             if (!AltVis) return;
+                             Altitude = _util.DegreesToDMS(SkyServer.Altitude, "° ", ":", "", 2);
+                             break;
+                         case "Azimuth":
+                             if (!AzVis) return;
+                             Azimuth = _util.DegreesToDMS(SkyServer.Azimuth, "° ", ":", "", 2);
+                             break;
+                         case "DeclinationXForm":
+                             if (!DecVis) return;
+                             Declination = _util.DegreesToDMS(SkyServer.DeclinationXForm, "° ", ":", "", 2);
+                             break;
+                         case "Lha":
+                             Lha = _util.HoursToHMS(SkyServer.Lha, "h ", ":", "", 2);
+                             break;
+                         case "RightAscensionXForm":
+                             var ra = _util.HoursToHMS(SkyServer.RightAscensionXForm, "h ", ":", "", 2);
+                             RightAscension = _raInDegrees ? _util.DegreesToDMS(_util.HMSToDegrees(ra), "° ", ":", "", 2) : ra;
+                             break;
+                         case "Rotate3DModel":
+                             Rotate();
+                             SetPierSideIndicator();
+                             break;
+                         case "IsMountRunning":
+                             ScreenEnabled = SkyServer.IsMountRunning;
+                             break;
+                         case "SiderealTime":
+                             Lst = _util.HoursToHMS(SkyServer.SiderealTime, "h ", ":", "", 2);
+                             Lha = _util.HoursToHMS(SkyServer.Lha, "h ", ":", "", 2);
+                             break;
+                         case "ActualAxisX":
+                             if (!RaAxisVis) return;
+                             ActualAxisX = $"{Numbers.TruncateD(SkyServer.ActualAxisX, 3):F3}";
+                             break;
+                         case "ActualAxisY":
+                             if (!DecAxisVis) return;
+                             ActualAxisY = $"{Numbers.TruncateD(SkyServer.ActualAxisY, 3):F3}";
+                             break;
+                         case "Steps":
+                             RawAxisX = $"{SkyServer.Steps[0],10:+00000000;-00000000; 00000000}";
+                             RawAxisY = $"{SkyServer.Steps[1],10:+00000000;-00000000; 00000000}";
+                             break;
+                     }
              });
             }
             catch (Exception ex)
@@ -599,18 +598,6 @@ namespace GS.Server.Model3D
             {
                 if (_cameraVis == value) return;
                 _cameraVis = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private string _siderealTime;
-        public string SiderealTime
-        {
-            get => _siderealTime;
-            set
-            {
-                if (value == _siderealTime) return;
-                _siderealTime = value;
                 OnPropertyChanged();
             }
         }
@@ -1278,6 +1265,9 @@ namespace GS.Server.Model3D
             Azimuth = "00° 00m 00s";
             Altitude = "00° 00m 00s";
             Lha = "00h 00m 00s";
+            Lst = "00h 00m 00s";
+            ShowLst = false;
+            DisplayedSiderealValue = Lha;
         }
 
         private string _altitude;
@@ -1324,6 +1314,44 @@ namespace GS.Server.Model3D
             {
                 if (value == _lha) return;
                 _lha = value;
+                OnPropertyChanged();
+                if (!ShowLst) DisplayedSiderealValue = _lha;
+            }
+        }
+
+        private string _lst;
+        public string Lst
+        {
+            get => _lst;
+            set
+            {
+                if (value == _lst) return;
+                _lst = value;
+                OnPropertyChanged();
+                if (ShowLst) DisplayedSiderealValue = _lst;
+            }
+        }
+
+        private bool _showLst;
+        public bool ShowLst
+        {
+            get => _showLst;
+            set
+            {
+                if (_showLst == value) return;
+                _showLst = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _displayedSiderealValue;
+        public string DisplayedSiderealValue
+        {
+            get => _displayedSiderealValue;
+            set
+            {
+                if (value == _displayedSiderealValue) return;
+                _displayedSiderealValue = value;
                 OnPropertyChanged();
             }
         }
@@ -1383,6 +1411,40 @@ namespace GS.Server.Model3D
             }
         }
 
+        private ICommand _lhaLstDoubleClickCommand;
+        public ICommand LhaLstDoubleClickCommand
+        {
+            get
+            {
+                var command = _lhaLstDoubleClickCommand;
+                if (command != null) return command;
+                return _lhaLstDoubleClickCommand = new RelayCommand(ClickLhaLstDoubleClickCommand);
+            }
+        }
+
+        private void ClickLhaLstDoubleClickCommand(object parameter)
+        {
+            try
+            {
+                ShowLst = !ShowLst;
+                DisplayedSiderealValue = ShowLst ? Lst : Lha;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Ui,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Error,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+                OpenDialog(ex.Message);
+            }
+        }
         #endregion
 
         #region Dialog

@@ -26,7 +26,13 @@
                Content="{StaticResource topRaShort}"
                FontSize="16"
                FontWeight="Bold"
-               Foreground="{StaticResource SecondaryHueMidBrush}" />
+               Foreground="{StaticResource SecondaryHueMidBrush}">
+            <b:Interaction.Triggers>
+                <b:EventTrigger EventName="PreviewMouseDoubleClick">
+                    <b:InvokeCommandAction Command="{Binding RaDoubleClickCommand}" />
+                </b:EventTrigger>
+            </b:Interaction.Triggers>
+        </Label>
         <Label Grid.Column="1"
                HorizontalAlignment="Center"
                VerticalAlignment="Bottom"
@@ -79,17 +85,38 @@
                FontSize="16"
                FontWeight="Bold" />
         <Label Grid.Column="8"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Bottom"
-               Content="{StaticResource topLHA}"
-               FontSize="16"
-               FontWeight="Bold"
-               Foreground="{StaticResource SecondaryHueMidBrush}" />
+       HorizontalAlignment="Center"
+       VerticalAlignment="Bottom"
+       FontSize="16"
+       FontWeight="Bold"
+       Foreground="{StaticResource SecondaryHueMidBrush}">
+            <Label.Style>
+                <Style BasedOn="{StaticResource {x:Type Label}}" TargetType="Label">
+                    <Setter Property="Content" Value="{StaticResource topLHA}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ShowLst}" Value="True">
+                            <Setter Property="Content" Value="{StaticResource topLST}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Label.Style>
+            <b:Interaction.Triggers>
+                <b:EventTrigger EventName="PreviewMouseDoubleClick">
+                    <b:InvokeCommandAction Command="{Binding LhaLstDoubleClickCommand}" />
+                </b:EventTrigger>
+            </b:Interaction.Triggers>
+        </Label>
         <Label Grid.Column="9"
                HorizontalAlignment="Center"
                VerticalAlignment="Bottom"
-               Content="{Binding Lha, UpdateSourceTrigger=PropertyChanged}"
+               Content="{Binding DisplayedSiderealValue, UpdateSourceTrigger=PropertyChanged}"
                FontSize="16"
-               FontWeight="Bold" />
+               FontWeight="Bold">
+            <b:Interaction.Triggers>
+                <b:EventTrigger EventName="PreviewMouseDoubleClick">
+                    <b:InvokeCommandAction Command="{Binding LhaLstDoubleClickCommand}" />
+                </b:EventTrigger>
+            </b:Interaction.Triggers>
+        </Label>
     </Grid>
 </UserControl>

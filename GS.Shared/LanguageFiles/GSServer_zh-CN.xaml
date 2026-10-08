@@ -45,6 +45,7 @@ along with this program.  If not, see<https://www.gnu.org/licenses/> .
     <system:String x:Key="topAz">方位角：</system:String>
     <system:String x:Key="topAlt">高度角：</system:String>
     <system:String x:Key="topLHA">地方时角：</system:String>
+    <system:String x:Key="topLST">地方恒星时：</system:String>
 
     <!--  Button bar  -->
     <system:String x:Key="btnHome">归位</system:String>
