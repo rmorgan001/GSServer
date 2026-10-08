@@ -1422,6 +1422,9 @@ namespace GS.Server.SkyTelescope
                 RightAscensionXForm = xy.X;
                 DeclinationXForm = xy.Y;
 
+                // LHA is only valid once RA has come from real mount steps
+                Lha = Coordinate.Ra2Ha12(RightAscensionXForm, SiderealTime);
+
                 OnStaticPropertyChanged();
             }
         }
@@ -7361,8 +7364,6 @@ namespace GS.Server.SkyTelescope
                 SiderealTime = GetLocalSiderealTime(); // the time is?
 
                 UpdateSteps(); // get step from the mount
-
-                Lha = Coordinate.Ra2Ha12(RightAscensionXForm, SiderealTime);
 
                 CheckSlewState(); // Track slewing state
 
