@@ -1445,6 +1445,41 @@ namespace GS.SkyWatcher
         /// <param name="cmdDataStr">The data need to send</param>
         /// <param name="ignoreWarnings">to ignore serial response issues</param>
         /// <returns>The response string from mount</returns>
+        internal bool TrySendSuspendStop(TimeSpan timeout, out string detail)
+        {
+            detail = null;
+            var serial = SkyQueue.Serial;
+            if (serial == null || !serial.IsOpen)
+            {
+                detail = "SerialUnavailable";
+                return false;
+            }
+
+            var useAdvancedStop = SupportAdvancedCommandSet && AllowAdvancedCommandSet;
+            var axis1Command = BuildRawCommand(AxisId.Axis1, useAdvancedStop ? 'X' : 'K', useAdvancedStop ? "0504" : null);
+            var axis2Command = BuildRawCommand(AxisId.Axis2, useAdvancedStop ? 'X' : 'K', useAdvancedStop ? "0504" : null);
+            var acquiredLock = false;
+
+            try
+            {
+                Monitor.TryEnter(_syncObject, timeout, ref acquiredLock);
+                if (!acquiredLock)
+                {
+                    detail = $"LockTimeout:{timeout.TotalMilliseconds:0}ms";
+                    return false;
+                }
+
+                serial.Write(axis1Command);
+                serial.Write(axis2Command);
+                detail = $"Axis1:{axis1Command.Trim()}|Axis2:{axis2Command.Trim()}|Advanced:{useAdvancedStop}";
+                return true;
+            }
+            finally
+            {
+                if (acquiredLock) Monitor.Exit(_syncObject);
+            }
+        }
+
         private string CmdToMount(AxisId axis, char command, string cmdDataStr, bool ignoreWarnings = false)
         {
             MonitorEntry monitorItem;
@@ -1564,21 +1599,11 @@ namespace GS.SkyWatcher
         /// <param name="cmdDataStr"></param>
         private string SendRequest(AxisId axis, char command, string cmdDataStr)
         {
-            const char startCharOut = ':';
-            if (cmdDataStr == null) cmdDataStr = "";
-            const int bufferSize = 20;
-            var commandStr = new StringBuilder(bufferSize);
-            commandStr.Append(startCharOut);                    // 0: Leading char
-            commandStr.Append(command);                         // 1: Length of command( Source, destination, command char, data )
-            // Target Device
-            commandStr.Append(axis == AxisId.Axis1 ? '1' : '2');// 2: Target Axis
-            // Copy command data to buffer
-            commandStr.Append(cmdDataStr);
-            commandStr.Append(EndChar);                         // CR Character            
+            var commandStr = BuildRawCommand(axis, command, cmdDataStr);
 
             var dt = HiResDateTime.UtcNow;
             var monitorItem = new MonitorEntry
-            { Datetime = dt, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{commandStr.ToString().Trim()}" };
+            { Datetime = dt, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{commandStr.Trim()}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             switch (command)
@@ -1629,9 +1654,23 @@ namespace GS.SkyWatcher
             }
 
             //Serial.Transmit(commandStr.ToString());
-            SkyQueue.Serial.Write(commandStr.ToString());
+            SkyQueue.Serial.Write(commandStr);
 
-            return commandStr.ToString().Trim();
+            return commandStr.Trim();
+        }
+
+        private static string BuildRawCommand(AxisId axis, char command, string cmdDataStr)
+        {
+            const char startCharOut = ':';
+            if (cmdDataStr == null) cmdDataStr = string.Empty;
+            const int bufferSize = 20;
+            var commandStr = new StringBuilder(bufferSize);
+            commandStr.Append(startCharOut);
+            commandStr.Append(command);
+            commandStr.Append(axis == AxisId.Axis1 ? '1' : '2');
+            commandStr.Append(cmdDataStr);
+            commandStr.Append(EndChar);
+            return commandStr.ToString();
         }
 
         ///// <summary>

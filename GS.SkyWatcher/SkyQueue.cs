@@ -353,6 +353,12 @@ namespace GS.SkyWatcher
             }
         }
 
+        public static bool TrySendSuspendStop(TimeSpan timeout, out string detail)
+        {
+            detail = null;
+            return _skyWatcher != null && _skyWatcher.TrySendSuspendStop(timeout, out detail);
+        }
+
         /// <summary>
         /// Startup Queues
         /// </summary>

@@ -138,6 +138,11 @@ namespace GS.SkyWatcher
             _commands.AllowAdvancedCommandSet = on;
         }
 
+        internal bool TrySendSuspendStop(TimeSpan timeout, out string detail)
+        {
+            return _commands.TrySendSuspendStop(timeout, out detail);
+        }
+
         /// <summary>
         /// Start tracking based degree rate.  Use for tracking and guiding, not go tos
         /// </summary>

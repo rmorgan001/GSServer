@@ -799,6 +799,11 @@ namespace GS.Server.SkyTelescope
                 Message = $"State:{state}|Mount:{SkySettings.Mount}|ConnType:{SkySystem.ConnType}|IsMountRunning:{IsMountRunning}|ApplyRecovery:{shouldApplyRecovery}"
             };
             MonitorLog.LogToMonitor(monitorItem);
+
+            if (shouldApplyRecovery)
+            {
+                SendFastSuspendStop(suspendUtc);
+            }
         }
 
         public static void NotifyPowerResumed()
@@ -827,6 +832,45 @@ namespace GS.Server.SkyTelescope
                 Message = $"State:{state}|Mount:{SkySettings.Mount}|ConnType:{SkySystem.ConnType}|IsMountRunning:{IsMountRunning}|ApplyRecovery:{shouldApplyRecovery}"
             };
             MonitorLog.LogToMonitor(monitorItem);
+        }
+
+        private static void SendFastSuspendStop(DateTime suspendUtc)
+        {
+            try
+            {
+                string detail;
+                var sent = SkyQueue.TrySendSuspendStop(TimeSpan.FromSeconds(1), out detail);
+                if (detail == null)
+                {
+                    detail = "SuspendStopUnavailable";
+                }
+
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = suspendUtc,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = sent ? MonitorType.Information : MonitorType.Warning,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = detail
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+            catch (Exception ex)
+            {
+                var failureMonitorItem = new MonitorEntry
+                {
+                    Datetime = suspendUtc,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Warning,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.InnerException?.Message}"
+                };
+                MonitorLog.LogToMonitor(failureMonitorItem);
+            }
         }
 
         /// <summary>
