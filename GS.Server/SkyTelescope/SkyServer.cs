@@ -61,6 +61,7 @@ namespace GS.Server.SkyTelescope
         private static readonly Util Util = new Util();
         private static readonly object TimerLock = new object();
         private static readonly object PowerTransitionLock = new object();
+        private static readonly object ResumeRecoveryLock = new object();
         private static MediaTimer _mediaTimer;
         private static MediaTimer _altAzTrackingTimer;
         private static Int32 _altAzTrackingLock;
@@ -213,6 +214,9 @@ namespace GS.Server.SkyTelescope
         private static PowerTransitionState _powerTransitionState = PowerTransitionState.Running;
         private static DateTime _lastSuspendUtc;
         private static DateTime _lastResumeUtc;
+        private static DateTime _recoveryDeadlineUtc;
+        private static int _recoveryAttemptCount;
+        private static bool _resumeRecoveryInProgress;
         private static double _rightAscensionXForm;
         private static bool _rotate3DModel;
         private static double _slewSettleTime;
@@ -773,6 +777,39 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        public static bool IsResumeRecoveryInProgress
+        {
+            get
+            {
+                lock (ResumeRecoveryLock)
+                {
+                    return _resumeRecoveryInProgress;
+                }
+            }
+        }
+
+        public static DateTime RecoveryDeadlineUtc
+        {
+            get
+            {
+                lock (ResumeRecoveryLock)
+                {
+                    return _recoveryDeadlineUtc;
+                }
+            }
+        }
+
+        public static int RecoveryAttemptCount
+        {
+            get
+            {
+                lock (ResumeRecoveryLock)
+                {
+                    return _recoveryAttemptCount;
+                }
+            }
+        }
+
         public static void NotifyPowerSuspending()
         {
             PowerTransitionState state;
@@ -832,6 +869,11 @@ namespace GS.Server.SkyTelescope
                 Message = $"State:{state}|Mount:{SkySettings.Mount}|ConnType:{SkySystem.ConnType}|IsMountRunning:{IsMountRunning}|ApplyRecovery:{shouldApplyRecovery}"
             };
             MonitorLog.LogToMonitor(monitorItem);
+
+            if (shouldApplyRecovery)
+            {
+                StartResumeRecovery();
+            }
         }
 
         private static void SendFastSuspendStop(DateTime suspendUtc)
@@ -871,6 +913,203 @@ namespace GS.Server.SkyTelescope
                 };
                 MonitorLog.LogToMonitor(failureMonitorItem);
             }
+        }
+
+        private static void StartResumeRecovery()
+        {
+            lock (ResumeRecoveryLock)
+            {
+                if (_resumeRecoveryInProgress)
+                {
+                    var duplicateMonitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Server,
+                        Category = MonitorCategory.Server,
+                        Type = MonitorType.Information,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = "Resume recovery already running"
+                    };
+                    MonitorLog.LogToMonitor(duplicateMonitorItem);
+                    return;
+                }
+
+                _resumeRecoveryInProgress = true;
+                _recoveryAttemptCount = 0;
+                _recoveryDeadlineUtc = HiResDateTime.UtcNow.AddSeconds(30);
+            }
+
+            Task.Run(() => ExecuteResumeRecovery());
+        }
+
+        private static void ExecuteResumeRecovery()
+        {
+            try
+            {
+                var startMonitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"Deadline:{RecoveryDeadlineUtc:O}|Mount:{SkySettings.Mount}|ConnType:{SkySystem.ConnType}"
+                };
+                MonitorLog.LogToMonitor(startMonitorItem);
+
+                Thread.Sleep(TimeSpan.FromSeconds(1));
+                if (TryFastResumeValidation())
+                {
+                    CompleteResumeRecovery(true, "Fast validation succeeded");
+                    return;
+                }
+
+                for (var attempt = 1; attempt <= 3; attempt++)
+                {
+                    if (HiResDateTime.UtcNow >= RecoveryDeadlineUtc)
+                    {
+                        break;
+                    }
+
+                    lock (ResumeRecoveryLock)
+                    {
+                        _recoveryAttemptCount = attempt;
+                    }
+
+                    if (TryReconnectAfterResume(attempt))
+                    {
+                        CompleteResumeRecovery(true, $"Reconnect succeeded attempt {attempt}");
+                        return;
+                    }
+                }
+
+                CompleteResumeRecovery(false, "Resume recovery failed before deadline");
+            }
+            catch (Exception ex)
+            {
+                CompleteResumeRecovery(false, ex.Message);
+            }
+        }
+
+        private static bool TryFastResumeValidation()
+        {
+            var command = new SkyGetMotorCardVersion(SkyQueue.NewId, AxisId.Axis1);
+            var result = SkyQueue.GetCommandResult(command);
+            var success = result.Successful && result.Exception == null && result.Result != null;
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = success ? MonitorType.Information : MonitorType.Warning,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = success ? $"MotorCard:{result.Result}" : result.Exception?.Message ?? "Fast validation failed"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+            return success;
+        }
+
+        private static bool TryReconnectAfterResume(int attempt)
+        {
+            lock (PowerTransitionLock)
+            {
+                _powerTransitionState = PowerTransitionState.RecoveringIo;
+            }
+
+            var reconnectMonitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"Attempt:{attempt}|Deadline:{RecoveryDeadlineUtc:O}"
+            };
+            MonitorLog.LogToMonitor(reconnectMonitorItem);
+
+            Tracking = false;
+            CancelAllAsync();
+            if (_mediaTimer != null) { _mediaTimer.Tick -= UpdateServerEvent; }
+            _mediaTimer?.Stop();
+            if (_altAzTrackingTimer != null) { _altAzTrackingTimer.Tick -= AltAzTrackingTimerEvent; }
+            _altAzTrackingTimer?.Stop();
+            SkyQueue.Stop();
+            SkySystem.ConnectSerial = false;
+
+            Thread.Sleep(TimeSpan.FromSeconds(attempt == 1 ? 1 : attempt == 2 ? 3 : 5));
+            SkySystem.DiscoverSerialDevices();
+            SkySystem.ConnectSerial = true;
+            if (!SkySystem.ConnectSerial)
+            {
+                return false;
+            }
+
+            var custom360Steps = new[] { 0, 0 };
+            var customWormSteps = new[] { 0.0, 0.0 };
+            if (SkySettings.CustomGearing)
+            {
+                custom360Steps = new[] { SkySettings.CustomRa360Steps, SkySettings.CustomDec360Steps };
+                customWormSteps = new[]
+                {
+                    (double)SkySettings.CustomRa360Steps / SkySettings.CustomRaWormTeeth,
+                    (double)SkySettings.CustomDec360Steps / SkySettings.CustomDecWormTeeth
+                };
+            }
+
+            SkyQueue.Start(SkySystem.Serial, custom360Steps, customWormSteps, LowVoltageEventSet);
+            if (!SkyQueue.IsRunning)
+            {
+                return false;
+            }
+
+            if (!TryFastResumeValidation())
+            {
+                return false;
+            }
+
+            _mediaTimer = new MediaTimer { Period = SkySettings.DisplayInterval, Resolution = 5 };
+            _mediaTimer.Tick += UpdateServerEvent;
+            _mediaTimer.Start();
+
+            _altAzTrackingTimer = new MediaTimer { Period = SkySettings.AltAzTrackingUpdateInterval, Resolution = 5 };
+            _altAzTrackingTimer.Tick += AltAzTrackingTimerEvent;
+            return true;
+        }
+
+        private static void CompleteResumeRecovery(bool succeeded, string detail)
+        {
+            lock (ResumeRecoveryLock)
+            {
+                _resumeRecoveryInProgress = false;
+                _recoveryDeadlineUtc = default(DateTime);
+            }
+
+            lock (PowerTransitionLock)
+            {
+                _powerTransitionState = succeeded ? PowerTransitionState.Running : PowerTransitionState.Disconnected;
+            }
+
+            if (!succeeded)
+            {
+                IsMountRunning = false;
+            }
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = succeeded ? MonitorType.Information : MonitorType.Warning,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"Succeeded:{succeeded}|Attempts:{RecoveryAttemptCount}|{detail}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
         }
 
         /// <summary>
