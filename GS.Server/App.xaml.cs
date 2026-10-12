@@ -1,6 +1,8 @@
 ﻿using GS.Server.Main;
+using GS.Server.SkyTelescope;
 using GS.Shared;
 using GS.Shared.EnvironmentInfo;
+using Microsoft.Win32;
 using System;
 using System.IO;
 using System.Linq;
@@ -57,6 +59,7 @@ namespace GS.Server
             if (!_createdNew) return;
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
 
             if (Server.Properties.Server.Default.DisableHardwareAcceleration)
             {
@@ -95,6 +98,18 @@ namespace GS.Server
             this.Shutdown();
         }
 
+        private static void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
+        {
+            switch (e.Mode)
+            {
+                case PowerModes.Suspend:
+                    SkyServer.NotifyPowerSuspending();
+                    break;
+                case PowerModes.Resume:
+                    SkyServer.NotifyPowerResumed();
+                    break;
+            }
+        }
 
         private void WriteException(Exception e)
         {
@@ -163,6 +178,7 @@ namespace GS.Server
         {
             if (disposing)
             {
+                SystemEvents.PowerModeChanged -= SystemEvents_PowerModeChanged;
                 _mutex?.Dispose();
             }
             // free native resources if there are any.

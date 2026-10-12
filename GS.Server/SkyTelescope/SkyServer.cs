@@ -60,6 +60,7 @@ namespace GS.Server.SkyTelescope
 
         private static readonly Util Util = new Util();
         private static readonly object TimerLock = new object();
+        private static readonly object PowerTransitionLock = new object();
         private static MediaTimer _mediaTimer;
         private static MediaTimer _altAzTrackingTimer;
         private static Int32 _altAzTrackingLock;
@@ -209,6 +210,9 @@ namespace GS.Server.SkyTelescope
         private static Vector _rateMoveAxes;
         private static bool _moveAxisActive;
         private static Vector _rateRaDec;
+        private static PowerTransitionState _powerTransitionState = PowerTransitionState.Running;
+        private static DateTime _lastSuspendUtc;
+        private static DateTime _lastResumeUtc;
         private static double _rightAscensionXForm;
         private static bool _rotate3DModel;
         private static double _slewSettleTime;
@@ -698,6 +702,131 @@ namespace GS.Server.SkyTelescope
 
                 OnStaticPropertyChanged();
             }
+        }
+
+        public static PowerTransitionState CurrentPowerTransitionState
+        {
+            get
+            {
+                lock (PowerTransitionLock)
+                {
+                    return _powerTransitionState;
+                }
+            }
+        }
+
+        public static DateTime LastSuspendUtc
+        {
+            get
+            {
+                lock (PowerTransitionLock)
+                {
+                    return _lastSuspendUtc;
+                }
+            }
+        }
+
+        public static DateTime LastResumeUtc
+        {
+            get
+            {
+                lock (PowerTransitionLock)
+                {
+                    return _lastResumeUtc;
+                }
+            }
+        }
+
+        public static bool ShouldApplySkyWatcherResumeRecovery
+        {
+            get
+            {
+                return SkySettings.Mount == MountType.SkyWatcher
+                       && SkySystem.ConnType == ConnectType.Com
+                       && SkyQueue.IsRunning
+                       && IsMountRunning;
+            }
+        }
+
+        public static bool IsSkyWatcherSerialRecoveryActive
+        {
+            get
+            {
+                var state = CurrentPowerTransitionState;
+                return state == PowerTransitionState.Suspending
+                       || state == PowerTransitionState.Resuming
+                       || state == PowerTransitionState.RecoveringIo;
+            }
+        }
+
+        public static bool IsWithinResumeRecoveryWindow
+        {
+            get
+            {
+                var lastResumeUtc = LastResumeUtc;
+                if (lastResumeUtc == default(DateTime))
+                {
+                    return false;
+                }
+
+                return (HiResDateTime.UtcNow - lastResumeUtc) <= TimeSpan.FromSeconds(30);
+            }
+        }
+
+        public static void NotifyPowerSuspending()
+        {
+            PowerTransitionState state;
+            DateTime suspendUtc;
+            bool shouldApplyRecovery;
+
+            lock (PowerTransitionLock)
+            {
+                _lastSuspendUtc = HiResDateTime.UtcNow;
+                _powerTransitionState = PowerTransitionState.Suspending;
+                state = _powerTransitionState;
+                suspendUtc = _lastSuspendUtc;
+                shouldApplyRecovery = ShouldApplySkyWatcherResumeRecovery;
+            }
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = suspendUtc,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"State:{state}|Mount:{SkySettings.Mount}|ConnType:{SkySystem.ConnType}|IsMountRunning:{IsMountRunning}|ApplyRecovery:{shouldApplyRecovery}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+        }
+
+        public static void NotifyPowerResumed()
+        {
+            PowerTransitionState state;
+            DateTime resumeUtc;
+            bool shouldApplyRecovery;
+
+            lock (PowerTransitionLock)
+            {
+                _lastResumeUtc = HiResDateTime.UtcNow;
+                _powerTransitionState = PowerTransitionState.Resuming;
+                state = _powerTransitionState;
+                resumeUtc = _lastResumeUtc;
+                shouldApplyRecovery = ShouldApplySkyWatcherResumeRecovery;
+            }
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = resumeUtc,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"State:{state}|Mount:{SkySettings.Mount}|ConnType:{SkySystem.ConnType}|IsMountRunning:{IsMountRunning}|ApplyRecovery:{shouldApplyRecovery}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
         }
 
         /// <summary>
