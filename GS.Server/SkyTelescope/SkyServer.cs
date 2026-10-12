@@ -996,8 +996,26 @@ namespace GS.Server.SkyTelescope
         private static bool TryFastResumeValidation()
         {
             var command = new SkyGetMotorCardVersion(SkyQueue.NewId, AxisId.Axis1);
-            var result = SkyQueue.GetCommandResult(command);
-            var success = result.Successful && result.Exception == null && result.Result != null;
+            const int fastValidationTimeoutMs = 1500;
+            var completed = false;
+
+            try
+            {
+                completed = command.CompletionEvent.Wait(fastValidationTimeoutMs);
+            }
+            catch (Exception ex)
+            {
+                command.Exception = ex;
+                command.Successful = false;
+            }
+
+            if (!completed && command.Exception == null)
+            {
+                command.Exception = new TimeoutException($"Fast validation timed out after {fastValidationTimeoutMs}ms");
+                command.Successful = false;
+            }
+
+            var success = completed && command.Successful && command.Exception == null && command.Result != null;
 
             var monitorItem = new MonitorEntry
             {
@@ -1007,7 +1025,9 @@ namespace GS.Server.SkyTelescope
                 Type = success ? MonitorType.Information : MonitorType.Warning,
                 Method = MethodBase.GetCurrentMethod()?.Name,
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = success ? $"MotorCard:{result.Result}" : result.Exception?.Message ?? "Fast validation failed"
+                Message = success
+                    ? $"MotorCard:{command.Result}|TimeoutMs:{fastValidationTimeoutMs}"
+                    : $"{command.Exception?.Message ?? "Fast validation failed"}|TimeoutMs:{fastValidationTimeoutMs}|Completed:{completed}|Successful:{command.Successful}"
             };
             MonitorLog.LogToMonitor(monitorItem);
             return success;
