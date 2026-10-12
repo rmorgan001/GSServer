@@ -3114,8 +3114,25 @@ namespace GS.Server.SkyTelescope
             };
             MonitorLog.LogToMonitor(monitorItem);
 
-            AlertState = true;
             var exType = ex.GetType().ToString().Trim();
+            var isRecoveryWindow = IsResumeRecoveryInProgress || IsWithinResumeRecoveryWindow;
+            if (isRecoveryWindow && IsRecoveryRelatedTransportException(ex))
+            {
+                var recoveryMonitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Warning,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"RecoveryWindow|{exType}|{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(recoveryMonitorItem);
+                return;
+            }
+
+            AlertState = true;
             switch (exType)
             {
                 case "GS.SkyWatcher.MountControlException":
@@ -3172,6 +3189,39 @@ namespace GS.Server.SkyTelescope
                     IsMountRunning = false;
                     break;
             }
+        }
+
+        private static bool IsRecoveryRelatedTransportException(Exception ex)
+        {
+            var mountErr = ex as MountControlException;
+            if (mountErr != null)
+            {
+                switch (mountErr.ErrorCode)
+                {
+                    case SkyWatcher.ErrorCode.ErrNotConnected:
+                    case SkyWatcher.ErrorCode.ErrNoResponseAxis1:
+                    case SkyWatcher.ErrorCode.ErrNoResponseAxis2:
+                    case SkyWatcher.ErrorCode.ErrSerialPortBusy:
+                    case SkyWatcher.ErrorCode.ErrQueueFailed:
+                    case SkyWatcher.ErrorCode.ErrTooManyRetries:
+                        return true;
+                }
+            }
+
+            var skyErr = ex as SkyServerException;
+            if (skyErr != null)
+            {
+                switch (skyErr.ErrorCode)
+                {
+                    case ErrorCode.ErrMount:
+                    case ErrorCode.ErrExecutingCommand:
+                    case ErrorCode.ErrUnableToDeqeue:
+                    case ErrorCode.ErrSerialFailed:
+                        return true;
+                }
+            }
+
+            return ex is TimeoutException || ex is IOException;
         }
 
         /// <summary>
