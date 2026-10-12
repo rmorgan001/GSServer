@@ -1049,20 +1049,7 @@ namespace GS.Server.SkyTelescope
                 return false;
             }
 
-            var custom360Steps = new[] { 0, 0 };
-            var customWormSteps = new[] { 0.0, 0.0 };
-            if (SkySettings.CustomGearing)
-            {
-                custom360Steps = new[] { SkySettings.CustomRa360Steps, SkySettings.CustomDec360Steps };
-                customWormSteps = new[]
-                {
-                    (double)SkySettings.CustomRa360Steps / SkySettings.CustomRaWormTeeth,
-                    (double)SkySettings.CustomDec360Steps / SkySettings.CustomDecWormTeeth
-                };
-            }
-
-            SkyQueue.Start(SkySystem.Serial, custom360Steps, customWormSteps, LowVoltageEventSet);
-            if (!SkyQueue.IsRunning)
+            if (!StartSkyWatcherQueue())
             {
                 return false;
             }
@@ -1079,6 +1066,30 @@ namespace GS.Server.SkyTelescope
             _altAzTrackingTimer = new MediaTimer { Period = SkySettings.AltAzTrackingUpdateInterval, Resolution = 5 };
             _altAzTrackingTimer.Tick += AltAzTrackingTimerEvent;
             return true;
+        }
+
+        private static bool StartSkyWatcherQueue()
+        {
+            var skyWatcherStartup = BuildSkyWatcherStartupOptions();
+            SkyQueue.Start(SkySystem.Serial, skyWatcherStartup.Custom360Steps, skyWatcherStartup.CustomWormSteps, LowVoltageEventSet);
+            return SkyQueue.IsRunning;
+        }
+
+        private static SkyWatcherStartupOptions BuildSkyWatcherStartupOptions()
+        {
+            var custom360Steps = new[] { 0, 0 };
+            var customWormSteps = new[] { 0.0, 0.0 };
+            if (SkySettings.CustomGearing)
+            {
+                custom360Steps = new[] { SkySettings.CustomRa360Steps, SkySettings.CustomDec360Steps };
+                customWormSteps = new[]
+                {
+                    (double)SkySettings.CustomRa360Steps / SkySettings.CustomRaWormTeeth,
+                    (double)SkySettings.CustomDec360Steps / SkySettings.CustomDecWormTeeth
+                };
+            }
+
+            return new SkyWatcherStartupOptions(custom360Steps, customWormSteps);
         }
 
         private static void CompleteResumeRecovery(bool succeeded, string detail)
@@ -3854,6 +3865,23 @@ namespace GS.Server.SkyTelescope
                 Message = $"TimerID|{_altAzTrackingTimer?.TimerID}"
             };
             MonitorLog.LogToMonitor(monitorItem);
+
+            if (ShouldApplySkyWatcherResumeRecovery && IsResumeRecoveryInProgress)
+            {
+                var gatedMonitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MonitorLog.GetCurrentMethod(),
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = "Skipped during resume recovery"
+                };
+                MonitorLog.LogToMonitor(gatedMonitorItem);
+                return;
+            }
+
             // timer must be running to update tracking
             if (_altAzTrackingTimer?.IsRunning == true)
             {
@@ -5876,17 +5904,8 @@ namespace GS.Server.SkyTelescope
                         throw new SkyServerException(ErrorCode.ErrSerialFailed,
                             $"Connection Failed: {SkySystem.Error}");
                     }
-                    // Start up, pass custom mount gearing if needed
-                    var custom360Steps = new[] { 0, 0 };
-                    var customWormSteps = new[] { 0.0, 0.0 };
-                    if (SkySettings.CustomGearing)
-                    {
-                        custom360Steps = new[] { SkySettings.CustomRa360Steps, SkySettings.CustomDec360Steps };
-                        customWormSteps = new[] { (double)SkySettings.CustomRa360Steps / SkySettings.CustomRaWormTeeth, (double)SkySettings.CustomDec360Steps / SkySettings.CustomDecWormTeeth };
-                    }
 
-                    SkyQueue.Start(SkySystem.Serial, custom360Steps, customWormSteps, LowVoltageEventSet);
-                    if (!SkyQueue.IsRunning)
+                    if (!StartSkyWatcherQueue())
                     {
                         throw new SkyServerException(ErrorCode.ErrMount, "Failed to start sky queue");
                     }
@@ -7771,6 +7790,22 @@ namespace GS.Server.SkyTelescope
                     return;
                 }
 
+                if (ShouldApplySkyWatcherResumeRecovery && IsResumeRecoveryInProgress)
+                {
+                    var gatedMonitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Server,
+                        Category = MonitorCategory.Server,
+                        Type = MonitorType.Information,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = "Skipped during resume recovery"
+                    };
+                    MonitorLog.LogToMonitor(gatedMonitorItem);
+                    return;
+                }
+
                 LoopCounter++; // increment counter
 
                 SiderealTime = GetLocalSiderealTime(); // the time is?
@@ -7824,6 +7859,18 @@ namespace GS.Server.SkyTelescope
         /// indicate that a low voltage condition has occurred.</remarks>
         /// <param name="sender">The source of the event. Typically, this is the object that raised the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> instance containing the event data.</param>
+        private sealed class SkyWatcherStartupOptions
+        {
+            internal SkyWatcherStartupOptions(int[] custom360Steps, double[] customWormSteps)
+            {
+                Custom360Steps = custom360Steps;
+                CustomWormSteps = customWormSteps;
+            }
+
+            internal int[] Custom360Steps { get; private set; }
+            internal double[] CustomWormSteps { get; private set; }
+        }
+
         private static void LowVoltageEventSet(object sender, EventArgs e)
         {
             LowVoltageEventState = true;
