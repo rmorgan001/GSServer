@@ -106,6 +106,17 @@ namespace GS.Server
                     SkyServer.NotifyPowerSuspending();
                     break;
                 case PowerModes.Resume:
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            RenderOptions.ProcessRenderMode = Server.Properties.Server.Default.DisableHardwareAcceleration
+                                ? System.Windows.Interop.RenderMode.SoftwareOnly
+                                : System.Windows.Interop.RenderMode.Default;
+                        }), System.Windows.Threading.DispatcherPriority.Background);
+                    }));
+
                     SkyServer.NotifyPowerResumed();
                     break;
             }
