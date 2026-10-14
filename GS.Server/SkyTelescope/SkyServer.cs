@@ -456,6 +456,8 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        public static event EventHandler PowerResumeHandled;
+
         /// <summary>
         /// Positions converted from mount
         /// </summary>
@@ -889,7 +891,10 @@ namespace GS.Server.SkyTelescope
             if (shouldApplyRecovery)
             {
                 StartResumeRecovery();
+                return;
             }
+
+            RaisePowerResumeHandled();
         }
 
         private static void SendFastSuspendStop(DateTime suspendUtc)
@@ -1157,6 +1162,36 @@ namespace GS.Server.SkyTelescope
                 Message = $"Succeeded:{succeeded}|Attempts:{RecoveryAttemptCount}|{detail}"
             };
             MonitorLog.LogToMonitor(monitorItem);
+
+            RaisePowerResumeHandled();
+        }
+
+        private static void RaisePowerResumeHandled()
+        {
+            var handler = PowerResumeHandled;
+            if (handler == null)
+            {
+                return;
+            }
+
+            try
+            {
+                handler(null, EventArgs.Empty);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Warning,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"PowerResumeHandledSubscriberFailed|{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
         }
 
         /// <summary>

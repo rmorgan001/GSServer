@@ -1,4 +1,5 @@
-﻿using GS.Server.Main;
+﻿using GS.Server.Helpers;
+using GS.Server.Main;
 using GS.Server.SkyTelescope;
 using GS.Shared;
 using GS.Shared.EnvironmentInfo;
@@ -27,6 +28,7 @@ namespace GS.Server
         private readonly Mutex _mutex;
         // overload the constructor
         private readonly bool _createdNew;
+        private PowerUiCoordinator _powerUiCoordinator;
         public App()
         {
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
@@ -59,6 +61,7 @@ namespace GS.Server
             if (!_createdNew) return;
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            _powerUiCoordinator = new PowerUiCoordinator();
             SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
 
             if (Server.Properties.Server.Default.DisableHardwareAcceleration)
@@ -98,25 +101,15 @@ namespace GS.Server
             this.Shutdown();
         }
 
-        private static void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
+        private void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
         {
             switch (e.Mode)
             {
                 case PowerModes.Suspend:
                     SkyServer.NotifyPowerSuspending();
+                    _powerUiCoordinator?.HandlePowerSuspending();
                     break;
                 case PowerModes.Resume:
-                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
-                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            RenderOptions.ProcessRenderMode = Server.Properties.Server.Default.DisableHardwareAcceleration
-                                ? System.Windows.Interop.RenderMode.SoftwareOnly
-                                : System.Windows.Interop.RenderMode.Default;
-                        }), System.Windows.Threading.DispatcherPriority.Background);
-                    }));
-
                     SkyServer.NotifyPowerResumed();
                     break;
             }
@@ -190,6 +183,9 @@ namespace GS.Server
             if (disposing)
             {
                 SystemEvents.PowerModeChanged -= SystemEvents_PowerModeChanged;
+                _powerUiCoordinator?.RestorePendingStateOnShutdown();
+                _powerUiCoordinator?.Dispose();
+                _powerUiCoordinator = null;
                 _mutex?.Dispose();
             }
             // free native resources if there are any.
