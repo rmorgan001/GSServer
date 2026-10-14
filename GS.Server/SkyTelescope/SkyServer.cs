@@ -840,6 +840,22 @@ namespace GS.Server.SkyTelescope
             if (shouldApplyRecovery)
             {
                 SendFastSuspendStop(suspendUtc);
+
+                if (_mediaTimer != null)
+                {
+                    _mediaTimer.Tick -= UpdateServerEvent;
+                    _mediaTimer.Stop();
+                    _mediaTimer.Dispose();
+                    _mediaTimer = null;
+                }
+
+                if (_altAzTrackingTimer != null)
+                {
+                    _altAzTrackingTimer.Tick -= AltAzTrackingTimerEvent;
+                    _altAzTrackingTimer.Stop();
+                    _altAzTrackingTimer.Dispose();
+                    _altAzTrackingTimer = null;
+                }
             }
         }
 

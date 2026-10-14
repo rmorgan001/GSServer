@@ -1438,13 +1438,11 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// One communication between mount and client
+        /// Try to send suspend stop command to both axes with a timeout and return detail message
         /// </summary>
-        /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
-        /// <param name="command">The command char set</param>
-        /// <param name="cmdDataStr">The data need to send</param>
-        /// <param name="ignoreWarnings">to ignore serial response issues</param>
-        /// <returns>The response string from mount</returns>
+        /// <param name="timeout">The timeout duration for acquiring the lock</param>
+        /// <param name="detail">The detail message returned</param>
+        /// <returns>True if the command was sent successfully, otherwise false</returns>
         internal bool TrySendSuspendStop(TimeSpan timeout, out string detail)
         {
             detail = null;
@@ -1470,6 +1468,7 @@ namespace GS.SkyWatcher
                 }
 
                 serial.Write(axis1Command);
+                Thread.Sleep(100); // give the mount time to process the first command before sending the second
                 serial.Write(axis2Command);
                 detail = $"Axis1:{axis1Command.Trim()}|Axis2:{axis2Command.Trim()}|Advanced:{useAdvancedStop}";
                 return true;
