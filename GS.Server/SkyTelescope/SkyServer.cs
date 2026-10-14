@@ -1100,10 +1100,6 @@ namespace GS.Server.SkyTelescope
                 return false;
             }
 
-            _mediaTimer = new MediaTimer { Period = SkySettings.DisplayInterval, Resolution = 5 };
-            _mediaTimer.Tick += UpdateServerEvent;
-            _mediaTimer.Start();
-
             _altAzTrackingTimer = new MediaTimer { Period = SkySettings.AltAzTrackingUpdateInterval, Resolution = 5 };
             _altAzTrackingTimer.Tick += AltAzTrackingTimerEvent;
             return true;
@@ -1135,6 +1131,23 @@ namespace GS.Server.SkyTelescope
 
         private static void CompleteResumeRecovery(bool succeeded, string detail)
         {
+            if (succeeded)
+            {
+                if (_mediaTimer != null)
+                {
+                    _mediaTimer.Tick -= UpdateServerEvent;
+                    _mediaTimer.Stop();
+                    _mediaTimer.Dispose();
+                    _mediaTimer = null;
+                }
+
+                // Both fast validation and reconnect must restore position polling before recovery completes.
+                _mediaTimer = new MediaTimer { Period = SkySettings.DisplayInterval, Resolution = 5 };
+                _mediaTimer.Tick += UpdateServerEvent;
+                _mediaTimer.Start();
+                detail += $"|UpdateTimerID:{_mediaTimer.TimerID}|UpdateTimerRunning:{_mediaTimer.IsRunning}";
+            }
+
             lock (ResumeRecoveryLock)
             {
                 _resumeRecoveryInProgress = false;

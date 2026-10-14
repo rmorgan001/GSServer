@@ -110,6 +110,7 @@ namespace GS.Server
                     _powerUiCoordinator?.HandlePowerSuspending();
                     break;
                 case PowerModes.Resume:
+                    _powerUiCoordinator?.HandlePowerResumed();
                     SkyServer.NotifyPowerResumed();
                     break;
             }

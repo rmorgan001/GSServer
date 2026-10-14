@@ -5,9 +5,11 @@ using GS.Server.SkyTelescope;
 using GS.Server.Windows;
 using GS.Shared;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
@@ -25,6 +27,11 @@ namespace GS.Server.Helpers
         private FrontGraphic _savedFrontGraphic = FrontGraphic.None;
         private bool _modelWindowWasOpen;
         private bool _model3DTabWasActive;
+        private static readonly TimeSpan GraphicsResumeDelay = TimeSpan.FromSeconds(5);
+        private Stopwatch _resumeElapsed;
+        private CancellationTokenSource _restoreCancellation;
+        private int _powerCycle;
+        private bool _disposed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PowerUiCoordinator"/> class and subscribes to the power resume event.
@@ -32,6 +39,7 @@ namespace GS.Server.Helpers
         public PowerUiCoordinator()
         {
             SkyServer.PowerResumeHandled += SkyServer_PowerResumeHandled;
+            Application.Current.Exit += Application_Exit;
         }
 
         /// <summary>
@@ -39,12 +47,27 @@ namespace GS.Server.Helpers
         /// </summary>
         public void HandlePowerSuspending()
         {
+            lock (_stateLock)
+            {
+                CancelPendingRestore();
+                _resumeElapsed = null;
+            }
             ExecuteOnUiThread(CaptureSuspendStateOnUiThread, MethodBase.GetCurrentMethod()?.Name);
         }
 
+        public void HandlePowerResumed()
+        {
+            lock (_stateLock)
+            {
+                if (_disposed) return;
+                CancelPendingRestore();
+                _resumeElapsed = Stopwatch.StartNew();
+            }
+            LogMonitor(MonitorType.Information, nameof(HandlePowerResumed), "GraphicsResumeDelayStarted|MinimumDelayMs:5000");
+        }
+
         /// <summary>
-        /// Restores the UI state that was captured before the power suspend event. This method should be called during 
-        /// application shutdown to ensure that the UI state is restored correctly.
+        /// Cancels delayed restoration and restores the saved graphic setting during shutdown.
         /// </summary>
         public void RestorePendingStateOnShutdown()
         {
@@ -53,6 +76,8 @@ namespace GS.Server.Helpers
 
             lock (_stateLock)
             {
+                CancelPendingRestore();
+                _resumeElapsed = null;
                 if (_snapshotPending)
                 {
                     frontGraphic = _savedFrontGraphic;
@@ -86,11 +111,32 @@ namespace GS.Server.Helpers
 
         public void Dispose()
         {
+            lock (_stateLock)
+            {
+                _disposed = true;
+                CancelPendingRestore();
+            }
             SkyServer.PowerResumeHandled -= SkyServer_PowerResumeHandled;
+            Application.Current.Exit -= Application_Exit;
+        }
+
+        private void Application_Exit(object sender, ExitEventArgs e)
+        {
+            Dispose();
+        }
+
+        // Called under _stateLock; the generation also invalidates already queued dispatcher work.
+        private void CancelPendingRestore()
+        {
+            _powerCycle++;
+            _restoreCancellation?.Cancel();
+            _restoreCancellation?.Dispose();
+            _restoreCancellation = null;
+            _restoreQueued = false;
         }
 
         /// <summary>
-        /// Handles the power resume event by restoring the UI state that was captured before the power suspend event.
+        /// Schedules UI restoration after server recovery and the minimum graphics resume delay.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The event data.</param>
@@ -98,29 +144,66 @@ namespace GS.Server.Helpers
         {
             lock (_stateLock)
             {
-                if (!_snapshotPending || _restoreQueued)
+                if (_disposed || !_snapshotPending || _restoreQueued || _resumeElapsed == null)
                 {
                     return;
                 }
 
                 _restoreQueued = true;
+                _restoreCancellation = new CancellationTokenSource();
+                var remaining = GraphicsResumeDelay - _resumeElapsed.Elapsed;
+                LogMonitor(MonitorType.Information, nameof(SkyServer_PowerResumeHandled),
+                    $"GraphicsRecoveryHandled|RemainingDelayMs:{Math.Max(0, remaining.TotalMilliseconds):0}");
+                _ = RestoreAfterDelayAsync(remaining, _powerCycle, _restoreCancellation.Token);
             }
+        }
 
-            var app = Application.Current;
-            var dispatcher = app?.Dispatcher;
-
-            if (dispatcher == null)
+        private async Task RestoreAfterDelayAsync(TimeSpan remaining, int powerCycle, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (remaining > TimeSpan.Zero)
+                {
+                    await Task.Delay((int)Math.Ceiling(remaining.TotalMilliseconds), cancellationToken).ConfigureAwait(false);
+                }
+                cancellationToken.ThrowIfCancellationRequested();
+                var dispatcher = Application.Current?.Dispatcher;
+                if (dispatcher == null || dispatcher.HasShutdownStarted)
+                {
+                    throw new InvalidOperationException("Graphics restoration dispatcher is unavailable or shutting down");
+                }
+                await dispatcher.InvokeAsync(() =>
+                {
+                    lock (_stateLock)
+                    {
+                        if (_disposed || powerCycle != _powerCycle || cancellationToken.IsCancellationRequested)
+                        {
+                            return;
+                        }
+                        RestoreSuspendStateOnUiThread();
+                    }
+                }).Task.ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                LogMonitor(MonitorType.Information, nameof(RestoreAfterDelayAsync), "GraphicsRestoreCancelled");
+            }
+            catch (Exception ex)
+            {
+                LogMonitor(MonitorType.Warning, nameof(RestoreAfterDelayAsync), $"GraphicsRestoreFailed|{ex}");
+            }
+            finally
             {
                 lock (_stateLock)
                 {
-                    _restoreQueued = false;
+                    if (powerCycle == _powerCycle)
+                    {
+                        _restoreQueued = false;
+                        _restoreCancellation?.Dispose();
+                        _restoreCancellation = null;
+                    }
                 }
-
-                LogMonitor(MonitorType.Warning, nameof(SkyServer_PowerResumeHandled), "ResumeRestoreSkipped|DispatcherUnavailable");
-                return;
             }
-
-            dispatcher.BeginInvoke(new Action(RestoreSuspendStateOnUiThread));
         }
 
         /// <summary>
@@ -130,32 +213,24 @@ namespace GS.Server.Helpers
         /// </summary>
         private void CaptureSuspendStateOnUiThread()
         {
-            lock (_stateLock)
-            {
-                if (_snapshotPending)
-                {
-                    RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
-                    return;
-                }
-
-                _savedFrontGraphic = SkySettings.FrontGraphic;
-                _restoreQueued = false;
-                _snapshotPending = true;
-            }
-
-            RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
-
             var mainWindowVm = MainWindowVm.MainWindow1Vm;
             var skyTelescopeVm = SkyTelescopeVm.ASkyTelescopeVm;
             var modelWindow = Application.Current?.Windows.OfType<ModelV>().FirstOrDefault();
+            var model3DTabIsActive = mainWindowVm?.CurrentPageViewModel is Model3Dvm;
 
-            var modelWindowWasOpen = modelWindow != null;
-            var model3DTabWasActive = mainWindowVm?.CurrentPageViewModel is Model3Dvm;
-
-            if (modelWindowWasOpen)
+            lock (_stateLock)
             {
-                modelWindow.Close();
+                if (_disposed) return;
+                if (!_snapshotPending)
+                {
+                    _savedFrontGraphic = SkySettings.FrontGraphic;
+                    _modelWindowWasOpen = modelWindow != null;
+                    _model3DTabWasActive = model3DTabIsActive;
+                    _snapshotPending = true;
+                }
             }
+
+            modelWindow?.Close();
 
             if (skyTelescopeVm != null)
             {
@@ -166,20 +241,21 @@ namespace GS.Server.Helpers
                 SkySettings.FrontGraphic = FrontGraphic.None;
             }
 
-            if (model3DTabWasActive && mainWindowVm != null)
+            if (model3DTabIsActive && mainWindowVm != null)
             {
                 mainWindowVm.SkyWatcherVmRadio = false;
                 mainWindowVm.SkyWatcherVmRadio = true;
             }
 
-            lock (_stateLock)
+            // Remove active 3D surfaces before requesting software rendering.
+            if (RenderOptions.ProcessRenderMode != System.Windows.Interop.RenderMode.SoftwareOnly)
             {
-                _modelWindowWasOpen = modelWindowWasOpen;
-                _model3DTabWasActive = model3DTabWasActive;
+                RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
             }
+            mainWindowVm?.SetPowerWindowMinimized(true);
 
             LogMonitor(MonitorType.Information, MethodBase.GetCurrentMethod()?.Name,
-                $"SnapshotCaptured|Graphic:{_savedFrontGraphic}|ModelWindow:{modelWindowWasOpen}|Model3DTab:{model3DTabWasActive}");
+                $"SnapshotCaptured|Graphic:{_savedFrontGraphic}|ModelWindow:{_modelWindowWasOpen}|Model3DTab:{_model3DTabWasActive}|WindowState:{mainWindowVm?.WindowStates}");
         }
 
         /// <summary>
@@ -215,6 +291,7 @@ namespace GS.Server.Helpers
             catch (Exception ex)
             {
                 LogMonitor(MonitorType.Warning, nameof(RestoreSuspendStateOnUiThread), $"RestoreRenderModeFailed|{ex.Message}");
+                return;
             }
 
             try
@@ -264,6 +341,14 @@ namespace GS.Server.Helpers
             }
             finally
             {
+                try
+                {
+                    MainWindowVm.MainWindow1Vm?.SetPowerWindowMinimized(false);
+                }
+                catch (Exception ex)
+                {
+                    LogMonitor(MonitorType.Warning, nameof(RestoreSuspendStateOnUiThread), $"RestoreWindowStateFailed|{ex}");
+                }
                 lock (_stateLock)
                 {
                     _snapshotPending = false;
@@ -272,7 +357,7 @@ namespace GS.Server.Helpers
             }
 
             LogMonitor(MonitorType.Information, MethodBase.GetCurrentMethod()?.Name,
-                $"SnapshotRestored|Graphic:{frontGraphic}|ModelWindow:{modelWindowWasOpen}|Model3DTab:{model3DTabWasActive}|RenderMode:{RenderOptions.ProcessRenderMode}");
+                $"SnapshotRestored|Graphic:{frontGraphic}|ModelWindow:{modelWindowWasOpen}|Model3DTab:{model3DTabWasActive}|RenderMode:{RenderOptions.ProcessRenderMode}|ResumeElapsedMs:{_resumeElapsed?.Elapsed.TotalMilliseconds:0}|WindowState:{MainWindowVm.MainWindow1Vm?.WindowStates}");
         }
 
         private static void ExecuteOnUiThread(Action action, string methodName)
