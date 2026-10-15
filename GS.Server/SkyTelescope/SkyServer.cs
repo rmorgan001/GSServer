@@ -217,6 +217,7 @@ namespace GS.Server.SkyTelescope
         private static DateTime _recoveryDeadlineUtc;
         private static int _recoveryAttemptCount;
         private static bool _resumeRecoveryInProgress;
+        private static bool _resumeErrorSuppressionEligible;
         private static double _rightAscensionXForm;
         private static bool _rotate3DModel;
         private static double _slewSettleTime;
@@ -765,17 +766,16 @@ namespace GS.Server.SkyTelescope
             }
         }
 
-        public static bool IsWithinResumeRecoveryWindow
+        private static bool ShouldSuppressResumeTransportErrors
         {
             get
             {
-                var lastResumeUtc = LastResumeUtc;
-                if (lastResumeUtc == default(DateTime))
+                lock (ResumeRecoveryLock)
                 {
-                    return false;
+                    return _resumeErrorSuppressionEligible
+                           && SkySettings.Mount == MountType.SkyWatcher
+                           && SkySystem.ConnType == ConnectType.Com;
                 }
-
-                return (HiResDateTime.UtcNow - lastResumeUtc) <= TimeSpan.FromSeconds(30);
             }
         }
 
@@ -868,6 +868,11 @@ namespace GS.Server.SkyTelescope
                 state = _powerTransitionState;
                 resumeUtc = _lastResumeUtc;
                 shouldApplyRecovery = ShouldApplySkyWatcherResumeRecovery;
+            }
+
+            lock (ResumeRecoveryLock)
+            {
+                _resumeErrorSuppressionEligible = shouldApplyRecovery;
             }
 
             var monitorItem = new MonitorEntry
@@ -1164,6 +1169,11 @@ namespace GS.Server.SkyTelescope
 
         private static void CompleteResumeRecovery(bool succeeded, string detail)
         {
+            lock (ResumeRecoveryLock)
+            {
+                _resumeErrorSuppressionEligible = false;
+            }
+
             if (succeeded)
             {
                 // Both fast validation and reconnect must restore position polling before recovery completes.
@@ -3205,8 +3215,7 @@ namespace GS.Server.SkyTelescope
             MonitorLog.LogToMonitor(monitorItem);
 
             var exType = ex.GetType().ToString().Trim();
-            var isRecoveryWindow = IsResumeRecoveryInProgress || IsWithinResumeRecoveryWindow;
-            if (isRecoveryWindow && IsRecoveryRelatedTransportException(ex))
+            if (ShouldSuppressResumeTransportErrors && IsRecoveryRelatedTransportException(ex))
             {
                 var recoveryMonitorItem = new MonitorEntry
                 {
