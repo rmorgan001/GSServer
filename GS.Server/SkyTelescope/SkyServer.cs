@@ -841,15 +841,7 @@ namespace GS.Server.SkyTelescope
 
             if (shouldApplyRecovery)
             {
-                SendFastSuspendStop(suspendUtc);
-
-                if (_mediaTimer != null)
-                {
-                    _mediaTimer.Tick -= UpdateServerEvent;
-                    _mediaTimer.Stop();
-                    _mediaTimer.Dispose();
-                    _mediaTimer = null;
-                }
+                StopPositionUpdateTimer();
 
                 if (_altAzTrackingTimer != null)
                 {
@@ -858,6 +850,8 @@ namespace GS.Server.SkyTelescope
                     _altAzTrackingTimer.Dispose();
                     _altAzTrackingTimer = null;
                 }
+
+                SendFastSuspendStop(suspendUtc);
             }
         }
 
@@ -1075,8 +1069,7 @@ namespace GS.Server.SkyTelescope
 
             Tracking = false;
             CancelAllAsync();
-            if (_mediaTimer != null) { _mediaTimer.Tick -= UpdateServerEvent; }
-            _mediaTimer?.Stop();
+            StopPositionUpdateTimer();
             if (_altAzTrackingTimer != null) { _altAzTrackingTimer.Tick -= AltAzTrackingTimerEvent; }
             _altAzTrackingTimer?.Stop();
             SkyQueue.Stop();
@@ -1173,19 +1166,12 @@ namespace GS.Server.SkyTelescope
         {
             if (succeeded)
             {
-                if (_mediaTimer != null)
-                {
-                    _mediaTimer.Tick -= UpdateServerEvent;
-                    _mediaTimer.Stop();
-                    _mediaTimer.Dispose();
-                    _mediaTimer = null;
-                }
-
                 // Both fast validation and reconnect must restore position polling before recovery completes.
-                _mediaTimer = new MediaTimer { Period = SkySettings.DisplayInterval, Resolution = 5 };
-                _mediaTimer.Tick += UpdateServerEvent;
-                _mediaTimer.Start();
-                detail += $"|UpdateTimerID:{_mediaTimer.TimerID}|UpdateTimerRunning:{_mediaTimer.IsRunning}";
+                StartPositionUpdateTimer();
+                lock (TimerLock)
+                {
+                    detail += $"|UpdateTimerID:{_mediaTimer?.TimerID}|UpdateTimerRunning:{_mediaTimer?.IsRunning}";
+                }
             }
 
             lock (ResumeRecoveryLock)
@@ -6058,9 +6044,7 @@ namespace GS.Server.SkyTelescope
                 AxesStopValidate();
 
                 // Event to get mount positions and update UI
-                _mediaTimer = new MediaTimer { Period = SkySettings.DisplayInterval, Resolution = 5 };
-                _mediaTimer.Tick += UpdateServerEvent;
-                _mediaTimer.Start();
+                StartPositionUpdateTimer();
 
                 // Event to update AltAz tracking rate
                 _altAzTrackingTimer = new MediaTimer { Period = SkySettings.AltAzTrackingUpdateInterval, Resolution = 5 };
@@ -6085,9 +6069,7 @@ namespace GS.Server.SkyTelescope
             Tracking = false;
             CancelAllAsync();
             AxesStopValidate();
-            if (_mediaTimer != null) { _mediaTimer.Tick -= UpdateServerEvent; }
-            _mediaTimer?.Stop();
-            _mediaTimer?.Dispose();
+            StopPositionUpdateTimer();
             if (_altAzTrackingTimer != null) { _altAzTrackingTimer.Tick -= AltAzTrackingTimerEvent; }
             _altAzTrackingTimer?.Stop();
             _altAzTrackingTimer?.Dispose();
@@ -7911,6 +7893,31 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static void StopPositionUpdateTimer()
+        {
+            lock (TimerLock)
+            {
+                var timer = _mediaTimer;
+                _mediaTimer = null;
+                if (timer == null) return;
+
+                timer.Tick -= UpdateServerEvent;
+                timer.Stop();
+                timer.Dispose();
+            }
+        }
+
+        private static void StartPositionUpdateTimer()
+        {
+            lock (TimerLock)
+            {
+                StopPositionUpdateTimer();
+                _mediaTimer = new MediaTimer { Period = SkySettings.DisplayInterval, Resolution = 5 };
+                _mediaTimer.Tick += UpdateServerEvent;
+                _mediaTimer.Start();
+            }
+        }
+
         /// <summary>
         /// Update the Server and UI from the axis positions
         /// </summary>
@@ -7924,6 +7931,12 @@ namespace GS.Server.SkyTelescope
                 if (!hasLock)
                 {
                     TimerOverruns++;
+                    return;
+                }
+
+                var timer = _mediaTimer;
+                if (timer == null || !ReferenceEquals(sender, timer))
+                {
                     return;
                 }
 
@@ -7971,8 +7984,12 @@ namespace GS.Server.SkyTelescope
                         IsSideOfPier = SideOfPier;
                         break;
                 }
-                var t = SkySettings.DisplayInterval; // Event interval time set for UI performance 
-                _mediaTimer.Period = t;
+                if (!ReferenceEquals(timer, _mediaTimer))
+                {
+                    return;
+                }
+
+                timer.Period = SkySettings.DisplayInterval;
 
                 if (LoopCounter % (ulong) Settings.Settings.ModelIntFactor == 0)
                 {
