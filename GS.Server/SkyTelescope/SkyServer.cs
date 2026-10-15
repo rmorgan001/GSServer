@@ -1100,6 +1100,8 @@ namespace GS.Server.SkyTelescope
                 return false;
             }
 
+            InitializeSkyWatcherController();
+
             _altAzTrackingTimer = new MediaTimer { Period = SkySettings.AltAzTrackingUpdateInterval, Resolution = 5 };
             _altAzTrackingTimer.Tick += AltAzTrackingTimerEvent;
             return true;
@@ -1110,6 +1112,44 @@ namespace GS.Server.SkyTelescope
             var skyWatcherStartup = BuildSkyWatcherStartupOptions();
             SkyQueue.Start(SkySystem.Serial, skyWatcherStartup.Custom360Steps, skyWatcherStartup.CustomWormSteps, LowVoltageEventSet);
             return SkyQueue.IsRunning;
+        }
+
+        // Controller caches are recreated with the queue; settings remain in memory across hibernate.
+        // Keep position resets and alignment setup in MountConnect, not in this shared sequence.
+        private static void InitializeSkyWatcherController()
+        {
+            SkyTasks(MountTaskName.AllowAdvancedCommandSet);
+            SkyTasks(MountTaskName.LoadDefaults);
+            SkyTasks(MountTaskName.GetAxisVersions);
+            SkyTasks(MountTaskName.StepsPerRevolution);
+            SkyTasks(MountTaskName.StepsWormPerRevolution);
+            SkyTasks(MountTaskName.StopAxes);
+            SkyTasks(MountTaskName.Encoders);
+            SkyTasks(MountTaskName.FullCurrent);
+            SkyTasks(MountTaskName.SetSt4Guiderate);
+            SkyTasks(MountTaskName.SetSouthernHemisphere);
+            SkyTasks(MountTaskName.MountName);
+            SkyTasks(MountTaskName.MountVersion);
+            SkyTasks(MountTaskName.StepTimeFreq);
+            SkyTasks(MountTaskName.CanPpec);
+            SkyTasks(MountTaskName.CanPolarLed);
+            SkyTasks(MountTaskName.PolarLedLevel);
+            SkyTasks(MountTaskName.CanHomeSensor);
+            SkyTasks(MountTaskName.DecPulseToGoTo);
+            SkyTasks(MountTaskName.AlternatingPpec);
+            SkyTasks(MountTaskName.MinPulseDec);
+            SkyTasks(MountTaskName.MinPulseRa);
+            SkyTasks(MountTaskName.MonitorPulse);
+            SkyTasks(MountTaskName.GetFactorStep);
+            SkyTasks(MountTaskName.Capabilities);
+            SkyTasks(MountTaskName.CanAdvancedCmdSupport);
+            if (CanPPec) SkyTasks(MountTaskName.Pec);
+
+            var raWormTeeth = (int)(StepsPerRevolution[0] / StepsWormPerRevolution[0]);
+            var decWormTeeth = (int)(StepsPerRevolution[1] / StepsWormPerRevolution[1]);
+            WormTeethCount = new[] { raWormTeeth, decWormTeeth };
+            PecBinSteps = StepsPerRevolution[0] / (WormTeethCount[0] * 1.0) / PecBinCount;
+            CalcCustomTrackingOffset();
         }
 
         private static SkyWatcherStartupOptions BuildSkyWatcherStartupOptions()
@@ -5849,44 +5889,7 @@ namespace GS.Server.SkyTelescope
                         Message = $"Voltage|{SkyServer.ControllerVoltage.ToString("F2")+ " V"}"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
-                    // defaults
-                    if (SkySettings.Mount == MountType.SkyWatcher)
-                    {
-                        SkyTasks(MountTaskName.AllowAdvancedCommandSet);
-                    }
-                    SkyTasks(MountTaskName.LoadDefaults);
-                    SkyTasks(MountTaskName.GetAxisVersions);
-                    SkyTasks(MountTaskName.StepsPerRevolution);
-                    SkyTasks(MountTaskName.StepsWormPerRevolution);
-                    SkyTasks(MountTaskName.StopAxes);
-                    SkyTasks(MountTaskName.Encoders);
-                    SkyTasks(MountTaskName.FullCurrent);
-                    SkyTasks(MountTaskName.SetSt4Guiderate);
-                    SkyTasks(MountTaskName.SetSouthernHemisphere);
-                    SkyTasks(MountTaskName.MountName);
-                    SkyTasks(MountTaskName.MountVersion);
-                    SkyTasks(MountTaskName.StepTimeFreq);
-                    SkyTasks(MountTaskName.CanPpec);
-                    SkyTasks(MountTaskName.CanPolarLed);
-                    SkyTasks(MountTaskName.PolarLedLevel);
-                    SkyTasks(MountTaskName.CanHomeSensor);
-                    SkyTasks(MountTaskName.DecPulseToGoTo);
-                    SkyTasks(MountTaskName.AlternatingPpec);
-                    SkyTasks(MountTaskName.MinPulseDec);
-                    SkyTasks(MountTaskName.MinPulseRa);
-                    SkyTasks(MountTaskName.GetFactorStep);
-                    SkyTasks(MountTaskName.Capabilities);
-                    SkyTasks(MountTaskName.CanAdvancedCmdSupport);
-                    if (CanPPec) SkyTasks(MountTaskName.Pec);
-
-                    //CanHomeSensor = true; //test auto home
-
-                    raWormTeeth = (int)(StepsPerRevolution[0] / StepsWormPerRevolution[0]);
-                    decWormTeeth = (int)(StepsPerRevolution[1] / StepsWormPerRevolution[1]);
-                    WormTeethCount = new[] { raWormTeeth, decWormTeeth };
-                    PecBinSteps = StepsPerRevolution[0] / (WormTeethCount[0] * 1.0) / PecBinCount;
-
-                    CalcCustomTrackingOffset();  //generates rates for the custom gearing offsets
+                    InitializeSkyWatcherController();
 
                     //log current positions
                     var steps = GetRawSteps();
