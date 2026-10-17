@@ -893,6 +893,13 @@ namespace GS.Server.SkyTelescope
                 return;
             }
 
+            lock (PowerTransitionLock)
+            {
+                _powerTransitionState = IsMountRunning
+                    ? PowerTransitionState.Running
+                    : PowerTransitionState.Disconnected;
+            }
+
             RaisePowerResumeHandled();
         }
 
