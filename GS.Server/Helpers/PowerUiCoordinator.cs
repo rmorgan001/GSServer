@@ -32,6 +32,7 @@ namespace GS.Server.Helpers
         private CancellationTokenSource _restoreCancellation;
         private int _powerCycle;
         private bool _disposed;
+        private bool _shutdownRequested;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PowerUiCoordinator"/> class and subscribes to the power resume event.
@@ -55,11 +56,14 @@ namespace GS.Server.Helpers
             ExecuteOnUiThread(CaptureSuspendStateOnUiThread, MethodBase.GetCurrentMethod()?.Name);
         }
 
+        /// <summary>
+        /// Starts tracking the delay after the system resumes from a power event.
+        /// </summary>
         public void HandlePowerResumed()
         {
             lock (_stateLock)
             {
-                if (_disposed) return;
+                if (_disposed || _shutdownRequested) return;
                 CancelPendingRestore();
                 _resumeElapsed = Stopwatch.StartNew();
             }
@@ -125,7 +129,11 @@ namespace GS.Server.Helpers
             Dispose();
         }
 
-        // Called under _stateLock; the generation also invalidates already queued dispatcher work.
+        /// <summary>
+        /// Cancels any pending restore operation and clears its queued state.
+        /// </summary>
+        /// <remarks>Invalidates already queued dispatcher work. Called under _stateLock; the generation also 
+        /// invalidates already queued dispatcher work.</remarks>
         private void CancelPendingRestore()
         {
             _powerCycle++;
@@ -144,7 +152,7 @@ namespace GS.Server.Helpers
         {
             lock (_stateLock)
             {
-                if (_disposed || !_snapshotPending || _restoreQueued || _resumeElapsed == null)
+                if (_disposed || _shutdownRequested || !_snapshotPending || _restoreQueued || _resumeElapsed == null)
                 {
                     return;
                 }
@@ -158,6 +166,13 @@ namespace GS.Server.Helpers
             }
         }
 
+        /// <summary>
+        /// Restores the graphics suspend state after the specified delay if the power cycle is still current.
+        /// </summary>
+        /// <param name="remaining">The time to wait before attempting restoration.</param>
+        /// <param name="powerCycle">The power-cycle identifier used to verify that restoration is still valid.</param>
+        /// <param name="cancellationToken">The token used to cancel the delay or restoration.</param>
+        /// <returns>A task that represents the asynchronous restoration operation.</returns>
         private async Task RestoreAfterDelayAsync(TimeSpan remaining, int powerCycle, CancellationToken cancellationToken)
         {
             try
@@ -176,7 +191,7 @@ namespace GS.Server.Helpers
                 {
                     lock (_stateLock)
                     {
-                        if (_disposed || powerCycle != _powerCycle || cancellationToken.IsCancellationRequested)
+                        if (_disposed || _shutdownRequested || powerCycle != _powerCycle || cancellationToken.IsCancellationRequested)
                         {
                             return;
                         }
@@ -190,7 +205,7 @@ namespace GS.Server.Helpers
             }
             catch (Exception ex)
             {
-                LogMonitor(MonitorType.Warning, nameof(RestoreAfterDelayAsync), $"GraphicsRestoreFailed|{ex}");
+                await ShutdownAfterRestoreFailureAsync(ex, powerCycle, cancellationToken).ConfigureAwait(false);
             }
             finally
             {
@@ -203,6 +218,51 @@ namespace GS.Server.Helpers
                         _restoreCancellation = null;
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Requests application shutdown after a graphics restore failure.
+        /// </summary>
+        /// <param name="exception">The exception that caused the graphics restore failure.</param>
+        /// <param name="powerCycle">The power-cycle identifier associated with the failed restore.</param>
+        /// <param name="cancellationToken">A token that can cancel handling of the restore failure.</param>
+        /// <returns>A task that represents the asynchronous shutdown request.</returns>
+        private async Task ShutdownAfterRestoreFailureAsync(Exception exception, int powerCycle, CancellationToken cancellationToken)
+        {
+            lock (_stateLock)
+            {
+                if (_disposed || _shutdownRequested || powerCycle != _powerCycle || cancellationToken.IsCancellationRequested)
+                {
+                    LogMonitor(MonitorType.Information, nameof(ShutdownAfterRestoreFailureAsync), $"GraphicsRestoreFailureIgnored|{exception}");
+                    return;
+                }
+                _shutdownRequested = true;
+            }
+
+            LogMonitor(MonitorType.Error, nameof(ShutdownAfterRestoreFailureAsync), $"GraphicsRestoreFailed|ShutdownRequested|{exception}");
+            try
+            {
+                var app = Application.Current;
+                var dispatcher = app?.Dispatcher;
+                if (dispatcher == null)
+                {
+                    throw new InvalidOperationException("Cannot request graphics failure shutdown without an application dispatcher");
+                }
+                if (dispatcher.HasShutdownStarted)
+                {
+                    LogMonitor(MonitorType.Information, nameof(ShutdownAfterRestoreFailureAsync), "ApplicationShutdownAlreadyStarted");
+                    return;
+                }
+                await dispatcher.InvokeAsync(() =>
+                {
+                    RestorePendingStateOnShutdown();
+                    app.Shutdown(1);
+                }).Task.ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                LogMonitor(MonitorType.Error, nameof(ShutdownAfterRestoreFailureAsync), $"GraphicsFailureShutdownFailed|{ex}");
             }
         }
 
@@ -282,78 +342,57 @@ namespace GS.Server.Helpers
                 model3DTabWasActive = _model3DTabWasActive;
             }
 
+            var step = "RestoreRenderMode";
             try
             {
                 RenderOptions.ProcessRenderMode = Server.Properties.Server.Default.DisableHardwareAcceleration
                     ? System.Windows.Interop.RenderMode.SoftwareOnly
                     : System.Windows.Interop.RenderMode.Default;
-            }
-            catch (Exception ex)
-            {
-                LogMonitor(MonitorType.Warning, nameof(RestoreSuspendStateOnUiThread), $"RestoreRenderModeFailed|{ex.Message}");
-                return;
-            }
 
-            try
-            {
-                var skyTelescopeVm = SkyTelescopeVm.ASkyTelescopeVm;
-                if (skyTelescopeVm != null)
-                {
-                    skyTelescopeVm.Graphic = frontGraphic;
-                }
-                else if (SkySettings.FrontGraphic != frontGraphic)
-                {
-                    SkySettings.FrontGraphic = frontGraphic;
-                }
-            }
-            catch (Exception ex)
-            {
-                LogMonitor(MonitorType.Warning, nameof(RestoreSuspendStateOnUiThread), $"RestoreFrontGraphicFailed|{ex.Message}");
-            }
+                step = "RestoreFrontGraphic";
+                var skyTelescopeVm = SkyTelescopeVm.ASkyTelescopeVm
+                    ?? throw new InvalidOperationException("Telescope view model is unavailable for graphics restoration");
+                skyTelescopeVm.Graphic = frontGraphic;
 
-            try
-            {
+                step = "RestoreModelWindow";
                 if (modelWindowWasOpen)
                 {
-                    SkyTelescopeVm.ASkyTelescopeVm?.OpenModelWindowCmd?.Execute(null);
-                }
-            }
-            catch (Exception ex)
-            {
-                LogMonitor(MonitorType.Warning, nameof(RestoreSuspendStateOnUiThread), $"RestoreModelWindowFailed|{ex.Message}");
-            }
-
-            try
-            {
-                if (model3DTabWasActive)
-                {
-                    var mainWindowVm = MainWindowVm.MainWindow1Vm;
-                    if (mainWindowVm != null && mainWindowVm.Model3DRadioVisible)
+                    skyTelescopeVm.OpenModelWindow(throwOnError: true);
+                    if (!Application.Current.Windows.OfType<ModelV>().Any(window => window.IsVisible))
                     {
-                        mainWindowVm.Model3DvmRadioRadio = false;
-                        mainWindowVm.Model3DvmRadioRadio = true;
+                        throw new InvalidOperationException("Floating model window did not reopen");
                     }
                 }
+
+                step = "RestoreModel3DTab";
+                var mainWindowVm = MainWindowVm.MainWindow1Vm
+                    ?? throw new InvalidOperationException("Main window view model is unavailable for graphics restoration");
+                if (model3DTabWasActive)
+                {
+                    if (!mainWindowVm.Model3DRadioVisible)
+                    {
+                        throw new InvalidOperationException("Model3D tab is unavailable for restoration");
+                    }
+                    mainWindowVm.Model3DvmRadioRadio = false;
+                    mainWindowVm.Model3DvmRadioRadio = true;
+                    if (!(mainWindowVm.CurrentPageViewModel is Model3Dvm))
+                    {
+                        throw new InvalidOperationException("Model3D tab did not become active");
+                    }
+                }
+
+                step = "RestoreWindowState";
+                mainWindowVm.SetPowerWindowMinimized(false);
             }
             catch (Exception ex)
             {
-                LogMonitor(MonitorType.Warning, nameof(RestoreSuspendStateOnUiThread), $"RestoreModel3DTabFailed|{ex.Message}");
+                throw new InvalidOperationException($"Graphics restoration failed at {step}", ex);
             }
-            finally
+
+            lock (_stateLock)
             {
-                try
-                {
-                    MainWindowVm.MainWindow1Vm?.SetPowerWindowMinimized(false);
-                }
-                catch (Exception ex)
-                {
-                    LogMonitor(MonitorType.Warning, nameof(RestoreSuspendStateOnUiThread), $"RestoreWindowStateFailed|{ex}");
-                }
-                lock (_stateLock)
-                {
-                    _snapshotPending = false;
-                    _restoreQueued = false;
-                }
+                _snapshotPending = false;
+                _restoreQueued = false;
             }
 
             LogMonitor(MonitorType.Information, MethodBase.GetCurrentMethod()?.Name,

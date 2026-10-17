@@ -3171,7 +3171,7 @@ namespace GS.Server.SkyTelescope
                 return _openModelWindowCmd = new RelayCommand(param => OpenModelWindow());
             }
         }
-        private void OpenModelWindow()
+        internal void OpenModelWindow(bool throwOnError = false)
         {
             try
             {
@@ -3191,6 +3191,8 @@ namespace GS.Server.SkyTelescope
             }
             catch (Exception ex)
             {
+                if (throwOnError) throw;
+
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
