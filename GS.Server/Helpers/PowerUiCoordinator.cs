@@ -27,7 +27,7 @@ namespace GS.Server.Helpers
         private FrontGraphic _savedFrontGraphic = FrontGraphic.None;
         private bool _modelWindowWasOpen;
         private bool _model3DTabWasActive;
-        private static readonly TimeSpan GraphicsResumeDelay = TimeSpan.FromSeconds(5);
+        private static readonly TimeSpan GraphicsResumeDelay = TimeSpan.FromSeconds(10);
         private Stopwatch _resumeElapsed;
         private CancellationTokenSource _restoreCancellation;
         private int _powerCycle;
