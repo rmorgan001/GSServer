@@ -900,6 +900,8 @@ namespace GS.Server.SkyTelescope
                     : PowerTransitionState.Disconnected;
             }
 
+            if (IsMountRunning) { PowerRequestHelper.Reassert(); }
+
             RaisePowerResumeHandled();
         }
 
@@ -1202,7 +1204,11 @@ namespace GS.Server.SkyTelescope
                 _powerTransitionState = succeeded ? PowerTransitionState.Running : PowerTransitionState.Disconnected;
             }
 
-            if (!succeeded)
+            if (succeeded)
+            {
+                PowerRequestHelper.Reassert();
+            }
+            else
             {
                 IsMountRunning = false;
             }
@@ -6062,6 +6068,9 @@ namespace GS.Server.SkyTelescope
                 // Event to get mount positions and update UI
                 StartPositionUpdateTimer();
 
+                // Keep the PC awake and the process unthrottled while connected
+                PowerRequestHelper.Acquire("GS Server: mount connected");
+
                 // Event to update AltAz tracking rate
                 _altAzTrackingTimer = new MediaTimer { Period = SkySettings.AltAzTrackingUpdateInterval, Resolution = 5 };
                 _altAzTrackingTimer.Tick += AltAzTrackingTimerEvent;
@@ -6080,6 +6089,8 @@ namespace GS.Server.SkyTelescope
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{SkySettings.Mount}" };
             MonitorLog.LogToMonitor(monitorItem);
+
+            PowerRequestHelper.Release();
 
             // Stop all asynchronous operations
             Tracking = false;
