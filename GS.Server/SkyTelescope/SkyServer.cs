@@ -660,6 +660,16 @@ namespace GS.Server.SkyTelescope
                 OnStaticPropertyChanged();
             }
         }
+
+        /// <summary>
+        /// Set when a slew fails part way, reported by ASCOM Slewing until another slew is initiated
+        /// </summary>
+        public static Exception SlewFault { get; private set; }
+
+        /// <summary>
+        /// Set when mount IO has failed, held until the mount has been restarted or recovered successfully
+        /// </summary>
+        public static bool SerialIoFailed { get; private set; }
         
         /// <summary>
         /// status for goto
@@ -1081,6 +1091,7 @@ namespace GS.Server.SkyTelescope
             };
             MonitorLog.LogToMonitor(reconnectMonitorItem);
 
+            if (IsSlewing) { SlewFault = new Exception("Slew interrupted by serial recovery"); }
             Tracking = false;
             CancelAllAsync();
             StopPositionUpdateTimer();
@@ -1198,6 +1209,9 @@ namespace GS.Server.SkyTelescope
                 _resumeRecoveryInProgress = false;
                 _recoveryDeadlineUtc = default(DateTime);
             }
+
+            // Update the flag before the power state so the gate never sees a gap
+            SerialIoFailed = !succeeded;
 
             lock (PowerTransitionLock)
             {
@@ -1668,6 +1682,7 @@ namespace GS.Server.SkyTelescope
         {
             if (MovePrimaryAxisActive || MoveSecondaryAxisActive)
             {
+                SlewFault = null;
                 MoveAxisActive = true;
                 IsSlewing = true;
                 SlewState = SlewType.SlewMoveAxis;
@@ -3244,6 +3259,8 @@ namespace GS.Server.SkyTelescope
                 return;
             }
 
+            if (IsSlewing) { SlewFault = ex; }
+            SerialIoFailed = true;
             AlertState = true;
             switch (exType)
             {
@@ -4875,6 +4892,7 @@ namespace GS.Server.SkyTelescope
                 // OperationCanceledException thrown by SimGoTo or SkyGoTo
                 // AggregateException with base OperationCanceledException thrown by PrecisionGoTo
                 var cancelled = ex is OperationCanceledException || ex.GetBaseException() is OperationCanceledException;
+                if (!cancelled) { SlewFault = ex; }
                 monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
@@ -6028,6 +6046,7 @@ namespace GS.Server.SkyTelescope
             MonitorLog.LogToMonitor(monitorItem);
 
             // setup server defaults, stop auto-discovery, connect serial port, start queues
+            SlewFault = null;
             Defaults();
             switch (SkySettings.Mount)
             {
@@ -6037,7 +6056,10 @@ namespace GS.Server.SkyTelescope
                     MountQueue.Start();
                     if (MountQueue.IsRunning) { ConnectAlignmentModel(); }
                     else
-                    { throw new Exception("Failed to start simulator queue"); }
+                    {
+                        SerialIoFailed = true;
+                        throw new Exception("Failed to start simulator queue");
+                    }
 
                     break;
                 case MountType.SkyWatcher:
@@ -6046,12 +6068,14 @@ namespace GS.Server.SkyTelescope
                     SkySystem.ConnectSerial = true;
                     if (!SkySystem.ConnectSerial)
                     {
+                        SerialIoFailed = true;
                         throw new SkyServerException(ErrorCode.ErrSerialFailed,
                             $"Connection Failed: {SkySystem.Error}");
                     }
 
                     if (!StartSkyWatcherQueue())
                     {
+                        SerialIoFailed = true;
                         throw new SkyServerException(ErrorCode.ErrMount, "Failed to start sky queue");
                     }
                     break;
@@ -6074,9 +6098,13 @@ namespace GS.Server.SkyTelescope
                 // Event to update AltAz tracking rate
                 _altAzTrackingTimer = new MediaTimer { Period = SkySettings.AltAzTrackingUpdateInterval, Resolution = 5 };
                 _altAzTrackingTimer.Tick += AltAzTrackingTimerEvent;
+
+                // Mount IO is usable again only once start up has fully completed
+                SerialIoFailed = false;
             }
             else
             {
+                SerialIoFailed = true;
                 MountStop();
             }
         }
@@ -7129,6 +7157,7 @@ namespace GS.Server.SkyTelescope
         private static void SlewMount(Vector targetPosition, SlewType slewState, bool tracking = false, bool slewAsync = true, ManualResetEvent externalSlewStartedEvent = null)
         {
             if (!IsMountRunning) { return; }
+            SlewFault = null;
 
             var monitorItem = new MonitorEntry
             {

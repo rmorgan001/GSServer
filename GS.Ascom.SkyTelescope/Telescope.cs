@@ -118,6 +118,7 @@ namespace ASCOM.GS.Sky.Telescope
         {
             get
             {
+                CheckSerialIO("Altitude");
                 CheckCapability(SkySettings.CanAltAz, "Altitude", false);
                 var r = SkyServer.Altitude;
 
@@ -163,6 +164,7 @@ namespace ASCOM.GS.Sky.Telescope
         {
             get
             {
+                CheckSerialIO("AtHome");
                 CheckVersionOne("AtHome", false);
                 var r = SkyServer.AtHome;
 
@@ -178,6 +180,7 @@ namespace ASCOM.GS.Sky.Telescope
         {
             get
             {
+                CheckSerialIO("AtPark");
                 CheckVersionOne("AtPark", false);
                 var r = SkySettings.AtPark;
 
@@ -193,6 +196,7 @@ namespace ASCOM.GS.Sky.Telescope
         {
             get
             {
+                CheckSerialIO("Azimuth");
                 CheckCapability(SkySettings.CanAltAz, "Azimuth", false);
                 var r = SkyServer.Azimuth;
 
@@ -440,7 +444,7 @@ namespace ASCOM.GS.Sky.Telescope
         {
             get
             {
-                var r = SkySystem.Connected;
+                var r = SkySystem.Connected && !SkySystem.Connecting && !SkyServer.SerialIoFailed && !SkyServer.IsSkyWatcherSerialRecoveryActive;
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Debug, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {r}" };
                 MonitorLog.LogToMonitor(monitorItem);
@@ -474,6 +478,7 @@ namespace ASCOM.GS.Sky.Telescope
         {
             get
             {
+                CheckSerialIO("Declination");
                 CheckCapability(SkySettings.CanEquatorial, "Declination", false);
                 var dec = SkyServer.DeclinationXForm;
 
@@ -510,6 +515,7 @@ namespace ASCOM.GS.Sky.Telescope
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
+                CheckSerialIO("DeclinationRate");
                 CheckCapability(SkySettings.CanSetEquRates, "DeclinationRate", true);
                 CheckRate(value);
                 if (TrackingRate != DriveRates.driveSidereal)
@@ -543,6 +549,7 @@ namespace ASCOM.GS.Sky.Telescope
         {
             get
             {
+                CheckSerialIO("DeviceState");
                 string msg = null;
                 try
                 {
@@ -559,7 +566,7 @@ namespace ASCOM.GS.Sky.Telescope
                     try { deviceState.Add(new StateValue(nameof(ITelescopeV4.RightAscension), SkyServer.RightAscension)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
                     try { deviceState.Add(new StateValue(nameof(ITelescopeV4.SideOfPier), SkyServer.SideOfPier)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
                     try { deviceState.Add(new StateValue(nameof(ITelescopeV4.SiderealTime), SkyServer.SiderealTime)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
-                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Slewing), SkyServer.IsSlewing)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Slewing), Slewing)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
                     try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Tracking), SkyServer.Tracking || SkyServer.SlewState == SlewType.SlewRaDec)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
                     try { deviceState.Add(new StateValue(nameof(ITelescopeV4.UTCDate), HiResDateTime.UtcNow)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
                     try { deviceState.Add(new StateValue(DateTime.Now)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
@@ -741,6 +748,7 @@ namespace ASCOM.GS.Sky.Telescope
         {
             get
             {
+                CheckSerialIO("IsPulseGuiding");
                 CheckCapability(SkySettings.CanPulseGuide, "IsPulseGuiding", false);
                 var r = SkyServer.IsPulseGuiding;
 
@@ -775,6 +783,7 @@ namespace ASCOM.GS.Sky.Telescope
         {
             get
             {
+                CheckSerialIO("RightAscension");
                 CheckCapability(SkySettings.CanEquatorial, "RightAscension", false);
                 var ra = SkyServer.RightAscensionXForm;
 
@@ -818,6 +827,7 @@ namespace ASCOM.GS.Sky.Telescope
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{value}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
+                CheckSerialIO("RightAscensionRate");
                 CheckCapability(SkySettings.CanSetEquRates, "RightAscensionRate ", true);
                 CheckRate(value);
                 if (TrackingRate != DriveRates.driveSidereal)
@@ -834,6 +844,7 @@ namespace ASCOM.GS.Sky.Telescope
         {
             get
             {
+                CheckSerialIO("SideOfPier");
                 var r = SkyServer.SideOfPier;
 
                 var monitorItem = new MonitorEntry
@@ -844,6 +855,7 @@ namespace ASCOM.GS.Sky.Telescope
             }
             set
             {
+                CheckSerialIO("SideOfPier");
                 CheckCapability(SkySettings.CanSetPierSide, "SideOfPier", true);
                 MonitorEntry monitorItem;
                 if (value == SkyServer.SideOfPier)
@@ -957,6 +969,17 @@ namespace ASCOM.GS.Sky.Telescope
         {
             get
             {
+                CheckSerialIO("Slewing");
+                var slewFault = SkyServer.SlewFault;
+                if (slewFault != null)
+                {
+                    var faultItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = slewFault.Message };
+                    MonitorLog.LogToMonitor(faultItem);
+
+                    throw new NotConnectedException($"Slewing: Slew failed - {slewFault.Message}");
+                }
+
                 var r = SkyServer.IsSlewing;
 
                 var monitorItem = new MonitorEntry
@@ -1053,6 +1076,7 @@ namespace ASCOM.GS.Sky.Telescope
         {
             get
             {
+                CheckSerialIO("Tracking");
                 var r = SkyServer.Tracking || SkyServer.SlewState == SlewType.SlewRaDec;
 
                 var monitorItem = new MonitorEntry
@@ -1063,6 +1087,7 @@ namespace ASCOM.GS.Sky.Telescope
             }
             set
             {
+                CheckSerialIO("Tracking");
                 if (!SkyServer.AsComOn) return;
 
                 if (value & SkyServer.AtPark){CheckParked("Cannot enable tracking at park");}
@@ -1174,6 +1199,7 @@ namespace ASCOM.GS.Sky.Telescope
             {
                 // ReSharper disable once StringLiteralTypo
                 case string str when str.Equals("telescope:setparkposition", StringComparison.InvariantCultureIgnoreCase):
+                    CheckSerialIO("Action");
                     if (SkyServer.IsMountRunning == false) { throw new NotConnectedException("Mount Not Connected"); }
                     var found = SkySettings.ParkPositions.FirstOrDefault(x => string.Equals(x.Name, actionParameters, StringComparison.InvariantCultureIgnoreCase));
                     if (found == null)
@@ -1214,6 +1240,7 @@ namespace ASCOM.GS.Sky.Telescope
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = " Started" };
             MonitorLog.LogToMonitor(monitorItem);
 
+            CheckSerialIO("AbortSlew");
             CheckParked("AbortSlew");
             SkyServer.AbortSlewAsync(true);
         }
@@ -1329,6 +1356,7 @@ namespace ASCOM.GS.Sky.Telescope
 
         public void FindHome()
         {
+            CheckSerialIO("FindHome");
             if (!SkyServer.AsComOn) return;
             CheckCapability(SkySettings.CanFindHome, "FindHome");
             CheckParked("FindHome");
@@ -1354,6 +1382,7 @@ namespace ASCOM.GS.Sky.Telescope
         /// <param name="rate"></param>
         public void MoveAxis(TelescopeAxes axis, double rate)
         {
+            CheckSerialIO("MoveAxis");
             if (!SkyServer.AsComOn) return;
             var monitorItem = new MonitorEntry
             {
@@ -1389,6 +1418,7 @@ namespace ASCOM.GS.Sky.Telescope
 
         public void Park()
         {
+            CheckSerialIO("Park");
             if (!SkyServer.AsComOn) return;
             CheckCapability(SkySettings.CanPark, "Park");
 
@@ -1422,6 +1452,7 @@ namespace ASCOM.GS.Sky.Telescope
             ManualResetEventSlim startedEvent = null;
             try
             {
+                CheckSerialIO("PulseGuide");
                 if (!SkyServer.AsComOn) { throw new InvalidOperationException("Not accepting commands"); }
                 if (SkyServer.AtPark) { throw new ParkedException(); }
                 //if (SkyServer.IsSlewing) { throw new InvalidValueException("Pulse rejected when slewing"); }
@@ -1466,6 +1497,7 @@ namespace ASCOM.GS.Sky.Telescope
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Started" };
             MonitorLog.LogToMonitor(monitorItem);
 
+            CheckSerialIO("SetPark");
             CheckCapability(SkySettings.CanSetPark, "SetPark");
             SkyServer.SetParkAxis("External");
         }
@@ -1494,6 +1526,7 @@ namespace ASCOM.GS.Sky.Telescope
 
         public void SlewToAltAz(double az, double alt)
         {
+            CheckSerialIO("SlewToAltAz");
             if (!SkyServer.AsComOn) return;
 
             var monitorItem = new MonitorEntry
@@ -1519,6 +1552,7 @@ namespace ASCOM.GS.Sky.Telescope
 
         public void SlewToAltAzAsync(double az, double alt)
         {
+            CheckSerialIO("SlewToAltAzAsync");
             if (!SkyServer.AsComOn) return;
 
             var monitorItem = new MonitorEntry
@@ -1544,6 +1578,7 @@ namespace ASCOM.GS.Sky.Telescope
 
         public void SlewToCoordinates(double ra, double dec)
         {
+            CheckSerialIO("SlewToCoordinates");
             if (!SkyServer.AsComOn) return;
 
             var monitorItem = new MonitorEntry
@@ -1573,6 +1608,7 @@ namespace ASCOM.GS.Sky.Telescope
 
         public void SlewToCoordinatesAsync(double ra, double dec)
         {
+            CheckSerialIO("SlewToCoordinatesAsync");
             if (!SkyServer.AsComOn) return;
 
             var monitorItem = new MonitorEntry
@@ -1602,6 +1638,7 @@ namespace ASCOM.GS.Sky.Telescope
 
         public void SlewToTarget()
         {
+            CheckSerialIO("SlewToTarget");
             if (!SkyServer.AsComOn) return;
 
             var ra = TargetRightAscension;
@@ -1641,6 +1678,7 @@ namespace ASCOM.GS.Sky.Telescope
 
         public void SlewToTargetAsync()
         {
+            CheckSerialIO("SlewToTargetAsync");
             if (!SkyServer.AsComOn) return;
 
             var ra = TargetRightAscension;
@@ -1675,6 +1713,7 @@ namespace ASCOM.GS.Sky.Telescope
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{_util.DegreesToDMS(az, "\u00B0 ", ":", "", 2)}|{_util.DegreesToDMS(alt, "\u00B0 ", ":", "", 2)}" };
             MonitorLog.LogToMonitor(monitorItem);
 
+            CheckSerialIO("SyncToAltAz");
             CheckCapability(SkySettings.CanSyncAltAz, "SyncToAltAz");
             CheckRange(az, 0, 360, "SyncToAltAz", "Azimuth");
             CheckRange(alt, -90, 90, "SyncToAltAz", "Altitude");
@@ -1706,6 +1745,7 @@ namespace ASCOM.GS.Sky.Telescope
             };
             MonitorLog.LogToMonitor(monitorItem);
 
+            CheckSerialIO("SyncToCoordinates");
             CheckCapability(SkySettings.CanSync, "SyncToCoordinates");
             CheckRange(ra, 0, 24, "SyncToCoordinates", "RightAscension");
             CheckRange(dec, -90, 90, "SyncToCoordinates", "Declination");
@@ -1742,6 +1782,7 @@ namespace ASCOM.GS.Sky.Telescope
             };
             MonitorLog.LogToMonitor(monitorItem);
 
+            CheckSerialIO("SyncToTarget");
             CheckCapability(SkySettings.CanSync, "SyncToTarget");
             CheckRange(SkyServer.TargetRa, 0, 24, "SyncToTarget", "TargetRightAscension");
             CheckRange(SkyServer.TargetDec, -90, 90, "SyncToTarget", "TargetDeclination");
@@ -1764,6 +1805,7 @@ namespace ASCOM.GS.Sky.Telescope
 
         public void Unpark()
         {
+            CheckSerialIO("Unpark");
             CheckCapability(SkySettings.CanUnPark, "UnPark");
             SkyServer.AtPark = false;
             if (SkySettings.TrackAfterUnpark)
@@ -1885,6 +1927,27 @@ namespace ASCOM.GS.Sky.Telescope
             MonitorLog.LogToMonitor(monitorItem);
 
             throw new PropertyNotImplementedException(property, setNotGet);
+        }
+
+        /// <summary>
+        /// Clients are connected and mount IO has failed or serial recovery is in progress
+        /// </summary>
+        private static bool IsSerialIoFailed =>
+            SkySystem.Connected && !SkySystem.Connecting && (SkyServer.SerialIoFailed || SkyServer.IsSkyWatcherSerialRecoveryActive);
+
+        /// <summary>
+        /// Gate ASCOM operations once mount serial IO has failed and the retry and reconnect attempts are exhausted
+        /// </summary>
+        private static void CheckSerialIO(string property)
+        {
+            if (!IsSerialIoFailed) return;
+
+            var detail = SkyServer.MountError?.Message;
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{property}|{detail}" };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            throw new NotConnectedException($"{property}: Mount serial IO has failed{(detail == null ? string.Empty : " - " + detail)}");
         }
 
         private static void CheckParked(string property)
