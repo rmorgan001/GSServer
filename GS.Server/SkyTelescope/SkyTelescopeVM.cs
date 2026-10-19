@@ -822,7 +822,9 @@ namespace GS.Server.SkyTelescope
                                     // no status kept for the simulator
                                     break;
                                 case "IsMountRunning":
-                                    MountState = SkyServer.IsMountRunning;
+                                case "SerialIoFailed":
+                                    // After a serial IO failure the button offers Connect for a reconnect
+                                    MountState = SkyServer.IsMountRunning && !SkyServer.SerialIoFailed;
                                     break;
                                 case "AutoHomeProgressBar":
                                     AutoHomeProgressBar = SkyServer.AutoHomeProgressBar;

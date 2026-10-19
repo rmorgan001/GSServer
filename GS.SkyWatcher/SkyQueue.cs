@@ -40,6 +40,11 @@ namespace GS.SkyWatcher
         private static ManualResetEventSlim _taskReadySignal;
         public static event PropertyChangedEventHandler StaticPropertyChanged;
 
+        /// <summary>
+        /// Raised once when the monitored serial port hardware has been physically removed
+        /// </summary>
+        public static event EventHandler SerialDisconnected;
+
         private static long _id;
         private static bool _isPulseGuidingDec;
         private static bool _isPulseGuidingRa;
@@ -611,6 +616,8 @@ namespace GS.SkyWatcher
                     Message = $"USB hardware disconnect detected — port {portName} no longer present in system device list"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
+
+                SerialDisconnected?.Invoke(null, EventArgs.Empty);
             }
             catch (Exception ex)
             {
@@ -625,6 +632,9 @@ namespace GS.SkyWatcher
                     Message = $"USB device change confirmation error: {ex.Message}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
+
+                // Restore the name so a later device event can check again
+                Interlocked.CompareExchange(ref _monitoredPortName, portName, null);
             }
         }
 

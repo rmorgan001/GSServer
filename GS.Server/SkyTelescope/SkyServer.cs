@@ -150,6 +150,9 @@ namespace GS.Server.SkyTelescope
                 // attach handler to watch for pulses changing;
                 MountQueue.StaticPropertyChanged += PropertyChangedMountQueue;
 
+                // attach handler to watch for USB removal of the mount serial port
+                SkyQueue.SerialDisconnected += SerialDisconnectedEventHandler;
+
             }
             catch (Exception ex)
             {
@@ -669,7 +672,17 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Set when mount IO has failed, held until the mount has been restarted or recovered successfully
         /// </summary>
-        public static bool SerialIoFailed { get; private set; }
+        private static bool _serialIoFailed;
+        public static bool SerialIoFailed
+        {
+            get => _serialIoFailed;
+            private set
+            {
+                if (_serialIoFailed == value) { return; }
+                _serialIoFailed = value;
+                OnStaticPropertyChanged();
+            }
+        }
         
         /// <summary>
         /// status for goto
@@ -8079,6 +8092,29 @@ namespace GS.Server.SkyTelescope
 
             internal int[] Custom360Steps { get; private set; }
             internal double[] CustomWormSteps { get; private set; }
+        }
+
+        /// <summary>
+        /// USB removal of the mount serial port fails the mount immediately, ignored while resume recovery is handling the port
+        /// </summary>
+        private static void SerialDisconnectedEventHandler(object sender, EventArgs e)
+        {
+            var ignore = IsSkyWatcherSerialRecoveryActive || IsResumeRecoveryInProgress || !IsMountRunning;
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Mount,
+                Type = ignore ? MonitorType.Information : MonitorType.Error,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = ignore ? "USB removal ignored during recovery or while stopped" : "Mount USB serial port removed"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+            if (ignore) { return; }
+
+            // The mount stop waits on the queue and stops the USB watcher, so leave the watcher callback thread
+            Task.Run(() => SkyErrorHandler(new MountControlException(SkyWatcher.ErrorCode.ErrNotConnected, "USB serial port removed")));
         }
 
         private static void LowVoltageEventSet(object sender, EventArgs e)
