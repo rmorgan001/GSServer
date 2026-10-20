@@ -59,12 +59,20 @@ namespace GS.SkyWatcher
         private long[] _breakSteps = new long[2];
         private readonly double[] _stepsPerSecond = new double[2];
         private bool _lowVoltageEventState; // Low voltage event state
+        private const int PollFailureLimit = 5; // Consecutive failed position polls that raise a serial IO error
+        private int _pollFailures;
 
         #endregion
 
         #region Properties
 
         internal bool IsConnected => _commands.IsConnected;
+
+        internal void ResetConnection()
+        {
+            _pollFailures = 0;
+            _commands.ResetConnection();
+        }
 
         private bool _pPecOn;
         internal bool IsPPecOn
@@ -874,18 +882,31 @@ namespace GS.SkyWatcher
         {
             try
             {
-                var positions = new double[] { 0, 0 };
+                // One attempt per axis so a dead link is noticed quickly, the poll repeats anyway
+                var x = _commands.GetAxisStepsNaN(AxisId.Axis1, Commands.PollAttempts);
+                var y = double.IsNaN(x) ? double.NaN : _commands.GetAxisStepsNaN(AxisId.Axis2, Commands.PollAttempts);
 
-                var x = _commands.GetAxisStepsNaN(AxisId.Axis1);
-                positions[0] = x;
+                if (double.IsNaN(x) || double.IsNaN(y))
+                {
+                    // The poll swallows IO failures, so report a run of failures to start serial recovery
+                    if (++_pollFailures >= PollFailureLimit)
+                    {
+                        SkyQueue.RaiseSerialIoError(new MountControlException(ErrorCode.ErrNoResponseAxis1, $"Position polling failed {_pollFailures} consecutive times"));
+                    }
+                    return;
+                }
 
-                var y = _commands.GetAxisStepsNaN(AxisId.Axis2);
-                positions[1] = y;
+                if (_pollFailures > 0)
+                {
+                    // First good poll after failures, a mount that lost power comes back uninitialised
+                    if (!AxesInitialized())
+                    {
+                        SkyQueue.RaiseSerialIoError(new MountControlException(ErrorCode.ErrNotConnected, "Mount axes are not initialised, the mount lost power"));
+                    }
+                    _pollFailures = 0;
+                }
 
-                if (double.IsNaN(positions[0]) || double.IsNaN(positions[1])){return;}
-
-                var a = new[] { positions[0], positions[1] };
-                SkyQueue.Steps = a;
+                SkyQueue.Steps = new[] { x, y };
             }
             catch (Exception e)
             {
@@ -936,6 +957,11 @@ namespace GS.SkyWatcher
             LowVoltageEventState = axisStatus.LowVoltageEventState;
             return axisStatus;
         }
+
+        /// <summary>
+        /// A controller that lost power comes back with its axes uninitialised
+        /// </summary>
+        internal bool AxesInitialized() => GetAxisStatus(AxisId.Axis1).Initialized && GetAxisStatus(AxisId.Axis2).Initialized;
 
         /// <summary>
         /// Gets last struct of status information but does not run a new mount command

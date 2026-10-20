@@ -55,6 +55,8 @@ namespace GS.SkyWatcher
         private readonly object _syncObject = new object();
         private int _conErrCnt;                                         // Number of continuous errors
         private const int ConErrMax = 50;                               // Max number of allowed continuous errors
+        private const int MaxCmdAttempts = 11;                          // Attempts per command before it fails
+        internal const int PollAttempts = 1;                            // The position poll repeats so it does not retry
         private readonly int[] _stepsPerRev = { 0, 0 };                 // From mount :a or :X0002
         private readonly int[] _resolutionFactor = { 1, 1 };            // Step division factor from :a and :X0002
 
@@ -72,6 +74,15 @@ namespace GS.SkyWatcher
         /// Quick check to see if serial is connected and mount is receiving and sending data
         /// </summary> 
         internal bool IsConnected => SkyQueue.Serial.IsOpen && MountConnected;
+
+        /// <summary>
+        /// Called after the serial port has been replaced so queued commands are executed again
+        /// </summary>
+        internal void ResetConnection()
+        {
+            _conErrCnt = 0;
+            MountConnected = SkyQueue.Serial?.IsOpen == true;
+        }
 
         /// <summary>
         /// Indicate whether the motor controller supports advanced command set (Firmware version 3.22.xx or above)
@@ -787,20 +798,20 @@ namespace GS.SkyWatcher
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <returns>Cardinal encoder count</returns>
-        internal double GetAxisStepsNaN(AxisId axis)
+        internal double GetAxisStepsNaN(AxisId axis, int attempts = MaxCmdAttempts)
         {
             try
             {
                 if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
                 {
-                    var response = CmdToMount(axis, 'X', "0003", true);    // 0x03（’03’）: Position reading of the axis
+                    var response = CmdToMount(axis, 'X', "0003", true, attempts);    // 0x03（’03’）: Position reading of the axis
                     if (string.IsNullOrEmpty(response)) return double.NaN;
                     var iPosition = String32ToInt(response, true, _resolutionFactor[(int)axis]);
                     return iPosition;
                 }
                 else
                 {
-                    var response = CmdToMount(axis, 'j', null, true);
+                    var response = CmdToMount(axis, 'j', null, true, attempts);
                     if (string.IsNullOrEmpty(response)) return double.NaN;
                     var iPosition = StringToLong(response);
                     iPosition -= 0x00800000;
@@ -1479,7 +1490,7 @@ namespace GS.SkyWatcher
             }
         }
 
-        private string CmdToMount(AxisId axis, char command, string cmdDataStr, bool ignoreWarnings = false)
+        private string CmdToMount(AxisId axis, char command, string cmdDataStr, bool ignoreWarnings = false, int attempts = MaxCmdAttempts)
         {
             MonitorEntry monitorItem;
             for (var i = 0; i <= 5; i++)
@@ -1494,7 +1505,7 @@ namespace GS.SkyWatcher
                         try
                         {
                             string responseString = null;
-                            for (var c = 0; c <= 10; c++)
+                            for (var c = 0; c < attempts; c++)
                             {
                                 SkyQueue.Serial.DiscardInBuffer();
                                 SkyQueue.Serial.DiscardOutBuffer();

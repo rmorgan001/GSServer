@@ -153,6 +153,9 @@ namespace GS.Server.SkyTelescope
                 // attach handler to watch for USB removal of the mount serial port
                 SkyQueue.SerialDisconnected += SerialDisconnectedEventHandler;
 
+                // attach handler to watch for serial transport failures
+                SkyQueue.SerialIoError += SerialIoErrorEventHandler;
+
             }
             catch (Exception ex)
             {
@@ -220,6 +223,10 @@ namespace GS.Server.SkyTelescope
         private static DateTime _recoveryDeadlineUtc;
         private static int _recoveryAttemptCount;
         private static bool _resumeRecoveryInProgress;
+        private static bool _serialRecoveryInProgress;
+        private static bool _mountStarting;
+        private const int UsbRecoveryWindowSeconds = 10;
+        private static readonly int[] SerialIoRecoveryDelaysSeconds = { 1, 2, 5 };
         private static bool _resumeErrorSuppressionEligible;
         private static double _rightAscensionXForm;
         private static bool _rotate3DModel;
@@ -723,7 +730,9 @@ namespace GS.Server.SkyTelescope
                 LoopCounter = 0;
                 if (value)
                 {
-                    MountStart();
+                    _mountStarting = true;
+                    try { MountStart(); }
+                    finally { _mountStarting = false; }
                 }
                 else
                 {
@@ -5856,6 +5865,9 @@ namespace GS.Server.SkyTelescope
                     WormTeethCount = new[] { raWormTeeth, decWormTeeth };
                     PecBinSteps = StepsPerRevolution[0] / (WormTeethCount[0] * 1.0) / PecBinCount;
 
+                    // ensure the mount is stopped and not slewing - error recovery safety
+                    AxesStopValidate();
+
                     // checks if the mount is close enough to home position to set default position. If not use the positions from the mount
                     while (rawPositions == null)
                     {
@@ -5929,6 +5941,9 @@ namespace GS.Server.SkyTelescope
                     };
                     MonitorLog.LogToMonitor(monitorItem);
                     InitializeSkyWatcherController();
+
+                    // ensure the mount is stopped and not slewing - error recovery safety
+                    AxesStopValidate();
 
                     //log current positions
                     var steps = GetRawSteps();
@@ -6099,7 +6114,7 @@ namespace GS.Server.SkyTelescope
             // Run mount default commands and start the UI updates
             if (MountConnect())
             {
-                // start with a stop
+                // start with a stop - redundant but ensures the mount is not slewing
                 AxesStopValidate();
 
                 // Event to get mount positions and update UI
@@ -6185,6 +6200,44 @@ namespace GS.Server.SkyTelescope
 
             SkyQueue.Stop();
             SkySystem.ConnectSerial = false;
+        }
+
+        /// <summary>
+        /// Teardown after the mount link has failed, no commands are sent to the mount.
+        /// Keep in step with MountStop
+        /// </summary>
+        private static void MountStopLinkFailed()
+        {
+            LogSerialRecovery("Teardown|link failed, no stop commands sent to the mount", MonitorType.Warning);
+
+            PowerRequestHelper.Release();
+
+            StopPositionUpdateTimer();
+            if (_altAzTrackingTimer != null) { _altAzTrackingTimer.Tick -= AltAzTrackingTimerEvent; }
+            _altAzTrackingTimer?.Stop();
+            _altAzTrackingTimer?.Dispose();
+
+            // Stop the queue before cancelling operations so none can wait on commands for a dead link
+            if (SkyQueue.IsRunning)
+            {
+                var skyStats = SkyQueue.Statistics;
+                if (skyStats != null) { LogSerialRecovery($"SkyQueue Session Statistics: {skyStats}"); }
+                SkyQueue.Stop();
+            }
+            SkySystem.ConnectSerial = false;
+            _mountRunning = false;
+            LoopCounter = 0;
+
+            CancelAllAsync();
+
+            // Software state only, the Tracking setter would send commands to the mount
+            IsPulseGuidingDec = false;
+            IsPulseGuidingRa = false;
+            _trackingMode = TrackingMode.Off;
+            _tracking = false;
+            SkyPredictor.Reset();
+            OnStaticPropertyChanged(nameof(Tracking));
+            OnStaticPropertyChanged(nameof(IsMountRunning));
         }
 
         /// <summary>
@@ -8095,26 +8148,224 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// USB removal of the mount serial port fails the mount immediately, ignored while resume recovery is handling the port
+        /// USB removal of the mount serial port starts a recovery window instead of failing the mount immediately
         /// </summary>
         private static void SerialDisconnectedEventHandler(object sender, EventArgs e)
         {
-            var ignore = IsSkyWatcherSerialRecoveryActive || IsResumeRecoveryInProgress || !IsMountRunning;
+            StartSerialRecovery(true, new MountControlException(SkyWatcher.ErrorCode.ErrNotConnected, "USB serial port removed"));
+        }
+
+        /// <summary>
+        /// A serial transport failure on the command queue starts the retry recovery
+        /// </summary>
+        private static void SerialIoErrorEventHandler(Exception ex)
+        {
+            StartSerialRecovery(false, ex);
+        }
+
+        private static void LogSerialRecovery(string message, MonitorType type = MonitorType.Information)
+        {
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
                 Device = MonitorDevice.Server,
-                Category = MonitorCategory.Mount,
-                Type = ignore ? MonitorType.Information : MonitorType.Error,
-                Method = MethodBase.GetCurrentMethod()?.Name,
+                Category = MonitorCategory.Server,
+                Type = type,
+                Method = "SerialRecovery",
                 Thread = Thread.CurrentThread.ManagedThreadId,
-                Message = ignore ? "USB removal ignored during recovery or while stopped" : "Mount USB serial port removed"
+                Message = message
             };
             MonitorLog.LogToMonitor(monitorItem);
-            if (ignore) { return; }
+        }
 
-            // The mount stop waits on the queue and stops the USB watcher, so leave the watcher callback thread
-            Task.Run(() => SkyErrorHandler(new MountControlException(SkyWatcher.ErrorCode.ErrNotConnected, "USB serial port removed")));
+        /// <summary>
+        /// Start one recovery at a time for a running SkyWatcher COM connection. The command queue keeps running
+        /// and only the serial port is replaced, so queued and in-flight commands carry on once the port is restored.
+        /// </summary>
+        private static void StartSerialRecovery(bool usbRemoval, Exception cause)
+        {
+            if (SkySettings.Mount != MountType.SkyWatcher || SkySystem.ConnType != ConnectType.Com) { return; }
+            // Start-up failures, a stopped mount, a failed mount and power transitions have their own handling
+            if (_mountStarting || SerialIoFailed || !IsMountRunning) { return; }
+            if (IsSkyWatcherSerialRecoveryActive || IsResumeRecoveryInProgress) { return; }
+
+            lock (ResumeRecoveryLock)
+            {
+                if (_serialRecoveryInProgress) { return; }
+                _serialRecoveryInProgress = true;
+                _resumeErrorSuppressionEligible = true;
+            }
+
+            lock (PowerTransitionLock)
+            {
+                _powerTransitionState = PowerTransitionState.RecoveringIo;
+            }
+
+            LogSerialRecovery($"Started|{(usbRemoval ? "UsbRemoval" : "SerialIo")}|{cause?.Message}", MonitorType.Warning);
+
+            // Leave the calling thread, the queue and USB watcher threads must not block
+            Task.Run(() => ExecuteSerialRecovery(usbRemoval, cause));
+        }
+
+        private static void ExecuteSerialRecovery(bool usbRemoval, Exception cause)
+        {
+            try
+            {
+                string detail;
+                var succeeded = usbRemoval ? RecoverUsbPort(out detail) : RecoverSerialIo(out detail);
+                CompleteSerialRecovery(succeeded, detail, cause);
+            }
+            catch (OperationCanceledException ex)
+            {
+                LogSerialRecovery($"Abandoned|{ex.Message}", MonitorType.Warning);
+
+                // Power recovery owns the state when it has taken over, otherwise release the recovery state
+                if (!IsResumeRecoveryInProgress && CurrentPowerTransitionState == PowerTransitionState.RecoveringIo)
+                {
+                    lock (ResumeRecoveryLock) { _resumeErrorSuppressionEligible = false; }
+                    lock (PowerTransitionLock) { _powerTransitionState = PowerTransitionState.Disconnected; }
+                }
+            }
+            catch (Exception ex)
+            {
+                CompleteSerialRecovery(false, ex.Message, cause);
+            }
+            finally
+            {
+                lock (ResumeRecoveryLock) { _serialRecoveryInProgress = false; }
+            }
+        }
+
+        private static void EnsureSerialRecoveryOwned()
+        {
+            var state = CurrentPowerTransitionState;
+            if (IsResumeRecoveryInProgress || state == PowerTransitionState.Suspending || state == PowerTransitionState.Resuming)
+            {
+                throw new OperationCanceledException("Superseded by power transition recovery");
+            }
+
+            if (!SkyQueue.IsRunning) { throw new OperationCanceledException("Mount stopped"); }
+        }
+
+        /// <summary>
+        /// Wait up to 10 seconds from detection for the USB port to return
+        /// </summary>
+        private static bool RecoverUsbPort(out string detail)
+        {
+            var port = SkySettings.Port;
+            var deadline = HiResDateTime.UtcNow.AddSeconds(UsbRecoveryWindowSeconds);
+            var poll = 0;
+            while (true)
+            {
+                EnsureSerialRecoveryOwned();
+                poll++;
+                var present = Array.Exists(System.IO.Ports.SerialPort.GetPortNames(),
+                    p => string.Equals(p, port, StringComparison.OrdinalIgnoreCase));
+                var restored = present && TrySerialRestore();
+                LogSerialRecovery($"UsbPoll:{poll}|Port:{port}|Present:{present}|Restored:{restored}");
+                if (restored)
+                {
+                    detail = $"USB port {port} restored|Polls:{poll}";
+                    return true;
+                }
+
+                if (HiResDateTime.UtcNow >= deadline) { break; }
+                Thread.Sleep(500);
+            }
+
+            detail = $"USB port {port} not restored within {UsbRecoveryWindowSeconds} seconds";
+            return false;
+        }
+
+        /// <summary>
+        /// Retry after 1, 2 and 5 seconds
+        /// </summary>
+        private static bool RecoverSerialIo(out string detail)
+        {
+            for (var attempt = 1; attempt <= SerialIoRecoveryDelaysSeconds.Length; attempt++)
+            {
+                var delay = SerialIoRecoveryDelaysSeconds[attempt - 1];
+                LogSerialRecovery($"SerialIoAttempt:{attempt}|WaitSeconds:{delay}");
+                Thread.Sleep(TimeSpan.FromSeconds(delay));
+                EnsureSerialRecoveryOwned();
+
+                var restored = TrySerialRestore();
+                LogSerialRecovery($"SerialIoAttempt:{attempt}|Restored:{restored}", restored ? MonitorType.Information : MonitorType.Warning);
+                if (restored)
+                {
+                    detail = $"Serial IO restored on attempt {attempt}";
+                    return true;
+                }
+            }
+
+            detail = $"Serial IO not restored after {SerialIoRecoveryDelaysSeconds.Length} attempts";
+            return false;
+        }
+
+        /// <summary>
+        /// Reopen the port, hand it to the running queue and confirm the mount responds
+        /// </summary>
+        private static bool TrySerialRestore()
+        {
+            SkySystem.ConnectSerial = false;
+            SkySystem.ConnectSerial = true;
+            if (!SkySystem.ConnectSerial) { return false; }
+
+            SkyQueue.ReplaceSerial(SkySystem.Serial);
+            return TryFastResumeValidation();
+        }
+
+        /// <summary>
+        /// A mount that lost power comes back with uninitialised axes and both positions at exactly zero
+        /// </summary>
+        private static bool MountLostPower()
+        {
+            try
+            {
+                var axes = new SkyAxesInitialized(SkyQueue.NewId);
+                var initialized = SkyQueue.GetCommandResult(axes).Result;
+                var notInitialized = axes.Successful && !Convert.ToBoolean(initialized);
+                var steps = GetRawSteps();
+                LogSerialRecovery($"PowerCheck|NotInitialized:{notInitialized}|Steps:{steps[0]}|{steps[1]}");
+                return notInitialized || (steps[0] == 0.0 && steps[1] == 0.0);
+            }
+            catch (Exception ex)
+            {
+                LogSerialRecovery($"PowerCheck|Failed|{ex.Message}", MonitorType.Warning);
+                return false;
+            }
+        }
+
+        private static void CompleteSerialRecovery(bool succeeded, string detail, Exception cause)
+        {
+            lock (ResumeRecoveryLock) { _resumeErrorSuppressionEligible = false; }
+
+            // The gate stays closed until this check is done, a mount that lost its position must be reconnected
+            if (succeeded && MountLostPower())
+            {
+                succeeded = false;
+                detail = "Serial IO restored but the mount lost power and was reinitialised, reconnect the mount";
+                cause = null;
+            }
+
+            if (succeeded)
+            {
+                lock (PowerTransitionLock) { _powerTransitionState = PowerTransitionState.Running; }
+                LogSerialRecovery($"Succeeded|{detail}");
+                return;
+            }
+
+            // Update the flag before the power state so the gate never sees a gap
+            SerialIoFailed = true;
+            lock (PowerTransitionLock) { _powerTransitionState = PowerTransitionState.Disconnected; }
+            LogSerialRecovery($"Failed|{detail}|{cause?.Message}", MonitorType.Error);
+
+            // The link is dead so tear down without sending stop commands, then report the error to the UI
+            var failure = new SkyServerException(ErrorCode.ErrSerialFailed, cause == null ? detail : $"{detail}. {cause.Message}");
+            if (IsSlewing) { SlewFault = failure; }
+            MountStopLinkFailed();
+            AlertState = true;
+            MountError = failure;
         }
 
         private static void LowVoltageEventSet(object sender, EventArgs e)

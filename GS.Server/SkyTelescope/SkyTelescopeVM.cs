@@ -7867,15 +7867,23 @@ namespace GS.Server.SkyTelescope
                 );
             }
         }
+        private const int ErrorDialogMaxLength = 150;
         private void OpenDialog(string msg, string caption = null)
         {
+            // Error dialogs show a short message on screen, the full text is logged
+            var shown = msg;
+            if (shown != null && shown.Length > ErrorDialogMaxLength && caption == $"{Application.Current.Resources["exError"]}")
+            {
+                shown = shown.Substring(0, ErrorDialogMaxLength - 3) + "...";
+            }
+
             if (IsDialogOpen)
             {
-                OpenDialogWin(msg, caption);
+                OpenDialogWin(shown, caption);
             }
             else
             {
-                if (msg != null) DialogMsg = msg;
+                if (shown != null) DialogMsg = shown;
                 DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
                 DialogContent = new DialogOK();
                 IsDialogOpen = true;
