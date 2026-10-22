@@ -931,14 +931,29 @@ namespace GS.Server.Main
             WindowStates = WindowState.Normal;
         }
 
+        private WindowState? _powerWindowState;
+
         public WindowState WindowStates
         {
-            get => Settings.Settings.WindowState;
+            get => _powerWindowState ?? Settings.Settings.WindowState;
             set
             {
-                Settings.Settings.WindowState = value;
+                if (_powerWindowState.HasValue)
+                {
+                    _powerWindowState = value;
+                }
+                else
+                {
+                    Settings.Settings.WindowState = value;
+                }
                 OnPropertyChanged();
             }
+        }
+
+        internal void SetPowerWindowMinimized(bool minimized)
+        {
+            _powerWindowState = minimized ? WindowState.Minimized : (WindowState?)null;
+            OnPropertyChanged(nameof(WindowStates));
         }
 
         public double WindowHeight

@@ -81,11 +81,19 @@ namespace GS.Server.SkyTelescope
                 {
                     if (!SkyServer.IsMountRunning)
                     {
-                        SkyServer.IsMountRunning = true;
-                        var connectionTimer = Stopwatch.StartNew();
-                        // Wait for two server event loop updates or 5 second timeout
-                        while (SkyServer.LoopCounter < 2 && connectionTimer.ElapsedMilliseconds < 5000)
-                            Thread.Sleep(100);
+                        try
+                        {
+                            SkyServer.IsMountRunning = true;
+                            var connectionTimer = Stopwatch.StartNew();
+                            // Wait for two server event loop updates or 5 second timeout
+                            while (SkyServer.LoopCounter < 2 && connectionTimer.ElapsedMilliseconds < 5000)
+                                Thread.Sleep(100);
+                        }
+                        finally
+                        {
+                            // A failed start must not leave Connecting stuck true
+                            Connecting = false;
+                        }
                     }
                 }
 

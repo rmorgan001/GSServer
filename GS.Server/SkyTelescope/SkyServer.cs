@@ -60,6 +60,8 @@ namespace GS.Server.SkyTelescope
 
         private static readonly Util Util = new Util();
         private static readonly object TimerLock = new object();
+        private static readonly object PowerTransitionLock = new object();
+        private static readonly object ResumeRecoveryLock = new object();
         private static MediaTimer _mediaTimer;
         private static MediaTimer _altAzTrackingTimer;
         private static Int32 _altAzTrackingLock;
@@ -148,6 +150,12 @@ namespace GS.Server.SkyTelescope
                 // attach handler to watch for pulses changing;
                 MountQueue.StaticPropertyChanged += PropertyChangedMountQueue;
 
+                // attach handler to watch for USB removal of the mount serial port
+                SkyQueue.SerialDisconnected += SerialDisconnectedEventHandler;
+
+                // attach handler to watch for serial transport failures
+                SkyQueue.SerialIoError += SerialIoErrorEventHandler;
+
             }
             catch (Exception ex)
             {
@@ -209,6 +217,17 @@ namespace GS.Server.SkyTelescope
         private static Vector _rateMoveAxes;
         private static bool _moveAxisActive;
         private static Vector _rateRaDec;
+        private static PowerTransitionState _powerTransitionState = PowerTransitionState.Running;
+        private static DateTime _lastSuspendUtc;
+        private static DateTime _lastResumeUtc;
+        private static DateTime _recoveryDeadlineUtc;
+        private static int _recoveryAttemptCount;
+        private static bool _resumeRecoveryInProgress;
+        private static bool _serialRecoveryInProgress;
+        private static bool _mountStarting;
+        private const int UsbRecoveryWindowSeconds = 10;
+        private static readonly int[] SerialIoRecoveryDelaysSeconds = { 1, 2, 5 };
+        private static bool _resumeErrorSuppressionEligible;
         private static double _rightAscensionXForm;
         private static bool _rotate3DModel;
         private static double _slewSettleTime;
@@ -448,6 +467,8 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        public static event EventHandler PowerResumeHandled;
+
         /// <summary>
         /// Positions converted from mount
         /// </summary>
@@ -649,6 +670,26 @@ namespace GS.Server.SkyTelescope
                 OnStaticPropertyChanged();
             }
         }
+
+        /// <summary>
+        /// Set when a slew fails part way, reported by ASCOM Slewing until another slew is initiated
+        /// </summary>
+        public static Exception SlewFault { get; private set; }
+
+        /// <summary>
+        /// Set when mount IO has failed, held until the mount has been restarted or recovered successfully
+        /// </summary>
+        private static bool _serialIoFailed;
+        public static bool SerialIoFailed
+        {
+            get => _serialIoFailed;
+            private set
+            {
+                if (_serialIoFailed == value) { return; }
+                _serialIoFailed = value;
+                OnStaticPropertyChanged();
+            }
+        }
         
         /// <summary>
         /// status for goto
@@ -689,7 +730,9 @@ namespace GS.Server.SkyTelescope
                 LoopCounter = 0;
                 if (value)
                 {
-                    MountStart();
+                    _mountStarting = true;
+                    try { MountStart(); }
+                    finally { _mountStarting = false; }
                 }
                 else
                 {
@@ -697,6 +740,557 @@ namespace GS.Server.SkyTelescope
                 }
 
                 OnStaticPropertyChanged();
+            }
+        }
+
+        public static PowerTransitionState CurrentPowerTransitionState
+        {
+            get
+            {
+                lock (PowerTransitionLock)
+                {
+                    return _powerTransitionState;
+                }
+            }
+        }
+
+        public static DateTime LastSuspendUtc
+        {
+            get
+            {
+                lock (PowerTransitionLock)
+                {
+                    return _lastSuspendUtc;
+                }
+            }
+        }
+
+        public static DateTime LastResumeUtc
+        {
+            get
+            {
+                lock (PowerTransitionLock)
+                {
+                    return _lastResumeUtc;
+                }
+            }
+        }
+
+        public static bool ShouldApplySkyWatcherResumeRecovery
+        {
+            get
+            {
+                return SkySettings.Mount == MountType.SkyWatcher
+                       && SkySystem.ConnType == ConnectType.Com
+                       && SkyQueue.IsRunning
+                       && IsMountRunning;
+            }
+        }
+
+        public static bool IsSkyWatcherSerialRecoveryActive
+        {
+            get
+            {
+                var state = CurrentPowerTransitionState;
+                return state == PowerTransitionState.Suspending
+                       || state == PowerTransitionState.Resuming
+                       || state == PowerTransitionState.RecoveringIo;
+            }
+        }
+
+        private static bool ShouldSuppressResumeTransportErrors
+        {
+            get
+            {
+                lock (ResumeRecoveryLock)
+                {
+                    return _resumeErrorSuppressionEligible
+                           && SkySettings.Mount == MountType.SkyWatcher
+                           && SkySystem.ConnType == ConnectType.Com;
+                }
+            }
+        }
+
+        public static bool IsResumeRecoveryInProgress
+        {
+            get
+            {
+                lock (ResumeRecoveryLock)
+                {
+                    return _resumeRecoveryInProgress;
+                }
+            }
+        }
+
+        public static DateTime RecoveryDeadlineUtc
+        {
+            get
+            {
+                lock (ResumeRecoveryLock)
+                {
+                    return _recoveryDeadlineUtc;
+                }
+            }
+        }
+
+        public static int RecoveryAttemptCount
+        {
+            get
+            {
+                lock (ResumeRecoveryLock)
+                {
+                    return _recoveryAttemptCount;
+                }
+            }
+        }
+
+        public static void NotifyPowerSuspending()
+        {
+            PowerTransitionState state;
+            DateTime suspendUtc;
+            bool shouldApplyRecovery;
+
+            lock (PowerTransitionLock)
+            {
+                _lastSuspendUtc = HiResDateTime.UtcNow;
+                _powerTransitionState = PowerTransitionState.Suspending;
+                state = _powerTransitionState;
+                suspendUtc = _lastSuspendUtc;
+                shouldApplyRecovery = ShouldApplySkyWatcherResumeRecovery;
+                if (shouldApplyRecovery) { SkyQueue.PowerSuspended = true; }
+            }
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = suspendUtc,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"State:{state}|Mount:{SkySettings.Mount}|ConnType:{SkySystem.ConnType}|IsMountRunning:{IsMountRunning}|ApplyRecovery:{shouldApplyRecovery}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            if (shouldApplyRecovery)
+            {
+                StopPositionUpdateTimer();
+
+                if (_altAzTrackingTimer != null)
+                {
+                    _altAzTrackingTimer.Tick -= AltAzTrackingTimerEvent;
+                    _altAzTrackingTimer.Stop();
+                    _altAzTrackingTimer.Dispose();
+                    _altAzTrackingTimer = null;
+                }
+
+                SendFastSuspendStop(suspendUtc);
+            }
+        }
+
+        public static void NotifyPowerResumed()
+        {
+            PowerTransitionState state;
+            DateTime resumeUtc;
+            bool shouldApplyRecovery;
+
+            lock (PowerTransitionLock)
+            {
+                _lastResumeUtc = HiResDateTime.UtcNow;
+                _powerTransitionState = PowerTransitionState.Resuming;
+                state = _powerTransitionState;
+                resumeUtc = _lastResumeUtc;
+                shouldApplyRecovery = ShouldApplySkyWatcherResumeRecovery;
+                SkyQueue.PowerSuspended = false;
+            }
+
+            lock (ResumeRecoveryLock)
+            {
+                _resumeErrorSuppressionEligible = shouldApplyRecovery;
+            }
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = resumeUtc,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"State:{state}|Mount:{SkySettings.Mount}|ConnType:{SkySystem.ConnType}|IsMountRunning:{IsMountRunning}|ApplyRecovery:{shouldApplyRecovery}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            if (shouldApplyRecovery)
+            {
+                StartResumeRecovery();
+                return;
+            }
+
+            lock (PowerTransitionLock)
+            {
+                _powerTransitionState = IsMountRunning
+                    ? PowerTransitionState.Running
+                    : PowerTransitionState.Disconnected;
+            }
+
+            if (IsMountRunning) { PowerRequestHelper.Reassert(); }
+
+            RaisePowerResumeHandled();
+        }
+
+        private static void SendFastSuspendStop(DateTime suspendUtc)
+        {
+            try
+            {
+                string detail;
+                var sent = SkyQueue.TrySendSuspendStop(TimeSpan.FromSeconds(1), out detail);
+                if (detail == null)
+                {
+                    detail = "SuspendStopUnavailable";
+                }
+
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = suspendUtc,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = sent ? MonitorType.Information : MonitorType.Warning,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = detail
+                };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+            catch (Exception ex)
+            {
+                var failureMonitorItem = new MonitorEntry
+                {
+                    Datetime = suspendUtc,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Warning,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{ex.Message}|{ex.InnerException?.Message}"
+                };
+                MonitorLog.LogToMonitor(failureMonitorItem);
+            }
+        }
+
+        private static void StartResumeRecovery()
+        {
+            lock (ResumeRecoveryLock)
+            {
+                if (_resumeRecoveryInProgress)
+                {
+                    var duplicateMonitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Server,
+                        Category = MonitorCategory.Server,
+                        Type = MonitorType.Information,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = "Resume recovery already running"
+                    };
+                    MonitorLog.LogToMonitor(duplicateMonitorItem);
+                    return;
+                }
+
+                _resumeRecoveryInProgress = true;
+                _recoveryAttemptCount = 0;
+                _recoveryDeadlineUtc = HiResDateTime.UtcNow.AddSeconds(30);
+            }
+
+            Task.Run(() => ExecuteResumeRecovery());
+        }
+
+        private static void ExecuteResumeRecovery()
+        {
+            try
+            {
+                var startMonitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"Deadline:{RecoveryDeadlineUtc:O}|Mount:{SkySettings.Mount}|ConnType:{SkySystem.ConnType}"
+                };
+                MonitorLog.LogToMonitor(startMonitorItem);
+
+                Thread.Sleep(TimeSpan.FromSeconds(1));
+                if (TryFastResumeValidation())
+                {
+                    CompleteResumeRecovery(true, "Fast validation succeeded");
+                    return;
+                }
+
+                for (var attempt = 1; attempt <= 3; attempt++)
+                {
+                    if (HiResDateTime.UtcNow >= RecoveryDeadlineUtc)
+                    {
+                        break;
+                    }
+
+                    lock (ResumeRecoveryLock)
+                    {
+                        _recoveryAttemptCount = attempt;
+                    }
+
+                    if (TryReconnectAfterResume(attempt))
+                    {
+                        CompleteResumeRecovery(true, $"Reconnect succeeded attempt {attempt}");
+                        return;
+                    }
+                }
+
+                CompleteResumeRecovery(false, "Resume recovery failed before deadline");
+            }
+            catch (Exception ex)
+            {
+                CompleteResumeRecovery(false, ex.Message);
+            }
+        }
+
+        private static bool TryFastResumeValidation()
+        {
+            var command = new SkyGetMotorCardVersion(SkyQueue.NewId, AxisId.Axis1);
+            const int fastValidationTimeoutMs = 1500;
+            var completed = false;
+
+            try
+            {
+                completed = command.CompletionEvent.Wait(fastValidationTimeoutMs);
+            }
+            catch (Exception ex)
+            {
+                command.Exception = ex;
+                command.Successful = false;
+            }
+
+            if (!completed && command.Exception == null)
+            {
+                command.Exception = new TimeoutException($"Fast validation timed out after {fastValidationTimeoutMs}ms");
+                command.Successful = false;
+            }
+
+            var success = completed && command.Successful && command.Exception == null && command.Result != null;
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = success ? MonitorType.Information : MonitorType.Warning,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = success
+                    ? $"MotorCard:{command.Result}|TimeoutMs:{fastValidationTimeoutMs}"
+                    : $"{command.Exception?.Message ?? "Fast validation failed"}|TimeoutMs:{fastValidationTimeoutMs}|Completed:{completed}|Successful:{command.Successful}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+            return success;
+        }
+
+        private static bool TryReconnectAfterResume(int attempt)
+        {
+            lock (PowerTransitionLock)
+            {
+                _powerTransitionState = PowerTransitionState.RecoveringIo;
+            }
+
+            var reconnectMonitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = MonitorType.Information,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"Attempt:{attempt}|Deadline:{RecoveryDeadlineUtc:O}"
+            };
+            MonitorLog.LogToMonitor(reconnectMonitorItem);
+
+            if (IsSlewing) { SlewFault = new Exception("Slew interrupted by serial recovery"); }
+            Tracking = false;
+            CancelAllAsync();
+            StopPositionUpdateTimer();
+            if (_altAzTrackingTimer != null) { _altAzTrackingTimer.Tick -= AltAzTrackingTimerEvent; }
+            _altAzTrackingTimer?.Stop();
+            SkyQueue.Stop();
+            SkySystem.ConnectSerial = false;
+
+            Thread.Sleep(TimeSpan.FromSeconds(attempt == 1 ? 1 : attempt == 2 ? 3 : 5));
+            SkySystem.DiscoverSerialDevices();
+            SkySystem.ConnectSerial = true;
+            if (!SkySystem.ConnectSerial)
+            {
+                return false;
+            }
+
+            if (!StartSkyWatcherQueue())
+            {
+                return false;
+            }
+
+            if (!TryFastResumeValidation())
+            {
+                return false;
+            }
+
+            InitializeSkyWatcherController();
+
+            _altAzTrackingTimer = new MediaTimer { Period = SkySettings.AltAzTrackingUpdateInterval, Resolution = 5 };
+            _altAzTrackingTimer.Tick += AltAzTrackingTimerEvent;
+            return true;
+        }
+
+        private static bool StartSkyWatcherQueue()
+        {
+            var skyWatcherStartup = BuildSkyWatcherStartupOptions();
+            SkyQueue.Start(SkySystem.Serial, skyWatcherStartup.Custom360Steps, skyWatcherStartup.CustomWormSteps, LowVoltageEventSet);
+            return SkyQueue.IsRunning;
+        }
+
+        // Controller caches are recreated with the queue; settings remain in memory across hibernate.
+        // Keep position resets and alignment setup in MountConnect, not in this shared sequence.
+        private static void InitializeSkyWatcherController()
+        {
+            SkyTasks(MountTaskName.AllowAdvancedCommandSet);
+            SkyTasks(MountTaskName.LoadDefaults);
+            SkyTasks(MountTaskName.GetAxisVersions);
+            SkyTasks(MountTaskName.StepsPerRevolution);
+            SkyTasks(MountTaskName.StepsWormPerRevolution);
+            SkyTasks(MountTaskName.StopAxes);
+            SkyTasks(MountTaskName.Encoders);
+            SkyTasks(MountTaskName.FullCurrent);
+            SkyTasks(MountTaskName.SetSt4Guiderate);
+            SkyTasks(MountTaskName.SetSouthernHemisphere);
+            SkyTasks(MountTaskName.MountName);
+            SkyTasks(MountTaskName.MountVersion);
+            SkyTasks(MountTaskName.StepTimeFreq);
+            SkyTasks(MountTaskName.CanPpec);
+            SkyTasks(MountTaskName.CanPolarLed);
+            SkyTasks(MountTaskName.PolarLedLevel);
+            SkyTasks(MountTaskName.CanHomeSensor);
+            SkyTasks(MountTaskName.DecPulseToGoTo);
+            SkyTasks(MountTaskName.AlternatingPpec);
+            SkyTasks(MountTaskName.MinPulseDec);
+            SkyTasks(MountTaskName.MinPulseRa);
+            SkyTasks(MountTaskName.MonitorPulse);
+            SkyTasks(MountTaskName.GetFactorStep);
+            SkyTasks(MountTaskName.Capabilities);
+            SkyTasks(MountTaskName.CanAdvancedCmdSupport);
+            if (CanPPec) SkyTasks(MountTaskName.Pec);
+
+            var raWormTeeth = (int)(StepsPerRevolution[0] / StepsWormPerRevolution[0]);
+            var decWormTeeth = (int)(StepsPerRevolution[1] / StepsWormPerRevolution[1]);
+            WormTeethCount = new[] { raWormTeeth, decWormTeeth };
+            PecBinSteps = StepsPerRevolution[0] / (WormTeethCount[0] * 1.0) / PecBinCount;
+            CalcCustomTrackingOffset();
+        }
+
+        private static SkyWatcherStartupOptions BuildSkyWatcherStartupOptions()
+        {
+            var custom360Steps = new[] { 0, 0 };
+            var customWormSteps = new[] { 0.0, 0.0 };
+            if (SkySettings.CustomGearing)
+            {
+                custom360Steps = new[] { SkySettings.CustomRa360Steps, SkySettings.CustomDec360Steps };
+                customWormSteps = new[]
+                {
+                    (double)SkySettings.CustomRa360Steps / SkySettings.CustomRaWormTeeth,
+                    (double)SkySettings.CustomDec360Steps / SkySettings.CustomDecWormTeeth
+                };
+            }
+
+            return new SkyWatcherStartupOptions(custom360Steps, customWormSteps);
+        }
+
+        private static void CompleteResumeRecovery(bool succeeded, string detail)
+        {
+            lock (ResumeRecoveryLock)
+            {
+                _resumeErrorSuppressionEligible = false;
+            }
+
+            if (succeeded)
+            {
+                // Both fast validation and reconnect must restore position polling before recovery completes.
+                StartPositionUpdateTimer();
+                lock (TimerLock)
+                {
+                    detail += $"|UpdateTimerID:{_mediaTimer?.TimerID}|UpdateTimerRunning:{_mediaTimer?.IsRunning}";
+                }
+            }
+
+            lock (ResumeRecoveryLock)
+            {
+                _resumeRecoveryInProgress = false;
+                _recoveryDeadlineUtc = default(DateTime);
+            }
+
+            // Update the flag before the power state so the gate never sees a gap
+            SerialIoFailed = !succeeded;
+
+            lock (PowerTransitionLock)
+            {
+                _powerTransitionState = succeeded ? PowerTransitionState.Running : PowerTransitionState.Disconnected;
+            }
+
+            if (succeeded)
+            {
+                PowerRequestHelper.Reassert();
+            }
+            else
+            {
+                IsMountRunning = false;
+            }
+
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = succeeded ? MonitorType.Information : MonitorType.Warning,
+                Method = MethodBase.GetCurrentMethod()?.Name,
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = $"Succeeded:{succeeded}|Attempts:{RecoveryAttemptCount}|{detail}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+
+            RaisePowerResumeHandled();
+        }
+
+        private static void RaisePowerResumeHandled()
+        {
+            var handler = PowerResumeHandled;
+            if (handler == null)
+            {
+                return;
+            }
+
+            try
+            {
+                handler(null, EventArgs.Empty);
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Warning,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"PowerResumeHandledSubscriberFailed|{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
@@ -1112,6 +1706,7 @@ namespace GS.Server.SkyTelescope
         {
             if (MovePrimaryAxisActive || MoveSecondaryAxisActive)
             {
+                SlewFault = null;
                 MoveAxisActive = true;
                 IsSlewing = true;
                 SlewState = SlewType.SlewMoveAxis;
@@ -2671,8 +3266,26 @@ namespace GS.Server.SkyTelescope
             };
             MonitorLog.LogToMonitor(monitorItem);
 
-            AlertState = true;
             var exType = ex.GetType().ToString().Trim();
+            if (ShouldSuppressResumeTransportErrors && IsRecoveryRelatedTransportException(ex))
+            {
+                var recoveryMonitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Warning,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"RecoveryWindow|{exType}|{ex.Message}"
+                };
+                MonitorLog.LogToMonitor(recoveryMonitorItem);
+                return;
+            }
+
+            if (IsSlewing) { SlewFault = ex; }
+            SerialIoFailed = true;
+            AlertState = true;
             switch (exType)
             {
                 case "GS.SkyWatcher.MountControlException":
@@ -2729,6 +3342,39 @@ namespace GS.Server.SkyTelescope
                     IsMountRunning = false;
                     break;
             }
+        }
+
+        private static bool IsRecoveryRelatedTransportException(Exception ex)
+        {
+            var mountErr = ex as MountControlException;
+            if (mountErr != null)
+            {
+                switch (mountErr.ErrorCode)
+                {
+                    case SkyWatcher.ErrorCode.ErrNotConnected:
+                    case SkyWatcher.ErrorCode.ErrNoResponseAxis1:
+                    case SkyWatcher.ErrorCode.ErrNoResponseAxis2:
+                    case SkyWatcher.ErrorCode.ErrSerialPortBusy:
+                    case SkyWatcher.ErrorCode.ErrQueueFailed:
+                    case SkyWatcher.ErrorCode.ErrTooManyRetries:
+                        return true;
+                }
+            }
+
+            var skyErr = ex as SkyServerException;
+            if (skyErr != null)
+            {
+                switch (skyErr.ErrorCode)
+                {
+                    case ErrorCode.ErrMount:
+                    case ErrorCode.ErrExecutingCommand:
+                    case ErrorCode.ErrUnableToDeqeue:
+                    case ErrorCode.ErrSerialFailed:
+                        return true;
+                }
+            }
+
+            return ex is TimeoutException || ex is IOException;
         }
 
         /// <summary>
@@ -3442,6 +4088,23 @@ namespace GS.Server.SkyTelescope
                 Message = $"TimerID|{_altAzTrackingTimer?.TimerID}"
             };
             MonitorLog.LogToMonitor(monitorItem);
+
+            if (ShouldApplySkyWatcherResumeRecovery && IsResumeRecoveryInProgress)
+            {
+                var gatedMonitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MonitorLog.GetCurrentMethod(),
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = "Skipped during resume recovery"
+                };
+                MonitorLog.LogToMonitor(gatedMonitorItem);
+                return;
+            }
+
             // timer must be running to update tracking
             if (_altAzTrackingTimer?.IsRunning == true)
             {
@@ -4253,6 +4916,7 @@ namespace GS.Server.SkyTelescope
                 // OperationCanceledException thrown by SimGoTo or SkyGoTo
                 // AggregateException with base OperationCanceledException thrown by PrecisionGoTo
                 var cancelled = ex is OperationCanceledException || ex.GetBaseException() is OperationCanceledException;
+                if (!cancelled) { SlewFault = ex; }
                 monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
@@ -5203,6 +5867,9 @@ namespace GS.Server.SkyTelescope
                     WormTeethCount = new[] { raWormTeeth, decWormTeeth };
                     PecBinSteps = StepsPerRevolution[0] / (WormTeethCount[0] * 1.0) / PecBinCount;
 
+                    // ensure the mount is stopped and not slewing - error recovery safety
+                    AxesStopValidate();
+
                     // checks if the mount is close enough to home position to set default position. If not use the positions from the mount
                     while (rawPositions == null)
                     {
@@ -5275,44 +5942,10 @@ namespace GS.Server.SkyTelescope
                         Message = $"Voltage|{SkyServer.ControllerVoltage.ToString("F2")+ " V"}"
                     };
                     MonitorLog.LogToMonitor(monitorItem);
-                    // defaults
-                    if (SkySettings.Mount == MountType.SkyWatcher)
-                    {
-                        SkyTasks(MountTaskName.AllowAdvancedCommandSet);
-                    }
-                    SkyTasks(MountTaskName.LoadDefaults);
-                    SkyTasks(MountTaskName.GetAxisVersions);
-                    SkyTasks(MountTaskName.StepsPerRevolution);
-                    SkyTasks(MountTaskName.StepsWormPerRevolution);
-                    SkyTasks(MountTaskName.StopAxes);
-                    SkyTasks(MountTaskName.Encoders);
-                    SkyTasks(MountTaskName.FullCurrent);
-                    SkyTasks(MountTaskName.SetSt4Guiderate);
-                    SkyTasks(MountTaskName.SetSouthernHemisphere);
-                    SkyTasks(MountTaskName.MountName);
-                    SkyTasks(MountTaskName.MountVersion);
-                    SkyTasks(MountTaskName.StepTimeFreq);
-                    SkyTasks(MountTaskName.CanPpec);
-                    SkyTasks(MountTaskName.CanPolarLed);
-                    SkyTasks(MountTaskName.PolarLedLevel);
-                    SkyTasks(MountTaskName.CanHomeSensor);
-                    SkyTasks(MountTaskName.DecPulseToGoTo);
-                    SkyTasks(MountTaskName.AlternatingPpec);
-                    SkyTasks(MountTaskName.MinPulseDec);
-                    SkyTasks(MountTaskName.MinPulseRa);
-                    SkyTasks(MountTaskName.GetFactorStep);
-                    SkyTasks(MountTaskName.Capabilities);
-                    SkyTasks(MountTaskName.CanAdvancedCmdSupport);
-                    if (CanPPec) SkyTasks(MountTaskName.Pec);
+                    InitializeSkyWatcherController();
 
-                    //CanHomeSensor = true; //test auto home
-
-                    raWormTeeth = (int)(StepsPerRevolution[0] / StepsWormPerRevolution[0]);
-                    decWormTeeth = (int)(StepsPerRevolution[1] / StepsWormPerRevolution[1]);
-                    WormTeethCount = new[] { raWormTeeth, decWormTeeth };
-                    PecBinSteps = StepsPerRevolution[0] / (WormTeethCount[0] * 1.0) / PecBinCount;
-
-                    CalcCustomTrackingOffset();  //generates rates for the custom gearing offsets
+                    // ensure the mount is stopped and not slewing - error recovery safety
+                    AxesStopValidate();
 
                     //log current positions
                     var steps = GetRawSteps();
@@ -5443,6 +6076,7 @@ namespace GS.Server.SkyTelescope
             MonitorLog.LogToMonitor(monitorItem);
 
             // setup server defaults, stop auto-discovery, connect serial port, start queues
+            SlewFault = null;
             Defaults();
             switch (SkySettings.Mount)
             {
@@ -5452,7 +6086,10 @@ namespace GS.Server.SkyTelescope
                     MountQueue.Start();
                     if (MountQueue.IsRunning) { ConnectAlignmentModel(); }
                     else
-                    { throw new Exception("Failed to start simulator queue"); }
+                    {
+                        SerialIoFailed = true;
+                        throw new Exception("Failed to start simulator queue");
+                    }
 
                     break;
                 case MountType.SkyWatcher:
@@ -5461,21 +6098,14 @@ namespace GS.Server.SkyTelescope
                     SkySystem.ConnectSerial = true;
                     if (!SkySystem.ConnectSerial)
                     {
+                        SerialIoFailed = true;
                         throw new SkyServerException(ErrorCode.ErrSerialFailed,
                             $"Connection Failed: {SkySystem.Error}");
                     }
-                    // Start up, pass custom mount gearing if needed
-                    var custom360Steps = new[] { 0, 0 };
-                    var customWormSteps = new[] { 0.0, 0.0 };
-                    if (SkySettings.CustomGearing)
-                    {
-                        custom360Steps = new[] { SkySettings.CustomRa360Steps, SkySettings.CustomDec360Steps };
-                        customWormSteps = new[] { (double)SkySettings.CustomRa360Steps / SkySettings.CustomRaWormTeeth, (double)SkySettings.CustomDec360Steps / SkySettings.CustomDecWormTeeth };
-                    }
 
-                    SkyQueue.Start(SkySystem.Serial, custom360Steps, customWormSteps, LowVoltageEventSet);
-                    if (!SkyQueue.IsRunning)
+                    if (!StartSkyWatcherQueue())
                     {
+                        SerialIoFailed = true;
                         throw new SkyServerException(ErrorCode.ErrMount, "Failed to start sky queue");
                     }
                     break;
@@ -5486,20 +6116,25 @@ namespace GS.Server.SkyTelescope
             // Run mount default commands and start the UI updates
             if (MountConnect())
             {
-                // start with a stop
+                // start with a stop - redundant but ensures the mount is not slewing
                 AxesStopValidate();
 
                 // Event to get mount positions and update UI
-                _mediaTimer = new MediaTimer { Period = SkySettings.DisplayInterval, Resolution = 5 };
-                _mediaTimer.Tick += UpdateServerEvent;
-                _mediaTimer.Start();
+                StartPositionUpdateTimer();
+
+                // Keep the PC awake and the process unthrottled while connected
+                PowerRequestHelper.Acquire("GS Server: mount connected");
 
                 // Event to update AltAz tracking rate
                 _altAzTrackingTimer = new MediaTimer { Period = SkySettings.AltAzTrackingUpdateInterval, Resolution = 5 };
                 _altAzTrackingTimer.Tick += AltAzTrackingTimerEvent;
+
+                // Mount IO is usable again only once start up has fully completed
+                SerialIoFailed = false;
             }
             else
             {
+                SerialIoFailed = true;
                 MountStop();
             }
         }
@@ -5513,13 +6148,13 @@ namespace GS.Server.SkyTelescope
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{SkySettings.Mount}" };
             MonitorLog.LogToMonitor(monitorItem);
 
+            PowerRequestHelper.Release();
+
             // Stop all asynchronous operations
             Tracking = false;
             CancelAllAsync();
             AxesStopValidate();
-            if (_mediaTimer != null) { _mediaTimer.Tick -= UpdateServerEvent; }
-            _mediaTimer?.Stop();
-            _mediaTimer?.Dispose();
+            StopPositionUpdateTimer();
             if (_altAzTrackingTimer != null) { _altAzTrackingTimer.Tick -= AltAzTrackingTimerEvent; }
             _altAzTrackingTimer?.Stop();
             _altAzTrackingTimer?.Dispose();
@@ -5567,6 +6202,44 @@ namespace GS.Server.SkyTelescope
 
             SkyQueue.Stop();
             SkySystem.ConnectSerial = false;
+        }
+
+        /// <summary>
+        /// Teardown after the mount link has failed, no commands are sent to the mount.
+        /// Keep in step with MountStop
+        /// </summary>
+        private static void MountStopLinkFailed()
+        {
+            LogSerialRecovery("Teardown|link failed, no stop commands sent to the mount", MonitorType.Warning);
+
+            PowerRequestHelper.Release();
+
+            StopPositionUpdateTimer();
+            if (_altAzTrackingTimer != null) { _altAzTrackingTimer.Tick -= AltAzTrackingTimerEvent; }
+            _altAzTrackingTimer?.Stop();
+            _altAzTrackingTimer?.Dispose();
+
+            // Stop the queue before cancelling operations so none can wait on commands for a dead link
+            if (SkyQueue.IsRunning)
+            {
+                var skyStats = SkyQueue.Statistics;
+                if (skyStats != null) { LogSerialRecovery($"SkyQueue Session Statistics: {skyStats}"); }
+                SkyQueue.Stop();
+            }
+            SkySystem.ConnectSerial = false;
+            _mountRunning = false;
+            LoopCounter = 0;
+
+            CancelAllAsync();
+
+            // Software state only, the Tracking setter would send commands to the mount
+            IsPulseGuidingDec = false;
+            IsPulseGuidingRa = false;
+            _trackingMode = TrackingMode.Off;
+            _tracking = false;
+            SkyPredictor.Reset();
+            OnStaticPropertyChanged(nameof(Tracking));
+            OnStaticPropertyChanged(nameof(IsMountRunning));
         }
 
         /// <summary>
@@ -6552,6 +7225,7 @@ namespace GS.Server.SkyTelescope
         private static void SlewMount(Vector targetPosition, SlewType slewState, bool tracking = false, bool slewAsync = true, ManualResetEvent externalSlewStartedEvent = null)
         {
             if (!IsMountRunning) { return; }
+            SlewFault = null;
 
             var monitorItem = new MonitorEntry
             {
@@ -7343,6 +8017,31 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+        private static void StopPositionUpdateTimer()
+        {
+            lock (TimerLock)
+            {
+                var timer = _mediaTimer;
+                _mediaTimer = null;
+                if (timer == null) return;
+
+                timer.Tick -= UpdateServerEvent;
+                timer.Stop();
+                timer.Dispose();
+            }
+        }
+
+        private static void StartPositionUpdateTimer()
+        {
+            lock (TimerLock)
+            {
+                StopPositionUpdateTimer();
+                _mediaTimer = new MediaTimer { Period = SkySettings.DisplayInterval, Resolution = 5 };
+                _mediaTimer.Tick += UpdateServerEvent;
+                _mediaTimer.Start();
+            }
+        }
+
         /// <summary>
         /// Update the Server and UI from the axis positions
         /// </summary>
@@ -7356,6 +8055,28 @@ namespace GS.Server.SkyTelescope
                 if (!hasLock)
                 {
                     TimerOverruns++;
+                    return;
+                }
+
+                var timer = _mediaTimer;
+                if (timer == null || !ReferenceEquals(sender, timer))
+                {
+                    return;
+                }
+
+                if (ShouldApplySkyWatcherResumeRecovery && IsResumeRecoveryInProgress)
+                {
+                    var gatedMonitorItem = new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Server,
+                        Category = MonitorCategory.Server,
+                        Type = MonitorType.Information,
+                        Method = MethodBase.GetCurrentMethod()?.Name,
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = "Skipped during resume recovery"
+                    };
+                    MonitorLog.LogToMonitor(gatedMonitorItem);
                     return;
                 }
 
@@ -7387,8 +8108,12 @@ namespace GS.Server.SkyTelescope
                         IsSideOfPier = SideOfPier;
                         break;
                 }
-                var t = SkySettings.DisplayInterval; // Event interval time set for UI performance 
-                _mediaTimer.Period = t;
+                if (!ReferenceEquals(timer, _mediaTimer))
+                {
+                    return;
+                }
+
+                timer.Period = SkySettings.DisplayInterval;
 
                 if (LoopCounter % (ulong) Settings.Settings.ModelIntFactor == 0)
                 {
@@ -7412,6 +8137,239 @@ namespace GS.Server.SkyTelescope
         /// indicate that a low voltage condition has occurred.</remarks>
         /// <param name="sender">The source of the event. Typically, this is the object that raised the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> instance containing the event data.</param>
+        private sealed class SkyWatcherStartupOptions
+        {
+            internal SkyWatcherStartupOptions(int[] custom360Steps, double[] customWormSteps)
+            {
+                Custom360Steps = custom360Steps;
+                CustomWormSteps = customWormSteps;
+            }
+
+            internal int[] Custom360Steps { get; private set; }
+            internal double[] CustomWormSteps { get; private set; }
+        }
+
+        /// <summary>
+        /// USB removal of the mount serial port starts a recovery window instead of failing the mount immediately
+        /// </summary>
+        private static void SerialDisconnectedEventHandler(object sender, EventArgs e)
+        {
+            StartSerialRecovery(true, new MountControlException(SkyWatcher.ErrorCode.ErrNotConnected, "USB serial port removed"));
+        }
+
+        /// <summary>
+        /// A serial transport failure on the command queue starts the retry recovery
+        /// </summary>
+        private static void SerialIoErrorEventHandler(Exception ex)
+        {
+            StartSerialRecovery(false, ex);
+        }
+
+        private static void LogSerialRecovery(string message, MonitorType type = MonitorType.Information)
+        {
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = type,
+                Method = "SerialRecovery",
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = message
+            };
+            MonitorLog.LogToMonitor(monitorItem);
+        }
+
+        /// <summary>
+        /// Start one recovery at a time for a running SkyWatcher COM connection. The command queue keeps running
+        /// and only the serial port is replaced, so queued and in-flight commands carry on once the port is restored.
+        /// </summary>
+        private static void StartSerialRecovery(bool usbRemoval, Exception cause)
+        {
+            if (SkySettings.Mount != MountType.SkyWatcher || SkySystem.ConnType != ConnectType.Com) { return; }
+            // Start-up failures, a stopped mount, a failed mount and power transitions have their own handling
+            if (_mountStarting || SerialIoFailed || !IsMountRunning) { return; }
+            if (IsSkyWatcherSerialRecoveryActive || IsResumeRecoveryInProgress) { return; }
+
+            lock (ResumeRecoveryLock)
+            {
+                if (_serialRecoveryInProgress) { return; }
+                _serialRecoveryInProgress = true;
+                _resumeErrorSuppressionEligible = true;
+            }
+
+            lock (PowerTransitionLock)
+            {
+                _powerTransitionState = PowerTransitionState.RecoveringIo;
+            }
+
+            LogSerialRecovery($"Started|{(usbRemoval ? "UsbRemoval" : "SerialIo")}|{cause?.Message}", MonitorType.Warning);
+
+            // Leave the calling thread, the queue and USB watcher threads must not block
+            Task.Run(() => ExecuteSerialRecovery(usbRemoval, cause));
+        }
+
+        private static void ExecuteSerialRecovery(bool usbRemoval, Exception cause)
+        {
+            try
+            {
+                string detail;
+                var succeeded = usbRemoval ? RecoverUsbPort(out detail) : RecoverSerialIo(out detail);
+                CompleteSerialRecovery(succeeded, detail, cause);
+            }
+            catch (OperationCanceledException ex)
+            {
+                LogSerialRecovery($"Abandoned|{ex.Message}", MonitorType.Warning);
+
+                // Power recovery owns the state when it has taken over, otherwise release the recovery state
+                if (!IsResumeRecoveryInProgress && CurrentPowerTransitionState == PowerTransitionState.RecoveringIo)
+                {
+                    lock (ResumeRecoveryLock) { _resumeErrorSuppressionEligible = false; }
+                    lock (PowerTransitionLock) { _powerTransitionState = PowerTransitionState.Disconnected; }
+                }
+            }
+            catch (Exception ex)
+            {
+                CompleteSerialRecovery(false, ex.Message, cause);
+            }
+            finally
+            {
+                lock (ResumeRecoveryLock) { _serialRecoveryInProgress = false; }
+            }
+        }
+
+        private static void EnsureSerialRecoveryOwned()
+        {
+            var state = CurrentPowerTransitionState;
+            if (IsResumeRecoveryInProgress || state == PowerTransitionState.Suspending || state == PowerTransitionState.Resuming)
+            {
+                throw new OperationCanceledException("Superseded by power transition recovery");
+            }
+
+            if (!SkyQueue.IsRunning) { throw new OperationCanceledException("Mount stopped"); }
+        }
+
+        /// <summary>
+        /// Wait up to 10 seconds from detection for the USB port to return
+        /// </summary>
+        private static bool RecoverUsbPort(out string detail)
+        {
+            var port = SkySettings.Port;
+            var deadline = HiResDateTime.UtcNow.AddSeconds(UsbRecoveryWindowSeconds);
+            var poll = 0;
+            while (true)
+            {
+                EnsureSerialRecoveryOwned();
+                poll++;
+                var present = Array.Exists(System.IO.Ports.SerialPort.GetPortNames(),
+                    p => string.Equals(p, port, StringComparison.OrdinalIgnoreCase));
+                var restored = present && TrySerialRestore();
+                LogSerialRecovery($"UsbPoll:{poll}|Port:{port}|Present:{present}|Restored:{restored}");
+                if (restored)
+                {
+                    detail = $"USB port {port} restored|Polls:{poll}";
+                    return true;
+                }
+
+                if (HiResDateTime.UtcNow >= deadline) { break; }
+                Thread.Sleep(500);
+            }
+
+            detail = $"USB port {port} not restored within {UsbRecoveryWindowSeconds} seconds";
+            return false;
+        }
+
+        /// <summary>
+        /// Retry after 1, 2 and 5 seconds
+        /// </summary>
+        private static bool RecoverSerialIo(out string detail)
+        {
+            for (var attempt = 1; attempt <= SerialIoRecoveryDelaysSeconds.Length; attempt++)
+            {
+                var delay = SerialIoRecoveryDelaysSeconds[attempt - 1];
+                LogSerialRecovery($"SerialIoAttempt:{attempt}|WaitSeconds:{delay}");
+                Thread.Sleep(TimeSpan.FromSeconds(delay));
+                EnsureSerialRecoveryOwned();
+
+                var restored = TrySerialRestore();
+                LogSerialRecovery($"SerialIoAttempt:{attempt}|Restored:{restored}", restored ? MonitorType.Information : MonitorType.Warning);
+                if (restored)
+                {
+                    detail = $"Serial IO restored on attempt {attempt}";
+                    return true;
+                }
+            }
+
+            detail = $"Serial IO not restored after {SerialIoRecoveryDelaysSeconds.Length} attempts";
+            return false;
+        }
+
+        /// <summary>
+        /// Reopen the port, hand it to the running queue and confirm the mount responds
+        /// </summary>
+        private static bool TrySerialRestore()
+        {
+            SkySystem.ConnectSerial = false;
+            SkySystem.ConnectSerial = true;
+            if (!SkySystem.ConnectSerial) { return false; }
+
+            SkyQueue.ReplaceSerial(SkySystem.Serial);
+            return TryFastResumeValidation();
+        }
+
+        /// <summary>
+        /// A mount that lost power comes back with uninitialised axes and both positions at exactly zero
+        /// </summary>
+        private static bool MountLostPower()
+        {
+            try
+            {
+                var axes = new SkyAxesInitialized(SkyQueue.NewId);
+                var initialized = SkyQueue.GetCommandResult(axes).Result;
+                var notInitialized = axes.Successful && !Convert.ToBoolean(initialized);
+                var steps = GetRawSteps();
+                LogSerialRecovery($"PowerCheck|NotInitialized:{notInitialized}|Steps:{steps[0]}|{steps[1]}");
+                return notInitialized || (steps[0] == 0.0 && steps[1] == 0.0);
+            }
+            catch (Exception ex)
+            {
+                LogSerialRecovery($"PowerCheck|Failed|{ex.Message}", MonitorType.Warning);
+                return false;
+            }
+        }
+
+        private static void CompleteSerialRecovery(bool succeeded, string detail, Exception cause)
+        {
+            lock (ResumeRecoveryLock) { _resumeErrorSuppressionEligible = false; }
+
+            // The gate stays closed until this check is done, a mount that lost its position must be reconnected
+            if (succeeded && MountLostPower())
+            {
+                succeeded = false;
+                detail = "Serial IO restored but the mount lost power and was reinitialised, reconnect the mount";
+                cause = null;
+            }
+
+            if (succeeded)
+            {
+                lock (PowerTransitionLock) { _powerTransitionState = PowerTransitionState.Running; }
+                LogSerialRecovery($"Succeeded|{detail}");
+                return;
+            }
+
+            // Update the flag before the power state so the gate never sees a gap
+            SerialIoFailed = true;
+            lock (PowerTransitionLock) { _powerTransitionState = PowerTransitionState.Disconnected; }
+            LogSerialRecovery($"Failed|{detail}|{cause?.Message}", MonitorType.Error);
+
+            // The link is dead so tear down without sending stop commands, then report the error to the UI
+            var failure = new SkyServerException(ErrorCode.ErrSerialFailed, cause == null ? detail : $"{detail}. {cause.Message}");
+            if (IsSlewing) { SlewFault = failure; }
+            MountStopLinkFailed();
+            AlertState = true;
+            MountError = failure;
+        }
+
         private static void LowVoltageEventSet(object sender, EventArgs e)
         {
             LowVoltageEventState = true;

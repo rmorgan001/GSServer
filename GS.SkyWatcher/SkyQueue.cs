@@ -33,12 +33,23 @@ namespace GS.SkyWatcher
         #region Fields
 
         private static BlockingCollection<ISkyCommand> _commandBlockingCollection;
+        private static volatile bool _powerSuspended;
         private static SkyWatcher _skyWatcher;
         private static CancellationTokenSource _cts;
         private static Task _processingTask;
         private static bool _isInWarningState;
         private static ManualResetEventSlim _taskReadySignal;
         public static event PropertyChangedEventHandler StaticPropertyChanged;
+
+        /// <summary>
+        /// Raised once when the monitored serial port hardware has been physically removed
+        /// </summary>
+        public static event EventHandler SerialDisconnected;
+
+        /// <summary>
+        /// Raised when a command fails with a serial transport error while the queue is running
+        /// </summary>
+        public static event Action<Exception> SerialIoError;
 
         private static long _id;
         private static bool _isPulseGuidingDec;
@@ -132,6 +143,26 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
+        /// Block ordinary commands during sleep or hibernate.
+        /// </summary>
+        public static bool PowerSuspended
+        {
+            get => _powerSuspended;
+            set => _powerSuspended = value;
+        }
+
+        internal static void ThrowIfPowerSuspended()
+        {
+            if (!_powerSuspended) return;
+
+            var ex = new OperationCanceledException("Mount command cancelled by sleep or hibernate");
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = ex.Message };
+            MonitorLog.LogToMonitor(monitorItem);
+            throw ex;
+        }
+
+        /// <summary>
         /// Mount data results
         /// </summary>
         /// <remarks>
@@ -221,12 +252,16 @@ namespace GS.SkyWatcher
 
             try
             {
+                ThrowIfPowerSuspended();
 
                 if (!IsRunning || _cts.IsCancellationRequested || _skyWatcher?.IsConnected != true)
                 {
                     command.Exception = new MountControlException(ErrorCode.ErrQueueFailed, "Queue stopped or not connected");
                     command.Successful = false;
                     Statistics?.IncrementFailed();
+
+                    // A running queue that cannot reach the mount is a serial IO failure, not an intentional stop
+                    if (IsRunning && !_cts.IsCancellationRequested) { RaiseSerialIoError(command.Exception); }
                 }
                 else
                 {
@@ -249,6 +284,9 @@ namespace GS.SkyWatcher
                         { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{command.Exception.Message}|{command.Exception.StackTrace}" };
                         MonitorLog.LogToMonitor(monitorItem);
                     }
+
+                    if (command.Exception != null && IsSerialIoException(command.Exception)) 
+                        { RaiseSerialIoError(command.Exception); }
 
                     // Calculate queue wait time for both diagnostic logging and performance monitoring
                     var queueWaitMs = (executionStart - dequeuedAt).TotalMilliseconds;
@@ -351,6 +389,54 @@ namespace GS.SkyWatcher
                 // Always signal completion - success or failure
                 command.CompletionEvent.Set();
             }
+        }
+
+        private static bool IsSerialIoException(Exception ex)
+        {
+            var mountErr = ex as MountControlException;
+            if (mountErr != null)
+            {
+                switch (mountErr.ErrorCode)
+                {
+                    case ErrorCode.ErrNotConnected:
+                    case ErrorCode.ErrTooManyRetries:
+                    case ErrorCode.ErrNoResponseAxis1:
+                    case ErrorCode.ErrNoResponseAxis2:
+                        return true;
+                }
+            }
+
+            return ex is System.IO.IOException || ex is TimeoutException;
+        }
+
+        internal static void RaiseSerialIoError(Exception ex)
+        {
+            SerialIoError?.Invoke(ex);
+        }
+
+        /// <summary>
+        /// Swap in a newly opened serial port while the queue keeps running, queued commands continue to be processed
+        /// </summary>
+        public static void ReplaceSerial(ISerialPort serial)
+        {
+            if (!IsRunning || serial == null) return;
+
+            Serial = serial;
+            _skyWatcher?.ResetConnection();
+
+            // Re-arm USB removal monitoring for the new port
+            var sp = serial as System.IO.Ports.SerialPort;
+            if (sp != null) StartUsbWatcher(sp.PortName);
+
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{serial.IsOpen}" };
+            MonitorLog.LogToMonitor(monitorItem);
+        }
+
+        public static bool TrySendSuspendStop(TimeSpan timeout, out string detail)
+        {
+            detail = null;
+            return _skyWatcher != null && _skyWatcher.TrySendSuspendStop(timeout, out detail);
         }
 
         /// <summary>
@@ -605,6 +691,8 @@ namespace GS.SkyWatcher
                     Message = $"USB hardware disconnect detected — port {portName} no longer present in system device list"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
+
+                SerialDisconnected?.Invoke(null, EventArgs.Empty);
             }
             catch (Exception ex)
             {
@@ -619,6 +707,9 @@ namespace GS.SkyWatcher
                     Message = $"USB device change confirmation error: {ex.Message}"
                 };
                 MonitorLog.LogToMonitor(monitorItem);
+
+                // Restore the name so a later device event can check again
+                Interlocked.CompareExchange(ref _monitoredPortName, portName, null);
             }
         }
 

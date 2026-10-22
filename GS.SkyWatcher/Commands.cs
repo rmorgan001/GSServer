@@ -55,6 +55,8 @@ namespace GS.SkyWatcher
         private readonly object _syncObject = new object();
         private int _conErrCnt;                                         // Number of continuous errors
         private const int ConErrMax = 50;                               // Max number of allowed continuous errors
+        private const int MaxCmdAttempts = 11;                          // Attempts per command before it fails
+        internal const int PollAttempts = 1;                            // The position poll repeats so it does not retry
         private readonly int[] _stepsPerRev = { 0, 0 };                 // From mount :a or :X0002
         private readonly int[] _resolutionFactor = { 1, 1 };            // Step division factor from :a and :X0002
 
@@ -72,6 +74,15 @@ namespace GS.SkyWatcher
         /// Quick check to see if serial is connected and mount is receiving and sending data
         /// </summary> 
         internal bool IsConnected => SkyQueue.Serial.IsOpen && MountConnected;
+
+        /// <summary>
+        /// Called after the serial port has been replaced so queued commands are executed again
+        /// </summary>
+        internal void ResetConnection()
+        {
+            _conErrCnt = 0;
+            MountConnected = SkyQueue.Serial?.IsOpen == true;
+        }
 
         /// <summary>
         /// Indicate whether the motor controller supports advanced command set (Firmware version 3.22.xx or above)
@@ -787,25 +798,29 @@ namespace GS.SkyWatcher
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
         /// <returns>Cardinal encoder count</returns>
-        internal double GetAxisStepsNaN(AxisId axis)
+        internal double GetAxisStepsNaN(AxisId axis, int attempts = MaxCmdAttempts)
         {
             try
             {
                 if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
                 {
-                    var response = CmdToMount(axis, 'X', "0003", true);    // 0x03（’03’）: Position reading of the axis
+                    var response = CmdToMount(axis, 'X', "0003", true, attempts);    // 0x03（’03’）: Position reading of the axis
                     if (string.IsNullOrEmpty(response)) return double.NaN;
                     var iPosition = String32ToInt(response, true, _resolutionFactor[(int)axis]);
                     return iPosition;
                 }
                 else
                 {
-                    var response = CmdToMount(axis, 'j', null, true);
+                    var response = CmdToMount(axis, 'j', null, true, attempts);
                     if (string.IsNullOrEmpty(response)) return double.NaN;
                     var iPosition = StringToLong(response);
                     iPosition -= 0x00800000;
                     return iPosition;
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -1438,14 +1453,48 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
-        /// One communication between mount and client
+        /// Try to send suspend stop command to both axes with a timeout and return detail message
         /// </summary>
-        /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
-        /// <param name="command">The command char set</param>
-        /// <param name="cmdDataStr">The data need to send</param>
-        /// <param name="ignoreWarnings">to ignore serial response issues</param>
-        /// <returns>The response string from mount</returns>
-        private string CmdToMount(AxisId axis, char command, string cmdDataStr, bool ignoreWarnings = false)
+        /// <param name="timeout">The timeout duration for acquiring the lock</param>
+        /// <param name="detail">The detail message returned</param>
+        /// <returns>True if the command was sent successfully, otherwise false</returns>
+        internal bool TrySendSuspendStop(TimeSpan timeout, out string detail)
+        {
+            detail = null;
+            var serial = SkyQueue.Serial;
+            if (serial == null || !serial.IsOpen)
+            {
+                detail = "SerialUnavailable";
+                return false;
+            }
+
+            var useAdvancedStop = SupportAdvancedCommandSet && AllowAdvancedCommandSet;
+            var axis1Command = BuildRawCommand(AxisId.Axis1, useAdvancedStop ? 'X' : 'K', useAdvancedStop ? "0504" : null);
+            var axis2Command = BuildRawCommand(AxisId.Axis2, useAdvancedStop ? 'X' : 'K', useAdvancedStop ? "0504" : null);
+            var acquiredLock = false;
+
+            try
+            {
+                Monitor.TryEnter(_syncObject, timeout, ref acquiredLock);
+                if (!acquiredLock)
+                {
+                    detail = $"LockTimeout:{timeout.TotalMilliseconds:0}ms";
+                    return false;
+                }
+
+                serial.Write(axis1Command);
+                Thread.Sleep(100); // give the mount time to process the first command before sending the second
+                serial.Write(axis2Command);
+                detail = $"Axis1:{axis1Command.Trim()}|Axis2:{axis2Command.Trim()}|Advanced:{useAdvancedStop}";
+                return true;
+            }
+            finally
+            {
+                if (acquiredLock) Monitor.Exit(_syncObject);
+            }
+        }
+
+        private string CmdToMount(AxisId axis, char command, string cmdDataStr, bool ignoreWarnings = false, int attempts = MaxCmdAttempts)
         {
             MonitorEntry monitorItem;
             for (var i = 0; i <= 5; i++)
@@ -1460,14 +1509,16 @@ namespace GS.SkyWatcher
                         try
                         {
                             string responseString = null;
-                            for (var c = 0; c <= 10; c++)
+                            for (var c = 0; c < attempts; c++)
                             {
+                                SkyQueue.ThrowIfPowerSuspended();
                                 SkyQueue.Serial.DiscardInBuffer();
                                 SkyQueue.Serial.DiscardOutBuffer();
                                 // send the request
                                 var cmdData = SendRequest(axis, command, cmdDataStr);
                                 // receive the response
                                 responseString = ReceiveResponse(axis, command, cmdData);
+                                SkyQueue.ThrowIfPowerSuspended();
                                 if (!string.IsNullOrEmpty(responseString))
                                 {
                                     _conErrCnt = 0;
@@ -1508,6 +1559,10 @@ namespace GS.SkyWatcher
                             }
                             MountConnected = true;
                             return responseString;
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            throw;
                         }
                         catch (TimeoutException ex)
                         {
@@ -1564,21 +1619,12 @@ namespace GS.SkyWatcher
         /// <param name="cmdDataStr"></param>
         private string SendRequest(AxisId axis, char command, string cmdDataStr)
         {
-            const char startCharOut = ':';
-            if (cmdDataStr == null) cmdDataStr = "";
-            const int bufferSize = 20;
-            var commandStr = new StringBuilder(bufferSize);
-            commandStr.Append(startCharOut);                    // 0: Leading char
-            commandStr.Append(command);                         // 1: Length of command( Source, destination, command char, data )
-            // Target Device
-            commandStr.Append(axis == AxisId.Axis1 ? '1' : '2');// 2: Target Axis
-            // Copy command data to buffer
-            commandStr.Append(cmdDataStr);
-            commandStr.Append(EndChar);                         // CR Character            
+            SkyQueue.ThrowIfPowerSuspended();
+            var commandStr = BuildRawCommand(axis, command, cmdDataStr);
 
             var dt = HiResDateTime.UtcNow;
             var monitorItem = new MonitorEntry
-            { Datetime = dt, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{commandStr.ToString().Trim()}" };
+            { Datetime = dt, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{commandStr.Trim()}" };
             MonitorLog.LogToMonitor(monitorItem);
 
             switch (command)
@@ -1629,9 +1675,23 @@ namespace GS.SkyWatcher
             }
 
             //Serial.Transmit(commandStr.ToString());
-            SkyQueue.Serial.Write(commandStr.ToString());
+            SkyQueue.Serial.Write(commandStr);
 
-            return commandStr.ToString().Trim();
+            return commandStr.Trim();
+        }
+
+        private static string BuildRawCommand(AxisId axis, char command, string cmdDataStr)
+        {
+            const char startCharOut = ':';
+            if (cmdDataStr == null) cmdDataStr = string.Empty;
+            const int bufferSize = 20;
+            var commandStr = new StringBuilder(bufferSize);
+            commandStr.Append(startCharOut);
+            commandStr.Append(command);
+            commandStr.Append(axis == AxisId.Axis1 ? '1' : '2');
+            commandStr.Append(cmdDataStr);
+            commandStr.Append(EndChar);
+            return commandStr.ToString();
         }
 
         ///// <summary>

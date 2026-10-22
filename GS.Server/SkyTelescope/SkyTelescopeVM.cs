@@ -822,7 +822,9 @@ namespace GS.Server.SkyTelescope
                                     // no status kept for the simulator
                                     break;
                                 case "IsMountRunning":
-                                    MountState = SkyServer.IsMountRunning;
+                                case "SerialIoFailed":
+                                    // After a serial IO failure the button offers Connect for a reconnect
+                                    MountState = SkyServer.IsMountRunning && !SkyServer.SerialIoFailed;
                                     break;
                                 case "AutoHomeProgressBar":
                                     AutoHomeProgressBar = SkyServer.AutoHomeProgressBar;
@@ -3171,7 +3173,7 @@ namespace GS.Server.SkyTelescope
                 return _openModelWindowCmd = new RelayCommand(param => OpenModelWindow());
             }
         }
-        private void OpenModelWindow()
+        internal void OpenModelWindow(bool throwOnError = false)
         {
             try
             {
@@ -3191,6 +3193,8 @@ namespace GS.Server.SkyTelescope
             }
             catch (Exception ex)
             {
+                if (throwOnError) throw;
+
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
@@ -7863,15 +7867,23 @@ namespace GS.Server.SkyTelescope
                 );
             }
         }
+        private const int ErrorDialogMaxLength = 150;
         private void OpenDialog(string msg, string caption = null)
         {
+            // Error dialogs show a short message on screen, the full text is logged
+            var shown = msg;
+            if (shown != null && shown.Length > ErrorDialogMaxLength && caption == $"{Application.Current.Resources["exError"]}")
+            {
+                shown = shown.Substring(0, ErrorDialogMaxLength - 3) + "...";
+            }
+
             if (IsDialogOpen)
             {
-                OpenDialogWin(msg, caption);
+                OpenDialogWin(shown, caption);
             }
             else
             {
-                if (msg != null) DialogMsg = msg;
+                if (shown != null) DialogMsg = shown;
                 DialogCaption = caption ?? Application.Current.Resources["diaDialog"].ToString();
                 DialogContent = new DialogOK();
                 IsDialogOpen = true;

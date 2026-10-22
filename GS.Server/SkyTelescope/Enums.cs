@@ -196,6 +196,15 @@ namespace GS.Server.SkyTelescope
         Wifi
     }
 
+    public enum PowerTransitionState
+    {
+        Running,
+        Suspending,
+        Resuming,
+        RecoveringIo,
+        Disconnected
+    }
+
     public enum PierSideUI
     {
         Unknown = -1,

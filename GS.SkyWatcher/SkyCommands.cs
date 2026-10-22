@@ -1082,6 +1082,28 @@ namespace GS.SkyWatcher
         }
     }
 
+    public class SkyAxesInitialized : SkyCommandBase
+    {
+        public SkyAxesInitialized(long id) : base(id)
+        {
+            SkyQueue.AddCommand(this);
+        }
+
+        public override void Execute(SkyWatcher skyWatcher)
+        {
+            try
+            {
+                Result = skyWatcher.AxesInitialized();
+                Successful = true;
+            }
+            catch (Exception e)
+            {
+                Successful = false;
+                Exception = e;
+            }
+        }
+    }
+
     public class SkyGetSiderealRate : SkyCommandBase
     {
         private readonly AxisId _axis;

@@ -1,6 +1,9 @@
-﻿using GS.Server.Main;
+﻿using GS.Server.Helpers;
+using GS.Server.Main;
+using GS.Server.SkyTelescope;
 using GS.Shared;
 using GS.Shared.EnvironmentInfo;
+using Microsoft.Win32;
 using System;
 using System.IO;
 using System.Linq;
@@ -25,6 +28,7 @@ namespace GS.Server
         private readonly Mutex _mutex;
         // overload the constructor
         private readonly bool _createdNew;
+        private PowerUiCoordinator _powerUiCoordinator;
         public App()
         {
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
@@ -57,6 +61,8 @@ namespace GS.Server
             if (!_createdNew) return;
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            _powerUiCoordinator = new PowerUiCoordinator();
+            SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
 
             if (Server.Properties.Server.Default.DisableHardwareAcceleration)
             {
@@ -95,6 +101,20 @@ namespace GS.Server
             this.Shutdown();
         }
 
+        private void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
+        {
+            switch (e.Mode)
+            {
+                case PowerModes.Suspend:
+                    SkyServer.NotifyPowerSuspending();
+                    _powerUiCoordinator?.HandlePowerSuspending();
+                    break;
+                case PowerModes.Resume:
+                    _powerUiCoordinator?.HandlePowerResumed();
+                    SkyServer.NotifyPowerResumed();
+                    break;
+            }
+        }
 
         private void WriteException(Exception e)
         {
@@ -163,6 +183,10 @@ namespace GS.Server
         {
             if (disposing)
             {
+                SystemEvents.PowerModeChanged -= SystemEvents_PowerModeChanged;
+                _powerUiCoordinator?.RestorePendingStateOnShutdown();
+                _powerUiCoordinator?.Dispose();
+                _powerUiCoordinator = null;
                 _mutex?.Dispose();
             }
             // free native resources if there are any.

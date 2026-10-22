@@ -1,4 +1,4 @@
-# GSServer - ASCOM Synta/SkyWatcher Mount Driver
+﻿# GSServer - ASCOM Synta/SkyWatcher Mount Driver
 GS Server is SkyWatcher ASCOM telescope driver for use with astronomy software and SkyWatcher and Orion mounts.  It is built using C#, WPF, and a variation of MVVM.
 
 ![Main Workflow](https://github.com/rmorgan001/GSServer/actions/workflows/GS.CI.yml/badge.svg)
@@ -32,10 +32,11 @@ GS Server is SkyWatcher ASCOM telescope driver for use with astronomy software a
 * Full and half current tracking for battery power source
 * Theme support with primary and secondary colors
 * Anti-Backlash for hand controller
+* Support hibernation and sleep modes
 
 ## Solution Projects
 
-* ASCOM.GS.Sky.Telescope - COM/.Net Class Library implementing the ASCOM device interface for V3 telescope driver.
+* ASCOM.GS.Sky.Telescope - COM/.Net Class Library implementing the ASCOM device interface for V4 telescope driver.
 * ColorPicker - from another source
 * GS.ChartViewer - Viewer for the charting data
 * Principles - Class Library that contains a number of fundamental methods including Coordinates, Conversions, Hi Resoulution dates,               Julian dates, Timers, Time, and unit functions.

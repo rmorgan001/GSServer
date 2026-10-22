@@ -43,6 +43,7 @@ namespace GS.Server.Windows
     {
         #region Fields
         private readonly Util _util = new Util();
+        private volatile bool _disposed;
         public static ModelVm Model1Vm;
         #endregion
 
@@ -78,6 +79,7 @@ namespace GS.Server.Windows
             }
             catch (Exception ex)
             {
+                Dispose();
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Ui, Category = MonitorCategory.Interface, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}" };
                 MonitorLog.LogToMonitor(monitorItem);
@@ -110,11 +112,15 @@ namespace GS.Server.Windows
         /// <param name="e"></param>
         private void PropertyChangedSkyServer(object sender, PropertyChangedEventArgs e)
         {
+            if (_disposed) return;
+
             try
             {
                 ThreadContext.BeginInvokeOnUiThread(
              delegate
              {
+                 if (_disposed) return;
+
                  switch (e.PropertyName)
                  {
                      case "IsMountRunning":
@@ -154,11 +160,15 @@ namespace GS.Server.Windows
 
         private void PropertyChangedSkySettings(object sender, PropertyChangedEventArgs e)
         {
+            if (_disposed) return;
+
             try
             {
                 ThreadContext.BeginInvokeOnUiThread(
                     delegate
                     {
+                        if (_disposed) return;
+
                         switch (e.PropertyName)
                         {
                             case "AlignmentMode":
@@ -193,11 +203,15 @@ namespace GS.Server.Windows
 
         private void PropertyChangedSettings(object sender, PropertyChangedEventArgs e)
         {
+            if (_disposed) return;
+
             try
             {
                 ThreadContext.BeginInvokeOnUiThread(
                     delegate
                     {
+                        if (_disposed) return;
+
                         switch (e.PropertyName)
                         {
                             case "AccentColor":
@@ -1341,31 +1355,17 @@ namespace GS.Server.Windows
         #region Dispose
         public void Dispose()
         {
-            Dispose(true);
-            // GC.SuppressFinalize(this);
-        }
-        // NOTE: Leave out the finalizer altogether if this class doesn't
-        // own unmanaged resources itself, but leave the other methods
-        // exactly as they are.
-        ~ModelVm()
-        {
-            // Finalizer calls Dispose(false)
-            Dispose(false);
-        }
-        // The bulk of the clean-up code is implemented in Dispose(bool)
-        private void Dispose(bool disposing)
-        {
-            if (disposing)
+            if (_disposed) return;
+            _disposed = true;
+
+            SkyServer.StaticPropertyChanged -= PropertyChangedSkyServer;
+            Settings.Settings.StaticPropertyChanged -= PropertyChangedSettings;
+            SkySettings.StaticPropertyChanged -= PropertyChangedSkySettings;
+            if (ReferenceEquals(Model1Vm, this))
             {
-                SkyServer.StaticPropertyChanged -= PropertyChangedSkyServer;
-                Settings.Settings.StaticPropertyChanged -= PropertyChangedSettings;
+                Model1Vm = null;
             }
-            // free native resources if there are any.
-            //if (nativeResource != IntPtr.Zero)
-            //{
-            //    Marshal.FreeHGlobal(nativeResource);
-            //    nativeResource = IntPtr.Zero;
-            //}
+            _util.Dispose();
         }
         #endregion
     }
