@@ -818,6 +818,10 @@ namespace GS.SkyWatcher
                     return iPosition;
                 }
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
@@ -1507,12 +1511,14 @@ namespace GS.SkyWatcher
                             string responseString = null;
                             for (var c = 0; c < attempts; c++)
                             {
+                                SkyQueue.ThrowIfPowerSuspended();
                                 SkyQueue.Serial.DiscardInBuffer();
                                 SkyQueue.Serial.DiscardOutBuffer();
                                 // send the request
                                 var cmdData = SendRequest(axis, command, cmdDataStr);
                                 // receive the response
                                 responseString = ReceiveResponse(axis, command, cmdData);
+                                SkyQueue.ThrowIfPowerSuspended();
                                 if (!string.IsNullOrEmpty(responseString))
                                 {
                                     _conErrCnt = 0;
@@ -1553,6 +1559,10 @@ namespace GS.SkyWatcher
                             }
                             MountConnected = true;
                             return responseString;
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            throw;
                         }
                         catch (TimeoutException ex)
                         {
@@ -1609,6 +1619,7 @@ namespace GS.SkyWatcher
         /// <param name="cmdDataStr"></param>
         private string SendRequest(AxisId axis, char command, string cmdDataStr)
         {
+            SkyQueue.ThrowIfPowerSuspended();
             var commandStr = BuildRawCommand(axis, command, cmdDataStr);
 
             var dt = HiResDateTime.UtcNow;

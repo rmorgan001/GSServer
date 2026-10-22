@@ -33,6 +33,7 @@ namespace GS.SkyWatcher
         #region Fields
 
         private static BlockingCollection<ISkyCommand> _commandBlockingCollection;
+        private static volatile bool _powerSuspended;
         private static SkyWatcher _skyWatcher;
         private static CancellationTokenSource _cts;
         private static Task _processingTask;
@@ -142,6 +143,26 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
+        /// Block ordinary commands during sleep or hibernate.
+        /// </summary>
+        public static bool PowerSuspended
+        {
+            get => _powerSuspended;
+            set => _powerSuspended = value;
+        }
+
+        internal static void ThrowIfPowerSuspended()
+        {
+            if (!_powerSuspended) return;
+
+            var ex = new OperationCanceledException("Mount command cancelled by sleep or hibernate");
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = ex.Message };
+            MonitorLog.LogToMonitor(monitorItem);
+            throw ex;
+        }
+
+        /// <summary>
         /// Mount data results
         /// </summary>
         /// <remarks>
@@ -231,6 +252,7 @@ namespace GS.SkyWatcher
 
             try
             {
+                ThrowIfPowerSuspended();
 
                 if (!IsRunning || _cts.IsCancellationRequested || _skyWatcher?.IsConnected != true)
                 {

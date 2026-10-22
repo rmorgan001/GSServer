@@ -405,30 +405,35 @@ namespace GS.SkyWatcher
                         }
                         finally
                         {
-                            // Restore rate tracking
-                            if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
+                            try
                             {
-                                _commands.AxisSlew_Advanced(AxisId.Axis1, trackingRateRa);    
-                            }
-                            else
-                            {
-                                if (changeDirection)
+                                // Restore rate tracking
+                                if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
                                 {
-                                    _commands.AxisStop(AxisId.Axis1); // Stop axis motion
-                                    _commands.SetMotionMode(AxisId.Axis1, 1, slewingForward ? 0 : 1, false);
-                                    _commands.SetStepSpeed(AxisId.Axis1, trackingSpeedRa); // :I Send pulse to axis
-                                    _commands.StartMotion(AxisId.Axis1);
+                                    _commands.AxisSlew_Advanced(AxisId.Axis1, trackingRateRa);
                                 }
                                 else
                                 {
-                                    _commands.SetStepSpeed(AxisId.Axis1, trackingSpeedRa); // :I set speed back to previous tracking speed
+                                    if (changeDirection)
+                                    {
+                                        _commands.AxisStop(AxisId.Axis1); // Stop axis motion
+                                        _commands.SetMotionMode(AxisId.Axis1, 1, slewingForward ? 0 : 1, false);
+                                        _commands.SetStepSpeed(AxisId.Axis1, trackingSpeedRa); // :I Send pulse to axis
+                                        _commands.StartMotion(AxisId.Axis1);
+                                    }
+                                    else
+                                    {
+                                        _commands.SetStepSpeed(AxisId.Axis1, trackingSpeedRa); // :I set speed back to previous tracking speed
+                                    }
                                 }
+
+                                if (_pPecOn && AlternatingPPec) { SetPPec(AxisId.Axis1, true); } // implements the alternating pPEC
                             }
-
-                            if (_pPecOn && AlternatingPPec) { SetPPec(AxisId.Axis1, true); } // implements the alternating pPEC
-
-                            if (startedEvent != null && !startedEvent.IsSet) startedEvent.Set();
-                            SkyQueue.IsPulseGuidingRa = false;
+                            finally
+                            {
+                                if (startedEvent != null && !startedEvent.IsSet) startedEvent.Set();
+                                SkyQueue.IsPulseGuidingRa = false;
+                            }
                         }
                         break;
                     case AxisId.Axis2:
@@ -565,9 +570,15 @@ namespace GS.SkyWatcher
                             }
                             finally
                             {
-                                AxisStop(AxisId.Axis2);
-                                if (startedEvent != null && !startedEvent.IsSet) startedEvent.Set();
-                                SkyQueue.IsPulseGuidingDec = false;
+                                try
+                                {
+                                    AxisStop(AxisId.Axis2);
+                                }
+                                finally
+                                {
+                                    if (startedEvent != null && !startedEvent.IsSet) startedEvent.Set();
+                                    SkyQueue.IsPulseGuidingDec = false;
+                                }
                             }
                         }
                         break;
@@ -907,6 +918,10 @@ namespace GS.SkyWatcher
                 }
 
                 SkyQueue.Steps = new[] { x, y };
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (Exception e)
             {

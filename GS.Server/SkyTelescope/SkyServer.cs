@@ -857,6 +857,7 @@ namespace GS.Server.SkyTelescope
                 state = _powerTransitionState;
                 suspendUtc = _lastSuspendUtc;
                 shouldApplyRecovery = ShouldApplySkyWatcherResumeRecovery;
+                if (shouldApplyRecovery) { SkyQueue.PowerSuspended = true; }
             }
 
             var monitorItem = new MonitorEntry
@@ -900,6 +901,7 @@ namespace GS.Server.SkyTelescope
                 state = _powerTransitionState;
                 resumeUtc = _lastResumeUtc;
                 shouldApplyRecovery = ShouldApplySkyWatcherResumeRecovery;
+                SkyQueue.PowerSuspended = false;
             }
 
             lock (ResumeRecoveryLock)
