@@ -391,7 +391,7 @@ namespace GS.SkyWatcher
             }
         }
 
-        private static bool IsSerialIoException(Exception ex)
+        internal static bool IsSerialIoException(Exception ex)
         {
             var mountErr = ex as MountControlException;
             if (mountErr != null)
@@ -421,8 +421,10 @@ namespace GS.SkyWatcher
         {
             if (!IsRunning || serial == null) return;
 
+            _skyWatcher?.StopPulseWorkers();
             Serial = serial;
             _skyWatcher?.ResetConnection();
+            _skyWatcher?.StartPulseWorkers();
 
             // Re-arm USB removal monitoring for the new port
             var sp = serial as System.IO.Ports.SerialPort;
@@ -454,14 +456,15 @@ namespace GS.SkyWatcher
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{serial?.IsOpen}|{customMount360Steps}|{customRaWormSteps}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
+                Stop();
                 Serial = serial;
                 CustomMount360Steps = customMount360Steps;
                 CustomRaWormSteps = customRaWormSteps;
-                Stop();
                 if (_cts == null) _cts = new CancellationTokenSource();
                 var ct = _cts.Token;
 
                 _skyWatcher = new SkyWatcher();
+                _skyWatcher.StartPulseWorkers();
                 _skyWatcher.LowVoltageEvent += lowVoltageEventHandler;
                 _commandBlockingCollection = new BlockingCollection<ISkyCommand>();
                 _taskReadySignal = new ManualResetEventSlim(false);
@@ -518,6 +521,7 @@ namespace GS.SkyWatcher
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Exception:|{ex}" };
                 MonitorLog.LogToMonitor(monitorItem);
+                Stop();
                 throw;
             }
         }
@@ -534,6 +538,7 @@ namespace GS.SkyWatcher
             _commandBlockingCollection?.CompleteAdding();
 
             _cts?.Cancel();
+            _skyWatcher?.StopPulseWorkers();
 
             // Wait for processing task to complete
             if (_processingTask != null)

@@ -832,6 +832,54 @@ namespace GS.SkyWatcher
         }
 
         /// <summary>
+        /// Retrieves the positions of both axes using the :X0F command, returning an array of two values or the j command. 
+        /// If either position cannot be retrieved, the corresponding value will be <see cref="double.NaN"/>.
+        /// </summary>
+        /// <remarks>An <see cref="OperationCanceledException"/> is rethrown.</remarks>
+        /// <param name="attempts">The maximum number of attempts for each mount command.</param>
+        /// <returns>An array containing the positions of Axis 1 and Axis 2, in that order, or two <see cref="double.NaN"/>
+        /// values if either position cannot be retrieved.</returns>
+        internal double[] GetAxisStepsNaN(int attempts = MaxCmdAttempts)
+        {
+            try
+            {
+                if (SupportAdvancedCommandSet && AllowAdvancedCommandSet)
+                {
+                    var response = CmdToMount(AxisId.Axis1, 'X', "0F00000000", true, attempts); // 0x0F（’0F’）: Position reading of both axes
+                    // response format is "=RRRRRRRRDDDDDDDDTTTTTTTTTTTTTTTT"
+                    if (string.IsNullOrEmpty(response) || response.Length != 33) return new double[] { double.NaN, double.NaN };
+                    // String32ToInt expects a leading "="
+                    var axis1Position = String32ToInt("=" + response.Substring(1, 8), true, _resolutionFactor[(int)AxisId.Axis1]);
+                    var axis2Position = String32ToInt("=" + response.Substring(9, 8), true, _resolutionFactor[(int)AxisId.Axis2]);
+                    return new double[] { axis1Position, axis2Position };
+                }
+                else
+                {
+                    var response = CmdToMount(AxisId.Axis1, 'j', null, true, attempts);
+                    if (string.IsNullOrEmpty(response)) return new double[] { double.NaN, double.NaN };
+                    var iAxis1Position = StringToLong(response);
+                    iAxis1Position -= 0x00800000;
+                    response = CmdToMount(AxisId.Axis2, 'j', null, true, attempts);
+                    if (string.IsNullOrEmpty(response)) return new double[] { double.NaN, double.NaN };
+                    var iAxis2Position = StringToLong(response);
+                    iAxis2Position -= 0x00800000;
+                    return new double[] { iAxis1Position, iAxis2Position };
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{ex.Message}|{ex.StackTrace}" };
+                MonitorLog.LogToMonitor(monitorItem);
+                return new double[] { double.NaN, double.NaN };
+            }
+        }
+
+        /// <summary>
         /// j or X0003 Gets axis position steps
         /// </summary>
         /// <param name="axis">AxisId.Axis1 or AxisId.Axis2</param>
@@ -1671,7 +1719,12 @@ namespace GS.SkyWatcher
                                 throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
                         }
                     }
-                    break;
+                    if (cmdDataStr == "0F00000000")
+                    {
+                        LastJ1RunTime = dt;
+                        LastJ2ARunTime = dt;
+                    }
+                break;
             }
 
             //Serial.Transmit(commandStr.ToString());

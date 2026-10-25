@@ -146,7 +146,7 @@ namespace GS.Shared
                 {
                     ProcessEntryQueueItem(monitorentry);
                 }
-            });
+            }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
             PulseBlockingCollection = new BlockingCollection<PulseEntry>();
             Task.Factory.StartNew(() =>
@@ -155,7 +155,7 @@ namespace GS.Shared
                 {
                     ProcessPulseQueueItem(pulseEntry);
                 }
-            });
+            }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         #region Methods

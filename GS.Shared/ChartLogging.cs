@@ -47,7 +47,7 @@ namespace GS.Shared
                     {
                         ProcessChartQueueItem(logItem);
                     }
-                });
+                }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
                 IsRunning = true;
             }
