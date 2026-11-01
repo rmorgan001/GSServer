@@ -1459,7 +1459,7 @@ namespace ASCOM.GS.Sky.Telescope
                 //if (!SkyServer.Tracking) { throw new InvalidValueException("Pulse rejected when tracking is off"); }
 
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{direction},{duration}") };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{direction},{duration}") };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 CheckCapability(SkySettings.CanPulseGuide, "PulseGuide");
@@ -1757,7 +1757,7 @@ namespace ASCOM.GS.Sky.Telescope
             var a = Transforms.CoordTypeToInternal(ra, dec);
             CheckRaDecSync(a.X, a.Y, "SyncToCoordinates");
 
-            SkyServer.AtPark = false;
+            // SkyServer.AtPark = false; // can never be parked if we are syncing to coordinates
             SkyServer.SyncToTargetRaDec();
             // DelayInterval(); RightAscension and Declination wait for latest update
             // Wait for updated mount position before returning
@@ -1792,7 +1792,7 @@ namespace ASCOM.GS.Sky.Telescope
             var a = Transforms.CoordTypeToInternal(RightAscension, Declination);
             CheckRaDecSync(a.X, a.Y, "SyncToTarget");
 
-            SkyServer.AtPark = false;
+            // SkyServer.AtPark = false; // can never be parked if we are syncing to coordinates
             SkyServer.SyncToTargetRaDec();
             // DelayInterval(); RightAscension and Declination wait for latest update
             // Wait for updated mount position before returning
