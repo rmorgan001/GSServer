@@ -62,6 +62,11 @@ namespace GS.Server.SkyTelescope
 
         public static bool Connected => ConnectStates.Count > 0;
 
+        /// <summary>
+        /// Number of driver instances currently registered as connected
+        /// </summary>
+        public static int ConnectedCount => ConnectStates.Count;
+
         public static bool Connecting { get; set; }
 
         public static Exception Error { get; private set; }
@@ -114,20 +119,38 @@ namespace GS.Server.SkyTelescope
                 if (ConnectStates.Count == 1) {Connecting = true;}
 
                 var successfullyRemoved = ConnectStates.TryRemove(id, out _);
-
-                var monitorItem = new MonitorEntry
-                {
-                    Datetime = Principles.HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
-                    Category = MonitorCategory.Server,
-                    Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Remove|{id}|{successfullyRemoved}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
+                LogRemove(id, successfullyRemoved, null, MonitorType.Information);
             }
             Connecting = false;
+        }
+
+        /// <summary>
+        /// Removes the connection entry of a driver instance whose COM object has been released.
+        /// Safe to call from the finalizer thread, it deliberately does not touch <see cref="Connecting"/>.
+        /// </summary>
+        /// <param name="id">driver instance id</param>
+        /// <param name="reason">why the entry is being removed, for the log</param>
+        /// <returns>true if the instance was still registered as connected</returns>
+        public static bool ReleaseInstance(long id, string reason)
+        {
+            var removed = ConnectStates.TryRemove(id, out _);
+            LogRemove(id, removed, reason, removed ? MonitorType.Warning : MonitorType.Information);
+            return removed;
+        }
+
+        private static void LogRemove(long id, bool removed, string reason, MonitorType type)
+        {
+            var monitorItem = new MonitorEntry
+            {
+                Datetime = Principles.HiResDateTime.UtcNow,
+                Device = MonitorDevice.Server,
+                Category = MonitorCategory.Server,
+                Type = type,
+                Method = "SetConnected",
+                Thread = Thread.CurrentThread.ManagedThreadId,
+                Message = reason == null ? $"Remove|{id}|{removed}" : $"Remove|{id}|{removed}|{reason}"
+            };
+            MonitorLog.LogToMonitor(monitorItem);
         }
 
         public static void DiscoverSerialDevices()
