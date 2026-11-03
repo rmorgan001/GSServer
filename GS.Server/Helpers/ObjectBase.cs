@@ -13,8 +13,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using GS.Server.SkyTelescope;
 using GS.Shared;
-using System.Reflection;
+using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -23,26 +24,51 @@ namespace GS.Server.Helpers
     [ComVisible(false)]
     public class ObjectBase
     {
+        private int _released;
+
+        /// <summary>
+        /// Unique id of this COM object instance, assigned at construction
+        /// </summary>
+        protected long InstanceId { get; }
+
+        internal long ComInstanceId => InstanceId;
+
         protected ObjectBase()
         {
-            var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "CountObject" };
-            MonitorLog.LogToMonitor(monitorItem);
+            InstanceId = SkySystem.GetId();
 
             // We increment the global count of objects.
-            GSServer.CountObject();
+            var objects = GSServer.CountObject();
+            GSServer.LogCom(".ctor", $"CountObject|Id|{InstanceId}|Type|{GetType().Name}|Objects|{objects}");
         }
 
         ~ObjectBase()
         {
-            var monitorItem = new MonitorEntry
-            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "UnCountObject" };
-            MonitorLog.LogToMonitor(monitorItem);
+            // Finalizers must never throw, an unhandled exception here ends the process
+            try
+            {
+                // Runs once, and removes any connection the client left behind
+                if (Interlocked.Exchange(ref _released, 1) != 0) return;
 
-            // We decrement the global count of objects.
-            GSServer.UncountObject();
-            // We then immediately test to see if we the conditions are right to attempt to terminate this server application.
-            GSServer.ExitIf();
+                var wasConnected = SkySystem.ReleaseInstance(InstanceId, "Finalize");
+
+                // We decrement the global count of objects.
+                var objects = GSServer.UncountObject();
+                GSServer.LogCom("Finalize",
+                    $"UnCountObject|Id|{InstanceId}|Type|{GetType().Name}|WasConnected|{wasConnected}|Objects|{objects}|Connections|{SkySystem.ConnectedCount}",
+                    wasConnected ? MonitorType.Warning : MonitorType.Information);
+            }
+            catch (Exception ex)
+            {
+                try { GSServer.LogCom("Finalize", $"Error|Id|{InstanceId}|{ex.Message}|{ex.StackTrace}", MonitorType.Error); }
+                catch { /* nothing more can be done in a finalizer */ }
+            }
+            finally
+            {
+                // We then immediately test to see if we the conditions are right to attempt to terminate this server application.
+                try { GSServer.ExitIf(); }
+                catch { /* nothing more can be done in a finalizer */ }
+            }
         }
     }
 }

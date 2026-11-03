@@ -13,6 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using GS.Shared;
 using System;
 using System.Collections;
 using System.Runtime.InteropServices;
@@ -179,36 +180,56 @@ namespace GS.Server.Helpers
             IntPtr nullPtr = new IntPtr(0);
             ppvObject = nullPtr;
 
-            //
-            // Handle specific requests for implemented interfaces
-            //
-            foreach (Type iType in _mInterfaceTypes)
+            try
             {
-                if (riid == Marshal.GenerateGuidForType(iType))
+                //
+                // Handle specific requests for implemented interfaces
+                //
+                foreach (Type iType in _mInterfaceTypes)
                 {
-                    ppvObject = Marshal.GetComInterfaceForObject(Activator.CreateInstance(_mClassType), iType);
-                    return;
+                    if (riid == Marshal.GenerateGuidForType(iType))
+                    {
+                        var instance = Activator.CreateInstance(_mClassType);
+                        ppvObject = Marshal.GetComInterfaceForObject(instance, iType);
+                        LogCreated(instance, riid);
+                        return;
+                    }
+                }
+                //
+                // Handle requests for IDispatch or IUnknown on the class
+                //
+
+                if (riid == IidIDispatch)
+                {
+                    var instance = Activator.CreateInstance(_mClassType);
+                    ppvObject = Marshal.GetIDispatchForObject(instance);
+                    LogCreated(instance, riid);
+                }
+                else if (riid == IidIUnknown)
+                {
+                    var instance = Activator.CreateInstance(_mClassType);
+                    ppvObject = Marshal.GetIUnknownForObject(instance);
+                    LogCreated(instance, riid);
+                }
+                else
+                {
+                    //
+                    // Oops, some interface that the class doesn't implement
+                    //
+                    throw new COMException("No interface", unchecked((int)0x80004002));
                 }
             }
-            //
-            // Handle requests for IDispatch or IUnknown on the class
-            //
+            catch (Exception ex)
+            {
+                GSServer.LogCom("CreateInstance", $"Error|Type|{_mClassType.Name}|IID|{riid}|{ex.Message}", MonitorType.Error);
+                throw;
+            }
+        }
 
-            if (riid == IidIDispatch)
-            {
-                ppvObject = Marshal.GetIDispatchForObject(Activator.CreateInstance(_mClassType));
-            }
-            else if (riid == IidIUnknown)
-            {
-                ppvObject = Marshal.GetIUnknownForObject(Activator.CreateInstance(_mClassType));
-            }
-            else
-            {
-                //
-                // Oops, some interface that the class doesn't implement
-                //
-                throw new COMException("No interface", unchecked((int)0x80004002));
-            }
+        private void LogCreated(object instance, Guid riid)
+        {
+            var id = (instance as ObjectBase)?.ComInstanceId ?? 0;
+            GSServer.LogCom("CreateInstance", $"Created|Type|{_mClassType.Name}|Id|{id}|IID|{riid}");
         }
 
         void IClassFactory.LockServer(bool bLock)
@@ -218,9 +239,12 @@ namespace GS.Server.Helpers
                 GSServer.CountLock();
             else
                 GSServer.UncountLock();
-                // Always attempt to see if we need to shutdown this server application.
-                // LocalSystem.TraceLogItem("LockServer", "Calling ExitIf to check whether we can exit the server");
-                GSServer.ExitIf();
+
+            GSServer.LogCom("LockServer", $"Lock|{bLock}|Locks|{GSServer.ServerLockCount}");
+
+            // Always attempt to see if we need to shutdown this server application.
+            // LocalSystem.TraceLogItem("LockServer", "Calling ExitIf to check whether we can exit the server");
+            GSServer.ExitIf();
         }
         #endregion
     }

@@ -31,6 +31,7 @@ namespace GS.Shared
         #region Fields
         public static event PropertyChangedEventHandler StaticPropertyChanged;
         private static readonly BlockingCollection<MonitorEntry> MonitorBlockingCollection;
+        private static int _entriesInFlight;
         private static readonly BlockingCollection<PulseEntry> PulseBlockingCollection;
         private static int _errIndex;
         private static int _sessionIndex;
@@ -144,7 +145,9 @@ namespace GS.Shared
             {
                 foreach (var monitorentry in MonitorBlockingCollection.GetConsumingEnumerable())
                 {
-                    ProcessEntryQueueItem(monitorentry);
+                    Interlocked.Increment(ref _entriesInFlight);
+                    try { ProcessEntryQueueItem(monitorentry); }
+                    finally { Interlocked.Decrement(ref _entriesInFlight); }
                 }
             }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
@@ -175,6 +178,22 @@ namespace GS.Shared
         public static void AddEntry(MonitorEntry entry)
         {
             MonitorBlockingCollection.TryAdd(entry);
+        }
+
+        /// <summary>
+        /// Waits until queued monitor entries have been processed, used before the process exits
+        /// </summary>
+        /// <param name="timeoutMilliseconds">maximum time to wait</param>
+        /// <returns>true if the queue was drained</returns>
+        public static bool WaitForDrain(int timeoutMilliseconds)
+        {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            while (MonitorBlockingCollection.Count > 0 || Volatile.Read(ref _entriesInFlight) > 0)
+            {
+                if (sw.ElapsedMilliseconds >= timeoutMilliseconds) return false;
+                Thread.Sleep(10);
+            }
+            return true;
         }
 
         /// <summary>

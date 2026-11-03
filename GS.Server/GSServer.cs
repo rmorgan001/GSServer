@@ -61,16 +61,10 @@ namespace GS.Server
         /// </summary>
         public static bool SetupDialogOpen { get; set; }
 
-        private static int _appCount;
-        public static int AppCount
-        {
-            get => _appCount;
-            set
-            {
-                _appCount = value;
-                OnStaticPropertyChanged();
-            }
-        }
+        /// <summary>
+        /// Number of live COM objects, same counter used to decide when the server can exit
+        /// </summary>
+        public static int AppCount => Volatile.Read(ref _objInUse);
 
         public static void SaveAllAppSettings()
         {
@@ -113,26 +107,39 @@ namespace GS.Server
         /// <summary>
         /// This method performs a thread-safe incrementation of the objects count.
         /// </summary>
-        public static void CountObject()
+        /// <returns>the number of objects alive after the increment</returns>
+        public static int CountObject()
         {
-            Interlocked.Increment(ref _objInUse);
-            ++AppCount;
-
+            var count = Interlocked.Increment(ref _objInUse);
+            OnStaticPropertyChanged(nameof(AppCount));
+            return count;
         }
 
         /// <summary>
         /// This method performs a thread-safe decrementation the objects count.
         /// </summary>
-        public static void UncountObject()
+        /// <returns>the number of objects alive after the decrement</returns>
+        public static int UncountObject()
         {
-            Interlocked.Decrement(ref _objInUse);
-            --AppCount;
+            var count = Interlocked.Decrement(ref _objInUse);
+            OnStaticPropertyChanged(nameof(AppCount));
+            return count;
+        }
+
+        /// <summary>
+        /// Writes a COM object lifetime record to the monitor log
+        /// </summary>
+        internal static void LogCom(string method, string message, MonitorType type = MonitorType.Information)
+        {
+            var monitorItem = new MonitorEntry
+            { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = type, Method = method, Thread = Thread.CurrentThread.ManagedThreadId, Message = message };
+            MonitorLog.LogToMonitor(monitorItem);
         }
 
         /// <summary>
         /// Returns the current server lock count.
         /// </summary>
-        private static int ServerLockCount
+        internal static int ServerLockCount
         {
             get
             {
@@ -168,13 +175,18 @@ namespace GS.Server
                 if (!StartedByCom) return;
                 SaveAllAppSettings();
 
-                var monitorItem = new MonitorEntry
-                { Datetime = Principles.HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "GSServer: Exiting" };
-                MonitorLog.LogToMonitor(monitorItem);
+                var connections = SkySystem.ConnectedCount;
+                if (connections > 0)
+                {
+                    LogCom("ExitIf", $"Exiting with stale connections|Connections|{connections}", MonitorType.Warning);
+                }
+                LogCom("ExitIf", $"GSServer: Exiting|Objects|{ObjectsCount}|Locks|{ServerLockCount}|Connections|{connections}");
 
                 var wParam = new UIntPtr(0);
                 var lParam = new IntPtr(0);
                 NativeMethods.PostThreadMessage(MainThreadId, 0x0012, wParam, lParam);
+                // Environment.Exit does not wait for the asynchronous log queue
+                MonitorQueue.WaitForDrain(2000);
                 Environment.Exit(0);
             }
         }
