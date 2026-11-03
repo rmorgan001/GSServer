@@ -847,7 +847,13 @@ namespace GS.SkyWatcher
                 {
                     var response = CmdToMount(AxisId.Axis1, 'X', "0F00000000", true, attempts); // 0x0F（’0F’）: Position reading of both axes
                     // response format is "=RRRRRRRRDDDDDDDDTTTTTTTTTTTTTTTT"
-                    if (string.IsNullOrEmpty(response) || response.Length != 33) return new double[] { double.NaN, double.NaN };
+                    if (string.IsNullOrEmpty(response) || response.Length != 33)
+                    {
+                        var monitorItem = new MonitorEntry
+                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Response  null, empty, unexpected length or error: {response??"null"}" };
+                        MonitorLog.LogToMonitor(monitorItem);
+                        return new double[] { double.NaN, double.NaN };
+                    }
                     // String32ToInt expects a leading "="
                     var axis1Position = String32ToInt("=" + response.Substring(1, 8), true, _resolutionFactor[(int)AxisId.Axis1]);
                     var axis2Position = String32ToInt("=" + response.Substring(9, 8), true, _resolutionFactor[(int)AxisId.Axis2]);
