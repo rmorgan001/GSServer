@@ -107,7 +107,7 @@ namespace GS.Shared.EnvironmentInfo
                 writer.WriteLine($"Product Version: {fileVersionInfo.ProductVersion}");
                 writer.WriteLine($"Copyright: {fileVersionInfo.LegalCopyright}");
                 writer.WriteLine($"Build Date: {File.GetLastWriteTime(assembly.Location):yyyy-MM-dd HH:mm:ss}");
-                writer.WriteLine($"Location: {ObscurePath(assembly.Location)}");
+                writer.WriteLine($"Location: {assembly.Location}");
             }
             catch (Exception ex)
             {
@@ -193,7 +193,7 @@ namespace GS.Shared.EnvironmentInfo
                     writer.WriteLine($"Command Line Arguments: {args.Length}");
                     for (int i = 0; i < args.Length && i < 10; i++)
                     {
-                        writer.WriteLine($"  [{i}]: {ObscurePath(args[i])}");
+                        writer.WriteLine($"  [{i}]: {args[i]}");
                     }
                 }
             }
