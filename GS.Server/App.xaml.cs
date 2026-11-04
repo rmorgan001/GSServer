@@ -61,8 +61,6 @@ namespace GS.Server
             if (!_createdNew) return;
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-            _powerUiCoordinator = new PowerUiCoordinator();
-            SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
 
             if (Server.Properties.Server.Default.DisableHardwareAcceleration)
             {
@@ -70,6 +68,13 @@ namespace GS.Server
             }
             base.OnStartup(e);
             Languages.SetLanguageDictionary(false, LanguageApp.GsServer, Shared.Settings.Language);
+
+            // Must follow Languages (which loads Shared.Settings and enables session logging).
+            // The coordinator subscribes to a SkyServer static event, which runs SkySettings.Load();
+            // doing that earlier drops the settings entries from the session log.
+            _powerUiCoordinator = new PowerUiCoordinator();
+            SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
+
             _ = EnvironmentHelper.LogToDefaultLocationAsync();
             var app = new MainWindow();
             var context = new MainWindowVm();

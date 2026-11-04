@@ -1,4 +1,4 @@
-/* Copyright(C) 2019-2026 Rob Morgan (robert.morgan.e@gmail.com)
+﻿/* Copyright(C) 2019-2026 Rob Morgan (robert.morgan.e@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -33,7 +33,7 @@ namespace GS.Shared.EnvironmentInfo
         /// <param name="logFilePath">Full path to log file</param>
         /// <param name="timeoutSeconds">Maximum time to wait for logging to complete</param>
         /// <returns>Task that completes when logging finishes or times out</returns>
-        public static async Task LogEnvironmentAsync(string logFilePath, int timeoutSeconds = 5)
+        public static async Task LogEnvironmentAsync(string logFilePath, int timeoutSeconds = 15)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace GS.Shared.EnvironmentInfo
         /// </summary>
         /// <param name="logFilePath">Full path to log file</param>
         /// <param name="timeoutSeconds">Maximum time to wait</param>
-        public static void LogEnvironmentSync(string logFilePath, int timeoutSeconds = 5)
+        public static void LogEnvironmentSync(string logFilePath, int timeoutSeconds = 15)
         {
             try
             {

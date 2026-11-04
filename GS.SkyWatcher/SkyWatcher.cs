@@ -22,7 +22,6 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace GS.SkyWatcher
 {
@@ -32,7 +31,7 @@ namespace GS.SkyWatcher
     /// Constructor takes a connected AsCom serial object. if AsCom isn't needed replace with
     /// standard serial object and remove AsCom references. 
     /// </summary>
-    public class SkyWatcher
+    public partial class SkyWatcher
     {
         #region Events
         public event EventHandler LowVoltageEvent; // Low voltage event
@@ -279,11 +278,11 @@ namespace GS.SkyWatcher
         /// <param name="guideRate">Guide rate degrees, 15.041/3600*.5, negative value denotes direction</param>
         /// <param name="duration">length of pulse in milliseconds, always positive numbers</param>
         /// <param name="backlashSteps">Positive micro steps added for backlash</param>
-        /// <param name="token">Token source used to cancel pulse guide operation</param>
+        /// <param name="cancellationToken">Token source used to cancel pulse guide operation</param>
         /// <param name="startedEvent">Optional event signalled when the hardware command has been sent</param>
-        internal void AxisPulse(AxisId axis, double guideRate, int duration, int backlashSteps, CancellationToken token, ManualResetEventSlim startedEvent = null)
+        internal void AxisPulse(AxisId axis, double guideRate, int duration, int backlashSteps, CancellationToken cancellationToken, ManualResetEventSlim startedEvent = null)
         {
-            Task.Run(() =>
+            GetPulseWorker(axis).Submit((token, signalStarted) =>
             {
                 var datetime = HiResDateTime.UtcNow;
                 var monitorItem = new MonitorEntry // setup to log the pulse
@@ -340,7 +339,7 @@ namespace GS.SkyWatcher
                             if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
                             {
                                 _commands.AxisSlew_Advanced(AxisId.Axis1, applyRate);
-                                startedEvent?.Set(); // Signal: hardware command sent
+                                signalStarted();
                             }
                             else
                             {
@@ -359,7 +358,7 @@ namespace GS.SkyWatcher
                                 {
                                     _commands.SetStepSpeed(AxisId.Axis1, speedInt); // :I Send pulse to axis
                                 }
-                                startedEvent?.Set(); // Signal: hardware command sent
+                                signalStarted();
                             }
 
                             //pulseEntry.StartTime = _commands.LastI1RunTime; // get the last :I start time
@@ -407,12 +406,13 @@ namespace GS.SkyWatcher
                         {
                             try
                             {
-                                // Restore rate tracking
-                                if (_commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
+                                // Do not restart tracking during shutdown or power suspension.
+                                var restoreTracking = SkyQueue.IsRunning && !SkyQueue.PowerSuspended;
+                                if (restoreTracking && _commands.SupportAdvancedCommandSet && _commands.AllowAdvancedCommandSet)
                                 {
                                     _commands.AxisSlew_Advanced(AxisId.Axis1, trackingRateRa);
                                 }
-                                else
+                                else if (restoreTracking)
                                 {
                                     if (changeDirection)
                                     {
@@ -427,11 +427,11 @@ namespace GS.SkyWatcher
                                     }
                                 }
 
-                                if (_pPecOn && AlternatingPPec) { SetPPec(AxisId.Axis1, true); } // implements the alternating pPEC
+                                if (restoreTracking && _pPecOn && AlternatingPPec) { SetPPec(AxisId.Axis1, true); } // implements the alternating pPEC
                             }
                             finally
                             {
-                                if (startedEvent != null && !startedEvent.IsSet) startedEvent.Set();
+                                signalStarted();
                                 SkyQueue.IsPulseGuidingRa = false;
                             }
                         }
@@ -473,7 +473,7 @@ namespace GS.SkyWatcher
                                 // check for cancellation
                                 token.ThrowIfCancellationRequested();
                                 AxisMoveSteps(AxisId.Axis2, stepsNeeded);
-                                startedEvent?.Set(); // Signal: hardware command sent
+                                signalStarted();
 
                                 var axesStatus = _commands.GetAxisStatus(AxisId.Axis2);
                                 if (!axesStatus.FullStop)
@@ -507,7 +507,7 @@ namespace GS.SkyWatcher
                             }
                             finally
                             {
-                                if (startedEvent != null && !startedEvent.IsSet) startedEvent.Set();
+                                signalStarted();
                                 SkyQueue.IsPulseGuidingDec = false;
                             }
                         }
@@ -534,7 +534,7 @@ namespace GS.SkyWatcher
                                 // check for cancellation
                                 token.ThrowIfCancellationRequested();
                                 AxisSlew(AxisId.Axis2, guideRate); // Send pulse to axis 
-                                startedEvent?.Set(); // Signal: hardware command sent
+                                signalStarted();
                                 //pulseEntry.StartTime = _commands.LastJ2RunTime; // last :J2 start time
                                 //var decPulseTime = HiResDateTime.UtcNow - pulseEntry.StartTime; // possible use for min pulse duration time
                                 //var decSpan = duration - decPulseTime.TotalMilliseconds;
@@ -572,11 +572,11 @@ namespace GS.SkyWatcher
                             {
                                 try
                                 {
-                                    AxisStop(AxisId.Axis2);
+                                    if (SkyQueue.IsRunning && !SkyQueue.PowerSuspended) AxisStop(AxisId.Axis2);
                                 }
                                 finally
                                 {
-                                    if (startedEvent != null && !startedEvent.IsSet) startedEvent.Set();
+                                    signalStarted();
                                     SkyQueue.IsPulseGuidingDec = false;
                                 }
                             }
@@ -596,7 +596,7 @@ namespace GS.SkyWatcher
                 if (!MonitorPulse) return;
                 pulseEntry.Duration = duration;
                 MonitorLog.LogToMonitor(pulseEntry);//send to monitor
-            }, token);
+            }, cancellationToken, startedEvent);
         }
 
         /// <summary>
@@ -893,11 +893,10 @@ namespace GS.SkyWatcher
         {
             try
             {
-                // One attempt per axis so a dead link is noticed quickly, the poll repeats anyway
-                var x = _commands.GetAxisStepsNaN(AxisId.Axis1, Commands.PollAttempts);
-                var y = double.IsNaN(x) ? double.NaN : _commands.GetAxisStepsNaN(AxisId.Axis2, Commands.PollAttempts);
+                // One attempt so a dead link is noticed quickly, the poll repeats anyway
+                var steps = _commands.GetAxisStepsNaN(Commands.PollAttempts);
 
-                if (double.IsNaN(x) || double.IsNaN(y))
+                if (double.IsNaN(steps[0]) || double.IsNaN(steps[1]))
                 {
                     // The poll swallows IO failures, so report a run of failures to start serial recovery
                     if (++_pollFailures >= PollFailureLimit)
@@ -917,7 +916,7 @@ namespace GS.SkyWatcher
                     _pollFailures = 0;
                 }
 
-                SkyQueue.Steps = new[] { x, y };
+                SkyQueue.Steps = new[] { steps[0], steps[1] };
             }
             catch (OperationCanceledException)
             {

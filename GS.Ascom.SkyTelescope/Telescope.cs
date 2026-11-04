@@ -47,7 +47,7 @@ namespace ASCOM.GS.Sky.Telescope
         private TrackingRatesSimple _mTrackingRatesSimple;
         private Util _util;
         private CommandStrings _mCommandStrings;
-        private readonly long _objectId;
+        private bool _disposed;
 
         #endregion
 
@@ -70,18 +70,16 @@ namespace ASCOM.GS.Sky.Telescope
                 _mTrackingRates = new TrackingRates();
                 _mTrackingRatesSimple = new TrackingRatesSimple();
                 _util = new Util();
-                // get a unique instance id
-                _objectId = SkySystem.GetId();
 
                 monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Instance ID|{_objectId}|Driver ID|{driverId}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Instance ID|{InstanceId}|Driver ID|{driverId}" };
                 MonitorLog.LogToMonitor(monitorItem);
 
             }
             catch (Exception ex)
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Error|{ex.Message}|{ex.StackTrace}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Error|Instance ID|{InstanceId}|{ex.Message}|{ex.StackTrace}|Object will be released at finalization" };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 throw;
@@ -453,9 +451,9 @@ namespace ASCOM.GS.Sky.Telescope
             set
             {
                 var monitorItem = new MonitorEntry
-                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {value}|{_objectId}" };
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {value}|{InstanceId}" };
                 MonitorLog.LogToMonitor(monitorItem);
-                SkySystem.SetConnected(_objectId, value);
+                SkySystem.SetConnected(InstanceId, value);
             }
         }
 
@@ -1459,7 +1457,7 @@ namespace ASCOM.GS.Sky.Telescope
                 //if (!SkyServer.Tracking) { throw new InvalidValueException("Pulse rejected when tracking is off"); }
 
                 var monitorItem = new MonitorEntry
-                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{direction},{duration}") };
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Information, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = FormattableString.Invariant($"{direction},{duration}") };
                 MonitorLog.LogToMonitor(monitorItem);
 
                 CheckCapability(SkySettings.CanPulseGuide, "PulseGuide");
@@ -1757,7 +1755,7 @@ namespace ASCOM.GS.Sky.Telescope
             var a = Transforms.CoordTypeToInternal(ra, dec);
             CheckRaDecSync(a.X, a.Y, "SyncToCoordinates");
 
-            SkyServer.AtPark = false;
+            // SkyServer.AtPark = false; // can never be parked if we are syncing to coordinates
             SkyServer.SyncToTargetRaDec();
             // DelayInterval(); RightAscension and Declination wait for latest update
             // Wait for updated mount position before returning
@@ -1792,7 +1790,7 @@ namespace ASCOM.GS.Sky.Telescope
             var a = Transforms.CoordTypeToInternal(RightAscension, Declination);
             CheckRaDecSync(a.X, a.Y, "SyncToTarget");
 
-            SkyServer.AtPark = false;
+            // SkyServer.AtPark = false; // can never be parked if we are syncing to coordinates
             SkyServer.SyncToTargetRaDec();
             // DelayInterval(); RightAscension and Declination wait for latest update
             // Wait for updated mount position before returning
@@ -2158,18 +2156,19 @@ namespace ASCOM.GS.Sky.Telescope
 
         private void Dispose(bool disposing)
         {
-            if (!disposing) return;
+            if (!disposing || _disposed) return;
+            _disposed = true;
             // free managed resources
             Connected = false;
-            _mAxisRates[0].Dispose();
-            _mAxisRates[1].Dispose();
-            _mAxisRates[2].Dispose();
+            _mAxisRates?[0]?.Dispose();
+            _mAxisRates?[1]?.Dispose();
+            _mAxisRates?[2]?.Dispose();
             _mAxisRates = null;
-            _mTrackingRates.Dispose();
+            _mTrackingRates?.Dispose();
             _mTrackingRates = null;
-            _mTrackingRatesSimple.Dispose();
+            _mTrackingRatesSimple?.Dispose();
             _mTrackingRatesSimple = null;
-            _util.Dispose();
+            _util?.Dispose();
             _util = null;
             // free native resources if there are any.
         }
