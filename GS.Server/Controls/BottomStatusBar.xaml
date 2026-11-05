@@ -153,9 +153,9 @@
                             </DataTrigger.EnterActions>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding IsMoveAxisActive}" Value="False">
-                            <DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
                                 <StopStoryboard BeginStoryboardName="TrackingBlinker" />
-                            </DataTrigger.EnterActions>
+                            </DataTrigger.ExitActions>
                             <Setter Property="Opacity" Value="1.0" />
                         </DataTrigger>
                     </Style.Triggers>
