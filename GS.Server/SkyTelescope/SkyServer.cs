@@ -315,24 +315,43 @@ namespace GS.Server.SkyTelescope
             }
         }
 
+
+        static void CheckHomeState()
+        {
+            // Home axis values are mount values internally
+            var home = Axes.AxesMountToApp(new[] { HomeAxes.X, HomeAxes.Y });
+            var h = new Vector(home[0], home[1]);
+            var m = new Vector(_appAxes.X, _appAxes.Y);
+            double dX = Abs(m.X - h.X);
+            dX = Min(dX, 360.0 - dX);   // Az Alt can have home (0, 0) so wrap at 360
+            double dY = Abs(m.Y - h.Y);
+            var d = new Vector(dX, dY);
+            var r = d.LengthSquared < 0.01414;
+            AtHome = r;
+        }
+
+        private static bool _atHome;
         /// <summary>
         /// within 0.1 degree circular range to trigger home
         /// </summary>
         public static bool AtHome
         {
-            get
+            get => _atHome;
+            set
             {
-                // Home axis values are mount values internally
-                var home = Axes.AxesMountToApp(new[] { HomeAxes.X, HomeAxes.Y });
-                var h = new Vector(home[0], home[1]);
-                var m = new Vector(_appAxes.X, _appAxes.Y);
-                double dX = Abs(m.X - h.X);
-                dX = Min(dX, 360.0 - dX);   // Az Alt can have home (0, 0) so wrap at 360
-                double dY = Abs(m.Y - h.Y);
-                var d = new Vector(dX, dY);
-                var r = d.LengthSquared < 0.01414;
-                // only report AtHome when slewing has finished
-                return r;
+                if (_atHome == value) { return; }
+                _atHome = value;
+                var monitorItem = new MonitorEntry
+                {
+                    Datetime = HiResDateTime.UtcNow,
+                    Device = MonitorDevice.Server,
+                    Category = MonitorCategory.Server,
+                    Type = MonitorType.Information,
+                    Method = MethodBase.GetCurrentMethod()?.Name,
+                    Thread = Thread.CurrentThread.ManagedThreadId,
+                    Message = $"{value}"
+                };
+                MonitorLog.LogToMonitor(monitorItem);
             }
         }
 
@@ -344,6 +363,7 @@ namespace GS.Server.SkyTelescope
             get => SkySettings.AtPark;
             set
             {
+                if (SkySettings.AtPark == value) { return; }
                 SkySettings.AtPark = value;
                 OnStaticPropertyChanged();
                 Synthesizer.Speak(value ? Application.Current.Resources["vceParked"].ToString() : Application.Current.Resources["vceUnParked"].ToString());
@@ -353,7 +373,7 @@ namespace GS.Server.SkyTelescope
                     Datetime = HiResDateTime.UtcNow,
                     Device = MonitorDevice.Server,
                     Category = MonitorCategory.Server,
-                    Type = MonitorType.Data,
+                    Type = MonitorType.Information,
                     Method = MethodBase.GetCurrentMethod()?.Name,
                     Thread = Thread.CurrentThread.ManagedThreadId,
                     Message = $"{value}"
@@ -8174,6 +8194,8 @@ namespace GS.Server.SkyTelescope
                 UpdateSteps(); // get step from the mount
 
                 CheckSlewState(); // Track slewing state
+
+                CheckHomeState(); // Track home state
 
                 CheckAxisLimits(); //used for warning light
 
