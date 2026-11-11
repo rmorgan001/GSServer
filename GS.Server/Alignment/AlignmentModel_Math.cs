@@ -100,7 +100,7 @@ namespace GS.Server.Alignment
 
         private MapResult Delta_Map(CartesCoord original)
         {
-            AlignmentPoint nearestPoint = GetNearest(original);
+            AlignmentPoint nearestPoint = GetNearest(original, true);
             if (nearestPoint != null)
             {
 
@@ -165,7 +165,7 @@ namespace GS.Server.Alignment
             // re transform based on the nearest 3 stars
             bool inTriangle = EQ_UpdateTaki(pos);
 
-            CartesCoord transformed = EQ_plTaki(pos);
+            CartesCoord transformed = inTriangle ? EQ_plTaki(pos) : pos;
             result.Position = transformed;
             result.InTriangle = inTriangle;
 
@@ -181,7 +181,7 @@ namespace GS.Server.Alignment
 
             // re transform using the 3 nearest stars
             bool inTriangle = EQ_UpdateAffine(pos);
-            CartesCoord transformed = EQ_plAffine(pos);
+            CartesCoord transformed = inTriangle ? EQ_plAffine(pos) : pos;
 
             result.Position = transformed;
             result.InTriangle = inTriangle;
@@ -301,13 +301,14 @@ namespace GS.Server.Alignment
         /// </summary>
         /// <param name="pos"></param>
         /// <returns></returns>
-        private AlignmentPoint GetNearest(CartesCoord pos)
+        private AlignmentPoint GetNearest(CartesCoord pos, bool synced = false)
         {
             Dictionary<int, double> distances = new Dictionary<int, double>();
 
             foreach (AlignmentPoint pt in this.AlignmentPoints)
             {
                 pt.SelectedForGoto = false;
+                Coord point = synced ? pt.SyncedCartesian : pt.UnsyncedCartesian;
                 switch (ActivePoints)
                 {
                     case ActivePointsEnum.All:
@@ -315,14 +316,14 @@ namespace GS.Server.Alignment
                         break;
                     case ActivePointsEnum.PierSide:
                         // only consider points on this side of the meridian 
-                        if (pt.UnsyncedCartesian.y * pos.y < 0)
+                        if (point.y * pos.y < 0)
                         {
                             continue;
                         }
                         break;
                     case ActivePointsEnum.LocalQuadrant:
                         // local quadrant 
-                        if (GetQuadrant(pos) != GetQuadrant(pt.UnsyncedCartesian))
+                        if (GetQuadrant(pos) != GetQuadrant(point))
                         {
                             continue;
                         }
@@ -330,7 +331,7 @@ namespace GS.Server.Alignment
                 }
 
                 // calculate cartesian distance
-                distances.Add(pt.Id, Math.Pow(pt.UnsyncedCartesian.x - pos.x, 2) + Math.Pow(pt.UnsyncedCartesian.y - pos.y, 2));
+                distances.Add(pt.Id, Math.Pow(point.x - pos.x, 2) + Math.Pow(point.y - pos.y, 2));
             }
 
             if (distances.Count == 0)

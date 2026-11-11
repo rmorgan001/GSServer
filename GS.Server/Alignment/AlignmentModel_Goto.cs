@@ -46,13 +46,13 @@ namespace GS.Server.Alignment
                 switch (this.AlignmentBehaviour)
                 {
                     case AlignmentBehaviourEnum.Nearest:
-                        mapResult = DeltaSync_Matrix_Map(sXy);
+                        mapResult = Delta_Map(sXy);
                         break;
                     default:
                         mapResult = Delta_Matrix_Reverse_Map(sXy);
                         if (!mapResult.InTriangle)
                         {
-                            mapResult = DeltaSync_Matrix_Map(sXy);
+                            mapResult = Delta_Map(sXy);
                         }
                         break;
                 }
@@ -87,13 +87,13 @@ namespace GS.Server.Alignment
                 switch (this.AlignmentBehaviour)
                 {
                     case AlignmentBehaviourEnum.Nearest:
-                        mapResult = DeltaSyncReverse_Matrix_Map(uXy);
+                        mapResult = DeltaReverse_Map(uXy);
                         break;
                     default:
                         mapResult = Delta_Matrix_Map(uXy);
                         if (!mapResult.InTriangle)
                         {
-                            mapResult = DeltaSyncReverse_Matrix_Map(uXy);
+                            mapResult = DeltaReverse_Map(uXy);
                         }
                         break;
                 }

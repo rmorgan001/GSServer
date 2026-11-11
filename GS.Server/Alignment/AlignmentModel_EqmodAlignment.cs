@@ -43,38 +43,16 @@ namespace GS.Server.Alignment
             _oneStarAdjustment = new CartesCoord(data.Delta);
 
             // Check if matrix should be updated.
-            if (AlignmentPoints.Count > 2)
-            {
-                // Update the matrices
-                SendToMatrix();
-            }
+            SendToMatrix();
 
             return eq_NPointAppend;
         }
 
         public void SendToMatrix()
         {
-            if (AlignmentPoints.Count < 3)
-            {
-                return;
-            }
-            ActivateMatrix();
-        }
-
-        private void ActivateMatrix()
-        {
-            _threeStarEnabled = false;
-            if (AlignmentPoints.Count >= 3)
-            {
-
-                _ = EQ_AssembleMatrix_Taki(0, 0,
-                    AlignmentPoints[0].UnsyncedCartesian, AlignmentPoints[1].UnsyncedCartesian, AlignmentPoints[2].UnsyncedCartesian,
-                    AlignmentPoints[0].SyncedCartesian, AlignmentPoints[1].SyncedCartesian, AlignmentPoints[2].SyncedCartesian);
-                _ = EQ_AssembleMatrix_Affine(0, 0,
-                    AlignmentPoints[0].SyncedCartesian, AlignmentPoints[1].SyncedCartesian, AlignmentPoints[2].SyncedCartesian,
-                    AlignmentPoints[0].UnsyncedCartesian, AlignmentPoints[1].UnsyncedCartesian, AlignmentPoints[2].UnsyncedCartesian);
-                _threeStarEnabled = true;
-            }
+            // Matrices are assembled for the selected triangle at mapping time.
+            // A degenerate initial triple must not prevent later points being used.
+            _threeStarEnabled = AlignmentPoints.Count >= 3;
         }
         // /pec /showalignment
     }

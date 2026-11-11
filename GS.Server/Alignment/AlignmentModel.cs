@@ -445,6 +445,7 @@ namespace GS.Server.Alignment
         public void LoadAlignmentPoints(string filename)
         {
             AlignmentPoints.Clear();
+            _threeStarEnabled = false;
             using (var file = File.OpenText(filename))
             {
                 var serializer = new JsonSerializer();

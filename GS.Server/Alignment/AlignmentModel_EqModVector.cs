@@ -248,14 +248,7 @@ namespace GS.Server.Alignment
             EQCT.z = m1.z - ((a1.x * EQMT.Element[0, 2]) + (a1.y * EQMT.Element[1, 2]) + (a1.z * EQMT.Element[2, 2]));
 
 
-            if ((x + Y) == 0)
-            {
-                return false;
-            }
-            else
-            {
-                return EQ_CheckPoint_in_Triangle(x, Y, a1.x, a1.y, a2.x, a2.y, a3.x, a3.y);
-            }
+            return EQ_CheckPoint_in_Triangle(x, Y, a1.x, a1.y, a2.x, a2.y, a3.x, a3.y);
 
 
         }
@@ -328,14 +321,7 @@ namespace GS.Server.Alignment
             EQCO.x = m1.x - ((a1.x * EQMM.Element[0, 0]) + (a1.y * EQMM.Element[1, 0]));
             EQCO.y = m1.y - ((a1.x * EQMM.Element[0, 1]) + (a1.y * EQMM.Element[1, 1]));
 
-            if ((x + Y) == 0)
-            {
-                return false;
-            }
-            else
-            {
-                return EQ_CheckPoint_in_Triangle(x, Y, m1.x, m1.y, m2.x, m2.y, m3.x, m3.y);
-            }
+            return EQ_CheckPoint_in_Triangle(x, Y, a1.x, a1.y, a2.x, a2.y, a3.x, a3.y);
 
         }
 
@@ -557,17 +543,18 @@ namespace GS.Server.Alignment
         private SphericalCoord EQ_Cartes2Polar(CartesCoord cart, CartesCoord rads)
         {
             SphericalCoord result = new SphericalCoord();
-            double radius = 0d;
-            // Ah the famous radius formula
-            if (!rads.divZeroProtected)
+            if (rads.divZeroProtected)
             {
-                // The radius was converted from 0 to 1 to prevent division by zero errors
-                radius = Math.Sqrt((cart.x * cart.x) + (cart.y * cart.y)) * rads.rSign;
-
+                cart.x -= rads.x;
+                cart.y -= rads.y;
             }
-
-            // And the nasty angle compute routine (any simpler way to implement this ?)
-
+            double radius = Math.Sqrt((cart.x * cart.x) + (cart.y * cart.y)) * rads.rSign;
+            // At the exact pole the azimuth is undefined; retain the input azimuth.
+            if (cart.x == 0 && cart.y == 0)
+            {
+                cart.x = rads.x;
+                cart.y = rads.y;
+            }
             double angle = SkyServer.RadToDeg(Math.Atan(cart.y / cart.x));
             if (cart.x < 0)
             {
@@ -673,10 +660,10 @@ namespace GS.Server.Alignment
             switch (this.ThreePointAlgorithm)
             {
                 case ThreePointAlgorithmEnum.BestCentre:
-                    nearestPoints = EQ_Choose_3Points(pos);
+                    nearestPoints = EQ_Choose_3Points(pos, true);
                     break;
                 default:
-                    nearestPoints = EQ_ChooseNearest3Points(pos);
+                    nearestPoints = EQ_ChooseNearest3Points(pos, true);
                     break;
             }
 
@@ -1089,21 +1076,15 @@ namespace GS.Server.Alignment
         {
 
 
-            double ta = EQ_Triangle_Area(px1, py1, px2, py2, px3, py3);
-            double t1 = EQ_Triangle_Area(px, py, px2, py2, px3, py3);
-            double t2 = EQ_Triangle_Area(px1, py1, px, py, px3, py3);
-            double t3 = EQ_Triangle_Area(px1, py1, px2, py2, px, py);
-
-
-            if (Math.Abs(ta - t1 - t2 - t3) < 2)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-
+            // Signed edge tests with a tolerance relative to the triangle area.
+            double area = (px2 - px1) * (py3 - py1) - (py2 - py1) * (px3 - px1);
+            double e1 = (px2 - px1) * (py - py1) - (py2 - py1) * (px - px1);
+            double e2 = (px3 - px2) * (py - py2) - (py3 - py2) * (px - px2);
+            double e3 = (px1 - px3) * (py - py3) - (py1 - py3) * (px - px3);
+            double tolerance = Math.Abs(area) * 1e-10;
+            return area > 0
+                ? e1 >= -tolerance && e2 >= -tolerance && e3 >= -tolerance
+                : area < 0 && e1 <= tolerance && e2 <= tolerance && e3 <= tolerance;
         }
 
 
@@ -1250,204 +1231,71 @@ namespace GS.Server.Alignment
         /// </summary>
         /// <param name="pos"></param>
         /// <returns>List of 3 points or an empty list</returns>
-        internal List<AlignmentPoint> EQ_Choose_3Points(CartesCoord pos)
+        internal List<AlignmentPoint> EQ_Choose_3Points(CartesCoord pos, bool synced = false)
         {
-            Dictionary<int, double> distances = new Dictionary<int, double>();
-            List<AlignmentPoint> results = new List<AlignmentPoint>();
-            // Adjust only if there are three alignment stars
-
-            if (AlignmentPoints.Count <= 3)
-            {
-                foreach (AlignmentPoint pt in this.AlignmentPoints)
-                {
-                    pt.SelectedForGoto = true;
-                    results.Add(pt);
-                }
-                return results.OrderBy(p => p.AlignTime).ToList();
-            }
-
-            // first find out the distances to the alignment stars
-            foreach (AlignmentPoint pt in this.AlignmentPoints)
-            {
-                pt.SelectedForGoto = false;
-                switch (this.ActivePoints)
-                {
-                    case ActivePointsEnum.All:
-                        // all points
-
-                        break;
-                    case ActivePointsEnum.PierSide:
-                        // only consider points on this side of the meridian
-                        if (pt.UnsyncedCartesian.y * pos.y < 0)
-                        {
-                            continue;
-                        }
-
-                        break;
-                    case ActivePointsEnum.LocalQuadrant:
-                        // local quadrant
-                        if (!GetQuadrant(pos).Equals(GetQuadrant(pt.UnsyncedCartesian)))
-                        {
-                            continue;
-                        }
-
-                        break;
-                }
-
-                // calculate cartesian disatnce
-                distances.Add(pt.Id, Math.Pow(pt.UnsyncedCartesian.x - pos.x, 2) + Math.Pow(pt.UnsyncedCartesian.y - pos.y, 2));
-            }
-
-            if (distances.Count < 3)
-            {
-                return results; // Empty list.
-            }
-
-            // now sort the distances so the closest stars are at the top
-            //Just use the nearest 50 stars (or max) - saves processing time
-            List<int> sortedIds = distances.OrderBy(d => d.Value).Select(d => d.Key).Take(this.NStarMaxCombinationCount).ToList();
-
-            var tmp1 = sortedIds.Count - 1;
-            var tmp2 = tmp1 - 1;
-
-            // iterate through all the triangles posible using the nearest alignment points
-            double minCentreDistance = double.MaxValue;
-            double centreDistance;
-            Coord triangleCentre;
-            for (int i = 0; i <= tmp2; i++)
-            {
-                var p1 = this.AlignmentPoints.First(pt => pt.Id == sortedIds[i]);
-                for (int j = i + 1; j < tmp1; j++)
-                {
-                    var p2 = this.AlignmentPoints.First(pt => pt.Id == sortedIds[j]);
-                    for (int k = (j + 1); k < sortedIds.Count; k++)
-                    {
-                        var p3 = this.AlignmentPoints.First(pt => pt.Id == sortedIds[k]);
-
-
-                        if (EQ_CheckPoint_in_Triangle(pos.x, pos.y,
-                            p1.UnsyncedCartesian.x, p1.UnsyncedCartesian.y,
-                            p2.UnsyncedCartesian.x, p2.UnsyncedCartesian.y,
-                            p3.UnsyncedCartesian.x, p3.UnsyncedCartesian.y))
-                        {
-                            // Compute for the center point
-                            triangleCentre = EQ_GetCenterPoint(p1.UnsyncedCartesian, p2.UnsyncedCartesian, p3.UnsyncedCartesian);
-                            // don't need full pythagoras - sum of squares is good enough
-                            centreDistance = Math.Pow(triangleCentre.x - pos.x, 2) + Math.Pow(triangleCentre.y - pos.y, 2);
-                            if (centreDistance < minCentreDistance)
-                            {
-                                results = new List<AlignmentPoint> { p3, p2, p1 };  // Reversed to match EQMOD sort order
-                                minCentreDistance = centreDistance;
-                            }
-                        }
-                    }
-                }
-            }
-            results.ForEach(p => p.SelectedForGoto = true);
-            return results.ToList();
-
+            return ChooseTriangle(pos, synced, true);
         }
 
-
-
-        /// <summary>
-        /// Returns the nearest 3 alignment points that form and enclosing triangle around a position.
-        /// </summary>
-        /// <param name="pos"></param>
-        /// <returns>List of 3 points or an empty list.</returns>
-        internal List<AlignmentPoint> EQ_ChooseNearest3Points(CartesCoord pos)
+        internal List<AlignmentPoint> EQ_ChooseNearest3Points(CartesCoord pos, bool synced = false)
         {
-            Dictionary<int, double> distances = new Dictionary<int, double>();
-            List<AlignmentPoint> results = new List<AlignmentPoint>();
-            // Adjust only if there are three alignment stars
+            return ChooseTriangle(pos, synced, false);
+        }
 
-            if (AlignmentPoints.Count <= 3)
+        // Reject triangles whose area is tiny compared with their longest edge squared.
+        // Both spaces must be invertible because the model maps in both directions.
+        private static bool WellConditioned(Coord a, Coord b, Coord c)
+        {
+            double abx = b.x - a.x, aby = b.y - a.y;
+            double acx = c.x - a.x, acy = c.y - a.y;
+            double bcx = c.x - b.x, bcy = c.y - b.y;
+            double scale = Math.Max(abx * abx + aby * aby,
+                Math.Max(acx * acx + acy * acy, bcx * bcx + bcy * bcy));
+            double area = Math.Abs(abx * acy - aby * acx);
+            return scale > 0 && !double.IsInfinity(scale) && !double.IsNaN(area)
+                && area > scale * 1e-6;
+        }
+
+        private List<AlignmentPoint> ChooseTriangle(CartesCoord pos, bool synced, bool bestCentre)
+        {
+            foreach (var point in AlignmentPoints) point.SelectedForGoto = false;
+            Func<AlignmentPoint, Coord> coordinate = p => synced ? p.SyncedCartesian : p.UnsyncedCartesian;
+            var candidates = AlignmentPoints.Where(p =>
             {
-                foreach (AlignmentPoint pt in this.AlignmentPoints)
-                {
-                    pt.SelectedForGoto = true;
-                    results.Add(pt);
-                }
-                return results.OrderBy(p => p.AlignTime).ToList();
-            }
-
-            // first find out the distances to the alignment stars
-            foreach (AlignmentPoint pt in this.AlignmentPoints)
+                Coord c = coordinate(p);
+                return ActivePoints == ActivePointsEnum.All ||
+                    (ActivePoints == ActivePointsEnum.PierSide && c.y * pos.y >= 0) ||
+                    (ActivePoints == ActivePointsEnum.LocalQuadrant && GetQuadrant(c) == GetQuadrant(pos));
+            }).OrderBy(p =>
             {
-                pt.SelectedForGoto = false;
-                switch (ActivePoints)
-                {
-                    case ActivePointsEnum.All:
-                        // all points
+                Coord c = coordinate(p);
+                return (c.x - pos.x) * (c.x - pos.x) + (c.y - pos.y) * (c.y - pos.y);
+            }).Take(NStarMaxCombinationCount).ToList();
 
-                        break;
-                    case ActivePointsEnum.PierSide:
-                        // only consider points on this side of the meridian
-                        if (pt.UnsyncedCartesian.y * pos.y < 0)
-                        {
-                            continue;
-                        }
-
-                        break;
-                    case ActivePointsEnum.LocalQuadrant:
-                        // local quadrant
-                        if (!GetQuadrant(pos).Equals(GetQuadrant(pt.UnsyncedCartesian)))
-                        {
-                            continue;
-                        }
-
-                        break;
-                }
-
-                // calculate cartesian distance
-                distances.Add(pt.Id, Math.Pow(pt.UnsyncedCartesian.x - pos.x, 2) + Math.Pow(pt.UnsyncedCartesian.y - pos.y, 2));
-            }
-
-            if (distances.Count < 3)
-            {
-                return results; // Empty list.
-            }
-
-            // now sort the distances so the closest stars are at the top
-            //Just use the nearest 50 stars (or max) - saves processing time
-            List<int> sortedIds = distances.OrderBy(d => d.Value).Select(d => d.Key).Take(this.NStarMaxCombinationCount).ToList();
-
-            var tmp1 = sortedIds.Count - 1;
-            var tmp2 = tmp1 - 1;
-            bool done = false;
-
-
-            // iterate through all the triangles possible using the nearest alignment points
-            for (int i = 0; i <= tmp2; i++)
-            {
-                var p1 = this.AlignmentPoints.First(pt => pt.Id == sortedIds[i]);
-                for (int j = i + 1; j < tmp1; j++)
-                {
-                    var p2 = this.AlignmentPoints.First(pt => pt.Id == sortedIds[j]);
-                    for (int k = (j + 1); k < sortedIds.Count; k++)
+            var result = new List<AlignmentPoint>();
+            double bestDistance = double.MaxValue;
+            for (int i = 0; i < candidates.Count - 2; i++)
+                for (int j = i + 1; j < candidates.Count - 1; j++)
+                    for (int k = j + 1; k < candidates.Count; k++)
                     {
-                        var p3 = this.AlignmentPoints.First(pt => pt.Id == sortedIds[k]);
-
-
-                        if (EQ_CheckPoint_in_Triangle(pos.x, pos.y,
-                            p1.UnsyncedCartesian.x, p1.UnsyncedCartesian.y,
-                            p2.UnsyncedCartesian.x, p2.UnsyncedCartesian.y,
-                            p3.UnsyncedCartesian.x, p3.UnsyncedCartesian.y))
+                        var p1 = candidates[i]; var p2 = candidates[j]; var p3 = candidates[k];
+                        if (!WellConditioned(p1.UnsyncedCartesian, p2.UnsyncedCartesian, p3.UnsyncedCartesian) ||
+                            !WellConditioned(p1.SyncedCartesian, p2.SyncedCartesian, p3.SyncedCartesian)) continue;
+                        Coord a = coordinate(p1), b = coordinate(p2), c = coordinate(p3);
+                        if (!EQ_CheckPoint_in_Triangle(pos.x, pos.y, a.x, a.y, b.x, b.y, c.x, c.y)) continue;
+                        double dx = (a.x + b.x + c.x) / 3 - pos.x;
+                        double dy = (a.y + b.y + c.y) / 3 - pos.y;
+                        double distance = dx * dx + dy * dy;
+                        if (distance >= bestDistance) continue;
+                        result = new List<AlignmentPoint> { p1, p2, p3 };
+                        bestDistance = distance;
+                        if (!bestCentre)
                         {
-                            results.Add(p1);
-                            results.Add(p2);
-                            results.Add(p3);
-                            done = true;
+                            result.ForEach(p => p.SelectedForGoto = true);
+                            return result;
                         }
-                        if (done) break;
                     }
-                    if (done) break;
-                }
-                if (done) break;
-            }
-            results.ForEach(p => p.SelectedForGoto = true);
-            return results.ToList();
-
+            result.ForEach(p => p.SelectedForGoto = true);
+            return result;
         }
 
 
