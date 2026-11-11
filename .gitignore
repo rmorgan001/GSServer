@@ -266,3 +266,6 @@ __pycache__/
 /~EqmodNStarAlignment.Tests
 *.exe
 *.zip
+
+# Local review notes and repro artifacts
+/Review/

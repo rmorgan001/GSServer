@@ -91,6 +91,8 @@ namespace GS.Server
         private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             DispatcherUnhandledException -= Application_DispatcherUnhandledException;
+            // Stop the mount before anything that can block (the dialog below waits for a click, possibly all night)
+            SkyServer.EmergencyStop($"Unhandled UI exception: {e.Exception.Message}");
             WriteException(e.Exception);
             MessageBox.Show("An unexpected error has occurred within GSS. Error details have been logged and GSS will now close. " + e.Exception.Message , "Application Error", MessageBoxButton.OK, MessageBoxImage.Error);
             e.Handled = true;
@@ -101,6 +103,8 @@ namespace GS.Server
         {
             AppDomain.CurrentDomain.UnhandledException -= CurrentDomain_UnhandledException;
             var ex = (Exception)e.ExceptionObject;
+            // Stop the mount before anything that can block or fail; the process ends after this handler
+            SkyServer.EmergencyStop($"Unhandled exception: {ex?.Message}");
             WriteException(ex);
             MessageBox.Show("An unexpected error has occurred within GSS. Error details have been logged and GSS will now close." + ex.Message, "Application Error", MessageBoxButton.OK, MessageBoxImage.Error);
             this.Shutdown();

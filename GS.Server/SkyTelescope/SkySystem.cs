@@ -63,6 +63,14 @@ namespace GS.Server.SkyTelescope
         public static bool Connected => ConnectStates.Count > 0;
 
         /// <summary>
+        /// Whether this driver instance (one client) is connected
+        /// </summary>
+        public static bool IsConnected(long id) => ConnectStates.ContainsKey(id);
+
+        // Serializes connect and disconnect so two clients cannot start the mount at the same time
+        private static readonly object ConnectLock = new object();
+
+        /// <summary>
         /// Number of driver instances currently registered as connected
         /// </summary>
         public static int ConnectedCount => ConnectStates.Count;
@@ -75,53 +83,66 @@ namespace GS.Server.SkyTelescope
 
         public static void SetConnected(long id, bool value)
         {
-            // add or remove the instance, this is done once regardless of the number of calls
-            if (value)
+            lock (ConnectLock)
             {
-                if (!Connected) {Connecting = true;}
-
-                var notAlreadyPresent = ConnectStates.TryAdd(id, true);
-
-                if (Connected)
+                try
                 {
-                    if (!SkyServer.IsMountRunning)
+                    // add or remove the instance, this is done once regardless of the number of calls
+                    if (value)
                     {
-                        try
+                        if (!Connected) { Connecting = true; }
+
+                        var notAlreadyPresent = ConnectStates.TryAdd(id, true);
+
+                        if (!SkyServer.IsMountRunning)
                         {
-                            SkyServer.IsMountRunning = true;
-                            var connectionTimer = Stopwatch.StartNew();
-                            // Wait for two server event loop updates or 5 second timeout
-                            while (SkyServer.LoopCounter < 2 && connectionTimer.ElapsedMilliseconds < 5000)
-                                Thread.Sleep(100);
+                            try
+                            {
+                                SkyServer.IsMountRunning = true;
+                                var connectionTimer = Stopwatch.StartNew();
+                                // Wait for two server event loop updates or 5 second timeout
+                                while (SkyServer.LoopCounter < 2 && connectionTimer.ElapsedMilliseconds < 5000)
+                                    Thread.Sleep(100);
+                            }
+                            catch
+                            {
+                                // A failed start must not leave this client registered as connected
+                                ConnectStates.TryRemove(id, out _);
+                                throw;
+                            }
+
+                            if (!SkyServer.IsMountRunning || SkyServer.SerialIoFailed)
+                            {
+                                ConnectStates.TryRemove(id, out _);
+                                throw new SkyServerException(ErrorCode.ErrMount, $"Connection failed: the mount did not respond{(SkyServer.MountError == null ? string.Empty : " - " + SkyServer.MountError.Message)}");
+                            }
                         }
-                        finally
+
+                        var monitorItem = new MonitorEntry
                         {
-                            // A failed start must not leave Connecting stuck true
-                            Connecting = false;
-                        }
+                            Datetime = Principles.HiResDateTime.UtcNow,
+                            Device = MonitorDevice.Server,
+                            Category = MonitorCategory.Server,
+                            Type = MonitorType.Information,
+                            Method = MethodBase.GetCurrentMethod()?.Name,
+                            Thread = Thread.CurrentThread.ManagedThreadId,
+                            Message = $"Add|{id}|{notAlreadyPresent}"
+                        };
+                        MonitorLog.LogToMonitor(monitorItem);
+                    }
+                    else
+                    {
+                        if (ConnectStates.Count == 1) { Connecting = true; }
+
+                        var successfullyRemoved = ConnectStates.TryRemove(id, out _);
+                        LogRemove(id, successfullyRemoved, null, MonitorType.Information);
                     }
                 }
-
-                var monitorItem = new MonitorEntry
+                finally
                 {
-                    Datetime = Principles.HiResDateTime.UtcNow,
-                    Device = MonitorDevice.Server,
-                    Category = MonitorCategory.Server,
-                    Type = MonitorType.Information,
-                    Method = MethodBase.GetCurrentMethod()?.Name,
-                    Thread = Thread.CurrentThread.ManagedThreadId,
-                    Message = $"Add|{id}|{notAlreadyPresent}"
-                };
-                MonitorLog.LogToMonitor(monitorItem);
+                    Connecting = false;
+                }
             }
-            else
-            {
-                if (ConnectStates.Count == 1) {Connecting = true;}
-
-                var successfullyRemoved = ConnectStates.TryRemove(id, out _);
-                LogRemove(id, successfullyRemoved, null, MonitorType.Information);
-            }
-            Connecting = false;
         }
 
         /// <summary>

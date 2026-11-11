@@ -52,8 +52,14 @@ namespace GS.SkyWatcher
         public static event Action<Exception> SerialIoError;
 
         private static long _id;
-        private static bool _isPulseGuidingDec;
-        private static bool _isPulseGuidingRa;
+        private static volatile bool _isPulseGuidingDec;
+        private static volatile bool _isPulseGuidingRa;
+        // Serializes AddCommand against Stop so a command is never added to a completed or disposed collection
+        private static readonly object LifecycleLock = new object();
+        // A consumer task that did not finish within the Stop timeout; Start waits for it before reusing the port
+        private static Task _lingeringTask;
+        // Command types logged in detail when Debug monitoring is on
+        private static readonly string[] CommandTypesToLog = { "SkyAxisPulse" };
         private static double[] _steps;
         private static ManagementEventWatcher _usbWatcher;
         private static string _monitoredPortName;
@@ -134,11 +140,17 @@ namespace GS.SkyWatcher
         /// <param name="command"></param>
         public static void AddCommand(ISkyCommand command)
         {
-            if (!IsRunning || _cts.IsCancellationRequested) return;
-
-            if (_commandBlockingCollection.TryAdd(command) == false)
+            lock (LifecycleLock)
             {
-                throw new MountControlException(ErrorCode.ErrQueueFailed, $"Unable to Add Command {command.Id}, {command}");
+                var cts = _cts;
+                var queue = _commandBlockingCollection;
+                // Not running: the caller's GetCommandResult reports ErrQueueFailed
+                if (!IsRunning || cts == null || queue == null || cts.IsCancellationRequested || queue.IsAddingCompleted) return;
+
+                if (queue.TryAdd(command) == false)
+                {
+                    throw new MountControlException(ErrorCode.ErrQueueFailed, $"Unable to Add Command {command.Id}, {command}");
+                }
             }
         }
 
@@ -174,9 +186,10 @@ namespace GS.SkyWatcher
         {
             try
             {
-                if (!IsRunning || _cts?.IsCancellationRequested != false)
+                var cts = _cts;
+                if (!IsRunning || cts?.IsCancellationRequested != false)
                 {
-                    var a = "Queue | IsRunning:" + IsRunning + "| IsCancel:" + _cts?.IsCancellationRequested;
+                    var a = "Queue | IsRunning:" + IsRunning + "| IsCancel:" + cts?.IsCancellationRequested;
                     if (command.Exception != null) { a += "| Ex:" + command.Exception.Message; }
                     var e = new MountControlException(ErrorCode.ErrQueueFailed, a);
                     command.Exception = e;
@@ -185,13 +198,14 @@ namespace GS.SkyWatcher
                 }
 
                 // Wait for command to complete with 40 second timeout
-                if (command.CompletionEvent.Wait(40000, _cts.Token))
+                if (command.CompletionEvent.Wait(40000, cts.Token))
                 {
                     // Command completed - return it
                     return command;
                 }
 
-                // Timeout occurred
+                // Timeout occurred: the caller has reported failure, so the command must not run later
+                command.Abandoned = true;
                 Statistics?.IncrementTimedOut();
                 var ex = new MountControlException(ErrorCode.ErrQueueFailed, $"Queue Read Timeout {command.Id}, {command}");
                 command.Exception = ex;
@@ -225,13 +239,11 @@ namespace GS.SkyWatcher
             // Check once if diagnostic logging is enabled to avoid overhead
             var diagnosticsEnabled = MonitorLog.InTypes(MonitorType.Debug);
 
-            //todo switch comment to turn on/off specific command types
-            var commandTypesToLog = new[]{ "SkyAxisPulse"};
-            //var commandTypesToLog = new string[]{};
+            var commandTypesToLog = CommandTypesToLog;
 
             // Always capture basic metrics for Warning/Information detection (minimal overhead)
             var dequeuedAt = HiResDateTime.UtcNow;
-            var queueDepth = _commandBlockingCollection.Count;
+            var queueDepth = _commandBlockingCollection?.Count ?? 0;
 
             // Only capture detailed data if diagnostics enabled
             string commandType = null;
@@ -254,20 +266,32 @@ namespace GS.SkyWatcher
             {
                 ThrowIfPowerSuspended();
 
-                if (!IsRunning || _cts.IsCancellationRequested || _skyWatcher?.IsConnected != true)
+                var skyWatcher = _skyWatcher;
+                var cts = _cts;
+                if (!IsRunning || cts == null || cts.IsCancellationRequested || skyWatcher?.IsConnected != true)
                 {
                     command.Exception = new MountControlException(ErrorCode.ErrQueueFailed, "Queue stopped or not connected");
                     command.Successful = false;
                     Statistics?.IncrementFailed();
 
                     // A running queue that cannot reach the mount is a serial IO failure, not an intentional stop
-                    if (IsRunning && !_cts.IsCancellationRequested) { RaiseSerialIoError(command.Exception); }
+                    if (IsRunning && cts != null && !cts.IsCancellationRequested) { RaiseSerialIoError(command.Exception); }
+                }
+                else if (command.Abandoned)
+                {
+                    // The caller timed out waiting; running it now could move the mount after a reported failure
+                    command.Exception = new MountControlException(ErrorCode.ErrQueueFailed, $"Command {command.Id} skipped, caller timed out");
+                    command.Successful = false;
+                    Statistics?.IncrementFailed();
+                    var skippedItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{command.GetType().Name}|{command.Id}|Skipped, caller timed out" };
+                    MonitorLog.LogToMonitor(skippedItem);
                 }
                 else
                 {
                     var executionStart = HiResDateTime.UtcNow;
 
-                    command.Execute(_skyWatcher);
+                    command.Execute(skyWatcher);
 
                     if (command.Successful)
                     {
@@ -347,7 +371,7 @@ namespace GS.SkyWatcher
                                 Datetime = HiResDateTime.UtcNow,
                                 Device = MonitorDevice.Telescope,
                                 Category = MonitorCategory.Mount,
-                                Type = MonitorType.Warning,
+                                Type = MonitorType.Information,
                                 Method = MethodBase.GetCurrentMethod()?.Name,
                                 Thread = Thread.CurrentThread.ManagedThreadId,
                                 Message = $"Queue performance normal - QueueDepth:{queueDepth}|QueueWait:{queueWaitMs:F3}ms"
@@ -419,12 +443,17 @@ namespace GS.SkyWatcher
         /// </summary>
         public static void ReplaceSerial(ISerialPort serial)
         {
-            if (!IsRunning || serial == null) return;
+            var skyWatcher = _skyWatcher;
+            if (!IsRunning || serial == null || skyWatcher == null) return;
 
-            _skyWatcher?.StopPulseWorkers();
-            Serial = serial;
-            _skyWatcher?.ResetConnection();
-            _skyWatcher?.StartPulseWorkers();
+            skyWatcher.StopPulseWorkers();
+            // Swap only between transactions so no command writes to the old port and reads from the new one
+            skyWatcher.RunSerialExclusive(() =>
+            {
+                Serial = serial;
+                skyWatcher.ResetConnection();
+            }, TimeSpan.FromSeconds(5));
+            skyWatcher.StartPulseWorkers();
 
             // Re-arm USB removal monitoring for the new port
             var sp = serial as System.IO.Ports.SerialPort;
@@ -438,7 +467,8 @@ namespace GS.SkyWatcher
         public static bool TrySendSuspendStop(TimeSpan timeout, out string detail)
         {
             detail = null;
-            return _skyWatcher != null && _skyWatcher.TrySendSuspendStop(timeout, out detail);
+            var skyWatcher = _skyWatcher;
+            return skyWatcher != null && skyWatcher.TrySendSuspendStop(timeout, out detail);
         }
 
         /// <summary>
@@ -457,6 +487,15 @@ namespace GS.SkyWatcher
                 MonitorLog.LogToMonitor(monitorItem);
 
                 Stop();
+
+                // A consumer from the previous session that is still inside a serial read must finish first
+                var lingering = _lingeringTask;
+                if (lingering != null && !lingering.IsCompleted && !lingering.Wait(TimeSpan.FromSeconds(10)))
+                {
+                    throw new MountControlException(ErrorCode.ErrQueueFailed, "Previous command queue is still busy, try again");
+                }
+                _lingeringTask = null;
+
                 Serial = serial;
                 CustomMount360Steps = customMount360Steps;
                 CustomRaWormSteps = customRaWormSteps;
@@ -467,6 +506,7 @@ namespace GS.SkyWatcher
                 _skyWatcher.StartPulseWorkers();
                 _skyWatcher.LowVoltageEvent += lowVoltageEventHandler;
                 _commandBlockingCollection = new BlockingCollection<ISkyCommand>();
+                var queue = _commandBlockingCollection;
                 _taskReadySignal = new ManualResetEventSlim(false);
 
                 if (Statistics == null)
@@ -484,7 +524,7 @@ namespace GS.SkyWatcher
                         // ReSharper disable once AccessToDisposedClosure
                         _taskReadySignal?.Set();
 
-                        foreach (var command in _commandBlockingCollection.GetConsumingEnumerable(ct))
+                        foreach (var command in queue.GetConsumingEnumerable(ct))
                         {
                             ProcessCommandQueue(command);
                         }
@@ -492,6 +532,17 @@ namespace GS.SkyWatcher
                     catch (OperationCanceledException)
                     {
                         // Expected during shutdown
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        // Queue torn down while this consumer was finishing
+                    }
+                    catch (Exception ex)
+                    {
+                        // Named differently from Start's own monitorItem: a lambda local cannot shadow it (CS0136)
+                        var consumerItem = new MonitorEntry
+                        { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = "SkyQueueConsumer", Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Consumer stopped|{ex}" };
+                        MonitorLog.LogToMonitor(consumerItem);
                     }
                 }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
@@ -532,33 +583,53 @@ namespace GS.SkyWatcher
         public static void Stop()
         {
             StopUsbWatcher();
-            IsRunning = false;
 
-            // Signal completion to BlockingCollection
-            _commandBlockingCollection?.CompleteAdding();
+            lock (LifecycleLock)
+            {
+                IsRunning = false;
+                // Signal completion to BlockingCollection
+                _commandBlockingCollection?.CompleteAdding();
+                _cts?.Cancel();
+            }
 
-            _cts?.Cancel();
             _skyWatcher?.StopPulseWorkers();
 
             // Wait for processing task to complete
+            var finished = true;
             if (_processingTask != null)
             {
                 try
                 {
-                    _processingTask.Wait(TimeSpan.FromSeconds(5));
+                    finished = _processingTask.Wait(TimeSpan.FromSeconds(5));
                 }
                 catch (AggregateException)
                 {
                     // Ignore cancellation exceptions
                 }
+
+                if (!finished)
+                {
+                    // Still inside a command (e.g. a slow serial read). Keep its objects alive and let it finish;
+                    // disposing them now would fault the consumer, and Start waits for it before reusing the port.
+                    _lingeringTask = _processingTask;
+                    var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = "Command queue consumer still busy after 5 seconds" };
+                    MonitorLog.LogToMonitor(monitorItem);
+                }
                 _processingTask = null;
             }
 
-            _skyWatcher = null;
-            _cts?.Dispose();
-            _cts = null;
-            _commandBlockingCollection?.Dispose();
-            _commandBlockingCollection = null;
+            lock (LifecycleLock)
+            {
+                _skyWatcher = null;
+                if (finished)
+                {
+                    _cts?.Dispose();
+                    _commandBlockingCollection?.Dispose();
+                }
+                _cts = null;
+                _commandBlockingCollection = null;
+            }
         }
 
         /// <summary>

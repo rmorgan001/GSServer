@@ -160,7 +160,8 @@ namespace GS.Server.Plot
                         f = SkyServer.SouthernHemisphere ? -Math.Abs(e) : Math.Abs(e);
                     }
                      
-                    point.Value = steps - f; 
+                    // Arcsecs scale: convert steps to arcseconds (it used to plot raw steps under an arcsec axis)
+                    point.Value = (steps - f) / _raStepsPerSecond;
                     Values1.Add(point);
                     item = TitleItems.FirstOrDefault(x => x.TitleName == Values1Title);
                     if (item != null)
@@ -172,7 +173,7 @@ namespace GS.Server.Plot
                         {
                             var tSpan = lPoint.DateTime - fPoint.DateTime;
                             var vSpan = Math.Abs(lPoint.Value - fPoint.Value);
-                            var rate = vSpan / _raStepsPerSecond / Math.Abs(tSpan.TotalSeconds);
+                            var rate = vSpan / Math.Abs(tSpan.TotalSeconds); // values are arcsec now
                             item.Value = Numbers.TruncateD(rate, 4);  
                         }
                     }
@@ -223,7 +224,8 @@ namespace GS.Server.Plot
                     }
                     break;
                 case ChartScale.Arcsecs:
-                    point.Value = steps;
+                    // Arcsecs scale: convert steps to arcseconds (it used to plot raw steps under an arcsec axis)
+                    point.Value = steps / _decStepsPerSecond;
                     Values2.Add(point);
                     item = TitleItems.FirstOrDefault(x => x.TitleName == Values2Title);
                     if (item != null)
@@ -235,7 +237,7 @@ namespace GS.Server.Plot
                         {
                             var tSpan = lPoint.DateTime - fPoint.DateTime;
                             var vSpan = Math.Abs(lPoint.Value - fPoint.Value);
-                            var rate = vSpan / _decStepsPerSecond / Math.Abs(tSpan.TotalSeconds);
+                            var rate = vSpan / Math.Abs(tSpan.TotalSeconds); // values are arcsec now
                             item.Value = Numbers.TruncateD(rate, 4);
                         }
                     }
@@ -637,7 +639,7 @@ namespace GS.Server.Plot
             switch (scale)
             {
                 case ChartScale.Arcsecs:
-                    FormatterY = value => value.ToString("N0");
+                    FormatterY = value => value.ToString("N1"); // sub-arcsec detail matters for tracking error
                     break;
                 case ChartScale.Degrees:
                     FormatterY = value => value.ToString("N2");

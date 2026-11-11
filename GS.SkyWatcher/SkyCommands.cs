@@ -26,6 +26,10 @@ namespace GS.SkyWatcher
         Exception Exception { get; set; }
         dynamic Result { get; }
         ManualResetEventSlim CompletionEvent { get; }
+        /// <summary>
+        /// Set when the caller stopped waiting (result timeout); a queued command that is abandoned is not executed
+        /// </summary>
+        bool Abandoned { get; set; }
         void Execute(SkyWatcher skyWatcher);
     }
 
@@ -46,6 +50,8 @@ namespace GS.SkyWatcher
         public Exception Exception { get; set; }
         public dynamic Result { get; protected set; }
         public ManualResetEventSlim CompletionEvent => _completionEvent;
+        private volatile bool _abandoned;
+        public bool Abandoned { get => _abandoned; set => _abandoned = value; }
 
         public abstract void Execute(SkyWatcher skyWatcher);
     }
@@ -127,14 +133,22 @@ namespace GS.SkyWatcher
         {
             try
             {
-                skyWatcher.AxisPulse(_axis, _guideRate, _duration, _backlashSteps, _token, _pulseStartedEvent);
-                Successful = true;
+                // The worker reports failures that happen before the pulse reaches the mount through the callback,
+                // which runs before the started event is set
+                skyWatcher.AxisPulse(_axis, _guideRate, _duration, _backlashSteps, _token, _pulseStartedEvent, e =>
+                {
+                    Successful = false;
+                    Exception = e;
+                });
+                // The worker may already have reported a failure on its own thread
+                if (Exception == null) Successful = true;
             }
             catch (Exception e)
             {
-                if (_pulseStartedEvent != null && !_pulseStartedEvent.IsSet) _pulseStartedEvent.Set();
+                // Record the failure before releasing the waiting PulseGuide caller so it can report it
                 Successful = false;
                 Exception = e;
+                if (_pulseStartedEvent != null && !_pulseStartedEvent.IsSet) _pulseStartedEvent.Set();
             }
         }
     }

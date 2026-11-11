@@ -1055,11 +1055,12 @@ namespace GS.SkyWatcher
 
             if (!SupportAdvancedCommandSet || !AllowAdvancedCommandSet) return response;
 
+            if (pp.Length < 8) { throw new MountControlException(ErrorCode.ErrInvalidData, $"Position parameter must be 8 hex characters: {pp}"); }
             var szCmd = "0F" + pp.Substring(0, 8);
             response = CmdToMount(AxisId.Axis1, 'X', szCmd);
 
             if (raw) { return response; }
-            if (response.Length != 33) { return response; }
+            if (response == null || response.Length != 33) { return response; }
             try
             {
                 var a = String32ToInt(response.Substring(1, 8), false, 1);
@@ -1067,9 +1068,9 @@ namespace GS.SkyWatcher
                 var c = response.Substring(17, 16);
                 response = a + ";" + b + ";" + c;
             }
-            catch (Exception e)
+            catch (Exception e) when (!(e is MountControlException))
             {
-                throw new Exception(e.Message);
+                throw new MountControlException(ErrorCode.ErrInvalidData, "Response Parse Error: " + response, e);
             }
             return response;
         }
@@ -1572,16 +1573,43 @@ namespace GS.SkyWatcher
             }
         }
 
+        /// <summary>
+        /// Runs an action while holding the serial transaction lock, so no command is half way through a
+        /// write/read pair when the action runs. Waits up to the timeout, then runs the action anyway and logs it.
+        /// </summary>
+        internal void RunExclusive(Action action, TimeSpan timeout)
+        {
+            var acquiredLock = false;
+            try
+            {
+                Monitor.TryEnter(_syncObject, timeout, ref acquiredLock);
+                if (!acquiredLock)
+                {
+                    var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Serial lock not acquired within {timeout.TotalMilliseconds:0}ms, continuing" };
+                    MonitorLog.LogToMonitor(monitorItem);
+                }
+                action();
+            }
+            finally
+            {
+                if (acquiredLock) Monitor.Exit(_syncObject);
+            }
+        }
+
         private string CmdToMount(AxisId axis, char command, string cmdDataStr, bool ignoreWarnings = false, int attempts = MaxCmdAttempts)
         {
             MonitorEntry monitorItem;
             var raw = BuildRawCommand(axis, command, cmdDataStr).Trim();
+            // Another thread may hold the lock for a whole transaction, including slow responses, so the wait
+            // scales with the read timeout: 6 attempts of max(50 ms, ReadTimeout / 3), about 2 x ReadTimeout in total.
+            var lockAttemptMs = Math.Max(ThreadLockTimeout, (SkyQueue.Serial?.ReadTimeout ?? 0) / 3);
             for (var i = 0; i <= 5; i++)
             {
                 var acquiredLock = false;
                 try
                 {
-                    Monitor.TryEnter(_syncObject, ThreadLockTimeout, ref acquiredLock);
+                    Monitor.TryEnter(_syncObject, lockAttemptMs, ref acquiredLock);
                     if (acquiredLock)
                     {
                         // Code that accesses resources that are protected by the lock.
@@ -1663,7 +1691,8 @@ namespace GS.SkyWatcher
                         }
                         catch (Exception ex)
                         {
-                            MountConnected = false;
+                            // Only a failed port means the mount link is down; a bad command or parse error does not
+                            if (IsTransportFailure(ex)) { MountConnected = false; }
                             monitorItem = new MonitorEntry
                             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{raw}|{ex.Message}|{ex.StackTrace}" };
                             MonitorLog.LogToMonitor(monitorItem);
@@ -1688,7 +1717,20 @@ namespace GS.SkyWatcher
             monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Mount, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{axis}|{raw}|Thread Lock Timeout" };
             MonitorLog.LogToMonitor(monitorItem);
-            return null;
+
+            // Callers that accept a missing response keep the old behaviour; for everything else a command that was
+            // never written (e.g. a stop) must fail loudly instead of looking successful
+            if (ignoreWarnings) { return null; }
+            throw new MountControlException(ErrorCode.ErrSerialPortBusy, $"Serial port busy, command not sent: {raw}");
+        }
+
+        /// <summary>
+        /// Exceptions that mean the serial link itself failed
+        /// </summary>
+        private static bool IsTransportFailure(Exception ex)
+        {
+            return ex is IOException || ex is TimeoutException || ex is InvalidOperationException
+                   || ex is ObjectDisposedException || ex is UnauthorizedAccessException;
         }
 
         /// <summary>
@@ -1737,7 +1779,7 @@ namespace GS.SkyWatcher
                                 throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
                         }
                     }
-                    if (cmdDataStr.Substring(0, 2) == "02")
+                    if (cmdDataStr != null && cmdDataStr.StartsWith("02", StringComparison.Ordinal))
                     {
                         switch (axis)
                         {
@@ -2039,6 +2081,7 @@ namespace GS.SkyWatcher
         /// <returns></returns>
         private static long StringToLong(string str)
         {
+            if (string.IsNullOrEmpty(str)) { throw new MountControlException(ErrorCode.ErrInvalidData, "Response Parse Error: no response"); }
             try
             {
                 long value = 0;
@@ -2115,6 +2158,7 @@ namespace GS.SkyWatcher
         /// </notes>
         private static int String32ToInt(string response, bool parseFirst, int divFactor)
         {
+            if (string.IsNullOrEmpty(response)) { throw new MountControlException(ErrorCode.ErrInvalidData, "Response Parse Error: no response"); }
             try
             {
                 if (parseFirst && response.Length > 0)

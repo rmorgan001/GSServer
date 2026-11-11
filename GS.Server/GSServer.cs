@@ -173,6 +173,10 @@ namespace GS.Server
             {
                 if ((ObjectsCount > 0) || (ServerLockCount > 0)) return;
                 if (!StartedByCom) return;
+                // The last client has gone (normal disconnect, or a crashed client detected by COM). The process
+                // ends below without the window's shutdown, so stop the mount first: the controller would otherwise
+                // keep tracking with no meridian or horizon limits enforced.
+                SkyServer.EmergencyStop("COM auto-exit, no clients left");
                 SaveAllAppSettings();
 
                 var connections = SkySystem.ConnectedCount;

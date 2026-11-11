@@ -97,6 +97,9 @@ namespace GS.Server.SkyTelescope
         private static volatile CancellationTokenSource _ctsPulseGuideRa;
         private static volatile CancellationTokenSource _ctsPulseGuideDec;
         private static volatile CancellationTokenSource _ctsHcPulseGuide;
+        private static volatile int _goToThreadId; // managed thread id of the running GoToAsync, 0 when none
+        private static readonly object GoToLock = new object(); // guards claiming and releasing _ctsGoTo
+        private static ParkPosition _pendingParkPosition; // park requested by GoToPark, persisted on arrival
         #endregion Fields 
 
         static SkyServer()
@@ -193,8 +196,8 @@ namespace GS.Server.SkyTelescope
         private static Vector _guideRate;
         private static bool _isAutoHomeRunning;
         private static bool _isHome;
-        private static bool _isPulseGuidingDec;
-        private static bool _isPulseGuidingRa;
+        private static volatile bool _isPulseGuidingDec;
+        private static volatile bool _isPulseGuidingRa;
         private static PierSide _isSideOfPier;
         private static bool _isSlewing;
         private static bool _isSop;
@@ -675,6 +678,16 @@ namespace GS.Server.SkyTelescope
         /// Set when a slew fails part way, reported by ASCOM Slewing until another slew is initiated
         /// </summary>
         public static Exception SlewFault { get; private set; }
+
+        /// <summary>
+        /// Returns the current slew fault and clears it, so a client is told about a failed slew once
+        /// </summary>
+        public static Exception TakeSlewFault()
+        {
+            var fault = SlewFault;
+            if (fault != null) { SlewFault = null; }
+            return fault;
+        }
 
         /// <summary>
         /// Set when mount IO has failed, held until the mount has been restarted or recovered successfully
@@ -1359,7 +1372,7 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public struct LimitStatusType
         {
@@ -1561,19 +1574,9 @@ namespace GS.Server.SkyTelescope
         public static bool IsPulseGuidingDec
         {
             get => _isPulseGuidingDec;
-            set
-            {
-                if (_isPulseGuidingDec != value)
-                {
-                    _isPulseGuidingDec = value;
-                    // reset Dec pulse guiding cancellation token source
-                    if (!_isPulseGuidingDec && _ctsPulseGuideDec != null)
-                    {
-                        _ctsPulseGuideDec?.Dispose();
-                        _ctsPulseGuideDec = null;
-                    }
-                }
-            }
+            // The token source is deliberately not disposed here: this notification can arrive after
+            // PulseGuide has already created the next pulse's source, which must stay usable and cancellable.
+            set => _isPulseGuidingDec = value;
         }
 
         /// <summary>
@@ -1582,19 +1585,8 @@ namespace GS.Server.SkyTelescope
         public static bool IsPulseGuidingRa
         {
             get => _isPulseGuidingRa;
-            set
-            {
-                if (_isPulseGuidingRa != value)
-                {
-                    _isPulseGuidingRa = value;
-                    // reset Ra pulse guiding cancellation token source
-                    if (!_isPulseGuidingRa && _ctsPulseGuideRa != null)
-                    {
-                        _ctsPulseGuideRa?.Dispose();
-                        _ctsPulseGuideRa = null;
-                    }
-                }
-            }
+            // See IsPulseGuidingDec: the token source belongs to the pulse, not to this flag.
+            set => _isPulseGuidingRa = value;
         }
 
         /// <summary>
@@ -2185,7 +2177,10 @@ namespace GS.Server.SkyTelescope
                 }
                 else
                 {
-                    // Tracking off
+                    // Tracking off: cancel active pulses. Their cleanup will not undo the tracking change (the
+                    // SkyWatcher layer only restores an axis the pulse still owns), cancelling just ends them early.
+                    TryCancel(_ctsPulseGuideDec);
+                    TryCancel(_ctsPulseGuideRa);
                     IsPulseGuidingDec = false; // Ensure pulses are off
                     IsPulseGuidingRa = false;
                     if (TrackingSpeak && _trackingMode != TrackingMode.Off) { Synthesizer.Speak(Application.Current.Resources["vceTrackingOff"].ToString()); }
@@ -2277,7 +2272,6 @@ namespace GS.Server.SkyTelescope
                 var axis2Stopped = axis2Status.Stopped;
 
                 if (!axis1Stopped || !axis2Stopped) continue;
-                if (SlewSettleTime > 0) Tasks.DelayHandler(TimeSpan.FromSeconds(SlewSettleTime).Milliseconds); // post-slew settling time
 
                 break;
             }
@@ -2301,7 +2295,7 @@ namespace GS.Server.SkyTelescope
             #region Final precision slew
             token.ThrowIfCancellationRequested(); // check for a stop
             if (stopwatch.Elapsed.TotalSeconds <= timer)
-                Task.Run(() => SimPrecisionGoto(target, slewType, token)).Wait();
+                Task.Run(() => SimPrecisionGoto(target, slewType, token)).GetAwaiter().GetResult();
             #endregion
 
             SimTasks(MountTaskName.StopAxes);//make sure all axes are stopped
@@ -2740,12 +2734,69 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
+        /// GoTo return code: the mount stopped or timed out before reaching the target
+        /// </summary>
+        private const int GoToNotReached = 2;
+
+        private static void LogGoToNotReached(string message)
+        {
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = "GoTo", Thread = Thread.CurrentThread.ManagedThreadId, Message = message };
+            MonitorLog.LogToMonitor(monitorItem);
+        }
+
+        /// <summary>
+        /// Longest wait for one position update: several update periods, never less than 5 seconds
+        /// </summary>
+        private static int PositionUpdateTimeoutMs => Math.Max(5000, 10 * SkySettings.DisplayInterval);
+
+        /// <summary>
+        /// Waits for MountPositionUpdated (callers reset it and request UpdateSteps first).
+        /// Returns false on timeout; throws OperationCanceledException if the token is cancelled.
+        /// Position updates stop when the serial link fails, so an unbounded wait here would strand the caller.
+        /// </summary>
+        private static bool TryWaitForPositionUpdate(CancellationToken token, int timeoutMs)
+        {
+            var sw = Stopwatch.StartNew();
+            while (!MountPositionUpdated)
+            {
+                token.ThrowIfCancellationRequested();
+                if (sw.ElapsedMilliseconds > timeoutMs) { return false; }
+                Thread.Sleep(10);
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// As <see cref="TryWaitForPositionUpdate"/> but throws TimeoutException on timeout
+        /// </summary>
+        private static void WaitForPositionUpdate(CancellationToken token, string context)
+        {
+            var timeoutMs = PositionUpdateTimeoutMs;
+            if (!TryWaitForPositionUpdate(token, timeoutMs))
+            {
+                throw new TimeoutException($"{context}: no position update from the mount within {timeoutMs / 1000.0:0.#} seconds");
+            }
+        }
+
+        /// <summary>
+        /// Blocks for SlewSettleTime seconds so Slewing stays true while the mount settles (ASCOM SlewSettleTime).
+        /// Throws OperationCanceledException if the slew is aborted while settling.
+        /// </summary>
+        private static void SettleAfterSlew(CancellationToken token)
+        {
+            var settle = TimeSpan.FromSeconds(SlewSettleTime);
+            if (settle <= TimeSpan.Zero) return;
+            token.WaitHandle.WaitOne(settle);
+            token.ThrowIfCancellationRequested();
+        }
+
+        /// <summary>
         /// SkyWatcher GOTO slew
         /// </summary>
         /// <returns></returns>
         private static int SkyGoTo(double[] target, bool trackingState, SlewType slewType, CancellationToken token)
         {
-            const int success = 0;
             var monitorItem = new MonitorEntry
             {
                 Datetime = HiResDateTime.UtcNow,
@@ -2798,10 +2849,6 @@ namespace GS.Server.SkyTelescope
 
                 if (!axis1Stopped || !axis2Stopped) { continue; }
 
-                if (SlewSettleTime > 0)
-                {
-                    Tasks.DelayHandler(TimeSpan.FromSeconds(SlewSettleTime).Milliseconds);// post-slew settling time
-                }
                 break;
             }
             stopwatch.Stop();
@@ -2821,12 +2868,19 @@ namespace GS.Server.SkyTelescope
 
             #region Final precision slew
             token.ThrowIfCancellationRequested(); // check for a stop
-            if (stopwatch.Elapsed.TotalSeconds <= timer)
-                Task.Run(() => SkyPrecisionGoto(target, slewType, token)).Wait();
+            if (stopwatch.Elapsed.TotalSeconds > timer)
+            {
+                // The axes never reported stopped: the mount did not get there
+                SkyTasks(MountTaskName.StopAxes);
+                LogGoToNotReached($"GoTo timed out after {timer} seconds");
+                return GoToNotReached;
+            }
+
+            var precisionResult = Task.Run(() => SkyPrecisionGoto(target, slewType, token)).GetAwaiter().GetResult();
             #endregion
 
             SkyTasks(MountTaskName.StopAxes); //make sure all axes are stopped
-            return success;
+            return precisionResult;
         }
 
         /// <summary>
@@ -2868,10 +2922,7 @@ namespace GS.Server.SkyTelescope
                 // Update mount position
                 MountPositionUpdated = false;
                 UpdateSteps();
-                while (!MountPositionUpdated) Thread.Sleep(10);
-                // Check for max tries or no change and exit
-                if (maxtries >= 5) { break; }
-                maxtries++;
+                WaitForPositionUpdate(token, "Precision GoTo");
 
                 if (SkySettings.AlignmentMode == AlignmentModes.algAltAz && slewType == SlewType.SlewRaDec)
                 {
@@ -2893,6 +2944,24 @@ namespace GS.Server.SkyTelescope
                 axis1AtTarget = Math.Abs(deltaDegree[0]) < gotoPrecision[0] || axis1AtTarget;
                 axis2AtTarget = Math.Abs(deltaDegree[1]) < gotoPrecision[1] || axis2AtTarget;
                 if (axis1AtTarget && axis2AtTarget) { break; }
+
+                // Out of correction attempts: a small miss is accepted with a warning, a large one fails the slew
+                if (maxtries >= 5)
+                {
+                    var residual = Math.Max(axis1AtTarget ? 0.0 : Math.Abs(deltaDegree[0]), axis2AtTarget ? 0.0 : Math.Abs(deltaDegree[1]));
+                    var failAbove = Math.Max(10 * SkySettings.GotoPrecision, 0.1);
+                    if (residual > failAbove)
+                    {
+                        LogGoToNotReached($"Precision GoTo still {residual:F4} degrees from target after {maxtries} corrections (limit {failAbove:F4})");
+                        return GoToNotReached;
+                    }
+
+                    monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"Precision GoTo accepted outside GotoPrecision|Residual|{residual:F4}|Delta|{deltaDegree[0]}|{deltaDegree[1]}" };
+                    MonitorLog.LogToMonitor(monitorItem);
+                    break;
+                }
+                maxtries++;
 
                 token.ThrowIfCancellationRequested(); // check for a stop
                 if (!axis1AtTarget)
@@ -2975,7 +3044,7 @@ namespace GS.Server.SkyTelescope
                     // Update mount position
                     MountPositionUpdated = false;
                     UpdateSteps();
-                    while (!MountPositionUpdated) Thread.Sleep(10);
+                    WaitForPositionUpdate(token, "Pulse GoTo");
                     // Check for max tries or no change and exit
                     if (maxTries >= 5) { break; }
                     maxTries++;
@@ -3484,14 +3553,15 @@ namespace GS.Server.SkyTelescope
                 // wait for the move to stop - physical overrun
                 //var trackingRate = SkyGetRate();
                 AxesRateOfChange.Reset();
+                var overrun = Stopwatch.StartNew();
                 do
                 {
-                    // Update mount velocity
+                    // Update mount velocity, give up if updates stop or the mount never settles (abort must return)
                     MountPositionUpdated = false;
                     UpdateSteps();
-                    while (!MountPositionUpdated) Thread.Sleep(50);
+                    if (!TryWaitForPositionUpdate(CancellationToken.None, PositionUpdateTimeoutMs)) { break; }
                     AxesRateOfChange.Update(_actualAxisX, _actualAxisY, HiResDateTime.UtcNow);
-                } while (AxesRateOfChange.AxisVelocity.Length > 0);
+                } while (AxesRateOfChange.AxisVelocity.Length > 0 && overrun.ElapsedMilliseconds < 15000);
                 SkyPredictor.Set(RightAscensionXForm, DeclinationXForm);
             }
             TrackingSpeak = false;
@@ -3831,7 +3901,11 @@ namespace GS.Server.SkyTelescope
                     }
                     break;
                 case AlignmentModes.algGermanPolar:
-                    if (SideOfPier == PierSide.pierEast && Altitude <= SkySettings.AxisHzTrackingLimit && Tracking)
+                    // pierEast as before; also whenever tracking is lowering the target (west of the meridian,
+                    // hour angle 0..12h), which covers pierWest positions past the meridian. Only adds triggers.
+                    var hourAngle = Range.Range24(SiderealTime - RightAscension);
+                    var descending = hourAngle > 0.0 && hourAngle < 12.0;
+                    if ((SideOfPier == PierSide.pierEast || descending) && Altitude <= SkySettings.AxisHzTrackingLimit && Tracking)
                     {
                         limitHit = true;
                         horizonLimit = true;
@@ -4189,10 +4263,10 @@ namespace GS.Server.SkyTelescope
                     double[] delta = { 0.0, 0.0 };
                     if (SkyPredictor.RaDecSet)
                     {
-                        // Update mount position
+                        // Update mount position; on timeout keep the previous rates for this tick
                         MountPositionUpdated = false;
                         UpdateSteps();
-                        while (!MountPositionUpdated) Thread.Sleep(10);
+                        if (!TryWaitForPositionUpdate(CancellationToken.None, PositionUpdateTimeoutMs)) { break; }
                         var steps = Steps;
                         DateTime nextTime = HiResDateTime.UtcNow.AddMilliseconds(SkySettings.AltAzTrackingUpdateInterval);
                         var raDec = SkyPredictor.GetRaDecAtTime(nextTime);
@@ -4229,17 +4303,31 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Cancel all currently executing async operations
         /// </summary>
+        /// <summary>
+        /// Cancels a token source that its owner may be disposing at the same moment
+        /// </summary>
+        private static void TryCancel(CancellationTokenSource cts)
+        {
+            try { cts?.Cancel(); }
+            catch (ObjectDisposedException) { /* already finished */ }
+        }
+
         public static void CancelAllAsync()
         {
             if (_ctsGoTo != null || _ctsPulseGuideDec != null || _ctsPulseGuideRa != null || _ctsHcPulseGuide != null)
             {
-                _ctsGoTo?.Cancel();
-                _ctsPulseGuideDec?.Cancel();
-                _ctsPulseGuideRa?.Cancel();
-                _ctsHcPulseGuide?.Cancel();
+                TryCancel(_ctsGoTo);
+                TryCancel(_ctsPulseGuideDec);
+                TryCancel(_ctsPulseGuideRa);
+                TryCancel(_ctsHcPulseGuide);
+
+                // Wait for a running GoTo to unwind so it cannot queue another axis command after the caller
+                // stops the axes. Only the GoTo is awaited: the pulse and hand control sources are not cleared on
+                // completion, and the GoTo thread itself must not wait for its own exit (e.g. GoToAsync -> StopAxes).
+                if (Thread.CurrentThread.ManagedThreadId == _goToThreadId) return;
                 var sw = Stopwatch.StartNew();
-                while (_ctsGoTo != null &&_ctsPulseGuideDec != null && _ctsPulseGuideRa != null && _ctsHcPulseGuide != null && sw.ElapsedMilliseconds< 2000)
-                    Thread.Sleep(200); // wait for any pending pulse guide operations to wake up and cancel
+                while (_ctsGoTo != null && sw.ElapsedMilliseconds < 2000)
+                    Thread.Sleep(20);
             }
         }
 
@@ -4741,54 +4829,84 @@ namespace GS.Server.SkyTelescope
             }
 
             CancelAllAsync();
-            while (_ctsGoTo != null) Thread.Sleep(10);
-            if (IsSlewing)
+            // Wait (bounded) for a previous GoTo to unwind, then claim the GoTo slot in the same step. Claiming
+            // here, before any state changes, means an AbortSlew at any later point has a token to cancel, and two
+            // slews starting together cannot both proceed. A GoTo stuck on a dead link must not block later slews.
+            CancellationTokenSource goToCts = null;
+            var idleTimer = Stopwatch.StartNew();
+            while (goToCts == null)
             {
-                SlewState = SlewType.SlewNone;
-                var stopped = AxesStopValidate();
-                if (!stopped)
+                lock (GoToLock)
                 {
-                    AbortSlew(true);
-                    monitorItem = new MonitorEntry
+                    if (_ctsGoTo == null)
                     {
-                        Datetime = HiResDateTime.UtcNow,
-                        Device = MonitorDevice.Server,
-                        Category = MonitorCategory.Server,
-                        Type = MonitorType.Warning,
-                        Method = MonitorLog.GetCurrentMethod(),
-                        Thread = Thread.CurrentThread.ManagedThreadId,
-                        Message = "Timeout stopping axes"
-                    };
+                        goToCts = new CancellationTokenSource();
+                        _ctsGoTo = goToCts;
+                        _goToThreadId = Thread.CurrentThread.ManagedThreadId;
+                    }
+                }
+                if (goToCts != null) { break; }
+
+                if (idleTimer.ElapsedMilliseconds > 10000)
+                {
+                    SlewFault = new Exception("Slew rejected: the previous slew did not finish");
+                    monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MonitorLog.GetCurrentMethod(), Thread = Thread.CurrentThread.ManagedThreadId, Message = "Previous GoTo still running after 10 seconds, slew rejected" };
                     MonitorLog.LogToMonitor(monitorItem);
+                    goToStarted.Set();
                     return;
                 }
+                Thread.Sleep(10);
             }
 
-            SlewState = slewState;
             var startingState = slewState;
-            // Planetarium fix to set Tracking for non-AsCom compliant programs - set true by GoToCoordinatesAsync()
-            var trackingState = tracking || Tracking;
-            TrackingSpeak = false;
-            Tracking = false;
-            if (slewState == SlewType.SlewRaDec)
-            {
-                SkyPredictor.Set(TargetRa, TargetDec, RateRa, RateDec); // 
-            }
-            IsSlewing = true;
-            goToStarted.Set(); // Signal that GoTo has started so async AsCom operations can return with Slewing = true
-
-            // Assume fail
+            var trackingState = false; // assigned below once any previous motion has been stopped
+            // Assume fail. Everything after the claim runs inside the try so the slot is always released.
             try
             {
-                _ctsGoTo = new CancellationTokenSource();
+                if (IsSlewing)
+                {
+                    SlewState = SlewType.SlewNone;
+                    var stopped = AxesStopValidate();
+                    if (!stopped)
+                    {
+                        goToStarted.Set();
+                        AbortSlew(true);
+                        monitorItem = new MonitorEntry
+                        {
+                            Datetime = HiResDateTime.UtcNow,
+                            Device = MonitorDevice.Server,
+                            Category = MonitorCategory.Server,
+                            Type = MonitorType.Warning,
+                            Method = MonitorLog.GetCurrentMethod(),
+                            Thread = Thread.CurrentThread.ManagedThreadId,
+                            Message = "Timeout stopping axes"
+                        };
+                        MonitorLog.LogToMonitor(monitorItem);
+                        return;
+                    }
+                }
+
+                SlewState = slewState;
+                // Planetarium fix to set Tracking for non-AsCom compliant programs - set true by GoToCoordinatesAsync()
+                trackingState = tracking || Tracking;
+                TrackingSpeak = false;
+                Tracking = false;
+                if (slewState == SlewType.SlewRaDec)
+                {
+                    SkyPredictor.Set(TargetRa, TargetDec, RateRa, RateDec); //
+                }
+                IsSlewing = true;
+                goToStarted.Set(); // Signal that GoTo has started so async AsCom operations can return with Slewing = true
+
                 var returnCode = 1;
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
-                        returnCode = SimGoTo(target, trackingState, slewState, _ctsGoTo.Token);
+                        returnCode = SimGoTo(target, trackingState, slewState, goToCts.Token);
                         break;
                     case MountType.SkyWatcher:
-                        returnCode = SkyGoTo(target, trackingState, slewState, _ctsGoTo.Token);
+                        returnCode = SkyGoTo(target, trackingState, slewState, goToCts.Token);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -4834,7 +4952,7 @@ namespace GS.Server.SkyTelescope
                                 var waitTime = highResMount ? 2 * SkySettings.AltAzTrackingUpdateInterval : 4 * SkySettings.AltAzTrackingUpdateInterval;
                                 while (sw.ElapsedMilliseconds < waitTime)
                                 {
-                                    if (_ctsGoTo?.IsCancellationRequested == true)
+                                    if (goToCts.IsCancellationRequested)
                                     {
                                         // Stop current Alt Az tracking timed action
                                         StopAltAzTrackingTimer();
@@ -4855,6 +4973,14 @@ namespace GS.Server.SkyTelescope
                         case SlewType.SlewPark:
                             trackingState = false;
                             AtPark = true;
+                            // Store as the startup park position only now that the mount actually got there
+                            var parked = _pendingParkPosition;
+                            if (parked != null)
+                            {
+                                SkySettings.ParkAxes = new[] { parked.X, parked.Y };
+                                SkySettings.ParkName = parked.Name;
+                                _pendingParkPosition = null;
+                            }
                             SkyPredictor.Reset();
                             break;
                         case SlewType.SlewHome:
@@ -4885,6 +5011,9 @@ namespace GS.Server.SkyTelescope
                     MonitorLog.LogToMonitor(monitorItem);
                     Tracking = trackingState;
                     if (Tracking) Thread.Sleep(1500);
+                    // ASCOM SlewSettleTime: Slewing stays true for the settle period. Done here, after tracking is
+                    // back on, so the target does not drift away while the mount settles.
+                    if (SlewSettleTime > 0) SettleAfterSlew(goToCts.Token);
                     SlewState = SlewType.SlewNone;
                     IsSop = false;
                     SpeakSlewEnd(startingState);
@@ -4901,8 +5030,10 @@ namespace GS.Server.SkyTelescope
                         Type = MonitorType.Warning,
                         Method = MethodBase.GetCurrentMethod()?.Name,
                         Thread = Thread.CurrentThread.ManagedThreadId,
-                        Message = "GoTo coordinates outside axes limits"
+                        Message = returnCode == GoToNotReached ? "GoTo did not reach the target, axes stopped" : "GoTo coordinates outside axes limits"
                     };
+                    // Tell the client: Slewing reports the fault instead of a normal completion
+                    if (returnCode == GoToNotReached) { SlewFault = new Exception("Slew stopped before reaching the target"); }
                     MonitorLog.LogToMonitor(monitorItem);
                     SlewState = SlewType.SlewNone;
                     SpeakSlewEnd(startingState);
@@ -4947,16 +5078,32 @@ namespace GS.Server.SkyTelescope
 
                 SlewState = SlewType.SlewNone;
                 IsSop = false;
-                Tracking = trackingState;
+                // After a fault the mount state is uncertain: only an intentional cancel restores tracking
+                Tracking = cancelled && trackingState;
                 // Some unknown exception
                 if (!cancelled)
                     MountError = new Exception($"GoTo Async Error|{ex.Message}");
             }
             finally
             {
-                _ctsGoTo?.Dispose();
-                _ctsGoTo = null;
+                ReleaseGoToSlot(goToCts);
             }
+        }
+
+        /// <summary>
+        /// Gives up the GoTo slot if this token source still holds it, then disposes the source
+        /// </summary>
+        private static void ReleaseGoToSlot(CancellationTokenSource goToCts)
+        {
+            lock (GoToLock)
+            {
+                if (ReferenceEquals(_ctsGoTo, goToCts))
+                {
+                    _ctsGoTo = null;
+                    _goToThreadId = 0;
+                }
+            }
+            goToCts.Dispose();
         }
 
         /// <summary>
@@ -4997,9 +5144,8 @@ namespace GS.Server.SkyTelescope
             if (double.IsNaN(ps.Y)) { return; }
             SetParkAxis(ps.Name, ps.X, ps.Y);
 
-            // Store for startup default position
-            SkySettings.ParkAxes = new[] { ps.X, ps.Y };
-            SkySettings.ParkName = ps.Name;
+            // Stored as the startup default position by GoToAsync once the park slew completes
+            _pendingParkPosition = ps;
 
             Tracking = false;
 
@@ -5611,9 +5757,9 @@ namespace GS.Server.SkyTelescope
                         do
                         {
                             MountPositionUpdated = false;
-                            // Update mount velocity
+                            // Update mount velocity; stop waiting if updates stop so tracking still resumes
                             UpdateSteps();
-                            while (!MountPositionUpdated) Thread.Sleep(50);
+                            if (!TryWaitForPositionUpdate(CancellationToken.None, PositionUpdateTimeoutMs)) { break; }
                             AxesRateOfChange.Update(_actualAxisX, _actualAxisY, HiResDateTime.UtcNow);
                         } while ((AxesRateOfChange.AxisVelocity - trackingRate).Length > 1.1 * CurrentTrackingRate());
                         // resume tracking
@@ -6100,7 +6246,7 @@ namespace GS.Server.SkyTelescope
                     {
                         SerialIoFailed = true;
                         throw new SkyServerException(ErrorCode.ErrSerialFailed,
-                            $"Connection Failed: {SkySystem.Error}");
+                            $"Connection Failed: {SkySystem.Error?.Message}"); // message only; the stack trace belongs in the log
                     }
 
                     if (!StartSkyWatcherQueue())
@@ -6298,7 +6444,9 @@ namespace GS.Server.SkyTelescope
             Task.Run(() =>
             {
                 var pulseStartTime = HiResDateTime.UtcNow;
-                // stop alt az tracking and set predictor Ra and Dec ready for pulse go to action
+                // stop alt az tracking and set predictor Ra and Dec ready for pulse go to action.
+                // Each case cancels the OTHER axis's running pulse go to on purpose: both corrections go into the
+                // shared predictor and the go to started below applies them together, superseding the older one.
                 switch (axis)
                 {
                     case 0:
@@ -6382,7 +6530,8 @@ namespace GS.Server.SkyTelescope
         /// <param name="direction">GuideDirections</param>
         /// <param name="duration">in milliseconds</param>
         /// /// <param name="altRate">alternate rate to replace the guide rate</param>
-        public static ManualResetEventSlim PulseGuide(GuideDirections direction, int duration, double altRate)
+        /// <returns>Handle whose Started event is set once the hardware command is issued, or the pulse was rejected</returns>
+        public static PulseGuideStart PulseGuide(GuideDirections direction, int duration, double altRate)
         {
             if (!IsMountRunning) { throw new Exception("Mount not running"); }
 
@@ -6399,7 +6548,7 @@ namespace GS.Server.SkyTelescope
                     if (duration == 0)
                     {
                         IsPulseGuidingDec = false;
-                        return new ManualResetEventSlim(true);
+                        return new PulseGuideStart(new ManualResetEventSlim(true), null);
                     }
                     HcResetPrevMove(MountAxis.Dec);
                     var decGuideRate = useAltRate ? altRate : Math.Abs(GuideRateDec);
@@ -6431,12 +6580,19 @@ namespace GS.Server.SkyTelescope
                             break;
                     }
 
+                    // Sign conventions (checked against GetDecRateDirection, which must stay in step with this):
+                    // - SkyWatcher GEM: no hemisphere flip; the :G hemisphere bit handles the southern hemisphere.
+                    // - SkyWatcher Polar: flipped in the northern hemisphere below, PolarMode.Left flips again above.
+                    // - Simulator GEM and Polar: flipped in the northern hemisphere below (its Dec axis runs the other way).
+                    // The asymmetry between GEM and Polar is deliberate; every case matches the Dec rate direction.
+
                     // Direction switched add backlash compensation
                     var decBacklashAmount = 0;
                     if (direction != LastDecDirection) decBacklashAmount = SkySettings.DecBacklash;
                     LastDecDirection = direction;
                     _ctsPulseGuideDec = new CancellationTokenSource();
                     var decStartedEvent = new ManualResetEventSlim(false);
+                    Func<Exception> decError = null;
 
                     switch (SkySettings.Mount)
                     {
@@ -6449,13 +6605,15 @@ namespace GS.Server.SkyTelescope
                                     break;
                                 case AlignmentModes.algPolar:
                                     if (!SouthernHemisphere) decGuideRate = decGuideRate > 0 ? -Math.Abs(decGuideRate) : Math.Abs(decGuideRate);
-                                    _ = new CmdAxisPulse(0, Axis.Axis2, decGuideRate, duration,
+                                    var simDecPulse = new CmdAxisPulse(0, Axis.Axis2, decGuideRate, duration,
                                         _ctsPulseGuideDec.Token, decStartedEvent);
+                                    decError = () => simDecPulse.Exception;
                                     break;
                                 case AlignmentModes.algGermanPolar:
                                     if (!SouthernHemisphere) decGuideRate = decGuideRate > 0 ? -Math.Abs(decGuideRate) : Math.Abs(decGuideRate);
-                                    _ = new CmdAxisPulse(0, Axis.Axis2, decGuideRate, duration,
+                                    var simDecPulseGem = new CmdAxisPulse(0, Axis.Axis2, decGuideRate, duration,
                                         _ctsPulseGuideDec.Token, decStartedEvent);
+                                    decError = () => simDecPulseGem.Exception;
                                     break;
                             }
                             break;
@@ -6468,23 +6626,25 @@ namespace GS.Server.SkyTelescope
                                     break;
                                 case AlignmentModes.algPolar:
                                     if (!SouthernHemisphere) decGuideRate = decGuideRate > 0 ? -Math.Abs(decGuideRate) : Math.Abs(decGuideRate);
-                                    _ = new SkyAxisPulse(0, AxisId.Axis2, decGuideRate, duration, decBacklashAmount, _ctsPulseGuideDec.Token, decStartedEvent);
+                                    var skyDecPulse = new SkyAxisPulse(0, AxisId.Axis2, decGuideRate, duration, decBacklashAmount, _ctsPulseGuideDec.Token, decStartedEvent);
+                                    decError = () => skyDecPulse.Exception;
                                     break;
                                 case AlignmentModes.algGermanPolar:
-                                    _ = new SkyAxisPulse(0, AxisId.Axis2, decGuideRate, duration, decBacklashAmount, _ctsPulseGuideDec.Token, decStartedEvent);
+                                    var skyDecPulseGem = new SkyAxisPulse(0, AxisId.Axis2, decGuideRate, duration, decBacklashAmount, _ctsPulseGuideDec.Token, decStartedEvent);
+                                    decError = () => skyDecPulseGem.Exception;
                                     break;
                             }
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
-                    return decStartedEvent;
+                    return new PulseGuideStart(decStartedEvent, decError);
                 case GuideDirections.guideEast:
                 case GuideDirections.guideWest:
                     if (duration == 0)
                     {
                         IsPulseGuidingRa = false;
-                        return new ManualResetEventSlim(true);
+                        return new PulseGuideStart(new ManualResetEventSlim(true), null);
                     }
                     HcResetPrevMove(MountAxis.Ra);
                     var raGuideRate = useAltRate ? altRate : Math.Abs(GuideRateRa);
@@ -6506,6 +6666,7 @@ namespace GS.Server.SkyTelescope
 
                     _ctsPulseGuideRa = new CancellationTokenSource();
                     var raStartedEvent = new ManualResetEventSlim(false);
+                    Func<Exception> raError = null;
                     switch (SkySettings.Mount)
                     {
                         case MountType.Simulator:
@@ -6516,7 +6677,8 @@ namespace GS.Server.SkyTelescope
                             }
                             else
                             {
-                                _ = new CmdAxisPulse(0, Axis.Axis1, raGuideRate, duration, _ctsPulseGuideRa.Token, raStartedEvent);
+                                var simRaPulse = new CmdAxisPulse(0, Axis.Axis1, raGuideRate, duration, _ctsPulseGuideRa.Token, raStartedEvent);
+                                raError = () => simRaPulse.Exception;
                             }
 
                             break;
@@ -6528,13 +6690,14 @@ namespace GS.Server.SkyTelescope
                             }
                             else
                             {
-                                _ = new SkyAxisPulse(0, AxisId.Axis1, raGuideRate, duration, 0, _ctsPulseGuideRa.Token, raStartedEvent);
+                                var skyRaPulse = new SkyAxisPulse(0, AxisId.Axis1, raGuideRate, duration, 0, _ctsPulseGuideRa.Token, raStartedEvent);
+                                raError = () => skyRaPulse.Exception;
                             }
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
-                    return raStartedEvent;
+                    return new PulseGuideStart(raStartedEvent, raError);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
             }
@@ -6877,7 +7040,7 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="position"></param>
         /// <returns></returns>
@@ -7283,6 +7446,46 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
+        /// Best-effort stop of both axes, tracking included, when GS Server is about to end without its normal
+        /// shutdown: an unhandled exception, or the COM auto-exit after the last client left. Without it the motor
+        /// controller keeps tracking (or slewing) while the meridian and horizon limits, enforced here, are gone.
+        /// Safe from any thread (including the finalizer thread), never throws, bounded by the serial lock timeout.
+        /// </summary>
+        /// <param name="reason">Why the server is going away, for the log</param>
+        public static void EmergencyStop(string reason)
+        {
+            try
+            {
+                var stopped = false;
+                string detail = null;
+                switch (SkySettings.Mount)
+                {
+                    case MountType.SkyWatcher:
+                        // Direct stop to both axes, bypassing the command queue (the path used before sleep)
+                        if (SkyQueue.IsRunning) { stopped = SkyQueue.TrySendSuspendStop(TimeSpan.FromSeconds(2), out detail); }
+                        break;
+                    case MountType.Simulator:
+                        if (MountQueue.IsRunning) { SimTasks(MountTaskName.StopAxes); stopped = true; }
+                        break;
+                }
+
+                var monitorItem = new MonitorEntry
+                { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{reason}|Stopped:{stopped}|{detail}" };
+                MonitorLog.LogToMonitor(monitorItem);
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    var monitorItem = new MonitorEntry
+                    { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Server, Category = MonitorCategory.Server, Type = MonitorType.Error, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{reason}|Stop failed|{ex.Message}" };
+                    MonitorLog.LogToMonitor(monitorItem);
+                }
+                catch { /* nothing more can be done while exiting */ }
+            }
+        }
+
+        /// <summary>
         /// Stop Axes in a normal motion
         /// </summary>
         public static void StopAxes()
@@ -7375,10 +7578,8 @@ namespace GS.Server.SkyTelescope
             }
 
             MountPositionUpdated = false;
-            while (!MountPositionUpdated)
-            {
-                Thread.Sleep(50);
-            }
+            // Bounded: if updates stop, still restore tracking below, then report the failure
+            var positionUpdated = TryWaitForPositionUpdate(CancellationToken.None, PositionUpdateTimeoutMs);
 
             if (trackingState)
             {
@@ -7386,6 +7587,7 @@ namespace GS.Server.SkyTelescope
                 TrackingSpeak = true;
             }
 
+            if (!positionUpdated) { throw new TimeoutException("Sync applied but the mount position did not update"); }
             Synthesizer.Speak(Application.Current.Resources["vceSyncAz"].ToString());
         }
 
@@ -7445,10 +7647,8 @@ namespace GS.Server.SkyTelescope
             }
 
             MountPositionUpdated = false;
-            while (!MountPositionUpdated)
-            {
-                Thread.Sleep(50);
-            }
+            // Bounded: if updates stop, still restore tracking below, then report the failure
+            var positionUpdated = TryWaitForPositionUpdate(CancellationToken.None, PositionUpdateTimeoutMs);
 
             if (trackingState)
             {
@@ -7464,6 +7664,7 @@ namespace GS.Server.SkyTelescope
                 TrackingSpeak = true;
             }
 
+            if (!positionUpdated) { throw new TimeoutException("Sync applied but the mount position did not update"); }
             Synthesizer.Speak(Application.Current.Resources["vceSyncCoords"].ToString());
         }
 
@@ -7486,8 +7687,9 @@ namespace GS.Server.SkyTelescope
             //get current mount position in app coordinates
             var current = new[] { _appAxisX, _appAxisY };
             //compare ra dec / az alt to current mount position
-            var a = Math.Abs(target[0]) - Math.Abs(current[0]);
-            var b = Math.Abs(target[1]) - Math.Abs(current[1]);
+            // Signed, wrap-aware difference: comparing magnitudes would treat -30 and +30 degrees as equal
+            var a = Range.Range180(target[0] - current[0]);
+            var b = Range.Range180(target[1] - current[1]);
             var ret = !(Math.Abs(a) > SkySettings.SyncLimit || Math.Abs(b) > SkySettings.SyncLimit);
             if (ret) return true;
 
@@ -7535,8 +7737,9 @@ namespace GS.Server.SkyTelescope
             }
 
             //compare ra dec to current position
-            var a = Math.Abs(target[0]) - Math.Abs(current[0]);
-            var b = Math.Abs(target[1]) - Math.Abs(current[1]);
+            // Signed, wrap-aware difference: comparing magnitudes would treat -30 and +30 degrees as equal
+            var a = Range.Range180(target[0] - current[0]);
+            var b = Range.Range180(target[1] - current[1]);
             var ret = !(Math.Abs(a) > SkySettings.SyncLimit || Math.Abs(b) > SkySettings.SyncLimit);
 
             if (ret) return true;
@@ -7925,7 +8128,7 @@ namespace GS.Server.SkyTelescope
             TrackingSpeak = true;
            
             StepsTimeFreq = new long[2];
-            AxesVersion = new[] { "X", "Y" };
+            AxesVersion = new[] { "N/A", "N/A" }; // shown in Mount Info until the mount reports its versions
         }
 
         /// <summary>
@@ -8318,23 +8521,34 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// A mount that lost power comes back with uninitialised axes and both positions at exactly zero
+        /// Whether the mount kept its position across a serial outage
         /// </summary>
-        private static bool MountLostPower()
+        private enum PowerCheckResult { PositionKept, PowerLost, Unknown }
+
+        /// <summary>
+        /// A mount that lost power comes back with uninitialised axes and both positions at exactly zero.
+        /// A check that could not be completed is Unknown, not PositionKept: resuming motion on an unverified
+        /// position could slew the mount using a stale coordinate model.
+        /// </summary>
+        private static PowerCheckResult CheckMountPower()
         {
             try
             {
                 var axes = new SkyAxesInitialized(SkyQueue.NewId);
                 var initialized = SkyQueue.GetCommandResult(axes).Result;
-                var notInitialized = axes.Successful && !Convert.ToBoolean(initialized);
                 var steps = GetRawSteps();
-                LogSerialRecovery($"PowerCheck|NotInitialized:{notInitialized}|Steps:{steps[0]}|{steps[1]}");
-                return notInitialized || (steps[0] == 0.0 && steps[1] == 0.0);
+                var stepsValid = steps != null && steps.Length >= 2 && !double.IsNaN(steps[0]) && !double.IsNaN(steps[1])
+                                 && !double.IsInfinity(steps[0]) && !double.IsInfinity(steps[1]);
+                LogSerialRecovery($"PowerCheck|QueryOk:{axes.Successful}|Initialized:{initialized}|StepsValid:{stepsValid}|Steps:{steps?[0]}|{steps?[1]}");
+
+                if (!axes.Successful || !stepsValid) { return PowerCheckResult.Unknown; }
+                var notInitialized = !Convert.ToBoolean(initialized);
+                return notInitialized || (steps[0] == 0.0 && steps[1] == 0.0) ? PowerCheckResult.PowerLost : PowerCheckResult.PositionKept;
             }
             catch (Exception ex)
             {
                 LogSerialRecovery($"PowerCheck|Failed|{ex.Message}", MonitorType.Warning);
-                return false;
+                return PowerCheckResult.Unknown;
             }
         }
 
@@ -8343,11 +8557,21 @@ namespace GS.Server.SkyTelescope
             lock (ResumeRecoveryLock) { _resumeErrorSuppressionEligible = false; }
 
             // The gate stays closed until this check is done, a mount that lost its position must be reconnected
-            if (succeeded && MountLostPower())
+            if (succeeded)
             {
-                succeeded = false;
-                detail = "Serial IO restored but the mount lost power and was reinitialised, reconnect the mount";
-                cause = null;
+                switch (CheckMountPower())
+                {
+                    case PowerCheckResult.PowerLost:
+                        succeeded = false;
+                        detail = "Serial IO restored but the mount lost power and was reinitialised, reconnect the mount";
+                        cause = null;
+                        break;
+                    case PowerCheckResult.Unknown:
+                        succeeded = false;
+                        detail = "Serial IO restored but the mount position could not be verified, reconnect the mount";
+                        cause = null;
+                        break;
+                }
             }
 
             if (succeeded)

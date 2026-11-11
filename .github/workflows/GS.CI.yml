@@ -91,9 +91,35 @@ jobs:
         uses: microsoft/setup-msbuild@v3 #2008f912f56e61277eefaac6d1888b750582aa16 v1.1 to v2
         
     # Restore the application to populate the obj folder with RuntimeIdentifiers
+    # RestorePackagesConfig also restores the packages.config based test project
       - name: Restore the application
-        run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration 
-        env: 
+        run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration /p:RestorePackagesConfig=true
+        env:
+           Configuration: ${{ matrix.configuration }}
+
+    # Compile every project so a change that does not build fails the workflow
+      - name: Build the solution
+        run: msbuild $env:Solution_Name /t:Build /m /p:Configuration=$env:Configuration
+        env:
+           Configuration: ${{ matrix.configuration }}
+
+    # Run the MSTest unit tests with the Visual Studio test runner already installed on the image.
+    # The tests write C:\temp\points.GssPointModel and a shared Points.config, so C:\temp must exist and they
+    # run one at a time.
+      - name: Run unit tests
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Path C:\temp -Force | Out-Null
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vstest = & $vswhere -latest -products * -find "**\TestPlatform\vstest.console.exe" | Select-Object -First 1
+          if (-not $vstest) { throw "vstest.console.exe not found" }
+          $tests = Get-ChildItem -Recurse -Filter AlignmentModelTests.dll | Where-Object { $_.FullName -match "\\bin\\$env:Configuration\\" -and $_.FullName -notmatch "\\obj\\" } | Select-Object -First 1
+          if (-not $tests) { throw "AlignmentModelTests.dll not found for $env:Configuration" }
+          $rs = Join-Path $env:RUNNER_TEMP "serial.runsettings"
+          '<?xml version="1.0" encoding="utf-8"?><RunSettings><RunConfiguration><DisableParallelization>true</DisableParallelization></RunConfiguration><MSTest><Parallelize><Workers>1</Workers><Scope>ClassLevel</Scope></Parallelize></MSTest></RunSettings>' | Set-Content $rs
+          & $vstest $tests.FullName /Settings:$rs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        env:
            Configuration: ${{ matrix.configuration }}
 
    # - name: Upload a Build Artifact

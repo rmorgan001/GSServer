@@ -94,6 +94,7 @@ namespace GS.SkyWatcher
         /// the worker to stop before releasing its resources.</remarks>
         private sealed class AxisPulseWorker : IDisposable
         {
+            private const int BusyGraceMs = 50; // how long Submit waits for the previous pulse to finish unwinding (runs on the queue thread, keep short)
             private readonly AxisId _axis;
             private readonly object _sync = new object();
             private readonly BlockingCollection<PulseWorkItem> _requests = new BlockingCollection<PulseWorkItem>(1);
@@ -142,7 +143,8 @@ namespace GS.SkyWatcher
             /// <param name="startedEvent">The event signaled when the pulse operation starts.</param>
             /// <exception cref="MountControlException">The pulse cannot be queued because the worker is stopping, another pulse is
             /// pending or active, or the worker cannot accept the pulse.</exception>
-            internal void Submit(Action<CancellationToken, Action> execute, CancellationToken token, ManualResetEventSlim startedEvent)
+            /// <param name="startFailed">Called with the reason when the pulse fails or is cancelled before it reaches the mount</param>
+            internal void Submit(Action<CancellationToken, Action> execute, CancellationToken token, ManualResetEventSlim startedEvent, Action<Exception> startFailed = null)
             {
                 lock (_sync)
                 {
@@ -152,9 +154,27 @@ namespace GS.SkyWatcher
                     }
                     if (_busy)
                     {
-                        throw new MountControlException(ErrorCode.ErrQueueFailed, $"{_axis} pulse rejected: a pulse is already pending or active");
+                        // The previous pulse publishes IsPulseGuiding=false shortly before this worker marks itself
+                        // idle, so a guider that starts the next pulse as soon as it sees false lands in that gap.
+                        // Wait briefly for the worker to finish instead of rejecting the pulse.
+                        var deadline = Stopwatch.GetTimestamp() + Stopwatch.Frequency * BusyGraceMs / 1000;
+                        while (_busy && !_stopping)
+                        {
+                            var remainingMs = (int)((deadline - Stopwatch.GetTimestamp()) * 1000 / Stopwatch.Frequency);
+                            if (remainingMs <= 0) break;
+                            Monitor.Wait(_sync, remainingMs);
+                        }
+
+                        if (_stopping)
+                        {
+                            throw new MountControlException(ErrorCode.ErrQueueFailed, $"{_axis} pulse worker is stopping");
+                        }
+                        if (_busy)
+                        {
+                            throw new MountControlException(ErrorCode.ErrQueueFailed, $"{_axis} pulse rejected: a pulse is already pending or active");
+                        }
                     }
-                    if (!_requests.TryAdd(new PulseWorkItem(execute, token, startedEvent)))
+                    if (!_requests.TryAdd(new PulseWorkItem(execute, token, startedEvent, startFailed)))
                     {
                         throw new MountControlException(ErrorCode.ErrQueueFailed, $"{_axis} pulse worker could not accept the pulse");
                     }
@@ -173,6 +193,7 @@ namespace GS.SkyWatcher
                     _stopping = true;
                     _requests.CompleteAdding();
                     _stop.Cancel();
+                    Monitor.PulseAll(_sync); // release any Submit waiting for the worker to become idle
                 }
             }
 
@@ -219,15 +240,22 @@ namespace GS.SkyWatcher
                     catch (OperationCanceledException)
                     {
                         Log(MonitorType.Warning, "Pulse cancelled before completion");
+                        // No effect once the pulse already reached the mount
+                        request.FailStart(new OperationCanceledException($"{_axis} pulse cancelled before it was sent to the mount"));
                     }
                     catch (Exception ex)
                     {
                         Log(MonitorType.Error, $"Pulse failed|{ex}");
+                        request.FailStart(ex);
                         if (SkyQueue.IsRunning && SkyQueue.IsSerialIoException(ex)) SkyQueue.RaiseSerialIoError(ex);
                     }
                     finally
                     {
-                        lock (_sync) _busy = false;
+                        lock (_sync)
+                        {
+                            _busy = false;
+                            Monitor.PulseAll(_sync); // wake a Submit waiting in its grace period
+                        }
                         request.SignalStarted();
                     }
                 }
@@ -254,13 +282,43 @@ namespace GS.SkyWatcher
             private sealed class PulseWorkItem
             {
                 private ManualResetEventSlim _startedEvent;
+                private readonly Action<Exception> _startFailed;
 
-                internal PulseWorkItem(Action<CancellationToken, Action> execute, CancellationToken token, ManualResetEventSlim startedEvent)
+                internal PulseWorkItem(Action<CancellationToken, Action> execute, CancellationToken token, ManualResetEventSlim startedEvent, Action<Exception> startFailed)
                 {
                     Execute = execute;
                     Token = token;
                     _startedEvent = startedEvent;
+                    _startFailed = startFailed;
                     QueuedAt = Stopwatch.GetTimestamp();
+                }
+
+                /// <summary>
+                /// Reports a failure to the caller, but only if the pulse has not already been signalled as started.
+                /// The reason is recorded before the started event is set so the waiting caller can read it.
+                /// </summary>
+                internal void FailStart(Exception reason)
+                {
+                    var startedEvent = Interlocked.Exchange(ref _startedEvent, null);
+                    if (startedEvent == null) return;
+                    try { _startFailed?.Invoke(reason); }
+                    catch (Exception ex) { LogNotification($"Pulse failure callback threw|{ex.Message}"); }
+                    try { startedEvent.Set(); }
+                    catch (ObjectDisposedException ex) { LogNotification($"Pulse start notification arrived after the caller disposed it|{ex.Message}"); }
+                }
+
+                private static void LogNotification(string message)
+                {
+                    MonitorLog.LogToMonitor(new MonitorEntry
+                    {
+                        Datetime = HiResDateTime.UtcNow,
+                        Device = MonitorDevice.Telescope,
+                        Category = MonitorCategory.Mount,
+                        Type = MonitorType.Warning,
+                        Method = "AxisPulseWorker",
+                        Thread = Thread.CurrentThread.ManagedThreadId,
+                        Message = message
+                    });
                 }
 
                 internal Action<CancellationToken, Action> Execute { get; }

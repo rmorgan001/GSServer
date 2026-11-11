@@ -1097,7 +1097,6 @@ namespace GS.Server.Main
                 SkyServer.OpenSetupDialog = false;
                 SkyServer.OpenSetupDialogFinished = true;
                 CloseContent = new CloseDialog();
-                Tasks.DelayHandler(1000);
                 IsCloseDialogOpen = true;
             }
         }

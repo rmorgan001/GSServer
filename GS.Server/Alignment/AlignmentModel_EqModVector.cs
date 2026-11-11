@@ -1211,7 +1211,12 @@ namespace GS.Server.Alignment
             double[] axes = Axes.AzAltToAxesXy(new [] { az, alt });
 
             AxisPosition result = Axes.AxesAppToMount(new AxisPosition(axes[0], axes[1]));
-            if (pos.weightsUp)
+            // An Az/Alt has two equivalent axis positions (either side of the pier). Return the one whose
+            // weights-up state matches the original, using the same test as EQ_SphericalPolar. Flipping only when
+            // the original was weights up picked the wrong pose when the default solution was already weights up
+            // (axis RA near 0 or 180 degrees), which mapped a target to the other side of the pier.
+            var resultWeightsUp = result.RA < 0.0 || result.RA > 180.0;
+            if (resultWeightsUp != pos.weightsUp)
             {
                 result = Axes.GetAltAxisPosition(result);
             }

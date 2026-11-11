@@ -2849,7 +2849,9 @@ namespace GS.Server.SkyTelescope
             {
                 try
                 {
-                    var parkAxes = new[] { Double.Parse((string)valueX), Double.Parse((string)valueY) };
+                    // Settings store numbers in invariant format; parsing with the user's culture (e.g. en-BE, decimal
+                    // comma) read "103.318" as 103318... and produced park axes around 1e16 degrees
+                    var parkAxes = new[] { Double.Parse((string)valueX, System.Globalization.CultureInfo.InvariantCulture), Double.Parse((string)valueY, System.Globalization.CultureInfo.InvariantCulture) };
                     Properties.SkyTelescope.Default.ParkAxes = JsonConvert.SerializeObject(parkAxes);
 
                 }

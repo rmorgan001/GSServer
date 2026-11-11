@@ -1130,7 +1130,7 @@ namespace GS.Server.SkyTelescope
                 _mountError = value;
                 if (value == null) return;
                // ScreenEnabled = true;
-                OpenDialog(value.Message, $"{Application.Current.Resources["exError"]}");
+                OpenDialog(UserErrorText(value.Message), $"{Application.Current.Resources["exError"]}");
             }
         }
 
@@ -7868,6 +7868,16 @@ namespace GS.Server.SkyTelescope
             }
         }
         private const int ErrorDialogMaxLength = 150;
+        /// <summary>
+        /// Strips the internal "Shared|ErrorCode|" log prefix so error dialogs show readable text (the log keeps it)
+        /// </summary>
+        private static string UserErrorText(string message)
+        {
+            if (string.IsNullOrEmpty(message) || !message.StartsWith("Shared|", StringComparison.Ordinal)) return message;
+            var parts = message.Split(new[] { '|' }, 3);
+            return parts.Length == 3 ? parts[2] : message;
+        }
+
         private void OpenDialog(string msg, string caption = null)
         {
             // Error dialogs show a short message on screen, the full text is logged

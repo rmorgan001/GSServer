@@ -289,7 +289,8 @@ namespace GS.Server.Gps
                     //Longitude = ConvertLatLong(lon, ew);
                     Longitude = NmeaToDecimal(lon, ew);
                 }
-                Altitude = 0;
+                // RMC has no altitude: keep the GGA value (ClearProperties resets it per retrieval). Zeroing it here
+                // made the elevation 0 whenever RMC was ticked, because RMC is usually parsed after GGA.
                 var utcDate = gpsDataArr[9];
 
                 string timeFormat;
@@ -477,7 +478,11 @@ namespace GS.Server.Gps
                     case "E":
                         break;
                 }
-                var a = Math.Round((Convert.ToInt32(num1 / 100, CultureInfo.InvariantCulture) + (num1 - Convert.ToInt32(num1 / 100, CultureInfo.InvariantCulture) * 100) / 60) * hemi,5);
+                // NMEA is dddmm.mmmm: whole degrees are the truncated hundreds. Convert.ToInt32 rounds to nearest,
+                // which turned 5055.739 (50 deg 55.739') into 51 deg - 44.26' = 50 deg 15.74' whenever minutes >= 30.
+                var degrees = Math.Floor(num1 / 100);
+                var minutes = num1 - degrees * 100;
+                var a = Math.Round((degrees + minutes / 60) * hemi, 5);
                 return a;
             }
             catch (Exception ex)

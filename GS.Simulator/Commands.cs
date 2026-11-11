@@ -491,9 +491,10 @@ namespace GS.Simulator
             }
             catch (Exception e)
             {
-                if (_pulseStartedEvent != null && !_pulseStartedEvent.IsSet) _pulseStartedEvent.Set();
+                // Record the failure before releasing the waiting PulseGuide caller so it can report it
                 Successful = false;
                 Exception = e;
+                if (_pulseStartedEvent != null && !_pulseStartedEvent.IsSet) _pulseStartedEvent.Set();
             }
         }
     }

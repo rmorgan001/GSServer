@@ -46,11 +46,10 @@ namespace GS.Shared
         /// of the system clock, which is approximately 15 milliseconds on Windows systems.
         /// </summary>
         /// <param name="ms"></param>
-        public static async void DelayHandler(int ms)
+        /// <remarks>Returns a Task so callers can await it; the previous async void version could not be waited on.</remarks>
+        public static Task DelayHandler(int ms)
         {
-            // whatever you need to do before delay goes here         
-            await Task.Delay(ms);
-            // whatever you need to do after delay.
+            return Task.Delay(ms);
         }
 
         /// <summary>
