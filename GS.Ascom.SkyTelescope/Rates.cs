@@ -134,6 +134,15 @@ namespace ASCOM.GS.Sky.Telescope
             _pos = -1;
         }
 
+        /// <summary>
+        /// Empty collection for an axis that can't be moved
+        /// </summary>
+        internal AxisRates(bool empty)
+        {
+            _mRates = Array.Empty<Rate>();
+            _pos = -1;
+        }
+
         #region IAxisRates Members
 
         public int Count => _mRates.Length;

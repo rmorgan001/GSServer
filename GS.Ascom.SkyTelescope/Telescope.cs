@@ -1249,23 +1249,22 @@ namespace ASCOM.GS.Sky.Telescope
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"   {axis}" };
             MonitorLog.LogToMonitor(monitorItem);
 
-            switch (axis)
-            {
-                case TelescopeAxes.axisPrimary:
-                    return new AxisRates(TelescopeAxes.axisPrimary);
-                case TelescopeAxes.axisSecondary:
-                    return new AxisRates(TelescopeAxes.axisSecondary);
-                case TelescopeAxes.axisTertiary:
-                    return new AxisRates(TelescopeAxes.axisTertiary);
-                default:
-                    return null;
-            }
+            if (!SkySystem.Connected || SkySystem.Connecting)
+            { throw new NotConnectedException("AxisRates: Telescope not connected"); }
+
+            CheckEnum(axis, "AxisRates", "Axis");
+
+            // An axis that can't move has no rates; return an empty collection (not null)
+            if (!SkyServer.CanMoveAxis(axis)) { return new AxisRates(true); }
+
+            return new AxisRates(axis);
         }
 
         public bool CanMoveAxis(TelescopeAxes axis)
         {
+            CheckEnum(axis, "CanMoveAxis", "Axis");
             CheckVersionOne("CanMoveAxis");
-            var r = SkyServer.CanMoveAxis(axis);
+            var r =SkyServer.CanMoveAxis(axis);
 
             var monitorItem = new MonitorEntry
             { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $" {r}" };
@@ -1450,6 +1449,7 @@ namespace ASCOM.GS.Sky.Telescope
             ManualResetEventSlim startedEvent = null;
             try
             {
+                CheckEnum(direction, "PulseGuide", "Direction");
                 CheckSerialIO("PulseGuide");
                 if (!SkyServer.AsComOn) { throw new InvalidOperationException("Not accepting commands"); }
                 if (SkyServer.AtPark) { throw new ParkedException(); }
@@ -1833,6 +1833,19 @@ namespace ASCOM.GS.Sky.Telescope
             MonitorLog.LogToMonitor(monitorItem);
 
             throw new InvalidValueException("TrackingRate invalid");
+        }
+
+        /// <summary>
+        /// Throws InvalidValueException if the enum value is not a defined member of its type.
+        /// </summary>
+        private static void CheckEnum<T>(T value, string propertyOrMethod, string valueName) where T : struct, Enum
+        {
+            if (Enum.IsDefined(typeof(T), value)) return;
+
+            var monitorItem = new MonitorEntry
+            { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Warning, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{Convert.ToInt32(value)}|{propertyOrMethod}|{valueName}" };
+            MonitorLog.LogToMonitor(monitorItem);
+            throw new InvalidValueException(propertyOrMethod, Convert.ToInt32(value).ToString(CultureInfo.InvariantCulture), $"a defined {typeof(T).Name} value");
         }
 
         private static void CheckRange(double value, double min, double max, string propertyOrMethod, string valueName)
