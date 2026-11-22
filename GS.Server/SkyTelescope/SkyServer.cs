@@ -5804,9 +5804,19 @@ namespace GS.Server.SkyTelescope
                     case GuideDirections.guideNorth:
                     case GuideDirections.guideWest:
                     case GuideDirections.guideEast:
-                        _ctsHcPulseGuide = new CancellationTokenSource();
-                        returnCode = await Task.Run(() => HcPulseMove(hcPulseGuide, pulseDirection, _ctsHcPulseGuide.Token));
-                        break;
+                        var cts = new CancellationTokenSource();
+                        _ctsHcPulseGuide = cts;
+                        returnCode = await Task.Run(() =>
+                        {
+                            try
+                            {
+                                return HcPulseMove(hcPulseGuide, pulseDirection, cts.Token);
+                            }
+                            finally
+                            {
+                                Interlocked.CompareExchange(ref _ctsHcPulseGuide, null, cts);
+                            }
+                        }); break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
                 }
@@ -7563,8 +7573,8 @@ namespace GS.Server.SkyTelescope
             //get current mount position in app coordinates
             var current = new[] { _appAxisX, _appAxisY };
             //compare ra dec / az alt to current mount position
-            var a = Math.Abs(target[0]) - Math.Abs(current[0]);
-            var b = Math.Abs(target[1]) - Math.Abs(current[1]);
+            var a = Range.Range180(target[0] - current[0]);
+            var b = Range.Range180(target[1] - current[1]);
             var ret = !(Math.Abs(a) > SkySettings.SyncLimit || Math.Abs(b) > SkySettings.SyncLimit);
             if (ret) return true;
 
@@ -7611,9 +7621,9 @@ namespace GS.Server.SkyTelescope
                 current[1] = _appAxisY;
             }
 
-            //compare ra dec to current position
-            var a = Math.Abs(target[0]) - Math.Abs(current[0]);
-            var b = Math.Abs(target[1]) - Math.Abs(current[1]);
+            //compare target to current position
+            var a = Range.Range180(target[0] - current[0]);
+            var b = Range.Range180(target[1] - current[1]);
             var ret = !(Math.Abs(a) > SkySettings.SyncLimit || Math.Abs(b) > SkySettings.SyncLimit);
 
             if (ret) return true;

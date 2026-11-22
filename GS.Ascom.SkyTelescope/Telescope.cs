@@ -586,9 +586,9 @@ namespace ASCOM.GS.Sky.Telescope
                     try { deviceState.Add(new StateValue(nameof(ITelescopeV4.AtHome), SkyServer.AtHome)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
                     try { deviceState.Add(new StateValue(nameof(ITelescopeV4.AtPark), SkyServer.AtPark)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
                     try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Azimuth), SkyServer.Azimuth)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
-                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Declination), SkyServer.Declination)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Declination), SkyServer.DeclinationXForm)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
                     try { deviceState.Add(new StateValue(nameof(ITelescopeV4.IsPulseGuiding), SkyServer.IsPulseGuiding)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
-                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.RightAscension), SkyServer.RightAscension)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
+                    try { deviceState.Add(new StateValue(nameof(ITelescopeV4.RightAscension), SkyServer.RightAscensionXForm)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
                     try { deviceState.Add(new StateValue(nameof(ITelescopeV4.SideOfPier), SkyServer.SideOfPier)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
                     try { deviceState.Add(new StateValue(nameof(ITelescopeV4.SiderealTime), SkyServer.SiderealTime)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
                     try { deviceState.Add(new StateValue(nameof(ITelescopeV4.Slewing), Slewing)); } catch (Exception ex) { LogMessage(MonitorType.Warning, "DeviceState", ex.Message); }
@@ -1872,7 +1872,7 @@ namespace ASCOM.GS.Sky.Telescope
             CheckParked("SyncToTarget");
             CheckTracking(true, "SyncToTarget");
 
-            var a = Transforms.CoordTypeToInternal(RightAscension, Declination);
+            var a = Transforms.CoordTypeToInternal(TargetRightAscension, TargetDeclination);
             CheckRaDecSync(a.X, a.Y, "SyncToTarget");
 
             // SkyServer.AtPark = false; // can never be parked if we are syncing to coordinates
