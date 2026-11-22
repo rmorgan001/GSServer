@@ -41,6 +41,7 @@ name: Main Workflow
 on:
   push:
     branches: [ master ]
+    tags: [ 'v*' ]
   pull_request:
     branches: [ master ]
   schedule:
@@ -102,3 +103,43 @@ jobs:
     #    name: GSServerBundle
     #    # A file, directory or wildcard pattern that describes what to upload
     #    path: "./Builds/Release"
+
+  # Creates a GitHub pre-release when a version tag (e.g. v1.2.3.3) is pushed.
+  # Release notes are built from the commit messages since the previous tag.
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Build release notes from commits
+        shell: bash
+        run: |
+          prev=$(git describe --tags --abbrev=0 "${GITHUB_REF_NAME}^" 2>/dev/null || true)
+          if [ -n "$prev" ]; then
+            range="${prev}..${GITHUB_REF_NAME}"
+          else
+            range="${GITHUB_REF_NAME}"
+          fi
+          {
+            echo "## Changes"
+            echo
+            git log "$range" --no-merges --pretty=format:'- %s (%h)'
+            echo
+          } > release-notes.md
+
+      - name: Create pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          gh release create "$GITHUB_REF_NAME"
+          --prerelease
+          --title "$GITHUB_REF_NAME"
+          --notes-file release-notes.md
