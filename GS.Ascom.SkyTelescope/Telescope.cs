@@ -667,7 +667,7 @@ namespace ASCOM.GS.Sky.Telescope
             {
                 CheckVersionOne("DriverVersion", false);
                 var asm = Assembly.GetExecutingAssembly();
-                var r = asm.GetName().Version.ToString();
+                var r = asm.GetName().Version.ToString(2);
 
                 var monitorItem = new MonitorEntry
                 { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{r}" };
