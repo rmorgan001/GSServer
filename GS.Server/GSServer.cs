@@ -351,6 +351,16 @@ namespace GS.Server
             }
         }
 
+        /// <summary>
+        /// Registry views COM registration is written to. GS Server is a 32-bit process, so the default
+        /// view is the 32-bit one; 64-bit clients only look in the 64-bit view, so register in both on 64-bit Windows.
+        /// </summary>
+        private static IEnumerable<RegistryView> ComRegistryViews()
+        {
+            yield return RegistryView.Registry32;
+            if (Environment.Is64BitOperatingSystem) yield return RegistryView.Registry64;
+        }
+
         // Do everything to register this for COM. Never use REGASM on
         // this exe assembly! It would create InProcServer32 entries 
         // which would prevent proper activation!
@@ -382,27 +392,33 @@ namespace GS.Server
             //
             try
             {
-                //
-                // HKCR\APPID\appid
-                //
-                using (var key = Registry.ClassesRoot.CreateSubKey("APPID\\" + SAppId))
+                foreach (var view in ComRegistryViews())
                 {
-                    if (key != null)
+                    using (var classesRoot = RegistryKey.OpenBaseKey(RegistryHive.ClassesRoot, view))
                     {
-                        key.SetValue(null, assyDescription);
-                        key.SetValue("AppID", SAppId);
-                        key.SetValue("AuthenticationLevel", 1, RegistryValueKind.DWord);
-                        key.SetValue("RunAs", "Interactive User", RegistryValueKind.String);
-                    }
-                }
+                        //
+                        // HKCR\APPID\appid
+                        //
+                        using (var key = classesRoot.CreateSubKey("APPID\\" + SAppId))
+                        {
+                            if (key != null)
+                            {
+                                key.SetValue(null, assyDescription);
+                                key.SetValue("AppID", SAppId);
+                                key.SetValue("AuthenticationLevel", 1, RegistryValueKind.DWord);
+                                key.SetValue("RunAs", "Interactive User", RegistryValueKind.String);
+                            }
+                        }
 
-                //
-                // HKCR\APPID\exename.ext
-                //
-                using (var key = Registry.ClassesRoot.CreateSubKey(
-                    $"APPID\\{Application.ExecutablePath.Substring(Application.ExecutablePath.LastIndexOf('\\') + 1)}"))
-                {
-                    key?.SetValue("AppID", SAppId);
+                        //
+                        // HKCR\APPID\exename.ext
+                        //
+                        using (var key = classesRoot.CreateSubKey(
+                            $"APPID\\{Application.ExecutablePath.Substring(Application.ExecutablePath.LastIndexOf('\\') + 1)}"))
+                        {
+                            key?.SetValue("AppID", SAppId);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -434,42 +450,49 @@ namespace GS.Server
                     //PWGS Generate device type from the Class name
                     var deviceType = type.Name;
 
-                    using (var key = Registry.ClassesRoot.CreateSubKey($"CLSID\\{clsid}"))
+                    // Register in both the 32-bit and 64-bit registry views so 32-bit and 64-bit clients can create the driver
+                    foreach (var view in ComRegistryViews())
                     {
-                        if (key != null)
+                        using (var classesRoot = RegistryKey.OpenBaseKey(RegistryHive.ClassesRoot, view))
                         {
-                            key.SetValue(null,
-                                progid); // Could be assyTitle/Desc??, but .NET components show ProgId here
-                            key.SetValue("AppId", SAppId);
-                            using (var key2 = key.CreateSubKey("Implemented Categories"))
+                            using (var key = classesRoot.CreateSubKey($"CLSID\\{clsid}"))
                             {
-                                key2?.CreateSubKey("{5F2A3C41-7FBC-41A3-A04C-31CA94D06407}");
+                                if (key != null)
+                                {
+                                    key.SetValue(null,
+                                        progid); // Could be assyTitle/Desc??, but .NET components show ProgId here
+                                    key.SetValue("AppId", SAppId);
+                                    using (var key2 = key.CreateSubKey("Implemented Categories"))
+                                    {
+                                        key2?.CreateSubKey("{5F2A3C41-7FBC-41A3-A04C-31CA94D06407}");
+                                    }
+
+                                    using (var key2 = key.CreateSubKey("ProgId"))
+                                    {
+                                        key2?.SetValue(null, progid);
+                                    }
+
+                                    key.CreateSubKey("Programmable");
+                                    using (var key2 = key.CreateSubKey("LocalServer32"))
+                                    {
+                                        key2?.SetValue(null, Application.ExecutablePath);
+                                    }
+                                }
                             }
 
-                            using (var key2 = key.CreateSubKey("ProgId"))
+                            //
+                            // HKCR\CLSID\progid
+                            //
+                            using (var key = classesRoot.CreateSubKey(progid))
                             {
-                                key2?.SetValue(null, progid);
-                            }
-
-                            key.CreateSubKey("Programmable");
-                            using (var key2 = key.CreateSubKey("LocalServer32"))
-                            {
-                                key2?.SetValue(null, Application.ExecutablePath);
-                            }
-                        }
-                    }
-
-                    //
-                    // HKCR\CLSID\progid
-                    //
-                    using (var key = Registry.ClassesRoot.CreateSubKey(progid))
-                    {
-                        if (key != null)
-                        {
-                            key.SetValue(null, assyTitle);
-                            using (var key2 = key.CreateSubKey("CLSID"))
-                            {
-                                key2?.SetValue(null, clsid);
+                                if (key != null)
+                                {
+                                    key.SetValue(null, assyTitle);
+                                    using (var key2 = key.CreateSubKey("CLSID"))
+                                    {
+                                        key2?.SetValue(null, clsid);
+                                    }
+                                }
                             }
                         }
                     }
@@ -518,10 +541,16 @@ namespace GS.Server
             //
             // Local server's DCOM/AppID information
             //
-            Registry.ClassesRoot.DeleteSubKey($"APPID\\{SAppId}", false);
-            Registry.ClassesRoot.DeleteSubKey(
-                $"APPID\\{Application.ExecutablePath.Substring(Application.ExecutablePath.LastIndexOf('\\') + 1)}",
-                false);
+            foreach (var view in ComRegistryViews())
+            {
+                using (var classesRoot = RegistryKey.OpenBaseKey(RegistryHive.ClassesRoot, view))
+                {
+                    classesRoot.DeleteSubKey($"APPID\\{SAppId}", false);
+                    classesRoot.DeleteSubKey(
+                        $"APPID\\{Application.ExecutablePath.Substring(Application.ExecutablePath.LastIndexOf('\\') + 1)}",
+                        false);
+                }
+            }
 
             //
             // For each of the driver assemblies
@@ -537,18 +566,24 @@ namespace GS.Server
                 //
                 // HKCR\progid
                 //
-                Registry.ClassesRoot.DeleteSubKey($"{progid}\\CLSID", false);
-                Registry.ClassesRoot.DeleteSubKey(progid, false);
-                //
-                // HKCR\CLSID\clsid
-                //
-                Registry.ClassesRoot.DeleteSubKey(
-                    $"CLSID\\{clsid}\\Implemented Categories\\{{5F2A3C41-7FBC-41A3-A04C-31CA94D06407}}", false);
-                Registry.ClassesRoot.DeleteSubKey($"CLSID\\{clsid}\\Implemented Categories", false);
-                Registry.ClassesRoot.DeleteSubKey($"CLSID\\{clsid}\\ProgId", false);
-                Registry.ClassesRoot.DeleteSubKey($"CLSID\\{clsid}\\LocalServer32", false);
-                Registry.ClassesRoot.DeleteSubKey($"CLSID\\{clsid}\\Programmable", false);
-                Registry.ClassesRoot.DeleteSubKey($"CLSID\\{clsid}", false);
+                foreach (var view in ComRegistryViews())
+                {
+                    using (var classesRoot = RegistryKey.OpenBaseKey(RegistryHive.ClassesRoot, view))
+                    {
+                        classesRoot.DeleteSubKey($"{progid}\\CLSID", false);
+                        classesRoot.DeleteSubKey(progid, false);
+                        //
+                        // HKCR\CLSID\clsid
+                        //
+                        classesRoot.DeleteSubKey(
+                            $"CLSID\\{clsid}\\Implemented Categories\\{{5F2A3C41-7FBC-41A3-A04C-31CA94D06407}}", false);
+                        classesRoot.DeleteSubKey($"CLSID\\{clsid}\\Implemented Categories", false);
+                        classesRoot.DeleteSubKey($"CLSID\\{clsid}\\ProgId", false);
+                        classesRoot.DeleteSubKey($"CLSID\\{clsid}\\LocalServer32", false);
+                        classesRoot.DeleteSubKey($"CLSID\\{clsid}\\Programmable", false);
+                        classesRoot.DeleteSubKey($"CLSID\\{clsid}", false);
+                    }
+                }
                 try
                 {
                     var gssAttrbutes = type.GetCustomAttributes(typeof(GssAttribute), false);

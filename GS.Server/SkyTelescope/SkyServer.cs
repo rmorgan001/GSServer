@@ -1627,19 +1627,26 @@ namespace GS.Server.SkyTelescope
                 // Set slewing state
                 SetRateMoveSlewState();
                 // Move axis at requested rate
+                Action waitForCommand;
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
-                        _ = new CmdMoveAxisRate(0, Axis.Axis2, -_rateMoveAxes.Y);
+                        var simCmd = new CmdMoveAxisRate(0, Axis.Axis2, -_rateMoveAxes.Y);
+                        waitForCommand = () => MountQueue.GetCommandResult(simCmd);
                         break;
                     case MountType.SkyWatcher:
-                        _ = new SkyAxisSlew(0, AxisId.Axis2, _rateMoveAxes.Y);
+                        var skyCmd = new SkyAxisSlew(0, AxisId.Axis2, _rateMoveAxes.Y);
+                        waitForCommand = () => SkyQueue.GetCommandResult(skyCmd);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+                // Stopping: wait for the axis to decelerate to a full stop before tracking is restored
+                if (_rateMoveAxes.Y == 0.0) WaitRateAxisStopped(waitForCommand, AxisId.Axis2);
                 // Update tracking if required
                 if (Tracking) SetTracking();
+                // Slewing stays true until the axis has actually stopped
+                CompleteRateMoveStop(waitForCommand);
 
                 var monitorItem = new MonitorEntry
                 {
@@ -1672,19 +1679,26 @@ namespace GS.Server.SkyTelescope
                 // Set slewing state
                 SetRateMoveSlewState();
                 // Move axis at requested rate
+                Action waitForCommand;
                 switch (SkySettings.Mount)
                 {
                     case MountType.Simulator:
-                        _ = new CmdMoveAxisRate(0, Axis.Axis1, _rateMoveAxes.X);
+                        var simCmd = new CmdMoveAxisRate(0, Axis.Axis1, _rateMoveAxes.X);
+                        waitForCommand = () => MountQueue.GetCommandResult(simCmd);
                         break;
                     case MountType.SkyWatcher:
-                        _ = new SkyAxisSlew(0, AxisId.Axis1, _rateMoveAxes.X);
+                        var skyCmd = new SkyAxisSlew(0, AxisId.Axis1, _rateMoveAxes.X);
+                        waitForCommand = () => SkyQueue.GetCommandResult(skyCmd);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+                // Stopping: wait for the axis to decelerate to a full stop before tracking is restored
+                if (_rateMoveAxes.X == 0.0) WaitRateAxisStopped(waitForCommand, AxisId.Axis1);
                 // Update tracking if required
                 if (Tracking) SetTracking();
+                // Slewing stays true until the axis has actually stopped
+                CompleteRateMoveStop(waitForCommand);
                 var monitorItem = new MonitorEntry
                 {
                     Datetime = HiResDateTime.UtcNow,
@@ -1702,7 +1716,9 @@ namespace GS.Server.SkyTelescope
         /// <summary>
         /// Set/ reset tracking and slewing state whilst MoveAxis is active
         /// </summary>
-        private static void SetRateMoveSlewState()
+        /// <param name="stopConfirmed">true once the axes have actually stopped. Until then, with no MoveAxis
+        /// active, the slewing state is left as is so Slewing stays true while the axes decelerate</param>
+        private static void SetRateMoveSlewState(bool stopConfirmed = false)
         {
             if (MovePrimaryAxisActive || MoveSecondaryAxisActive)
             {
@@ -1713,11 +1729,57 @@ namespace GS.Server.SkyTelescope
             }
             if (!MovePrimaryAxisActive && !MoveSecondaryAxisActive)
             {
+                if (!stopConfirmed && IsMountRunning && MoveAxisActive) { return; }
                 MoveAxisActive = false;
                 IsSlewing = false;
                 SlewState = SlewType.SlewNone;
                 if (Tracking) SkyPredictor.Set(RightAscensionXForm, DeclinationXForm);
             }
+        }
+
+        /// <summary>
+        /// After a MoveAxis rate has been set to 0, waits for the rate command to run and, on a SkyWatcher mount,
+        /// for the axis to report full stop (deceleration finished). Gives up after 5 s.
+        /// The simulator stops as soon as the command has run.
+        /// </summary>
+        private static void WaitRateAxisStopped(Action waitForCommand, AxisId axis)
+        {
+            if (!IsMountRunning) { return; }
+            waitForCommand?.Invoke();
+            if (SkySettings.Mount != MountType.SkyWatcher) { return; }
+
+            var stopwatch = Stopwatch.StartNew();
+            while (stopwatch.ElapsedMilliseconds < 5000 && IsMountRunning)
+            {
+                var status = new SkyIsAxisFullStop(SkyQueue.NewId, axis);
+                if (Convert.ToBoolean(SkyQueue.GetCommandResult(status).Result)) { return; }
+                Thread.Sleep(25);
+            }
+        }
+
+        /// <summary>
+        /// After a MoveAxis rate has been set to 0, waits for the stop command to run on the mount and for
+        /// the position to refresh, then clears the MoveAxis slewing state. Does nothing if an axis is still moving.
+        /// </summary>
+        /// <param name="waitForCommand">blocks until the mount has executed the rate command</param>
+        private static void CompleteRateMoveStop(Action waitForCommand)
+        {
+            if (MovePrimaryAxisActive || MoveSecondaryAxisActive) { return; }
+
+            if (IsMountRunning)
+            {
+                waitForCommand?.Invoke();
+
+                // let the axis finish decelerating, then refresh the position
+                var stopwatch = Stopwatch.StartNew();
+                MountPositionUpdated = false;
+                UpdateSteps();
+                while (!MountPositionUpdated && stopwatch.ElapsedMilliseconds < 1000) Thread.Sleep(10);
+            }
+
+            // another MoveAxis may have started while waiting
+            if (MovePrimaryAxisActive || MoveSecondaryAxisActive) { return; }
+            SetRateMoveSlewState(true);
         }
 
         /// <summary>
@@ -2277,7 +2339,6 @@ namespace GS.Server.SkyTelescope
                 var axis2Stopped = axis2Status.Stopped;
 
                 if (!axis1Stopped || !axis2Stopped) continue;
-                if (SlewSettleTime > 0) Tasks.DelayHandler(TimeSpan.FromSeconds(SlewSettleTime).Milliseconds); // post-slew settling time
 
                 break;
             }
@@ -2305,6 +2366,16 @@ namespace GS.Server.SkyTelescope
             #endregion
 
             SimTasks(MountTaskName.StopAxes);//make sure all axes are stopped
+
+            #region Post-slew settle
+            // Settle time starts once the mount is fully still, after the precision slew
+            if (SlewSettleTime > 0)
+            {
+                token.WaitHandle.WaitOne(TimeSpan.FromSeconds(SlewSettleTime));
+                token.ThrowIfCancellationRequested(); // check for a stop
+            }
+            #endregion
+
             return success;
         }
 
@@ -2798,10 +2869,6 @@ namespace GS.Server.SkyTelescope
 
                 if (!axis1Stopped || !axis2Stopped) { continue; }
 
-                if (SlewSettleTime > 0)
-                {
-                    Tasks.DelayHandler(TimeSpan.FromSeconds(SlewSettleTime).Milliseconds);// post-slew settling time
-                }
                 break;
             }
             stopwatch.Stop();
@@ -2826,6 +2893,16 @@ namespace GS.Server.SkyTelescope
             #endregion
 
             SkyTasks(MountTaskName.StopAxes); //make sure all axes are stopped
+
+            #region Post-slew settle
+            // Settle time starts once the mount is fully still, after the precision slew
+            if (SlewSettleTime > 0)
+            {
+                token.WaitHandle.WaitOne(TimeSpan.FromSeconds(SlewSettleTime));
+                token.ThrowIfCancellationRequested(); // check for a stop
+            }
+            #endregion
+
             return success;
         }
 
