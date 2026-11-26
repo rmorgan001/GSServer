@@ -243,6 +243,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AlignmentPointTests.cs" />
+    <Compile Include="HomeParkCharacterizationTests.cs" />
     <Compile Include="SphericalPolarTests.cs" />
     <Compile Include="PolarCartesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -260,6 +261,9 @@
   <ItemGroup>
     <Analyzer Include="..\packages\MSTest.Analyzers.4.5.1\analyzers\dotnet\cs\MSTest.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\MSTest.Analyzers.4.5.1\analyzers\dotnet\cs\MSTest.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="HomeParkCharacterization.txt" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

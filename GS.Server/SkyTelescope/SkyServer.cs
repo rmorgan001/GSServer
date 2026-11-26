@@ -7158,24 +7158,25 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Gets both possible axis positions (normal and through-pole) for target coordinates.
+        /// Gets both possible mount axis positions (normal and through-pole) for target coordinates.
         /// </summary>
-        /// <param name="position">Target axis position</param>
+        /// <param name="position">Target mount axis position</param>
         /// <returns>
         /// Tuple containing:
-        ///   normalPosition - axis coordinates for normal orientation (or null if violates limits)
-        ///   throughPolePosition - axis coordinates for through-pole orientation (or null if violates limits)
+        ///   normalPosition - mount axis coordinates for normal orientation (or null if violates limits)
+        ///   throughPolePosition - mount axis coordinates for through-pole orientation (or null if violates limits)
         /// </returns>
         private static (double[] normalPosition, double[] throughPolePosition) GetBothAxisPositionsPolar(double[] position)
         {
             double[] pos1 = position;
-            double[] pos2 = Axes.GetAltAxisPosition(position);
+            var appPosition = Axes.AxesMountToApp(position);
+            double[] pos2 = Axes.AxesAppToMount(Axes.GetAltAxisPosition(appPosition));
 
             // Range pos2 properly for polar
             pos2[0] = Range.Range180(pos2[0]);
 
-            // Determine which is which
-            bool pos1IsThroughPole = Axes.DetermineIfThroughPole(pos1[0], pos1[1]);
+            // Orientation uses application axes; hardware limits use mount axes.
+            bool pos1IsThroughPole = Axes.DetermineIfThroughPole(appPosition[0], appPosition[1]);
 
             double[] normalPos;
             double[] throughPolePos;

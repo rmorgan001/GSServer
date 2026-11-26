@@ -155,6 +155,7 @@ namespace GS.Server.SkyTelescope
 
                     // defaults
                     AtPark = SkyServer.AtPark;
+                    IsHome = SkyServer.IsHome;
                     IsLimits = SkySettings.LimitsOn;
                     ConnectButtonContent = Application.Current.Resources["skyConnect"].ToString();
                     VoiceState = Settings.Settings.VoiceActive;
@@ -226,7 +227,8 @@ namespace GS.Server.SkyTelescope
                     if (existingHomePark != null)
                     {
                         var azAlt = Axes.PolarParkToAzAlt(existingHomePark.X, existingHomePark.Y);
-                        if (Math.Abs(existingHomePark.X - 90.0) < 0.00001 && Math.Abs(existingHomePark.Y - 90.0) < 0.00001)
+                        var isDefault = Math.Abs(existingHomePark.X - 90.0) < 0.00001 && Math.Abs(existingHomePark.Y - 90.0) < 0.00001;
+                        if (isDefault)
                         {
                             azAlt[0] = 0.0;
                             azAlt[1] = Math.Abs(SkySettings.Latitude);
@@ -236,7 +238,6 @@ namespace GS.Server.SkyTelescope
                             displayAz = Range.Range360(displayAz + 180.0);
                         HomeParkAz  = Convert.ToInt32(displayAz);
                         HomeParkAlt = Convert.ToInt32(azAlt[1]);
-                        var isDefault = Math.Abs(azAlt[1] - Math.Abs(SkySettings.Latitude)) < 0.00001;
                         SelectedHomeParkPosition = isDefault ? HomeParkPositionType.Default : HomeParkPositionType.Custom;
                     }
                     else
@@ -13125,6 +13126,47 @@ namespace GS.Server.SkyTelescope
         {
             try
             {
+                double[] homeParkAxes;
+                if (SelectedHomeParkPosition == HomeParkPositionType.Default)
+                {
+                    homeParkAxes = new[] { 90.0, 90.0 };
+                }
+                else
+                {
+                    // The dialog uses local azimuth; Polar park storage uses the northern convention.
+                    var storageAz = SkyServer.SouthernHemisphere
+                        ? Range.Range360(HomeParkAz + 180.0)
+                        : HomeParkAz;
+                    homeParkAxes = Axes.AzAltToPolarPark(storageAz, HomeParkAlt);
+                }
+
+                // Validate custom park position is reachable with a normal slew
+                if (SelectedHomeParkPosition == HomeParkPositionType.Custom)
+                {
+                    var physicalTarget = SkyServer.MapSlewTargetToAxes(
+                        new[] { homeParkAxes[0], homeParkAxes[1] }, SlewType.SlewPark);
+
+                    if (!SkyServer.IsTargetWithinLimits(physicalTarget))
+                    {
+                        _returnDialogContent = new HomeSettingsDialog();
+                        DialogMsg = $"{Application.Current.Resources["homeSettingsParkOutsideLimits"]}";
+                        DialogCaption = $"{Application.Current.Resources["exError"]}";
+                        DialogContent = new DialogOK();
+                        IsDialogOpen = true;
+                        return;
+                    }
+
+                    if (Axes.DetermineIfThroughPole(homeParkAxes[0], homeParkAxes[1]))
+                    {
+                        _returnDialogContent = new HomeSettingsDialog();
+                        DialogMsg = $"{Application.Current.Resources["homeSettingsParkThroughPole"]}";
+                        DialogCaption = $"{Application.Current.Resources["exError"]}";
+                        DialogContent = new DialogOK();
+                        IsDialogOpen = true;
+                        return;
+                    }
+                }
+
                 switch (SelectedAutoHomePosition)
                 {
                     case AutoHomePositionType.DefaultGEM:
@@ -13148,55 +13190,6 @@ namespace GS.Server.SkyTelescope
                         break;
                     default:
                         break;
-                }
-
-                // Determine final Az/Alt for the Home park position
-                double homeParkAzDeg;
-                double homeParkAltDeg;
-
-                if (SelectedHomeParkPosition == HomeParkPositionType.Default)
-                {
-                    homeParkAzDeg  = SkyServer.SouthernHemisphere ? 180.0 : 360.0;
-                    homeParkAltDeg = Math.Abs(SkySettings.Latitude);
-                }
-                else
-                {
-                    homeParkAzDeg  = HomeParkAz;
-                    homeParkAltDeg = HomeParkAlt;
-                }
-
-                var homeParkAxes = Axes.AzAltToPolarPark(homeParkAzDeg, homeParkAltDeg);
-                if (SelectedHomeParkPosition == HomeParkPositionType.Default)
-                {
-                    homeParkAxes[0] = 90.0;
-                    homeParkAxes[1] = 90.0;
-                }
-
-                // Validate custom park position is reachable with a normal slew
-                if (SelectedHomeParkPosition == HomeParkPositionType.Custom)
-                {
-                    var physicalTarget = SkyServer.MapSlewTargetToAxes(
-                        new[] { homeParkAxes[0], homeParkAxes[1] }, SlewType.SlewPark);
-
-                    if (!SkyServer.IsTargetWithinLimits(physicalTarget))
-                    {
-                        _returnDialogContent = new HomeSettingsDialog();
-                        DialogMsg = $"{Application.Current.Resources["homeSettingsParkOutsideLimits"]}";
-                        DialogCaption = $"{Application.Current.Resources["exError"]}";
-                        DialogContent = new DialogOK();
-                        IsDialogOpen = true;
-                        return;
-                    }
-
-                    if (Axes.DetermineIfThroughPole(physicalTarget[0], physicalTarget[1]))
-                    {
-                        _returnDialogContent = new HomeSettingsDialog();
-                        DialogMsg = $"{Application.Current.Resources["homeSettingsParkThroughPole"]}";
-                        DialogCaption = $"{Application.Current.Resources["exError"]}";
-                        DialogContent = new DialogOK();
-                        IsDialogOpen = true;
-                        return;
-                    }
                 }
 
                 var existingHomePark = ParkPositionViewModel.Instance.Positions
