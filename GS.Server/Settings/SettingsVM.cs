@@ -1128,7 +1128,7 @@ namespace GS.Server.Settings
                 Shared.Settings.StartMonitor = false;
                 var saveFileDialog = new SaveFileDialog
                 {
-                    InitialDirectory = @"C:\",
+                    InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                     Title = "Save Monitor Information",
                     CheckFileExists = false,
                     CheckPathExists = false,
@@ -1145,7 +1145,7 @@ namespace GS.Server.Settings
                     foreach (var item in MonitorEntries)
                     {
                         stream.WriteLine(
-                            $"{item.Index}|{item.Datetime.ToLocalTime():dd/MM/yyyy HH:mm:ss.fff}|{item.Device}|{item.Category}|{item.Type}|{item.Thread}|{item.Method}|{item.Message}");
+                            $"{item.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{item.Index.ToString("0000#")}|{item.Device}|{item.Category}|{item.Type}|{item.Thread}|{item.Method}|{item.Message}");
                     }
 
                     stream.Close();
@@ -1201,7 +1201,7 @@ namespace GS.Server.Settings
                         foreach (var item in MonitorEntries)
                         {
                             sw.Write(
-                                $"{item.Index}|{item.Datetime.ToLocalTime():dd/MM/yyyy HH:mm:ss.fff}|{item.Device}|{item.Category}|{item.Type}|{item.Thread}|{item.Method}|{item.Message}{Environment.NewLine}");
+                                $"{item.Datetime.ToLocalTime():yyyy-MM-dd HH:mm:ss.fff}|{item.Index.ToString("0000#")}|{item.Device}|{item.Category}|{item.Type}|{item.Thread}|{item.Method}|{item.Message}{Environment.NewLine}");
                             sw.Flush();
                         }
 

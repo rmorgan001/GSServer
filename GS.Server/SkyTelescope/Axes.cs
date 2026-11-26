@@ -112,21 +112,16 @@ namespace GS.Server.SkyTelescope
                             {
                                 if (SkyServer.SouthernHemisphere)
                                 {
-                                    a[0] = 180 - a[0];
-                                    a[1] = a[1];
+                                    a[0] = -a[0];
                                 }
-                                else
-                                {
-                                    a[0] = a[0];
-                                    a[1] = 180 - a[1];
-                                }
+                                a[1] = 180 - a[1];
                             }
                             else
                             {
                                 if (SkyServer.SouthernHemisphere)
                                 {
                                     a[0] = -a[0];
-                                a[1] = a[1];
+                                    a[1] = a[1];
                                 }
                                 else
                                 {
@@ -486,47 +481,19 @@ namespace GS.Server.SkyTelescope
         }
 
         /// <summary>
-        /// Determines if given axis coordinates represent a through-pole position.
+        /// Determines if application axis coordinates represent a through-pole position.
+        /// Mount coordinates must first be converted using AxesMountToApp.
         /// </summary>
-        /// <param name="axisX">RA axis position (degrees)</param>
-        /// <param name="axisY">Dec axis position (degrees)</param>
+        /// <param name="axisX">Application RA axis position (degrees)</param>
+        /// <param name="axisY">Application Dec axis position (degrees)</param>
         /// <returns>True if through-pole orientation, false if normal orientation</returns>
         internal static bool DetermineIfThroughPole(double axisX, double axisY)
         {
             switch (SkySettings.AlignmentMode)
             {
                 case AlignmentModes.algPolar:
-                    // Polar mount through-pole detection
-                    // This is mount-type and hemisphere specific
-
-                    if (SkyServer.SouthernHemisphere)
-                    {
-                        // Southern Hemisphere logic
-                        // Through-pole when RA axis > 90° (mount pointing "backwards")
-                        return axisX > 90.0;
-                    }
-                    else
-                    {
-                        // Northern Hemisphere logic
-                        // Through-pole indicated by:
-                        // 1. RA axis > 90° (past meridian), OR
-                        // 2. Dec axis in through-pole range
-
-                        if (axisX > 90.0)
-                        {
-                            return true;  // Past meridian, likely through pole
-                        }
-
-                        // Check Dec axis range for through-pole indicators
-                        // Through-pole Dec ranges: [90..180) or [-180..-90)
-                        if ((axisY >= 90.0 && axisY < 180.0) ||
-                            (axisY >= -180.0 && axisY < -90.0))
-                        {
-                            return true;
-                        }
-
-                        return false;  // Normal position
-                    }
+                    // Match the pole tolerance used by SideOfPier; RA does not determine orientation.
+                    return Math.Abs(Range.Range180(axisY)) > 90.0000000001;
 
                 case AlignmentModes.algGermanPolar:
                     // For German Equatorial Mounts, use side of pier
