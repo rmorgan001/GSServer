@@ -1017,6 +1017,7 @@ namespace ASCOM.GS.Sky.Telescope
             {
                 CheckConnected("Slewing");
                 CheckSerialIO("Slewing");
+                var r = SkyServer.IsSlewing || SkyServer.AbortSlewInProgress;
                 var slewFault = SkyServer.SlewFault;
                 if (slewFault != null)
                 {
@@ -1026,8 +1027,6 @@ namespace ASCOM.GS.Sky.Telescope
 
                     throw new NotConnectedException($"Slewing: Slew failed - {slewFault.Message}");
                 }
-
-                var r = SkyServer.IsSlewing;
 
                 var monitorItem = new MonitorEntry
                     { Datetime = HiResDateTime.UtcNow, Device = MonitorDevice.Telescope, Category = MonitorCategory.Driver, Type = MonitorType.Data, Method = MethodBase.GetCurrentMethod()?.Name, Thread = Thread.CurrentThread.ManagedThreadId, Message = $"{r}" };
